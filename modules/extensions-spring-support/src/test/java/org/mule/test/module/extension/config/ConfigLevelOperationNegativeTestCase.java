@@ -8,10 +8,19 @@ package org.mule.test.module.extension.config;
 
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 
+import org.junit.rules.ExpectedException;
+
 public class ConfigLevelOperationNegativeTestCase extends InvalidExtensionConfigTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "vegan-invalid-config-for-operations.xml";
+    return "validation/vegan-invalid-config-for-operations.xml";
+  }
+
+  @Override
+  protected void additionalExceptionAssertions(ExpectedException expectedException) {
+    super.additionalExceptionAssertions(expectedException);
+    expectedException
+        .expectMessage("Root component 'appleEatsBanana' defines an usage of operation 'eatBanana' which points to configuration 'apple'. The selected config does not support that operation.");
   }
 }

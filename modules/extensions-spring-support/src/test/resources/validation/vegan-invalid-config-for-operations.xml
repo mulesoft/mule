@@ -5,13 +5,15 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
 
-
-    <vegan:apple-config name="apple"/>
+    <vegan:apple-config name="apple">
+        <vegan:cook-book>
+            <vegan:vegan-cook-book/>
+        </vegan:cook-book>
+    </vegan:apple-config>
     <vegan:banana-config name="banana"/>
 
-    <flow name="harvest-apples">
-        <vegan:harvest-apples config-ref="banana"/>
-        <logger/>
+    <flow name="appleEatsBanana">
+        <vegan:eat-banana config-ref="apple"/>
     </flow>
 
 </mule>

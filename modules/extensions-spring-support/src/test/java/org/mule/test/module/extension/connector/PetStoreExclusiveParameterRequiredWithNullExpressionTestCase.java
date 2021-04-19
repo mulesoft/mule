@@ -7,46 +7,50 @@
 package org.mule.test.module.extension.connector;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.Aquarium;
 import org.mule.test.petstore.extension.ExclusiveCashier;
 import org.mule.test.petstore.extension.ExclusivePetBreeder;
 import org.mule.test.petstore.extension.PetStoreDeal;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Map;
-import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunnerDelegateTo(MockitoJUnitRunner.class)
 public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private final String TEST_VALUE = "TEST";
 
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
   @Mock
-  ConfigurationProperties configProperties;
+  private ConfigurationProperties configProperties;
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    Mockito.doReturn(Optional.empty()).when(configProperties).resolveBooleanProperty(Matchers.anyString());
+    doReturn(empty()).when(configProperties).resolveBooleanProperty(anyString());
     return singletonMap(OBJECT_CONFIGURATION_PROPERTIES, configProperties);
   }
 
   @Override
   protected String getConfigFile() {
-    return "petstore-exclusive-parameters-required-with-null-expression.xml";
+    return "validation/petstore-exclusive-parameters-required-with-null-expression.xml";
   }
 
   @Test

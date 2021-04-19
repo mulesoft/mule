@@ -7,6 +7,8 @@
 package org.mule.test.module.extension.validation;
 
 import static java.util.Collections.emptySet;
+import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
 import org.mule.functional.junit4.AbstractConfigurationFailuresTestCase;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -21,12 +23,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 /**
  * An {@link AbstractConfigurationFailuresTestCase} which is expected to point to a somewhat invalid config. The test fails if the
  * config is parsed correctly.
  *
  * @since 4.0
  */
+@Feature(MULE_DSL)
+@Story(DSL_VALIDATION_STORY)
 public class InvalidExtensionConfigNewTestCase extends AbstractConfigurationFailuresTestCase {
 
   @Rule
@@ -36,15 +43,26 @@ public class InvalidExtensionConfigNewTestCase extends AbstractConfigurationFail
   public void heisenbergMissingTls() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("[validation/heisenberg-missing-tls-connection-config.xml:17]: Element <heisenberg:secure-connection> is missing required parameter 'tlsContext'.");
+        .expectMessage("[validation/heisenberg-missing-tls-connection-config.xml:17]: "
+            + "Element <heisenberg:secure-connection> is missing required parameter 'tlsContext'.");
     loadConfiguration("validation/heisenberg-missing-tls-connection-config.xml");
+  }
+
+  @Test
+  public void heisenbergDefaultConfigNegative() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("[validation/heisenberg-default-illegal-config.xml:21]: "
+            + "Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
+    loadConfiguration("validation/heisenberg-default-illegal-config.xml");
   }
 
   @Test
   public void petStoreMissingRequiredParameterInsidePojo() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("[validation/petstore-missing-required-parameter.xml:17]: Element <petstore:phone-number> is missing required parameter 'areaCodes'.");
+        .expectMessage("[validation/petstore-missing-required-parameter.xml:17]: "
+            + "Element <petstore:phone-number> is missing required parameter 'areaCodes'.");
     loadConfiguration("validation/petstore-missing-required-parameter.xml");
   }
 
@@ -52,7 +70,8 @@ public class InvalidExtensionConfigNewTestCase extends AbstractConfigurationFail
   public void operationWithExpressionConfigReference() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("[validation/operation-with-expression-config-ref.xml:19]: Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
+        .expectMessage("[validation/operation-with-expression-config-ref.xml:19]: "
+            + "Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
     loadConfiguration("validation/operation-with-expression-config-ref.xml");
   }
 
@@ -60,8 +79,63 @@ public class InvalidExtensionConfigNewTestCase extends AbstractConfigurationFail
   public void sourceWithExpressionConfigReference() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("[validation/source-with-expression-config-ref.xml:20]: Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
+        .expectMessage("[validation/source-with-expression-config-ref.xml:20]: "
+            + "Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
     loadConfiguration("validation/source-with-expression-config-ref.xml");
+  }
+
+  @Test
+  public void petStoreExclusiveGroupPojo() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("[validation/petstore-exclusive-group-pojo-config.xml:8]: "
+            + "Element <config>, the following parameters cannot be set at the same time: [cash, debt].");
+    loadConfiguration("validation/petstore-exclusive-group-pojo-config.xml");
+  }
+
+  @Test
+  public void petStoreExclusiveGroupInsidePojo() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("[validation/petstore-exclusive-group-inside-pojo-config.xml:13]: "
+            + "Element <Aquarium>, the following parameters cannot be set at the same time: [frogName, fishName].");
+    loadConfiguration("validation/petstore-exclusive-group-inside-pojo-config.xml");
+  }
+
+  @Test
+  public void petStoreExclusiveParameterOperation() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("[validation/petstore-exclusive-parameters-operation.xml:16]: "
+            + "Element <getBreeder>, the following parameters cannot be set at the same time: [mammals, birds].");
+    loadConfiguration("validation/petstore-exclusive-parameters-operation.xml");
+  }
+
+  @Test
+  public void petStoreExclusiveParameterWithAlias() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("[validation/petstore-exclusive-parameter-with-alias.xml:8]: "
+            + "Element <config>, the following parameters cannot be set at the same time: [cash, debt].");
+    loadConfiguration("validation/petstore-exclusive-parameter-with-alias.xml");
+  }
+
+  @Test
+  public void petStoreExclusiveGroupInsidePojoOneRequired() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("[validation/petstore-exclusive-group-inside-pojo-one-required-config.xml:13]: "
+            + "Element <Aquarium> requires that one of its optional parameters must be set, but all of them are missing. One of the following must be set: [frogName, fishName].");
+    loadConfiguration("validation/petstore-exclusive-group-inside-pojo-one-required-config.xml");
+  }
+
+  @Test
+  public void petStoreExclusiveParameterRequired() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("[validation/petstore-exclusive-required-parameter.xml:9]: "
+            + "Element <Breeder> requires that one of its optional parameters must be set, but all of them are missing. One of the following must be set: [mammals, birds].");
+    loadConfiguration("validation/petstore-exclusive-required-parameter.xml");
   }
 
   @Override

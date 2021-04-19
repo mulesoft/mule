@@ -35,6 +35,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new ErrorMappingSourceTypeReferencesExist(),
                   new ErrorHandlerOnErrorTypeExists(),
                   new RequiredParametersPresent(),
+                  new ParameterGroupExclusiveness(),
                   new ExpressionsInRequiredExpressionsParams(),
                   new ExpressionsInConfigurationParams(),
                   new PollingSourceHasSchedulingStrategy(),
