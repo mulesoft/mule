@@ -6,6 +6,7 @@
  */
 package org.mule.test.values.extension;
 
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -200,5 +201,10 @@ public class ValuesOperations {
       value = WithEnumParameterValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.enumField")}) String parameterWithValues,
                                            @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
+
+  public void withBoundActingParameterWithAlias(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithRequiredParameterSdkValueProvider.class,
+      bindings = {@Binding(actingParameter = "requiredValue", path = "parameterAlias")}) String parameterWithValues,
+                                                @Alias("parameterAlias") String actingParameter) {}
 
 }
