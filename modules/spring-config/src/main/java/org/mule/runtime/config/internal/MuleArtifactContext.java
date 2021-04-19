@@ -356,11 +356,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
       }
 
-      validateArtifact(artifactAst);
-      return new ApplicationModel(artifactAst,
-                                  artifactProperties, parentConfigurationProperties,
-                                  new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader()),
-                                  featureFlaggingService);
+      final ApplicationModel applicationModel = new ApplicationModel(artifactAst,
+                                                                     artifactProperties, parentConfigurationProperties,
+                                                                     new ClassLoaderResourceProvider(muleContext
+                                                                         .getExecutionClassLoader()),
+                                                                     featureFlaggingService);
+      validateArtifact(applicationModel);
+      return applicationModel;
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {

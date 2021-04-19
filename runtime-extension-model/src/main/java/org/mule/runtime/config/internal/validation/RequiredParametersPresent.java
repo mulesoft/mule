@@ -13,6 +13,7 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -86,13 +87,14 @@ public class RequiredParametersPresent implements Validation {
 
     return paramsStream
         .map(param -> {
-          if (param.getSecond() == null || !param.getSecond().getValue().getValue().isPresent()) {
+          final Either<String, Object> value = param.getSecond().getValue();
+          if (param.getSecond() == null || !value.getValue().isPresent()) {
             return of(create(component, this,
                              format("Element <%s> is missing required parameter '%s'.",
                                     component.getIdentifier().toString(),
                                     param.getFirst().getName())));
-          } else if (param.getSecond().getValue().getRight() instanceof ComponentAst) {
-            return validate((ComponentAst) param.getSecond().getValue().getRight(), artifact);
+          } else if (value.getRight() instanceof ComponentAst) {
+            return validate((ComponentAst) value.getRight(), artifact);
           } else {
             return Optional.<ValidationResultItem>empty();
           }
