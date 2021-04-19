@@ -155,6 +155,15 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
+  public void withBoundActingParameterWithAlias() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterWithAlias", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
   public void withBoundActingParameterField() throws Exception {
     ValueResult result = getValueResult("withBoundActingParameterField", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
@@ -226,7 +235,6 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasValues("One Value", "Another value", "Yet another value"));
   }
 
-  // MAKE THIS ONE WORK
   @Test
   public void withPojoBoundActingParameter() throws Exception {
     ValueResult result = getValueResult("withPojoBoundActingParameter", "parameterWithValues");
@@ -282,15 +290,6 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasSize(1));
     assertThat(values, hasValues("ENUM_VALUE"));
   }
-
-  // ADD optional parameter cases cases
-
-  // Binded scalar parameter that is binded to optional acting is missing
-
-  // Complex parameter binded to options parameter is present but field is missing
-
-  // Complex parameter binded to optional acting para is present but path is missing for example , path is a.b.c.d and b.c.d is
-  // missing
 
   @Test
   public void withBoundOptionalActingParameterPresent() throws Exception {

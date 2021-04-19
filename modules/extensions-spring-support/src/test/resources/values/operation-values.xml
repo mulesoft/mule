@@ -99,6 +99,10 @@
         <values:with-bound-acting-parameter actingParameter="Acting parameter value"/>
     </flow>
 
+    <flow name="withBoundActingParameterWithAlias">
+        <values:with-bound-acting-parameter-with-alias parameterAlias="Acting parameter value"/>
+    </flow>
+
     <flow name="withBoundActingParameterField">
         <values:with-bound-acting-parameter-field
             actingParameter='#[output application/json --- { "field" : "Acting parameter value" }]'/>

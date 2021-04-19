@@ -56,5 +56,4 @@
             <sample-data:complex payload="my payload" attributes="my attributes" />
         </sample-data:complex-acting-parameter>
     </flow>
-
 </mule>

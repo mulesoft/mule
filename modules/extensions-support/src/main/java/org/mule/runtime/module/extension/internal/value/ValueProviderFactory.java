@@ -111,52 +111,8 @@ public class ValueProviderFactory {
       initialiseIfNeeded(resolver, true, muleContext);
 
       Map<String, Object> resolvedActingParameters = new HashMap<>();
-      // Problem here is, streams are consumed
 
-      // for (InjectableParameterInfo injectableParameterInfo : factoryModelProperty.getInjectableParameters()) {
-      // BindingContext.Builder bindingContextBuilder = BindingContext.builder();
-      // for (Map.Entry<String, ValueResolver<? extends Object>> entry : parameterValueResolver.getParameters().entrySet()) {
-      // Object value = parameterValueResolver.getParameterValue(entry.getKey());
-      // String mediaType = parameterizedModel.getAllParameterModels().stream()
-      // .filter(parameterModel -> parameterModel.getName().equals(entry.getKey())).findFirst().get().getType()
-      // .getMetadataFormat().getValidMimeTypes().iterator().next();
-      // DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
-      // bindingContextBuilder
-      // .addBinding(entry.getKey(), new TypedValue(value, valueDataType));
-      // }
-      // BindingContext bindingContext = bindingContextBuilder.build();
-      // resolvedActingParameters.put(injectableParameterInfo.getParameterName(),
-      // expressionManager
-      // .evaluate("#[" + injectableParameterInfo.getPath() + "]",
-      // DataType.fromType(getField(resolverClass,
-      // injectableParameterInfo.getParameterName(),
-      // new ReflectionCache()).get().getType()),
-      // bindingContext)
-      // .getValue());
-      //
-      //
-      // }
-
-      // PROBLEMS WITH ALIASED PARAMETERS
-      // PROBLEM WITH OPTIONAL PARAMETERS TO THE VP
-      // PROBLEM WITH PARAMETER TYPE MEDIA TYPE ARRAY
       BindingContext.Builder bindingContextBuilder = BindingContext.builder();
-
-
-      // PROBLEM WITH getParameter method
-
-      // for (Map.Entry<String, ValueResolver<? extends Object>> entry : parameterValueResolver.getParameters().entrySet()) {
-      // Object value = parameterValueResolver.getParameterValue(entry.getKey());
-      // Optional<String> mediaType = parameterizedModel.getAllParameterModels().stream()
-      // .filter(parameterModel -> getUnaliasedName(parameterModel).equals(entry.getKey())).findFirst()
-      // .map(parameterModel -> parameterModel.getType()
-      // .getMetadataFormat().getValidMimeTypes().iterator().next());
-      // if (mediaType.isPresent()) {
-      // DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType.get()).build();
-      // bindingContextBuilder
-      // .addBinding(entry.getKey(), new TypedValue(value, valueDataType));
-      // }
-      // }
 
       for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
         String unaliasedName = getUnaliasedName(parameterModel);
@@ -169,7 +125,7 @@ public class ValueProviderFactory {
         if (value != null) {
           String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
-          bindingContextBuilder.addBinding(unaliasedName, new TypedValue(value, valueDataType));
+          bindingContextBuilder.addBinding(parameterModel.getName(), new TypedValue(value, valueDataType));
         }
       }
 
