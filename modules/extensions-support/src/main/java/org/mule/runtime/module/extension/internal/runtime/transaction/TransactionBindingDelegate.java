@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -123,10 +124,15 @@ public class TransactionBindingDelegate {
                                                                   extensionModel.getName(),
                                                                   connection.getClass().getName())));
       }
+    } catch (Exception e) {
+      if (extractConnectionException(e).isPresent()) {
+        connectionHandler.invalidate();
+      }
+      throw e;
     } finally {
       if (!bound) {
         try {
-          connectionHandler.invalidate();
+          connectionHandler.release();
         } catch (Exception e) {
           final String msg = "Ignored '" + e.getClass().getName() + ": " + e.getMessage() + "' during connection release";
           if (LOGGER.isDebugEnabled()) {
