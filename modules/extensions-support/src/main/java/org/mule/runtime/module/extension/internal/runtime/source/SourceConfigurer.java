@@ -165,6 +165,7 @@ public final class SourceConfigurer {
     } else {
       int maxItemsPerPoll = (Integer) valueResolver.resolve(context);
       if (maxItemsPerPoll < 1) {
+        // TODO MULE-19351 have this validated previously
         throw new IllegalArgumentException(format("The %s parameter must have a value greater than 1",
                                                   POLLING_SOURCE_LIMIT_PARAMETER_NAME));
       }

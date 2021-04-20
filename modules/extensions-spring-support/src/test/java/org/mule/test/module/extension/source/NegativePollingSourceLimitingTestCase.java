@@ -13,23 +13,28 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENA
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 
-import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
+// TODO MULE-19351 migrate this test to InvalidExtensionConfigTestCase
 @Feature(SOURCES)
 @Story(POLLING)
 @RunnerDelegateTo(Parameterized.class)
-public class NegativePollingSourceLimitingTestCase extends InvalidExtensionConfigTestCase {
+public class NegativePollingSourceLimitingTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final Map<String, Object> EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS = new HashMap<String, Object>() {
 
@@ -38,12 +43,14 @@ public class NegativePollingSourceLimitingTestCase extends InvalidExtensionConfi
     }
   };
 
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
   @Parameterized.Parameter
   public String parameterizationName;
 
   @Parameterized.Parameter(1)
   public String configName;
-
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object> modeParameters() {
@@ -57,14 +64,16 @@ public class NegativePollingSourceLimitingTestCase extends InvalidExtensionConfi
   }
 
   @Override
-  protected boolean mustRegenerateExtensionModels() {
-    return true;
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    expectedException.expect(InitialisationException.class);
+    expectedException
+        .expectCause(hasCause(hasCause(hasMessage("The maxItemsPerPoll parameter must have a value greater than 1"))));
   }
 
   @Override
-  protected void additionalExceptionAssertions(ExpectedException expectedException) {
-    expectedException
-        .expectCause(hasCause(hasCause(hasMessage("The maxItemsPerPoll parameter must have a value greater than 1"))));
+  protected boolean mustRegenerateExtensionModels() {
+    return true;
   }
 
   @Override
@@ -72,4 +81,8 @@ public class NegativePollingSourceLimitingTestCase extends InvalidExtensionConfi
     return configName;
   }
 
+  @Test
+  public void fail() {
+    Assert.fail("Config should have failed to parse");
+  }
 }

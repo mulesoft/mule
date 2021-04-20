@@ -11,10 +11,12 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
 import org.mule.functional.junit4.AbstractConfigurationFailuresTestCase;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
+import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,15 +140,43 @@ public class InvalidExtensionConfigNewTestCase extends AbstractConfigurationFail
     loadConfiguration("validation/petstore-exclusive-required-parameter.xml");
   }
 
+  // TODO MULE-19350 migrate and adapt this test
+  @Test
+  public void configLevelOperationNegative() throws Exception {
+    expectedException.expect(InitialisationException.class);
+    expectedException
+        .expectMessage("Root component 'appleEatsBanana' defines an usage of operation 'eatBanana' which points to configuration 'apple'. The selected config does not support that operation.");
+    loadConfiguration("validation/vegan-invalid-config-for-operations.xml");
+  }
+
+  // TODO MULE-19350 migrate and adapt this test
+  @Test
+  public void configLevelSourceNegative() throws Exception {
+    expectedException.expect(InitialisationException.class);
+    expectedException
+        .expectMessage("Root component 'harvest-apples' defines an usage of operation 'harvest-apples' which points to configuration 'banana'. The selected config does not support that operation.");
+    loadConfiguration("validation/vegan-invalid-config-for-sources.xml");
+  }
+
+  @Test
+  public void routerStereotypeValidation() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("Invalid content was found starting with element");
+    expectedException.expectMessage("set-variable");
+    loadConfiguration("scopes/heisenberg-stereotype-validation-config.xml");
+  }
+
   @Override
   protected List<ExtensionModel> getRequiredExtensions() {
     ExtensionModel petStore = loadExtension(PetStoreConnector.class, emptySet());
     ExtensionModel heisenberg = loadExtension(HeisenbergExtension.class, emptySet());
+    ExtensionModel vegan = loadExtension(VeganExtension.class, emptySet());
 
     final List<ExtensionModel> extensions = new ArrayList<>();
     extensions.addAll(super.getRequiredExtensions());
     extensions.add(petStore);
     extensions.add(heisenberg);
+    extensions.add(vegan);
 
     return extensions;
   }
