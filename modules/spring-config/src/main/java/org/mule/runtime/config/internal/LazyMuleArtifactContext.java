@@ -365,10 +365,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
 
       if (dslDeclarationValidationEnabled) {
-        doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null);
-      } else {
         doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null
             || v.getClass().getAnnotation(IgnoreOnLazyInit.class).forceDslDeclarationValidation());
+      } else {
+        doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null);
       }
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
