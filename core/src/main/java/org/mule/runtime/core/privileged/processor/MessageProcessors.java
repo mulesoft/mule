@@ -55,7 +55,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -678,7 +677,13 @@ public class MessageProcessors {
    */
   public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
                                                                    Location rootContainerLocation) {
-    return locator.find(rootContainerLocation)
+    final Optional<Component> found = locator.find(rootContainerLocation);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("getProcessingStrategy - location: {} -> found: {}", rootContainerLocation,
+                   found.map(loc -> loc.getClass().getSimpleName() + ": " + loc.getLocation().getLocation()).orElse("(null)"));
+    }
+
+    return found
         .filter(loc -> loc instanceof ProcessingStrategySupplier)
         .map(loc -> ((ProcessingStrategySupplier) loc).getProcessingStrategy());
   }

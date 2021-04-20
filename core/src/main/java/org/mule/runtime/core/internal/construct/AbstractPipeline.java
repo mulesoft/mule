@@ -503,6 +503,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStartProcessingStrategy() throws MuleException {
+    LOGGER.debug("Starting processing strategy ({}) of flow '{}'...", processingStrategy, getName());
     super.doStartProcessingStrategy();
     startIfStartable(processingStrategy);
   }
@@ -512,6 +513,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doStart();
 
     try {
+      LOGGER.debug("Starting pipeline of flow '{}'...", getName());
       // Each component in the chain must be started before `apply` is called on them, ...
       startIfStartable(pipeline);
       // ... which happens when the sink is created
@@ -525,6 +527,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     if (getMuleContext().isStarted()) {
       try {
         if (componentInitialStateManager.mustStartMessageSource(source)) {
+          LOGGER.debug("Starting source of flow '{}'...", getName());
           startIfStartable(source);
         } else {
           LOGGER.info("Not starting source for '{}' because of {}", getName(), componentInitialStateManager);
@@ -582,6 +585,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected void doStop() throws MuleException {
     stopSafely(() -> {
       if (componentInitialStateManager.mustStartMessageSource(source)) {
+        LOGGER.debug("Stopping source of flow '{}'...", getName());
         stopIfStoppable(source);
       } else {
         LOGGER.info("Not stopping source for '{}', it was not started because of {}", getName(), componentInitialStateManager);
@@ -589,6 +593,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     });
     canProcessMessage = false;
 
+    LOGGER.debug("Stopping pipeline of flow '{}'...", getName());
     stopSafely(() -> disposeIfDisposable(sink));
     sink = null;
     stopIfStoppable(pipeline);
@@ -597,6 +602,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStopProcessingStrategy() throws MuleException {
+    LOGGER.debug("Stopping processing strategy ({}) of flow '{}'...", processingStrategy, getName());
     stopIfStoppable(processingStrategy);
 
     super.doStopProcessingStrategy();
