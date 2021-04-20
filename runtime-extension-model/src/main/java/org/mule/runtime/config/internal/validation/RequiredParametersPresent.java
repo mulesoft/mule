@@ -13,7 +13,6 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
-import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -29,8 +28,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-@IgnoreOnLazyInit
-// TODO but enable for tooling!
+@IgnoreOnLazyInit(forceDslDeclarationValidation = true)
 public class RequiredParametersPresent implements Validation {
 
   @Override

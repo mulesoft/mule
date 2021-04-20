@@ -36,7 +36,7 @@ import io.qameta.allure.Story;
  */
 @Feature(MULE_DSL)
 @Story(DSL_VALIDATION_STORY)
-public class InvalidExtensionConfigNewTestCase extends AbstractConfigurationFailuresTestCase {
+public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailuresTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

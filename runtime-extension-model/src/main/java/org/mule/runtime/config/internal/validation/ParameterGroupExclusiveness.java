@@ -34,8 +34,7 @@ import com.google.common.base.Joiner;
 /**
  * Ref: {@link ExclusiveOptionals}.
  */
-@IgnoreOnLazyInit
-// TODO but enable for tooling!
+@IgnoreOnLazyInit(forceDslDeclarationValidation = true)
 public class ParameterGroupExclusiveness implements Validation {
 
   @Override
@@ -82,19 +81,12 @@ public class ParameterGroupExclusiveness implements Validation {
                                         group.getName(),
                                         Joiner.on(", ").join(exclusiveModel.getExclusiveParameterNames()))));
               } else if (definedExclusiveParameters.size() > 1) {
-                // if (model.isPresent()) {
                 return of(create(component,
                                  definedExclusiveParameters.stream().map(component::getParameter).collect(toList()),
                                  this,
                                  format("Element <%s>, the following parameters cannot be set at the same time: [%s].",
                                         getModelName(pmzd),
                                         Joiner.on(", ").join(definedExclusiveParameters))));
-                // } else {
-                // throw new ConfigurationException(createStaticMessage(format("The following parameters cannot be set at the same
-                // time: [%s]",
-                // Joiner.on(", ").join(definedExclusiveParameters))));
-                // }
-                // TODO AnonymousGroup??
               }
             }
           }

@@ -23,5 +23,9 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 public @interface IgnoreOnLazyInit {
 
+  /**
+   * Whether to force this validations via the deployment property
+   * {@code mule.application.deployment.lazyInit.enableDslDeclarationValidations} even if running in lazy mode.
+   */
   boolean forceDslDeclarationValidation() default false;
 }
