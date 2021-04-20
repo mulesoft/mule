@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
@@ -86,7 +85,6 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
         .setParameters(parameters)
         .setTarget(target)
         .setTargetValue(targetValue)
-        .setLazyMode(isLazyInitMode(properties))
         .setCursorProviderFactory(cursorProviderFactory)
         .setRetryPolicyTemplate(retryPolicyTemplate)
         .setNestedChain(nestedChain)

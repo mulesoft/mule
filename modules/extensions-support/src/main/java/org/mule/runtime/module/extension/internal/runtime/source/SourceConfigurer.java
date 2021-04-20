@@ -17,7 +17,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRuntimeVersion;
 
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -54,7 +53,6 @@ public final class SourceConfigurer {
   private final ResolverSet resolverSet;
   private final ComponentLocation componentLocation;
   private final ExpressionManager expressionManager;
-  private final ConfigurationProperties properties;
   private final MuleContext muleContext;
   private final boolean restarting;
 
@@ -65,12 +63,11 @@ public final class SourceConfigurer {
    *                          method will accept
    * @param resolverSet       the {@link ResolverSet} used to resolve the parameters
    * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
-   * @param properties        deployment configuration properties
    * @param muleContext       the current {@link MuleContext}
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
-                          ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext) {
-    this(model, componentLocation, resolverSet, expressionManager, properties, muleContext, false);
+                          ExpressionManager expressionManager, MuleContext muleContext) {
+    this(model, componentLocation, resolverSet, expressionManager, muleContext, false);
   }
 
   /**
@@ -85,13 +82,12 @@ public final class SourceConfigurer {
    * @param restarting        indicates if the source is being created after a restart or not.
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
-                          ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext,
+                          ExpressionManager expressionManager, MuleContext muleContext,
                           boolean restarting) {
     this.model = model;
     this.resolverSet = resolverSet;
     this.componentLocation = componentLocation;
     this.expressionManager = expressionManager;
-    this.properties = properties;
     this.muleContext = muleContext;
     this.restarting = restarting;
   }

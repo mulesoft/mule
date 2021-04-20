@@ -26,7 +26,6 @@ import java.lang.reflect.Field;
 public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
 
   private final ExclusiveOptionalsTypeAnnotation exclusiveOptionalsTypeAnnotation;
-  private final boolean lazyInitEnabled;
 
   /**
    * Creates a new instance that will build instances of {@code prototypeClass}.
@@ -35,11 +34,9 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
    */
   public ExclusiveParameterGroupObjectBuilder(Class<T> prototypeClass,
                                               ExclusiveOptionalsTypeAnnotation exclusiveOptionalsTypeAnnotation,
-                                              boolean lazyInitEnabled,
                                               ReflectionCache reflectionCache) {
     super(prototypeClass, reflectionCache);
     this.exclusiveOptionalsTypeAnnotation = exclusiveOptionalsTypeAnnotation;
-    this.lazyInitEnabled = lazyInitEnabled;
   }
 
   @Override
@@ -69,28 +66,5 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
     }
     return resolver;
   }
-
-  // @Override
-  // public T build(ValueResolvingContext context) throws MuleException {
-  // if (!lazyInitEnabled) {
-  // Collection<String> definedExclusiveParameters =
-  // intersection(exclusiveOptionalsTypeAnnotation.getExclusiveParameterNames(),
-  // resolvers.keySet().stream().map(fs -> getAlias(fs.getField())).collect(toSet()));
-  // if (definedExclusiveParameters.isEmpty() && exclusiveOptionalsTypeAnnotation.isOneRequired()) {
-  // throw new ConfigurationException((createStaticMessage(format(
-  // "Parameter group of type '%s' requires that one of its optional parameters should be set but all of them are missing. "
-  // + "One of the following should be set: [%s]",
-  // prototypeClass.getName(),
-  // on(", ").join(exclusiveOptionalsTypeAnnotation
-  // .getExclusiveParameterNames())))));
-  // } else if (definedExclusiveParameters.size() > 1) {
-  // throw new ConfigurationException(
-  // createStaticMessage(format("In Parameter group of type '%s', the following parameters cannot be set at the same time: [%s]",
-  // prototypeClass.getName(),
-  // on(", ").join(definedExclusiveParameters))));
-  // }
-  // }
-  // return super.build(context);
-  // }
 
 }

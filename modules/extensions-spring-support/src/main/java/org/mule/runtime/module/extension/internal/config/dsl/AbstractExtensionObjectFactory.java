@@ -9,13 +9,10 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isDslDeclarationValidationEnabled;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.isChildKey;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.unwrapChildKey;
 
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -44,9 +41,6 @@ import javax.inject.Inject;
  */
 public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponentFactory<T>
     implements ObjectTypeParametersResolver {
-
-  @Inject
-  protected ConfigurationProperties properties;
 
   @Inject
   protected ReflectionCache reflectionCache;
@@ -93,8 +87,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
   }
 
   private ParametersResolver parametersResolverFromValues(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext, isLazyInitMode(properties)
-        && !isDslDeclarationValidationEnabled(properties), reflectionCache, expressionManager,
+    return ParametersResolver.fromValues(parameters, muleContext, reflectionCache, expressionManager,
                                          this.getRepresentation());
   }
 

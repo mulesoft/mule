@@ -87,14 +87,13 @@ public class RequiredParametersPresent implements Validation {
 
     return paramsStream
         .map(param -> {
-          final Either<String, Object> value = param.getSecond().getValue();
-          if (param.getSecond() == null || !value.getValue().isPresent()) {
+          if (param.getSecond() == null || !param.getSecond().getValue().getValue().isPresent()) {
             return of(create(component, this,
                              format("Element <%s> is missing required parameter '%s'.",
                                     component.getIdentifier().toString(),
                                     param.getFirst().getName())));
-          } else if (value.getRight() instanceof ComponentAst) {
-            return validate((ComponentAst) value.getRight(), artifact);
+          } else if (param.getSecond().getValue().getRight() instanceof ComponentAst) {
+            return validate((ComponentAst) param.getSecond().getValue().getRight(), artifact);
           } else {
             return Optional.<ValidationResultItem>empty();
           }

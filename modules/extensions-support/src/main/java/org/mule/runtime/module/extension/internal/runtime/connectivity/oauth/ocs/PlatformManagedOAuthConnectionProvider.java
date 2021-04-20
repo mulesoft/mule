@@ -200,7 +200,6 @@ public class PlatformManagedOAuthConnectionProvider<C>
   private ConnectionProvider<C> createDelegate(PlatformManagedConnectionDescriptor descriptor) throws MuleException {
     ParametersResolver resolver = fromValues(descriptor.getParameters(),
                                              muleContext,
-                                             false,
                                              new ReflectionCache(),
                                              expressionManager,
                                              this.toString());

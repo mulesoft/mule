@@ -32,6 +32,7 @@ import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NO
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -117,6 +118,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private static final String DEFAULT_METADATA_CACHE_MANAGER_KEY = "_defaultPersistentMetadataCacheManager";
   private static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
 
+  private final boolean dslDeclarationValidationEnabled;
+
   private TrackingPostProcessor trackingPostProcessor;
 
   private final Optional<ComponentModelInitializer> parentComponentModelInitializer;
@@ -177,6 +180,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                     MuleValueProviderService.class);
 
     customizationService.overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
+
+    dslDeclarationValidationEnabled = Boolean.valueOf(artifactProperties
+        .getOrDefault(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY, Boolean.FALSE.toString()));
 
     String sharedPartitionedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
     if (sharedPartitionedPersistentObjectStorePath != null) {
@@ -357,7 +363,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               && comp.getLocation().getLocation().equals(locationOptional.get().toString()));
 
       final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
-      doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null);
+
+      if (dslDeclarationValidationEnabled) {
+        doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null);
+      } else {
+        doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null
+            || v.getClass().getAnnotation(IgnoreOnLazyInit.class).forceDslDeclarationValidation());
+      }
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null

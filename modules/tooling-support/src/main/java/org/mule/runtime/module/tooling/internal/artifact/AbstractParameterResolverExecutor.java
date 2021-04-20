@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -61,9 +62,6 @@ public class AbstractParameterResolverExecutor {
       final ResolverSet resolverSet =
           ParametersResolver.fromValues(parametersMap,
                                         muleContext,
-                                        // Required parameters should be validated by the resolver factory instead of this
-                                        // resolver
-                                        true,
                                         reflectionCache,
                                         expressionManager,
                                         parameterizedModel.getName())

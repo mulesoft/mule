@@ -23,4 +23,5 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 public @interface IgnoreOnLazyInit {
 
+  boolean forceDslDeclarationValidation() default false;
 }
