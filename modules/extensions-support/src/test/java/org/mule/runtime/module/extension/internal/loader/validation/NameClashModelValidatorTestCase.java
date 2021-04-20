@@ -17,6 +17,8 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -923,15 +925,24 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void singularizedChildNamesWithoutLoadedClasses() throws ClassNotFoundException {
+  public void classLoaderIsNoLongerUsedToValidateSingularizedChildNames() throws ClassNotFoundException {
     ParameterModel plural = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
     ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, ChildTest.class);
     when(constructModel.getAllParameterModels()).thenReturn(asList(singular, plural));
-    ClassLoader classLoader = mock(ClassLoader.class);
-    when(classLoader.loadClass(anyString())).thenThrow(ClassNotFoundException.class);
-    ClassLoaderModelProperty property = new ClassLoaderModelProperty(classLoader);
-    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(of(property));
     validate();
+    verify(extensionModel, times(0)).getModelProperty(ClassLoaderModelProperty.class);
+  }
+
+  @Test
+  public void classLoaderIsNoLongerUsedToValidateContentNamesMatchType() {
+    ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
+    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
+    when(secondParam.getRole()).thenReturn(CONTENT);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
+    validate();
+    verify(extensionModel, times(0)).getModelProperty(ClassLoaderModelProperty.class);
   }
 
   private void mockParameterGroup(ParameterizedModel model, List<ParameterModel> parameters) {
