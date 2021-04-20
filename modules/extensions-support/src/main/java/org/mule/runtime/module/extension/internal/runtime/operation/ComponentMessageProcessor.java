@@ -630,8 +630,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void initProcessingStrategy() throws InitialisationException {
-    final Optional<ProcessingStrategy> processingStrategyFromRootContainer =
-        getProcessingStrategy(componentLocator, getRootContainerLocation());
+    final Optional<ProcessingStrategy> processingStrategyFromRootContainer = getProcessingStrategy(componentLocator, this);
 
     processingStrategy = processingStrategyFromRootContainer
         .orElseGet(() -> createDefaultProcessingStrategyFactory().create(muleContext, toString() + ".ps"));

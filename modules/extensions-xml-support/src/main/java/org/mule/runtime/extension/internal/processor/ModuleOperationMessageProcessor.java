@@ -422,7 +422,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
 
   @Override
   public void initialise() throws InitialisationException {
-    final Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
+    final Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Initializing {} {} with processing strategy {}...", this.getClass().getSimpleName(),
                    getLocation().getLocation(), processingStrategy);
