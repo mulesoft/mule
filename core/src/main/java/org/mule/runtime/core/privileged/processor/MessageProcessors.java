@@ -680,6 +680,10 @@ public class MessageProcessors {
    */
   public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
                                                                    Component component) {
+    if (component.getLocation() == null) {
+      return empty();
+    }
+
     return component.getLocation().getParts().get(0).getPartIdentifier()
         // This filter is consistent with the types that implement ProcessingStrategySupplier
         .filter(id -> id.getType().equals(FLOW)
