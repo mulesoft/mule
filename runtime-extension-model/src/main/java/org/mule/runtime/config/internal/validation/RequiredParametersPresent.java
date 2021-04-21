@@ -101,7 +101,7 @@ public class RequiredParametersPresent implements Validation {
   }
 
   private Stream<Pair<ParameterModel, ComponentParameterAst>> requiredSourceCallbackParameters(ComponentAst component,
-                                                                                                 SourceCallbackModel ecbk) {
+                                                                                               SourceCallbackModel ecbk) {
     return ecbk.getParameterGroupModels().stream()
         .flatMap(cpgm -> cpgm.getParameterModels().stream()
             .filter(this::isDoValidation)
