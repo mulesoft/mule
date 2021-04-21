@@ -15,7 +15,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -127,17 +126,10 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   public ValueProviderFactory createFactory(ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                             Supplier<Object> configurationSupplier, ReflectionCache reflectionCache,
-                                            MuleContext muleContext) {
-    return new ValueProviderFactory(this, parameterValueResolver, connectionSupplier, configurationSupplier, connectionField,
-                                    configField, reflectionCache, muleContext);
-  }
-
-  public ValueProviderFactory createFactory(ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
-                                            Supplier<Object> configurationSupplier, ReflectionCache reflectionCache,
-                                            MuleContext muleContext, ExpressionManager expressionManager,
+                                            MuleContext muleContext,
                                             ParameterizedModel parameterizedModel) {
     return new ValueProviderFactory(this, parameterValueResolver, connectionSupplier, configurationSupplier, connectionField,
-                                    configField, reflectionCache, muleContext, expressionManager, parameterizedModel);
+                                    configField, reflectionCache, muleContext, parameterizedModel);
   }
 
   /**

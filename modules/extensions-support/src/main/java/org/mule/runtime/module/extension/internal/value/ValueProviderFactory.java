@@ -74,21 +74,7 @@ public class ValueProviderFactory {
   public ValueProviderFactory(ValueProviderFactoryModelProperty factoryModelProperty,
                               ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                               Supplier<Object> configurationSupplier, Field connectionField, Field configField,
-                              ReflectionCache reflectionCache, MuleContext muleContext) {
-    this.factoryModelProperty = factoryModelProperty;
-    this.parameterValueResolver = parameterValueResolver;
-    this.connectionSupplier = connectionSupplier;
-    this.configurationSupplier = configurationSupplier;
-    this.connectionField = connectionField;
-    this.configField = configField;
-    this.reflectionCache = reflectionCache;
-    this.muleContext = muleContext;
-  }
-
-  public ValueProviderFactory(ValueProviderFactoryModelProperty factoryModelProperty,
-                              ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
-                              Supplier<Object> configurationSupplier, Field connectionField, Field configField,
-                              ReflectionCache reflectionCache, MuleContext muleContext, ExpressionManager expressionManager,
+                              ReflectionCache reflectionCache, MuleContext muleContext,
                               ParameterizedModel parameterizedModel) {
     this.factoryModelProperty = factoryModelProperty;
     this.parameterValueResolver = parameterValueResolver;
@@ -98,8 +84,7 @@ public class ValueProviderFactory {
     this.configField = configField;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
-    // The expression manager can be taken from the mule context CHANGE THIS
-    this.expressionManager = expressionManager;
+    this.expressionManager = muleContext.getExpressionManager();
     this.parameterizedModel = parameterizedModel;
   }
 

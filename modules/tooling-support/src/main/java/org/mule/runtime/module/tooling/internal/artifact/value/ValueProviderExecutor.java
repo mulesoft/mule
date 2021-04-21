@@ -170,7 +170,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
   private ValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel) {
     return new ValueProviderMediator(parameterizedModel,
                                      () -> muleContext,
-                                     () -> reflectionCache, expressionManager);
+                                     () -> reflectionCache);
   }
 
   private Optional<String> getConfigRef(ParameterizedElementDeclaration component) {

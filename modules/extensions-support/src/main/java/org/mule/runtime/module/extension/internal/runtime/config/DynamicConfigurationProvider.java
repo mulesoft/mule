@@ -59,7 +59,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
 import org.slf4j.Logger;
 
 /**
@@ -278,7 +277,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   @Override
   public Set<Value> getConfigValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> new ValueProviderMediator<>(getConfigurationModel(), () -> muleContext,
-                                                                   () -> reflectionCache, expressionManager)
+                                                                   () -> reflectionCache)
                                                                        .getValues(parameterName,
                                                                                   new ResolverSetBasedParameterResolver(resolverSet,
                                                                                                                         getConfigurationModel(),
@@ -302,7 +301,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
       return new ValueProviderMediator<>(connectionProviderModel,
                                          () -> muleContext,
-                                         () -> reflectionCache, expressionManager)
+                                         () -> reflectionCache)
                                              .getValues(parameterName,
                                                         new ResolverSetBasedParameterResolver(resolverSet,
                                                                                               connectionProviderModel,

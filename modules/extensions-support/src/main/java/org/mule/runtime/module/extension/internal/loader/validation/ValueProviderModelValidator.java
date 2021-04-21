@@ -120,10 +120,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     }
 
     for (InjectableParameterInfo parameterInfo : modelProperty.getInjectableParameters()) {
-      int parameterNameDelimiter = parameterInfo.getPath().indexOf(".");
-
-      String parameterName = parameterNameDelimiter < 0 ? parameterInfo.getPath()
-          : parameterInfo.getPath().substring(0, parameterNameDelimiter);
+      String parameterName = getParameterNameFromPath(parameterInfo.getPath());
       if (!allParameters.containsKey(parameterName)) {
         problemsReporter.addError(new Problem(model,
                                               format("The Value Provider [%s] declares to use a parameter '%s' which doesn't exist in the %s '%s'",
@@ -234,4 +231,10 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
       });
     }
   }
+
+  private String getParameterNameFromPath(String path) {
+    int parameterNameDelimiter = path.indexOf(".");
+    return parameterNameDelimiter < 0 ? path : path.substring(0, parameterNameDelimiter);
+  }
+
 }
