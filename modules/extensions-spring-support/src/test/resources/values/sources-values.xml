@@ -59,4 +59,8 @@
         <values:source-must-not-start/>
     </flow>
 
+    <flow name="source-with-two-bound-acting-parameters">
+        <values:source-with-two-bound-acting-parameters oneParameter="oneParameterValue" someParameter="someParameterValue"/>
+    </flow>
+
 </mule>

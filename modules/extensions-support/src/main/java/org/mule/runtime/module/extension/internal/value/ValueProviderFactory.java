@@ -118,7 +118,11 @@ public class ValueProviderFactory {
         String unaliasedName = getUnaliasedName(parameterModel);
         Object value = null;
         try {
+          // value = parameterValueResolver.getParameterValue(unaliasedName); this one was used before
           value = parameterValueResolver.getParameterValue(unaliasedName);
+          if (value == null) {
+            value = parameterValueResolver.getParameterValue(parameterModel.getName());
+          }
         } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException e) {
           value = null;
         }

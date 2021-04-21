@@ -94,4 +94,13 @@ public class ConfigurationValuesTestCase extends AbstractValuesTestCase {
     assertThat(resolvingFailure.getFailureCode(), is("CUSTOM_ERROR"));
     assertThat(resolvingFailure.getMessage(), is(ERROR_MESSAGE));
   }
+
+  @Test
+  public void withBoundActingParameter() throws Exception {
+    ValueResult result = getValueResultFromConfig("with-bound-acting-parameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
 }

@@ -47,6 +47,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.value.OfValueInformation;
 import org.mule.sdk.api.annotation.binding.Binding;
 import java.lang.annotation.Annotation;
@@ -160,7 +161,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
     resolverParameters.forEach(param -> propertyBuilder
         .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired(),
-                                 bindingMap.getOrDefault(param.getName(), param.getName())));
+                                 bindingMap
+                                     .getOrDefault(param.getName(),
+                                                   containerParameterNames.getOrDefault(param.getName(), param.getName()))));
 
     Reference<Boolean> requiresConfiguration = new Reference<>(false);
     Reference<Boolean> requiresConnection = new Reference<>(false);
@@ -272,10 +275,18 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                               List<ParameterDeclaration> allParameters,
                                                               Map<String, String> bindings) {
     return parameterDeclarations.stream()
-        .map(extensionParameter -> new ImmutableActingParameterModel(extensionParameter.getName(),
-                                                                     extensionParameter.isRequired(),
-                                                                     bindings.getOrDefault(extensionParameter.getName(),
-                                                                                           extensionParameter.getName())))
+        .map(extensionParameter -> {
+          if (bindings.containsKey(extensionParameter.getName())) {
+            return new ImmutableActingParameterModel(extensionParameter.getName(),
+                                                     extensionParameter.isRequired(),
+                                                     bindings.get(extensionParameter.getName()));
+          } else {
+            return new ImmutableActingParameterModel(parameterNames
+                .getOrDefault(extensionParameter.getName(), extensionParameter.getName()), extensionParameter.isRequired(),
+                                                     parameterNames.getOrDefault(extensionParameter.getName(),
+                                                                                 extensionParameter.getName()));
+          }
+        })
         .collect(toList());
   }
 

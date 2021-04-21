@@ -104,7 +104,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
           .addValueProviderInformation(new ValueProviderInformation(valueProviderModel.get(), model, valueProvider.getName()));
     }
     Map<String, MetadataType> allParameters =
-        model.getAllParameterModels().stream().collect(toMap(IntrospectionUtils::getImplementingName, ParameterModel::getType));
+        model.getAllParameterModels().stream().collect(toMap(ParameterModel::getName, ParameterModel::getType));
     String modelName = NameUtils.getModelName(model);
     String modelTypeName = getComponentModelTypeName(model);
 

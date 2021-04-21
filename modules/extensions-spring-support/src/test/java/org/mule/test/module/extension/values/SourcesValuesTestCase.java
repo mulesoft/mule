@@ -130,4 +130,12 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
     Set<Value> hasBeenStarted = getValuesFromSource("source-must-not-start", "hasBeenStarted");
     assertThat(hasBeenStarted, hasValues("FALSE"));
   }
+
+  @Test
+  public void sourceWithTwoBoundActingParameters() throws Exception {
+    Set<Value> values = getValuesFromSource("source-with-two-bound-acting-parameters", "parameterWithValue");
+    assertThat(values, hasSize(2));
+    assertThat(values, hasValues("oneParameterValue", "someParameterValue"));
+  }
+
 }
