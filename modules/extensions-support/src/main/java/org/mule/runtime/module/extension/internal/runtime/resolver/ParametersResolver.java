@@ -23,7 +23,6 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.Resolv
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 
@@ -77,7 +76,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @since 4.0
  */
-public final class ParametersResolver implements ObjectTypeParametersResolver {
+public class ParametersResolver implements ObjectTypeParametersResolver {
 
   private final MuleContext muleContext;
   private final Map<String, ?> parameters;
@@ -85,8 +84,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private final ExpressionManager expressionManager;
   private final String parameterOwner;
 
-  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters,
-                             ReflectionCache reflectionCache, ExpressionManager expressionManager, String parameterOwner) {
+  protected ParametersResolver(MuleContext muleContext, Map<String, ?> parameters,
+                               ReflectionCache reflectionCache, ExpressionManager expressionManager, String parameterOwner) {
     this.muleContext = muleContext;
     this.parameters = parameters;
     this.reflectionCache = reflectionCache;
@@ -97,8 +96,17 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext,
                                               ReflectionCache reflectionCache, ExpressionManager expressionManager,
                                               String parameterOwner) {
-    return new ParametersResolver(muleContext, parameters, reflectionCache, expressionManager,
-                                  parameterOwner);
+    return fromValues(parameters, muleContext, true, reflectionCache, expressionManager, parameterOwner);
+  }
+
+  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean disableValidations,
+                                              ReflectionCache reflectionCache, ExpressionManager expressionManager,
+                                              String parameterOwner) {
+    if (disableValidations) {
+      return new ParametersResolver(muleContext, parameters, reflectionCache, expressionManager, parameterOwner);
+    } else {
+      return new ValidatingParametersResolver(muleContext, parameters, reflectionCache, expressionManager, parameterOwner);
+    }
   }
 
   public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext,
@@ -195,28 +203,24 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return getResolverSet(Optional.empty(), groups, parameterModels, resolverSet);
   }
 
-  private ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
-                                     List<ParameterModel> parameterModels, ResolverSet resolverSet)
+  protected ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
+                                       List<ParameterModel> parameterModels, ResolverSet resolverSet)
       throws ConfigurationException {
-    Map<String, String> aliasedParameterNames = forSize(parameterModels.size());
     parameterModels
         .stream()
         .filter(p -> !p.isComponentId()
             // This model property exists only for non synthetic parameters, in which case the value resolver has to be created,
             // regardless of the parameter being the componentId
             || p.getModelProperty(ExtensionParameterDescriptorModelProperty.class).isPresent())
-        .forEach(p -> {
-          final String parameterName = getMemberName(p, p.getName());
-          if (!parameterName.equals(p.getName())) {
-            aliasedParameterNames.put(parameterName, p.getName());
-          }
-          ValueResolver<?> resolver = getParameterValueResolver(p);
-          if (resolver != null) {
-            resolverSet.add(parameterName, resolver);
-          }
-        });
+        .forEach(p -> addToResolverSet(p, resolverSet, getParameterValueResolver(p)));
 
     return resolverSet;
+  }
+
+  protected void addToResolverSet(ParameterModel paramModel, final ResolverSet resolverSet, ValueResolver<?> resolver) {
+    if (resolver != null) {
+      resolverSet.add(paramModel.getName(), resolver);
+    }
   }
 
   private ValueResolver<Object> getParameterValueResolver(ParameterModel parameter) {
@@ -355,15 +359,20 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                   objectClass.getName());
       }
 
-      if (valueResolver != null) {
-        try {
-          initialiseIfNeeded(valueResolver, true, muleContext);
-          builder.addPropertyResolver(objectField, valueResolver);
-        } catch (InitialisationException e) {
-          throw new MuleRuntimeException(e);
-        }
-      }
+      addPropertyResolver(builder, valueResolver, field, objectField);
     });
+  }
+
+  protected void addPropertyResolver(DefaultObjectBuilder builder, ValueResolver<?> valueResolver, ObjectFieldType field,
+                                     Field objectField) {
+    if (valueResolver != null) {
+      try {
+        initialiseIfNeeded(valueResolver, true, muleContext);
+        builder.addPropertyResolver(objectField, valueResolver);
+      } catch (InitialisationException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
   }
 
   private Field getField(Class<?> objectClass, String key) {
@@ -432,5 +441,9 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private ValueResolver<?> getCollectionResolver(Collection<?> collection) {
     return CollectionValueResolver.of(collection.getClass(),
                                       collection.stream().map(p -> toValueResolver(p)).collect(toImmutableList()));
+  }
+
+  protected Map<String, ?> getParameters() {
+    return parameters;
   }
 }

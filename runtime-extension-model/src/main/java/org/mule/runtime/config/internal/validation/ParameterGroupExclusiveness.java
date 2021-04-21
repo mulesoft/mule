@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
@@ -17,6 +18,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -28,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import com.google.common.base.Joiner;
 
@@ -55,7 +58,7 @@ public class ParameterGroupExclusiveness implements Validation {
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(comp -> comp.getModel(ParameterizedModel.class)
-        .map(pmzd -> pmzd.getParameterGroupModels().stream()
+        .map(pmzd -> resolveGroups(pmzd).stream()
             .anyMatch(pmg -> !pmg.getExclusiveParametersModels().isEmpty()))
         .orElse(false));
   }
@@ -64,8 +67,7 @@ public class ParameterGroupExclusiveness implements Validation {
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     return component.getModel(ParameterizedModel.class)
         .flatMap(pmzd -> {
-          final List<ParameterGroupModel> groups = pmzd.getParameterGroupModels();
-          for (ParameterGroupModel group : groups) {
+          for (ParameterGroupModel group : resolveGroups(pmzd)) {
             for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
               final Collection<String> definedExclusiveParameters = exclusiveModel.getExclusiveParameterNames().stream()
                   .filter(exclParamName -> {
@@ -99,6 +101,22 @@ public class ParameterGroupExclusiveness implements Validation {
               .map(Optional::get)
               .findFirst();
         });
+  }
+
+  protected List<ParameterGroupModel> resolveGroups(ParameterizedModel pmzd) {
+    if (pmzd instanceof SourceModel) {
+      return concat(concat(
+                           ((SourceModel) pmzd).getSuccessCallback()
+                               .map(scbk -> scbk.getParameterGroupModels().stream())
+                               .orElse(Stream.empty()),
+                           ((SourceModel) pmzd).getErrorCallback()
+                               .map(scbk -> scbk.getParameterGroupModels().stream())
+                               .orElse(Stream.empty())),
+                    pmzd.getParameterGroupModels().stream())
+                        .collect(toList());
+    } else {
+      return pmzd.getParameterGroupModels();
+    }
   }
 
 }
