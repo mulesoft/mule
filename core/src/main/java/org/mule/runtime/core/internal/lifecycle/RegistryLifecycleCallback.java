@@ -14,6 +14,7 @@ import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -106,8 +107,11 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       interceptor.afterPhaseExecution(phase, target, of(e));
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) == null
           && (phase.getName().equals(Disposable.PHASE_NAME) || phase.getName().equals(Stoppable.PHASE_NAME))) {
-        LOGGER.info(format("Failure executing phase %s over object %s, error message is: %s", phase.getName(),
-                           target.getClass().getSimpleName(), e.getMessage()),
+        LOGGER.info(format("Failure executing phase %s over object %s%s, error is: %s(%s)", phase.getName(),
+                           target.getClass().getSimpleName(),
+                           target instanceof Component ? (": " + ((Component) target).getRepresentation()) : "",
+                           e.getClass().getName(),
+                           e.getMessage()),
                     e.getMessage());
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(e.getMessage(), e);

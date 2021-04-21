@@ -288,7 +288,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     if (flowLocation.isPresent()) {
       processingStrategy = getProcessingStrategy(locator, flowLocation.get());
     } else if (location != null) {
-      processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
+      processingStrategy = getProcessingStrategy(locator, this);
     }
     configuredMessageProcessors =
         buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance());

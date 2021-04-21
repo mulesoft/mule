@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.factories;
 
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
@@ -47,9 +48,7 @@ public abstract class AbstractProcessorRouteFactoryBean<T> extends AbstractCompo
       }
     }
     MessageProcessorChain chain = newLazyProcessorChainBuilder(builder, muleContext,
-                                                               () -> getProcessingStrategy(locator,
-                                                                                           getRootContainerLocation())
-                                                                                               .orElse(null));
+                                                               () -> getProcessingStrategy(locator, this).orElse(null));
     return getProcessorRoute(chain);
   }
 

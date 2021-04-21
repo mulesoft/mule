@@ -32,6 +32,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -62,6 +63,7 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
@@ -83,6 +85,7 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * Creates a chain for any operation, where it parameterizes two type of values (parameter and property) to the inner processors
@@ -107,6 +110,8 @@ import org.reactivestreams.Publisher;
  * </pre>
  */
 public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwner implements Processor, ErrorMappingsAware {
+
+  private static final Logger LOGGER = getLogger(ModuleOperationMessageProcessor.class);
 
   private static final String ORIGINAL_EVENT_KEY = "mule.xmlSdk.originalEvent";
 
@@ -418,7 +423,12 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
 
   @Override
   public void initialise() throws InitialisationException {
-    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
+    final Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Initializing {} {} with processing strategy {}...", this.getClass().getSimpleName(),
+                   getLocation().getLocation(), processingStrategy);
+    }
+    this.nestedChain = buildNewChainWithListOfProcessors(processingStrategy, processors);
     super.initialise();
     if (targetValue != null) {
       targetValueExpression = compile(targetValue, expressionManager);
@@ -427,16 +437,19 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
 
   @Override
   public void dispose() {
+    LOGGER.debug("Disposing {} {}...", this.getClass().getSimpleName(), getLocation().getLocation());
     super.dispose();
   }
 
   @Override
   public void start() throws MuleException {
+    LOGGER.debug("Starting {} {}...", this.getClass().getSimpleName(), getLocation().getLocation());
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
+    LOGGER.debug("Stopping {} {}...", this.getClass().getSimpleName(), getLocation().getLocation());
     super.stop();
   }
 

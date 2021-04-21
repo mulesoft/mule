@@ -16,7 +16,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.google.common.collect.Iterators;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -39,9 +38,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import javax.inject.Inject;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import com.google.common.collect.Iterators;
 
 /**
  * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an expression,
@@ -98,7 +101,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   public void initialise() throws InitialisationException {
-    Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
+    Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
     nestedChain = buildNewChainWithListOfProcessors(processingStrategy, messageProcessors);
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, expression);
     super.initialise();
