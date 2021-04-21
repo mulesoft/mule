@@ -603,27 +603,29 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
-      resolvedProcessorRepresentation = getRepresentation();
-
-      initProcessingStrategy();
-
       ComponentLocation componentLocation = getLocation();
       if (componentLocation != null) {
         processorPath = componentLocation.getLocation();
       }
+
+      resolvedProcessorRepresentation = getRepresentation();
+
+      initProcessingStrategy();
 
       initialised = true;
     }
   }
 
   private void initProcessingStrategy() throws InitialisationException {
-    final Optional<ProcessingStrategy> processingStrategyFromRootContainer =
-        getProcessingStrategy(componentLocator, getRootContainerLocation());
+    final Optional<ProcessingStrategy> processingStrategyFromRootContainer = getProcessingStrategy(componentLocator, this);
 
     processingStrategy = processingStrategyFromRootContainer
         .orElseGet(() -> createDefaultProcessingStrategyFactory().create(muleContext, toString() + ".ps"));
 
-    if (!processingStrategyFromRootContainer.isPresent()) {
+    if (processingStrategyFromRootContainer.isPresent()) {
+      LOGGER.debug("Using processing strategy ({}) from container for component '{}'", processingStrategy, processorPath);
+    } else {
+      LOGGER.debug("Initializing own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       ownedProcessingStrategy = true;
       initialiseIfNeeded(processingStrategy);
     }
@@ -1109,26 +1111,33 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     startIfNeeded(componentExecutor);
 
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Starting own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       startIfNeeded(processingStrategy);
     }
     if (outerFluxTerminationTimeout >= 0) {
       outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
           .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
+      LOGGER.debug("Created outerFluxCompletionScheduler ({}) of component '{}'", outerFluxCompletionScheduler, processorPath);
     }
 
+    LOGGER.debug("Starting inner flux of component '{}'...", processorPath);
     startInnerFlux();
   }
 
   @Override
   public void doStop() throws MuleException {
     stopIfNeeded(componentExecutor);
+    LOGGER.debug("Stopping inner flux of component '{}'...", processorPath);
     stopInnerFlux();
 
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Stopping own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       stopIfNeeded(processingStrategy);
     }
 
     if (outerFluxTerminationTimeout >= 0 && outerFluxCompletionScheduler != null) {
+      LOGGER.debug("Stopping outerFluxCompletionScheduler ({}) of component '{}'...", outerFluxCompletionScheduler,
+                   processorPath);
       outerFluxCompletionScheduler.stop();
       outerFluxCompletionScheduler = null;
     }
@@ -1159,6 +1168,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public void doDispose() {
     disposeIfNeeded(componentExecutor, LOGGER);
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Disposing own processing strategy ({}) of component '{}'...", ownedProcessingStrategy, processorPath);
       disposeIfNeeded(processingStrategy, LOGGER);
     }
     initialised = false;

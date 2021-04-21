@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
          {
+           "code": "java.method.added",
+           "new": "method java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy> org.mule.runtime.core.privileged.processor.MessageProcessors::getProcessingStrategy(org.mule.runtime.api.component.location.ConfigurationComponentLocator, org.mule.runtime.api.component.Component)",
+           "package": "org.mule.runtime.core.privileged.processor",
+           "classSimpleName": "MessageProcessors",
+           "methodName": "getProcessingStrategy",
+           "elementKind": "method",
+           "justification": "MULE-19010: Need method backported to 4.3"
+         },
+         {
           "code": "java.method.added",
           "new": "method void org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate::computeStats()",
           "package": "org.mule.runtime.core.api.retry.policy",
