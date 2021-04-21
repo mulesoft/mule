@@ -524,7 +524,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     canProcessMessage = true;
-    if (getMuleContext().isStarted()) {
+    if (source != null && getMuleContext().isStarted()) {
       try {
         if (componentInitialStateManager.mustStartMessageSource(source)) {
           LOGGER.debug("Starting source of flow '{}'...", getName());
@@ -583,14 +583,16 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStop() throws MuleException {
-    stopSafely(() -> {
-      if (componentInitialStateManager.mustStartMessageSource(source)) {
-        LOGGER.debug("Stopping source of flow '{}'...", getName());
-        stopIfStoppable(source);
-      } else {
-        LOGGER.info("Not stopping source for '{}', it was not started because of {}", getName(), componentInitialStateManager);
-      }
-    });
+    if (source != null) {
+      stopSafely(() -> {
+        if (componentInitialStateManager.mustStartMessageSource(source)) {
+          LOGGER.debug("Stopping source of flow '{}'...", getName());
+          stopIfStoppable(source);
+        } else {
+          LOGGER.info("Not stopping source for '{}', it was not started because of {}", getName(), componentInitialStateManager);
+        }
+      });
+    }
     canProcessMessage = false;
 
     LOGGER.debug("Stopping pipeline of flow '{}'...", getName());

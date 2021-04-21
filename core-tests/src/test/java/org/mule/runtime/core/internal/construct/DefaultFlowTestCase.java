@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -42,6 +43,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -281,11 +283,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         mock(ProcessingStrategy.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
     when(processingStrategy.createSink(any(FlowConstruct.class), any(ReactiveProcessor.class)))
         .thenReturn(sink);
-    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
-        .source(directInboundMessageSource)
-        .processors(singletonList(processor))
-        .processingStrategyFactory((muleContext, s) -> processingStrategy)
-        .build();
+    flow = flowWithSource(processor, processingStrategy);
 
     startFlow();
 
@@ -345,11 +343,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         mock(ProcessingStrategy.class, withSettings().extraInterfaces(Disposable.class));
     when(processingStrategy.createSink(any(FlowConstruct.class), any(ReactiveProcessor.class)))
         .thenReturn(sink);
-    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
-        .source(directInboundMessageSource)
-        .processors(singletonList(processor))
-        .processingStrategyFactory((muleContext, s) -> processingStrategy)
-        .build();
+    flow = flowWithSource(processor, processingStrategy);
 
     flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     flow.initialise();
@@ -395,10 +389,22 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   @Test
   @Issue("MULE-18089")
   public void lifecycleWithStartSourceFalse() throws Exception {
+    lifecycleWithStartSourceFalse((processor, processingStrategy) -> flowWithSource(processor, processingStrategy));
+  }
+
+  @Test
+  @Issue("MULE-19356")
+  public void lifecycleWithStartSourceFalseNoSource() throws Exception {
+    lifecycleWithStartSourceFalse((processor, processingStrategy) -> flowWithoutSource(processor, processingStrategy));
+  }
+
+  protected void lifecycleWithStartSourceFalse(BiFunction<Processor, ProcessingStrategy, DefaultFlow> flowFactory)
+      throws MuleException {
     MuleContextWithRegistry mcwr = (MuleContextWithRegistry) muleContext;
     final MuleRegistry registry = spy(mcwr.getRegistry());
     final ComponentInitialStateManager initialStateManager = mock(ComponentInitialStateManager.class);
-    when(initialStateManager.mustStartMessageSource(any())).thenReturn(false);
+    when(initialStateManager.mustStartMessageSource(any(Component.class))).thenReturn(false);
+    when(initialStateManager.mustStartMessageSource(isNull())).thenThrow(NullPointerException.class);
     when(registry.lookupObject(ComponentInitialStateManager.SERVICE_ID)).thenReturn(initialStateManager);
     when(mcwr.getRegistry()).thenReturn(registry);
     directInboundMessageSource = spy(directInboundMessageSource);
@@ -411,11 +417,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         mock(ProcessingStrategy.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
     when(processingStrategy.createSink(any(FlowConstruct.class), any(ReactiveProcessor.class)))
         .thenReturn(sink);
-    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
-        .source(directInboundMessageSource)
-        .processors(singletonList(processor))
-        .processingStrategyFactory((muleContext, s) -> processingStrategy)
-        .build();
+    flow = flowFactory.apply(processor, processingStrategy);
 
     startFlow();
 
@@ -434,6 +436,21 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     inOrder.verify((Stoppable) processingStrategy).stop();
 
     muleContext.stop();
+  }
+
+  protected DefaultFlow flowWithSource(Processor processor, ProcessingStrategy processingStrategy) {
+    return (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(directInboundMessageSource)
+        .processors(singletonList(processor))
+        .processingStrategyFactory((muleContext, s) -> processingStrategy)
+        .build();
+  }
+
+  protected DefaultFlow flowWithoutSource(Processor processor, ProcessingStrategy processingStrategy) {
+    return (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .processors(singletonList(processor))
+        .processingStrategyFactory((muleContext, s) -> processingStrategy)
+        .build();
   }
 
   @Test
