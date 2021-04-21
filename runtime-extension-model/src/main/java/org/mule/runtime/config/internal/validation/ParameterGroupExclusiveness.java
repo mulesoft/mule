@@ -96,6 +96,7 @@ public class ParameterGroupExclusiveness implements Validation {
           return pmzd.getAllParameterModels().stream()
               .map(pm -> component.getParameter(pm.getName()))
               .filter(param -> param != null && param.getValue().getRight() instanceof ComponentAst)
+              // validate any nested pojos as well...
               .map(param -> validate((ComponentAst) param.getValue().getRight(), artifact))
               .filter(Optional::isPresent)
               .map(Optional::get)

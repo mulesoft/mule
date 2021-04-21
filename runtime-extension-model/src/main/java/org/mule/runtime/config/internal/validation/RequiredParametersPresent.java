@@ -15,6 +15,7 @@ import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -57,33 +58,7 @@ public class RequiredParametersPresent implements Validation {
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    Stream<Pair<ParameterModel, ComponentParameterAst>> paramsStream = component.getModel(SourceModel.class)
-        .map(sm -> {
-          final Stream<Pair<ParameterModel, ComponentParameterAst>> succesCallbackParams = sm.getSuccessCallback()
-              .map(scbk -> scbk.getParameterGroupModels().stream()
-                  .flatMap(cpgm -> cpgm.getParameterModels().stream()
-                      .filter(this::isDoValidation)
-                      .map(pm -> new Pair<>(pm, component.getParameter(cpgm.getName(), pm.getName())))))
-              .orElse(Stream.empty());
-
-          final Stream<Pair<ParameterModel, ComponentParameterAst>> errorCallbackParams = sm.getErrorCallback()
-              .map(ecbk -> ecbk.getParameterGroupModels().stream()
-                  .flatMap(cpgm -> cpgm.getParameterModels().stream()
-                      .filter(this::isDoValidation)
-                      .map(pm -> new Pair<>(pm, component.getParameter(cpgm.getName(), pm.getName())))))
-              .orElse(Stream.empty());
-
-          return concat(succesCallbackParams, errorCallbackParams);
-        })
-        .orElse(Stream.empty());
-
-    paramsStream = concat(paramsStream, component.getModel(ParameterizedModel.class)
-        .map(pmzd -> pmzd.getAllParameterModels().stream()
-            .filter(this::isDoValidation)
-            .map(pm -> new Pair<>(pm, component.getParameter(pm.getName()))))
-        .orElse(Stream.empty()));
-
-    return paramsStream
+    return requiredParamsStream(component)
         .map(param -> {
           if (param.getSecond() == null || !param.getSecond().getValue().getValue().isPresent()) {
             return of(create(component, this,
@@ -91,6 +66,7 @@ public class RequiredParametersPresent implements Validation {
                                     component.getIdentifier().toString(),
                                     param.getFirst().getName())));
           } else if (param.getSecond().getValue().getRight() instanceof ComponentAst) {
+            // validate any nested pojos as well...
             return validate((ComponentAst) param.getSecond().getValue().getRight(), artifact);
           } else {
             return Optional.<ValidationResultItem>empty();
@@ -99,6 +75,37 @@ public class RequiredParametersPresent implements Validation {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .findFirst();
+  }
+
+  // resolve the provided value for every required param to iterate and check
+  private Stream<Pair<ParameterModel, ComponentParameterAst>> requiredParamsStream(ComponentAst component) {
+    Stream<Pair<ParameterModel, ComponentParameterAst>> paramsStream = component.getModel(SourceModel.class)
+        .map(sm -> {
+          final Stream<Pair<ParameterModel, ComponentParameterAst>> succesCallbackParams = sm.getSuccessCallback()
+              .map(scbk -> requiredSourceCallbackParameters(component, scbk))
+              .orElse(Stream.empty());
+
+          final Stream<Pair<ParameterModel, ComponentParameterAst>> errorCallbackParams = sm.getErrorCallback()
+              .map(ecbk -> requiredSourceCallbackParameters(component, ecbk))
+              .orElse(Stream.empty());
+
+          return concat(succesCallbackParams, errorCallbackParams);
+        })
+        .orElse(Stream.empty());
+
+    return concat(paramsStream, component.getModel(ParameterizedModel.class)
+        .map(pmzd -> pmzd.getAllParameterModels().stream()
+            .filter(this::isDoValidation)
+            .map(pm -> new Pair<>(pm, component.getParameter(pm.getName()))))
+        .orElse(Stream.empty()));
+  }
+
+  private Stream<Pair<ParameterModel, ComponentParameterAst>> requiredSourceCallbackParameters(ComponentAst component,
+                                                                                                 SourceCallbackModel ecbk) {
+    return ecbk.getParameterGroupModels().stream()
+        .flatMap(cpgm -> cpgm.getParameterModels().stream()
+            .filter(this::isDoValidation)
+            .map(pm -> new Pair<>(pm, component.getParameter(cpgm.getName(), pm.getName()))));
   }
 
   // componentId presence is already validated by NamedTopLevelElementsHaveName
