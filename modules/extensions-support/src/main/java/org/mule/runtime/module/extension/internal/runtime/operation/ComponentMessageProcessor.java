@@ -64,7 +64,6 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -612,31 +611,34 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
-      if (nestedChain != null) {
-        initialiseIfNeeded(nestedChain, muleContext);
-      }
-
-      resolvedProcessorRepresentation = getRepresentation();
-
-      initProcessingStrategy();
-
       ComponentLocation componentLocation = getLocation();
       if (componentLocation != null) {
         processorPath = componentLocation.getLocation();
       }
+
+      resolvedProcessorRepresentation = getRepresentation();
+
+      if (nestedChain != null) {
+        LOGGER.debug("Initializing nested chain ({}) of component '{}'...", nestedChain, processorPath);
+        initialiseIfNeeded(nestedChain, muleContext);
+      }
+
+      initProcessingStrategy();
 
       initialised = true;
     }
   }
 
   private void initProcessingStrategy() throws InitialisationException {
-    final Optional<ProcessingStrategy> processingStrategyFromRootContainer =
-        getProcessingStrategy(componentLocator, getRootContainerLocation());
+    final Optional<ProcessingStrategy> processingStrategyFromRootContainer = getProcessingStrategy(componentLocator, this);
 
     processingStrategy = processingStrategyFromRootContainer
         .orElseGet(() -> createDefaultProcessingStrategyFactory().create(muleContext, toString() + ".ps"));
 
-    if (!processingStrategyFromRootContainer.isPresent()) {
+    if (processingStrategyFromRootContainer.isPresent()) {
+      LOGGER.debug("Using processing strategy ({}) from container for component '{}'", processingStrategy, processorPath);
+    } else {
+      LOGGER.debug("Initializing own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       ownedProcessingStrategy = true;
       initialiseIfNeeded(processingStrategy);
     }
@@ -1117,33 +1119,42 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     startIfNeeded(componentExecutor);
 
     if (nestedChain != null) {
+      LOGGER.debug("Starting nested chain ({}) of component '{}'...", nestedChain, processorPath);
       startIfNeeded(nestedChain);
     }
 
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Starting own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       startIfNeeded(processingStrategy);
     }
     if (outerFluxTerminationTimeout >= 0) {
       outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
           .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
+      LOGGER.debug("Created outerFluxCompletionScheduler ({}) of component '{}'", outerFluxCompletionScheduler, processorPath);
     }
 
+    LOGGER.debug("Starting inner flux of component '{}'...", processorPath);
     startInnerFlux();
   }
 
   @Override
   public void doStop() throws MuleException {
     if (nestedChain != null) {
+      LOGGER.debug("Sttopping nested chain ({}) of component '{}'...", nestedChain, processorPath);
       stopIfNeeded(nestedChain);
     }
     stopIfNeeded(componentExecutor);
+    LOGGER.debug("Stopping inner flux of component '{}'...", processorPath);
     stopInnerFlux();
 
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Stopping own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       stopIfNeeded(processingStrategy);
     }
 
     if (outerFluxTerminationTimeout >= 0 && outerFluxCompletionScheduler != null) {
+      LOGGER.debug("Stopping outerFluxCompletionScheduler ({}) of component '{}'...", outerFluxCompletionScheduler,
+                   processorPath);
       outerFluxCompletionScheduler.stop();
       outerFluxCompletionScheduler = null;
     }
@@ -1173,10 +1184,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public void doDispose() {
     if (nestedChain != null) {
+      LOGGER.debug("Disposing nested chain ({}) of component '{}'...", nestedChain, processorPath);
       disposeIfNeeded(nestedChain, LOGGER);
     }
     disposeIfNeeded(componentExecutor, LOGGER);
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Disposing own processing strategy ({}) of component '{}'...", ownedProcessingStrategy, processorPath);
       disposeIfNeeded(processingStrategy, LOGGER);
     }
     initialised = false;

@@ -69,15 +69,14 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
                                         this);
     }
 
-    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
+    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors);
 
     super.initialise();
 
     timer = schedulerService.cpuLightScheduler();
     shouldRetry = event -> event.getError().isPresent();
 
-    final Optional<ProcessingStrategy> processingStrategyFromRootContainer =
-        getProcessingStrategy(componentLocator, getRootContainerLocation());
+    final Optional<ProcessingStrategy> processingStrategyFromRootContainer = getProcessingStrategy(componentLocator, this);
 
     processingStrategy = processingStrategyFromRootContainer
         .orElseGet(() -> createDefaultProcessingStrategyFactory().create(muleContext, getLocation().getLocation() + ".ps"));
