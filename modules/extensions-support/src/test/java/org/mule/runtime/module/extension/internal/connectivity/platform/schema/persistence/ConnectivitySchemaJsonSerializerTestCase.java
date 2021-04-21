@@ -39,7 +39,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 @RunWith(Parameterized.class)
 public class ConnectivitySchemaJsonSerializerTestCase extends AbstractMuleTestCase {
 
-  private ConnectivitySchemaJsonSerializer serializer = ConnectivitySchemaJsonSerializer.newInstance(true);
+  private ConnectivitySchemaJsonSerializer serializer = ConnectivitySchemaJsonSerializer.builder().build();
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "connectivitySchema.updateExpectedFilesOnError");
