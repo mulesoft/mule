@@ -14,6 +14,7 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionUtils;
 
+@Deprecated
 public class MessagingExceptionUtilsDelegate {
 
   private static final Exception EXPECTED_EXCEPTION = new Exception("Expected");
