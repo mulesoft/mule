@@ -12,13 +12,14 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.connectivity.api.test.platform.ConnectivitySchemaTestUtils.getNetsuiteTokenAuthenticationSchema;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
-import static org.mule.runtime.module.extension.internal.connectivity.platform.schema.ConnectivitySchemaTestUtils.getNetsuiteTokenAuthenticationSchema;
 import static org.mule.runtime.module.extension.internal.connectivity.platform.schema.persistence.ConnectivitySchemaJsonSerializerTestCase.ConnectivitySchemaJsonSerializerTestUnit.newTestUnit;
 
-import org.mule.runtime.module.extension.internal.connectivity.platform.schema.ConnectivitySchema;
+import org.mule.runtime.connectivity.api.platform.schema.ConnectivitySchema;
+import org.mule.runtime.connectivity.api.platform.schema.persistence.ConnectivitySchemaJsonSerializer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -38,7 +39,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 @RunWith(Parameterized.class)
 public class ConnectivitySchemaJsonSerializerTestCase extends AbstractMuleTestCase {
 
-  private ConnectivitySchemaJsonSerializer serializer = new ConnectivitySchemaJsonSerializer(true);
+  private ConnectivitySchemaJsonSerializer serializer = ConnectivitySchemaJsonSerializer.newInstance(true);
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "connectivitySchema.updateExpectedFilesOnError");
