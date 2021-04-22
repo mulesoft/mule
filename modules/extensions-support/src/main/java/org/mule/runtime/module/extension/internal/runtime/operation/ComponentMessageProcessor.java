@@ -305,12 +305,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
-    final boolean async = isAsync();
+    final boolean blocking = isBlocking();
     final ComponentLocation location = getLocation();
 
     return subscriberContext()
         .flatMapMany(ctx -> {
-          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, async, ctx)
+          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, blocking, ctx)
               .doOnNext(result -> {
                 result.apply(me -> {
                   final CoreEvent event = ((MessagingException) me).getEvent();
@@ -346,7 +346,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Flux<Either<Throwable, CoreEvent>> createOuterFlux(final Flux<CoreEvent> publisher,
                                                              final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook,
-                                                             final boolean async, Context ctx) {
+                                                             final boolean blocking, Context ctx) {
     final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
@@ -398,7 +398,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 }
               };
 
-              if (!async && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
+              if (blocking && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
                 onEvent(event, executorCallback, ctx);
@@ -1085,6 +1085,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return true;
   }
 
+  protected boolean isBlocking() {
+    return isAsync();
+  }
+
+  /**
+   * Returns true if there will be a thread switch in the operation, whether because it is non blocking and the inner flux is used
+   * or a reconnection strategy can be triggered.
+   * 
+   * @return the component processing is sync
+   */
   protected boolean isAsync() {
     if (!requiresConfig()) {
       return false;
