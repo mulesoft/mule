@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromPath;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -19,6 +21,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
 import java.util.Collection;
@@ -27,10 +30,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+
 /**
- * ADD JDOC
+ * Class in charge of resolving the values of acting parameter given the list of {@link InjectableParameterInfo} , the
+ * {@link ParameterizedModel} it is associated to and the {@link ParameterValueResolver} that corresponds to it.
+ *
+ * @since 4.4.0
  */
 public class InjectableParameterResolver {
+
+  private static final Logger LOGGER = getLogger(InjectableParameterResolver.class);
 
   private static final String EXPRESSION_PREFIX = "#[{";
   private static final String EXPRESSION_SUFFIX = "}]";
@@ -53,6 +63,35 @@ public class InjectableParameterResolver {
     initResolvedValues(parameterValueResolver);
   }
 
+  /**
+   * Retrieves the value of a injectable parameter
+   *
+   * @param parameterName the name of the injectable parameter.
+   * @return the value of the injectable parameter.
+   */
+  public Object getInjectableParameterValue(String parameterName) {
+    Object parameterValue;
+    parameterValue = resolvedParameterValues.get(parameterName);
+    InjectableParameterInfo injectableParameterInfo = injectableParametersMap.get(parameterName);
+
+    if (parameterValue != null) {
+      try {
+        parameterValue = expressionManager
+            .evaluate("#[payload]",
+                      DataType.fromType(getClassFromType(injectableParameterInfo.getType())),
+                      BindingContext.builder()
+                          .addBinding("payload", new TypedValue(parameterValue, DataType.fromObject(parameterValue))).build())
+            .getValue();
+      } catch (ClassNotFoundException e) {
+        LOGGER.debug("Transformation of injectable parameter '{}' failed, the same value of the resolution will be used.",
+                     parameterName);
+      }
+
+    }
+
+    return parameterValue;
+  }
+
   private void initInjectableParametersMap() {
     this.injectableParametersMap =
         injectableParameters.stream().collect(toMap(injectableParameter -> injectableParameter.getParameterName(),
@@ -67,10 +106,7 @@ public class InjectableParameterResolver {
     if (!expression.equals(EMPTY_EXPRESSION)) {
       resolvedParameterValues =
           (Map<String, Object>) expressionManager
-              .evaluate(expression,
-                        DataType.builder().mapType(Map.class)
-                            .valueMediaType(ANY).build(),
-                        bindingContext)
+              .evaluate(expression, DataType.builder().mapType(Map.class).build(), bindingContext)
               .getValue();
     }
   }
@@ -80,15 +116,11 @@ public class InjectableParameterResolver {
 
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       String unaliasedName = getImplementingName(parameterModel);
-      Object value = null;
-      try {
-        value = parameterValueResolver.getParameterValue(unaliasedName);
-        if (value == null) {
-          value = parameterValueResolver.getParameterValue(parameterModel.getName());
-        }
-      } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException e) {
-        value = null;
+      Object value = getParameterValueSafely(parameterValueResolver, unaliasedName);
+      if (value == null) {
+        value = getParameterValueSafely(parameterValueResolver, parameterModel.getName());
       }
+
       if (value != null) {
         String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
         DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
@@ -113,28 +145,6 @@ public class InjectableParameterResolver {
     return expression.toString();
   }
 
-  public Object getInjectableParameterValue(String parameterName) {
-    Object parameterValue = null;
-    parameterValue = resolvedParameterValues.get(parameterName);
-    InjectableParameterInfo injectableParameterInfo = injectableParametersMap.get(parameterName);
-
-    if (parameterValue != null) {
-      try {
-        parameterValue = expressionManager
-            .evaluate("#[payload]",
-                      DataType.fromType(getClassFromType(injectableParameterInfo.getType())),
-                      BindingContext.builder()
-                          .addBinding("payload", new TypedValue(parameterValue, DataType.fromObject(parameterValue))).build())
-            .getValue();
-      } catch (ClassNotFoundException e) {
-        // Failed to transform value.
-      }
-
-    }
-
-    return parameterValue;
-  }
-
   private Class getClassFromType(MetadataType parameterMetadataType) throws ClassNotFoundException {
     return Thread.currentThread().getContextClassLoader()
         .loadClass(parameterMetadataType.getAnnotation(ClassInformationAnnotation.class)
@@ -142,9 +152,12 @@ public class InjectableParameterResolver {
             .orElse(Object.class.getName()));
   }
 
-  private String getParameterNameFromPath(String path) {
-    int parameterNameDelimiter = path.indexOf(".");
-    return parameterNameDelimiter < 0 ? path : path.substring(0, parameterNameDelimiter);
+  private Object getParameterValueSafely(ParameterValueResolver parameterValueResolver, String parameterName) {
+    try {
+      return parameterValueResolver.getParameterValue(parameterName);
+    } catch (ValueResolvingException e) {
+      return null;
+    }
   }
 
 }

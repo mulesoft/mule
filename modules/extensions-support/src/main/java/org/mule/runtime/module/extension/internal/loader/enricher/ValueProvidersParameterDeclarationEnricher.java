@@ -103,7 +103,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   /**
    * This method will look for parameters of the given {@link ParameterizedDeclaration declaration} and, if a parameter or
    * parameter group annotated with {@link OfValues} or {@link org.mule.sdk.api.annotation.values.OfValues} is found, a
-   * {@link ValueProviderModel} will be added to this element to communicate that values can be provided.
+   * {@link oValueProviderModel} will be added to this element to communicate that values can be provided.
    * <p>
    * Also the {@link ParameterDeclaration parameters} of the {@link ParameterizedDeclaration declaration} will be enriched.
    *

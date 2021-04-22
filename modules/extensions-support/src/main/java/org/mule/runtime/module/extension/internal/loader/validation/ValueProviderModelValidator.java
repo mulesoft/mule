@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromPath;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
@@ -230,11 +231,6 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
         }
       });
     }
-  }
-
-  private String getParameterNameFromPath(String path) {
-    int parameterNameDelimiter = path.indexOf(".");
-    return parameterNameDelimiter < 0 ? path : path.substring(0, parameterNameDelimiter);
   }
 
 }
