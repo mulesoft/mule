@@ -7,12 +7,18 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
@@ -71,5 +77,30 @@ public abstract class AbstractAnnotatedDeclarationEnricher implements Declaratio
   protected Optional<Type> extractType(BaseDeclaration<? extends BaseDeclaration> declaration) {
     return declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
         .map(ExtensionTypeDescriptorModelProperty::getType);
+  }
+
+  /**
+   * If the operation was derived from a Java method, this method extracts and returns it.
+   *
+   * @param declaration the operation's declaration
+   * @return an {@link Optional} {@link Method}
+   * @since 4.4.0
+   */
+  protected Optional<Method> extractImplementingMethod(OperationDeclaration declaration) {
+    return declaration.getModelProperty(ImplementingMethodModelProperty.class)
+        .map(ImplementingMethodModelProperty::getMethod);
+  }
+
+  /**
+   * If the parameter was derived from a Java field or method argument, this method returns an {@link ExtensionParameter} which
+   * provides an abstraction over that field or argument
+   *
+   * @param declaration the parameter's declaration
+   * @return an {@link ExtensionParameter}
+   * @since 4.4.0
+   */
+  protected Optional<ExtensionParameter> extractDeclaredParameter(ParameterDeclaration declaration) {
+    return declaration.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+        .map(ExtensionParameterDescriptorModelProperty::getExtensionParameter);
   }
 }

@@ -46,6 +46,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "DO-GET-CLIENT",
         "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
@@ -84,6 +85,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -115,6 +117,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -224,6 +227,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -283,6 +287,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "DO-GET-CLIENT-WITH-PRIVATE-OPERATION",
         "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
@@ -321,6 +326,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -352,6 +358,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -461,6 +468,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -520,6 +528,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "DO-GET-PETS",
         "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
@@ -558,6 +567,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "owner",
               "displayModel": {},
               "description": "",
@@ -595,6 +605,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -626,6 +637,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -735,6 +747,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {

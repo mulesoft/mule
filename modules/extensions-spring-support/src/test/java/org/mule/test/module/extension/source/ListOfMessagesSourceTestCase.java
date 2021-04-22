@@ -12,14 +12,15 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.heisenberg.extension.DEARadioSource.MESSAGES_PER_POLL;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -28,6 +29,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+
+@Feature(SOURCES)
 public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static AtomicReference<List<Message>> capturedPayload = new AtomicReference<>(null);
@@ -35,7 +39,7 @@ public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTes
 
   @Override
   protected String getConfigFile() {
-    return "heisenberg-source-list-config.xml";
+    return "source/heisenberg-source-list-config.xml";
   }
 
   @Override

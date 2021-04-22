@@ -53,6 +53,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aPropertyWithDoc",
               "displayModel": {},
               "description": "Documentation for the property",
@@ -81,6 +82,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aHiddenPropertyWithDoc",
               "displayModel": {},
               "description": "Documentation for the hidden property",
@@ -109,6 +111,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aPropertyDisplayModel",
               "displayModel": {
                 "displayName": "A pretty name property",
@@ -142,6 +145,7 @@
                 "tabName": "Not General Property"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aPropertyWithPlacement",
               "displayModel": {},
               "description": "",
@@ -164,6 +168,7 @@
                 "allowTopLevelDefinition": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -280,6 +285,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -335,6 +341,7 @@
             "MODULE-DOCUMENTATION:CUSTOM_ERROR_HERE",
             "MODULE-DOCUMENTATION:ANOTHER_CUSTOM_ERROR_HERE"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ANOTHER_OPERATION_WITH_DOC",
             "namespace": "MODULE-DOCUMENTATION",
@@ -373,6 +380,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramWithDoc",
                   "displayModel": {},
                   "description": "Documentation for the parameter",
@@ -401,6 +409,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "hiddenParamWithDoc",
                   "displayModel": {},
                   "description": "Documentation for the hidden parameter",
@@ -429,6 +438,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramDisplayModel",
                   "displayModel": {
                     "displayName": "A pretty name parameter",
@@ -462,6 +472,7 @@
                     "tabName": "Not General Parameter"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramWithPlacement",
                   "displayModel": {},
                   "description": "",
@@ -509,6 +520,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -545,6 +557,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -576,6 +589,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -685,6 +699,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -751,6 +766,7 @@
             "MODULE-DOCUMENTATION:CUSTOM_ERROR_HERE",
             "MODULE-DOCUMENTATION:ANOTHER_CUSTOM_ERROR_HERE"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "OPERATION-WITH-DOC",
             "namespace": "MODULE-DOCUMENTATION",
@@ -789,6 +805,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramWithDoc",
                   "displayModel": {},
                   "description": "Documentation for the parameter",
@@ -817,6 +834,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "hiddenParamWithDoc",
                   "displayModel": {},
                   "description": "Documentation for the hidden parameter",
@@ -845,6 +863,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramDisplayModel",
                   "displayModel": {
                     "displayName": "A pretty name parameter",
@@ -878,6 +897,7 @@
                     "tabName": "Not General Parameter"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramWithPlacement",
                   "displayModel": {},
                   "description": "",
@@ -925,6 +945,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -961,6 +982,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -992,6 +1014,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1101,6 +1124,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {

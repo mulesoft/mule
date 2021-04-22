@@ -58,6 +58,7 @@ import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfi
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.ram.RickAndMortyExtension;
+import org.mule.test.semantic.extension.SemanticTermsExtension;
 import org.mule.test.soap.extension.FootballSoapExtension;
 import org.mule.test.substitutiongroup.extension.SubstitutionGroupExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
@@ -134,6 +135,7 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
                         newTestUnit(javaLoader, ValuesExtension.class, "values.xsd"),
                         newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.xsd"),
                         newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.xsd"),
+                        newTestUnit(javaLoader, SemanticTermsExtension.class, "semantic-terms-extension.xsd"),
                         newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.xsd"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {

@@ -77,7 +77,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "channel",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider",
+                "providerId": "WithRequiredParametersFromConfigValueProvider-Id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -96,6 +96,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -123,6 +124,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "required1",
               "description": "",
               "modelProperties": {}
@@ -150,6 +152,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "required2",
               "description": "",
               "modelProperties": {}
@@ -177,6 +180,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -294,6 +298,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -330,6 +335,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "VALUES",
@@ -364,6 +370,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -573,6 +580,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -657,7 +665,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "valueParam",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -676,6 +684,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "valueParam",
               "description": "",
               "modelProperties": {}
@@ -703,6 +712,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -820,6 +830,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -882,6 +893,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -909,6 +921,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -934,6 +947,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "VALUES",
@@ -968,6 +982,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -1177,6 +1192,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1261,7 +1277,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "valueParam",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -1280,6 +1296,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "valueParam",
               "description": "",
               "modelProperties": {}
@@ -1307,6 +1324,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -1424,6 +1442,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -1486,6 +1505,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -1513,6 +1533,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -1538,6 +1559,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "VALUES",
@@ -1572,6 +1594,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -1781,6 +1804,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1871,6 +1895,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "data",
               "description": "",
               "modelProperties": {}
@@ -1919,6 +1944,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "configValues",
               "description": "",
               "modelProperties": {}
@@ -1946,6 +1972,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -2063,6 +2090,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -2124,6 +2152,7 @@
             "VALUES:RETRY_EXHAUSTED",
             "VALUES:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SINGLE_VALUES_ENABLED_PARAMETER_WITH_CONFIGURATION",
             "namespace": "VALUES",
@@ -2152,7 +2181,7 @@
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
-                    "providerId": "org.mule.test.values.extension.resolver.WithConfigValueProvider",
+                    "providerId": "WithConfigValueProvider-id",
                     "requiresConfiguration": true,
                     "requiresConnection": false,
                     "isOpen": true
@@ -2171,6 +2200,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -2223,6 +2253,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2336,6 +2367,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2525,6 +2557,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2589,6 +2622,7 @@
             "VALUES:RETRY_EXHAUSTED",
             "VALUES:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SINGLE_VALUES_ENABLED_PARAMETER_WITH_CONNECTION",
             "namespace": "VALUES",
@@ -2636,6 +2670,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -2688,6 +2723,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2801,6 +2837,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2990,6 +3027,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3030,6 +3068,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "WITH_VALUE_WITH_REQUIRED_PARAM",
             "namespace": "VALUES",
@@ -3063,7 +3102,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "channel",
-                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider",
+                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigLegacyValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3082,6 +3121,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -3109,6 +3149,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "required1",
                   "description": "",
                   "modelProperties": {}
@@ -3136,6 +3177,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "required2",
                   "description": "",
                   "modelProperties": {}
@@ -3345,6 +3387,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -3390,6 +3433,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "WITH_VALUES_WITH_REQUIRED_PARAMS_FROM_PARAM_GROUP",
             "namespace": "VALUES",
@@ -3419,7 +3463,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "valueParam",
-                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                    "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3438,6 +3482,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "valueParam",
                   "description": "",
                   "modelProperties": {}
@@ -3489,6 +3534,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -3516,6 +3562,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "anyParameter",
                   "description": "",
                   "modelProperties": {}
@@ -3725,6 +3772,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -3770,6 +3818,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "WITH_VALUES_WITH_REQUIRED_PARAMS_FROM_SHOW_IN_DSL_GROUP",
             "namespace": "VALUES",
@@ -3799,7 +3848,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "valueParam",
-                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3818,6 +3867,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "valueParam",
                   "description": "",
                   "modelProperties": {}
@@ -3869,6 +3919,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -3896,6 +3947,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "anyParameter",
                   "description": "",
                   "modelProperties": {}
@@ -4105,6 +4157,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -4150,6 +4203,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "VALUES",
@@ -4184,6 +4238,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -4393,6 +4448,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -4436,6 +4492,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "FAILURE-CONNECTION",
             "namespace": "VALUES",
@@ -4465,7 +4522,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "values",
-                    "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
+                    "providerId": "WithErrorValueProvider-id",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -4484,6 +4541,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "values",
                   "description": "",
                   "modelProperties": {}
@@ -4511,6 +4569,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorCode",
                   "description": "",
                   "modelProperties": {}
@@ -4720,6 +4779,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -4764,6 +4824,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "WITH-VALUE-PARAMETER",
             "namespace": "VALUES",
@@ -4807,6 +4868,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -5016,6 +5078,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -5090,6 +5153,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SOURCE_WITH_CONFIGURATION",
             "namespace": "VALUES",
@@ -5118,7 +5182,7 @@
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
-                    "providerId": "org.mule.test.values.extension.resolver.WithConfigValueProvider",
+                    "providerId": "WithConfigValueProvider-id",
                     "requiresConfiguration": true,
                     "requiresConnection": false,
                     "isOpen": true
@@ -5137,6 +5201,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -5189,6 +5254,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5218,6 +5284,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -5357,6 +5424,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -5424,6 +5492,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SOURCE_WITH_CONNECTION",
             "namespace": "VALUES",
@@ -5471,6 +5540,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -5523,6 +5593,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5552,6 +5623,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -5691,6 +5763,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -5877,6 +5950,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5949,7 +6023,7 @@
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
-                "providerId": "Simple value provider",
+                "providerId": "org.mule.test.values.extension.resolver.SimpleLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -5968,6 +6042,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -5995,6 +6070,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -6112,6 +6188,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -6148,6 +6225,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "VALUES",
@@ -6182,6 +6260,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -6391,6 +6470,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -6473,7 +6553,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
+                "providerId": "WithErrorValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -6492,6 +6572,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -6519,6 +6600,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorCode",
               "description": "",
               "modelProperties": {}
@@ -6546,6 +6628,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -6663,6 +6746,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -6737,6 +6821,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "MULTI_LEVEL_VALUE",
         "namespace": "VALUES",
@@ -6776,6 +6861,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "required",
               "description": "",
               "modelProperties": {}
@@ -6813,6 +6899,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "continent",
               "description": "",
               "modelProperties": {}
@@ -6850,6 +6937,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "country",
               "description": "",
               "modelProperties": {}
@@ -6887,6 +6975,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "city",
               "displayModel": {
                 "displayName": "State | City"
@@ -7003,6 +7092,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -7067,6 +7157,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "RESOLVER_GETS_MULE_CONTEXT_INJECTION",
         "namespace": "VALUES",
@@ -7114,6 +7205,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -7227,6 +7319,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -7291,6 +7384,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER",
         "namespace": "VALUES",
@@ -7338,6 +7432,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -7451,6 +7546,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -7515,6 +7611,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER_INSIDE_PARAMETER_GROUP",
         "namespace": "VALUES",
@@ -7562,6 +7659,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -7589,6 +7687,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -7702,6 +7801,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -7766,6 +7866,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER_REQUIRES_VALUES_OF_PARAMETER_GROUP",
         "namespace": "VALUES",
@@ -7799,7 +7900,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -7818,6 +7919,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -7869,6 +7971,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -7896,6 +7999,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -8009,6 +8113,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -8073,6 +8178,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER_WITH_REQUIRED_PARAMETERS",
         "namespace": "VALUES",
@@ -8137,6 +8243,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -8164,6 +8271,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredString",
               "description": "",
               "modelProperties": {}
@@ -8195,6 +8303,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredBoolean",
               "description": "",
               "modelProperties": {}
@@ -8237,6 +8346,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredInteger",
               "description": "",
               "modelProperties": {}
@@ -8285,6 +8395,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "strings",
               "description": "",
               "modelProperties": {}
@@ -8398,6 +8509,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -8462,6 +8574,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SINGLE_VALUES_WITH_REQUIRED_PARAMETER_WITH_ALIAS",
         "namespace": "VALUES",
@@ -8500,6 +8613,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "superString",
               "description": "",
               "modelProperties": {}
@@ -8541,6 +8655,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -8654,6 +8769,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -8718,6 +8834,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "VALUES_INSIDE_SHOW_IN_DSL_GROUP",
         "namespace": "VALUES",
@@ -8751,7 +8868,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -8770,6 +8887,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -8821,6 +8939,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -8848,6 +8967,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -8961,6 +9081,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -9025,6 +9146,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_COMPLEX_ACTING_PARAMETER",
         "namespace": "VALUES",
@@ -9077,6 +9199,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameter",
               "description": "",
               "modelProperties": {}
@@ -9104,6 +9227,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "complexActingParameter",
               "description": "",
               "modelProperties": {}
@@ -9217,6 +9341,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -9281,6 +9406,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_ERROR_VALUE_PROVIDER",
         "namespace": "VALUES",
@@ -9314,7 +9440,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
+                "providerId": "WithErrorValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -9333,6 +9459,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -9360,6 +9487,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorCode",
               "description": "",
               "modelProperties": {}
@@ -9473,6 +9601,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -9537,6 +9666,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_OPTIONAL_PARAMETER",
         "namespace": "VALUES",
@@ -9589,6 +9719,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameters",
               "description": "",
               "modelProperties": {}
@@ -9616,6 +9747,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalValue",
               "description": "",
               "modelProperties": {}
@@ -9729,6 +9861,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -9793,6 +9926,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_OPTIONAL_PARAMETER_AS_REQUIRED",
         "namespace": "VALUES",
@@ -9845,6 +9979,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameters",
               "description": "",
               "modelProperties": {}
@@ -9872,6 +10007,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalValue",
               "description": "",
               "modelProperties": {}
@@ -9985,6 +10121,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -10049,6 +10186,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_OPTIONAL_PARAMETER_WITH_DEFAULT",
         "namespace": "VALUES",
@@ -10101,6 +10239,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameters",
               "description": "",
               "modelProperties": {}
@@ -10129,6 +10268,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalValue",
               "description": "",
               "modelProperties": {}
@@ -10242,6 +10382,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -10306,6 +10447,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_REQUIRED_AND_OPTIONAL_PARAMETERS",
         "namespace": "VALUES",
@@ -10362,6 +10504,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameters",
               "description": "",
               "modelProperties": {}
@@ -10389,6 +10532,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredValue",
               "description": "",
               "modelProperties": {}
@@ -10416,6 +10560,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalValue",
               "description": "",
               "modelProperties": {}
@@ -10529,6 +10674,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -10593,6 +10739,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_REQUIRED_AND_OPTIONAL_WITH_DEFAULT_PARAMETERS",
         "namespace": "VALUES",
@@ -10649,6 +10796,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameters",
               "description": "",
               "modelProperties": {}
@@ -10676,6 +10824,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredValue",
               "description": "",
               "modelProperties": {}
@@ -10704,6 +10853,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalValue",
               "description": "",
               "modelProperties": {}
@@ -10817,6 +10967,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -10881,6 +11032,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_REQUIRED_PARAMETER",
         "namespace": "VALUES",
@@ -10933,6 +11085,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameters",
               "description": "",
               "modelProperties": {}
@@ -10960,6 +11113,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredValue",
               "description": "",
               "modelProperties": {}
@@ -11073,6 +11227,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -11137,6 +11292,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_REQUIRED_PARAMETER_AND_OPTIONAL_PARAMETER_AS_REQUIRED",
         "namespace": "VALUES",
@@ -11193,6 +11349,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameters",
               "description": "",
               "modelProperties": {}
@@ -11220,6 +11377,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredValue",
               "description": "",
               "modelProperties": {}
@@ -11247,6 +11405,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalValue",
               "description": "",
               "modelProperties": {}
@@ -11360,6 +11519,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -11424,6 +11584,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WITH_VP_OPTIONAL_PARAMETER_WITH_DEFAULT_VALUE",
         "namespace": "VALUES",
@@ -11476,6 +11637,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providedParameters",
               "description": "",
               "modelProperties": {}
@@ -11504,6 +11666,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalValue",
               "description": "",
               "modelProperties": {}
@@ -11617,6 +11780,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -11692,6 +11856,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SIMPLE_SOURCE",
         "namespace": "VALUES",
@@ -11739,6 +11904,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -11768,6 +11934,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -11907,6 +12074,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -11974,6 +12142,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SOURCE_MUST_NOT_START",
         "namespace": "VALUES",
@@ -12002,7 +12171,7 @@
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "hasBeenStarted",
-                "providerId": "org.mule.test.values.extension.resolver.TrueFalseValueProvider",
+                "providerId": "TrueFalseValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -12021,6 +12190,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "hasBeenStarted",
               "description": "",
               "modelProperties": {}
@@ -12050,6 +12220,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -12189,6 +12360,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -12256,6 +12428,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SOURCE_WITH_MULTI_LEVEL_VALUE",
         "namespace": "VALUES",
@@ -12296,6 +12469,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -12435,6 +12609,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -12489,6 +12664,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "required",
               "description": "",
               "modelProperties": {}
@@ -12526,6 +12702,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "continent",
               "description": "",
               "modelProperties": {}
@@ -12563,6 +12740,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "country",
               "description": "",
               "modelProperties": {}
@@ -12600,6 +12778,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "city",
               "displayModel": {
                 "displayName": "State | City"
@@ -12659,6 +12838,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SOURCE_WITH_REQUIRED_PARAMETER_INSIDE_SHOW_IN_DSL_GROUP",
         "namespace": "VALUES",
@@ -12692,7 +12872,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -12711,6 +12891,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -12740,6 +12921,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -12879,6 +13061,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -12941,6 +13124,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -12968,6 +13152,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -13024,6 +13209,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SOURCE_WITH_REQUIRED_PARAMETER_WITH_ALIAS",
         "namespace": "VALUES",
@@ -13064,6 +13250,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -13203,6 +13390,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -13256,6 +13444,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "superString",
               "description": "",
               "modelProperties": {}
@@ -13297,6 +13486,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -13353,6 +13543,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SOURCE_WITH_VALUES_WITH_REQUIRED_PARAMETER_INSIDE_PARAM_GROUP",
         "namespace": "VALUES",
@@ -13393,6 +13584,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -13532,6 +13724,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -13594,6 +13787,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -13621,6 +13815,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -13677,6 +13872,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SOURCE_WITH_VALUES_WITH_REQUIRED_PARAMETERS",
         "namespace": "VALUES",
@@ -13741,6 +13937,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -13768,6 +13965,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredString",
               "description": "",
               "modelProperties": {}
@@ -13799,6 +13997,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredBoolean",
               "description": "",
               "modelProperties": {}
@@ -13841,6 +14040,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "requiredInteger",
               "description": "",
               "modelProperties": {}
@@ -13889,6 +14089,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "strings",
               "description": "",
               "modelProperties": {}
@@ -13918,6 +14119,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -14057,6 +14259,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {

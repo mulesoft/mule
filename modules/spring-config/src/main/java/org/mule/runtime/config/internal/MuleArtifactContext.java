@@ -45,9 +45,11 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
+import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureHonourRetryPolicyTemplateOverrideFeature;
+import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureResolveExuectionModeBasedOnEnabledReconnectionStrategy;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -155,6 +157,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     configureHonourRetryPolicyTemplateOverrideFeature();
     configureBatchFixedAggregatorTransactionRecordBuffer();
     configureComputeConnectionErrorsInStats();
+    configureToStringTransformerTransformIteratorElements();
+    configureResolveExuectionModeBasedOnEnabledReconnectionStrategy();
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactContext.class);
@@ -352,11 +356,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
       }
 
-      validateArtifact(artifactAst);
-      return new ApplicationModel(artifactAst,
-                                  artifactProperties, parentConfigurationProperties,
-                                  new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader()),
-                                  featureFlaggingService);
+      final ApplicationModel applicationModel = new ApplicationModel(artifactAst,
+                                                                     artifactProperties, parentConfigurationProperties,
+                                                                     new ClassLoaderResourceProvider(muleContext
+                                                                         .getExecutionClassLoader()),
+                                                                     featureFlaggingService);
+      validateArtifact(applicationModel);
+      return applicationModel;
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -799,8 +805,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
 
     ffRegistry.registerFeature(HANDLE_SPLITTER_EXCEPTION,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
-                                   && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
+                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.atLeast("4.4.0")).orElse(false));
   }
 
   private static void configureBatchFixedAggregatorTransactionRecordBuffer() {

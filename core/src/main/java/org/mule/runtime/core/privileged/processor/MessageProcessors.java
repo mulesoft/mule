@@ -9,6 +9,8 @@ package org.mule.runtime.core.privileged.processor;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
@@ -55,7 +57,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -672,13 +673,45 @@ public class MessageProcessors {
   /**
    * Helper method to get the {@link ProcessingStrategy} from a component.
    *
-   * @param locator               the locator
-   * @param rootContainerLocation the component root container element
-   * @return the processing strategy of the root component if it was an instance of {@link FlowConstruct}, empty otherwise.
+   * @param locator   the locator
+   * @param component the component from which root the processing strategy will be obtained
+   * @return the processing strategy of the root of the component if it was an instance of {@link ProcessingStrategySupplier},
+   *         empty otherwise.
    */
   public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
+                                                                   Component component) {
+    if (component.getLocation() == null) {
+      return empty();
+    }
+
+    return component.getLocation().getParts().get(0).getPartIdentifier()
+        // This filter is consistent with the types that implement ProcessingStrategySupplier
+        .filter(id -> id.getType().equals(FLOW)
+            // a top level router is a policy...
+            || id.getType().equals(ROUTER))
+        .flatMap(id -> getProcessingStrategy(locator, component.getRootContainerLocation()));
+  }
+
+  /**
+   * Helper method to get the {@link ProcessingStrategy} from a component.
+   *
+   * @param locator               the locator
+   * @param rootContainerLocation the component root container element
+   * @return the processing strategy of the root component if it was an instance of {@link ProcessingStrategySupplier}, empty
+   *         otherwise.
+   *
+   * @deprecated Use {@link #getProcessingStrategy(ConfigurationComponentLocator, Component)} instead.
+   */
+  @Deprecated
+  public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
                                                                    Location rootContainerLocation) {
-    return locator.find(rootContainerLocation)
+    final Optional<Component> found = locator.find(rootContainerLocation);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("getProcessingStrategy - location: {} -> found: {}", rootContainerLocation,
+                   found.map(loc -> loc.getClass().getSimpleName() + ": " + loc.getLocation().getLocation()).orElse("(null)"));
+    }
+
+    return found
         .filter(loc -> loc instanceof ProcessingStrategySupplier)
         .map(loc -> ((ProcessingStrategySupplier) loc).getProcessingStrategy());
   }

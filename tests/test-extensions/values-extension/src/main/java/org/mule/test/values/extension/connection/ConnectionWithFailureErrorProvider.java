@@ -8,7 +8,7 @@ package org.mule.test.values.extension.connection;
 
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.values.OfValues;
+import org.mule.sdk.api.annotation.values.OfValues;
 import org.mule.test.values.extension.resolver.WithErrorValueProvider;
 
 @Alias("failure-connection")

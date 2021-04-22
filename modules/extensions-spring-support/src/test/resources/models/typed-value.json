@@ -230,6 +230,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stringTypedValue",
               "description": "",
               "modelProperties": {}
@@ -262,6 +263,7 @@
                   "namespace": "HEISENBERG"
                 }
               ],
+              "semanticTerms": [],
               "name": "differedDoor",
               "description": "",
               "modelProperties": {}
@@ -289,6 +291,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -406,6 +409,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -464,6 +468,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TYPED_VALUE_ON_CONFIG",
             "namespace": "TYPED-VALUE",
@@ -527,6 +532,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -570,6 +576,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -602,6 +609,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -718,6 +726,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -788,6 +797,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TYPED_VALUE_OPERATION_STRING_PARAMETER",
             "namespace": "TYPED-VALUE",
@@ -827,6 +837,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "stringValue",
                   "description": "",
                   "modelProperties": {}
@@ -879,6 +890,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -922,6 +934,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -954,6 +967,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1070,6 +1084,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1191,6 +1206,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "MIXED_TYPED_VALUES",
         "namespace": "TYPED-VALUE",
@@ -1229,6 +1245,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stringNotWrapped",
               "description": "",
               "modelProperties": {}
@@ -1256,6 +1273,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "wrappedString",
               "description": "",
               "modelProperties": {}
@@ -1283,6 +1301,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "complexTypedValue",
               "description": "",
               "modelProperties": {}
@@ -1310,6 +1329,7 @@
                 "order": 6
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "complexNotWrapped",
               "description": "",
               "modelProperties": {}
@@ -1377,6 +1397,7 @@
                 "order": 7
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "mapOfComplexValues",
               "description": "",
               "modelProperties": {}
@@ -1444,6 +1465,7 @@
                 "order": 8
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "mapOfComplexTypedValues",
               "description": "",
               "modelProperties": {}
@@ -1486,6 +1508,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "user",
               "description": "",
               "modelProperties": {}
@@ -1513,6 +1536,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pass",
               "description": "",
               "modelProperties": {}
@@ -1556,6 +1580,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1588,6 +1613,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1704,6 +1730,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -1800,6 +1827,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_FOR_INPUT_STREAM",
         "namespace": "TYPED-VALUE",
@@ -1855,6 +1883,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "inputStream",
               "description": "",
               "modelProperties": {}
@@ -2032,6 +2061,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -2086,6 +2116,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2118,6 +2149,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2234,6 +2266,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -2317,6 +2350,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_FOR_OBJECT",
         "namespace": "TYPED-VALUE",
@@ -2375,6 +2409,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "objectTypedValue",
               "description": "",
               "modelProperties": {}
@@ -2418,6 +2453,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2450,6 +2486,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2566,6 +2603,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -2640,6 +2678,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_FOR_STRING_INSIDE_POJO",
         "namespace": "TYPED-VALUE",
@@ -2683,6 +2722,7 @@
                   "namespace": "HEISENBERG"
                 }
               ],
+              "semanticTerms": [],
               "name": "differedDoor",
               "description": "",
               "modelProperties": {}
@@ -2726,6 +2766,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2758,6 +2799,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2874,6 +2916,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -2959,6 +3002,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_DOOR_LIST_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -3018,6 +3062,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "doorValues",
               "description": "",
               "modelProperties": {}
@@ -3061,6 +3106,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3093,6 +3139,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -3209,6 +3256,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -3294,6 +3342,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_DOOR_MAP_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -3353,6 +3402,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "doorMapValues",
               "description": "",
               "modelProperties": {}
@@ -3396,6 +3446,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3428,6 +3479,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -3544,6 +3596,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -3608,6 +3661,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_DOOR_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -3646,6 +3700,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "doorValue",
               "description": "",
               "modelProperties": {}
@@ -3689,6 +3744,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3721,6 +3777,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -3837,6 +3894,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -3901,6 +3959,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_POJO_WITH_NULLSAFE_AND_CONTENT",
         "namespace": "TYPED-VALUE",
@@ -3940,6 +3999,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "description",
               "description": "",
               "modelProperties": {}
@@ -3967,6 +4027,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "brandName",
               "description": "",
               "modelProperties": {}
@@ -4011,6 +4072,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "weight",
               "description": "",
               "modelProperties": {}
@@ -4054,6 +4116,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -4086,6 +4149,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -4202,6 +4266,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -4287,6 +4352,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_STRING_LIST_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -4346,6 +4412,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stringValues",
               "description": "",
               "modelProperties": {}
@@ -4374,6 +4441,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -4421,6 +4489,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -4453,6 +4522,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -4569,6 +4639,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -4675,6 +4746,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_STRING_MAP_LIST_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -4755,6 +4827,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "doorMapListValues",
               "description": "",
               "modelProperties": {}
@@ -4798,6 +4871,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -4830,6 +4904,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -4946,6 +5021,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -5031,6 +5107,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_STRING_MAP_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -5090,6 +5167,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stringMapValues",
               "description": "",
               "modelProperties": {}
@@ -5133,6 +5211,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5165,6 +5244,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -5281,6 +5361,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -5351,6 +5432,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_WITH_STRING_CONTENT",
         "namespace": "TYPED-VALUE",
@@ -5390,6 +5472,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stringDescription",
               "description": "",
               "modelProperties": {}
@@ -5433,6 +5516,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5465,6 +5549,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -5581,6 +5666,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -5653,6 +5739,7 @@
                   "order": 2
                 },
                 "allowedStereotypeModels": [],
+                "semanticTerms": [],
                 "name": "stringValue",
                 "description": "",
                 "modelProperties": {}
@@ -5723,6 +5810,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SOURCE",
         "namespace": "TYPED-VALUE",
@@ -5763,6 +5851,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -5902,6 +5991,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {

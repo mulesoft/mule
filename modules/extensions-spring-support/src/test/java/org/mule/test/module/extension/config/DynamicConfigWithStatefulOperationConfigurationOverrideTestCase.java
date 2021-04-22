@@ -6,18 +6,40 @@
  */
 package org.mule.test.module.extension.config;
 
-import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
+import static org.junit.Assert.fail;
+import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DynamicConfigWithStatefulOperationConfigurationOverrideTestCase extends InvalidExtensionConfigTestCase {
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(MULE_DSL)
+@Story(DSL_VALIDATION_STORY)
+// TODO MULE-19352 migrate this test to InvalidExtensionConfigTestCase
+public class DynamicConfigWithStatefulOperationConfigurationOverrideTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Override
-  protected String getConfigFile() {
-    return "dynamic-stateful-override-config.xml";
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    expectedException.expect(InitialisationException.class);
+    additionalExceptionAssertions(expectedException);
   }
 
   @Override
+  protected String getConfigFile() {
+    return "validation/dynamic-stateful-override-config.xml";
+  }
+
   protected void additionalExceptionAssertions(ExpectedException expectedException) {
     expectedException.expectMessage("Component 'implicit:get-enriched-name' at implicitConfig/processors/0 uses a dynamic "
         + "configuration and defines configuration override parameter 'optionalWithDefault' which is "
@@ -25,4 +47,8 @@ public class DynamicConfigWithStatefulOperationConfigurationOverrideTestCase ext
         + "configuration or don't set the parameter.");
   }
 
+  @Test
+  public void failedValidation() {
+    fail("Config should have failed to parse");
+  }
 }

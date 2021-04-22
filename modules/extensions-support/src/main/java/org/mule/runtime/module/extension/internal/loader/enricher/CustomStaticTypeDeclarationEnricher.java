@@ -48,13 +48,10 @@ import org.mule.runtime.extension.api.annotation.metadata.fixed.InputXmlType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
-import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +67,7 @@ import java.util.Set;
  *
  * @since 4.1
  */
-public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnricher {
+public final class CustomStaticTypeDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
   private final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
 
@@ -87,14 +84,12 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
       protected void onOperation(WithOperationsDeclaration owner, OperationDeclaration operation) {
         OutputDeclaration output = operation.getOutput();
         OutputDeclaration attributes = operation.getOutputAttributes();
-        operation.getModelProperty(ImplementingMethodModelProperty.class)
-            .map(ImplementingMethodModelProperty::getMethod)
-            .ifPresent(method -> {
-              getOutputType(method, output.getType())
-                  .ifPresent(type -> declareCustomType(output, type));
-              getAttributesType(method, attributes.getType())
-                  .ifPresent(type -> declareCustomType(attributes, type));
-            });
+        extractImplementingMethod(operation).ifPresent(method -> {
+          getOutputType(method, output.getType())
+              .ifPresent(type -> declareCustomType(output, type));
+          getAttributesType(method, attributes.getType())
+              .ifPresent(type -> declareCustomType(attributes, type));
+        });
         declareParametersCustomStaticTypes(operation);
       }
 
@@ -102,13 +97,11 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
       protected void onSource(WithSourcesDeclaration owner, SourceDeclaration source) {
         OutputDeclaration output = source.getOutput();
         OutputDeclaration attributes = source.getOutputAttributes();
-        source.getModelProperty(ImplementingTypeModelProperty.class)
-            .map(ImplementingTypeModelProperty::getType)
-            .ifPresent(clazz -> {
-              getOutputType(clazz, output.getType()).ifPresent(type -> declareCustomType(output, type));
-              getAttributesType(clazz, attributes.getType())
-                  .ifPresent(type -> declareCustomType(attributes, type));
-            });
+        extractImplementingType(source).ifPresent(clazz -> {
+          getOutputType(clazz, output.getType()).ifPresent(type -> declareCustomType(output, type));
+          getAttributesType(clazz, attributes.getType())
+              .ifPresent(type -> declareCustomType(attributes, type));
+        });
 
         source.getSuccessCallback().ifPresent(this::declareParametersCustomStaticTypes);
         source.getErrorCallback().ifPresent(this::declareParametersCustomStaticTypes);

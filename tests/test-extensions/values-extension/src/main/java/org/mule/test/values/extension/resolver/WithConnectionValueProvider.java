@@ -6,10 +6,10 @@
  */
 package org.mule.test.values.extension.resolver;
 
-import org.mule.runtime.extension.api.values.ValueBuilder;
-import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.values.ValueProvider;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueBuilder;
+import org.mule.sdk.api.values.ValueProvider;
 import org.mule.test.values.extension.ValuesConnection;
 
 import java.util.Set;

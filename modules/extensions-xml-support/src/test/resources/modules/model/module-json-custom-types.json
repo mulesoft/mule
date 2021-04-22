@@ -46,6 +46,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "CHECK-STREET-IS-AVENUE",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -84,6 +85,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "street",
               "displayModel": {},
               "description": "",
@@ -121,6 +123,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -152,6 +155,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -261,6 +265,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -348,6 +353,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "COPY-JSONTYPE1",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -414,6 +420,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aParameter",
               "displayModel": {},
               "description": "",
@@ -451,6 +458,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -482,6 +490,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -591,6 +600,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -678,6 +688,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET-HARDCODED-TYPE1",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -716,6 +727,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -747,6 +759,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -856,6 +869,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -943,6 +957,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET-HARDCODED-TYPE1-AS-JSON",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -981,6 +996,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1012,6 +1028,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1121,6 +1138,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -1180,6 +1198,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "IS-JSONTYPE1",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -1246,6 +1265,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aParameter",
               "displayModel": {},
               "description": "",
@@ -1283,6 +1303,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1314,6 +1335,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1423,6 +1445,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -1482,6 +1505,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "IS-JSONTYPE1-CONTENT",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -1549,6 +1573,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "rules",
               "displayModel": {},
               "description": "",
@@ -1586,6 +1611,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1617,6 +1643,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1726,6 +1753,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -1785,6 +1813,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "IS-JSONTYPE2",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -1863,6 +1892,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aParameter",
               "displayModel": {},
               "description": "",
@@ -1900,6 +1930,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1931,6 +1962,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2040,6 +2072,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -2099,6 +2132,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "JOIN-STRING-ARRAY",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -2140,6 +2174,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "behaviourArray",
               "displayModel": {},
               "description": "",
@@ -2172,6 +2207,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "contentArray",
               "displayModel": {},
               "description": "",
@@ -2209,6 +2245,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2240,6 +2277,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2349,6 +2387,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -2448,6 +2487,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "OPERATION-WITH-CUSTOM-TYPES",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -2514,6 +2554,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "value",
               "displayModel": {},
               "description": "",
@@ -2551,6 +2592,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2582,6 +2624,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2691,6 +2734,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {

@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -168,8 +169,8 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import org.slf4j.MDC;
+
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -610,31 +611,34 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
-      if (nestedChain != null) {
-        initialiseIfNeeded(nestedChain, muleContext);
-      }
-
-      resolvedProcessorRepresentation = getRepresentation();
-
-      initProcessingStrategy();
-
       ComponentLocation componentLocation = getLocation();
       if (componentLocation != null) {
         processorPath = componentLocation.getLocation();
       }
+
+      resolvedProcessorRepresentation = getRepresentation();
+
+      if (nestedChain != null) {
+        LOGGER.debug("Initializing nested chain ({}) of component '{}'...", nestedChain, processorPath);
+        initialiseIfNeeded(nestedChain, muleContext);
+      }
+
+      initProcessingStrategy();
 
       initialised = true;
     }
   }
 
   private void initProcessingStrategy() throws InitialisationException {
-    final Optional<ProcessingStrategy> processingStrategyFromRootContainer =
-        getProcessingStrategy(componentLocator, getRootContainerLocation());
+    final Optional<ProcessingStrategy> processingStrategyFromRootContainer = getProcessingStrategy(componentLocator, this);
 
     processingStrategy = processingStrategyFromRootContainer
         .orElseGet(() -> createDefaultProcessingStrategyFactory().create(muleContext, toString() + ".ps"));
 
-    if (!processingStrategyFromRootContainer.isPresent()) {
+    if (processingStrategyFromRootContainer.isPresent()) {
+      LOGGER.debug("Using processing strategy ({}) from container for component '{}'", processingStrategy, processorPath);
+    } else {
+      LOGGER.debug("Initializing own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       ownedProcessingStrategy = true;
       initialiseIfNeeded(processingStrategy);
     }
@@ -984,6 +988,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         resolvedValue = ((ConfigOverrideValueResolverWrapper<?>) resolver).resolveWithoutConfig(resolvingContext.get());
         if (resolvedValue == null) {
           if (dynamicConfig.get()) {
+            // TODO MULE-19352 migrate this validation
             final ComponentLocation location = getLocation();
             String message = format(
                                     "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
@@ -1090,12 +1095,24 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     } else {
       Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
       if (staticConfig.isPresent()) {
-        RetryPolicyTemplate resolvedRetryPolicyTemplate = getRetryPolicyTemplate(staticConfig);
-        return resolvedRetryPolicyTemplate.isEnabled() && resolvedRetryPolicyTemplate.isAsync();
+        return isAsyncExecutableBasedOn(staticConfig);
       }
     }
 
     return true;
+  }
+
+  protected boolean isAsyncExecutableBasedOn(Optional<ConfigurationInstance> staticConfig) {
+    RetryPolicyTemplate resolvedRetryPolicyTemplate = getRetryPolicyTemplate(staticConfig);
+
+    if (resolveExecutionModeBasedOnAsyncReconnectionPolicy()) {
+      return resolvedRetryPolicyTemplate.isEnabled() && resolvedRetryPolicyTemplate.isAsync();
+    }
+
+    // By default the operation will be executed in async mode if it has a reconnection
+    // strategy regardless it is async or sync (this may result in some performance bottlenecks
+    // and has to be reviewed see MULE-19346 MULE-19342)
+    return resolvedRetryPolicyTemplate.isEnabled();
   }
 
   @Override
@@ -1103,33 +1120,42 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     startIfNeeded(componentExecutor);
 
     if (nestedChain != null) {
+      LOGGER.debug("Starting nested chain ({}) of component '{}'...", nestedChain, processorPath);
       startIfNeeded(nestedChain);
     }
 
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Starting own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       startIfNeeded(processingStrategy);
     }
     if (outerFluxTerminationTimeout >= 0) {
       outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
           .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
+      LOGGER.debug("Created outerFluxCompletionScheduler ({}) of component '{}'", outerFluxCompletionScheduler, processorPath);
     }
 
+    LOGGER.debug("Starting inner flux of component '{}'...", processorPath);
     startInnerFlux();
   }
 
   @Override
   public void doStop() throws MuleException {
     if (nestedChain != null) {
+      LOGGER.debug("Sttopping nested chain ({}) of component '{}'...", nestedChain, processorPath);
       stopIfNeeded(nestedChain);
     }
     stopIfNeeded(componentExecutor);
+    LOGGER.debug("Stopping inner flux of component '{}'...", processorPath);
     stopInnerFlux();
 
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Stopping own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       stopIfNeeded(processingStrategy);
     }
 
     if (outerFluxTerminationTimeout >= 0 && outerFluxCompletionScheduler != null) {
+      LOGGER.debug("Stopping outerFluxCompletionScheduler ({}) of component '{}'...", outerFluxCompletionScheduler,
+                   processorPath);
       outerFluxCompletionScheduler.stop();
       outerFluxCompletionScheduler = null;
     }
@@ -1159,10 +1185,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public void doDispose() {
     if (nestedChain != null) {
+      LOGGER.debug("Disposing nested chain ({}) of component '{}'...", nestedChain, processorPath);
       disposeIfNeeded(nestedChain, LOGGER);
     }
     disposeIfNeeded(componentExecutor, LOGGER);
     if (ownedProcessingStrategy) {
+      LOGGER.debug("Disposing own processing strategy ({}) of component '{}'...", ownedProcessingStrategy, processorPath);
       disposeIfNeeded(processingStrategy, LOGGER);
     }
     initialised = false;
@@ -1336,9 +1364,19 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
 
     ffRegistry.registerFeature(HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
-                                   && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
+                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.atLeast("4.4.0")).orElse(false));
 
+  }
+
+  public static void configureResolveExuectionModeBasedOnEnabledReconnectionStrategy() {
+    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+
+    ffRegistry.registerFeature(RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY,
+                               ctx -> false);
+  }
+
+  public boolean resolveExecutionModeBasedOnAsyncReconnectionPolicy() {
+    return featureFlaggingService.isEnabled(RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY);
   }
 
   protected boolean honourOperationRetryPolicyOverride() {

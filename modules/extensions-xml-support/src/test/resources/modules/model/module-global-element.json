@@ -53,6 +53,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "username",
               "displayModel": {},
               "description": "",
@@ -81,6 +82,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "password",
               "displayModel": {},
               "description": "",
@@ -103,6 +105,7 @@
                 "allowTopLevelDefinition": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -219,6 +222,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -271,6 +275,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "DO-GET-CLIENT",
             "namespace": "MODULE-GLOBAL-ELEMENT",
@@ -328,6 +333,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -364,6 +370,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -395,6 +402,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -504,6 +512,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -563,6 +572,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "DO-GET-CLIENT-WITH-PRIVATE-OPERATION",
             "namespace": "MODULE-GLOBAL-ELEMENT",
@@ -620,6 +630,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -656,6 +667,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -687,6 +699,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -796,6 +809,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -855,6 +869,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "DO-GET-PETS",
             "namespace": "MODULE-GLOBAL-ELEMENT",
@@ -893,6 +908,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "owner",
                   "displayModel": {},
                   "description": "",
@@ -940,6 +956,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -976,6 +993,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1007,6 +1025,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1116,6 +1135,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1154,6 +1174,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "MODULE-GLOBAL-ELEMENT",

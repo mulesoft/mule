@@ -11,7 +11,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.values.OfValues;
+import org.mule.sdk.api.annotation.values.OfValues;
 import org.mule.test.values.extension.ValuesConnection;
 import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
 

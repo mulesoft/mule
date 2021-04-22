@@ -4,12 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension;
+package org.mule.test.semantic.extension.connection;
 
-public class HeisenbergDefaultConfigNegativeTestCase extends InvalidExtensionConfigTestCase {
+public class SemanticConnection {
 
-  @Override
-  protected String getConfigFile() {
-    return "heisenberg-default-illegal-config.xml";
-  }
 }

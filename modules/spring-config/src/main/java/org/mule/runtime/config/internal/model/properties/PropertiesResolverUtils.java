@@ -21,6 +21,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PRO
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
@@ -35,7 +36,6 @@ import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigura
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
@@ -341,8 +341,7 @@ public class PropertiesResolverUtils {
       FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
 
       ffRegistry.registerFeature(HONOUR_RESERVED_PROPERTIES,
-                                 ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
-                                     && ctx.getConfiguration().getMinMuleVersion().get().newerThan("4.2.2"));
+                                 ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.newerThan("4.2.2")).orElse(false));
     }
   }
 

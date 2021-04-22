@@ -103,7 +103,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
   }
 
 
-  static class StreamEmitterProcessingStrategy extends AbstractReactorStreamProcessingStrategy implements Stoppable {
+  static class StreamEmitterProcessingStrategy extends AbstractReactorStreamProcessingStrategy {
 
     private static final Logger LOGGER = getLogger(StreamEmitterProcessingStrategy.class);
     private static final String NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR = "No subscriptions active for processor.";
@@ -147,6 +147,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       if (allSchedulersStopped()) {
         stopSchedulersIfNeeded();
       }
+      super.stop();
     }
 
     @Override

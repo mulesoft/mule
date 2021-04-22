@@ -46,6 +46,7 @@
         <module>classloading-extension</module>
         <module>resource-extension</module>
         <module>custom-object-store-extension</module>
+        <module>semantic-terms-extension</module>
     </modules>
 
     <build>
