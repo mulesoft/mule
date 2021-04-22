@@ -12,7 +12,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureAction;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -24,7 +23,6 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.runtime.source.Source;
 
 import java.util.Optional;
@@ -41,9 +39,7 @@ public class SourceAdapterFactory {
   private final ResolverSet errorCallbackParameters;
   private final CursorProviderFactory cursorProviderFactory;
   private final Optional<BackPressureAction> backPressureAction;
-  private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
-  private final ConfigurationProperties properties;
   private final MuleContext muleContext;
 
   public SourceAdapterFactory(ExtensionModel extensionModel,
@@ -53,9 +49,7 @@ public class SourceAdapterFactory {
                               ResolverSet errorCallbackParameters,
                               CursorProviderFactory cursorProviderFactory,
                               BackPressureStrategy backPressureStrategy,
-                              ReflectionCache reflectionCache,
                               ExpressionManager expressionManager,
-                              ConfigurationProperties properties,
                               MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -64,9 +58,7 @@ public class SourceAdapterFactory {
     this.errorCallbackParameters = errorCallbackParameters;
     this.cursorProviderFactory = cursorProviderFactory;
     this.backPressureAction = toBackPressureAction(backPressureStrategy);
-    this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
-    this.properties = properties;
     this.muleContext = muleContext;
   }
 
@@ -89,7 +81,7 @@ public class SourceAdapterFactory {
         getSdkSourceFactory(sourceModel).createMessageSource();
     try {
       SourceConfigurer sourceConfigurer = new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters,
-                                                               expressionManager, properties, muleContext, restarting);
+                                                               expressionManager, muleContext, restarting);
       Source sdkSource = sourceConfigurer.configure(source.getValue().get(), configurationInstance);
       return new SourceAdapter(extensionModel,
                                sourceModel,

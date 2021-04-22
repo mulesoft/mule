@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
+import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
@@ -41,10 +41,9 @@ public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValu
                                                String parameterName,
                                                String literalValue) {
     super(delegate);
-    this.errorMessage = String.format(
-                                      "Required parameter '%s' was assigned with value '%s' which resolved to null." +
-                                          " Required parameters need to be assigned with non null values",
-                                      parameterName, literalValue);
+    this.errorMessage = format("Required parameter '%s' was assigned with value '%s' which resolved to null." +
+        " Required parameters need to be assigned with non null values",
+                               parameterName, literalValue);
   }
 
   /**
@@ -56,16 +55,15 @@ public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValu
   public RequiredParameterValueResolverWrapper(ValueResolver<T> delegate,
                                                String parameterName) {
     super(delegate);
-    this.errorMessage = String.format(
-                                      "Required parameter '%s' resolved to null." +
-                                          " Required parameters need to be assigned with non null values",
-                                      parameterName);
+    this.errorMessage = format("Required parameter '%s' resolved to null." +
+        " Required parameters need to be assigned with non null values",
+                               parameterName);
   }
 
   @Override
   public T resolve(ValueResolvingContext context) throws MuleException {
     T value = super.resolve(context);
-    if (value == null && !isLazyInitMode(properties)) {
+    if (value == null) {
       throw new IllegalArgumentException(errorMessage);
     }
 

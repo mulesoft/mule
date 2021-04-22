@@ -988,6 +988,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         resolvedValue = ((ConfigOverrideValueResolverWrapper<?>) resolver).resolveWithoutConfig(resolvingContext.get());
         if (resolvedValue == null) {
           if (dynamicConfig.get()) {
+            // TODO MULE-19352 migrate this validation
             final ComponentLocation location = getLocation();
             String message = format(
                                     "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
