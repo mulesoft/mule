@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromPath;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -25,7 +25,6 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,21 +45,17 @@ public class InjectableParameterResolver {
   private static final String EXPRESSION_SUFFIX = "}]";
   private static final String EMPTY_EXPRESSION = EXPRESSION_PREFIX + EXPRESSION_SUFFIX;
 
-  private Map<String, Object> resolvedParameterValues;
-  private ParameterizedModel parameterizedModel;
-  private ExpressionManager expressionManager;
-  private List<InjectableParameterInfo> injectableParameters;
-  private Map<String, InjectableParameterInfo> injectableParametersMap;
+  private final Map<String, Object> resolvedParameterValues;
+  private final ExpressionManager expressionManager;
+  private final Map<String, InjectableParameterInfo> injectableParametersMap;
 
   public InjectableParameterResolver(ParameterizedModel parameterizedModel,
                                      ParameterValueResolver parameterValueResolver,
                                      ExpressionManager expressionManager,
                                      List<InjectableParameterInfo> injectableParameters) {
-    this.parameterizedModel = parameterizedModel;
     this.expressionManager = expressionManager;
-    this.injectableParameters = injectableParameters;
-    initInjectableParametersMap();
-    initResolvedValues(parameterValueResolver);
+    this.injectableParametersMap = getInjectableParametersMap(injectableParameters);
+    this.resolvedParameterValues = getResolvedValues(parameterValueResolver, parameterizedModel);
   }
 
   /**
@@ -92,26 +87,27 @@ public class InjectableParameterResolver {
     return parameterValue;
   }
 
-  private void initInjectableParametersMap() {
-    this.injectableParametersMap =
-        injectableParameters.stream().collect(toMap(injectableParameter -> injectableParameter.getParameterName(),
-                                                    injectableParameter -> injectableParameter));
+  private Map<String, InjectableParameterInfo> getInjectableParametersMap(List<InjectableParameterInfo> injectableParameters) {
+    return injectableParameters.stream().collect(toMap(injectableParameter -> injectableParameter.getParameterName(),
+                                                       injectableParameter -> injectableParameter));
   }
 
-  private void initResolvedValues(ParameterValueResolver parameterValueResolver) {
-    resolvedParameterValues = new HashMap<>();
-    BindingContext bindingContext = createBindingContext(parameterValueResolver);
+  private Map<String, Object> getResolvedValues(ParameterValueResolver parameterValueResolver,
+                                                ParameterizedModel parameterizedModel) {
+    BindingContext bindingContext = createBindingContext(parameterValueResolver, parameterizedModel);
     String expression = getResolvedParameterValuesExpression(bindingContext.identifiers());
 
     if (!expression.equals(EMPTY_EXPRESSION)) {
-      resolvedParameterValues =
-          (Map<String, Object>) expressionManager
-              .evaluate(expression, DataType.builder().mapType(Map.class).build(), bindingContext)
-              .getValue();
+      return (Map<String, Object>) expressionManager
+          .evaluate(expression, DataType.builder().mapType(Map.class).build(), bindingContext)
+          .getValue();
+    } else {
+      return emptyMap();
     }
   }
 
-  private BindingContext createBindingContext(ParameterValueResolver parameterValueResolver) {
+  private BindingContext createBindingContext(ParameterValueResolver parameterValueResolver,
+                                              ParameterizedModel parameterizedModel) {
     BindingContext.Builder bindingContextBuilder = BindingContext.builder();
 
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
@@ -134,7 +130,7 @@ public class InjectableParameterResolver {
     StringBuilder expression = new StringBuilder();
     expression.append(EXPRESSION_PREFIX);
     expression.append(
-                      injectableParameters.stream()
+                      injectableParametersMap.values().stream()
                           .filter(injectableParameterInfo -> identifiers
                               .contains(getParameterNameFromPath(injectableParameterInfo.getPath())))
                           .map(injectableParameterInfo -> "\""

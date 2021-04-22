@@ -172,7 +172,7 @@ public class ValueProviderUtils {
   }
 
   /**
-   * Retrieves the name of the parameter a path is referring to/
+   * Retrieves the name of the parameter a path is referring to
    *
    * @param path a path of a binding defined in an {@link org.mule.runtime.api.meta.model.parameter.ActingParameterModel}
    * @return the name of the parameter it refers to
