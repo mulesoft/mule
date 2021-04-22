@@ -7,46 +7,31 @@
 package org.mule.runtime.module.extension.internal.value;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
 import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
 
 
-import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
-import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.metadata.DefaultDataTypeBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.InjectableParameterResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.values.ValueProvider;
 import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,57 +80,11 @@ public class ValueProviderFactory {
       Object resolver = instantiateClass(resolverClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
-      Map<String, Object> resolvedActingParameters = new HashMap<>();
+      InjectableParameterResolver injectableParameterResolver =
+          new InjectableParameterResolver(parameterizedModel, parameterValueResolver, expressionManager,
+                                          factoryModelProperty.getInjectableParameters());
 
-      BindingContext.Builder bindingContextBuilder = BindingContext.builder();
-
-      for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
-        String unaliasedName = getUnaliasedName(parameterModel);
-        Object value = null;
-        try {
-          // value = parameterValueResolver.getParameterValue(unaliasedName); this one was used before
-          value = parameterValueResolver.getParameterValue(unaliasedName);
-          if (value == null) {
-            value = parameterValueResolver.getParameterValue(parameterModel.getName());
-          }
-        } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException e) {
-          value = null;
-        }
-        if (value != null) {
-          String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
-          DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
-          bindingContextBuilder.addBinding(parameterModel.getName(), new TypedValue(value, valueDataType));
-        }
-      }
-
-      BindingContext bindingContext = bindingContextBuilder.build();
-
-      StringBuilder expression = new StringBuilder();
-      expression.append("#[{");
-      expression.append(
-                        factoryModelProperty
-                            .getInjectableParameters().stream()
-                            .filter(injectableParameterInfo -> bindingContext.identifiers()
-                                .contains(injectableParameterInfo.getPath()
-                                    .substring(0, injectableParameterInfo.getPath().indexOf(".") > 0
-                                        ? injectableParameterInfo.getPath().indexOf(".")
-                                        : injectableParameterInfo.getPath().length())))
-                            .map(injectableParameterInfo -> "\""
-                                + injectableParameterInfo.getParameterName() + "\"  : " + injectableParameterInfo.getPath())
-                            .collect(Collectors.joining(", ")));
-      expression.append("}]");
-
-      if (!expression.toString().equals("#[{}]")) {
-        resolvedActingParameters =
-            (Map<String, Object>) expressionManager
-                .evaluate(expression.toString(),
-                          DataType.builder().mapType(Map.class)
-                              .valueMediaType(ANY).build(),
-                          bindingContext)
-                .getValue();
-      }
-
-      injectValueProviderFields(resolver, resolvedActingParameters);
+      injectValueProviderFields(resolver, injectableParameterResolver);
 
       if (factoryModelProperty.usesConnection()) {
         Object connection;
@@ -178,38 +117,15 @@ public class ValueProviderFactory {
     }
   }
 
-  private String getUnaliasedName(ParameterModel parameterModel) {
-    return parameterModel.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
-        .map(extensionParameterDescriptorModelProperty -> extensionParameterDescriptorModelProperty.getExtensionParameter()
-            .getName())
-        .orElse(parameterModel.getName());
-  }
-
-  private void injectValueProviderFields(Object resolver, Map<String, Object> resolvedParameters) throws ValueResolvingException {
+  private void injectValueProviderFields(Object resolver, InjectableParameterResolver resolvedParameters)
+      throws ValueResolvingException {
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
-      Object parameterValue = null;
-      // Maybe need transformation ? example list -> array
-      String parameterName = injectableParam.getParameterName();
-      parameterValue = resolvedParameters.get(parameterName);
-
+      Object parameterValue = resolvedParameters.getInjectableParameterValue(injectableParam.getParameterName());
       if (parameterValue != null) {
-        try {
-          parameterValue = expressionManager
-              .evaluate("#[payload]",
-                        DataType.fromType(Thread.currentThread().getContextClassLoader()
-                            .loadClass(injectableParam.getType().getAnnotation(ClassInformationAnnotation.class)
-                                .map(classInformationAnnotation -> classInformationAnnotation.getClassname())
-                                .orElse(Object.class.getName()))),
-                        BindingContext.builder()
-                            .addBinding("payload", new TypedValue(parameterValue, DataType.fromObject(parameterValue))).build())
-              .getValue();
-        } catch (ClassNotFoundException e) {
-          // Failed to transform value.
-        }
-        setValueIntoField(resolver, parameterValue, parameterName, reflectionCache);
+        setValueIntoField(resolver, parameterValue, injectableParam.getParameterName(), reflectionCache);
       } else if (injectableParam.isRequired()) {
-        missingParameters.add(parameterName);
+        missingParameters.add(injectableParam.getParameterName());
       }
     }
 
