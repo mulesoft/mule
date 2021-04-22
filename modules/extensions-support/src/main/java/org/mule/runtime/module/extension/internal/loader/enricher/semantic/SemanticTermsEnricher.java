@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher.semantic;
 
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION_PARAMETER;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.PROXY_CONFIGURATION_PARAMETER;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.PROXY_CONFIGURATION_TYPE;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.SCALAR_SECRET;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.SECRET;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION_PARAMETER;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.PROXY_CONFIGURATION_PARAMETER;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.PROXY_CONFIGURATION_TYPE;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.SCALAR_SECRET;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.SECRET;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSemanticTerms;
-import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getTermsFromAnnotations;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getConnectionTermsFromAnnotations;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getParameterTermsFromAnnotations;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getAllTermsFromAnnotations;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -27,7 +29,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSemanticTermsDecla
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.enricher.AbstractAnnotatedDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
 
@@ -49,24 +50,24 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
 
       @Override
       protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-        extractType(declaration).ifPresent(type -> addSemanticTerms(declaration, type));
+        extractType(declaration).ifPresent(type -> addSemanticTerms(getConnectionTermsFromAnnotations(type::isAnnotatedWith), declaration));
       }
 
       @Override
       protected void onOperation(OperationDeclaration declaration) {
         extractImplementingMethod(declaration)
             .map(method -> new MethodWrapper(method, typeLoader))
-            .ifPresent(method -> addSemanticTerms(declaration, method));
+            .ifPresent(method -> addSemanticTerms(getAllTermsFromAnnotations(method::isAnnotatedWith), declaration));
       }
 
       @Override
       protected void onSource(SourceDeclaration declaration) {
-        extractType(declaration).ifPresent(type -> addSemanticTerms(declaration, type));
+        extractType(declaration).ifPresent(type -> addSemanticTerms(getAllTermsFromAnnotations(type::isAnnotatedWith), declaration));
       }
 
       @Override
       protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration parameter) {
-        extractDeclaredParameter(parameter).ifPresent(e -> addSemanticTerms(parameter, e));
+        extractDeclaredParameter(parameter).ifPresent(e -> addSemanticTerms(getParameterTermsFromAnnotations(e::isAnnotatedWith), parameter));
         Set<String> typeTerms = new LinkedHashSet<>(getSemanticTerms(parameter.getType()));
 
         addTermIfPresent(typeTerms, parameter, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER);
@@ -91,7 +92,9 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
     }
   }
 
-  private void addSemanticTerms(WithSemanticTermsDeclaration declaration, WithAnnotations base) {
-    getTermsFromAnnotations(base::isAnnotatedWith).forEach(declaration::addSemanticTerm);
+
+
+  private void addSemanticTerms(Set<String> terms, WithSemanticTermsDeclaration declaration) {
+    terms.forEach(declaration::addSemanticTerm);
   }
 }
