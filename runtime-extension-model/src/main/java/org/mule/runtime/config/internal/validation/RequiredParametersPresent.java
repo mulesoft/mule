@@ -77,7 +77,9 @@ public class RequiredParametersPresent implements Validation {
         .findFirst();
   }
 
-  // resolve the provided value for every required param to iterate and check
+  /**
+   * Resolve the provided value for every required param to iterate and check.
+   */
   private Stream<Pair<ParameterModel, ComponentParameterAst>> requiredParamsStream(ComponentAst component) {
     Stream<Pair<ParameterModel, ComponentParameterAst>> paramsStream = component.getModel(SourceModel.class)
         .map(sm -> {
@@ -108,8 +110,8 @@ public class RequiredParametersPresent implements Validation {
             .map(pm -> new Pair<>(pm, component.getParameter(cpgm.getName(), pm.getName()))));
   }
 
-  // componentId presence is already validated by NamedTopLevelElementsHaveName
   protected boolean isDoValidation(ParameterModel pm) {
+    // componentId presence is already validated by NamedTopLevelElementsHaveName
     return pm.isRequired() && !pm.isComponentId();
   }
 }

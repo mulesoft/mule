@@ -6,14 +6,22 @@
  */
 package org.mule.test.module.extension.config;
 
+import static org.junit.Assert.fail;
+import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(MULE_DSL)
+@Story(DSL_VALIDATION_STORY)
 // TODO MULE-19352 migrate this test to InvalidExtensionConfigTestCase
 public class DynamicConfigWithStatefulOperationConfigurationOverrideTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -40,7 +48,7 @@ public class DynamicConfigWithStatefulOperationConfigurationOverrideTestCase ext
   }
 
   @Test
-  public void fail() {
-    Assert.fail("Config should have failed to parse");
+  public void failedValidation() {
+    fail("Config should have failed to parse");
   }
 }

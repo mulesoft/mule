@@ -81,8 +81,8 @@ public class RequiredParameterValueResolverWrapperTestCase extends LifecycleAwar
   }
 
   @Test
-  // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
   public void resolveNullValue() throws Exception {
+    // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
     when(delegate.resolve(context)).thenReturn(null);
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(allOf(containsString(PARAMETER_NAME), containsString(EXPRESSION)));

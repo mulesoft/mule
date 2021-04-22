@@ -282,8 +282,15 @@ public interface AllureConstants {
   interface OauthFeature {
 
     String OAUTH_EXTENSION = "OAuth Extension";
+    String OCS_SUPPORT = "OCS Support";
 
     interface OauthStory {
+
+    }
+
+    interface OcsStory {
+
+      String OCS_CONNECTION_VALIDATION = "Validation of OCS data provided by the platform";
 
     }
 

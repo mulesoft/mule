@@ -268,8 +268,8 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   }
 
   @Test
-  // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
   public void operationWithRequiredParameterButNullReturningExpression() throws Exception {
+    // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
     expectedException.expect(hasRootCause(instanceOf(IllegalArgumentException.class)));
     runFlow("knockWithNullDoor");
   }

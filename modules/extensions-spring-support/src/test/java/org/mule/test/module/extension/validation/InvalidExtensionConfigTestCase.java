@@ -140,8 +140,8 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
     loadConfiguration("validation/petstore-exclusive-required-parameter.xml");
   }
 
-  // TODO MULE-19350 migrate and adapt this test
   @Test
+  // TODO MULE-19350 migrate and adapt this test
   public void configLevelOperationNegative() throws Exception {
     expectedException.expect(InitialisationException.class);
     expectedException
@@ -149,8 +149,8 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
     loadConfiguration("validation/vegan-invalid-config-for-operations.xml");
   }
 
-  // TODO MULE-19350 migrate and adapt this test
   @Test
+  // TODO MULE-19350 migrate and adapt this test
   public void configLevelSourceNegative() throws Exception {
     expectedException.expect(InitialisationException.class);
     expectedException

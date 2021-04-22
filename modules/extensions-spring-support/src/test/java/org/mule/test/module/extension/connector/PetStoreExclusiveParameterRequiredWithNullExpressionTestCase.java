@@ -54,8 +54,8 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
   }
 
   @Test
-  // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
   public void getBreederOperationFail() throws Exception {
+    // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
     flowRunner("getBreederOperation").withVariable("mammals", null)
         .runExpectingException(hasMessage(containsString("Required parameters need to be assigned with non null values")));
   }
@@ -68,8 +68,8 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
   }
 
   @Test
-  // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
   public void getAquariumOperationFail() throws Exception {
+    // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
     flowRunner("getAquariumOperation").withVariable("frogName", null)
         .runExpectingException(hasMessage(containsString("Required parameters need to be assigned with non null values")));
   }
