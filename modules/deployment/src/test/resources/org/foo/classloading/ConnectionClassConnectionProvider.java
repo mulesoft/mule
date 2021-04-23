@@ -7,15 +7,22 @@
 
 package org.foo.classloading;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 
 public class ConnectionClassConnectionProvider implements ConnectionProvider<ClassConnection123> {
 
+  @Override
   public ClassConnection123 connect() {
     return new ClassConnection123();
   }
 
+  @Override
   public void disconnect(ClassConnection123 connection) {
     connection.invalidate();
+  }
+
+  @Override
+  public ConnectionValidationResult validate(ClassConnection123 connection) {
+    return null;
   }
 }

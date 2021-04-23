@@ -7,33 +7,36 @@
 
 package org.foo.classloading;
 
-import static java.lang.Thread.currentThread;
-
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
-import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
-import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.io.InputStream;
 
 public class ConnectOperation {
 
-  public String fooConfigOperation(@Config ConnectExtension config){
+  @MediaType(TEXT_PLAIN)
+  public String fooConfigOperation1(@Config ConnectExtension config){
     return "this operation receives the FooConfig!";
   }
 
+  @MediaType(TEXT_PLAIN)
   public String fooConnectedOperation(@Connection ClassConnection123 connection){
     return "this operation receives ClassConnection!";
   }
 
-  public String fooConnectedOperation(@Config ConnectExtension config, @Connection ClassConnection123 connection){
-    return "this operation receives both config and connection!";
+  @MediaType(TEXT_PLAIN)
+  public String getFile(@Connection ClassConnection123 connection){
+    InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("file.txt");
+    return IOUtils.toString(stream);
   }
+
+//  @MediaType(TEXT_PLAIN)
+//  public String fooConnectedOperation3(@Config ConnectExtension config, @Connection ClassConnection123 connection){
+//    return "this operation receives both config and connection!";
+//  }
 
 }

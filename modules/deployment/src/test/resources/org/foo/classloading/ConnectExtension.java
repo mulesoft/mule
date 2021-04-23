@@ -9,15 +9,14 @@ package org.foo.classloading;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.sdk.api.annotation.connectivity.ConnectionProviders;
-import org.mule.sdk.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 
-import javax.inject.Inject;
+import org.foo.classloading.ConnectionClassConnectionProvider;
 
 /**
  * Extension for testing purposes
  */
-@Extension(name = "Connect Extension")
+@Extension(name = "Connect")
 @Operations({ConnectOperation.class})
 @ConnectionProviders(ConnectionClassConnectionProvider.class)
 public class ConnectExtension {
