@@ -10,9 +10,20 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 
+import io.qameta.allure.Issue;
+import org.junit.runner.RunWith;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -20,7 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(OnCriticalErrorHandler.class)
+@PowerMockIgnore("javax.management.*")
 public class ExceptionListenerTestCase extends AbstractMuleTestCase {
 
   @Test
@@ -49,4 +66,20 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
     assertNotNull(router.getMessageProcessors());
     assertEquals(2, router.getMessageProcessors().size());
   }
+
+  @Test
+  @Issue("MULE-19344")
+  public void alwaysLogFlowBackPressureExceptions() throws Exception {
+    OnCriticalErrorHandler handler = spy(new OnCriticalErrorHandler(mock(ErrorTypeMatcher.class)));
+    FlowBackPressureException flowBackPressureException = mock(FlowBackPressureException.class);
+    MuleExceptionInfo muleExceptionInfo = new MuleExceptionInfo();
+    when(flowBackPressureException.getDetailedMessage()).thenReturn("Detail");
+    when(flowBackPressureException.getExceptionInfo()).thenReturn(muleExceptionInfo);
+
+    handler.logException(flowBackPressureException);
+    assertTrue(muleExceptionInfo.isAlreadyLogged());
+    handler.logException(flowBackPressureException);
+    verifyPrivate(handler, times(2)).invoke("doLogException", anyString(), isNull());
+  }
+
 }
