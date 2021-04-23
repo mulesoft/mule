@@ -1956,11 +1956,12 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     // Given an app depending on the domain and exporting a class.
     final ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder("app-with-load-class-operation").definedBy("app-with-load-class-operation.xml")
+        new ApplicationFileBuilder("app-with-connection").definedBy("app-with-connection.xml")
             .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
             .configuredWith(EXPORTED_PACKAGES, "org.foo")
             .dependingOn(domainFileBuilder)
-            .dependingOn(pluginWhichCreatesConnection);
+            .dependingOn(pluginWhichCreatesConnection)
+        .containingResource("org/foo/classloading/app/file.txt", "file.txt");
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);

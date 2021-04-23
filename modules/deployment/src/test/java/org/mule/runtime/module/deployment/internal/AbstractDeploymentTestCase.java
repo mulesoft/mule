@@ -340,10 +340,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .compile("mule-module-oracle-1.0.0.jar", "1.0.0");
 
     connectionExtensionJarFile = new ExtensionCompiler()
-        .compiling(
-                  getResourceFile("/org/foo/classloading/ConnectionClassConnectionProvider.java"),
-                  getResourceFile("/org/foo/classloading/ConnectExtension.java"),
+        .compiling(getResourceFile("/org/foo/classloading/ConnectExtension.java"),
                   getResourceFile("/org/foo/classloading/ConnectOperation.java"))
+        .including(getResourceFile("/org/foo/classloading/file.txt"),
+            "file.txt")
         .compile("mule-module-connect-1.0.0.jar", "1.0.0");
 
     usingObjectStoreJarFile = new ExtensionCompiler()
