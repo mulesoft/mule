@@ -1941,6 +1941,39 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     withContextClassLoader(anotherClassLoader, () -> completionCallback.error(new NullPointerException()));
   }
 
+  @Test
+  // @Issue("MULE-18159")
+  public void pluginDeclaredInDomainWithConnectionIsAbleToLoadClassesExportedByTheAppWhereItIsUsed() throws Exception {
+    // Given a plugin which loads classes.
+    final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
+    // Given a plugin which creates a connection.
+    final ArtifactPluginFileBuilder pluginWhichCreatesConnection = connectExtensionPlugin;
+
+    // Given a domain depending on the plugin.
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("domain-with-test-plugin")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(pluginWhichLoadsClasses);
+
+    // Given an app depending on the domain and exporting a class.
+    final ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("app-with-load-class-operation").definedBy("app-with-load-class-operation.xml")
+            .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+            .configuredWith(EXPORTED_PACKAGES, "org.foo")
+            .dependingOn(domainFileBuilder)
+            .dependingOn(pluginWhichCreatesConnection);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    // When the app uses the plugin in order to load the exported class, then it doesn't raise any error.
+    executeApplicationFlow("flowWhichTriesToLoadTheClass");
+  }
+
   private CompletionCallback<Object, Object> getCompletionCallback(String callbackName) {
     Registry registry = deploymentService.getApplications().get(0).getRegistry();
     Map<String, CompletionCallback<Object, Object>> callbacksMap =

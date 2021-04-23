@@ -254,6 +254,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static File oracleExtensionJarFile;
 
+  protected static File connectionExtensionJarFile;
+
   private static File defaulServiceEchoJarFile;
 
   private static File defaultFooServiceJarFile;
@@ -337,6 +339,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                    getResourceFile("/org/foo/oracle/OracleOperation.java"))
         .compile("mule-module-oracle-1.0.0.jar", "1.0.0");
 
+    connectionExtensionJarFile = new ExtensionCompiler()
+        .compiling(
+                  getResourceFile("/org/foo/classloading/ConnectionClassConnectionProvider.java"),
+                  getResourceFile("/org/foo/classloading/ConnectExtension.java"),
+                  getResourceFile("/org/foo/classloading/ConnectOperation.java"))
+        .compile("mule-module-connect-1.0.0.jar", "1.0.0");
+
     usingObjectStoreJarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/os/UsingObjectStoreExtension.java"))
         .compile("mule-module-using-object-store-1.0.0.jar", "1.0.0");
@@ -387,6 +396,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder byeXmlExtensionPlugin = createByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder usingObjectStorePlugin = createUsingObjectStorePluginFileBuilder();
+  protected final ArtifactPluginFileBuilder connectExtensionPlugin = createConnectExtensionPluginFileBuilder();
 
   // Application file builders
   protected final ApplicationFileBuilder emptyAppFileBuilder =
@@ -1593,6 +1603,21 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       logger.error(e.getMessage());
     }
     return pluginFileBuilder;
+  }
+
+  private ArtifactPluginFileBuilder createConnectExtensionPluginFileBuilder() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("connectExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("connectExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.classloading.ConnectExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("connectExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("connectExtension", connectionExtensionJarFile))
+        .describedBy((mulePluginModelBuilder.build()));
   }
 
   private ArtifactPluginFileBuilder createUsingObjectStorePluginFileBuilder() {
