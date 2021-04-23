@@ -225,6 +225,30 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     verify(transaction, never()).bindResource(any(), any(XAExtensionTransactionalResource.class));
   }
 
+  @Test
+  @Issue("MULE-19347")
+  public void ifXATransactionBindResourceFailsWithConnectionExceptionThenHandlerIsInvalidated() throws Exception {
+    final ConnectionException expectedConnectionException =
+        new ConnectionException("Failed to bind tx due to connectivity issue.");
+    final TransactionException expectedTxException = new TransactionException(expectedConnectionException);
+
+    assumeThat(lazyConnections, is(false));
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+    doThrow(expectedTxException).when(transaction).bindResource(any(), any());
+
+    expected.expect(TransactionException.class);
+    expected.expectCause(sameInstance(expectedConnectionException));
+
+    try {
+      connectionManager.bind(config, connectionProvider);
+      TransactionCoordination.getInstance().bindTransaction(transaction);
+      adapter.getConnection(operationContext);
+    } finally {
+      verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
+      verify(connectionProvider).disconnect(any(XATransactionalConnection.class));
+    }
+  }
+
   private void bindAndVerify() throws TransactionException, ConnectionException {
     connectionManager.bind(config, connectionProvider);
 
