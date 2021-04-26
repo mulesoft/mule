@@ -33,6 +33,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -41,6 +42,7 @@ import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.util.annotation.Nullable;
 
 /**
  * Reactor specific utils
@@ -82,6 +84,18 @@ public class RxUtils {
             .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber
                 .subscriberContext(ctx)
                 .subscribe())));
+  }
+
+  public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
+                                                                    Flux<U> deferredSubscriber,
+                                                                    @Nullable Consumer<? super U> consumer,
+                                                                    @Nullable Consumer<? super Throwable> errorConsumer,
+                                                                    @Nullable Runnable completeConsumer) {
+    return triggeringSubscriber
+        .compose(eventPub -> subscriberContext()
+            .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber
+                .subscriberContext(ctx)
+                .subscribe(consumer, errorConsumer, completeConsumer))));
   }
 
   /**
@@ -226,20 +240,7 @@ public class RxUtils {
 
     Flux<T> enrichedUpstream = Flux.from(upstream)
         .doOnNext(s -> inflightCounter.incrementAndGet())
-        .transform(transformer)
-        .doOnComplete(() -> {
-          upstreamComplete.set(true);
-
-          if (inflightCounter.get() == 0) {
-            completer.runOnce();
-          } else {
-            scheduledCompletion.set(scheduleCompletion.get());
-          }
-        })
-        .doOnError(t -> {
-          upstreamError.set(t);
-          errorForwarder.consumeOnce(t);
-        });
+        .transform(transformer);
 
     return subscribeFluxOnPublisherSubscription(Flux.from(downstream)
         .doOnNext(s -> {
@@ -251,7 +252,21 @@ public class RxUtils {
             }
           }
         }),
-                                                enrichedUpstream);
+                                                enrichedUpstream,
+                                                null,
+                                                t -> {
+                                                  upstreamError.set(t);
+                                                  errorForwarder.consumeOnce(t);
+                                                },
+                                                () -> {
+                                                  upstreamComplete.set(true);
+
+                                                  if (inflightCounter.get() == 0) {
+                                                    completer.runOnce();
+                                                  } else {
+                                                    scheduledCompletion.set(scheduleCompletion.get());
+                                                  }
+                                                });
   }
 
   /**

@@ -503,14 +503,13 @@ public class MessageProcessors {
                     .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
                                                                            completeParentIfEmpty, propagateErrors))
                     .transform(processor)
-                    .doOnNext(completeSuccessIfNeeded())
-                    .map(event -> right(MessagingException.class, event))
                     // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
                     // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
-                    .doOnError(t -> errorSwitchSinkSinkRef.error(t))
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
+                    .map(event -> right(MessagingException.class, event));
 
-                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream)
+                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
+                                                            completeSuccessEitherIfNeeded(), errorSwitchSinkSinkRef::error,
+                                                            errorSwitchSinkSinkRef::complete)
                     .map(propagateErrorResponseMapper().andThen(MessageProcessors::toParentContext));
               }
             }));
@@ -668,6 +667,10 @@ public class MessageProcessors {
         ctx.success(result);
       }
     };
+  }
+
+  private static Consumer<Either<MessagingException, CoreEvent>> completeSuccessEitherIfNeeded() {
+    return result -> result.applyRight(completeSuccessIfNeeded());
   }
 
   /**
