@@ -1335,8 +1335,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     prober.check(new FileExists(appFolder));
   }
 
-  protected void executeApplicationFlow(String flowName) throws Exception {
-    executeApplicationFlow(flowName, null);
+  protected CoreEvent executeApplicationFlow(String flowName) throws Exception {
+    return executeApplicationFlow(flowName, null);
   }
 
   protected CoreEvent executeApplicationFlow(String flowName, String correlationId) throws Exception {

@@ -44,4 +44,5 @@ public interface ApplicationPolicyInstance extends Initialisable, Disposable {
    * @return policy to intercept the operation execution
    */
   Optional<Policy> getOperationPolicy();
+
 }

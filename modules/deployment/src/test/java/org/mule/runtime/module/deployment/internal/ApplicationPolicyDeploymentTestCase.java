@@ -79,7 +79,9 @@ import org.mule.tck.util.CompilerUtils;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.junit.BeforeClass;
@@ -237,6 +239,61 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                       getResourceFile("/barPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(2);
+  }
+
+  @Test
+  public void duplicatedApplicationPolicy() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    try {
+      policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                              new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
+                                                        singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                        getResourceFile("/fooPolicy.xml"), emptyList()));
+      fail("Policy Re-Application should have failed.");
+    } catch (PolicyRegistrationException e) {
+      assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
+    }
+  }
+
+  @Test
+  public void reorderApplicationPolicy() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE);
+    parameters.put("isPolicyReorder", "true");
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
+                                                      parameters,
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    assertManualExecutionsCount(1);
   }
 
   @Test

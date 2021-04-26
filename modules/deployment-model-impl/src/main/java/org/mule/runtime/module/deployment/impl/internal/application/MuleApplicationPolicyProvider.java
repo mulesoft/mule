@@ -14,6 +14,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.noAttributes;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyProvider;
@@ -68,8 +69,14 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
       Optional<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProvider = registeredPolicyInstanceProviders.stream()
           .filter(p -> p.getPolicyId().equals(parametrization.getId())).findFirst();
+
       if (registeredPolicyInstanceProvider.isPresent()) {
-        throw new IllegalArgumentException(createPolicyAlreadyRegisteredError(parametrization.getId()));
+        if (isPolicyReorder(registeredPolicyInstanceProvider.get(), policyTemplateDescriptor, parametrization)) {
+          reorderPolicy(registeredPolicyInstanceProvider.get(), parametrization);
+          return;
+        } else {
+          throw new IllegalArgumentException(createPolicyAlreadyRegisteredError(parametrization.getId()));
+        }
       }
 
       Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
@@ -103,6 +110,17 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
     } catch (Exception e) {
       throw new PolicyRegistrationException(createPolicyRegistrationError(parametrization.getId()), e);
     }
+  }
+
+  private boolean isPolicyReorder(RegisteredPolicyInstanceProvider provider, PolicyTemplateDescriptor policyTemplateDescriptor,
+                                  PolicyParametrization parametrization) {
+    return parametrization.getParameters().getOrDefault("isPolicyReorder", "false").equalsIgnoreCase("true");
+  }
+
+  private void reorderPolicy(RegisteredPolicyInstanceProvider provider, PolicyParametrization parametrization) {
+    provider.updateOrder(parametrization.getOrder());
+    registeredPolicyInstanceProviders.sort(null);
+    policiesChangedCallback.run();
   }
 
   @Override
@@ -258,15 +276,21 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
     private final ApplicationPolicyInstance applicationPolicyInstance;
     private final String policyId;
+    private int order;
 
     public RegisteredPolicyInstanceProvider(ApplicationPolicyInstance applicationPolicyInstance, String policyId) {
       this.applicationPolicyInstance = applicationPolicyInstance;
       this.policyId = policyId;
+      this.order = applicationPolicyInstance.getOrder();
+    }
+
+    public void updateOrder(int newOrder) {
+      this.order = newOrder;
     }
 
     @Override
     public int compareTo(RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider) {
-      return compare(applicationPolicyInstance.getOrder(), registeredPolicyInstanceProvider.applicationPolicyInstance.getOrder());
+      return compare(order, registeredPolicyInstanceProvider.order);
     }
 
     public ApplicationPolicyInstance getApplicationPolicyInstance() {
@@ -276,5 +300,6 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
     public String getPolicyId() {
       return policyId;
     }
+
   }
 }
