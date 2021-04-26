@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.functional.Either.left;
@@ -187,8 +188,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
             return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
                                             pub -> from(pub)
-                                                .map(event -> right(MessagingException.class, event))
-                                                .doOnNext(errorSwitchSinkSinkRef::next),
+                                                .map(event -> {
+                                                  final Either<MessagingException, CoreEvent> result =
+                                                      right(MessagingException.class, event);
+                                                  errorSwitchSinkSinkRef.next(result);
+                                                  return result;
+                                                }),
                                             inflightEvents,
                                             () -> {
                                               errorSwitchSinkSinkRef.complete();
@@ -200,7 +205,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                             }))
                                                 .map(result -> result.reduce(me -> {
                                                   throw propagateWrappingFatal(me);
-                                                }, response -> response));
+                                                }, identity()));
           });
 
     } else {
