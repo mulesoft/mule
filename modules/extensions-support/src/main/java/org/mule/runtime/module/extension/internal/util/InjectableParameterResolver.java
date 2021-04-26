@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
-import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromPath;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -132,7 +132,8 @@ public class InjectableParameterResolver {
     expression.append(
                       injectableParametersMap.values().stream()
                           .filter(injectableParameterInfo -> identifiers
-                              .contains(getParameterNameFromPath(injectableParameterInfo.getExtractionExpression())))
+                              .contains(getParameterNameFromExtractionExpression(injectableParameterInfo
+                                  .getExtractionExpression())))
                           .map(injectableParameterInfo -> "\""
                               + injectableParameterInfo.getParameterName() + "\"  : "
                               + injectableParameterInfo.getExtractionExpression())

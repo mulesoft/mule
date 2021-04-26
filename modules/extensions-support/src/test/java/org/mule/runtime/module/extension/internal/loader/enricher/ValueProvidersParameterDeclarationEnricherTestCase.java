@@ -129,7 +129,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
   }
 
   @Test
-  public void verifyPathOfParametersOfValueProviderModelWithoutBinding() {
+  public void verifyExtractinExpressionOfParametersOfValueProviderModelWithoutBinding() {
     ParameterDeclaration parameterDeclaration =
         getParameterByOperationAndName("withRequiredParameter", "providedParameters");
 
@@ -145,7 +145,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
   }
 
   @Test
-  public void verifyPathOfParametersOfValueProviderModelWithBinding() {
+  public void verifyExtractinExpressionOfParametersOfValueProviderModelWithBinding() {
     ParameterDeclaration parameterDeclaration = getParameterByOperationAndName("withBoundActingParameter", "parameterWithValues");
 
     assertThat(parameterDeclaration, notNullValue());
@@ -160,7 +160,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
   }
 
   @Test
-  public void verifyPathOfParametersOfValueProviderModelWithBindingToField() {
+  public void verifyExtractionExpressionOfParametersOfValueProviderModelWithBindingToField() {
     ParameterDeclaration parameterDeclaration =
         getParameterByOperationAndName("withBoundActingParameterField", "parameterWithValues");
 

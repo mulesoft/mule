@@ -13,7 +13,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
-import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromPath;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
@@ -120,7 +120,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     }
 
     for (InjectableParameterInfo parameterInfo : modelProperty.getInjectableParameters()) {
-      String parameterName = getParameterNameFromPath(parameterInfo.getExtractionExpression());
+      String parameterName = getParameterNameFromExtractionExpression(parameterInfo.getExtractionExpression());
       if (!allParameters.containsKey(parameterName)) {
         problemsReporter.addError(new Problem(model,
                                               format("The Value Provider [%s] declares to use a parameter '%s' which doesn't exist in the %s '%s'",

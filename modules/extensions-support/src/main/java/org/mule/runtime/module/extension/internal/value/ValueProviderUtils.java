@@ -172,15 +172,16 @@ public class ValueProviderUtils {
   }
 
   /**
-   * Retrieves the name of the parameter a path is referring to
+   * Retrieves the name of the parameter an extraction expression is referring to
    *
-   * @param path a path of a binding defined in an {@link org.mule.runtime.api.meta.model.parameter.ActingParameterModel}
+   * @param extractionExpression an expression of a binding defined in an
+   *                             {@link org.mule.runtime.api.meta.model.parameter.ActingParameterModel}
    * @return the name of the parameter it refers to
    * @since 4.4.0
    */
-  public static String getParameterNameFromPath(String path) {
-    int parameterNameDelimiter = path.indexOf(".");
-    return parameterNameDelimiter < 0 ? path : path.substring(0, parameterNameDelimiter);
+  public static String getParameterNameFromExtractionExpression(String extractionExpression) {
+    int parameterNameDelimiter = extractionExpression.indexOf(".");
+    return parameterNameDelimiter < 0 ? extractionExpression : extractionExpression.substring(0, parameterNameDelimiter);
   }
 
 }

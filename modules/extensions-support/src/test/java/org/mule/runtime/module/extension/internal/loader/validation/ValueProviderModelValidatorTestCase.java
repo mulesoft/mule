@@ -210,7 +210,7 @@ public class ValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterFromPathExists() {
+  public void boundParameterFromExtractionExpressionExists() {
     operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName.someTag.@attribute");
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
@@ -220,7 +220,7 @@ public class ValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterFromPathShouldExist() {
+  public void boundParameterFromExtractionExpressionShouldExist() {
     operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName.nested.fields");
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
