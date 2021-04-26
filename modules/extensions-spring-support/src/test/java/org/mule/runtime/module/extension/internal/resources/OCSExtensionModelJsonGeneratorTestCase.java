@@ -11,8 +11,6 @@ import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ENABLED;
 import static org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 import static org.mule.tck.junit4.rule.SystemProperty.callWithProperty;
 
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.test.oauth.TestOAuthExtension;
 
 import java.util.Collection;
@@ -22,12 +20,10 @@ import org.junit.runners.Parameterized;
 
 public class OCSExtensionModelJsonGeneratorTestCase extends ExtensionModelJsonGeneratorTestCase {
 
-  private static ExtensionModelLoader javaLoader = new DefaultJavaExtensionModelLoader();
-
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
     List<ResourceExtensionUnitTest> extensions =
-            singletonList(newUnitTest(javaLoader, TestOAuthExtension.class, "test-oauth-ocs.json"));
+            singletonList(newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth-ocs.json"));
     try {
       return callWithProperty(OCS_ENABLED, "true", () -> createExtensionModels(extensions));
     } catch (Throwable t) {

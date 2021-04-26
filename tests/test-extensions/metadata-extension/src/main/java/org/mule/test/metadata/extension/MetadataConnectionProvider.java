@@ -14,6 +14,8 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.extension.api.annotation.metadata.RequiredForMetadata;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.semantics.security.Password;
+import org.mule.sdk.api.annotation.semantics.security.Username;
 
 public class MetadataConnectionProvider implements ConnectionProvider<MetadataConnection>, Startable {
 
@@ -22,10 +24,12 @@ public class MetadataConnectionProvider implements ConnectionProvider<MetadataCo
   @Parameter
   @Optional
   @RequiredForMetadata
+          @Username
   String user;
 
   @Parameter
   @Optional
+          @Password
   String password;
 
   @Override

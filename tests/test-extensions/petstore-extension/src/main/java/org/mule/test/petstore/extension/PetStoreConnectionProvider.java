@@ -23,11 +23,13 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
+import org.mule.sdk.api.annotation.semantics.security.Username;
 
-import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+
+import javax.inject.Inject;
 
 public abstract class PetStoreConnectionProvider<T extends PetStoreClient> implements ConnectionProvider<T>, Lifecycle {
 
@@ -40,6 +42,7 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
   protected String configName;
 
   @Parameter
+  @Username
   protected String username;
 
   @Parameter
