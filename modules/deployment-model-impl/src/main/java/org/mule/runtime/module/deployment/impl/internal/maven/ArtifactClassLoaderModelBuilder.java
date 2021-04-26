@@ -142,7 +142,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     }
 
     // Sort them so the processing is consistent with how Maven calculates the plugin configuration for the effective pom.
-    final List<String> activeProfiles = getMavenConfig().getActiveProfiles().orElse(emptyList())
+    final List<String> activeProfiles = getActiveProfiles()
         .stream()
         .sorted((o1, o2) -> o1.compareTo(o2))
         .collect(toList());
@@ -160,6 +160,11 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
           return p1;
         });
+  }
+
+  // For testability pourposes
+  protected List<String> getActiveProfiles() {
+    return getMavenConfig().getActiveProfiles().orElse(emptyList());
   }
 
   private Optional<Plugin> findArtifactPackagerPlugin(List<Plugin> plugins) {
