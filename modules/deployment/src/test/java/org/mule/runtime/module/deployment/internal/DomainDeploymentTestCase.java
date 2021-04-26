@@ -1965,7 +1965,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .configuredWith(EXPORTED_PACKAGES, "org.foo")
             .dependingOn(domainFileBuilder)
             .dependingOn(pluginWhichCreatesConnection)
-        .containingResource("org/foo/classloading/app/file.txt", "file.txt");
+            .containingResource("org/foo/classloading/app/file.txt", "file.txt");
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
