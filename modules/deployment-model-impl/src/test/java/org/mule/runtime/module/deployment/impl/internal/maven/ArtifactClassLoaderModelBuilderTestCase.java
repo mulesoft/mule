@@ -20,7 +20,7 @@ public class ArtifactClassLoaderModelBuilderTestCase {
 
   @Test
   public void testFindArtifactPackagerPluginDoesNotThrowException_IfProfileBuildIsNull() {
-    // When
+    // Given
     Model model = mock(Model.class);
     Profile profile = mock(Profile.class);
     String profileId = "profileId";
