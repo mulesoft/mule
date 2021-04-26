@@ -23,12 +23,11 @@
         "Connection": {
           "mapping": {
             "password": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "username": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.username",
               "range": "string",
               "mandatory": true
             }
@@ -70,12 +69,11 @@
         "Connection": {
           "mapping": {
             "password": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "username": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.username",
               "range": "string",
               "mandatory": true
             }
@@ -117,12 +115,11 @@
         "Connection": {
           "mapping": {
             "password": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "username": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.username",
               "range": "string",
               "mandatory": true
             }
@@ -164,12 +161,11 @@
         "Connection": {
           "mapping": {
             "password": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "username": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.username",
               "range": "string",
               "mandatory": true
             }
@@ -211,12 +207,11 @@
         "Connection": {
           "mapping": {
             "password": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "username": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.username",
               "range": "string",
               "mandatory": true
             }

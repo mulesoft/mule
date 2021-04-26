@@ -23,12 +23,10 @@
         "Connection": {
           "mapping": {
             "number": {
-              "propertyTerm": "",
               "range": "number",
               "mandatory": false
             },
             "privateName": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             }

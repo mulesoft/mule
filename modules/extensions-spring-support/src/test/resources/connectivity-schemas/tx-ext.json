@@ -23,7 +23,6 @@
         "Connection": {
           "mapping": {
             "useXa": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             }
@@ -65,7 +64,6 @@
         "Connection": {
           "mapping": {
             "useXa": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             }

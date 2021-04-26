@@ -23,17 +23,14 @@
         "Connection": {
           "mapping": {
             "before": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "display": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "listenerConfig": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
@@ -48,12 +45,10 @@
               "mandatory": true
             },
             "apiVersion": {
-              "propertyTerm": "",
               "range": "number",
               "mandatory": false
             },
             "authorizationUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -63,17 +58,14 @@
               "mandatory": true
             },
             "objectStore": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "immediate": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -83,12 +75,10 @@
               "mandatory": false
             },
             "scopes": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "after": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -98,7 +88,6 @@
               "mandatory": true
             },
             "prompt": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
@@ -145,17 +134,14 @@
         "Connection": {
           "mapping": {
             "before": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "display": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "listenerConfig": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
@@ -170,12 +156,10 @@
               "mandatory": true
             },
             "apiVersion": {
-              "propertyTerm": "",
               "range": "number",
               "mandatory": false
             },
             "authorizationUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -185,17 +169,14 @@
               "mandatory": true
             },
             "objectStore": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "immediate": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -205,12 +186,10 @@
               "mandatory": false
             },
             "scopes": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "after": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -220,7 +199,6 @@
               "mandatory": true
             },
             "prompt": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
@@ -267,17 +245,14 @@
         "Connection": {
           "mapping": {
             "before": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "display": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "listenerConfig": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
@@ -292,12 +267,10 @@
               "mandatory": true
             },
             "apiVersion": {
-              "propertyTerm": "",
               "range": "number",
               "mandatory": false
             },
             "authorizationUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -307,17 +280,14 @@
               "mandatory": true
             },
             "objectStore": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "immediate": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -327,12 +297,10 @@
               "mandatory": false
             },
             "scopes": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "after": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -342,7 +310,6 @@
               "mandatory": true
             },
             "prompt": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
@@ -389,17 +356,14 @@
         "Connection": {
           "mapping": {
             "before": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "display": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "listenerConfig": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
@@ -414,12 +378,10 @@
               "mandatory": true
             },
             "apiVersion": {
-              "propertyTerm": "",
               "range": "number",
               "mandatory": false
             },
             "authorizationUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -429,32 +391,26 @@
               "mandatory": true
             },
             "objectStore": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "immediate": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "withAlias": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "defaultPlacement": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "accessTokenUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "header": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
@@ -464,17 +420,14 @@
               "mandatory": false
             },
             "queryParam": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "scopes": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "after": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -484,7 +437,6 @@
               "mandatory": true
             },
             "prompt": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
@@ -531,7 +483,6 @@
         "Connection": {
           "mapping": {
             "apiVersion": {
-              "propertyTerm": "",
               "range": "number",
               "mandatory": false
             },
@@ -541,22 +492,18 @@
               "mandatory": true
             },
             "tokenUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "objectStore": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "immediate": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "display": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
@@ -566,17 +513,14 @@
               "mandatory": true
             },
             "scopes": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "knownCustomHeader": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "prompt": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             }
@@ -618,17 +562,14 @@
         "Connection": {
           "mapping": {
             "before": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "display": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "listenerConfig": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
@@ -643,12 +584,10 @@
               "mandatory": true
             },
             "apiVersion": {
-              "propertyTerm": "",
               "range": "number",
               "mandatory": false
             },
             "authorizationUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -658,17 +597,14 @@
               "mandatory": true
             },
             "objectStore": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "immediate": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -678,12 +614,10 @@
               "mandatory": false
             },
             "scopes": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "after": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -693,7 +627,6 @@
               "mandatory": true
             },
             "prompt": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
@@ -740,17 +673,14 @@
         "Connection": {
           "mapping": {
             "before": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "display": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "listenerConfig": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
@@ -765,12 +695,10 @@
               "mandatory": true
             },
             "apiVersion": {
-              "propertyTerm": "",
               "range": "number",
               "mandatory": false
             },
             "authorizationUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -780,17 +708,14 @@
               "mandatory": true
             },
             "objectStore": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "immediate": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -800,12 +725,10 @@
               "mandatory": false
             },
             "scopes": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "after": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
@@ -815,7 +738,6 @@
               "mandatory": true
             },
             "prompt": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },

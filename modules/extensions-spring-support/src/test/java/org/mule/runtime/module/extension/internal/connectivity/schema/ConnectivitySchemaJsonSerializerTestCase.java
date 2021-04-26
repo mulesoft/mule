@@ -37,7 +37,6 @@ import org.mule.test.ram.RickAndMortyExtension;
 import org.mule.test.semantic.extension.SemanticTermsExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.transactional.TransactionalExtension;
-import org.mule.test.typed.value.extension.extension.TypedValueExtension;
 import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.vegan.extension.VeganExtension;
 
@@ -73,7 +72,6 @@ public class ConnectivitySchemaJsonSerializerTestCase extends FileGenerationPara
             newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.json"),
             newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.json"),
             newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.json"),
-            newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.json"),
             newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.json"),
             newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.json"),
             newUnitTest(JAVA_LOADER, SampleDataExtension.class, "sample-data.json"),

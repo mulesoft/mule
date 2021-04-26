@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
+import org.mule.sdk.api.annotation.semantics.security.TenantIdentifier;
 
 public class TestOAuthConnectionState {
 
@@ -47,6 +48,7 @@ public class TestOAuthConnectionState {
   private String instanceId;
 
   @OAuthCallbackValue(expression = "#[payload.id]")
+  @TenantIdentifier
   private String userId;
 
 

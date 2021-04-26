@@ -23,17 +23,17 @@
         "Connection": {
           "mapping": {
             "port": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.port",
               "range": "string",
               "mandatory": true
             },
             "service": {
-              "propertyTerm": "",
+              "propertyTerm": "apiContract.endPoint",
               "range": "string",
               "mandatory": true
             },
             "wsdlUrl": {
-              "propertyTerm": "",
+              "propertyTerm": "core.urlTemplate",
               "range": "string",
               "mandatory": true
             }

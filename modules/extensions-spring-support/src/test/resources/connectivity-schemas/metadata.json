@@ -23,12 +23,12 @@
         "Connection": {
           "mapping": {
             "password": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.password",
               "range": "string",
               "mandatory": false
             },
             "user": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.username",
               "range": "string",
               "mandatory": false
             }

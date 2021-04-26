@@ -23,7 +23,6 @@
         "Connection": {
           "mapping": {
             "multipleConfig": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             }
@@ -65,7 +64,6 @@
         "Connection": {
           "mapping": {
             "multipleConfig": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             }
@@ -107,7 +105,6 @@
         "Connection": {
           "mapping": {
             "missileConfigurationDirectory": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             }
@@ -149,7 +146,6 @@
         "Connection": {
           "mapping": {
             "missileConfigurationDirectory": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             }

@@ -23,7 +23,6 @@
         "Connection": {
           "mapping": {
             "someParameter": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             }
@@ -65,17 +64,14 @@
         "Connection": {
           "mapping": {
             "required1": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "required2": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "channel": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             }
@@ -117,17 +113,14 @@
         "Connection": {
           "mapping": {
             "valueParam": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "channels": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "anyParameter": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             }
@@ -169,17 +162,14 @@
         "Connection": {
           "mapping": {
             "valueParam": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "channels": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "anyParameter": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             }
@@ -221,12 +211,10 @@
         "Connection": {
           "mapping": {
             "values": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             },
             "errorCode": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             }
@@ -268,7 +256,6 @@
         "Connection": {
           "mapping": {
             "channel": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": true
             }

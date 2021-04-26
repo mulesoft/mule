@@ -23,17 +23,15 @@
         "Connection": {
           "mapping": {
             "fullyBald": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "beardTrimming": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "saulPhoneNumber": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.port",
               "range": "string",
               "mandatory": false
             }
@@ -75,17 +73,15 @@
         "Connection": {
           "mapping": {
             "fullyBald": {
-              "propertyTerm": "",
               "range": "boolean",
               "mandatory": false
             },
             "beardTrimming": {
-              "propertyTerm": "",
               "range": "string",
               "mandatory": false
             },
             "saulPhoneNumber": {
-              "propertyTerm": "",
+              "propertyTerm": "connectivity.port",
               "range": "string",
               "mandatory": false
             }

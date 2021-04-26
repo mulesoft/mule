@@ -20,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.sdk.api.annotation.semantics.connectivity.Port;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 
 import java.util.HashSet;
@@ -49,6 +50,7 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
 
   @Parameter
   @Optional(defaultValue = SAUL_OFFICE_NUMBER)
+  @Port
   private String saulPhoneNumber;
 
   @ParameterGroup(name = "look", showInDsl = true)
