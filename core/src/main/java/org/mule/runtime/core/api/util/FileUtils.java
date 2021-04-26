@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.util;
 
 import static java.lang.System.getProperty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
@@ -37,8 +38,10 @@ import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -367,6 +370,7 @@ public class FileUtils {
       }
     }
 
+    List<File> createdFiles = new ArrayList<>();
     try (ZipInputStream zis = new ZipInputStream(archive)) {
       ZipEntry entry;
       while ((entry = zis.getNextEntry()) != null) {
@@ -374,22 +378,32 @@ public class FileUtils {
           verifyZipEntryPath(entry);
         }
 
-        File f = FileUtils.newFile(directory, entry.getName());
+        File file = newFile(directory, entry.getName());
+
         if (entry.isDirectory()) {
-          if (!f.exists() && !f.mkdirs()) {
-            throw new IOException("Could not create directory: " + f);
+          if (!file.exists() && !file.mkdirs()) {
+            throw new IOException("Could not create directory: " + file);
           }
+          createdFiles.add(file);
         } else {
-          File file = new File(directory, entry.getName());
           if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
             throw new IOException("Unable to create folders for zip entry: " + entry.getName());
           }
 
-          OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+          OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
           copy(zis, os);
           IOUtils.closeQuietly(os);
+          createdFiles.add(file);
         }
       }
+    } catch (Exception e) {
+      // Remove everything that was created in the file system before failing, then rethrow.
+      for (File createdFile : createdFiles) {
+        deleteQuietly(createdFile);
+      }
+
+      throw e;
+
     }
   }
 
