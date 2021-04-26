@@ -149,7 +149,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
       ValueProvider valueProvider =
           factoryModelProperty
               .createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, reflectionCache.get(),
-                             muleContext.get())
+                             muleContext.get(), containerModel)
               .createValueProvider();
 
       Set<org.mule.sdk.api.values.Value> valueSet = valueProvider.resolve();

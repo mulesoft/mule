@@ -48,7 +48,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.ValueProv
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
 import org.mule.runtime.module.extension.internal.value.OfValueInformation;
-
+import org.mule.sdk.api.annotation.binding.Binding;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -102,7 +102,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   /**
    * This method will look for parameters of the given {@link ParameterizedDeclaration declaration} and, if a parameter or
    * parameter group annotated with {@link OfValues} or {@link org.mule.sdk.api.annotation.values.OfValues} is found, a
-   * {@link ValueProviderModel} will be added to this element to communicate that values can be provided.
+   * {@link oValueProviderModel} will be added to this element to communicate that values can be provided.
    * <p>
    * Also the {@link ParameterDeclaration parameters} of the {@link ParameterizedDeclaration declaration} will be enriched.
    *
@@ -146,6 +146,10 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                Consumer<ValueProviderModel> valueProviderModelConsumer, Integer partOrder,
                                Map<String, String> containerParameterNames, String name,
                                List<ParameterDeclaration> allParameters) {
+    Map<String, String> bindingMap = new HashMap<>();
+    for (Binding binding : ofValueInformation.getBindings()) {
+      bindingMap.put(binding.actingParameter(), binding.extractionExpression());
+    }
 
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =
         ValueProviderFactoryModelProperty.builder(ofValueInformation.getValue());
@@ -155,7 +159,10 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     List<ExtensionParameter> resolverParameters = resolverClassWrapper.getParametersAnnotatedWith(Parameter.class);
 
     resolverParameters.forEach(param -> propertyBuilder
-        .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired()));
+        .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired(),
+                                 bindingMap
+                                     .getOrDefault(param.getName(),
+                                                   containerParameterNames.getOrDefault(param.getName(), param.getName()))));
 
     Reference<Boolean> requiresConfiguration = new Reference<>(false);
     Reference<Boolean> requiresConnection = new Reference<>(false);
@@ -168,7 +175,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     paramDeclaration.addModelProperty(propertyBuilder.build());
 
     valueProviderModelConsumer
-        .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters),
+        .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters,
+                                                                bindingMap),
                                        requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
                                        partOrder,
                                        name, getValueProviderId(ofValueInformation.getValue())));
@@ -263,12 +271,21 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
   private List<ActingParameterModel> getActingParametersModel(List<ExtensionParameter> parameterDeclarations,
                                                               Map<String, String> parameterNames,
-                                                              List<ParameterDeclaration> allParameters) {
-    Map<String, Boolean> paramsInfo = parameterDeclarations.stream()
-        .collect(toMap(param -> parameterNames.getOrDefault(param.getName(), param.getName()), ExtensionParameter::isRequired));
-    return allParameters.stream()
-        .filter(param -> paramsInfo.containsKey(param.getName()))
-        .map(param -> new ImmutableActingParameterModel(param.getName(), paramsInfo.get(param.getName())))
+                                                              List<ParameterDeclaration> allParameters,
+                                                              Map<String, String> bindings) {
+    return parameterDeclarations.stream()
+        .map(extensionParameter -> {
+          if (bindings.containsKey(extensionParameter.getName())) {
+            return new ImmutableActingParameterModel(extensionParameter.getName(),
+                                                     extensionParameter.isRequired(),
+                                                     bindings.get(extensionParameter.getName()));
+          } else {
+            return new ImmutableActingParameterModel(parameterNames
+                .getOrDefault(extensionParameter.getName(), extensionParameter.getName()), extensionParameter.isRequired(),
+                                                     parameterNames.getOrDefault(extensionParameter.getName(),
+                                                                                 extensionParameter.getName()));
+          }
+        })
         .collect(toList());
   }
 
@@ -295,20 +312,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     Optional<org.mule.sdk.api.annotation.values.OfValues> sdkAnnotation =
         getAnnotation(parameterDeclaration, org.mule.sdk.api.annotation.values.OfValues.class);
 
-    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
-      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter %s of %s %s",
-                                                       OfValues.class.getName(),
-                                                       org.mule.sdk.api.annotation.values.OfValues.class.getName(),
-                                                       parameterDeclaration.getName(),
-                                                       componentType,
-                                                       componentName));
-    } else if (legacyAnnotation.isPresent()) {
-      return of(new OfValueInformation(legacyAnnotation.get().value(), legacyAnnotation.get().open()));
-    } else if (sdkAnnotation.isPresent()) {
-      return of(new OfValueInformation(sdkAnnotation.get().value(), sdkAnnotation.get().open()));
-    } else {
-      return empty();
-    }
+    return getOfValueInformation(legacyAnnotation.orElse(null), sdkAnnotation.orElse(null), parameterDeclaration.getName(),
+                                 componentName, componentType, "parameter");
   }
 
   private Optional<OfValueInformation> getOfValueInformation(ParameterGroupDeclaration parameterGroupDeclaration,
@@ -319,17 +324,28 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     org.mule.sdk.api.annotation.values.OfValues sdkAnnotation =
         annotatedElement.getAnnotation(org.mule.sdk.api.annotation.values.OfValues.class);
 
-    if (legacyAnnotation != null && sdkAnnotation != null) {
-      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter group %s of %s %s",
+    return getOfValueInformation(legacyAnnotation, sdkAnnotation, parameterGroupDeclaration.getName(), componentName,
+                                 componentType, "parameter group");
+  }
+
+  private Optional<OfValueInformation> getOfValueInformation(OfValues legacyOfValues,
+                                                             org.mule.sdk.api.annotation.values.OfValues ofValues,
+                                                             String elementName,
+                                                             String componentName,
+                                                             String componentType,
+                                                             String elementType) {
+    if (legacyOfValues != null && ofValues != null) {
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on %s %s of %s %s",
                                                        OfValues.class.getName(),
                                                        org.mule.sdk.api.annotation.values.OfValues.class.getName(),
-                                                       parameterGroupDeclaration.getName(),
+                                                       elementType,
+                                                       elementName,
                                                        componentType,
                                                        componentName));
-    } else if (legacyAnnotation != null) {
-      return of(new OfValueInformation(legacyAnnotation.value(), legacyAnnotation.open()));
-    } else if (sdkAnnotation != null) {
-      return of(new OfValueInformation(sdkAnnotation.value(), sdkAnnotation.open()));
+    } else if (legacyOfValues != null) {
+      return of(new OfValueInformation(legacyOfValues.value(), legacyOfValues.open(), new Binding[0]));
+    } else if (ofValues != null) {
+      return of(new OfValueInformation(ofValues.value(), ofValues.open(), ofValues.bindings()));
     } else {
       return empty();
     }

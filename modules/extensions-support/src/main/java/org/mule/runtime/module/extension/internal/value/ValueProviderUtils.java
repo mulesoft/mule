@@ -171,4 +171,17 @@ public class ValueProviderUtils {
         : ((ValueProvider) valueProviderObject).getId();
   }
 
+  /**
+   * Retrieves the name of the parameter an extraction expression is referring to
+   *
+   * @param extractionExpression an expression of a binding defined in an
+   *                             {@link org.mule.runtime.api.meta.model.parameter.ActingParameterModel}
+   * @return the name of the parameter it refers to
+   * @since 4.4.0
+   */
+  public static String getParameterNameFromExtractionExpression(String extractionExpression) {
+    int parameterNameDelimiter = extractionExpression.indexOf(".");
+    return parameterNameDelimiter < 0 ? extractionExpression : extractionExpression.substring(0, parameterNameDelimiter);
+  }
+
 }

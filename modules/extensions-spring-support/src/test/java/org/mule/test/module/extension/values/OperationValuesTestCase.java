@@ -144,4 +144,205 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(resolvingFailure.getFailureCode(), is("CUSTOM_ERROR"));
     assertThat(resolvingFailure.getMessage(), is(ERROR_MESSAGE));
   }
+
+  @Test
+  public void withBoundActingParameter() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundActingParameterWithAlias() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterWithAlias", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundActingParameterField() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterField", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundActingParameterFieldWithDot() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterFieldWithDot", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withTwoActingParameters() throws Exception {
+    ValueResult result = getValueResult("withTwoActingParameters", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(2));
+    assertThat(values, hasValues("Acting parameter value", "Scalar value"));
+  }
+
+  @Test
+  public void withTwoBoundActingParameters() throws Exception {
+    ValueResult result = getValueResult("withTwoBoundActingParameters", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(2));
+    assertThat(values, hasValues("Acting parameter value", "Scalar value"));
+  }
+
+  @Test
+  public void withBoundActingParameterToXmlTagContent() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterToXmlTagContent", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the tag content"));
+  }
+
+  @Test
+  public void withBoundActingParameterToXmlTagAttribute() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterToXmlTagAttribute", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the attribute value"));
+  }
+
+  @Test
+  public void withFourBoundActingParameters() throws Exception {
+    ValueResult result = getValueResult("withFourBoundActingParameters", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(4));
+    assertThat(values, hasValues("Field1 Value", "Field2 Value", "Field3 Value", "Field4 Value"));
+  }
+
+  @Test
+  public void withBoundActingParameterArray() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterArray", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(3));
+    assertThat(values, hasValues("One Value", "Another value", "Yet another value"));
+  }
+
+  @Test
+  public void withPojoBoundActingParameter() throws Exception {
+    ValueResult result = getValueResult("withPojoBoundActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values,
+               hasValues("MyPojo{pojoId='This is the pojo ID', pojoName='This is the pojo name', pojoNumber=23, pojoBoolean=true}"));
+  }
+
+  @Test
+  public void withMapBoundActingParameter() throws Exception {
+    ValueResult result = getValueResult("withMapBoundActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(4));
+    assertThat(values, hasValues("pojoId : This is the pojo ID", "pojoName : This is the pojo name", "pojoNumber : 23",
+                                 "pojoBoolean : true"));
+  }
+
+  @Test
+  public void withPojoFieldBoundActingParameterFieldExpression() throws Exception {
+    ValueResult result = getValueResult("withPojoFieldBoundActingParameterFieldExpression", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the pojo ID"));
+  }
+
+  @Test
+  public void withPojoFieldBoundActingParameterFieldDsl() throws Exception {
+    ValueResult result = getValueResult("withPojoFieldBoundActingParameterFieldDsl", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the pojo ID"));
+  }
+
+  @Test
+  public void withPojoFieldBoundIncompleteActingParameterFieldDsl() throws Exception {
+    ValueResult result = getValueResult("withPojoFieldBoundIncompleteActingParameterFieldDsl", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the pojo ID"));
+  }
+
+  @Test
+  public void withBoundActingParameterEnum() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterEnum", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("ENUM_VALUE"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterPresent() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterPresent", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameter() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Optional value ommited"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterFieldPresent() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterFieldPresent", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterFieldMissingParameter() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterFieldMissingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Optional value ommited"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterFieldMissingField() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterFieldMissingField", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Optional value ommited"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterFieldMissingPath() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterFieldMissingPath", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Optional value ommited"));
+  }
+
 }

@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
@@ -125,9 +126,10 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   public ValueProviderFactory createFactory(ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                             Supplier<Object> configurationSupplier, ReflectionCache reflectionCache,
-                                            MuleContext muleContext) {
+                                            MuleContext muleContext,
+                                            ParameterizedModel parameterizedModel) {
     return new ValueProviderFactory(this, parameterValueResolver, connectionSupplier, configurationSupplier, connectionField,
-                                    configField, reflectionCache, muleContext);
+                                    configField, reflectionCache, muleContext, parameterizedModel);
   }
 
   /**
@@ -149,7 +151,12 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
     public ValueProviderFactoryModelPropertyBuilder withInjectableParameter(String name, MetadataType metadataType,
                                                                             boolean isRequired) {
-      injectableParameters.add(new InjectableParameterInfo(name, metadataType, isRequired));
+      return withInjectableParameter(name, metadataType, isRequired, name);
+    }
+
+    public ValueProviderFactoryModelPropertyBuilder withInjectableParameter(String name, MetadataType metadataType,
+                                                                            boolean isRequired, String extractionExpression) {
+      injectableParameters.add(new InjectableParameterInfo(name, metadataType, isRequired, extractionExpression));
       return this;
     }
 

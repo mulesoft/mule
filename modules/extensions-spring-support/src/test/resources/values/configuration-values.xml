@@ -28,4 +28,7 @@
     <values:failure-config errorCode="CUSTOM_ERROR" name="failure-config"/>
 
     <values:failure-config errorCode="#['CUSTOM_ERROR']" name="dynamic-failure-config"/>
+
+    <values:with-bound-value-parameter-config name="with-bound-acting-parameter"
+                                              actingParameter="Acting parameter value"/>
 </mule>

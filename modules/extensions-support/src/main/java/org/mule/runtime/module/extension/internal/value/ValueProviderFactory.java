@@ -14,10 +14,16 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKN
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
 import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
 
+
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.util.InjectableParameterResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.values.ValueProvider;
 import org.mule.sdk.api.values.ValueResolvingException;
@@ -47,11 +53,14 @@ public class ValueProviderFactory {
   private final Field configField;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
+  private ExpressionManager expressionManager;
+  private ParameterizedModel parameterizedModel;
 
   public ValueProviderFactory(ValueProviderFactoryModelProperty factoryModelProperty,
                               ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                               Supplier<Object> configurationSupplier, Field connectionField, Field configField,
-                              ReflectionCache reflectionCache, MuleContext muleContext) {
+                              ReflectionCache reflectionCache, MuleContext muleContext,
+                              ParameterizedModel parameterizedModel) {
     this.factoryModelProperty = factoryModelProperty;
     this.parameterValueResolver = parameterValueResolver;
     this.connectionSupplier = connectionSupplier;
@@ -60,6 +69,8 @@ public class ValueProviderFactory {
     this.configField = configField;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
+    this.expressionManager = muleContext.getExpressionManager();
+    this.parameterizedModel = parameterizedModel;
   }
 
   ValueProvider createValueProvider() throws ValueResolvingException {
@@ -69,7 +80,11 @@ public class ValueProviderFactory {
       Object resolver = instantiateClass(resolverClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
-      injectValueProviderFields(resolver);
+      InjectableParameterResolver injectableParameterResolver =
+          new InjectableParameterResolver(parameterizedModel, parameterValueResolver, expressionManager,
+                                          factoryModelProperty.getInjectableParameters());
+
+      injectValueProviderFields(resolver, injectableParameterResolver);
 
       if (factoryModelProperty.usesConnection()) {
         Object connection;
@@ -102,23 +117,15 @@ public class ValueProviderFactory {
     }
   }
 
-  private void injectValueProviderFields(Object resolver) throws ValueResolvingException {
+  private void injectValueProviderFields(Object resolver, InjectableParameterResolver resolvedParameters)
+      throws ValueResolvingException {
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
-      Object parameterValue = null;
-      String parameterName = injectableParam.getParameterName();
-      try {
-        parameterValue = parameterValueResolver.getParameterValue(parameterName);
-      } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException ignored) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("An error occurred while resolving parameter " + parameterName, ignored);
-        }
-      }
-
+      Object parameterValue = resolvedParameters.getInjectableParameterValue(injectableParam.getParameterName());
       if (parameterValue != null) {
-        setValueIntoField(resolver, parameterValue, parameterName, reflectionCache);
+        setValueIntoField(resolver, parameterValue, injectableParam.getParameterName(), reflectionCache);
       } else if (injectableParam.isRequired()) {
-        missingParameters.add(parameterName);
+        missingParameters.add(injectableParam.getParameterName());
       }
     }
 

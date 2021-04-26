@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
@@ -33,7 +34,6 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
@@ -104,7 +104,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
           .addValueProviderInformation(new ValueProviderInformation(valueProviderModel.get(), model, valueProvider.getName()));
     }
     Map<String, MetadataType> allParameters =
-        model.getAllParameterModels().stream().collect(toMap(IntrospectionUtils::getImplementingName, ParameterModel::getType));
+        model.getAllParameterModels().stream().collect(toMap(ParameterModel::getName, ParameterModel::getType));
     String modelName = NameUtils.getModelName(model);
     String modelTypeName = getComponentModelTypeName(model);
 
@@ -120,25 +120,27 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     }
 
     for (InjectableParameterInfo parameterInfo : modelProperty.getInjectableParameters()) {
-
-      if (!allParameters.containsKey(parameterInfo.getParameterName())) {
+      String parameterName = getParameterNameFromExtractionExpression(parameterInfo.getExtractionExpression());
+      if (!allParameters.containsKey(parameterName)) {
         problemsReporter.addError(new Problem(model,
-                                              format("The Value Provider [%s] declares a parameter '%s' which doesn't exist in the %s '%s'",
-                                                     providerName, parameterInfo.getParameterName(), modelTypeName, modelName)));
+                                              format("The Value Provider [%s] declares to use a parameter '%s' which doesn't exist in the %s '%s'",
+                                                     providerName, parameterName, modelTypeName, modelName)));
       } else {
-        MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
-        Class<?> expectedType = getType(metadataType)
-            .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                parameterInfo.getParameterName())));
-        Class<?> gotType = getType(parameterInfo.getType())
-            .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                parameterInfo.getParameterName())));
+        if (parameterInfo.getExtractionExpression().equals(parameterInfo.getParameterName())) {
+          MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
+          Class<?> expectedType = getType(metadataType)
+              .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                  parameterInfo.getParameterName())));
+          Class<?> gotType = getType(parameterInfo.getType())
+              .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                  parameterInfo.getParameterName())));
 
-        if (!expectedType.equals(gotType)) {
-          problemsReporter.addError(new Problem(model,
-                                                format("The Value Provider [%s] defines a parameter '%s' of type '%s' but in the %s '%s' is of type '%s'",
-                                                       providerName, parameterInfo.getParameterName(), gotType, modelTypeName,
-                                                       modelName, expectedType)));
+          if (!expectedType.equals(gotType)) {
+            problemsReporter.addError(new Problem(model,
+                                                  format("The Value Provider [%s] defines a parameter '%s' of type '%s' but in the %s '%s' is of type '%s'",
+                                                         providerName, parameterInfo.getParameterName(), gotType, modelTypeName,
+                                                         modelName, expectedType)));
+          }
         }
       }
     }
@@ -229,4 +231,5 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
       });
     }
   }
+
 }

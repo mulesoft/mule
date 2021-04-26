@@ -39,6 +39,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -668,7 +669,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     if (valueProviderMediator == null) {
       synchronized (this) {
         if (valueProviderMediator == null) {
-          valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+          valueProviderMediator =
+              new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
         }
       }
     }

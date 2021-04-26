@@ -128,6 +128,53 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameterDeclaration.getValueProviderModel().getParameters(), contains(item(parameterName, true)));
   }
 
+  @Test
+  public void verifyExtractinExpressionOfParametersOfValueProviderModelWithoutBinding() {
+    ParameterDeclaration parameterDeclaration =
+        getParameterByOperationAndName("withRequiredParameter", "providedParameters");
+
+    assertThat(parameterDeclaration, notNullValue());
+    assertThat(parameterDeclaration.getValueProviderModel(), notNullValue());
+    assertThat(parameterDeclaration.getValueProviderModel().getParameters(), hasSize(1));
+
+    ActingParameterModel parameter = parameterDeclaration.getValueProviderModel().getParameters().get(0);
+    assertThat(parameter, notNullValue());
+    assertThat(parameter.getName(), is("requiredValue"));
+    assertThat(parameter.isRequired(), is(true));
+    assertThat(parameter.getExtractionExpression(), is("requiredValue"));
+  }
+
+  @Test
+  public void verifyExtractinExpressionOfParametersOfValueProviderModelWithBinding() {
+    ParameterDeclaration parameterDeclaration = getParameterByOperationAndName("withBoundActingParameter", "parameterWithValues");
+
+    assertThat(parameterDeclaration, notNullValue());
+    assertThat(parameterDeclaration.getValueProviderModel(), notNullValue());
+    assertThat(parameterDeclaration.getValueProviderModel().getParameters(), hasSize(1));
+
+    ActingParameterModel parameter = parameterDeclaration.getValueProviderModel().getParameters().get(0);
+    assertThat(parameter, notNullValue());
+    assertThat(parameter.getName(), is("requiredValue"));
+    assertThat(parameter.isRequired(), is(true));
+    assertThat(parameter.getExtractionExpression(), is("actingParameter"));
+  }
+
+  @Test
+  public void verifyExtractionExpressionOfParametersOfValueProviderModelWithBindingToField() {
+    ParameterDeclaration parameterDeclaration =
+        getParameterByOperationAndName("withBoundActingParameterField", "parameterWithValues");
+
+    assertThat(parameterDeclaration, notNullValue());
+    assertThat(parameterDeclaration.getValueProviderModel(), notNullValue());
+    assertThat(parameterDeclaration.getValueProviderModel().getParameters(), hasSize(1));
+
+    ActingParameterModel parameter = parameterDeclaration.getValueProviderModel().getParameters().get(0);
+    assertThat(parameter, notNullValue());
+    assertThat(parameter.getName(), is("requiredValue"));
+    assertThat(parameter.isRequired(), is(true));
+    assertThat(parameter.getExtractionExpression(), is("actingParameter.field"));
+  }
+
   private ParameterDeclaration getParameterByOperationAndName(String operationName, String parameterName) {
     OperationDeclaration operationDeclaration = getNamedObject(this.declaration.getOperations(), operationName);
     return getNamedObject(operationDeclaration.getAllParameters(), parameterName);
