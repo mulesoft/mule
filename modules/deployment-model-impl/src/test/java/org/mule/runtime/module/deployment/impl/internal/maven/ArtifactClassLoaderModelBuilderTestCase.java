@@ -1,6 +1,5 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -26,7 +25,7 @@ public class ArtifactClassLoaderModelBuilderTestCase {
     Profile profile = mock(Profile.class);
     String profileId = "profileId";
     when(profile.getId()).thenReturn(profileId);
-    profiles = newArrayList(profile);
+    profiles = singletonList(profile);
     when(model.getProfiles()).thenReturn(profiles);
 
     File artifactFolder = mock(File.class);
