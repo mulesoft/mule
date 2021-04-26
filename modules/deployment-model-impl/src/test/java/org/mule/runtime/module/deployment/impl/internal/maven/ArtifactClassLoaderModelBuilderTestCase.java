@@ -3,6 +3,8 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import com.google.common.collect.Lists;
 import java.io.File;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -10,6 +12,7 @@ import org.junit.Test;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
+import static com.google.common.collect.Lists.*;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,7 +28,7 @@ public class ArtifactClassLoaderModelBuilderTestCase {
     Profile profile = mock(Profile.class);
     String profileId = "profileId";
     when(profile.getId()).thenReturn(profileId);
-    profiles = Lists.newArrayList(profile);
+    profiles = newArrayList(profile);
     when(model.getProfiles()).thenReturn(profiles);
 
     File artifactFolder = mock(File.class);
@@ -43,15 +46,15 @@ public class ArtifactClassLoaderModelBuilderTestCase {
 
       @Override
       protected List<String> getActiveProfiles() {
-        return Lists.newArrayList(profileId);
+        return Collections.singletonList(profileId);
       }
     };
 
     // When
     try {
       artifactClassLoaderModelBuilder.findArtifactPackagerPlugin(model);
-    }catch (Throwable t){
-      fail();
+    } catch (NullPointerException t){
+      fail("NullPointerException should not be thrown");
     }
 
   }
