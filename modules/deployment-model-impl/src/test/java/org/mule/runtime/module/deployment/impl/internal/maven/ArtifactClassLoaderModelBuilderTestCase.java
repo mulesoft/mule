@@ -1,21 +1,19 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import com.google.common.collect.Lists;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.junit.Test;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-
-import static com.google.common.collect.Lists.*;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class ArtifactClassLoaderModelBuilderTestCase {
 
@@ -46,7 +44,7 @@ public class ArtifactClassLoaderModelBuilderTestCase {
 
       @Override
       protected List<String> getActiveProfiles() {
-        return Collections.singletonList(profileId);
+        return singletonList(profileId);
       }
     };
 
