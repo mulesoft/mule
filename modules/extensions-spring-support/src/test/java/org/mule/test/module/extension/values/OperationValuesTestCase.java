@@ -11,6 +11,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.tck.junit4.matcher.ValueMatcher.valueWithId;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.AMERICA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.ARGENTINA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.BUENOS_AIRES;
 import static org.mule.test.values.extension.resolver.WithErrorValueProvider.ERROR_MESSAGE;
 
 import org.mule.runtime.api.value.ResolvingFailure;
@@ -396,6 +399,23 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     ValueResult result = getValueResult("singleValuesEnabledParameterWithOneFieldValues", "body", "simple.path");
     assertThat(result.getValues(), hasSize(3));
     assertThat(result.getValues(), hasValues("channel1", "channel2", "channel3"));
+  }
+
+  @Test
+  public void parameterWithMultiLevelFieldValues() throws Exception {
+    Set<Value> values = getValues("parameterWithMultilevelFieldValue", "body", "location.continent");
+
+    ValueMatcher americaValue = valueWithId(AMERICA)
+        .withDisplayName(AMERICA)
+        .withPartName("body.location.continent")
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName("body.location.country")
+            .withChilds(valueWithId(BUENOS_AIRES)
+                .withDisplayName(BUENOS_AIRES)
+                .withPartName("body.location.city")));
+
+    assertThat(values, hasValues(americaValue));
   }
 
 }

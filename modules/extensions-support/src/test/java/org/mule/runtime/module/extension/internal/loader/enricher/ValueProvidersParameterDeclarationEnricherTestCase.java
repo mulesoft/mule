@@ -118,6 +118,29 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameter.isRequired(), is(true));
   }
 
+  @Test
+  public void verifyFieldValueProviderWithoutParametersForOperationParameterWithOneFieldValues() {
+    ParameterDeclaration parameterDeclaration =
+        getParameterByOperationAndName("singleValuesEnabledParameterWithOneFieldValues", "body");
+
+    assertThat(parameterDeclaration, notNullValue());
+    assertThat(parameterDeclaration.getFieldValueProviderModels(), hasSize(1));
+    assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getTargetPath(), is("simple.path"));
+    assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getParameters(), hasSize(0));
+  }
+
+  @Test
+  public void verifyFieldValueProviderWithoutParametersForOperationParameterWithMoreThanOneFieldValues() {
+    ParameterDeclaration parameterDeclaration =
+        getParameterByOperationAndName("singleValuesEnabledParameterWithMoreThanOneFieldValues", "body");
+
+    assertThat(parameterDeclaration, notNullValue());
+    assertThat(parameterDeclaration.getFieldValueProviderModels(), hasSize(2));
+    assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getTargetPath(), is("simple.path"));
+    assertThat(parameterDeclaration.getFieldValueProviderModels().get(1).getTargetPath(), is("another.simple.path"));
+    assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getParameters(), hasSize(0));
+  }
+
   private void assertWithRequiredParameter(ParameterDeclaration parameterDeclaration, String parameterName) {
     assertThat(parameterDeclaration, notNullValue());
     assertThat(parameterDeclaration.getValueProviderModel(), notNullValue());

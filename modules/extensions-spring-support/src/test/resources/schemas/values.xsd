@@ -571,6 +571,15 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ParameterWithMultilevelFieldValueType" substitutionGroup="mule:abstract-operator" name="parameter-with-multilevel-field-value"></xs:element>
+  <xs:complexType name="ParameterWithMultilevelFieldValueType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="body"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ResolverGetsMuleContextInjectionType" substitutionGroup="mule:abstract-operator" name="resolver-gets-mule-context-injection"></xs:element>
   <xs:complexType name="ResolverGetsMuleContextInjectionType">
     <xs:complexContent>

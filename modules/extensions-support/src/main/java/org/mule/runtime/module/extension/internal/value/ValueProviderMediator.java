@@ -191,8 +191,9 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
       factoryModelProperty =
           parameterModel.getModelProperty(FieldsValueProviderFactoryModelProperty.class)
               .map(fieldsValueProvider -> fieldsValueProvider.getFieldsValueProviderFactories().get(targetPath))
-              .orElseThrow(() -> new ValueResolvingException(format("The parameter with name '%s' is not an Values Provider",
-                                                                    parameterName),
+              .orElseThrow(() -> new ValueResolvingException(
+                                                             format("The parameter with name '%s' does not have a Value Provider associated with the targetPath '%s'",
+                                                                    parameterName, targetPath),
                                                              INVALID_VALUE_RESOLVER_NAME));
     } else {
       factoryModelProperty =

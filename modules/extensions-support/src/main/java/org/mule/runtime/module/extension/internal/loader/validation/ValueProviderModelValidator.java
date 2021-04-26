@@ -22,6 +22,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
@@ -32,6 +33,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.util.NameUtils;
+import org.mule.runtime.module.extension.internal.loader.java.property.FieldsValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -82,20 +84,52 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
   private void validateModel(ParameterizedModel model, ProblemsReporter problemsReporter, boolean supportsConnectionsAndConfigs,
                              ValueProvidersIdValidator valueProvidersIdValidator, ReflectionCache reflectionCache) {
     model.getAllParameterModels()
-        .forEach(param -> param
-            .getModelProperty(ValueProviderFactoryModelProperty.class)
-            .ifPresent(modelProperty -> validateOptionsResolver(param, modelProperty, model, problemsReporter,
-                                                                supportsConnectionsAndConfigs, reflectionCache,
-                                                                valueProvidersIdValidator)));
+        .forEach(param -> {
+          Optional<ValueProviderFactoryModelProperty> valueProviderFactoryModelProperty =
+              param.getModelProperty(ValueProviderFactoryModelProperty.class);
+          Optional<FieldsValueProviderFactoryModelProperty> fieldValueProviderFactoryModelProperty =
+              param.getModelProperty(FieldsValueProviderFactoryModelProperty.class);
+
+          if (valueProviderFactoryModelProperty.isPresent() && fieldValueProviderFactoryModelProperty.isPresent()) {
+            problemsReporter
+                .addError(new Problem(model,
+                                      format("Parameter [%s] from %s with name %s has both a Value Provider and a Field Value Provider",
+                                             param.getName(), getComponentModelTypeName(model), getModelName(model))));
+          } else if (valueProviderFactoryModelProperty.isPresent()) {
+            validateOptionsResolver(param, true, null, valueProviderFactoryModelProperty.get(), model, problemsReporter,
+                                    supportsConnectionsAndConfigs, reflectionCache, valueProvidersIdValidator);
+          } else if (fieldValueProviderFactoryModelProperty.isPresent()) {
+            fieldValueProviderFactoryModelProperty.get().getFieldsValueProviderFactories()
+                .forEach((targetPath,
+                          fieldsValueProviderFactoryModelProperty) -> validateOptionsResolver(param, false,
+                                                                                              targetPath,
+                                                                                              fieldsValueProviderFactoryModelProperty,
+                                                                                              model, problemsReporter,
+                                                                                              supportsConnectionsAndConfigs,
+                                                                                              reflectionCache,
+                                                                                              valueProvidersIdValidator));
+          }
+        });
   }
 
-  private void validateOptionsResolver(ParameterModel param, ValueProviderFactoryModelProperty modelProperty,
+  private void validateOptionsResolver(ParameterModel param, boolean mustBeStringType,
+                                       String targetPath,
+                                       ValueProviderFactoryModelProperty modelProperty,
                                        ParameterizedModel model, ProblemsReporter problemsReporter,
                                        boolean supportsConnectionsAndConfigs, ReflectionCache reflectionCache,
                                        ValueProvidersIdValidator valueProvidersIdValidator) {
     Class<?> valueProvider = modelProperty.getValueProvider();
     String providerName = valueProvider.getSimpleName();
-    Optional<ValueProviderModel> valueProviderModel = param.getValueProviderModel();
+
+    Optional<? extends ValueProviderModel> valueProviderModel;
+    if (targetPath != null) {
+      valueProviderModel = param.getFieldValueProviderModels().stream()
+          .filter(fieldValueProviderModel -> fieldValueProviderModel.getTargetPath().equals(targetPath))
+          .findAny();
+    } else {
+      valueProviderModel = param.getValueProviderModel();
+    }
+
     if (!valueProviderModel.isPresent()) {
       throw new IllegalStateException(format("Parameter %s from %s with name %s has should have a ValueProviderModel associated.",
                                              param.getName(), getComponentModelTypeName(model), getModelName(model)));
@@ -113,7 +147,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
                                                           providerName)));
     }
 
-    if (!(param.getType() instanceof StringType)) {
+    if (mustBeStringType && !(param.getType() instanceof StringType)) {
       problemsReporter.addError(new Problem(model,
                                             format("The parameter [%s] of the %s '%s' is not of String type. Parameters that provides Values should be of String type.",
                                                    param.getName(), modelTypeName, modelName)));

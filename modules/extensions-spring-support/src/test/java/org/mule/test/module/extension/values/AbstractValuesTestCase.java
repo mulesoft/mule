@@ -93,6 +93,15 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
     return valueProviderService.getValues(location, parameterName);
   }
 
+  Set<Value> getValues(String flowName, String parameterName, String targetPath) throws Exception {
+    return checkResultAndRetrieveValues(getValueResult(flowName, parameterName, targetPath));
+  }
+
+  ValueResult getValueResult(String flowName, String parameterName, String targetPath) throws Exception {
+    Location location = Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build();
+    return valueProviderService.getFieldValues(location, parameterName, targetPath);
+  }
+
   Set<Value> getValuesFromConfig(String configName, String parameterName) throws Exception {
     return checkResultAndRetrieveValues(getValueResultFromConfig(configName, parameterName));
   }
@@ -135,11 +144,6 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
       throw new ValueResolvingException(resolvingFailure.getMessage(), resolvingFailure.getFailureCode());
     }
     return values.getValues();
-  }
-
-  ValueResult getValueResult(String flowName, String parameterName, String targetPath) throws Exception {
-    Location location = Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build();
-    return valueProviderService.getFieldValues(location, parameterName, targetPath);
   }
 
 }

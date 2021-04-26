@@ -18,6 +18,7 @@ import org.mule.sdk.api.values.FieldValues;
 import org.mule.test.values.extension.metadata.JsonTypeResolver;
 import org.mule.test.values.extension.metadata.XmlTypeResolver;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
+import org.mule.test.values.extension.resolver.SdkMultiLevelValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 import org.mule.test.values.extension.resolver.TrueFalseValueProvider;
 import org.mule.test.values.extension.resolver.WithComplexActingParameter;
@@ -242,5 +243,9 @@ public class ValuesOperations {
   public void singleValuesEnabledParameterWithMoreThanOneFieldValues(@Content @FieldValues(targetSelectors = "simple.path",
       value = SimpleValueProvider.class) @FieldValues(targetSelectors = "another.simple.path",
           value = TrueFalseValueProvider.class) InputStream body) {}
+
+  public void parameterWithMultilevelFieldValue(@Content @FieldValues(targetPaths = "channel",
+      value = SimpleValueProvider.class) @FieldValues(targetPaths = {"location.continent", "location.country", "location.city"},
+          value = SdkMultiLevelValueProvider.class) InputStream body) {}
 
 }

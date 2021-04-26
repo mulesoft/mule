@@ -228,7 +228,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         ValueProviderFactoryModelProperty valueProviderFactoryModelProperty = propertyBuilder.build();
         valueProviderFactoryModelProperties.put(targetPath, valueProviderFactoryModelProperty);
         fieldValueProviderModels
-            .add(new FieldValueProviderModel(getActingParametersModel(resolverParameters, parameterNames, allParameters, emptyMap()),
+            .add(new FieldValueProviderModel(getActingParametersModel(resolverParameters, parameterNames, allParameters,
+                                                                      emptyMap()),
                                              requiresConfiguration.get(), requiresConnection.get(), fieldValues.open(),
                                              partOrder,
                                              name, getValueProviderId(fieldValues.value()), targetPath));

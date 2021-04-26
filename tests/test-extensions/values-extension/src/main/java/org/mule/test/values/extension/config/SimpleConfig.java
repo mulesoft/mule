@@ -38,11 +38,12 @@ import java.util.List;
 @ConnectionProviders({ValuesConnectionProvider.class, ConnectionWithValueParameter.class,
     ConnectionWithValueWithRequiredParam.class, ConnectionWithValuesWithRequiredParamsFromParamGroup.class,
     ConnectionWithValuesWithRequiredParamsFromShowInDslGroup.class, ConnectionWithFailureErrorProvider.class,
-    ConnectionWithValueFourBoundActingParameters.class ,ConnectionWithParameterWithFieldValues.class})
+    ConnectionWithValueFourBoundActingParameters.class, ConnectionWithParameterWithFieldValues.class})
 @Operations({ValuesOperations.class})
 @Sources({SourceWithConfiguration.class, SourceWithConnection.class, SourceWithValuesWithRequiredParameters.class,
     SourceWithValuesWithRequiredParameterInsideParamGroup.class})
-@org.mule.sdk.api.annotation.Sources({SourceWithRequiredParameterWithAlias.class, SourceWithRequiredParameterInsideShowInDslGroup.class,
+@org.mule.sdk.api.annotation.Sources({SourceWithRequiredParameterWithAlias.class,
+    SourceWithRequiredParameterInsideShowInDslGroup.class,
     SourceWithMultiLevelValue.class, SourceMustNotStart.class, SimpleSourceWithParameterWithFieldValues.class,
     SourceWithMultiLevelFieldValues.class})
 public class SimpleConfig {

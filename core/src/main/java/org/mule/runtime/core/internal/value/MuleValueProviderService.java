@@ -49,7 +49,7 @@ public class MuleValueProviderService implements ValueProviderService {
    */
   @Override
   public ValueResult getValues(Location location, String providerName) {
-    return getValueResult(() -> this.findValueProvider(location, providerName).resolve());
+    return getValueResult(() -> this.findValueProvider(location, providerName, null).resolve());
   }
 
   @Override
@@ -86,32 +86,6 @@ public class MuleValueProviderService implements ValueProviderService {
     Set<Value> get() throws Exception;
   }
 
-  private ValueProvider findValueProvider(Location location, String providerName) throws ValueResolvingException {
-    boolean isConnection = isConnection(location);
-
-    Location realLocation = isConnection
-        ? deleteLastPartFromLocation(location)
-        : location;
-
-    Object component = findComponent(realLocation);
-
-    if (component instanceof ComponentValueProvider) {
-      return () -> ((ComponentValueProvider) component).getValues(providerName);
-    }
-
-    if (component instanceof ConfigurationParameterValueProvider) {
-      if (isConnection) {
-        return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(providerName);
-      } else {
-        return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(providerName);
-      }
-    }
-
-    throw new ValueResolvingException(format("The found element in the Location [%s] is not capable of provide Values",
-                                             location),
-                                      NOT_VALUE_PROVIDER_ENABLED);
-  }
-
   private ValueProvider findValueProvider(Location location, String parameterName, String targetPath)
       throws ValueResolvingException {
     boolean isConnection = isConnection(location);
@@ -123,14 +97,26 @@ public class MuleValueProviderService implements ValueProviderService {
     Object component = findComponent(realLocation);
 
     if (component instanceof ComponentValueProvider) {
-      return () -> ((ComponentValueProvider) component).getValues(parameterName, targetPath);
+      if (targetPath != null) {
+        return () -> ((ComponentValueProvider) component).getValues(parameterName, targetPath);
+      } else {
+        return () -> ((ComponentValueProvider) component).getValues(parameterName);
+      }
     }
 
     if (component instanceof ConfigurationParameterValueProvider) {
       if (isConnection) {
-        return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(parameterName, targetPath);
+        if (targetPath != null) {
+          return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(parameterName, targetPath);
+        } else {
+          return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(parameterName);
+        }
       } else {
-        return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(parameterName, targetPath);
+        if (targetPath != null) {
+          return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(parameterName, targetPath);
+        } else {
+          return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(parameterName);
+        }
       }
     }
 
