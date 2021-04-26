@@ -19,7 +19,7 @@ public class ArtifactClassLoaderModelBuilderTestCase {
   private List<Profile> profiles;
 
   @Test
-  public void testFindArtifactPackagerPluginDoesNotThrowException_IfProfileBuildIsNull(){
+  public void testFindArtifactPackagerPluginDoesNotThrowException_IfProfileBuildIsNull() {
     // When
     Model model = mock(Model.class);
     Profile profile = mock(Profile.class);
@@ -35,24 +35,25 @@ public class ArtifactClassLoaderModelBuilderTestCase {
         .setVersion("1.2.3")
         .build();
 
-    ArtifactClassLoaderModelBuilder artifactClassLoaderModelBuilder = new ArtifactClassLoaderModelBuilder(artifactFolder, artifactBundleDescriptor) {
-      @Override
-      protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
-        return null;
-      }
+    ArtifactClassLoaderModelBuilder artifactClassLoaderModelBuilder =
+        new ArtifactClassLoaderModelBuilder(artifactFolder, artifactBundleDescriptor) {
 
-      @Override
-      protected List<String> getActiveProfiles() {
-        return singletonList(profileId);
-      }
-    };
+          @Override
+          protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
+            return null;
+          }
+
+          @Override
+          protected List<String> getActiveProfiles() {
+            return singletonList(profileId);
+          }
+        };
 
     // When
-    try {
-      artifactClassLoaderModelBuilder.findArtifactPackagerPlugin(model);
-    } catch (NullPointerException t){
-      fail("NullPointerException should not be thrown");
-    }
+    artifactClassLoaderModelBuilder.findArtifactPackagerPlugin(model);
+
+    // Then
+    // No NPE is thrown
 
   }
 
