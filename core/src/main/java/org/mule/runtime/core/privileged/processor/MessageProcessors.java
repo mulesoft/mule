@@ -508,9 +508,11 @@ public class MessageProcessors {
                     .map(event -> right(MessagingException.class, event));
 
                 return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
-                                                            completeSuccessEitherIfNeeded(), errorSwitchSinkSinkRef::error,
+                                                            completeSuccessEitherIfNeeded(),
+                                                            errorSwitchSinkSinkRef::error,
                                                             errorSwitchSinkSinkRef::complete)
-                    .map(propagateErrorResponseMapper().andThen(MessageProcessors::toParentContext));
+                                                                .map(propagateErrorResponseMapper()
+                                                                    .andThen(MessageProcessors::toParentContext));
               }
             }));
   }
