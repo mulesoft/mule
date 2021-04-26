@@ -149,7 +149,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
     final Stream<Plugin> packagerConfigsForActivePluginsStream = model.getProfiles().stream()
         .filter(profile -> activeProfiles.contains(profile.getId()))
-        .map(profile -> findArtifactPackagerPlugin(profile.getBuild().getPlugins()))
+        .map(profile -> findArtifactPackagerPlugin(profile.getBuild() != null ? profile.getBuild().getPlugins() : null))
         .filter(plugin -> !plugin.equals(empty()))
         .map(Optional::get);
 
