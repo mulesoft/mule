@@ -11,11 +11,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLA
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.sdk.api.annotation.binding.Binding;
-import org.mule.sdk.api.annotation.values.OfValues;
-import org.mule.test.values.extension.resolver.SimpleValueProvider;
 import org.mule.test.values.extension.resolver.WithTwoActingParametersValueProvider;
-
-import java.io.InputStream;
 
 @MediaType(TEXT_PLAIN)
 public class SourceWithTwoBoundActingParameters extends AbstractSource {
@@ -23,8 +19,8 @@ public class SourceWithTwoBoundActingParameters extends AbstractSource {
   @Parameter
   @org.mule.sdk.api.annotation.values.OfValues(
       value = WithTwoActingParametersValueProvider.class,
-      bindings = {@Binding(actingParameter = "requiredValue", path = "oneParameter"),
-          @Binding(actingParameter = "scalarActingParameter", path = "someParameter")})
+      bindings = {@Binding(actingParameter = "requiredValue", extractionExpression = "oneParameter"),
+          @Binding(actingParameter = "scalarActingParameter", extractionExpression = "someParameter")})
   private String parameterWithValue;
 
   @Parameter

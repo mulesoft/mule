@@ -34,7 +34,6 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
@@ -121,13 +120,13 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     }
 
     for (InjectableParameterInfo parameterInfo : modelProperty.getInjectableParameters()) {
-      String parameterName = getParameterNameFromPath(parameterInfo.getPath());
+      String parameterName = getParameterNameFromPath(parameterInfo.getExtractionExpression());
       if (!allParameters.containsKey(parameterName)) {
         problemsReporter.addError(new Problem(model,
                                               format("The Value Provider [%s] declares to use a parameter '%s' which doesn't exist in the %s '%s'",
                                                      providerName, parameterName, modelTypeName, modelName)));
       } else {
-        if (parameterInfo.getPath().equals(parameterInfo.getParameterName())) {
+        if (parameterInfo.getExtractionExpression().equals(parameterInfo.getParameterName())) {
           MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
           Class<?> expectedType = getType(metadataType)
               .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",

@@ -7,12 +7,8 @@
 package org.mule.test.values.extension.config;
 
 import org.mule.runtime.extension.api.annotation.Configuration;
-import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.sdk.api.annotation.binding.Binding;
-import org.mule.test.values.extension.connection.ValuesConnectionProvider;
-import org.mule.test.values.extension.resolver.SimpleLegacyValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider;
 
 @Configuration(name = "with-bound-value-parameter")
@@ -21,7 +17,7 @@ public class ConfigWithBoundValueParameter {
   @Parameter
   @org.mule.sdk.api.annotation.values.OfValues(
       value = WithRequiredParameterSdkValueProvider.class,
-      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter")})
+      bindings = {@Binding(actingParameter = "requiredValue", extractionExpression = "actingParameter")})
   private String parameterWithValues;
 
   @Parameter

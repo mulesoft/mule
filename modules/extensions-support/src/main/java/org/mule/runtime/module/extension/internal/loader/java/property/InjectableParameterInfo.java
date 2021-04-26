@@ -18,17 +18,17 @@ public class InjectableParameterInfo {
   private String parameterName;
   private MetadataType type;
   private boolean required;
-  private String path;
+  private String extractionExpression;
 
   InjectableParameterInfo(String parameterName, MetadataType type, boolean required) {
     this(parameterName, type, required, null);
   }
 
-  InjectableParameterInfo(String parameterName, MetadataType type, boolean required, String path) {
+  InjectableParameterInfo(String parameterName, MetadataType type, boolean required, String extractionExpression) {
     this.parameterName = parameterName;
     this.type = type;
     this.required = required;
-    this.path = path;
+    this.extractionExpression = extractionExpression;
   }
 
   public String getParameterName() {
@@ -55,11 +55,11 @@ public class InjectableParameterInfo {
     this.required = required;
   }
 
-  public String getPath() {
-    return path;
+  public String getExtractionExpression() {
+    return extractionExpression;
   }
 
-  public void setPath(String path) {
-    this.path = path;
+  public void setExtractionExpression(String extractionExpression) {
+    this.extractionExpression = extractionExpression;
   }
 }

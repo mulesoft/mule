@@ -8,10 +8,8 @@ package org.mule.test.values.extension.connection;
 
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.sdk.api.annotation.binding.Binding;
 import org.mule.test.values.extension.resolver.WithFourActingParametersValueProvider;
-import org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigLegacyValueProvider;
 
 @Alias("withValueFourBoundActingParameters")
 public class ConnectionWithValueFourBoundActingParameters extends AbstractConnectionProvider {
@@ -19,10 +17,10 @@ public class ConnectionWithValueFourBoundActingParameters extends AbstractConnec
   @Parameter
   @org.mule.sdk.api.annotation.values.OfValues(
       value = WithFourActingParametersValueProvider.class,
-      bindings = {@Binding(actingParameter = "requiredValue", path = "parameterOne"),
-          @Binding(actingParameter = "anotherValue", path = "parameterTwo"),
-          @Binding(actingParameter = "someValue", path = "parameterThree"),
-          @Binding(actingParameter = "optionalValue", path = "parameterFour")})
+      bindings = {@Binding(actingParameter = "requiredValue", extractionExpression = "parameterOne"),
+          @Binding(actingParameter = "anotherValue", extractionExpression = "parameterTwo"),
+          @Binding(actingParameter = "someValue", extractionExpression = "parameterThree"),
+          @Binding(actingParameter = "optionalValue", extractionExpression = "parameterFour")})
   String parameterWithValue;
 
   @Parameter

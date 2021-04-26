@@ -292,12 +292,12 @@
               {
                 "name": "aliasedPayload",
                 "required": true,
-                "path": "aliasedPayload"
+                "extractionExpression": "aliasedPayload"
               },
               {
                 "name": "aliasedAttributes",
                 "required": true,
-                "path": "aliasedAttributes"
+                "extractionExpression": "aliasedAttributes"
               }
             ],
             "providerId": "ParameterizedTestSampleDataProvider",
@@ -899,12 +899,12 @@
               {
                 "name": "payload",
                 "required": true,
-                "path": "payload"
+                "extractionExpression": "payload"
               },
               {
                 "name": "attributes",
                 "required": true,
-                "path": "attributes"
+                "extractionExpression": "attributes"
               }
             ],
             "providerId": "ConnectedTestSampleDataProvider",
@@ -1491,12 +1491,12 @@
               {
                 "name": "groupParameter",
                 "required": true,
-                "path": "groupParameter"
+                "extractionExpression": "groupParameter"
               },
               {
                 "name": "optionalParameter",
                 "required": false,
-                "path": "optionalParameter"
+                "extractionExpression": "optionalParameter"
               }
             ],
             "providerId": "GroupTestSampleDataProvider",
@@ -2098,12 +2098,12 @@
               {
                 "name": "groupParameter",
                 "required": true,
-                "path": "groupParameter"
+                "extractionExpression": "groupParameter"
               },
               {
                 "name": "optionalParameter",
                 "required": false,
-                "path": "optionalParameter"
+                "extractionExpression": "optionalParameter"
               }
             ],
             "providerId": "GroupTestSampleDataProvider",
@@ -2705,12 +2705,12 @@
               {
                 "name": "payload",
                 "required": true,
-                "path": "payload"
+                "extractionExpression": "payload"
               },
               {
                 "name": "attributes",
                 "required": true,
-                "path": "attributes"
+                "extractionExpression": "attributes"
               }
             ],
             "providerId": "ConfigAwareTestSampleDataProvider",
@@ -3297,12 +3297,12 @@
               {
                 "name": "payload",
                 "required": true,
-                "path": "payload"
+                "extractionExpression": "payload"
               },
               {
                 "name": "attributes",
                 "required": true,
-                "path": "attributes"
+                "extractionExpression": "attributes"
               }
             ],
             "providerId": "ConnectedTestSampleDataProvider",
@@ -4133,12 +4133,12 @@
               {
                 "name": "payload",
                 "required": true,
-                "path": "payload"
+                "extractionExpression": "payload"
               },
               {
                 "name": "attributes",
                 "required": true,
-                "path": "attributes"
+                "extractionExpression": "attributes"
               }
             ],
             "providerId": "ConfigAwareTestSampleDataProvider",
@@ -4695,12 +4695,12 @@
               {
                 "name": "payload",
                 "required": true,
-                "path": "payload"
+                "extractionExpression": "payload"
               },
               {
                 "name": "attributes",
                 "required": true,
-                "path": "attributes"
+                "extractionExpression": "attributes"
               }
             ],
             "providerId": "ConnectedTestSampleDataProvider",
@@ -5271,7 +5271,7 @@
           {
             "name": "complex",
             "required": true,
-            "path": "complex"
+            "extractionExpression": "complex"
           }
         ],
         "providerId": "ComplexActingParameterSampleDataProvider",
@@ -5602,7 +5602,7 @@
           {
             "name": "complex",
             "required": true,
-            "path": "complex"
+            "extractionExpression": "complex"
           }
         ],
         "providerId": "ComplexTypeSampleDataProvider",
@@ -5918,12 +5918,12 @@
           {
             "name": "payload",
             "required": true,
-            "path": "payload"
+            "extractionExpression": "payload"
           },
           {
             "name": "attributes",
             "required": true,
-            "path": "attributes"
+            "extractionExpression": "attributes"
           }
         ],
         "providerId": "ParameterizedTestSampleDataProvider",
@@ -6303,7 +6303,7 @@
           {
             "name": "complex",
             "required": true,
-            "path": "complex"
+            "extractionExpression": "complex"
           }
         ],
         "providerId": "MoreComplexTypeSampleDataProvider",
@@ -6619,12 +6619,12 @@
           {
             "name": "payload",
             "required": true,
-            "path": "payload"
+            "extractionExpression": "payload"
           },
           {
             "name": "attributes",
             "required": true,
-            "path": "attributes"
+            "extractionExpression": "attributes"
           }
         ],
         "providerId": "MuleContextAwareSampleDataProvider",
@@ -6968,12 +6968,12 @@
           {
             "name": "payload",
             "required": false,
-            "path": "payload"
+            "extractionExpression": "payload"
           },
           {
             "name": "attributes",
             "required": false,
-            "path": "attributes"
+            "extractionExpression": "attributes"
           }
         ],
         "providerId": "OptionalTestSampleDataProvider",
@@ -7831,12 +7831,12 @@
           {
             "name": "aliasedPayload",
             "required": true,
-            "path": "aliasedPayload"
+            "extractionExpression": "aliasedPayload"
           },
           {
             "name": "aliasedAttributes",
             "required": true,
-            "path": "aliasedAttributes"
+            "extractionExpression": "aliasedAttributes"
           }
         ],
         "providerId": "ParameterizedTestSampleDataProvider",
@@ -8168,7 +8168,7 @@
           {
             "name": "complex",
             "required": true,
-            "path": "complex"
+            "extractionExpression": "complex"
           }
         ],
         "providerId": "ComplexActingParameterSampleDataProvider",
@@ -8457,12 +8457,12 @@
           {
             "name": "payload",
             "required": true,
-            "path": "payload"
+            "extractionExpression": "payload"
           },
           {
             "name": "attributes",
             "required": true,
-            "path": "attributes"
+            "extractionExpression": "attributes"
           }
         ],
         "providerId": "ParameterizedTestSampleDataProvider",
@@ -8779,12 +8779,12 @@
           {
             "name": "payload",
             "required": true,
-            "path": "payload"
+            "extractionExpression": "payload"
           },
           {
             "name": "attributes",
             "required": true,
-            "path": "attributes"
+            "extractionExpression": "attributes"
           }
         ],
         "providerId": "MuleContextAwareSampleDataProvider",
@@ -9101,12 +9101,12 @@
           {
             "name": "groupParameter",
             "required": true,
-            "path": "groupParameter"
+            "extractionExpression": "groupParameter"
           },
           {
             "name": "optionalParameter",
             "required": false,
-            "path": "optionalParameter"
+            "extractionExpression": "optionalParameter"
           }
         ],
         "providerId": "GroupTestSampleDataProvider",
@@ -9438,12 +9438,12 @@
           {
             "name": "groupParameter",
             "required": true,
-            "path": "groupParameter"
+            "extractionExpression": "groupParameter"
           },
           {
             "name": "optionalParameter",
             "required": false,
-            "path": "optionalParameter"
+            "extractionExpression": "optionalParameter"
           }
         ],
         "providerId": "GroupTestSampleDataProvider",

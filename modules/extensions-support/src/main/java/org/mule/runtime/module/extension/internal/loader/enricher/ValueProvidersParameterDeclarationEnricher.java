@@ -47,7 +47,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.value.OfValueInformation;
 import org.mule.sdk.api.annotation.binding.Binding;
 import java.lang.annotation.Annotation;
@@ -149,7 +148,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                List<ParameterDeclaration> allParameters) {
     Map<String, String> bindingMap = new HashMap<>();
     for (Binding binding : ofValueInformation.getBindings()) {
-      bindingMap.put(binding.actingParameter(), binding.path());
+      bindingMap.put(binding.actingParameter(), binding.extractionExpression());
     }
 
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =

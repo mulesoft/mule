@@ -132,9 +132,10 @@ public class InjectableParameterResolver {
     expression.append(
                       injectableParametersMap.values().stream()
                           .filter(injectableParameterInfo -> identifiers
-                              .contains(getParameterNameFromPath(injectableParameterInfo.getPath())))
+                              .contains(getParameterNameFromPath(injectableParameterInfo.getExtractionExpression())))
                           .map(injectableParameterInfo -> "\""
-                              + injectableParameterInfo.getParameterName() + "\"  : " + injectableParameterInfo.getPath())
+                              + injectableParameterInfo.getParameterName() + "\"  : "
+                              + injectableParameterInfo.getExtractionExpression())
                           .collect(Collectors.joining(", ")));
     expression.append(EXPRESSION_SUFFIX);
 

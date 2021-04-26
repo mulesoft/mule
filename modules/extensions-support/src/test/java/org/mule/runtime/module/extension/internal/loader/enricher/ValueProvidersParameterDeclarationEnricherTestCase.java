@@ -141,7 +141,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameter, notNullValue());
     assertThat(parameter.getName(), is("requiredValue"));
     assertThat(parameter.isRequired(), is(true));
-    assertThat(parameter.getPath(), is("requiredValue"));
+    assertThat(parameter.getExtractionExpression(), is("requiredValue"));
   }
 
   @Test
@@ -156,7 +156,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameter, notNullValue());
     assertThat(parameter.getName(), is("requiredValue"));
     assertThat(parameter.isRequired(), is(true));
-    assertThat(parameter.getPath(), is("actingParameter"));
+    assertThat(parameter.getExtractionExpression(), is("actingParameter"));
   }
 
   @Test
@@ -172,7 +172,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameter, notNullValue());
     assertThat(parameter.getName(), is("requiredValue"));
     assertThat(parameter.isRequired(), is(true));
-    assertThat(parameter.getPath(), is("actingParameter.field"));
+    assertThat(parameter.getExtractionExpression(), is("actingParameter.field"));
   }
 
   private ParameterDeclaration getParameterByOperationAndName(String operationName, String parameterName) {

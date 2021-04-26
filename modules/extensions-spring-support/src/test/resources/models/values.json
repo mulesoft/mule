@@ -69,12 +69,12 @@
                   {
                     "name": "required1",
                     "required": true,
-                    "path": "required1"
+                    "extractionExpression": "required1"
                   },
                   {
                     "name": "required2",
                     "required": true,
-                    "path": "required2"
+                    "extractionExpression": "required2"
                   }
                 ],
                 "partOrder": 1,
@@ -663,7 +663,7 @@
                   {
                     "name": "anyParameter",
                     "required": true,
-                    "path": "anyParameter"
+                    "extractionExpression": "anyParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -1276,7 +1276,7 @@
                   {
                     "name": "anyParameter",
                     "required": true,
-                    "path": "anyParameter"
+                    "extractionExpression": "anyParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -3098,12 +3098,12 @@
                       {
                         "name": "required1",
                         "required": true,
-                        "path": "required1"
+                        "extractionExpression": "required1"
                       },
                       {
                         "name": "required2",
                         "required": true,
-                        "path": "required2"
+                        "extractionExpression": "required2"
                       }
                     ],
                     "partOrder": 1,
@@ -3465,7 +3465,7 @@
                       {
                         "name": "anyParameter",
                         "required": true,
-                        "path": "anyParameter"
+                        "extractionExpression": "anyParameter"
                       }
                     ],
                     "partOrder": 1,
@@ -3851,7 +3851,7 @@
                       {
                         "name": "anyParameter",
                         "required": true,
-                        "path": "anyParameter"
+                        "extractionExpression": "anyParameter"
                       }
                     ],
                     "partOrder": 1,
@@ -4526,7 +4526,7 @@
                       {
                         "name": "errorCode",
                         "required": true,
-                        "path": "errorCode"
+                        "extractionExpression": "errorCode"
                       }
                     ],
                     "partOrder": 1,
@@ -5157,22 +5157,22 @@
                       {
                         "name": "requiredValue",
                         "required": true,
-                        "path": "parameterOne"
+                        "extractionExpression": "parameterOne"
                       },
                       {
                         "name": "anotherValue",
                         "required": true,
-                        "path": "parameterTwo"
+                        "extractionExpression": "parameterTwo"
                       },
                       {
                         "name": "someValue",
                         "required": true,
-                        "path": "parameterThree"
+                        "extractionExpression": "parameterThree"
                       },
                       {
                         "name": "optionalValue",
                         "required": false,
-                        "path": "parameterFour"
+                        "extractionExpression": "parameterFour"
                       }
                     ],
                     "partOrder": 1,
@@ -6993,7 +6993,7 @@
                   {
                     "name": "errorCode",
                     "required": true,
-                    "path": "errorCode"
+                    "extractionExpression": "errorCode"
                   }
                 ],
                 "partOrder": 1,
@@ -7263,7 +7263,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter"
+                    "extractionExpression": "actingParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -8611,7 +8611,7 @@
                   {
                     "name": "anyParameter",
                     "required": true,
-                    "path": "anyParameter"
+                    "extractionExpression": "anyParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -8924,22 +8924,22 @@
                   {
                     "name": "requiredString",
                     "required": false,
-                    "path": "requiredString"
+                    "extractionExpression": "requiredString"
                   },
                   {
                     "name": "requiredInteger",
                     "required": true,
-                    "path": "requiredInteger"
+                    "extractionExpression": "requiredInteger"
                   },
                   {
                     "name": "requiredBoolean",
                     "required": true,
-                    "path": "requiredBoolean"
+                    "extractionExpression": "requiredBoolean"
                   },
                   {
                     "name": "strings",
                     "required": true,
-                    "path": "strings"
+                    "extractionExpression": "strings"
                   }
                 ],
                 "partOrder": 1,
@@ -9352,7 +9352,7 @@
                   {
                     "name": "superString",
                     "required": true,
-                    "path": "superString"
+                    "extractionExpression": "superString"
                   }
                 ],
                 "partOrder": 1,
@@ -9585,7 +9585,7 @@
                   {
                     "name": "anyParameter",
                     "required": true,
-                    "path": "anyParameter"
+                    "extractionExpression": "anyParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -9898,7 +9898,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter"
+                    "extractionExpression": "actingParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -10159,7 +10159,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.jsonArray"
+                    "extractionExpression": "actingParameter.jsonArray"
                   }
                 ],
                 "partOrder": 1,
@@ -10436,7 +10436,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.enumField"
+                    "extractionExpression": "actingParameter.enumField"
                   }
                 ],
                 "partOrder": 1,
@@ -10713,7 +10713,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.field"
+                    "extractionExpression": "actingParameter.field"
                   }
                 ],
                 "partOrder": 1,
@@ -10990,7 +10990,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.\"field.with.dot\""
+                    "extractionExpression": "actingParameter.\"field.with.dot\""
                   }
                 ],
                 "partOrder": 1,
@@ -11267,7 +11267,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.nested.xmlTag.@attribute"
+                    "extractionExpression": "actingParameter.nested.xmlTag.@attribute"
                   }
                 ],
                 "partOrder": 1,
@@ -11544,7 +11544,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.nested.xmlTag"
+                    "extractionExpression": "actingParameter.nested.xmlTag"
                   }
                 ],
                 "partOrder": 1,
@@ -11821,7 +11821,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "parameterAlias"
+                    "extractionExpression": "parameterAlias"
                   }
                 ],
                 "partOrder": 1,
@@ -12082,7 +12082,7 @@
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "actingParameter"
+                    "extractionExpression": "actingParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -12343,7 +12343,7 @@
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "actingParameter.nested.field"
+                    "extractionExpression": "actingParameter.nested.field"
                   }
                 ],
                 "partOrder": 1,
@@ -12620,7 +12620,7 @@
                   {
                     "name": "complexActingParameter",
                     "required": true,
-                    "path": "complexActingParameter"
+                    "extractionExpression": "complexActingParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -12881,7 +12881,7 @@
                   {
                     "name": "errorCode",
                     "required": true,
-                    "path": "errorCode"
+                    "extractionExpression": "errorCode"
                   }
                 ],
                 "partOrder": 1,
@@ -13142,22 +13142,22 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.field1"
+                    "extractionExpression": "actingParameter.field1"
                   },
                   {
                     "name": "anotherValue",
                     "required": true,
-                    "path": "actingParameter.nested.field2"
+                    "extractionExpression": "actingParameter.nested.field2"
                   },
                   {
                     "name": "someValue",
                     "required": true,
-                    "path": "actingParameter.nested.field3"
+                    "extractionExpression": "actingParameter.nested.field3"
                   },
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "actingParameter.anotherNested.field4"
+                    "extractionExpression": "actingParameter.anotherNested.field4"
                   }
                 ],
                 "partOrder": 1,
@@ -13434,7 +13434,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.mapField"
+                    "extractionExpression": "actingParameter.mapField"
                   }
                 ],
                 "partOrder": 1,
@@ -13711,7 +13711,7 @@
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "optionalValue"
+                    "extractionExpression": "optionalValue"
                   }
                 ],
                 "partOrder": 1,
@@ -13972,7 +13972,7 @@
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "optionalValue"
+                    "extractionExpression": "optionalValue"
                   }
                 ],
                 "partOrder": 1,
@@ -14233,7 +14233,7 @@
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "optionalValue"
+                    "extractionExpression": "optionalValue"
                   }
                 ],
                 "partOrder": 1,
@@ -14495,7 +14495,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.pojoField"
+                    "extractionExpression": "actingParameter.pojoField"
                   }
                 ],
                 "partOrder": 1,
@@ -14772,7 +14772,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.pojoId"
+                    "extractionExpression": "actingParameter.pojoId"
                   }
                 ],
                 "partOrder": 1,
@@ -15033,12 +15033,12 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "requiredValue"
+                    "extractionExpression": "requiredValue"
                   },
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "optionalValue"
+                    "extractionExpression": "optionalValue"
                   }
                 ],
                 "partOrder": 1,
@@ -15327,12 +15327,12 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "requiredValue"
+                    "extractionExpression": "requiredValue"
                   },
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "optionalValue"
+                    "extractionExpression": "optionalValue"
                   }
                 ],
                 "partOrder": 1,
@@ -15622,7 +15622,7 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "requiredValue"
+                    "extractionExpression": "requiredValue"
                   }
                 ],
                 "partOrder": 1,
@@ -15883,12 +15883,12 @@
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "requiredValue"
+                    "extractionExpression": "requiredValue"
                   },
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "optionalValue"
+                    "extractionExpression": "optionalValue"
                   }
                 ],
                 "partOrder": 1,
@@ -16177,12 +16177,12 @@
                   {
                     "name": "scalarActingParameter",
                     "required": true,
-                    "path": "scalarActingParameter"
+                    "extractionExpression": "scalarActingParameter"
                   },
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.field"
+                    "extractionExpression": "actingParameter.field"
                   }
                 ],
                 "partOrder": 1,
@@ -16487,12 +16487,12 @@
                   {
                     "name": "scalarActingParameter",
                     "required": true,
-                    "path": "anotherParameter"
+                    "extractionExpression": "anotherParameter"
                   },
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "actingParameter.field"
+                    "extractionExpression": "actingParameter.field"
                   }
                 ],
                 "partOrder": 1,
@@ -16797,7 +16797,7 @@
                   {
                     "name": "optionalValue",
                     "required": false,
-                    "path": "optionalValue"
+                    "extractionExpression": "optionalValue"
                   }
                 ],
                 "partOrder": 1,
@@ -18052,7 +18052,7 @@
                   {
                     "name": "anyParameter",
                     "required": true,
-                    "path": "anyParameter"
+                    "extractionExpression": "anyParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -18648,7 +18648,7 @@
                   {
                     "name": "superString",
                     "required": true,
-                    "path": "superString"
+                    "extractionExpression": "superString"
                   }
                 ],
                 "partOrder": 1,
@@ -18759,12 +18759,12 @@
                   {
                     "name": "scalarActingParameter",
                     "required": true,
-                    "path": "someParameter"
+                    "extractionExpression": "someParameter"
                   },
                   {
                     "name": "requiredValue",
                     "required": true,
-                    "path": "oneParameter"
+                    "extractionExpression": "oneParameter"
                   }
                 ],
                 "partOrder": 1,
@@ -19441,22 +19441,22 @@
                   {
                     "name": "requiredString",
                     "required": false,
-                    "path": "requiredString"
+                    "extractionExpression": "requiredString"
                   },
                   {
                     "name": "requiredInteger",
                     "required": true,
-                    "path": "requiredInteger"
+                    "extractionExpression": "requiredInteger"
                   },
                   {
                     "name": "requiredBoolean",
                     "required": true,
-                    "path": "requiredBoolean"
+                    "extractionExpression": "requiredBoolean"
                   },
                   {
                     "name": "strings",
                     "required": true,
-                    "path": "strings"
+                    "extractionExpression": "strings"
                   }
                 ],
                 "partOrder": 1,
