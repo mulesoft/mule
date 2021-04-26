@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.qameta.allure.Issue;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
@@ -19,6 +20,7 @@ public class ArtifactClassLoaderModelBuilderTestCase {
   private List<Profile> profiles;
 
   @Test
+  @Issue("MULE-19355")
   public void testFindArtifactPackagerPluginDoesNotThrowException_IfProfileBuildIsNull() {
     // Given
     Model model = mock(Model.class);
