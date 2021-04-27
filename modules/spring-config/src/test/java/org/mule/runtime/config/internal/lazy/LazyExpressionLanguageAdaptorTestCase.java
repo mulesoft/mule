@@ -4,29 +4,34 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.el;
+package org.mule.runtime.config.internal.lazy;
 
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class LazyExpressionLanguageAdaptorTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private CheckedSupplier<ExtendedExpressionLanguageAdaptor> supplier;
@@ -43,7 +48,7 @@ public class LazyExpressionLanguageAdaptorTestCase extends AbstractMuleTestCase 
   private LazyExpressionLanguageAdaptor lazyAdaptor;
 
 
-  private Latch latch = new Latch();
+  private final Latch latch = new Latch();
 
 
   @Before
