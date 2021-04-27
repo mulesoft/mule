@@ -6,21 +6,25 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.module.deployment.api.StartupListener;
-import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
-public class MuleDeploymentServiceTestCase {
+public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private static final int NUMBER_OF_LISTENER_SUBSCRIBERS = 0;
 
@@ -56,7 +60,7 @@ public class MuleDeploymentServiceTestCase {
 
   private static class ListenerSubscriber implements Runnable {
 
-    private MuleDeploymentService deploymentService;
+    private final MuleDeploymentService deploymentService;
 
     public ListenerSubscriber(MuleDeploymentService deploymentService) {
       this.deploymentService = deploymentService;
@@ -64,12 +68,8 @@ public class MuleDeploymentServiceTestCase {
 
     @Override
     public void run() {
-      deploymentService.addStartupListener(new StartupListener() {
-
-        @Override
-        public void onAfterStartup() {
-          // Do nothing
-        }
+      deploymentService.addStartupListener(() -> {
+        // Do nothing
       });
     }
   }

@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 
 /**
- * Deployes and Undeploys artifacts in the container.
+ * Deploys and Undeploys artifacts in the container.
  *
  * @param <T> artifact type
  */
@@ -18,9 +18,9 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
   /**
    * Deploys an artifact.
    * <p>
-   * The deployer executes the artifact installation phases until the artifact is deployed After this method call the Artifact
-   * will be installed in the container and started.
-   * 
+   * The deployer executes the artifact installation phases until the artifact is deployed. After this method call the Artifact
+   * will be installed in the container and its start dispatched asynchronously.
+   *
    * @param artifact      artifact to be deployed
    * @param startArtifact whether the artifact should be started after initialisation
    */
@@ -29,9 +29,9 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
   /**
    * Deploys an artifact.
    * <p>
-   * The deployer executes the artifact installation phases until the artifact is deployed After this method call the Artifact
-   * will be installed in the container and started.
-   * 
+   * The deployer executes the artifact installation phases until the artifact is deployed. After this method call the Artifact
+   * will be installed in the container and its start dispatched asynchronously.
+   *
    * @param artifact artifact to be deployed
    */
   default void deploy(final T artifact) {

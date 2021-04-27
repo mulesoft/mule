@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -26,7 +25,6 @@ import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
-import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
@@ -572,10 +570,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     return deployExplodedApp(artifactDir, deploymentProperties);
   }
 
+  @Override
   public void doNotPersistArtifactStop(T artifact) {
     deployer.doNotPersistArtifactStop(artifact);
   }
 
+  @Override
   public void doNotPersistFlowsStop(String artifactName) {
     deployer.doNotPersistFlowsStop(artifactName);
   }

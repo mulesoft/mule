@@ -90,8 +90,8 @@ public class MuleDeploymentService implements DeploymentService {
                                Supplier<SchedulerService> schedulerServiceSupplier) {
     // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
     // artifact plugins.
-    ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();
-    ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>();
+    ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(schedulerServiceSupplier);
+    ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>(schedulerServiceSupplier);
 
     this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
                                                             NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
@@ -123,7 +123,7 @@ public class MuleDeploymentService implements DeploymentService {
     }
   }
 
-  private boolean useParallelDeployment() {
+  static boolean useParallelDeployment() {
     return getProperties().containsKey(PARALLEL_DEPLOYMENT_PROPERTY);
   }
 

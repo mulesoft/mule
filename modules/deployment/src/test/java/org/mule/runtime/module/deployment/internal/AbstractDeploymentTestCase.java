@@ -42,7 +42,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
@@ -54,6 +53,8 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
@@ -99,10 +100,8 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -440,7 +439,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
           .dependingOn(exceptionThrowingPlugin);
 
   private File muleHome;
-  protected final boolean parallelDeployment;
   protected File appsDir;
   protected File domainsDir;
   protected ServiceManager serviceManager;
@@ -457,6 +455,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   public SystemProperty changeChangeInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "10");
 
   @Rule
+  public SystemProperty parallelDeployment;
+
+  @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");
 
   @Rule
@@ -465,15 +466,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private File services;
 
   public AbstractDeploymentTestCase(boolean parallelDeployment) {
-    this.parallelDeployment = parallelDeployment;
+    this.parallelDeployment = new SystemProperty(PARALLEL_DEPLOYMENT_PROPERTY, "");
   }
 
   @Before
   public void setUp() throws Exception {
-    if (parallelDeployment) {
-      setProperty(PARALLEL_DEPLOYMENT_PROPERTY, "");
-    }
-
     final String tmpDir = getProperty("java.io.tmpdir");
     muleHome = new File(new File(tmpDir, "mule_home"), getClass().getSimpleName() + currentTimeMillis());
     appsDir = new File(muleHome, "apps");
@@ -525,7 +522,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   @After
   public void undeployApps() {
-    deploymentService.getApplications().forEach(app -> deploymentService.undeploy(app.getArtifactName()));
+    if (deploymentService != null) {
+      deploymentService.getApplications().forEach(app -> deploymentService.undeploy(app.getArtifactName()));
+    }
     TestApplicationFactory.after();
   }
 
@@ -560,16 +559,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       extensionModelLoaderManager.stop();
     }
 
-    FileUtils.deleteTree(muleHome);
+    deleteTree(muleHome);
 
     // this is a complex classloader setup and we can't reproduce standalone Mule 100%,
     // so trick the next test method into thinking it's the first run, otherwise
     // app resets CCL ref to null and breaks the next test
-    Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
-
-    if (parallelDeployment) {
-      System.clearProperty(PARALLEL_DEPLOYMENT_PROPERTY);
-    }
+    currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
   }
 
   protected void alterTimestampIfNeeded(File file, long firstTimestamp) {
@@ -1225,7 +1220,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     lock.lock();
     try {
       File tempFolder = new File(muleHome, artifactName);
-      FileUtils.unzip(new File(url.toURI()), tempFolder);
+      unzip(new File(url.toURI()), tempFolder);
 
       // Under some platforms, file.lastModified is managed at second level, not milliseconds.
       // Need to update the config file lastModified ere to ensure that is different from previous value
@@ -1237,7 +1232,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       File appFolder = new File(destinationDir, artifactName);
 
       if (appFolder.exists()) {
-        FileUtils.deleteTree(appFolder);
+        deleteTree(appFolder);
       }
 
       moveDirectory(tempFolder, appFolder);

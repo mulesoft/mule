@@ -9,42 +9,57 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
-import static java.rmi.registry.LocateRegistry.getRegistry;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.useParallelDeployment;
+import static org.mule.runtime.module.deployment.internal.ParallelDeploymentDirectoryWatcher.MAX_APPS_IN_PARALLEL_DEPLOYMENT;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
+import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 
 import java.io.IOException;
-import java.util.Optional;
-
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
-import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T> {
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
-  private HashMap<String, List<FlowStoppedPersistenceListener>> appsFlowStoppedListeners = new HashMap<>();
+  private static final Logger logger = getLogger(DefaultArtifactDeployer.class);
+  private final Map<String, List<FlowStoppedPersistenceListener>> appsFlowStoppedListeners = new HashMap<>();
+
+  private final Scheduler threadPoolExecutor;
+
+  public DefaultArtifactDeployer(Supplier<SchedulerService> schedulerServiceSupplier) {
+    this.threadPoolExecutor =
+        schedulerServiceSupplier.get()
+            .customScheduler(config()
+                .withName("ArtifactDeployer.start")
+                .withMaxConcurrentTasks(useParallelDeployment() ? MAX_APPS_IN_PARALLEL_DEPLOYMENT : 1),
+                             256);
+  }
 
   @Override
   public void deploy(T artifact, boolean startArtifact) {
@@ -53,7 +68,14 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       doInit(artifact);
       addFlowStoppedListeners(artifact);
       if (shouldStartArtifact(artifact)) {
-        artifact.start();
+        threadPoolExecutor.execute(() -> {
+          try {
+            artifact.start();
+          } catch (Throwable t) {
+            artifact.dispose();
+            logger.error("Failed to deploy artifact [{}]", artifact.getArtifactName());
+          }
+        });
       }
 
       ArtifactStoppedPersistenceListener artifactStoppedDeploymentListener =
@@ -69,8 +91,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
         throw ((DeploymentException) t);
       }
 
-      final String msg = format("Failed to deploy artifact [%s]", artifact.getArtifactName());
-      throw new DeploymentException(createStaticMessage(msg), t);
+      throw new DeploymentException(createStaticMessage("Failed to deploy artifact [%s]", artifact.getArtifactName()), t);
     }
   }
 
@@ -161,6 +182,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
         && parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 
+  @Override
   public void doNotPersistArtifactStop(T artifact) {
     Registry artifactRegistry = artifact.getRegistry();
 
@@ -171,6 +193,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     }
   }
 
+  @Override
   public void doNotPersistFlowsStop(String artifactName) {
     if (appsFlowStoppedListeners.containsKey(artifactName)) {
       appsFlowStoppedListeners.get(artifactName)

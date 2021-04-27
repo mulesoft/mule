@@ -132,14 +132,14 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
     });
     this.schedulerServiceSupplier = schedulerServiceSupplier;
-    this.applicationTimestampListener = new ArtifactTimestampListener(applications);
-    this.domainTimestampListener = new ArtifactTimestampListener(domains);
+    this.applicationTimestampListener = new ArtifactTimestampListener<>(applications);
+    this.domainTimestampListener = new ArtifactTimestampListener<>(domains);
   }
 
   /**
    * Starts the process of deployment / undeployment of artifact.
    * <p/>
-   * It wil schedule a task for periodically scan the deployment directories.
+   * It will schedule a task for periodically scan the deployment directories.
    */
   public void start() {
     deploymentLock.lock();
