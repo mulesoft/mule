@@ -8,13 +8,13 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
 import static java.util.Arrays.sort;
+import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.collections.CollectionUtils.subtract;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
@@ -40,13 +40,13 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -346,7 +346,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   public <T extends Artifact> T findArtifact(String artifactName, ObservableList<T> artifacts) {
-    return (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+    final BeanPropertyValueEqualsPredicate nameEqualsPredicate =
+        new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName);
+    return artifacts.stream().filter(artifact -> nameEqualsPredicate.evaluate(artifact)).findFirst().orElse(null);
   }
 
   private void undeployRemovedDomains() {
@@ -370,9 +372,11 @@ public class DeploymentDirectoryWatcher implements Runnable {
       logger.debug(sb.toString());
     }
 
-    String[] artifactAnchors = findExpectedAnchorFiles(artifacts);
-    @SuppressWarnings("unchecked")
-    final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
+    final Set<String> currentAnchorsSet = stream(currentAnchors).collect(toSet());
+    Collection<String> deletedAnchors = stream(findExpectedAnchorFiles(artifacts))
+        .filter(a -> !currentAnchorsSet.contains(a))
+        .collect(toList());
+
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append(format("Deleted anchors:%n"));

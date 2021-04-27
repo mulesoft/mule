@@ -466,7 +466,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private File services;
 
   public AbstractDeploymentTestCase(boolean parallelDeployment) {
-    this.parallelDeployment = new SystemProperty(PARALLEL_DEPLOYMENT_PROPERTY, "");
+    if (parallelDeployment) {
+      this.parallelDeployment = new SystemProperty(PARALLEL_DEPLOYMENT_PROPERTY, "");
+    }
   }
 
   @Before

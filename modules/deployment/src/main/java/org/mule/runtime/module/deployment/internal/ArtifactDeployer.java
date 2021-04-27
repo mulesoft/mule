@@ -41,7 +41,7 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
   /**
    * Undeploys an artifact.
    * <p>
-   * The deployer executes the artifact desinstallation phases until de artifact is undeployed. After this method call the
+   * The deployer executes the artifact unsinstallation phases until the artifact is undeployed. After this method call the
    * Artifact will not longer be running inside the container.
    *
    * @param artifact artifact to be undeployed
