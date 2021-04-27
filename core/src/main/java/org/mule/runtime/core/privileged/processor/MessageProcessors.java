@@ -9,6 +9,7 @@ package org.mule.runtime.core.privileged.processor;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static java.util.function.UnaryOperator.identity;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.functional.Either.left;
@@ -570,10 +571,10 @@ public class MessageProcessors {
     });
   }
 
-  private static Function<? super Either<MessagingException, CoreEvent>, ? extends CoreEvent> propagateErrorResponseMapper() {
+  public static Function<? super Either<MessagingException, CoreEvent>, ? extends CoreEvent> propagateErrorResponseMapper() {
     return result -> result.reduce(me -> {
       throw propagateWrappingFatal(me);
-    }, response -> response);
+    }, identity());
   }
 
   private static CoreEvent toParentContext(final CoreEvent event) {

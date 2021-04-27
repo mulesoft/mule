@@ -8,7 +8,6 @@ package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.functional.Either.left;
@@ -21,7 +20,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -30,6 +28,7 @@ import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInter
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.propagateErrorResponseMapper;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveException;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveMessagingException;
@@ -203,9 +202,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                               errorSwitchSinkSinkRef.error(t);
                                               disposeIfNeeded(errorRouter, LOGGER);
                                             }))
-                                                .map(result -> result.reduce(me -> {
-                                                  throw propagateWrappingFatal(me);
-                                                }, identity()));
+                                                .map(propagateErrorResponseMapper());
           });
 
     } else {
