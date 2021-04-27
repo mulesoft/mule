@@ -285,7 +285,10 @@ public class LifecycleUtils {
    * @param properties the current properties
    * @return Whether the lazy init property has been set
    * @since 4.3.0
+   *
+   * @deprecated since 4.4, do not rely on deployment properties at runtime.
    */
+  @Deprecated
   public static boolean isLazyInitMode(ConfigurationProperties properties) {
     return properties != null && properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }

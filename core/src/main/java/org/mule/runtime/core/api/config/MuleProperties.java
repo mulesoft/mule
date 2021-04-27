@@ -13,6 +13,7 @@ import static java.lang.System.getProperty;
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
+import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 
 /**
@@ -152,6 +153,12 @@ public class MuleProperties {
   public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
   public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
   /**
+   * Registry key for {@link DefaultConnectivityTesterFactory}
+   *
+   * @since 4.4
+   */
+  public static final String OBJECT_CONNECTIVITY_TESTER_FACTORY = "_muleConnectivityTesterFactory";
+  /**
    * Registry key for {@link CursorDecoratorFactory}
    *
    * @since 4.4, 4.3.1
@@ -170,14 +177,14 @@ public class MuleProperties {
 
   /**
    * Registry key for the {@code AuthorizationCodeOAuthHandler}
-   * 
+   *
    * @since 4.2.1
    */
   public static final String OBJECT_EXTENSION_AUTH_CODE_HANDLER = "extensions.authCode.handler";
 
   /**
    * Registry key for the {@code ClientCredentialsOAuthHandler}
-   * 
+   *
    * @since 4.2.1
    */
   public static final String OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER = "extensions.clientCredentials.handler";
@@ -233,7 +240,7 @@ public class MuleProperties {
 
   /**
    * The prefix for any Mule-specific properties set in the system properties
-   * 
+   *
    * @deprecated since 4.2. Use {@link MuleSystemProperties#SYSTEM_PROPERTY_PREFIX} instead
    */
   @Deprecated
@@ -271,7 +278,7 @@ public class MuleProperties {
 
   /**
    * System property key for the default size of a streaming buffer bucket
-   * 
+   *
    * @since 4.1.4
    * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_STREAMING_BUCKET_SIZE} instead
    */
