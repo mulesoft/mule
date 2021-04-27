@@ -10,6 +10,11 @@ import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 
+/**
+ * Expression manager that does not initialize the underlying expression language support until a first usage is done.
+ *
+ * @since 4.4
+ */
 public class LazyExpressionManager extends DefaultExpressionManager {
 
   public static final String NON_LAZY_EXPRESSION_MANAGER = "_muleNonLazyExpressionManager";
