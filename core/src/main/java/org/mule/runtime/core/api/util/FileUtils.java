@@ -8,11 +8,13 @@ package org.mule.runtime.core.api.util;
 
 import static java.lang.System.getProperty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.compression.InvalidZipFileException;
 
@@ -36,13 +38,16 @@ import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -321,16 +326,84 @@ public class FileUtils {
 
   public static void verifyZipFilePaths(ZipFile zip) throws InvalidZipFileException {
     for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-      ZipEntry entry = (ZipEntry) entries.nextElement();
+      verifyZipEntryPath((ZipEntry) entries.nextElement());
+    }
+  }
 
-      Path namePath = Paths.get(entry.getName());
-      if (namePath.getRoot() != null) {
-        // According to .ZIP File Format Specification (Section 4.4.17), the path can not be absolute
-        throw new InvalidZipFileException("Absolute paths are not allowed: " + namePath.toString());
-      } else if (namePath.normalize().toString().startsWith("..")) {
-        // Not specified, but presents a security risk (allows overwriting external files)
-        throw new InvalidZipFileException("External paths are not allowed: " + namePath.toString());
+  public static void verifyZipEntryPath(ZipEntry entry) throws InvalidZipFileException {
+    Path namePath = Paths.get(entry.getName());
+    if (namePath.getRoot() != null) {
+      // According to .ZIP File Format Specification (Section 4.4.17), the path can not be absolute
+      throw new InvalidZipFileException("Absolute paths are not allowed: " + namePath.toString());
+    } else if (namePath.normalize().toString().startsWith("..")) {
+      // Not specified, but presents a security risk (allows overwriting external files)
+      throw new InvalidZipFileException("External paths are not allowed: " + namePath.toString());
+    }
+  }
+
+  /**
+   * Unzip the specified archive to the given directory. Equivalent to invoking {@link #unzip(InputStream, File, boolean)} with a
+   * {@code true} value for the {@code verify} parameter
+   *
+   * @param archive   the contents of the archive to be unzipped
+   * @param directory the target directory
+   */
+  public static void unzip(InputStream archive, File directory) throws IOException {
+    unzip(archive, directory, true);
+  }
+
+  /**
+   * Unzip the specified {@code archive} to the given {@code directory}.
+   *
+   * @param archive   the contents of the archive to be unzipped
+   * @param directory the target directory
+   * @param verify    whether to verify all entries before extractions
+   */
+  public static void unzip(InputStream archive, File directory, boolean verify) throws IOException {
+    if (directory.exists()) {
+      if (!directory.isDirectory()) {
+        throw new IOException("Directory is not a directory: " + directory);
       }
+    } else {
+      if (!directory.mkdirs()) {
+        throw new IOException("Could not create directory: " + directory);
+      }
+    }
+
+    List<File> createdFiles = new ArrayList<>();
+    try (ZipInputStream zis = new ZipInputStream(archive)) {
+      ZipEntry entry;
+      while ((entry = zis.getNextEntry()) != null) {
+        if (verify) {
+          verifyZipEntryPath(entry);
+        }
+
+        File file = newFile(directory, entry.getName());
+
+        if (entry.isDirectory()) {
+          if (!file.exists() && !file.mkdirs()) {
+            throw new IOException("Could not create directory: " + file);
+          }
+          createdFiles.add(file);
+        } else {
+          if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+            throw new IOException("Unable to create folders for zip entry: " + entry.getName());
+          }
+
+          OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+          copy(zis, os);
+          IOUtils.closeQuietly(os);
+          createdFiles.add(file);
+        }
+      }
+    } catch (Exception e) {
+      // Remove everything that was created in the file system before failing, then rethrow.
+      for (File createdFile : createdFiles) {
+        deleteQuietly(createdFile);
+      }
+
+      throw e;
+
     }
   }
 
