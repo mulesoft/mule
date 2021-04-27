@@ -345,4 +345,39 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasValues("Optional value ommited"));
   }
 
+  @Test
+  public void withBoundActingParameterFromContentField() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterFromContentField", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundActingParameterFromContentFieldWithExpression() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterFromContentFieldWithExpression", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundActingParameterFromXmlContentField() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterFromXmlContentField", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundActingParameterFromXmlContentFieldWithExpression() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterFromXmlContentFieldWithExpression", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
 }
