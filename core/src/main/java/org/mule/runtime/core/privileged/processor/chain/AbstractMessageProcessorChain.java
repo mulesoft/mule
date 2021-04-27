@@ -28,7 +28,6 @@ import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInter
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.propagateErrorResponseMapper;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveException;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveMessagingException;
@@ -64,6 +63,7 @@ import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptor
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -202,7 +202,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                               errorSwitchSinkSinkRef.error(t);
                                               disposeIfNeeded(errorRouter, LOGGER);
                                             }))
-                                                .map(propagateErrorResponseMapper());
+                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
           });
 
     } else {

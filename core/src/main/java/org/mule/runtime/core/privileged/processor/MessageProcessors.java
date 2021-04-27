@@ -9,12 +9,10 @@ package org.mule.runtime.core.privileged.processor;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
-import static java.util.function.UnaryOperator.identity;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
@@ -457,7 +455,7 @@ public class MessageProcessors {
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
-            .map(propagateErrorResponseMapper())
+            .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
             .toProcessor())
         .map(MessageProcessors::toParentContext)
         .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
@@ -512,7 +510,7 @@ public class MessageProcessors {
                                                             completeSuccessEitherIfNeeded(),
                                                             errorSwitchSinkSinkRef::error,
                                                             errorSwitchSinkSinkRef::complete)
-                                                                .map(propagateErrorResponseMapper()
+                                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
                                                                     .andThen(MessageProcessors::toParentContext));
               }
             }));
@@ -569,12 +567,6 @@ public class MessageProcessors {
         LOGGER.error("Uncaught exception in childContextResponseHandler", e);
       }
     });
-  }
-
-  public static Function<? super Either<MessagingException, CoreEvent>, ? extends CoreEvent> propagateErrorResponseMapper() {
-    return result -> result.reduce(me -> {
-      throw propagateWrappingFatal(me);
-    }, identity());
   }
 
   private static CoreEvent toParentContext(final CoreEvent event) {

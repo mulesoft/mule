@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.util.rx;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.function.UnaryOperator.identity;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyDecorator.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyDecorator.pushTxToSubscriberContext;
@@ -17,6 +19,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -391,4 +394,11 @@ public class RxUtils {
     return new TransactionAwareFluxSinkSupplier<>(factory,
                                                   new RoundRobinFluxSinkSupplier<>(size, factory));
   }
+
+  public static <E extends Throwable> Function<? super Either<E, CoreEvent>, ? extends CoreEvent> propagateErrorResponseMapper() {
+    return result -> result.reduce(me -> {
+      throw propagateWrappingFatal(me);
+    }, identity());
+  }
+
 }
