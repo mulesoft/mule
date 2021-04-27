@@ -33,6 +33,7 @@ import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -63,6 +64,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.lazy.LazyExpressionManager;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
@@ -161,6 +163,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
     final CustomizationService customizationService = muleContext.getCustomizationService();
+
+    customizationService.overrideDefaultServiceImpl(OBJECT_EXPRESSION_MANAGER, new LazyExpressionManager());
     customizationService.overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
                                                     new LazyConnectivityTestingService(this, () -> getRegistry()
                                                         .<ConnectivityTestingService>lookupByName(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
