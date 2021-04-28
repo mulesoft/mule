@@ -38,6 +38,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateErrorResponseMapper;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.createDefaultProcessingStrategyFactory;
@@ -105,6 +106,7 @@ import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.OperationInnerProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
+import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -326,11 +328,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   }
                 });
               })
-              .map(result -> {
-                return result.reduce(me -> {
-                  throw propagateWrappingFatal(me);
-                }, response -> response);
-              });
+              .map(propagateErrorResponseMapper());
 
           if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
             return transformed
@@ -661,9 +659,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                     .doOnNext(innerEventDispatcher(emitter))
                                                     .map(e -> Either.empty()),
                                                 () -> emitter.complete(), e -> emitter.error(e)))
-                                                    .map(result -> result.reduce(me -> {
-                                                      throw propagateWrappingFatal(me);
-                                                    }, response -> response));
+                                                    .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
               });
         }
 
