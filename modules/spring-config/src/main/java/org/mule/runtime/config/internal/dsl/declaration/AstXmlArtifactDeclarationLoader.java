@@ -281,19 +281,18 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           artifactDeclarer.withGlobalElement(configurationDeclarer.getDeclaration());
         });
 
-    component.getModel(MetadataTypeAdapter.class)
-        .map(MetadataTypeAdapter::getType)
-        .ifPresent(type -> {
-          TopLevelParameterDeclarer topLevelParameter = extensionElementsDeclarer
-              .newGlobalParameter(component.getIdentifier().getName());
+    final MetadataType type = component.getType();
+    if (type != null) {
+      TopLevelParameterDeclarer topLevelParameter = extensionElementsDeclarer
+          .newGlobalParameter(component.getIdentifier().getName());
 
-          component.getComponentId().ifPresent(topLevelParameter::withRefName);
+      component.getComponentId().ifPresent(topLevelParameter::withRefName);
 
-          type.accept(getParameterDeclarerVisitor(component, component.getGenerationInformation().getSyntax().get(),
-                                                  value -> topLevelParameter.withValue((ParameterObjectValue) value)));
+      type.accept(getParameterDeclarerVisitor(component, component.getGenerationInformation().getSyntax().get(),
+                                              value -> topLevelParameter.withValue((ParameterObjectValue) value)));
 
-          artifactDeclarer.withGlobalElement(topLevelParameter.getDeclaration());
-        });
+      artifactDeclarer.withGlobalElement(topLevelParameter.getDeclaration());
+    }
   }
 
   private void declareComponent(final Consumer<ComponentElementDeclaration> declarationConsumer,

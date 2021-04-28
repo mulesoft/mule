@@ -736,7 +736,7 @@ class ComponentAstBasedElementModelFactory {
         final ComponentAst strategy = nestedIt.next();
         strategy.getGenerationInformation().getSyntax()
             .ifPresent(typeDsl -> wrapper.containing(DslElementModel.builder()
-                .withModel(strategy.getModel(MetadataTypeAdapter.class).get().getType())
+                .withModel(strategy.getType())
                 .withDsl(typeDsl)
                 .withConfig(strategy)
                 .build()));

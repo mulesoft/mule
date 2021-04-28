@@ -12,14 +12,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import io.qameta.allure.Issue;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -38,6 +30,17 @@ import org.mule.runtime.ast.internal.DefaultComponentAst;
 import org.mule.runtime.ast.internal.builder.PropertiesResolver;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class ParameterUtilsTestCase extends AbstractMuleTestCase {
 
@@ -69,7 +72,7 @@ public class ParameterUtilsTestCase extends AbstractMuleTestCase {
     componentAst =
         new DefaultComponentAst(builtChildren, parameterAsts, extraParams, propertiesResolver, componentId, extensionModel,
                                 componentModel, nestableElementModel, configurationModel, connectionProviderModel,
-                                parameterizedModel, generationInformation, metadata, location, identifier, componentType);
+                                parameterizedModel, null, generationInformation, metadata, location, identifier, componentType);
   }
 
   @Test

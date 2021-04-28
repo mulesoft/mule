@@ -23,6 +23,7 @@ import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyCompone
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -245,6 +246,11 @@ public class MacroExpansionModuleModel {
             @Override
             public <M> Optional<M> getModel(Class<M> modelClass) {
               return empty();
+            }
+
+            @Override
+            public MetadataType getType() {
+              return null;
             }
 
             @Override
