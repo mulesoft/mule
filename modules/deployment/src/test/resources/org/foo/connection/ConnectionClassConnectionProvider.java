@@ -5,11 +5,21 @@
  * LICENSE.txt file.
  */
 
-package org.foo.classloading;
+package org.foo.connection;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.util.IOUtils;
 
-public class ConnectionClassConnectionProvider implements ConnectionProvider<ClassConnection123> {
+import java.io.InputStream;
+
+public class ConnectionClassConnectionProvider implements ConnectionProvider<ClassConnection123>, Initialisable {
+
+  @Override
+  public void initialise() throws InitialisationException {
+    InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("file.txt");
+  }
 
   @Override
   public ClassConnection123 connect() {

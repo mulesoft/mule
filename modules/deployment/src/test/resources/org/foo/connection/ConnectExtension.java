@@ -5,13 +5,18 @@
  * LICENSE.txt file.
  */
 
-package org.foo.classloading;
+package org.foo.connection;
 
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-import org.foo.classloading.ConnectionClassConnectionProvider;
+import java.io.InputStream;
+
+import org.foo.connection.ConnectionClassConnectionProvider;
 
 /**
  * Extension for testing purposes
@@ -20,4 +25,15 @@ import org.foo.classloading.ConnectionClassConnectionProvider;
 @Operations({ConnectOperation.class})
 @ConnectionProviders(ConnectionClassConnectionProvider.class)
 public class ConnectExtension {
+
+  private String fileMessage;
+
+  public String getFileMessage() {
+    return fileMessage;
+  }
+
+//  public void loadFileMessageFromResource(){
+//    InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("file.txt");
+//    fileMessage = IOUtils.toString(stream);
+//  }
 }

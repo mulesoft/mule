@@ -7,8 +7,9 @@
 
     <connect:config name="default"/>
 
-    <flow name="flowWhichTriesToLoadTheClass">
-        <connect:get-file />
+    <flow name="flowWhichConnects">
+<!--        <connect:get-file />-->
+        <connect:get-file-obtained-at-config />
     </flow>
 
 </mule>

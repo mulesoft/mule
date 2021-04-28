@@ -139,7 +139,7 @@ public class MethodExecutorGenerator {
 
   private Class<MethodExecutor> generateExecutorClass(String executorName, Method method, File generatedByteCodeFile) {
     final CompositeClassLoader executorClassLoader =
-        from(getClass().getClassLoader(), method.getDeclaringClass().getClassLoader());
+        from(method.getDeclaringClass().getClassLoader(), getClass().getClassLoader());
     try {
       return (Class<MethodExecutor>) forName(executorName, true, executorClassLoader);
     } catch (ClassNotFoundException e) {

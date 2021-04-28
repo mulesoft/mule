@@ -1969,7 +1969,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .configuredWith(EXPORTED_PACKAGES, "org.foo")
             .dependingOn(domainFileBuilder)
             .dependingOn(pluginWhichCreatesConnection)
-            .containingResource("org/foo/classloading/app/file.txt", "file.txt");
+            .containingResource("file.txt", "file.txt");
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -1979,8 +1979,23 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    // When the app uses the plugin in order to load the exported class, then it doesn't raise any error.
-    executeApplicationFlow("flowWhichTriesToLoadTheClass");
+    ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
+    String fileMessage = (String) withContextClassLoader(appClassLoader, () -> {
+      final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), "flowWhichConnects")
+          .withPayload(TEST_MESSAGE);
+
+      CoreEvent result;
+      try {
+        result = flowRunner.run();
+      } finally {
+        flowRunner.dispose();
+      }
+
+      assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
+
+      return result.getMessage().getPayload().getValue();
+    });
+    assertThat(fileMessage, is(equalTo("application file")));
   }
 
   private CompletionCallback<Object, Object> getCompletionCallback(String callbackName) {

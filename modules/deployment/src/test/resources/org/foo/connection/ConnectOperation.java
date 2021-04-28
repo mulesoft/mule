@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.foo.classloading;
+package org.foo.connection;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
@@ -34,9 +34,9 @@ public class ConnectOperation {
     return IOUtils.toString(stream);
   }
 
-//  @MediaType(TEXT_PLAIN)
-//  public String fooConnectedOperation3(@Config ConnectExtension config, @Connection ClassConnection123 connection){
-//    return "this operation receives both config and connection!";
-//  }
-
+  @MediaType(TEXT_PLAIN)
+  public String getFileObtainedAtConfig(@Config ConnectExtension config, @Connection ClassConnection123 connection){
+//    config.loadFileMessageFromResource();
+    return config.getFileMessage();
+  }
 }
