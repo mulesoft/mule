@@ -122,7 +122,7 @@
 
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-        <groovyVersion>2.4.15</groovyVersion>
+        <groovyVersion>2.4.21</groovyVersion>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
         <maven.eclipse.plugin.version>2.10</maven.eclipse.plugin.version>
         <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
