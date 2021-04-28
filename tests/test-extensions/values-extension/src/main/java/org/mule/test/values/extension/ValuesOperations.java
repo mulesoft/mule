@@ -9,6 +9,7 @@ package org.mule.test.values.extension;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
@@ -203,7 +204,6 @@ public class ValuesOperations {
           extractionExpression = "actingParameter.mapField")}) String parameterWithValues,
                                           @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
-  // Test both defining pojo as an expression and in the dsl.
   public void withPojoFieldBoundActingParameterField(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithRequiredParameterSdkValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue",
@@ -221,5 +221,17 @@ public class ValuesOperations {
       bindings = {
           @Binding(actingParameter = "requiredValue", extractionExpression = "parameterAlias")}) String parameterWithValues,
                                                 @Alias("parameterAlias") String actingParameter) {}
+
+  public void withBoundActingParameterFromContentField(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithRequiredParameterSdkValueProvider.class,
+      bindings = {
+          @Binding(actingParameter = "requiredValue", extractionExpression = "body.field")}) String parameterWithValues,
+                                                       @TypeResolver(JsonTypeResolver.class) @Content InputStream body) {}
+
+  public void withBoundActingParameterFromXmlContentField(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithRequiredParameterSdkValueProvider.class,
+      bindings = {
+          @Binding(actingParameter = "requiredValue", extractionExpression = "xmlBody.field")}) String parameterWithValues,
+                                                          @TypeResolver(XmlTypeResolver.class) @Content InputStream xmlBody) {}
 
 }

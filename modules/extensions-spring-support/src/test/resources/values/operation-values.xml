@@ -203,4 +203,40 @@
             actingParameter='#[output application/json --- { "otherField": "another value"}]'/>
     </flow>
 
+    <flow name="withBoundActingParameterFromContentField">
+        <values:with-bound-acting-parameter-from-content-field>
+            <values:body>
+                { "field" : "Acting parameter value" }
+            </values:body>
+        </values:with-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="withBoundActingParameterFromContentFieldWithExpression">
+        <values:with-bound-acting-parameter-from-content-field>
+            <values:body>#[output application/json --- { "field" : "Acting parameter value" }]</values:body>
+        </values:with-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="withBoundActingParameterFromContentJsonField">
+        <values:with-bound-acting-parameter-from-content-field>
+            <values:body>
+                { "field" : { "complexField" : "Acting parameter value" } }
+            </values:body>
+        </values:with-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="withBoundActingParameterFromXmlContentFieldWithExpression">
+        <values:with-bound-acting-parameter-from-xml-content-field>
+            <values:xml-body>#[output application/xml --- { "field" : "Acting parameter value" }]</values:xml-body>
+        </values:with-bound-acting-parameter-from-xml-content-field>
+    </flow>
+
+    <flow name="withBoundActingParameterFromXmlContentField">
+        <values:with-bound-acting-parameter-from-xml-content-field>
+            <values:xml-body>
+                <![CDATA[<field>Acting parameter value</field>]]>
+            </values:xml-body>
+        </values:with-bound-acting-parameter-from-xml-content-field>
+    </flow>
+
 </mule>

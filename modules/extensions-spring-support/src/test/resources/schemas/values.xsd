@@ -654,6 +654,28 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterFromContentFieldType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-from-content-field"></xs:element>
+  <xs:complexType name="WithBoundActingParameterFromContentFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterFromXmlContentFieldType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-from-xml-content-field"></xs:element>
+  <xs:complexType name="WithBoundActingParameterFromXmlContentFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="xml-body"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterToXmlTagAttributeType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-to-xml-tag-attribute"></xs:element>
   <xs:complexType name="WithBoundActingParameterToXmlTagAttributeType">
     <xs:complexContent>
