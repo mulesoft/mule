@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -78,8 +77,7 @@ public abstract class AbstractArtifactAgnosticService {
             application.lazyInit(!isLazyInitEnableXmlValidations());
             // Force the initialization of the app components so that the registry is populated with the configs
             application.getRegistry().lookupByType(LazyComponentInitializer.class)
-                .ifPresent(lazyInit -> lazyInit
-                    .initializeComponents((Predicate<ComponentAst>) comp -> comp.getModel(ConfigurationModel.class).isPresent()));
+                .ifPresent(lazyInit -> lazyInit.initializeComponents((Predicate<ComponentAst>) comp -> true));
           } catch (Exception e) {
             if (e.getCause() instanceof ConfigurationException) {
               // Keep thrown exception consistent with the previous implementation.
