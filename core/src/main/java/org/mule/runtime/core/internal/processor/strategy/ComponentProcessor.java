@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 /**
  * Specialization of {@link ReactiveProcessor} that allows to perform certain optimizations when the processor is not blocking, as
  * indicated by its {@link #isBlocking()} method and that evaluates if a thread switch may happen, as indicated by its
- * {@link #canBeAsync()}
+ * {@link #mayBeAsync()}
  * </p>
  * <b>IMPORTANT!</b> The processing strategy will delegate the parallel processing of events to the implementation, so it is
  * required that implementations properly handle parallel processing.
@@ -21,8 +21,8 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 public interface ComponentProcessor extends ReactiveProcessor {
 
   /**
-   * A blocking processor is one that will perform blocking calls. So it is not guaranteed that a thread switch happens or that
-   * the operation returns without blocking.
+   * A blocking processor is one that will perform blocking calls. So it is not guaranteed that a thread switch happens before
+   * that call or that the operation returns without blocking.
    *
    * @return {@code} if the processor is blocking.
    */
@@ -34,5 +34,5 @@ public interface ComponentProcessor extends ReactiveProcessor {
    *
    * @return {@code} if the processor may be asynchronous.
    */
-  boolean canBeAsync();
+  boolean mayBeAsync();
 }

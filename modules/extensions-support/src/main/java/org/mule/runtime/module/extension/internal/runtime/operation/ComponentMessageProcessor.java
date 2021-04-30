@@ -298,7 +298,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
-    final boolean async = canBeAsync();
+    final boolean async = mayBeAsync();
     final ComponentLocation location = getLocation();
 
     return subscriberContext()
@@ -418,7 +418,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public ProcessingType getProcessingType() {
-    if (canBeAsync()) {
+    if (mayBeAsync()) {
       // In this case, any thread switch will be done in the innerFlux
       return CPU_LITE;
     } else {
@@ -698,7 +698,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
         @Override
         public boolean canBeAsync() {
-          return ComponentMessageProcessor.this.canBeAsync();
+          return ComponentMessageProcessor.this.mayBeAsync();
         }
       };
 
@@ -1029,7 +1029,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   public boolean isBlocking() {
-    return !canBeAsync();
+    return !mayBeAsync();
   }
 
   public boolean canBeAsync() {
