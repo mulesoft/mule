@@ -72,10 +72,10 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
         .getValues();
   }
 
-  Set<Value> getValuesFromSource(String flowName, String parameterName, String targetPath) throws Exception {
+  Set<Value> getValuesFromSource(String flowName, String parameterName, String targetSelector) throws Exception {
     ValueResult valueResult =
         valueProviderService.getFieldValues(Location.builder().globalName(flowName).addSourcePart().build(), parameterName,
-                                            targetPath);
+                                            targetSelector);
     if (valueResult.getFailure().isPresent()) {
       ResolvingFailure resolvingFailure = valueResult.getFailure().get();
       throw new ValueResolvingException(resolvingFailure.getMessage(), resolvingFailure.getFailureCode());
@@ -93,13 +93,13 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
     return valueProviderService.getValues(location, parameterName);
   }
 
-  Set<Value> getValues(String flowName, String parameterName, String targetPath) throws Exception {
-    return checkResultAndRetrieveValues(getValueResult(flowName, parameterName, targetPath));
+  Set<Value> getValues(String flowName, String parameterName, String targetSelector) throws Exception {
+    return checkResultAndRetrieveValues(getValueResult(flowName, parameterName, targetSelector));
   }
 
-  ValueResult getValueResult(String flowName, String parameterName, String targetPath) throws Exception {
+  ValueResult getValueResult(String flowName, String parameterName, String targetSelector) throws Exception {
     Location location = Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build();
-    return valueProviderService.getFieldValues(location, parameterName, targetPath);
+    return valueProviderService.getFieldValues(location, parameterName, targetSelector);
   }
 
   Set<Value> getValuesFromConfig(String configName, String parameterName) throws Exception {
@@ -111,13 +111,13 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
                                           parameterName);
   }
 
-  Set<Value> getFieldValuesFromConfig(String configName, String parameterName, String targetPath) throws Exception {
-    return checkResultAndRetrieveValues(getFieldValuesResultFromConfig(configName, parameterName, targetPath));
+  Set<Value> getFieldValuesFromConfig(String configName, String parameterName, String targetSelector) throws Exception {
+    return checkResultAndRetrieveValues(getFieldValuesResultFromConfig(configName, parameterName, targetSelector));
   }
 
-  public ValueResult getFieldValuesResultFromConfig(String configName, String parameterName, String targetPath) {
+  public ValueResult getFieldValuesResultFromConfig(String configName, String parameterName, String targetSelector) {
     return valueProviderService.getFieldValues(Location.builder().globalName(configName).build(),
-                                               parameterName, targetPath);
+                                               parameterName, targetSelector);
   }
 
   Set<Value> getValuesFromConnection(String configName, String parameterName) throws Exception {
@@ -129,13 +129,13 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
         .getValues(Location.builder().globalName(configName).addConnectionPart().build(), parameterName);
   }
 
-  Set<Value> getFieldValuesFromConnection(String configName, String parameterName, String targetPath) throws Exception {
-    return checkResultAndRetrieveValues(getFieldValueResultFromConnection(configName, parameterName, targetPath));
+  Set<Value> getFieldValuesFromConnection(String configName, String parameterName, String targetSelector) throws Exception {
+    return checkResultAndRetrieveValues(getFieldValueResultFromConnection(configName, parameterName, targetSelector));
   }
 
-  public ValueResult getFieldValueResultFromConnection(String configName, String parameterName, String targetPath) {
+  public ValueResult getFieldValueResultFromConnection(String configName, String parameterName, String targetSelector) {
     return valueProviderService
-        .getFieldValues(Location.builder().globalName(configName).addConnectionPart().build(), parameterName, targetPath);
+        .getFieldValues(Location.builder().globalName(configName).addConnectionPart().build(), parameterName, targetSelector);
   }
 
   private Set<Value> checkResultAndRetrieveValues(ValueResult values) throws ValueResolvingException {

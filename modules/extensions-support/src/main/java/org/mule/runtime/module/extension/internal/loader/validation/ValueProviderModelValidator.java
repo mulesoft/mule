@@ -22,7 +22,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
@@ -100,9 +99,9 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
                                     supportsConnectionsAndConfigs, reflectionCache, valueProvidersIdValidator);
           } else if (fieldValueProviderFactoryModelProperty.isPresent()) {
             fieldValueProviderFactoryModelProperty.get().getFieldsValueProviderFactories()
-                .forEach((targetPath,
+                .forEach((targetSelector,
                           fieldsValueProviderFactoryModelProperty) -> validateOptionsResolver(param, false,
-                                                                                              targetPath,
+                                                                                              targetSelector,
                                                                                               fieldsValueProviderFactoryModelProperty,
                                                                                               model, problemsReporter,
                                                                                               supportsConnectionsAndConfigs,
@@ -113,7 +112,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
   }
 
   private void validateOptionsResolver(ParameterModel param, boolean mustBeStringType,
-                                       String targetPath,
+                                       String targetSelector,
                                        ValueProviderFactoryModelProperty modelProperty,
                                        ParameterizedModel model, ProblemsReporter problemsReporter,
                                        boolean supportsConnectionsAndConfigs, ReflectionCache reflectionCache,
@@ -122,9 +121,9 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     String providerName = valueProvider.getSimpleName();
 
     Optional<? extends ValueProviderModel> valueProviderModel;
-    if (targetPath != null) {
+    if (targetSelector != null) {
       valueProviderModel = param.getFieldValueProviderModels().stream()
-          .filter(fieldValueProviderModel -> fieldValueProviderModel.getTargetPath().equals(targetPath))
+          .filter(fieldValueProviderModel -> fieldValueProviderModel.getTargetSelector().equals(targetSelector))
           .findAny();
     } else {
       valueProviderModel = param.getValueProviderModel();

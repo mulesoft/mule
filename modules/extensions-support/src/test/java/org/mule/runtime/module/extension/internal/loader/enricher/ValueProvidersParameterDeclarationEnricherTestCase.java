@@ -125,7 +125,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
 
     assertThat(parameterDeclaration, notNullValue());
     assertThat(parameterDeclaration.getFieldValueProviderModels(), hasSize(1));
-    assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getTargetPath(), is("simple.path"));
+    assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getTargetSelector(), is("simple.path"));
     assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getParameters(), hasSize(0));
   }
 
@@ -136,8 +136,8 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
 
     assertThat(parameterDeclaration, notNullValue());
     assertThat(parameterDeclaration.getFieldValueProviderModels(), hasSize(2));
-    assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getTargetPath(), is("simple.path"));
-    assertThat(parameterDeclaration.getFieldValueProviderModels().get(1).getTargetPath(), is("another.simple.path"));
+    assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getTargetSelector(), is("simple.path"));
+    assertThat(parameterDeclaration.getFieldValueProviderModels().get(1).getTargetSelector(), is("another.simple.path"));
     assertThat(parameterDeclaration.getFieldValueProviderModels().get(0).getParameters(), hasSize(0));
   }
 

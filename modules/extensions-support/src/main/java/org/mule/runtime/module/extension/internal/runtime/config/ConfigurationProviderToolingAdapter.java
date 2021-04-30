@@ -169,11 +169,11 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   }
 
   @Override
-  public Set<Value> getConfigValues(String parameterName, String targetPath) throws ValueResolvingException {
+  public Set<Value> getConfigValues(String parameterName, String targetSelector) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConfigurationModel configurationModel = getConfigurationModel();
       return new ValueProviderMediator<>(configurationModel, () -> muleContext, () -> reflectionCache)
-          .getValues(parameterName, targetPath, getParameterValueResolver(configuration.getValue(), configurationModel));
+          .getValues(parameterName, targetSelector, getParameterValueResolver(configuration.getValue(), configurationModel));
     }, getExtensionModel());
   }
 
@@ -198,11 +198,11 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   }
 
   @Override
-  public Set<Value> getConnectionValues(String parameterName, String targetPath) throws ValueResolvingException {
+  public Set<Value> getConnectionValues(String parameterName, String targetSelector) throws ValueResolvingException {
     return valuesWithClassLoader(() -> withConnectionProviderInfo((connection, model) -> {
       ValueProviderMediator<ConnectionProviderModel> valueProviderMediator =
           new ValueProviderMediator<>(model, () -> muleContext, () -> reflectionCache);
-      return valueProviderMediator.getValues(parameterName, targetPath, getParameterValueResolver(connection, model));
+      return valueProviderMediator.getValues(parameterName, targetSelector, getParameterValueResolver(connection, model));
     }), getExtensionModel());
   }
 

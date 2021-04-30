@@ -147,18 +147,18 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
 
   @Test
   public void multiLevelFieldValues() throws Exception {
-    Set<Value> values = getValuesFromSource("source-with-multi-level-field-values", "body",
+    Set<Value> values = getValuesFromSource("source-with-multi-level-field-values", "xmlBodyTemplate",
                                             "location.continent");
 
     ValueMatcher americaValue = valueWithId(AMERICA)
         .withDisplayName(AMERICA)
-        .withPartName("body.location.continent")
+        .withPartName("xmlBodyTemplate.location.continent")
         .withChilds(valueWithId(ARGENTINA)
             .withDisplayName(ARGENTINA)
-            .withPartName("body.location.country")
+            .withPartName("xmlBodyTemplate.location.country")
             .withChilds(valueWithId(BUENOS_AIRES)
                 .withDisplayName(BUENOS_AIRES)
-                .withPartName("body.location.city")));
+                .withPartName("xmlBodyTemplate.location.city")));
 
     assertThat(values, hasValues(americaValue));
   }

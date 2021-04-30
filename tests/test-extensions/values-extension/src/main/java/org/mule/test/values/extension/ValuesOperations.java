@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.sdk.api.annotation.binding.Binding;
-import org.mule.sdk.api.values.FieldValues;
+import org.mule.sdk.api.annotation.values.FieldValues;
 import org.mule.test.values.extension.metadata.JsonTypeResolver;
 import org.mule.test.values.extension.metadata.XmlTypeResolver;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
@@ -237,15 +237,19 @@ public class ValuesOperations {
           @Binding(actingParameter = "requiredValue", extractionExpression = "xmlBody.field")}) String parameterWithValues,
                                                           @TypeResolver(XmlTypeResolver.class) @Content InputStream xmlBody) {}
 
-  public void singleValuesEnabledParameterWithOneFieldValues(@Content @FieldValues(targetSelectors = "simple.path",
+  public void singleValuesEnabledParameterWithOneFieldValues(@TypeResolver(JsonTypeResolver.class) @Content @FieldValues(
+      targetSelectors = "simple.path",
       value = SimpleValueProvider.class) InputStream body) {}
 
-  public void singleValuesEnabledParameterWithMoreThanOneFieldValues(@Content @FieldValues(targetSelectors = "simple.path",
+  public void singleValuesEnabledParameterWithMoreThanOneFieldValues(@TypeResolver(JsonTypeResolver.class) @Content @FieldValues(
+      targetSelectors = "simple.path",
       value = SimpleValueProvider.class) @FieldValues(targetSelectors = "another.simple.path",
           value = TrueFalseValueProvider.class) InputStream body) {}
 
-  public void parameterWithMultilevelFieldValue(@Content @FieldValues(targetPaths = "channel",
-      value = SimpleValueProvider.class) @FieldValues(targetPaths = {"location.continent", "location.country", "location.city"},
+  public void parameterWithMultilevelFieldValue(@TypeResolver(JsonTypeResolver.class) @Content @FieldValues(
+      targetSelectors = "channel",
+      value = SimpleValueProvider.class) @FieldValues(
+          targetSelectors = {"location.continent", "location.country", "location.city"},
           value = SdkMultiLevelValueProvider.class) InputStream body) {}
 
 }

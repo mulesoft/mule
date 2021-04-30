@@ -81,14 +81,14 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
    * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
    *                               parameters from the same parameter container.
-   * @param targetPath             the target path of the field of the parameter.
+   * @param targetSelector         the target path of the field of the parameter.
    * 
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
-  public Set<Value> getValues(String parameterName, String targetPath, ParameterValueResolver parameterValueResolver)
+  public Set<Value> getValues(String parameterName, String targetSelector, ParameterValueResolver parameterValueResolver)
       throws ValueResolvingException {
-    return getValues(parameterName, parameterValueResolver, targetPath, nullSupplier, nullSupplier);
+    return getValues(parameterName, parameterValueResolver, targetSelector, nullSupplier, nullSupplier);
   }
 
   /**
@@ -118,7 +118,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
    * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
    *                               parameters from the same parameter container.
-   * @param targetPath             the target path of the field of the parameter.
+   * @param targetSelector         the target selector of the field of the parameter.
    * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
    *                               {@link ValueProvider}
    * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
@@ -127,10 +127,10 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
-  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver, String targetPath,
+  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver, String targetSelector,
                               Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier)
       throws ValueResolvingException {
-    return getValues(parameterName, parameterValueResolver, targetPath, connectionSupplier, configurationSupplier, null);
+    return getValues(parameterName, parameterValueResolver, targetSelector, connectionSupplier, configurationSupplier, null);
   }
 
   /**
@@ -162,7 +162,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
    * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
    *                               parameters from the same parameter container.
-   * @param targetPath             the target path of the field of the parameter.
+   * @param targetSelector         the target selector of the field of the parameter.
    * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
    *                               {@link ValueProvider}
    * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
@@ -171,7 +171,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
-  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver, String targetPath,
+  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver, String targetSelector,
                               Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier,
                               ConnectionProvider connectionProvider)
       throws ValueResolvingException {
@@ -187,13 +187,13 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
     ParameterModel parameterModel = parameters.get(0);
 
     ValueProviderFactoryModelProperty factoryModelProperty;
-    if (targetPath != null) {
+    if (targetSelector != null) {
       factoryModelProperty =
           parameterModel.getModelProperty(FieldsValueProviderFactoryModelProperty.class)
-              .map(fieldsValueProvider -> fieldsValueProvider.getFieldsValueProviderFactories().get(targetPath))
+              .map(fieldsValueProvider -> fieldsValueProvider.getFieldsValueProviderFactories().get(targetSelector))
               .orElseThrow(() -> new ValueResolvingException(
-                                                             format("The parameter with name '%s' does not have a Value Provider associated with the targetPath '%s'",
-                                                                    parameterName, targetPath),
+                                                             format("The parameter with name '%s' does not have a Value Provider associated with the targetSelector '%s'",
+                                                                    parameterName, targetSelector),
                                                              INVALID_VALUE_RESOLVER_NAME));
     } else {
       factoryModelProperty =

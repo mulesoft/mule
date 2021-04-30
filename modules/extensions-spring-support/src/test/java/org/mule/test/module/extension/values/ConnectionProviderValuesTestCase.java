@@ -105,7 +105,8 @@ public class ConnectionProviderValuesTestCase extends AbstractValuesTestCase {
 
   @Test
   public void connectionWithParameterWithFieldValues() throws Exception {
-    Set<Value> channels = getFieldValuesFromConnection("with-parameter-with-field-values-connection", "channel", "simple.path");
+    Set<Value> channels =
+        getFieldValuesFromConnection("with-parameter-with-field-values-connection", "urlFormat", "url.protocol");
     assertThat(channels, hasSize(3));
     assertThat(channels, hasValues("channel1", "channel2", "channel3"));
   }

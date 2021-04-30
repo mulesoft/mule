@@ -456,13 +456,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Override
-  public Set<Value> getValues(String parameterName, String targetPath)
+  public Set<Value> getValues(String parameterName, String targetSelector)
       throws org.mule.runtime.extension.api.values.ValueResolvingException {
     try {
       return runWithResolvingContext(context -> withContextClassLoader(classLoader,
                                                                        () -> getValueProviderMediator()
                                                                            .getValues(parameterName,
-                                                                                      getParameterValueResolver(), targetPath,
+                                                                                      getParameterValueResolver(), targetSelector,
                                                                                       (CheckedSupplier<Object>) () -> context
                                                                                           .getConnection().orElse(null),
                                                                                       (CheckedSupplier<Object>) () -> context

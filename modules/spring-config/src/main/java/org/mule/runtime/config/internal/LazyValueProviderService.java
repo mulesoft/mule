@@ -73,9 +73,9 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   }
 
   @Override
-  public ValueResult getFieldValues(Location location, String parameter, String targetPath) {
+  public ValueResult getFieldValues(Location location, String parameter, String targetSelector) {
     return initializeComponent(location)
-        .orElseGet(() -> providerService.getFieldValues(location, parameter, targetPath));
+        .orElseGet(() -> providerService.getFieldValues(location, parameter, targetSelector));
   }
 
   private Optional<ValueResult> initializeComponent(Location location) {

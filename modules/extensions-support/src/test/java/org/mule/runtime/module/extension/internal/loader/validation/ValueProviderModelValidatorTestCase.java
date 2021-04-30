@@ -314,8 +314,8 @@ public class ValueProviderModelValidatorTestCase {
                              Map<String, ValueProviderFactoryModelPropertyBuilder> valueProviderFactoryModelPropertyBuilders) {
 
     Map<String, ValueProviderFactoryModelProperty> fieldsValueProviderFactories = new HashMap<>();
-    valueProviderFactoryModelPropertyBuilders.forEach((targetPath, valueProviderFactoryModelPropertyBuilder) -> {
-      fieldsValueProviderFactories.put(targetPath, valueProviderFactoryModelPropertyBuilder.build());
+    valueProviderFactoryModelPropertyBuilders.forEach((targetSelector, valueProviderFactoryModelPropertyBuilder) -> {
+      fieldsValueProviderFactories.put(targetSelector, valueProviderFactoryModelPropertyBuilder.build());
     });
     FieldsValueProviderFactoryModelProperty fieldsValueProviderFactoryModelProperty =
         new FieldsValueProviderFactoryModelProperty(fieldsValueProviderFactories);

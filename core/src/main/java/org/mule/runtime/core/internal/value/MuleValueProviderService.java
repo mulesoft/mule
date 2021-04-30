@@ -53,8 +53,8 @@ public class MuleValueProviderService implements ValueProviderService {
   }
 
   @Override
-  public ValueResult getFieldValues(Location location, String parameterName, String targetPath) {
-    return getValueResult(() -> this.findValueProvider(location, parameterName, targetPath).resolve());
+  public ValueResult getFieldValues(Location location, String parameterName, String targetSelector) {
+    return getValueResult(() -> this.findValueProvider(location, parameterName, targetSelector).resolve());
   }
 
   /**
@@ -86,7 +86,7 @@ public class MuleValueProviderService implements ValueProviderService {
     Set<Value> get() throws Exception;
   }
 
-  private ValueProvider findValueProvider(Location location, String parameterName, String targetPath)
+  private ValueProvider findValueProvider(Location location, String parameterName, String targetSelector)
       throws ValueResolvingException {
     boolean isConnection = isConnection(location);
 
@@ -97,8 +97,8 @@ public class MuleValueProviderService implements ValueProviderService {
     Object component = findComponent(realLocation);
 
     if (component instanceof ComponentValueProvider) {
-      if (targetPath != null) {
-        return () -> ((ComponentValueProvider) component).getValues(parameterName, targetPath);
+      if (targetSelector != null) {
+        return () -> ((ComponentValueProvider) component).getValues(parameterName, targetSelector);
       } else {
         return () -> ((ComponentValueProvider) component).getValues(parameterName);
       }
@@ -106,14 +106,14 @@ public class MuleValueProviderService implements ValueProviderService {
 
     if (component instanceof ConfigurationParameterValueProvider) {
       if (isConnection) {
-        if (targetPath != null) {
-          return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(parameterName, targetPath);
+        if (targetSelector != null) {
+          return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(parameterName, targetSelector);
         } else {
           return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(parameterName);
         }
       } else {
-        if (targetPath != null) {
-          return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(parameterName, targetPath);
+        if (targetSelector != null) {
+          return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(parameterName, targetSelector);
         } else {
           return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(parameterName);
         }

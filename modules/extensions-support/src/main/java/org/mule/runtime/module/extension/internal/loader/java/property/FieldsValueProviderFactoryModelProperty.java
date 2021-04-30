@@ -10,7 +10,7 @@ import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.sdk.api.values.FieldValues;
+import org.mule.sdk.api.annotation.values.FieldValues;
 
 import java.util.Map;
 

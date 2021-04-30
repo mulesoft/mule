@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderId;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -52,8 +53,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.ValueProv
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
 import org.mule.runtime.module.extension.internal.value.OfValueInformation;
 import org.mule.sdk.api.annotation.binding.Binding;
-import org.mule.sdk.api.values.FieldValues;
-import org.mule.sdk.api.values.FieldsValues;
+import org.mule.sdk.api.annotation.values.FieldValues;
+import org.mule.sdk.api.annotation.values.FieldsValues;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -75,6 +76,8 @@ import java.util.function.Consumer;
  * @since 4.0
  */
 public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+
+  private final ClassTypeLoader classTypeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -170,8 +173,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =
         ValueProviderFactoryModelProperty.builder(ofValueInformation.getValue());
     ParameterizableTypeWrapper resolverClassWrapper =
-        new ParameterizableTypeWrapper(ofValueInformation.getValue(),
-                                       new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
+        new ParameterizableTypeWrapper(ofValueInformation.getValue(), classTypeLoader);
     List<ExtensionParameter> resolverParameters = resolverClassWrapper.getParametersAnnotatedWith(Parameter.class);
 
     resolverParameters.forEach(param -> propertyBuilder
@@ -208,8 +210,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
       ValueProviderFactoryModelPropertyBuilder propertyBuilder =
           ValueProviderFactoryModelProperty.builder(fieldValues.value());
 
-      ParameterizableTypeWrapper resolverClassWrapper =
-          new ParameterizableTypeWrapper(fieldValues.value(), new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
+      ParameterizableTypeWrapper resolverClassWrapper = new ParameterizableTypeWrapper(fieldValues.value(), classTypeLoader);
       List<ExtensionParameter> resolverParameters = resolverClassWrapper.getParametersAnnotatedWith(Parameter.class);
 
       resolverParameters.forEach(param -> propertyBuilder
@@ -224,15 +225,15 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
           .ifPresent(field -> requiresConfiguration.set(true));
 
       int partOrder = 1;
-      for (String targetPath : fieldValues.targetPaths()) {
+      for (String targetSelector : fieldValues.targetSelectors()) {
         ValueProviderFactoryModelProperty valueProviderFactoryModelProperty = propertyBuilder.build();
-        valueProviderFactoryModelProperties.put(targetPath, valueProviderFactoryModelProperty);
+        valueProviderFactoryModelProperties.put(targetSelector, valueProviderFactoryModelProperty);
         fieldValueProviderModels
             .add(new FieldValueProviderModel(getActingParametersModel(resolverParameters, parameterNames, allParameters,
                                                                       emptyMap()),
                                              requiresConfiguration.get(), requiresConnection.get(), fieldValues.open(),
                                              partOrder,
-                                             name, getValueProviderId(fieldValues.value()), targetPath));
+                                             name, getValueProviderId(fieldValues.value()), targetSelector));
         partOrder++;
       }
       paramDeclaration.setFieldValueProviderModels(fieldValueProviderModels);

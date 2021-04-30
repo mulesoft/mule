@@ -290,10 +290,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    * {@inheritDoc}
    */
   @Override
-  public Set<Value> getConfigValues(String parameterName, String targetPath) throws ValueResolvingException {
+  public Set<Value> getConfigValues(String parameterName, String targetSelector) throws ValueResolvingException {
     return valuesWithClassLoader(() -> new ValueProviderMediator<>(getConfigurationModel(), () -> muleContext,
                                                                    () -> reflectionCache)
-                                                                       .getValues(parameterName, targetPath,
+                                                                       .getValues(parameterName, targetSelector,
                                                                                   new ResolverSetBasedParameterResolver(resolverSet,
                                                                                                                         getConfigurationModel(),
                                                                                                                         reflectionCache,
@@ -326,7 +326,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   }
 
   @Override
-  public Set<Value> getConnectionValues(String parameterName, String targetPath) throws ValueResolvingException {
+  public Set<Value> getConnectionValues(String parameterName, String targetSelector) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
           .orElseThrow(() -> new ValueResolvingException(
@@ -340,7 +340,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       return new ValueProviderMediator<>(connectionProviderModel,
                                          () -> muleContext,
                                          () -> reflectionCache)
-                                             .getValues(parameterName, targetPath,
+                                             .getValues(parameterName, targetSelector,
                                                         new ResolverSetBasedParameterResolver(resolverSet,
                                                                                               connectionProviderModel,
                                                                                               reflectionCache,

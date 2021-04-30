@@ -186,7 +186,7 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
-          <xs:attribute type="mule:expressionString" use="required" name="channel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="urlFormat"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -302,7 +302,7 @@
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
           </xs:sequence>
-          <xs:attribute type="mule:expressionString" use="required" name="channel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="securityHeaders"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="name">
             <xs:annotation>
               <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
@@ -421,7 +421,7 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="body"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="xmlBodyTemplate"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
@@ -575,8 +575,9 @@
   <xs:complexType name="ParameterWithMultilevelFieldValueType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="body"></xs:attribute>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -623,8 +624,9 @@
   <xs:complexType name="SingleValuesEnabledParameterWithMoreThanOneFieldValuesType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="body"></xs:attribute>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -632,8 +634,9 @@
   <xs:complexType name="SingleValuesEnabledParameterWithOneFieldValuesType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="body"></xs:attribute>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

@@ -10,13 +10,13 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLA
 
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.sdk.api.values.FieldValues;
+import org.mule.sdk.api.annotation.values.FieldValues;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 
 @MediaType(TEXT_PLAIN)
 public class SimpleSourceWithParameterWithFieldValues extends AbstractSdkSource {
 
-  @FieldValues(targetPaths = "simple.path", value = SimpleValueProvider.class)
+  @FieldValues(targetSelectors = "simple.path", value = SimpleValueProvider.class)
   @Parameter
   String channel;
 

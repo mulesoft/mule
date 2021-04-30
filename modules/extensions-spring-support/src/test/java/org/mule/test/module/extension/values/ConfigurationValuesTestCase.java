@@ -106,7 +106,8 @@ public class ConfigurationValuesTestCase extends AbstractValuesTestCase {
 
   @Test
   public void configWithParameterWithFieldValues() throws Exception {
-    Set<Value> channels = getFieldValuesFromConfig("config-with-parameter-with-field-values", "channel", "simple.path");
+    Set<Value> channels =
+        getFieldValuesFromConfig("config-with-parameter-with-field-values", "securityHeaders", "security.algorithm");
     assertThat(channels, hasSize(3));
     assertThat(channels, hasValues("channel1", "channel2", "channel3"));
   }

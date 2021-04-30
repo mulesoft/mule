@@ -105,7 +105,7 @@ public class ValueProviderUtils {
       return parameters.get(0).getFieldValueProviderModels().stream()
           .filter(fieldValueProviderModel -> fieldValueProviderModel.getProviderId().equals(providerId))
           .collect(toMap(ValueProviderModel::getPartOrder,
-                         fieldModel -> parameters.get(0).getName() + "." + fieldModel.getTargetPath()));
+                         fieldModel -> parameters.get(0).getName() + "." + fieldModel.getTargetSelector()));
     }
 
     return parameters.stream()

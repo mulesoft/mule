@@ -8,19 +8,18 @@ package org.mule.test.values.extension.source;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
-import org.mule.runtime.core.api.util.Base64.InputStream;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.sdk.api.values.FieldValues;
+import org.mule.sdk.api.annotation.values.FieldValues;
 import org.mule.test.values.extension.resolver.SdkMultiLevelValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 
 @MediaType(TEXT_PLAIN)
 public class SourceWithMultiLevelFieldValues extends AbstractSdkSource {
 
-  @FieldValues(targetPaths = "channel", value = SimpleValueProvider.class)
-  @FieldValues(targetPaths = {"location.continent", "location.country", "location.city"},
+  @FieldValues(targetSelectors = "channel", value = SimpleValueProvider.class)
+  @FieldValues(targetSelectors = {"location.continent", "location.country", "location.city"},
       value = SdkMultiLevelValueProvider.class)
   @Parameter
-  InputStream body;
+  String xmlBodyTemplate;
 }
