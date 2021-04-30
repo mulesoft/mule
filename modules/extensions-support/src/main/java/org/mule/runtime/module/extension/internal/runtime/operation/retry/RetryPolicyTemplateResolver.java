@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 /**
- * This class encapsulates the logic to resolve a retry policy.
+ * Resolves a retry template.
  * 
  * @since 4.4.0, 4.3.1
  */

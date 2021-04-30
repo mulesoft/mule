@@ -322,16 +322,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void removeSdkInternalContextFromResult(final ComponentLocation location, Either<Throwable, CoreEvent> result) {
-    result.apply(me -> {
-      removeSdkInternalContext(location, ((MessagingException) me).getEvent());
-    }, response -> {
-      removeSdkInternalContext(location, response);
-    });
+    result.apply(me -> removeSdkInternalContext(location, ((MessagingException) me).getEvent()),
+                 response -> removeSdkInternalContext(location, response));
   }
 
   private void removeSdkInternalContext(final ComponentLocation location, final CoreEvent event) {
-    final SdkInternalContext sdkCtx =
-        from(event);
+    final SdkInternalContext sdkCtx = from(event);
     if (sdkCtx != null) {
       sdkCtx.removeContext(location, event.getContext().getId());
     }

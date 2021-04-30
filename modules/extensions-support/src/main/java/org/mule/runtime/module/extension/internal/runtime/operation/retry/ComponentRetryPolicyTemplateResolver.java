@@ -22,9 +22,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
  */
 public class ComponentRetryPolicyTemplateResolver implements RetryPolicyTemplateResolver {
 
-
-  private RetryPolicyTemplate componentRetryPolicyTemplate;
-  private ConnectionManagerAdapter connectionManager;
+  private final RetryPolicyTemplate componentRetryPolicyTemplate;
+  private final ConnectionManagerAdapter connectionManager;
   private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
 
   public ComponentRetryPolicyTemplateResolver(RetryPolicyTemplate retryPolicyTemplate,
