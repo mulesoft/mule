@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 public interface ComponentProcessor extends ReactiveProcessor {
 
   /**
-   * An blocking processor is one that will perform blocking calls. So it is not guaranteed that a thread switch happens or that
+   * A blocking processor is one that will perform blocking calls. So it is not guaranteed that a thread switch happens or that
    * the operation returns without blocking.
    *
    * @return {@code} if the processor is blocking.
