@@ -2852,7 +2852,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -3606,7 +3613,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -4360,7 +4374,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -5085,7 +5106,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -7530,7 +7558,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -9098,7 +9133,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -9930,7 +9972,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -10622,7 +10671,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -12720,7 +12776,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-stream"
+                          "typeId": "repeatable-file-store-stream",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-stream",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -13356,7 +13419,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-stream"
+                          "typeId": "repeatable-file-store-stream",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-stream",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -14081,7 +14151,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -14790,7 +14867,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -15520,7 +15604,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-stream"
+                          "typeId": "repeatable-file-store-stream",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-stream",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -16042,7 +16133,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -19712,7 +19810,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-stream"
+                          "typeId": "repeatable-file-store-stream",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-stream",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -22027,7 +22132,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-stream"
+                          "typeId": "repeatable-file-store-stream",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-stream",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -24318,7 +24430,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-stream"
+                          "typeId": "repeatable-file-store-stream",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-stream",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -26628,7 +26747,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-stream"
+                          "typeId": "repeatable-file-store-stream",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-stream",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
