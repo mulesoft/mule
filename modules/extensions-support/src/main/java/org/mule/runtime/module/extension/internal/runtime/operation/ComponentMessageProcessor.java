@@ -96,7 +96,7 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
-import org.mule.runtime.core.internal.processor.strategy.OperationInnerProcessor;
+import org.mule.runtime.core.internal.processor.strategy.ComponentProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
@@ -194,7 +194,7 @@ import reactor.util.context.Context;
  * @since 4.0
  */
 public abstract class ComponentMessageProcessor<T extends ComponentModel> extends ExtensionComponent<T>
-    implements Processor, ParametersResolverProcessor<T>, Lifecycle {
+    implements Processor, ParametersResolverProcessor<T>, Lifecycle, ComponentProcessor {
 
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
@@ -298,7 +298,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
-    final boolean async = isAsync();
+    final boolean async = canBeAsync();
     final ComponentLocation location = getLocation();
 
     return subscriberContext()
@@ -418,7 +418,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public ProcessingType getProcessingType() {
-    if (isAsync()) {
+    if (canBeAsync()) {
       // In this case, any thread switch will be done in the innerFlux
       return CPU_LITE;
     } else {
@@ -638,7 +638,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
     // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
-      final OperationInnerProcessor innerProcessor = new OperationInnerProcessor() {
+      final ComponentProcessor innerProcessor = new ComponentProcessor() {
 
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
@@ -687,11 +687,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
 
         @Override
-        public boolean isAsync() {
+        public boolean isBlocking() {
           // If the operation is blocking we cannot guarantee that the
           // processor switch threads while executing. So parallelism
-          // should be handled in the processing strategy.
-          return !ComponentMessageProcessor.this.isBlocking();
+          // should be handled in the processing strategy. We can only
+          // guarantee that a switch thread is applied in the processor
+          // in case it is non blocking
+          return ComponentMessageProcessor.this.isBlocking();
         }
       };
 
@@ -1021,11 +1023,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return true;
   }
 
-  protected boolean isBlocking() {
-    return !isAsync();
+  public boolean isBlocking() {
+    return !canBeAsync();
   }
 
-  protected boolean isAsync() {
+  public boolean canBeAsync() {
     if (!requiresConfig()) {
       return false;
     }
