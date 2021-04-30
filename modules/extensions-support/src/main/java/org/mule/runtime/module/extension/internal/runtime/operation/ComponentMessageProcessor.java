@@ -697,7 +697,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
 
         @Override
-        public boolean canBeAsync() {
+        public boolean mayBeAsync() {
           return ComponentMessageProcessor.this.mayBeAsync();
         }
       };
