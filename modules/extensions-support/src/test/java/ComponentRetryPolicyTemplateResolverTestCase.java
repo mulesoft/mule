@@ -14,10 +14,13 @@ import static org.mule.test.allure.AllureConstants.ReconnectionPolicyFeature.Ret
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoRule;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -32,8 +35,10 @@ import io.qameta.allure.Story;
 
 @Feature(RECONNECTION_POLICIES)
 @Story(RETRY_TEMPLATE)
-@RunWith(MockitoJUnitRunner.class)
 public class ComponentRetryPolicyTemplateResolverTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   RetryPolicyTemplate retryPolicyTemplate;

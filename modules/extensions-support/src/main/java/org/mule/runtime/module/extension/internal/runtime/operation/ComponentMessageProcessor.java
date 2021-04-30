@@ -695,6 +695,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           // in case it is non blocking
           return ComponentMessageProcessor.this.isBlocking();
         }
+
+        @Override
+        public boolean canBeAsync() {
+          return ComponentMessageProcessor.this.canBeAsync();
+        }
       };
 
       return from(processingStrategy
