@@ -91,6 +91,7 @@ import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -370,11 +371,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
-  protected void validateArtifact(final ArtifactAst artifactAst) {
+  protected void validateArtifact(final ArtifactAst artifactAst) throws ConfigurationException {
     doValidateModel(artifactAst, v -> true);
   }
 
-  protected final void doValidateModel(ArtifactAst appModel, Predicate<Validation> validationsFilter) {
+  protected final void doValidateModel(ArtifactAst appModel, Predicate<Validation> validationsFilter)
+      throws ConfigurationException {
     final ValidationResult validation = validate(appModel, validationsFilter);
 
     final Collection<ValidationResultItem> items = validation.getItems();
@@ -388,7 +390,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         .collect(toList());
 
     if (!errors.isEmpty()) {
-      throw new MuleRuntimeException(createStaticMessage(validation.getItems()
+      throw new ConfigurationException(createStaticMessage(validation.getItems()
           .stream()
           .map(this::componentsLocation)
           .collect(joining(lineSeparator()))));
