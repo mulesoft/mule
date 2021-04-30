@@ -146,6 +146,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
     }
   }
 
+  @Override
   public boolean mayBeAsync() {
     if (!isBlocking()) {
       return true;
@@ -154,6 +155,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
     return super.mayBeAsync();
   }
 
+  @Override
   public boolean isBlocking() {
     return componentModel.isBlocking();
   }
