@@ -796,4 +796,13 @@ public interface AllureConstants {
     String CLUSTERING = "Clustering";
 
   }
+
+  interface ArtifactPatchingFeature {
+
+    String ARTIFACT_PATCHING = "Artifact Patching";
+
+    interface ArtifactPatchingStory {
+
+    }
+  }
 }
