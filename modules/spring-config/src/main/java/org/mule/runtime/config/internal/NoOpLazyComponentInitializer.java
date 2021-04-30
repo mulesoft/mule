@@ -7,7 +7,10 @@
 package org.mule.runtime.config.internal;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.LazyComponentInitializer;
+
+import java.util.function.Predicate;
 
 /**
  * NoOp implementation for {@link LazyComponentInitializer}.
@@ -21,6 +24,11 @@ public class NoOpLazyComponentInitializer implements LazyComponentInitializer {
 
   @Override
   public void initializeComponent(Location location) {
+    // Nothing to do...
+  }
+
+  @Override
+  public void initializeComponents(Predicate<ComponentAst> componentModelPredicate) {
     // Nothing to do...
   }
 

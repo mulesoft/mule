@@ -9,14 +9,23 @@ package org.mule.runtime.module.tooling.internal;
 import static com.google.common.base.Throwables.getCausalChain;
 import static com.google.common.base.Throwables.propagateIfPossible;
 import static java.lang.System.currentTimeMillis;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.api.LazyComponentInitializer;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
@@ -63,7 +72,26 @@ public abstract class AbstractArtifactAgnosticService {
           LOGGER.debug("Starting application: '{}'", application.getArtifactId());
         }
         application.install();
-        application.init();
+
+        if (isLazyInit()) {
+          try {
+            application.lazyInit(!isLazyInitEnableXmlValidations());
+            // Force the initialization of the app components so that the registry is populated with the configs
+            application.getRegistry().lookupByType(LazyComponentInitializer.class)
+                .ifPresent(lazyInit -> lazyInit
+                    .initializeComponents((Predicate<ComponentAst>) comp -> comp.getModel(ConfigurationModel.class).isPresent()));
+          } catch (Exception e) {
+            if (e.getCause() instanceof ConfigurationException) {
+              // Keep thrown exception consistent with the previous implementation.
+              throw new DeploymentInitException(createStaticMessage(e.getCause().getMessage()), e.getCause());
+            } else {
+              throw e;
+            }
+          }
+        } else {
+          application.init();
+        }
+
         application.start();
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Application: '{}' has been started in [{}ms]", application.getArtifactId(),
@@ -76,6 +104,21 @@ public abstract class AbstractArtifactAgnosticService {
       }
     }
     return application;
+  }
+
+  private Boolean isLazyInit() {
+    return application.getDescriptor().getDeploymentProperties()
+        .map(deplProps -> (String) deplProps.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "false"))
+        .map(Boolean::valueOf)
+        .orElse(false);
+  }
+
+  private Boolean isLazyInitEnableXmlValidations() {
+    return application.getDescriptor().getDeploymentProperties()
+        .map(deplProps -> (String) deplProps.getOrDefault(MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
+                                                          "false"))
+        .map(Boolean::valueOf)
+        .orElse(false);
   }
 
   protected <T> T withTemporaryApplication(Function<Application, T> function,

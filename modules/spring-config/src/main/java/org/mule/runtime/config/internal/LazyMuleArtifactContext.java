@@ -326,6 +326,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   @Override
+  public void initializeComponents(Predicate<ComponentAst> componentModelPredicate) {
+    initializeComponents(componentModelPredicate, true);
+  }
+
+  @Override
   public void initializeComponent(Location location, boolean applyStartPhase) {
     applyLifecycle(createComponents(empty(), of(location), applyStartPhase,
                                     getParentComponentModelInitializerAdapter(applyStartPhase)),

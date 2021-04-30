@@ -11,6 +11,9 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.ast.api.ComponentAst;
+
+import java.util.function.Predicate;
 
 /**
  * Initializer for the creation of lazy resources.
@@ -48,6 +51,19 @@ public interface LazyComponentInitializer {
    * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
    */
   void initializeComponent(Location location);
+
+  /**
+   * Calling this method guarantees that the components accepted by the filter from the configuration will be created, initialized
+   * and started.
+   * <p/>
+   * If there were any component already initialized it will be unregistered in order to initialize the ones selected by this
+   * filter.
+   *
+   * @param componentModelPredicate a {@link Predicate} for {@link ComponentAst} to be initialized.
+   *
+   * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
+   */
+  void initializeComponents(Predicate<ComponentAst> componentModelPredicate);
 
   /**
    * Defines which {@link Component components} should be initialized by accepting it by {@link ComponentLocation}.
