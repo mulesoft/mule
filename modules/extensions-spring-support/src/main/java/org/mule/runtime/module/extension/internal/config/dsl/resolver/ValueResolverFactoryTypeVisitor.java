@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -150,6 +151,9 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(dateTime.toDate());
         constructedValue = calendar;
+      } else if (type.equals(ZonedDateTime.class)) {
+        Instant instant = ofEpochMilli(dateTime.getMillis());
+        constructedValue = ZonedDateTime.ofInstant(instant, ZoneId.of(dateTime.getZone().getID()));
       }
 
       if (constructedValue == null) {
@@ -160,7 +164,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
       }
     }
 
-    if (value instanceof Date || value instanceof LocalDate || value instanceof LocalDateTime || value instanceof Calendar) {
+    if (hasValidType(value)) {
       return new StaticValueResolver<>(value, content);
     }
 
@@ -174,5 +178,10 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     } catch (DateTimeParseException e) {
       throw new IllegalArgumentException(format("Could not parse value '%s' according to ISO 8601", value));
     }
+  }
+
+  private boolean hasValidType(Object value) {
+    return value instanceof Date || value instanceof LocalDate || value instanceof LocalDateTime
+        || value instanceof Calendar || value instanceof ZonedDateTime;
   }
 }
