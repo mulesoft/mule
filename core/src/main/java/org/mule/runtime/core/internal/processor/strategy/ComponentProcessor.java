@@ -29,8 +29,8 @@ public interface ComponentProcessor extends ReactiveProcessor {
   boolean isBlocking();
 
   /**
-   * An async processor is one that may change the thread where it is executing but not always. For example if a reconnection
-   * strategy is applied and a connection problem happens
+   * Indicates that the processor may change the thread where it is executing but not always. For example if a reconnection
+   * strategy is applied and a connection problem happens.
    *
    * @return {@code} if the processor may be asynchronous.
    */

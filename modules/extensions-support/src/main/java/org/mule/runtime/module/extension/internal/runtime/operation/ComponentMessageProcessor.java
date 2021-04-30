@@ -1032,7 +1032,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return !mayBeAsync();
   }
 
-  public boolean canBeAsync() {
+  public boolean mayBeAsync() {
     if (!requiresConfig()) {
       return false;
     }

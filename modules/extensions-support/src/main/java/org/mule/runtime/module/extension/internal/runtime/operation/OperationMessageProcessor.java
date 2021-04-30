@@ -151,7 +151,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
       return true;
     }
 
-    return super.canBeAsync();
+    return super.mayBeAsync();
   }
 
   public boolean isBlocking() {
