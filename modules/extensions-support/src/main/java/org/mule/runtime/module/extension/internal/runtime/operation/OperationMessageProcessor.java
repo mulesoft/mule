@@ -148,11 +148,15 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
 
   @Override
   protected boolean isAsync() {
-    if (!componentModel.isBlocking()) {
+    if (!isBlocking()) {
       return true;
     }
 
     return super.isAsync();
+  }
+
+  protected boolean isBlocking() {
+    return componentModel.isBlocking();
   }
 
   @Override

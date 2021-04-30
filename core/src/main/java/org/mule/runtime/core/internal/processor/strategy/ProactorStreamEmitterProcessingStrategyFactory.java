@@ -161,7 +161,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
         return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
             .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
       } else if (maxConcurrency == MAX_VALUE) {
-        if (processor instanceof OperationInnerProcessor) {
+        if (processor instanceof OperationInnerProcessor && ((OperationInnerProcessor) processor).isAsync()) {
           // For no limit, the java SDK already handles parallelism internally, so no need to do that here
           return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
