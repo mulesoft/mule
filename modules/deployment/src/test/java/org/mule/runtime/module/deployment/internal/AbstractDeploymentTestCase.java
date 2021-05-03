@@ -26,6 +26,7 @@ import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticFiel
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
 import static org.hamcrest.core.Is.is;
@@ -1104,13 +1105,25 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private void assertArtifactDir(File artifactDir, String[] expectedZips, String[] expectedArtifacts, boolean performValidation) {
+    final String[] actualZips = artifactDir.list(JAR_ARTIFACT_FILTER);
+    final String[] actualArtifacts = artifactDir.list(DIRECTORY);
+
     if (performValidation) {
-      assertThat("Invalid Mule artifact archives set",
-                 artifactDir.list(JAR_ARTIFACT_FILTER), arrayContaining(expectedZips));
-    }
-    if (performValidation) {
-      assertThat("Invalid Mule exploded artifact set",
-                 artifactDir.list(DIRECTORY), arrayContaining(expectedArtifacts));
+      if (expectedZips.length == 0) {
+        assertThat("Invalid Mule artifact archives set",
+                   actualZips, arrayWithSize(0));
+      } else {
+        assertThat("Invalid Mule artifact archives set",
+                   actualZips, arrayContaining(expectedZips));
+      }
+
+      if (expectedZips.length == 0) {
+        assertThat("Invalid Mule exploded artifact set",
+                   actualArtifacts, arrayWithSize(0));
+      } else {
+        assertThat("Invalid Mule exploded artifact set",
+                   actualArtifacts, arrayContaining(expectedArtifacts));
+      }
     }
   }
 
