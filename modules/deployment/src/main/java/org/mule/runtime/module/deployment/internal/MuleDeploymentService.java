@@ -71,6 +71,7 @@ public class MuleDeploymentService implements DeploymentService {
   public static final IOFileFilter JAR_ARTIFACT_FILTER =
       new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX), FileFileFilter.FILE);
   public static final String PARALLEL_DEPLOYMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "deployment.parallel";
+  private static final int MAX_QUEUED_STARTING_ARTIFACTS = 256;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
   // fair lock
@@ -98,7 +99,7 @@ public class MuleDeploymentService implements DeploymentService {
         .customScheduler(config()
             .withName("ArtifactDeployer.start")
             .withMaxConcurrentTasks(useParallelDeployment() ? MAX_APPS_IN_PARALLEL_DEPLOYMENT : 1),
-                         256));
+                         MAX_QUEUED_STARTING_ARTIFACTS));
     // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
     // artifact plugins.
     ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
