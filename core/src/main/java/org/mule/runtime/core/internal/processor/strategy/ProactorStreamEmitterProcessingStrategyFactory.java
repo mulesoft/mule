@@ -15,6 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.mule.runtime.api.component.location.ComponentProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -161,8 +162,9 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
         return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
             .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
       } else if (maxConcurrency == MAX_VALUE) {
-        if (processor instanceof ComponentProcessor && !((ComponentProcessor) processor).isBlocking()) {
-          // For no limit, the java SDK already handles parallelism internally, so no need to do that here
+        if (processor instanceof ComponentInnerProcessor && !((ComponentInnerProcessor) processor).isBlocking()) {
+          // For a no concurrency limit non blocking processor, the java SDK already handles parallelism internally, so no need to
+          // do that here.
           return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
         } else {

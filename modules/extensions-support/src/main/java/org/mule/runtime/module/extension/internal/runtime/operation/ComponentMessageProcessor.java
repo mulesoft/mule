@@ -60,6 +60,25 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -96,7 +115,7 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
-import org.mule.runtime.core.internal.processor.strategy.ComponentProcessor;
+import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
@@ -144,31 +163,12 @@ import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDeleg
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
 /**
@@ -194,7 +194,7 @@ import reactor.util.context.Context;
  * @since 4.0
  */
 public abstract class ComponentMessageProcessor<T extends ComponentModel> extends ExtensionComponent<T>
-    implements Processor, ParametersResolverProcessor<T>, Lifecycle, ComponentProcessor {
+    implements Processor, ParametersResolverProcessor<T>, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
@@ -298,12 +298,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
-    final boolean async = mayBeAsync();
+    final boolean mayJumpThreads = mayJumpThreads();
     final ComponentLocation location = getLocation();
 
     return subscriberContext()
         .flatMapMany(ctx -> {
-          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, async, ctx)
+          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, mayJumpThreads, ctx)
               .doOnNext(result -> {
                 removeSdkInternalContextFromResult(location, result);
               })
@@ -335,7 +335,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Flux<Either<Throwable, CoreEvent>> createOuterFlux(final Flux<CoreEvent> publisher,
                                                              final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook,
-                                                             final boolean async, Context ctx) {
+                                                             final boolean mayJumpThreads, Context ctx) {
     final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
@@ -387,7 +387,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 }
               };
 
-              if (!async && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
+              if (!mayJumpThreads && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
                 onEvent(event, executorCallback, ctx);
@@ -418,7 +418,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public ProcessingType getProcessingType() {
-    if (mayBeAsync()) {
+    if (mayJumpThreads()) {
       // In this case, any thread switch will be done in the innerFlux
       return CPU_LITE;
     } else {
@@ -638,7 +638,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
     // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
-      final ComponentProcessor innerProcessor = new ComponentProcessor() {
+      final ComponentInnerProcessor innerProcessor = new ComponentInnerProcessor() {
 
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
@@ -682,28 +682,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
 
         @Override
-        public ProcessingType getProcessingType() {
-          return getInnerProcessingType();
-        }
-
-        @Override
         public boolean isBlocking() {
-          // If the operation is blocking we cannot guarantee that the
-          // processor switch threads while executing. So parallelism
-          // should be handled in the processing strategy. We can only
-          // guarantee that a switch thread is applied in the processor
-          // in case it is non blocking
           return ComponentMessageProcessor.this.isBlocking();
-        }
-
-        @Override
-        public boolean mayBeAsync() {
-          return ComponentMessageProcessor.this.mayBeAsync();
         }
       };
 
       return from(processingStrategy
-          .configureInternalPublisher(from(p)
+          .configureInternalPublisher(from(p))
               .transform(processingStrategy.onProcessor(innerProcessor))
               .doOnNext(result -> {
                 from(result)
@@ -827,8 +812,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void initRetryPolicyResolver() {
     Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
-    RetryPolicyTemplateResolver policyResolver =
-        getRetryPolicyTemplateResolver();
+    RetryPolicyTemplateResolver policyResolver = getRetryPolicyTemplateResolver();
     if (staticConfig.isPresent() || !requiresConfig()) {
       RetryPolicyTemplate staticPolicy = policyResolver.fetchRetryPolicyTemplate(staticConfig);
       retryPolicyResolver = config -> staticPolicy;
@@ -1028,11 +1012,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return true;
   }
 
-  public boolean isBlocking() {
-    return !mayBeAsync();
+
+  protected boolean isBlocking() {
+    return !mayJumpThreads();
   }
 
-  public boolean mayBeAsync() {
+  /**
+   * This indicates that the component message processor may jump threads under certain conditions (not necessarily always). For
+   * example, it may jump threads only when a connection problem happens and the retry strategy is triggered.
+   * 
+   * @return whether it may jump threads.
+   */
+  protected boolean mayJumpThreads() {
     if (!requiresConfig()) {
       return false;
     }

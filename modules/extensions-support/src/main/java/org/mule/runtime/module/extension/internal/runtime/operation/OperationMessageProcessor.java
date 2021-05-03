@@ -147,16 +147,17 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   @Override
-  public boolean mayBeAsync() {
+  protected boolean mayJumpThreads() {
+    // If the operation is non blocking we can guarantee that that the processor will jump threads.
     if (!isBlocking()) {
       return true;
     }
 
-    return super.mayBeAsync();
+    return super.mayJumpThreads();
   }
 
   @Override
-  public boolean isBlocking() {
+  protected boolean isBlocking() {
     return componentModel.isBlocking();
   }
 

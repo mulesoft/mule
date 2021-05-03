@@ -53,11 +53,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
-
-  @Rule
-  public SystemProperty muleDisableAsyncRetryPolicyOnSourcesProperty =
-      new SystemProperty(DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES, "false");
+public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private final static long TIMEOUT = 5000;
   private final static long POLL_DELAY = 500;
@@ -167,7 +163,7 @@ public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunc
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnectionBlocking").run()
         .getMessage().getPayload().getValue();
 
-    assertRetryTemplate(template, expectedAsyncWhenOperationBlockingRetryPolicyIsOverridden(), 30, 50);
+    assertRetryTemplate(template, false, 30, 50);
   }
 
   @Test
@@ -297,8 +293,6 @@ public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunc
 
     return provider.openCursor();
   }
-
-  protected abstract boolean expectedAsyncWhenOperationBlockingRetryPolicyIsOverridden();
 
   public static void resetCounters() {
     closePagingProviderCalls = 0;
