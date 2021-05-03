@@ -10,8 +10,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.collections.CollectionUtils.collect;
-import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -25,6 +23,7 @@ import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
@@ -35,15 +34,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,10 +82,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public boolean isUpdatedZombieArtifact(String artifactName) {
-    @SuppressWarnings("rawtypes")
-    Collection<String> deployedAppNames = collect(artifacts, new BeanToPropertyValueTransformer(ARTIFACT_NAME_PROPERTY));
-
-    if (deployedAppNames.contains(artifactName) && (!artifactZombieMap.containsKey(artifactName))) {
+    if (!artifactZombieMap.containsKey(artifactName)
+        && artifacts.stream()
+            .map(Artifact::getArtifactName)
+            .anyMatch(deployedAppName -> deployedAppName.equals(artifactName))) {
       return false;
     }
 
@@ -275,7 +271,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private T findArtifact(String artifactName) {
-    return (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+    return artifacts.stream()
+        .filter(artifact -> artifact.getArtifactName().equals(artifactName))
+        .findAny()
+        .orElse(null);
   }
 
   private void trackArtifact(T artifact) {

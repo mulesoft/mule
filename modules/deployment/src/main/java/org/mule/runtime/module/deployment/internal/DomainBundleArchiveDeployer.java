@@ -9,15 +9,14 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -35,7 +34,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,6 +239,9 @@ public class DomainBundleArchiveDeployer {
   }
 
   private Domain findDomain(String domainName) {
-    return (Domain) find(domains, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, domainName));
+    return domains.stream()
+        .filter(domain -> domain.getArtifactName().equals(domainName))
+        .findAny()
+        .orElse(null);
   }
 }

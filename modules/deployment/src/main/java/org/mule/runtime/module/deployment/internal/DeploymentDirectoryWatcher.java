@@ -20,7 +20,6 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
@@ -51,7 +50,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -346,9 +344,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   public <T extends Artifact> T findArtifact(String artifactName, ObservableList<T> artifacts) {
-    final BeanPropertyValueEqualsPredicate nameEqualsPredicate =
-        new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName);
-    return artifacts.stream().filter(artifact -> nameEqualsPredicate.evaluate(artifact)).findFirst().orElse(null);
+    return artifacts.stream()
+        .filter(artifact -> artifact.getArtifactName().equals(artifactName))
+        .findFirst()
+        .orElse(null);
   }
 
   private void undeployRemovedDomains() {

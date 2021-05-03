@@ -14,7 +14,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -26,15 +25,14 @@ import static org.apache.commons.lang.reflect.FieldUtils.readDeclaredStaticField
 import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticField;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -72,6 +70,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
@@ -1105,14 +1104,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private void assertArtifactDir(File artifactDir, String[] expectedZips, String[] expectedArtifacts, boolean performValidation) {
-    final String[] actualZips = artifactDir.list(MuleDeploymentService.JAR_ARTIFACT_FILTER);
     if (performValidation) {
-      assertArrayEquals("Invalid Mule artifact archives set", expectedZips, actualZips);
+      assertThat("Invalid Mule artifact archives set",
+                 artifactDir.list(JAR_ARTIFACT_FILTER), arrayContaining(expectedZips));
     }
-    final String[] actualArtifacts = artifactDir.list(DIRECTORY);
     if (performValidation) {
-      assertTrue("Invalid Mule exploded artifact set",
-                 isEqualCollection(asList(expectedArtifacts), asList(actualArtifacts)));
+      assertThat("Invalid Mule exploded artifact set",
+                 artifactDir.list(DIRECTORY), arrayContaining(expectedArtifacts));
     }
   }
 
