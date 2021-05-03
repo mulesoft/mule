@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
+import static org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory.DO_TEST_CONNECTIVITY_PROPERTY_NAME;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -28,7 +29,7 @@ import org.hamcrest.Matcher;
 public class TestConnectivityUtils {
 
   private static final Matcher NULL_VALUE = nullValue();
-  private Registry registry;
+  private final Registry registry;
 
   public TestConnectivityUtils(Registry registry) {
     this.registry = registry;
@@ -36,7 +37,7 @@ public class TestConnectivityUtils {
 
   /**
    * Executes a test connectivity and excepts that it finish correctly
-   * 
+   *
    * @param configName name of the Config to do a test connectivity
    */
   public void assertSuccessConnection(String configName) {
@@ -60,7 +61,7 @@ public class TestConnectivityUtils {
    * Injects a System property to disable automatic test connectivity when the Mule app starts
    */
   public static SystemProperty disableAutomaticTestConnectivity() {
-    return new SystemProperty("doTestConnectivity", "false");
+    return new SystemProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME, "false");
   }
 
   private void assertConnection(String configName, boolean isSuccess, Matcher<Exception> exceptionMatcher,

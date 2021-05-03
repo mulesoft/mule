@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SER
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXCEPTION_LOCATION_PROVIDER;
@@ -110,6 +111,7 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.connection.DelegateConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
@@ -249,6 +251,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_SCHEDULER_POOLS_CONFIG, getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()))
       .put(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class))
       .put(OBJECT_CLUSTER_SERVICE, getBeanDefinition(DefaultClusterService.class))
+      .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
       .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
       .build();

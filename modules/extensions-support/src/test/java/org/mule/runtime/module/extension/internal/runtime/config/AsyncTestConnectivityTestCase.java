@@ -7,24 +7,19 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.System.currentTimeMillis;
-import static java.util.Optional.empty;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -34,13 +29,15 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -50,15 +47,23 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
+import java.util.Map;
 import java.util.Optional;
 
-import io.qameta.allure.Description;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Description;
 
 @SmallTest
 public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   protected static final int RECONNECTION_MAX_ATTEMPTS = 5;
   private static final int RECONNECTION_FREQ = 100;
@@ -74,35 +79,38 @@ public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
   @Mock
   private ConfigurationState configurationState;
 
-  @Mock
-  private ConfigurationProperties configurationProperties;
-
   protected Lifecycle value = mock(Lifecycle.class, withSettings().extraInterfaces(Component.class));
   protected AsyncConnectionManagerAdapter connectionManager;
   protected RetryPolicyTemplate retryPolicyTemplate;
   protected LifecycleAwareConfigurationInstance configurationInstance;
-  private TestTimeSupplier timeSupplier = new TestTimeSupplier(currentTimeMillis());
-  private Optional<ConnectionProvider> connectionProvider =
+  private final TestTimeSupplier timeSupplier = new TestTimeSupplier(currentTimeMillis());
+  private final Optional<ConnectionProvider> connectionProvider =
       of(mock(ConnectionProvider.class, withSettings().extraInterfaces(Lifecycle.class, MuleContextAware.class)));
 
   @Override
-  protected void doSetUpBeforeMuleContextCreation() throws Exception {
-    initMocks(this);
-    super.doSetUpBeforeMuleContextCreation();
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_TIME_SUPPLIER, timeSupplier);
+  }
+
+  @Override
+  protected ConfigurationBuilder getBuilder() throws Exception {
+    return new DefaultsConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        super.doConfigure(muleContext);
+
+        retryPolicyTemplate = createRetryTemplate();
+        retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
+        connectionManager = spy(new AsyncConnectionManagerAdapter(retryPolicyTemplate));
+
+        registerObject(OBJECT_CONNECTION_MANAGER, connectionManager, muleContext);
+      }
+    };
   }
 
   @Override
   protected void doSetUp() throws Exception {
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONFIGURATION_PROPERTIES,
-                                                                         configurationProperties);
-
-    doReturn(empty()).when(configurationProperties).resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY);
-
-    retryPolicyTemplate = createRetryTemplate();
-    retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
-    connectionManager = spy(new AsyncConnectionManagerAdapter(retryPolicyTemplate));
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
     configurationInstance = createConfigurationInstance();
 
     super.doSetUp();
@@ -144,7 +152,7 @@ public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
    */
   private static class AsyncConnectionManagerAdapter implements ConnectionManagerAdapter {
 
-    private RetryPolicyTemplate retryPolicyTemplate;
+    private final RetryPolicyTemplate retryPolicyTemplate;
 
     public AsyncConnectionManagerAdapter(RetryPolicyTemplate retryPolicyTemplate) {
       this.retryPolicyTemplate = retryPolicyTemplate;
