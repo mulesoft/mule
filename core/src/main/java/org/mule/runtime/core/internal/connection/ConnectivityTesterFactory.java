@@ -14,7 +14,7 @@ package org.mule.runtime.core.internal.connection;
 public interface ConnectivityTesterFactory {
 
   /**
-   * Created a new {@link ConnectivityTester} for the connection with the given {@code connectionName}.
+   * Creates a new {@link ConnectivityTester} for the connection with the given {@code connectionName}.
    *
    * @param connectionName the name of the connection under test.
    * @return a new {@link ConnectivityTester}

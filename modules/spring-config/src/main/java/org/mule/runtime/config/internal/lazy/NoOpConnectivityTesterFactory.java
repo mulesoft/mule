@@ -13,6 +13,11 @@ import org.mule.runtime.core.internal.connection.ConnectivityTester;
 import org.mule.runtime.core.internal.connection.ConnectivityTesterFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
+/**
+ * Implementation of {@link ConnectivityTesterFactory} that doesn't do any connectivity testing.
+ *
+ * @since 4.4
+ */
 public class NoOpConnectivityTesterFactory implements ConnectivityTesterFactory {
 
   @Override

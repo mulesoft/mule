@@ -87,9 +87,8 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
           @Override
           public void doWork(RetryContext context) throws Exception {
             try {
-              Lock lock = testConnectivityLock;
-              if (lock != null) {
-                final boolean lockAcquired = lock.tryLock();
+              if (testConnectivityLock != null) {
+                final boolean lockAcquired = testConnectivityLock.tryLock();
                 if (lockAcquired) {
                   LOGGER.debug("Doing testConnectivity() for config '{}'", name);
                   try {
@@ -97,21 +96,10 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
                     if (result.isValid()) {
                       context.setOk();
                     } else {
-                      if ((reconnectionConfig.isFailsDeployment())) {
-                        context.setFailed(result.getException());
-                        throw new ConnectionException(format("Connectivity test failed for config '%s'", name),
-                                                      result.getException());
-                      } else {
-                        if (LOGGER.isInfoEnabled()) {
-                          LOGGER
-                              .info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: %s",
-                                           name, result.getMessage()),
-                                    result.getException());
-                        }
-                      }
+                      handleTestConnectivityFailure(name, reconnectionConfig, context, result);
                     }
                   } finally {
-                    lock.unlock();
+                    testConnectivityLock.unlock();
                   }
                 } else {
                   LOGGER.warn("There is a testConnectivity() already running for config '{}'", name);
@@ -168,6 +156,21 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
         }
       }
     };
+  }
+
+  private void handleTestConnectivityFailure(String name, ReconnectionConfig reconnectionConfig, RetryContext context,
+                                             ConnectionValidationResult result)
+      throws ConnectionException {
+    if ((reconnectionConfig.isFailsDeployment())) {
+      context.setFailed(result.getException());
+      throw new ConnectionException(format("Connectivity test failed for config '%s'", name), result.getException());
+    } else {
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: %s",
+                           name, result.getMessage()),
+                    result.getException());
+      }
+    }
   }
 
   private boolean getDoTestConnectivityProperty() {

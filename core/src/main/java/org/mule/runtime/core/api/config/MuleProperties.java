@@ -48,6 +48,7 @@ public class MuleProperties {
   public static final String MULE_ORIGINATING_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ORIGINATING_ENDPOINT";
   public static final String MULE_ERROR_CODE_PROPERTY = PROPERTY_PREFIX + "ERROR_CODE";
   public static final String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";
+
   /**
    * Prevents processing of the ReplyTo property by the Service. This is useful if you're component routed the message somewhere
    * else which processed the ReplyTo.
@@ -152,12 +153,14 @@ public class MuleProperties {
   public static final String OBJECT_LOCK_PROVIDER = "_muleLockProvider";
   public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
   public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
+
   /**
    * Registry key for {@link DefaultConnectivityTesterFactory}
    *
    * @since 4.4
    */
   public static final String OBJECT_CONNECTIVITY_TESTER_FACTORY = "_muleConnectivityTesterFactory";
+
   /**
    * Registry key for {@link CursorDecoratorFactory}
    *
