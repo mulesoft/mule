@@ -1117,7 +1117,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                    actualZips, arrayContaining(expectedZips));
       }
 
-      if (expectedZips.length == 0) {
+      if (expectedArtifacts.length == 0) {
         assertThat("Invalid Mule exploded artifact set",
                    actualArtifacts, arrayWithSize(0));
       } else {
