@@ -22,7 +22,7 @@ public interface ComponentInnerProcessor extends ReactiveProcessor {
   /**
    * Indicates that the component is blocking.
    *
-   * @return {@code} if the processor will jump threads.
+   * @return {@code} if the processor is blocking.
    */
   boolean isBlocking();
 
