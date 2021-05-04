@@ -31,9 +31,4 @@ public abstract class TestComponentMessageProcessor extends ComponentMessageProc
     super(extensionModel, componentModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
           retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer, terminationTimeout);
   }
-
-  @Override
-  protected boolean honourOperationRetryPolicyOverride() {
-    return true;
-  }
 }
