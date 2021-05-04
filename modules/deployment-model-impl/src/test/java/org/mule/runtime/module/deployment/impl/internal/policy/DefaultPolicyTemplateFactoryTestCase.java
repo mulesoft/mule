@@ -93,7 +93,8 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
     PolicyTemplateClassLoaderBuilder policyTemplateClassLoaderBuilder = createPolicyTemplateClassLoaderBuilder(regionClassLoader);
     MuleDeployableArtifactClassLoader policyClassLoader = mock(MuleDeployableArtifactClassLoader.class);
 
-    List<String> pluginNames = Arrays.asList("plugin 1", "plugin 2", "plugin 3", "plugin 4", "plugin 5", "plugin 6", "plugin 7", "plugin 8", "plugin 9");
+    List<String> pluginNames =
+        Arrays.asList("plugin 1", "plugin 2", "plugin 3", "plugin 4", "plugin 5", "plugin 6", "plugin 7", "plugin 8", "plugin 9");
     List<ArtifactPluginDescriptor> pluginDescriptors = new ArrayList<>(pluginNames.size());
     List<ArtifactClassLoader> pluginArtifactClassLoaders = new ArrayList<>(pluginNames.size());
     pluginNames.forEach(pluginName -> {

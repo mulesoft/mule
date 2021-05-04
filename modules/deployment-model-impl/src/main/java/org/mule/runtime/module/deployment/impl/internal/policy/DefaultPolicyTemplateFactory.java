@@ -101,17 +101,17 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
                                                          List<ArtifactPluginDescriptor> ownResolvedPluginDescriptors,
                                                          MuleDeployableArtifactClassLoader ownPolicyClassLoader) {
     return ownResolvedPluginDescriptors.stream()
-            .map(pluginDescriptor -> artifactPlugins.stream()
-                    .filter(artifactPlugin -> artifactPlugin.getDescriptor().getName().equals(pluginDescriptor.getName())).findFirst()
-                    .orElseGet(() -> new DefaultArtifactPlugin(getArtifactPluginId(ownPolicyClassLoader.getArtifactId(),
-                            pluginDescriptor.getName()),
-                            pluginDescriptor, ownPolicyClassLoader
-                            .getArtifactPluginClassLoaders().stream()
-                            .filter(artifactClassLoader -> artifactClassLoader
-                                    .getArtifactId()
-                                    .endsWith(pluginDescriptor.getName()))
-                            .findFirst().get())))
-            .collect(toList());
+        .map(pluginDescriptor -> artifactPlugins.stream()
+            .filter(artifactPlugin -> artifactPlugin.getDescriptor().getName().equals(pluginDescriptor.getName())).findFirst()
+            .orElseGet(() -> new DefaultArtifactPlugin(getArtifactPluginId(ownPolicyClassLoader.getArtifactId(),
+                                                                           pluginDescriptor.getName()),
+                                                       pluginDescriptor, ownPolicyClassLoader
+                                                           .getArtifactPluginClassLoaders().stream()
+                                                           .filter(artifactClassLoader -> artifactClassLoader
+                                                               .getArtifactId()
+                                                               .endsWith(pluginDescriptor.getName()))
+                                                           .findFirst().get())))
+        .collect(toList());
   }
 
   private List<ArtifactPluginDescriptor> resolvePolicyPluginDescriptors(Application application,
