@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -41,7 +42,6 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Rule;
@@ -93,7 +93,7 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
     MuleDeployableArtifactClassLoader policyClassLoader = mock(MuleDeployableArtifactClassLoader.class);
 
     List<String> pluginNames =
-        Arrays.asList("plugin 1", "plugin 2", "plugin 3", "plugin 4", "plugin 5", "plugin 6", "plugin 7", "plugin 8", "plugin 9");
+        asList("plugin 1", "plugin 2", "plugin 3", "plugin 4", "plugin 5", "plugin 6", "plugin 7", "plugin 8", "plugin 9");
     List<ArtifactPluginDescriptor> pluginDescriptors = new ArrayList<>(pluginNames.size());
     List<ArtifactClassLoader> pluginArtifactClassLoaders = new ArrayList<>(pluginNames.size());
     pluginNames.forEach(pluginName -> {
