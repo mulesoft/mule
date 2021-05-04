@@ -688,7 +688,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       };
 
       return from(processingStrategy
-          .configureInternalPublisher(from(p))
+          .configureInternalPublisher(from(p)
               .transform(processingStrategy.onProcessor(innerProcessor))
               .doOnNext(result -> {
                 from(result)
