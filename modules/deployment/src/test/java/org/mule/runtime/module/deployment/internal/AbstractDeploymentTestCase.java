@@ -14,6 +14,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -25,15 +26,15 @@ import static org.apache.commons.lang.reflect.FieldUtils.readDeclaredStaticField
 import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticField;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
@@ -52,8 +54,6 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
-import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
@@ -71,7 +71,6 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
@@ -100,8 +99,10 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -439,6 +440,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
           .dependingOn(exceptionThrowingPlugin);
 
   private File muleHome;
+  protected final boolean parallelDeployment;
   protected File appsDir;
   protected File domainsDir;
   protected ServiceManager serviceManager;
@@ -455,9 +457,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   public SystemProperty changeChangeInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "10");
 
   @Rule
-  public SystemProperty parallelDeployment;
-
-  @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");
 
   @Rule
@@ -466,13 +465,15 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private File services;
 
   public AbstractDeploymentTestCase(boolean parallelDeployment) {
-    if (parallelDeployment) {
-      this.parallelDeployment = new SystemProperty(PARALLEL_DEPLOYMENT_PROPERTY, "");
-    }
+    this.parallelDeployment = parallelDeployment;
   }
 
   @Before
   public void setUp() throws Exception {
+    if (parallelDeployment) {
+      setProperty(PARALLEL_DEPLOYMENT_PROPERTY, "");
+    }
+
     final String tmpDir = getProperty("java.io.tmpdir");
     muleHome = new File(new File(tmpDir, "mule_home"), getClass().getSimpleName() + currentTimeMillis());
     appsDir = new File(muleHome, "apps");
@@ -524,9 +525,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   @After
   public void undeployApps() {
-    if (deploymentService != null) {
-      deploymentService.getApplications().forEach(app -> deploymentService.undeploy(app.getArtifactName()));
-    }
+    deploymentService.getApplications().forEach(app -> deploymentService.undeploy(app.getArtifactName()));
     TestApplicationFactory.after();
   }
 
@@ -561,12 +560,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       extensionModelLoaderManager.stop();
     }
 
-    deleteTree(muleHome);
+    FileUtils.deleteTree(muleHome);
 
     // this is a complex classloader setup and we can't reproduce standalone Mule 100%,
     // so trick the next test method into thinking it's the first run, otherwise
     // app resets CCL ref to null and breaks the next test
-    currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+    Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+
+    if (parallelDeployment) {
+      System.clearProperty(PARALLEL_DEPLOYMENT_PROPERTY);
+    }
   }
 
   protected void alterTimestampIfNeeded(File file, long firstTimestamp) {
@@ -1105,25 +1108,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private void assertArtifactDir(File artifactDir, String[] expectedZips, String[] expectedArtifacts, boolean performValidation) {
-    final String[] actualZips = artifactDir.list(JAR_ARTIFACT_FILTER);
-    final String[] actualArtifacts = artifactDir.list(DIRECTORY);
-
+    final String[] actualZips = artifactDir.list(MuleDeploymentService.JAR_ARTIFACT_FILTER);
     if (performValidation) {
-      if (expectedZips.length == 0) {
-        assertThat("Invalid Mule artifact archives set",
-                   actualZips, arrayWithSize(0));
-      } else {
-        assertThat("Invalid Mule artifact archives set",
-                   actualZips, arrayContaining(expectedZips));
-      }
-
-      if (expectedArtifacts.length == 0) {
-        assertThat("Invalid Mule exploded artifact set",
-                   actualArtifacts, arrayWithSize(0));
-      } else {
-        assertThat("Invalid Mule exploded artifact set",
-                   actualArtifacts, arrayContaining(expectedArtifacts));
-      }
+      assertArrayEquals("Invalid Mule artifact archives set", expectedZips, actualZips);
+    }
+    final String[] actualArtifacts = artifactDir.list(DIRECTORY);
+    if (performValidation) {
+      assertTrue("Invalid Mule exploded artifact set",
+                 isEqualCollection(asList(expectedArtifacts), asList(actualArtifacts)));
     }
   }
 
@@ -1233,7 +1225,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     lock.lock();
     try {
       File tempFolder = new File(muleHome, artifactName);
-      unzip(new File(url.toURI()), tempFolder);
+      FileUtils.unzip(new File(url.toURI()), tempFolder);
 
       // Under some platforms, file.lastModified is managed at second level, not milliseconds.
       // Need to update the config file lastModified ere to ensure that is different from previous value
@@ -1245,7 +1237,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       File appFolder = new File(destinationDir, artifactName);
 
       if (appFolder.exists()) {
-        deleteTree(appFolder);
+        FileUtils.deleteTree(appFolder);
       }
 
       moveDirectory(tempFolder, appFolder);

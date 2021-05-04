@@ -6,25 +6,21 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.module.deployment.api.StartupListener;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 
-public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
+@RunWith(MockitoJUnitRunner.class)
+public class MuleDeploymentServiceTestCase {
 
   private static final int NUMBER_OF_LISTENER_SUBSCRIBERS = 0;
 
@@ -60,7 +56,7 @@ public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private static class ListenerSubscriber implements Runnable {
 
-    private final MuleDeploymentService deploymentService;
+    private MuleDeploymentService deploymentService;
 
     public ListenerSubscriber(MuleDeploymentService deploymentService) {
       this.deploymentService = deploymentService;
@@ -68,8 +64,12 @@ public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
 
     @Override
     public void run() {
-      deploymentService.addStartupListener(() -> {
-        // Do nothing
+      deploymentService.addStartupListener(new StartupListener() {
+
+        @Override
+        public void onAfterStartup() {
+          // Do nothing
+        }
       });
     }
   }

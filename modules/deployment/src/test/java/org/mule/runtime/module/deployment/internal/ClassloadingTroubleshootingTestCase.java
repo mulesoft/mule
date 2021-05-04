@@ -90,9 +90,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   @Override
   public void tearDown() throws Exception {
     super.tearDown();
-    if (appender != null) {
-      appender.tearDown();
-    }
+    appender.tearDown();
   }
 
   @Test

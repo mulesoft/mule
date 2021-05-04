@@ -57,6 +57,8 @@ import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowStatePersistenceStory.FLOW_STATE_PERSISTENCE;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -88,14 +90,11 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.qameta.allure.Story;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 
 /**
  * Contains test for application deployment on the default domain
@@ -106,7 +105,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   private static final String OVERWRITTEN_PROPERTY_SYSTEM_VALUE = "nonExistent.yaml";
   private static final String OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE = "someProps.yaml";
 
-  protected static ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
+  protected ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
 
   @Rule
   public SystemProperty systemProperty = new SystemProperty(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_SYSTEM_VALUE);
@@ -1447,14 +1446,17 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     // Application was deployed
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(
+                                                                 dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(
+                                                                   dummyAppDescriptorFileBuilder.getId());
 
     // Redeploy by using deploy method
     deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
-    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(
+                                                                   dummyAppDescriptorFileBuilder.getId());
   }
 
   private void testTempFileOnRedeployment(CheckedRunnable deployApp, CheckedRunnable redeployApp) throws Exception {

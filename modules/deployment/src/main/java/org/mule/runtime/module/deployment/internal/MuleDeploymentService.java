@@ -15,21 +15,17 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.ParallelDeploymentDirectoryWatcher.MAX_APPS_IN_PARALLEL_DEPLOYMENT;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -54,7 +50,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -71,12 +66,10 @@ public class MuleDeploymentService implements DeploymentService {
   public static final IOFileFilter JAR_ARTIFACT_FILTER =
       new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX), FileFileFilter.FILE);
   public static final String PARALLEL_DEPLOYMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "deployment.parallel";
-  private static final int MAX_QUEUED_STARTING_ARTIFACTS = 256;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
   // fair lock
   private final ReentrantLock deploymentLock = new DebuggableReentrantLock(true);
-  private final LazyValue<Scheduler> artifactStartExecutor;
 
   private final ObservableList<Application> applications = new ObservableList<>();
   private final ObservableList<Domain> domains = new ObservableList<>();
@@ -94,16 +87,11 @@ public class MuleDeploymentService implements DeploymentService {
   private final DomainBundleArchiveDeployer domainBundleDeployer;
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
-                               Supplier<SchedulerService> artifactStartExecutorSupplier) {
-    artifactStartExecutor = new LazyValue<>(() -> artifactStartExecutorSupplier.get()
-        .customScheduler(config()
-            .withName("ArtifactDeployer.start")
-            .withMaxConcurrentTasks(useParallelDeployment() ? MAX_APPS_IN_PARALLEL_DEPLOYMENT : 1),
-                         MAX_QUEUED_STARTING_ARTIFACTS));
+                               Supplier<SchedulerService> schedulerServiceSupplier) {
     // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
     // artifact plugins.
-    ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
-    ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
+    ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();
+    ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>();
 
     this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
                                                             NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
@@ -126,16 +114,16 @@ public class MuleDeploymentService implements DeploymentService {
       this.deploymentDirectoryWatcher =
           new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
                                                  applications,
-                                                 artifactStartExecutorSupplier, deploymentLock);
+                                                 schedulerServiceSupplier, deploymentLock);
     } else {
       this.deploymentDirectoryWatcher =
           new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
-                                         artifactStartExecutorSupplier,
+                                         schedulerServiceSupplier,
                                          deploymentLock);
     }
   }
 
-  static boolean useParallelDeployment() {
+  private boolean useParallelDeployment() {
     return getProperties().containsKey(PARALLEL_DEPLOYMENT_PROPERTY);
   }
 
@@ -171,7 +159,6 @@ public class MuleDeploymentService implements DeploymentService {
   @Override
   public void stop() {
     deploymentDirectoryWatcher.stop();
-    artifactStartExecutor.ifComputed(ExecutorService::shutdownNow);
   }
 
   @Override

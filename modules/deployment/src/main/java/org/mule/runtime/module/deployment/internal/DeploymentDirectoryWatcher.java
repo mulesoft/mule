@@ -8,18 +8,19 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
 import static java.util.Arrays.sort;
-import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.collections.CollectionUtils.find;
+import static org.apache.commons.collections.CollectionUtils.subtract;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
@@ -39,17 +40,18 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -130,14 +132,14 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
     });
     this.schedulerServiceSupplier = schedulerServiceSupplier;
-    this.applicationTimestampListener = new ArtifactTimestampListener<>(applications);
-    this.domainTimestampListener = new ArtifactTimestampListener<>(domains);
+    this.applicationTimestampListener = new ArtifactTimestampListener(applications);
+    this.domainTimestampListener = new ArtifactTimestampListener(domains);
   }
 
   /**
    * Starts the process of deployment / undeployment of artifact.
    * <p/>
-   * It will schedule a task for periodically scan the deployment directories.
+   * It wil schedule a task for periodically scan the deployment directories.
    */
   public void start() {
     deploymentLock.lock();
@@ -344,10 +346,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   public <T extends Artifact> T findArtifact(String artifactName, ObservableList<T> artifacts) {
-    return artifacts.stream()
-        .filter(artifact -> artifact.getArtifactName().equals(artifactName))
-        .findFirst()
-        .orElse(null);
+    return (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
   }
 
   private void undeployRemovedDomains() {
@@ -371,11 +370,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
       logger.debug(sb.toString());
     }
 
-    final Set<String> currentAnchorsSet = stream(currentAnchors).collect(toSet());
-    Collection<String> deletedAnchors = stream(findExpectedAnchorFiles(artifacts))
-        .filter(a -> !currentAnchorsSet.contains(a))
-        .collect(toList());
-
+    String[] artifactAnchors = findExpectedAnchorFiles(artifacts);
+    @SuppressWarnings("unchecked")
+    final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append(format("Deleted anchors:%n"));
