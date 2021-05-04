@@ -9,11 +9,12 @@ package org.mule.runtime.core.internal.processor.strategy;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 /**
- * Specialization of {@link ReactiveProcessor} that allows performing certain optimizations when the processor is not blocking, as
- * indicated by its {@link #isBlocking()} method.
+ * Specialization of {@link ReactiveProcessor} that allows execution of a mule component taking into account its processing
+ * strategy when it has to be decoupled from a policy (see MULE-17939). This allows performing certain optimizations when the
+ * processor is not blocking, as indicated by its {@link #isBlocking()} method.
  * </p>
- * <b>IMPORTANT!</b> The processing strategy will delegate the parallel processing of events to the implementation if it is
- * not blocking, so it is required that implementations properly handle parallel processing in this case.
+ * <b>IMPORTANT!</b> The processing strategy will delegate the parallel processing of events to the implementation if the
+ * component is not blocking, so it is required that implementations properly handle parallel processing in this case.
  *
  * @since 4.3
  */
