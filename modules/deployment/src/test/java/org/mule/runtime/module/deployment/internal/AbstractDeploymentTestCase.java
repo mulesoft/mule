@@ -1106,24 +1106,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   private void assertArtifactDir(File artifactDir, String[] expectedZips, String[] expectedArtifacts, boolean performValidation) {
     final String[] actualZips = artifactDir.list(JAR_ARTIFACT_FILTER);
-    final String[] actualArtifacts = artifactDir.list(DIRECTORY);
-
     if (performValidation) {
-      if (expectedZips.length == 0) {
-        assertThat("Invalid Mule artifact archives set",
-                   actualZips, arrayWithSize(0));
-      } else {
-        assertThat("Invalid Mule artifact archives set",
-                   actualZips, arrayContaining(expectedZips));
-      }
-
-      if (expectedArtifacts.length == 0) {
-        assertThat("Invalid Mule exploded artifact set",
-                   actualArtifacts, arrayWithSize(0));
-      } else {
-        assertThat("Invalid Mule exploded artifact set",
-                   actualArtifacts, arrayContaining(expectedArtifacts));
-      }
+      assertThat("Invalid Mule artifact archives set", actualZips,
+                 expectedZips.length == 0 ? arrayWithSize(0) : arrayContaining(expectedZips));
+    }
+    final String[] actualArtifacts = artifactDir.list(DIRECTORY);
+    if (performValidation) {
+      assertThat("Invalid Mule exploded artifact set", actualArtifacts,
+                 expectedArtifacts.length == 0 ? arrayWithSize(0) : arrayContainingInAnyOrder(expectedArtifacts));
     }
   }
 
