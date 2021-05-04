@@ -175,7 +175,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   }
 
   @Override
-  // TODO: Adjust the interface javadoc (does not match this implementation that can only return an implicit configuration)
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
                                                                   ComponentModel componentModel,
                                                                   CoreEvent muleEvent) {
@@ -193,7 +192,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   }
 
   @Override
-  // TODO: Adjust the interface javadoc (does not match this implementation that can only return an implicit configuration)
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
     Set<ConfigurationModel> configurationsForComponent = getConfigurationForComponent(extensionModel, componentModel);
     Optional<ConfigurationModel> extensionConfigurationModel =
