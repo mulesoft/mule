@@ -576,11 +576,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     }
 
     @Override
-    protected boolean honourOperationRetryPolicyOverride() {
-      return true;
-    }
-
-    @Override
     protected void executeOperation(ExecutionContextAdapter<OperationModel> operationContext,
                                     CompletableComponentExecutor.ExecutorCallback callback) {
       lastOperationExecutionMDC = MDC.getCopyOfContextMap();

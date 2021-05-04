@@ -13,8 +13,6 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -62,10 +60,27 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -81,15 +96,12 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
-import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
@@ -103,7 +115,7 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
-import org.mule.runtime.core.internal.processor.strategy.OperationInnerProcessor;
+import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
@@ -136,6 +148,8 @@ import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
+import org.mule.runtime.module.extension.internal.runtime.operation.retry.ComponentRetryPolicyTemplateResolver;
+import org.mule.runtime.module.extension.internal.runtime.operation.retry.RetryPolicyTemplateResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigOverrideValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -149,31 +163,12 @@ import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDeleg
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
 /**
@@ -211,7 +206,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private final ReflectionCache reflectionCache;
   private final ResultTransformer resultTransformer;
-  private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
 
   protected final ExtensionModel extensionModel;
   private final boolean hasNestedChain;
@@ -238,9 +232,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private CursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
-
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -307,26 +298,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
-    final boolean async = isAsync();
+    final boolean mayJumpThreads = mayJumpThreads();
     final ComponentLocation location = getLocation();
 
     return subscriberContext()
         .flatMapMany(ctx -> {
-          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, async, ctx)
+          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, mayJumpThreads, ctx)
               .doOnNext(result -> {
-                result.apply(me -> {
-                  final CoreEvent event = ((MessagingException) me).getEvent();
-                  final SdkInternalContext sdkCtx =
-                      from(event);
-                  if (sdkCtx != null) {
-                    sdkCtx.removeContext(location, event.getContext().getId());
-                  }
-                }, response -> {
-                  final SdkInternalContext sdkCtx = from(response);
-                  if (sdkCtx != null) {
-                    sdkCtx.removeContext(location, response.getContext().getId());
-                  }
-                });
+                removeSdkInternalContextFromResult(location, result);
               })
               .map(propagateErrorResponseMapper());
 
@@ -342,9 +321,21 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         });
   }
 
+  private void removeSdkInternalContextFromResult(final ComponentLocation location, Either<Throwable, CoreEvent> result) {
+    result.apply(me -> removeSdkInternalContext(location, ((MessagingException) me).getEvent()),
+                 response -> removeSdkInternalContext(location, response));
+  }
+
+  private void removeSdkInternalContext(final ComponentLocation location, final CoreEvent event) {
+    final SdkInternalContext sdkCtx = from(event);
+    if (sdkCtx != null) {
+      sdkCtx.removeContext(location, event.getContext().getId());
+    }
+  }
+
   private Flux<Either<Throwable, CoreEvent>> createOuterFlux(final Flux<CoreEvent> publisher,
                                                              final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook,
-                                                             final boolean async, Context ctx) {
+                                                             final boolean mayJumpThreads, Context ctx) {
     final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
@@ -396,7 +387,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 }
               };
 
-              if (!async && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
+              if (!mayJumpThreads && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
                 onEvent(event, executorCallback, ctx);
@@ -427,7 +418,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public ProcessingType getProcessingType() {
-    if (isAsync()) {
+    if (mayJumpThreads()) {
       // In this case, any thread switch will be done in the innerFlux
       return CPU_LITE;
     } else {
@@ -589,7 +580,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
                                          getCursorProviderFactory(), componentDecoratorFactory, streamingManager, this,
-                                         getRetryPolicyTemplate(configuration), currentScheduler, transactionConfig, muleContext);
+                                         retryPolicyResolver.apply(configuration), currentScheduler, transactionConfig,
+                                         muleContext);
   }
 
   @Override
@@ -646,7 +638,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
     // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
-      final OperationInnerProcessor innerProcessor = new OperationInnerProcessor() {
+      final ComponentInnerProcessor innerProcessor = new ComponentInnerProcessor() {
 
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
@@ -695,8 +687,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
 
         @Override
-        public boolean isAsync() {
-          return ComponentMessageProcessor.this.isAsync();
+        public boolean isBlocking() {
+          return ComponentMessageProcessor.this.isBlocking();
         }
       };
 
@@ -825,73 +817,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void initRetryPolicyResolver() {
     Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
+    RetryPolicyTemplateResolver policyResolver = getRetryPolicyTemplateResolver();
     if (staticConfig.isPresent() || !requiresConfig()) {
-      RetryPolicyTemplate staticPolicy = fetchRetryPolicyTemplate(staticConfig);
+      RetryPolicyTemplate staticPolicy = policyResolver.fetchRetryPolicyTemplate(staticConfig);
       retryPolicyResolver = config -> staticPolicy;
     } else {
-      retryPolicyResolver = this::fetchRetryPolicyTemplate;
+      retryPolicyResolver = policyResolver::fetchRetryPolicyTemplate;
     }
   }
 
-  private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
-    return retryPolicyResolver.apply(configuration);
-  }
-
-  private RetryPolicyTemplate fetchRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
-    return resolveDelegateForComponentUsing(configuration);
-  }
-
-  private RetryPolicyTemplate resolveDelegateForComponentUsing(Optional<ConfigurationInstance> configuration) {
-    RetryPolicyTemplate delegate = retryPolicyTemplate;
-
-    if (honourOperationRetryPolicyOverride()) {
-      return resolveHonouringRetryPolicyTemplateOverride(configuration, delegate);
-    } else {
-
-      // Previous behavior was to resolve the retry policy taking into account the connection level config
-      // which resolves the retry policy according to failDeployment and system properties for the source.
-      // This should not be taken into account for operations/components but is left for preserving
-      // previous behavior
-      return resolveWithoutHonouringRetryPolicyTemplateOverride(configuration, delegate);
-    }
-  }
-
-  private RetryPolicyTemplate resolveWithoutHonouringRetryPolicyTemplateOverride(Optional<ConfigurationInstance> configuration,
-                                                                                 RetryPolicyTemplate delegate) {
-    if (delegate != null) {
-      delegate = configuration
-          .map(config -> config.getConnectionProvider().orElse(null))
-          .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(retryPolicyTemplate))
-          .orElse(retryPolicyTemplate);
-    }
-
-    if (delegate == null) {
-      delegate = resolveRetryTemplateFromConnectionConfig(configuration);
-    }
-
-    return delegate;
-  }
-
-  private RetryPolicyTemplate resolveHonouringRetryPolicyTemplateOverride(Optional<ConfigurationInstance> configuration,
-                                                                          RetryPolicyTemplate delegate) {
-    if (delegate == null) {
-      delegate = resolveRetryTemplateFromConnectionConfig(configuration);
-      // If the retry policy is async we must unwrap the policy for the operation.
-      if (delegate.isAsync()) {
-        delegate = ((AsynchronousRetryTemplate) delegate).getDelegate();
-      }
-    }
-
-    return delegate;
-  }
-
-  private RetryPolicyTemplate resolveRetryTemplateFromConnectionConfig(Optional<ConfigurationInstance> configuration) {
-    RetryPolicyTemplate delegate;
-    delegate = configuration
-        .map(config -> config.getConnectionProvider().orElse(null))
-        .map(provider -> connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider))
-        .orElse(fallbackRetryPolicyTemplate);
-    return delegate;
+  protected RetryPolicyTemplateResolver getRetryPolicyTemplateResolver() {
+    return new ComponentRetryPolicyTemplateResolver(retryPolicyTemplate, connectionManager);
   }
 
   private CompletableComponentExecutor<T> createComponentExecutor(CursorComponentDecoratorFactory componentDecoratorFactory)
@@ -1081,7 +1017,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return true;
   }
 
-  protected boolean isAsync() {
+
+  protected boolean isBlocking() {
+    return !mayJumpThreads();
+  }
+
+  /**
+   * This indicates that the component message processor may jump threads under certain conditions (not necessarily always). For
+   * example, it may jump threads only when a connection problem happens and the retry strategy is triggered.
+   * 
+   * @return whether it may jump threads.
+   */
+  protected boolean mayJumpThreads() {
     if (!requiresConfig()) {
       return false;
     }
@@ -1099,16 +1046,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   protected boolean isAsyncExecutableBasedOn(Optional<ConfigurationInstance> staticConfig) {
-    RetryPolicyTemplate resolvedRetryPolicyTemplate = getRetryPolicyTemplate(staticConfig);
-
-    if (resolveExecutionModeBasedOnAsyncReconnectionPolicy()) {
-      return resolvedRetryPolicyTemplate.isEnabled() && resolvedRetryPolicyTemplate.isAsync();
-    }
-
-    // By default the operation will be executed in async mode if it has a reconnection
-    // strategy regardless it is async or sync (this may result in some performance bottlenecks
-    // and has to be reviewed see MULE-19346 MULE-19342)
-    return resolvedRetryPolicyTemplate.isEnabled();
+    return retryPolicyResolver.apply(staticConfig).isEnabled();
   }
 
   @Override
@@ -1356,26 +1294,4 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return location != null ? location.getLocation() : super.toString();
   }
 
-  public static void configureHonourRetryPolicyTemplateOverrideFeature() {
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-
-    ffRegistry.registerFeature(HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.atLeast("4.4.0")).orElse(false));
-
-  }
-
-  public static void configureResolveExuectionModeBasedOnEnabledReconnectionStrategy() {
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-
-    ffRegistry.registerFeature(RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY,
-                               ctx -> false);
-  }
-
-  public boolean resolveExecutionModeBasedOnAsyncReconnectionPolicy() {
-    return featureFlaggingService.isEnabled(RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY);
-  }
-
-  protected boolean honourOperationRetryPolicyOverride() {
-    return featureFlaggingService.isEnabled(HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE);
-  }
 }
