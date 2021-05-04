@@ -682,6 +682,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
 
         @Override
+        public ProcessingType getProcessingType() {
+          return getInnerProcessingType();
+        }
+
+        @Override
         public boolean isBlocking() {
           return ComponentMessageProcessor.this.isBlocking();
         }
