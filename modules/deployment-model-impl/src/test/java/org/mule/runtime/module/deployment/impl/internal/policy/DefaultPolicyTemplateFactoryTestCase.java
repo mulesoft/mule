@@ -23,7 +23,6 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultPol
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import io.qameta.allure.Issue;
-import org.junit.Before;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
