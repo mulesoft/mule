@@ -117,7 +117,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
@@ -232,9 +231,11 @@ public final class XmlExtensionLoaderDelegate {
   private static final String XML_SUFFIX = ".xml";
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
+  // Set a conservative value for how big the pool can get
+  private static final int FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE = max(1, getRuntime().availableProcessors() / 2);
   private static final PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL =
       new ConcurrentPool<>(new ConcurrentLinkedQueueCollection<>(), new ForTnsTransformerFactory(), 1,
-                           max(1, getRuntime().availableProcessors() / 2), false);
+                           FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE, false);
 
   private static final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
       newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
@@ -369,10 +370,7 @@ public final class XmlExtensionLoaderDelegate {
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
     final Transformer transformer = FOR_TNS_XSTL_TRANSFORMER_POOL.take();
     try (BufferedInputStream resourceIS = new BufferedInputStream(resource.openStream())) {
-      final Source moduleToTransform = new StreamSource(resourceIS);
-      synchronized (transformer) {
-        transformer.transform(moduleToTransform, new StreamResult(resultStream));
-      }
+      transformer.transform(new StreamSource(resourceIS), new StreamResult(resultStream));
     } catch (TransformerException e) {
       throw new MuleRuntimeException(createStaticMessage(format("There was an issue transforming the stream for the resource %s while trying to remove the content of the <body> element to generate an XSD",
                                                                 resource.getFile())),
@@ -388,7 +386,7 @@ public final class XmlExtensionLoaderDelegate {
         .build();
 
     ArtifactAst transformedModuleAst =
-        xmlToAstParser.parse("transformed_" + resource.getFile(), new ByteArrayInputStream(resultStream.toByteArray()));
+        xmlToAstParser.parse("transformed_" + resource.getFile(), resultStream.toInputStream());
 
     if (transformedModuleAst.topLevelComponentsStream().findFirst().get().getRawParameterValue(XMLNS_TNS).isPresent()) {
       loadModuleExtension(extensionDeclarer, transformedModuleAst, true);

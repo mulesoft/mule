@@ -24,13 +24,14 @@ import org.vibur.objectpool.PoolObjectFactory;
 
 public class ForTnsTransformerFactory implements PoolObjectFactory<Transformer> {
 
+  private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
   private static final String TRANSFORMATION_FOR_TNS_RESOURCE = "META-INF/transform_for_tns.xsl";
 
   @Override
   public Transformer create() {
     try (InputStream in = new BufferedInputStream(XmlExtensionLoaderDelegate.class.getClassLoader()
         .getResourceAsStream(TRANSFORMATION_FOR_TNS_RESOURCE))) {
-      return TransformerFactory.newInstance().newTransformer(new StreamSource(in));
+      return TRANSFORMER_FACTORY.newTransformer(new StreamSource(in));
     } catch (TransformerException | IOException e) {
       throw new MuleRuntimeException(createStaticMessage(format("There was an issue creating the transformer to remove the content of the <body> element to generate an XSD")),
                                      e);
@@ -49,7 +50,7 @@ public class ForTnsTransformerFactory implements PoolObjectFactory<Transformer> 
 
   @Override
   public void destroy(Transformer obj) {
-    // Nothing to do
+    obj.reset();
   }
 
 }
