@@ -42,7 +42,15 @@ public interface ImplicitConfigurationProviderFactory {
                                                             ExpressionManager expressionManager,
                                                             MuleContext muleContext);
 
-  // TODO: Javadoc
+  /**
+   * Returns an implicit {@link ConfigurationProvider} name, that can be used to look it up.
+   *
+   * @param extensionModel     The configurable {@link ExtensionModel}.
+   * @param configurationModel The {@link ConfigurationModel} that represents the extensionModel configuration.
+   * @param muleContext        The corresponding {@link MuleContext}.
+   * @return The {@link ConfigurationProvider} name.
+   * @see org.mule.runtime.module.extension.internal.manager.ExtensionRegistry#getConfigurationProvider(String)
+   */
   String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel,
                                                   MuleContext muleContext);
 

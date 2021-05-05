@@ -9,6 +9,8 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
+import static java.util.Collections.singleton;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
@@ -53,7 +55,6 @@ import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.policy.api.PolicyPointcut;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -135,14 +136,14 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   }
 
   /**
-   * Applies the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} to the policy artifact plugins list.
+   * Applies the {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature to the policy artifact plugins list.
    *
    * @return The policy artifact plugins.
    */
   private List<ArtifactPlugin> featureFlaggedArtifactPlugins() {
     // TODO: Create MULE with necessary FeatureFlaggingService improvements and list it here
     boolean isPolicyIsolationEnabled;
-    Optional<String> policyIsolationPropertyName = MuleRuntimeFeature.ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName();
+    Optional<String> policyIsolationPropertyName = ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName();
     if (policyIsolationPropertyName.isPresent() && getProperty(policyIsolationPropertyName.get()) != null) {
       isPolicyIsolationEnabled = getBoolean(policyIsolationPropertyName.get());
     } else {
@@ -159,7 +160,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   /**
    * {@link ExtensionManagerFactory} that defers the decision of the {@link ExtensionManager} implementation until the MuleContext
-   * is available, in order to apply the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
+   * is available, in order to apply the {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature flag.
    *
    * @return {@link ExtensionManagerFactory} instance.
    */
@@ -168,7 +169,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
       try {
         FeatureFlaggingService featureFlaggingService =
             ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(FeatureFlaggingService.class);
-        if (featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)) {
+        if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
           // The policy will not share extension models and configuration providers with the application that is being applied to.
           ArtifactExtensionManagerFactory artifactExtensionManagerFactory =
               new ArtifactExtensionManagerFactory(template.getOwnArtifactPlugins(), extensionModelLoaderRepository,
@@ -177,7 +178,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
           Optional<ExtensionModel> httpExtensionModel =
               application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("HTTP");
           if (httpExtensionModel.isPresent()) {
-            return artifactExtensionManagerFactory.create(muleContext, Collections.singleton(httpExtensionModel.get()));
+            return artifactExtensionManagerFactory.create(muleContext, singleton(httpExtensionModel.get()));
           } else {
             return artifactExtensionManagerFactory.create(muleContext);
           }

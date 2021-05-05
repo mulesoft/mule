@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigurationForComponent;
@@ -90,7 +91,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
     extensionActivator = new ExtensionActivator(muleContext);
     try {
-      muleContext.getInjector().inject(implicitConfigurationProviderFactory);
+      initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }

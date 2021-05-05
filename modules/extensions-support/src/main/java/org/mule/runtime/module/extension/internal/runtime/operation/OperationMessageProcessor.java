@@ -7,15 +7,16 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -26,7 +27,6 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -143,8 +143,8 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   private void validatePolicyIsolation(ConfigurationProvider configurationProvider) {
-    if (featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)
-        && muleContext.getArtifactType().equals(ArtifactType.POLICY)
+    if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)
+        && muleContext.getArtifactType().equals(POLICY)
         && configurationProvider.getExtensionModel() != extensionModel) {
       throw new IllegalOperationException(format(
                                                  "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
