@@ -97,8 +97,41 @@
         }
       },
       "nodeMappings": {
+        "org.mule.test.vegan.extension.VeganPolicy": {
+          "mapping": {
+            "meetAllowed": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "ingredients": {
+              "range": "org.mule.test.vegan.extension.VeganIngredients",
+              "mandatory": true
+            },
+            "maxCalories": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "Connection": {
-          "mapping": {}
+          "mapping": {
+            "veganPolicy": {
+              "range": "org.mule.test.vegan.extension.VeganPolicy",
+              "mandatory": false
+            }
+          }
+        },
+        "org.mule.test.vegan.extension.VeganIngredients": {
+          "mapping": {
+            "saltMiligrams": {
+              "range": "number",
+              "mandatory": false
+            },
+            "saltReplacementName": {
+              "range": "string",
+              "mandatory": false
+            }
+          }
         }
       },
       "uses": {

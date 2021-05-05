@@ -20,6 +20,36 @@
         }
       },
       "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
         "Connection": {
           "mapping": {
             "endpoint": {
@@ -55,6 +85,10 @@
             "url": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
           }
@@ -92,6 +126,36 @@
         }
       },
       "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
         "Connection": {
           "mapping": {
             "endpoint": {
@@ -127,6 +191,10 @@
             "url": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             },
             "username": {
@@ -169,6 +237,36 @@
         }
       },
       "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
         "Connection": {
           "mapping": {
             "endpoint": {
@@ -210,6 +308,10 @@
               "propertyTerm": "core.urlTemplate",
               "range": "string",
               "mandatory": true
+            },
+            "proxyConfiguration": {
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
             }
           }
         }
@@ -246,6 +348,36 @@
         }
       },
       "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
         "Connection": {
           "mapping": {
             "tokenId": {
@@ -317,6 +449,10 @@
               "propertyTerm": "connectivity.connectionId",
               "range": "string",
               "mandatory": true
+            },
+            "proxyConfiguration": {
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
             }
           }
         }
@@ -353,6 +489,36 @@
         }
       },
       "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
         "Connection": {
           "mapping": {
             "endpoint": {
@@ -383,6 +549,10 @@
             "url": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
           }
@@ -420,11 +590,48 @@
         }
       },
       "nodeMappings": {
+        "org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain": {
+          "mapping": {}
+        },
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
         "Connection": {
           "mapping": {
             "endpoint": {
               "propertyTerm": "apiContract.endPoint",
               "range": "string",
+              "mandatory": true
+            },
+            "ntlmDomain": {
+              "range": "org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain",
               "mandatory": true
             },
             "port": {
@@ -450,6 +657,10 @@
             "url": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
           }
@@ -487,6 +698,36 @@
         }
       },
       "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
         "Connection": {
           "mapping": {
             "endpoint": {
@@ -517,6 +758,10 @@
             "url": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
           }

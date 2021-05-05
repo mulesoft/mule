@@ -21,6 +21,26 @@
       },
       "nodeMappings": {
         "Connection": {
+          "mapping": {
+            "doorInterface": {
+              "range": "org.mule.test.subtypes.extension.Door",
+              "mandatory": true
+            },
+            "abstractShape": {
+              "range": "org.mule.test.subtypes.extension.ParentShape",
+              "mandatory": true
+            }
+          }
+        },
+        "org.mule.test.subtypes.extension.ParentShape": {
+          "mapping": {
+            "area": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
+        "org.mule.test.subtypes.extension.Door": {
           "mapping": {}
         }
       },

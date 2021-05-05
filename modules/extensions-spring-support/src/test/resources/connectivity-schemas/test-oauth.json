@@ -70,7 +70,6 @@
               "mandatory": false
             },
             "resourceOwnerId": {
-              "propertyTerm": "connectivity.clientId",
               "range": "string",
               "mandatory": false
             },
@@ -92,7 +91,6 @@
               "mandatory": false
             },
             "authorizePath": {
-              "propertyTerm": "apiContract.path",
               "range": "string",
               "mandatory": true
             }
@@ -181,7 +179,6 @@
               "mandatory": false
             },
             "resourceOwnerId": {
-              "propertyTerm": "connectivity.clientId",
               "range": "string",
               "mandatory": false
             },
@@ -203,7 +200,6 @@
               "mandatory": false
             },
             "authorizePath": {
-              "propertyTerm": "apiContract.path",
               "range": "string",
               "mandatory": true
             }
@@ -292,7 +288,6 @@
               "mandatory": false
             },
             "resourceOwnerId": {
-              "propertyTerm": "connectivity.clientId",
               "range": "string",
               "mandatory": false
             },
@@ -314,7 +309,6 @@
               "mandatory": false
             },
             "authorizePath": {
-              "propertyTerm": "apiContract.path",
               "range": "string",
               "mandatory": true
             }
@@ -415,7 +409,6 @@
               "mandatory": true
             },
             "resourceOwnerId": {
-              "propertyTerm": "connectivity.clientId",
               "range": "string",
               "mandatory": false
             },
@@ -441,7 +434,6 @@
               "mandatory": false
             },
             "authorizePath": {
-              "propertyTerm": "apiContract.path",
               "range": "string",
               "mandatory": true
             }
@@ -507,6 +499,10 @@
               "range": "string",
               "mandatory": true
             },
+            "randomHeaders": {
+              "range": "RandomHeaders",
+              "mandatory": false
+            },
             "clientSecret": {
               "propertyTerm": "connectivity.clientSecret",
               "range": "string",
@@ -525,6 +521,9 @@
               "mandatory": false
             }
           }
+        },
+        "RandomHeaders": {
+          "mapping": {}
         }
       },
       "uses": {
@@ -609,7 +608,6 @@
               "mandatory": false
             },
             "resourceOwnerId": {
-              "propertyTerm": "connectivity.clientId",
               "range": "string",
               "mandatory": false
             },
@@ -631,7 +629,6 @@
               "mandatory": false
             },
             "authorizePath": {
-              "propertyTerm": "apiContract.path",
               "range": "string",
               "mandatory": true
             }
@@ -720,7 +717,6 @@
               "mandatory": false
             },
             "resourceOwnerId": {
-              "propertyTerm": "connectivity.clientId",
               "range": "string",
               "mandatory": false
             },
@@ -742,7 +738,6 @@
               "mandatory": false
             },
             "authorizePath": {
-              "propertyTerm": "apiContract.path",
               "range": "string",
               "mandatory": true
             }
