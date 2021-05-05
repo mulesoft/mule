@@ -46,7 +46,6 @@ public interface ConfigurationPropertiesResolverProvider extends ConfigurationPr
      * @param artifactAst the artifact to scan for additional resolvers.
      * @return the updated builder.
      */
-
     public Builder from(ArtifactAst artifactAst) {
       this.artifactAst = artifactAst;
       return this;
