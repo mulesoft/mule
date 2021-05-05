@@ -8,8 +8,7 @@
       http://www.mulesoft.org/schema/mule/reconnection http://www.mulesoft.org/schema/mule/reconnection/current/mule-reconnection.xsd
       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-
-    <object name="capture" class="org.mule.test.module.extension.reconnection.AbstractReconnectionTestCase$CaptureProcessor" />
+    <object name="capture" class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
 
     <reconnection:config name="reconnection_Config" configId="dsa" >
         <reconnection:connection>
@@ -31,21 +30,21 @@
         <reconnection:reconection-source config-ref="reconnection_Config">
             <reconnect-forever />
         </reconnection:reconection-source>
-        <test:processor class="org.mule.test.module.extension.reconnection.AbstractReconnectionTestCase$CaptureProcessor" />
+        <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
     </flow>
 
     <flow name="reconnectAfterFailure" initialState="stopped">
         <reconnection:fallible-reconnectable-source config-ref="reconnection_Config">
             <reconnect-forever frequency="2000" />
         </reconnection:fallible-reconnectable-source>
-        <test:processor class="org.mule.test.module.extension.reconnection.AbstractReconnectionTestCase$CaptureProcessor" />
+        <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
     </flow>
 
     <flow name="noReconnect" initialState="stopped">
         <reconnection:non-reconnectable-source config-ref="reconnection_Config">
             <reconnect count="5" frequency="200" />
         </reconnection:non-reconnectable-source>
-        <test:processor class="org.mule.test.module.extension.reconnection.AbstractReconnectionTestCase$CaptureProcessor" />
+        <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
     </flow>
 
     <flow name="switchConnection">
