@@ -42,6 +42,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.model.parameter.ImmutableActingParameterModel;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
@@ -76,6 +77,9 @@ import java.util.function.Consumer;
  * @since 4.0
  */
 public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+
+  private static final SinceMuleVersionModelProperty SINCE_MULE_VERSION_MODEL_PROPERTY_SDK_API_VP =
+      new SinceMuleVersionModelProperty("4.4.0");
 
   private final ClassTypeLoader classTypeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
 
@@ -189,12 +193,23 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
     paramDeclaration.addModelProperty(propertyBuilder.build());
 
-    valueProviderModelConsumer
-        .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters,
-                                                                bindingMap),
-                                       requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
-                                       partOrder,
-                                       name, getValueProviderId(ofValueInformation.getValue())));
+    if (ofValueInformation.isFromLegacyAnnotation()) {
+      valueProviderModelConsumer
+          .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters,
+                                                                  bindingMap),
+                                         requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
+                                         partOrder,
+                                         name, getValueProviderId(ofValueInformation.getValue())));
+    } else {
+      valueProviderModelConsumer
+          .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters,
+                                                                  bindingMap),
+                                         requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
+                                         partOrder,
+                                         name, getValueProviderId(ofValueInformation.getValue()),
+                                         SINCE_MULE_VERSION_MODEL_PROPERTY_SDK_API_VP));
+    }
+
   }
 
   private Map<String, String> getBindingsMap(Binding[] bindings) {
@@ -425,9 +440,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                        componentType,
                                                        componentName));
     } else if (legacyOfValues != null) {
-      return of(new OfValueInformation(legacyOfValues.value(), legacyOfValues.open(), new Binding[0]));
+      return of(new OfValueInformation(legacyOfValues.value(), legacyOfValues.open(), new Binding[0], true));
     } else if (ofValues != null) {
-      return of(new OfValueInformation(ofValues.value(), ofValues.open(), ofValues.bindings()));
+      return of(new OfValueInformation(ofValues.value(), ofValues.open(), ofValues.bindings(), false));
     } else {
       return empty();
     }
