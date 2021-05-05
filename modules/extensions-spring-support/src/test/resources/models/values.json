@@ -82,7 +82,12 @@
                 "providerId": "WithRequiredParametersFromConfigValueProvider-Id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -678,7 +683,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -890,7 +896,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -1298,7 +1309,12 @@
                 "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -1510,7 +1526,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -2027,7 +2048,8 @@
                       "providerId": "Channels value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": true,
-                      "isOpen": true
+                      "isOpen": true,
+                      "modelProperties": {}
                     },
                     {
                       "targetSelector": "workspace",
@@ -2037,7 +2059,8 @@
                       "providerId": "Workspaces value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": true,
-                      "isOpen": true
+                      "isOpen": true,
+                      "modelProperties": {}
                     }
                   ],
                   "expressionSupport": "SUPPORTED",
@@ -2530,7 +2553,8 @@
                       "providerId": "Chat multilevel value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": true,
-                      "isOpen": true
+                      "isOpen": true,
+                      "modelProperties": {}
                     },
                     {
                       "targetSelector": "channelId",
@@ -2540,7 +2564,8 @@
                       "providerId": "Chat multilevel value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": true,
-                      "isOpen": true
+                      "isOpen": true,
+                      "modelProperties": {}
                     }
                   ],
                   "expressionSupport": "SUPPORTED",
@@ -3537,7 +3562,12 @@
                     "providerId": "WithConfigValueProvider-id",
                     "requiresConfiguration": true,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -4011,7 +4041,12 @@
                     "providerId": "Value provider with connection",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -4468,7 +4503,8 @@
                     "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigLegacyValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {}
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -4834,7 +4870,12 @@
                     "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -4887,7 +4928,12 @@
                     "providerId": "Simple value provider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -5224,7 +5270,8 @@
                     "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {}
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -5277,7 +5324,12 @@
                     "providerId": "Simple value provider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -5905,7 +5957,12 @@
                     "providerId": "WithErrorValueProvider-id",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -6237,7 +6294,8 @@
                       "providerId": "Simple value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": false,
-                      "isOpen": true
+                      "isOpen": true,
+                      "modelProperties": {}
                     }
                   ],
                   "expressionSupport": "SUPPORTED",
@@ -6537,7 +6595,12 @@
                     "providerId": "Simple value provider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -6858,7 +6921,12 @@
                     "providerId": "org.mule.test.values.extension.resolver.WithFourActingParametersValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -7313,7 +7381,12 @@
                     "providerId": "WithConfigValueProvider-id",
                     "requiresConfiguration": true,
                     "requiresConnection": false,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
@@ -7656,7 +7729,12 @@
                     "providerId": "Value provider with connection",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {
+                      "sinceMuleVersion": {
+                        "version": "4.4.0"
+                      }
+                    }
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
@@ -8165,7 +8243,8 @@
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "SUPPORTED",
@@ -8695,7 +8774,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.SimpleLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -9231,7 +9311,12 @@
                 "providerId": "WithErrorValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -9505,7 +9590,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -9899,7 +9989,8 @@
                   "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "SUPPORTED",
@@ -10159,7 +10250,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -10198,7 +10290,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -10237,7 +10330,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -10488,7 +10582,8 @@
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 },
                 {
                   "targetSelector": "location.continent",
@@ -10498,7 +10593,8 @@
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 },
                 {
                   "targetSelector": "location.country",
@@ -10508,7 +10604,8 @@
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 },
                 {
                   "targetSelector": "location.city",
@@ -10518,7 +10615,8 @@
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "SUPPORTED",
@@ -10748,7 +10846,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithMuleContextValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -10977,7 +11076,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -11206,7 +11310,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -11470,7 +11579,12 @@
                 "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -11523,7 +11637,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -11799,7 +11918,8 @@
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 },
                 {
                   "targetSelector": "another.simple.path",
@@ -11809,7 +11929,8 @@
                   "providerId": "TrueFalseValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "SUPPORTED",
@@ -12057,7 +12178,8 @@
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "SUPPORTED",
@@ -12308,7 +12430,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -12728,7 +12851,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -12981,7 +13105,8 @@
                   "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "SUPPORTED",
@@ -13235,7 +13360,8 @@
                   "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "SUPPORTED",
@@ -13471,7 +13597,12 @@
                 "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -13524,7 +13655,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -13788,7 +13924,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -14052,7 +14193,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithListParameterValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -14332,7 +14478,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithEnumParameterValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -14612,7 +14763,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -14892,7 +15048,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -15172,7 +15333,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -15453,7 +15619,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -15734,7 +15905,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -16014,7 +16190,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -16294,7 +16475,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -16558,7 +16744,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithOptionalParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -16822,7 +17013,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithOptionalParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -17102,7 +17298,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithComplexActingParameter",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -17366,7 +17563,12 @@
                 "providerId": "WithErrorValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -17645,7 +17847,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithFourActingParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -17925,7 +18132,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithMapParameterValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -18205,7 +18417,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithOptionalParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -18469,7 +18682,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithOptionalParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -18733,7 +18947,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithOptionalParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -18998,7 +19213,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithPojoParameterValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -19278,7 +19498,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -19547,7 +19772,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredAndOptionalParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -19845,7 +20071,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredAndOptionalParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -20139,7 +20366,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -20408,7 +20636,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredAndOptionalParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -20706,7 +20935,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithTwoActingParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -21020,7 +21254,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithTwoActingParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -21329,7 +21568,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithOptionalParametersWithDefaultValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
@@ -21599,7 +21839,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -21890,7 +22135,8 @@
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "NOT_SUPPORTED",
@@ -22179,7 +22425,12 @@
                 "providerId": "TrueFalseValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -22470,7 +22721,8 @@
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 },
                 {
                   "targetSelector": "location.continent",
@@ -22480,7 +22732,8 @@
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 },
                 {
                   "targetSelector": "location.country",
@@ -22490,7 +22743,8 @@
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 },
                 {
                   "targetSelector": "location.city",
@@ -22500,7 +22754,8 @@
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
-                  "isOpen": true
+                  "isOpen": true,
+                  "modelProperties": {}
                 }
               ],
               "expressionSupport": "NOT_SUPPORTED",
@@ -23017,7 +23272,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -23056,7 +23312,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -23095,7 +23352,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -23211,7 +23469,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -23447,7 +23706,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -23815,7 +24079,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -23932,7 +24197,12 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithTwoActingParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -24477,7 +24747,12 @@
                 "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
@@ -24633,7 +24908,8 @@
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
-                "isOpen": true
+                "isOpen": true,
+                "modelProperties": {}
               },
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
