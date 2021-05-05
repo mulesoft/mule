@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.data.sample;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.test.allure.AllureConstants.SampleData.SAMPLE_DATA;
 import static org.mule.test.allure.AllureConstants.SampleData.SampleDataStory.RESOLVE_THROUGH_TOOLING_API;
@@ -108,5 +109,54 @@ public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTes
     params.put("complex", complexActingParameter);
 
     assertMessage(getSampleByComponentName("complexActingParameter", params, null), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessTwoWithBoundActingParameter() throws Exception {
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameter", getDefaultParameters(), null),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromContentField() throws Exception {
+    Map<String, Object> params = new HashMap<>();
+    params.put("message", "{ \"payload\": \"my payload\", \"attributes\": \"my attributes\" }");
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromContentField", params,
+                                           null),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void useConnectionWithTwoBoundActingParameter() throws Exception {
+    assertMessage(getSampleByComponentName("useConnectionWithTwoBoundActingParameter", getDefaultParameters(), "config"),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void missingBoundActingParameter() throws Exception {
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+
+    Map<String, Object> params = getDefaultParameters();
+    params.remove("attributes");
+
+    assertMessage(getSampleByComponentName("useConnectionWithTwoBoundActingParameter", params, "config"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void complexBoundActingParameter() throws Exception {
+    ComplexActingParameter complexActingParameter = new ComplexActingParameter();
+    complexActingParameter.setPayload(EXPECTED_PAYLOAD);
+    complexActingParameter.setAttributes(EXPECTED_ATTRIBUTES);
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("complex", complexActingParameter);
+
+    assertMessage(getSampleByComponentName("complexBoundActingParameter", params, null), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 }

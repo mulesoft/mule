@@ -80,4 +80,36 @@ public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTes
   public void complexActingParameter() throws Exception {
     assertMessage(getOperationSampleByLocation("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
+
+  @Test
+  public void connectionLessTwoWithBoundActingParameter() throws Exception {
+    assertMessage(getOperationSampleByLocation("connectionLessWithTwoBoundActingParameter"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromContentField() throws Exception {
+    assertMessage(getOperationSampleByLocation("connectionLessWithTwoBoundActingParameterFromContentField"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void useConnectionWithTwoBoundActingParameter() throws Exception {
+    assertMessage(getOperationSampleByLocation("useConnectionWithTwoBoundActingParameter"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void missingBoundActingParameter() throws Exception {
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getOperationSampleByLocation("missingBoundActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void complexBoundActingParameter() throws Exception {
+    assertMessage(getOperationSampleByLocation("complexBoundActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
 }

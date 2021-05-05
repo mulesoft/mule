@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 import org.mule.metadata.api.model.MetadataType;
 
 /**
- * Describes a parameter that can be injected into another componen
+ * Describes a parameter that can be injected into another component
  *
  * @since 4.4.0
  */

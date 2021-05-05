@@ -36,6 +36,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty.SampleDataProviderFactoryModelPropertyBuilder;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
+import org.mule.sdk.api.annotation.binding.Binding;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * {@link DeclarationEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for sources and
@@ -86,6 +88,11 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
 
   private SampleDataProviderModel createSampleDataModel(SampleData annotation, ExecutableComponentDeclaration declaration) {
 
+    Map<String, String> bindingMap = new HashMap<>();
+    for (Binding binding : annotation.bindings()) {
+      bindingMap.put(binding.actingParameter(), binding.extractionExpression());
+    }
+
     List<ParameterDeclaration> allParameters = declaration.getAllParameters();
     Map<String, String> parameterNames = getContainerParameterNames(allParameters);
 
@@ -100,7 +107,9 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
     resolverParameters.addAll(resolverClassWrapper.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Parameter.class));
 
     resolverParameters.forEach(param -> propertyBuilder
-        .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired()));
+        .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired(),
+                                 bindingMap.getOrDefault(param.getName(),
+                                                         parameterNames.getOrDefault(param.getName(), param.getName()))));
 
     Reference<Boolean> requiresConfiguration = new Reference<>(false);
     Reference<Boolean> requiresConnection = new Reference<>(false);
@@ -110,7 +119,7 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
 
     declaration.addModelProperty(propertyBuilder.build());
 
-    return new SampleDataProviderModel(getActingParametersModel(resolverParameters, parameterNames, allParameters),
+    return new SampleDataProviderModel(getActingParametersModel(resolverParameters, parameterNames, bindingMap),
                                        getSampleDataProviderId(resolverClass),
                                        requiresConfiguration.get(),
                                        requiresConnection.get());
@@ -160,13 +169,17 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
 
   private List<ActingParameterModel> getActingParametersModel(List<ExtensionParameter> parameterDeclarations,
                                                               Map<String, String> parameterNames,
-                                                              List<ParameterDeclaration> allParameters) {
-    Map<String, Boolean> paramsInfo = parameterDeclarations.stream()
-        .collect(toMap(param -> parameterNames.getOrDefault(param.getName(), param.getName()), ExtensionParameter::isRequired));
-    return allParameters.stream()
-        .filter(param -> paramsInfo.containsKey(param.getName()))
-        .map(param -> new ImmutableActingParameterModel(param.getName(), paramsInfo.get(param.getName())))
-        .collect(toList());
+                                                              Map<String, String> bindings) {
+    return parameterDeclarations.stream()
+        .map(extensionParameter -> bindings.containsKey(extensionParameter.getName())
+            ? new ImmutableActingParameterModel(extensionParameter.getName(), extensionParameter.isRequired(),
+                                                bindings.get(extensionParameter.getName()))
+            : new ImmutableActingParameterModel(parameterNames.getOrDefault(extensionParameter.getName(),
+                                                                            extensionParameter.getName()),
+                                                extensionParameter.isRequired(),
+                                                parameterNames.getOrDefault(extensionParameter.getName(),
+                                                                            extensionParameter.getName())))
+        .collect(Collectors.toList());
   }
 
   private Map<String, String> getContainerParameterNames(List<ParameterDeclaration> allParameters) {

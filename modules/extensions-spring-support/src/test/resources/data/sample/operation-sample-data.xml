@@ -56,4 +56,30 @@
             <sample-data:complex payload="my payload" attributes="my attributes" />
         </sample-data:complex-acting-parameter>
     </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameter">
+        <sample-data:connection-less-with-two-bound-acting-parameter payload="my payload" attributes="my attributes" />
+    </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameterFromContentField">
+        <sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
+            <sample-data:message>
+                { "payload" : "my payload", "attributes": "my attributes" }
+            </sample-data:message>
+        </sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="useConnectionWithTwoBoundActingParameter">
+        <sample-data:use-connection-with-two-bound-acting-parameter payload="my payload" attributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="missingBoundActingParameter">
+        <sample-data:use-connection-with-two-bound-acting-parameter payload="my payload" config-ref="config"/>
+    </flow>
+
+    <flow name="complexBoundActingParameter">
+        <sample-data:complex-bound-acting-parameter>
+            <sample-data:complex payload="my payload" attributes="my attributes" />
+        </sample-data:complex-bound-acting-parameter>
+    </flow>
 </mule>
