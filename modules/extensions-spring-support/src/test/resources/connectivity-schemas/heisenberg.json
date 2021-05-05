@@ -35,7 +35,8 @@
               "range": "string",
               "mandatory": false
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -85,7 +86,8 @@
               "range": "string",
               "mandatory": false
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {

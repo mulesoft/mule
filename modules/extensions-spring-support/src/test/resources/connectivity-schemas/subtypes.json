@@ -22,15 +22,12 @@
       "nodeMappings": {
         "Connection": {
           "mapping": {
-            "doorInterface": {
-              "range": "org.mule.test.subtypes.extension.Door",
-              "mandatory": true
-            },
             "abstractShape": {
               "range": "org.mule.test.subtypes.extension.ParentShape",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         },
         "org.mule.test.subtypes.extension.ParentShape": {
           "mapping": {
@@ -39,9 +36,6 @@
               "mandatory": false
             }
           }
-        },
-        "org.mule.test.subtypes.extension.Door": {
-          "mapping": {}
         }
       },
       "uses": {

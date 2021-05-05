@@ -32,19 +32,13 @@
               "range": "string",
               "mandatory": true
             },
-            "transport": {
-              "range": "org.mule.runtime.extension.api.soap.MessageDispatcherProvider",
-              "mandatory": true
-            },
             "wsdlUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
               "mandatory": true
             }
-          }
-        },
-        "org.mule.runtime.extension.api.soap.MessageDispatcherProvider": {
-          "mapping": {}
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {

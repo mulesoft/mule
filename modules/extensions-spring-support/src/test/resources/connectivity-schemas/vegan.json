@@ -21,7 +21,8 @@
       },
       "nodeMappings": {
         "Connection": {
-          "mapping": {}
+          "mapping": {},
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -62,7 +63,8 @@
               "range": "string",
               "mandatory": false
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -119,7 +121,8 @@
               "range": "org.mule.test.vegan.extension.VeganPolicy",
               "mandatory": false
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         },
         "org.mule.test.vegan.extension.VeganIngredients": {
           "mapping": {
@@ -167,7 +170,8 @@
       },
       "nodeMappings": {
         "Connection": {
-          "mapping": {}
+          "mapping": {},
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -203,7 +207,8 @@
       },
       "nodeMappings": {
         "Connection": {
-          "mapping": {}
+          "mapping": {},
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {

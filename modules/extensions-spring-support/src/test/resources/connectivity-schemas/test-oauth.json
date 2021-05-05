@@ -8,7 +8,7 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-connection",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
     "definition": {
       "external": {
         "core": "anypoint://semantics/core",
@@ -94,7 +94,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
         }
       },
       "uses": {
@@ -105,7 +106,7 @@
     "labels": {
       "connectionProvider": "connection",
       "system": "TODO",
-      "type": "connectivity.Connection"
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
   {
@@ -117,7 +118,7 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-connection",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
     "definition": {
       "external": {
         "core": "anypoint://semantics/core",
@@ -203,7 +204,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
         }
       },
       "uses": {
@@ -214,7 +216,7 @@
     "labels": {
       "connectionProvider": "scopeless",
       "system": "TODO",
-      "type": "connectivity.Connection"
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
   {
@@ -226,7 +228,7 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-connection",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
     "definition": {
       "external": {
         "core": "anypoint://semantics/core",
@@ -312,7 +314,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
         }
       },
       "uses": {
@@ -323,7 +326,7 @@
     "labels": {
       "connectionProvider": "validated-connection",
       "system": "TODO",
-      "type": "connectivity.Connection"
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
   {
@@ -335,7 +338,7 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-connection",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
     "definition": {
       "external": {
         "core": "anypoint://semantics/core",
@@ -437,7 +440,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
         }
       },
       "uses": {
@@ -448,7 +452,7 @@
     "labels": {
       "connectionProvider": "with-params-connection",
       "system": "TODO",
-      "type": "connectivity.Connection"
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
   {
@@ -460,7 +464,7 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-connection",
+    "artifactId": "mule-test-oauth-extension-oauthclientcredentialsconnection",
     "definition": {
       "external": {
         "core": "anypoint://semantics/core",
@@ -499,10 +503,6 @@
               "range": "string",
               "mandatory": true
             },
-            "randomHeaders": {
-              "range": "RandomHeaders",
-              "mandatory": false
-            },
             "clientSecret": {
               "propertyTerm": "connectivity.clientSecret",
               "range": "string",
@@ -520,10 +520,8 @@
               "range": "boolean",
               "mandatory": false
             }
-          }
-        },
-        "RandomHeaders": {
-          "mapping": {}
+          },
+          "classTerm": "connectivity.OAuthClientCredentialsConnection"
         }
       },
       "uses": {
@@ -534,7 +532,7 @@
     "labels": {
       "connectionProvider": "client-credentials",
       "system": "TODO",
-      "type": "connectivity.Connection"
+      "type": "connectivity.OAuthClientCredentialsConnection"
     }
   },
   {
@@ -546,7 +544,7 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-connection",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
     "definition": {
       "external": {
         "core": "anypoint://semantics/core",
@@ -632,7 +630,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
         }
       },
       "uses": {
@@ -643,7 +642,7 @@
     "labels": {
       "connectionProvider": "pooled",
       "system": "TODO",
-      "type": "connectivity.Connection"
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
   {
@@ -655,7 +654,7 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-connection",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
     "definition": {
       "external": {
         "core": "anypoint://semantics/core",
@@ -741,7 +740,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
         }
       },
       "uses": {
@@ -752,7 +752,7 @@
     "labels": {
       "connectionProvider": "refresh-validation",
       "system": "TODO",
-      "type": "connectivity.Connection"
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   }
 ]

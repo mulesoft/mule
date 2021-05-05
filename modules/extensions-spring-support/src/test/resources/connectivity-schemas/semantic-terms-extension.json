@@ -88,10 +88,12 @@
               "mandatory": true
             },
             "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
               "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.ApiKeyAuthenticationConnection"
         }
       },
       "uses": {
@@ -194,6 +196,7 @@
               "mandatory": true
             },
             "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
               "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             },
@@ -202,7 +205,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.BasicAuthenticationConnection"
         }
       },
       "uses": {
@@ -310,10 +314,12 @@
               "mandatory": true
             },
             "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
               "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.ApiKeyAuthenticationConnection"
         }
       },
       "uses": {
@@ -451,10 +457,12 @@
               "mandatory": true
             },
             "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
               "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -552,10 +560,12 @@
               "mandatory": true
             },
             "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
               "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.DigestAuthenticationConnection"
         }
       },
       "uses": {
@@ -590,9 +600,6 @@
         }
       },
       "nodeMappings": {
-        "org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain": {
-          "mapping": {}
-        },
         "org.mule.test.semantic.extension.ProxyConfiguration": {
           "mapping": {
             "password": {
@@ -630,10 +637,6 @@
               "range": "string",
               "mandatory": true
             },
-            "ntlmDomain": {
-              "range": "org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain",
-              "mandatory": true
-            },
             "port": {
               "propertyTerm": "connectivity.port",
               "range": "number",
@@ -660,10 +663,12 @@
               "mandatory": true
             },
             "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
               "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.KerberosAuthenticationConnection"
         }
       },
       "uses": {
@@ -761,10 +766,12 @@
               "mandatory": true
             },
             "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
               "range": "org.mule.test.semantic.extension.ProxyConfiguration",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.UnsecureConnection"
         }
       },
       "uses": {

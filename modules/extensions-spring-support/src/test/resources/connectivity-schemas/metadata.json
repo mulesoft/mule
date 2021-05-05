@@ -32,7 +32,8 @@
               "range": "string",
               "mandatory": false
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {

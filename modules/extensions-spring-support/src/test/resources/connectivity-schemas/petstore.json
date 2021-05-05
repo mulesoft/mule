@@ -31,7 +31,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -77,7 +78,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -123,7 +125,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -169,7 +172,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -215,7 +219,8 @@
               "range": "string",
               "mandatory": true
             }
-          }
+          },
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {

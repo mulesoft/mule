@@ -21,7 +21,8 @@
       },
       "nodeMappings": {
         "Connection": {
-          "mapping": {}
+          "mapping": {},
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
@@ -57,7 +58,8 @@
       },
       "nodeMappings": {
         "Connection": {
-          "mapping": {}
+          "mapping": {},
+          "classTerm": "connectivity.Connection"
         }
       },
       "uses": {
