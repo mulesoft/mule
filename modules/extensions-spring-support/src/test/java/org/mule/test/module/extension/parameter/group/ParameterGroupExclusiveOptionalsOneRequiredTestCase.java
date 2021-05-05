@@ -71,6 +71,58 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
     assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
   }
 
+  @Test
+  public void testShowInDslTrueWithRepeatedNameParameter() throws Exception {
+    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueRepeatedNameParameter");
+    assertThat(config.getRepeatedNameParameter(), is("hello cat!"));
+  }
+
+  @Test
+  public void testShowInDslTrueWithComplexParameterWithRepeatedNameParameter() throws Exception {
+    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueComplexParameterWithRepeatedNameParameter");
+    assertThat(config.getComplexParameter().getRepeatedNameParameter(), is("hi bird!"));
+  }
+
+  @Test
+  public void testShowInDslTrueWithDynamicSimpleParameterWithRepeatedNameParameter() throws Exception {
+    SomeParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("dslTrueSomeParameterDynamicWithRepeatedNameParameter", "repeatedNameParameter", "hello cat!");
+    assertThat(config.getRepeatedNameParameter(), is("hello cat!"));
+  }
+
+  @Test
+  public void testShowInDslTrueWithDynamicComplexParameterWithRepeatedNameParameter() throws Exception {
+    SomeParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("dslTrueComplexParameterDynamicWithRepeatedNameParameter", "repeatedNameParameter", "hi bird!");
+    assertThat(config.getComplexParameter().getRepeatedNameParameter(), is("hi bird!"));
+  }
+
+  @Test
+  public void testWithRepeatedNameParameter() throws Exception {
+    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("repeatedNameParameter");
+    assertThat(config.getRepeatedNameParameter(), is("hello cat!"));
+  }
+
+  @Test
+  public void testWithComplexParameterWithRepeatedNameParameter() throws Exception {
+    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("complexParameterWithRepeatedNameParameter");
+    assertThat(config.getComplexParameter().getRepeatedNameParameter(), is("hi bird!"));
+  }
+
+  @Test
+  public void testWithDynamicRepeatedNameParameter() throws Exception {
+    SomeParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("repeatedNameParameterDynamic", "repeatedNameParameter", "hello cat!");
+    assertThat(config.getRepeatedNameParameter(), is("hello cat!"));
+  }
+
+  @Test
+  public void testWithDynamicComplexParameterWithRepeatedNameParameter() throws Exception {
+    SomeParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("complexParameterWithRepeatedNameParameterDynamic", "repeatedNameParameter", "hi bird!");
+    assertThat(config.getComplexParameter().getRepeatedNameParameter(), is("hi bird!"));
+  }
+
   private SomeParameterGroupOneRequiredConfig runFlowAndGetConfig(String flowName) throws Exception {
     return runFlowAndGetConfig(flowName, "", "");
   }

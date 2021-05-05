@@ -18,11 +18,19 @@ public class ComplexParameter {
   @Optional
   private String yetAnotherParameter;
 
+  @Parameter
+  @Optional
+  private String repeatedNameParameter;
+
   public String getAnotherParameter() {
     return anotherParameter;
   }
 
   public String getYetAnotherParameter() {
     return yetAnotherParameter;
+  }
+
+  public String getRepeatedNameParameter() {
+    return repeatedNameParameter;
   }
 }

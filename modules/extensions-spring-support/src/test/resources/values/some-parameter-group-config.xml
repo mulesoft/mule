@@ -53,4 +53,52 @@
         </some:one-required-parameter-resolver-operation>
     </flow>
 
+    <flow name="dslTrueRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true >
+            <some:awesome-parameter-group repeatedNameParameter="hello cat!"/>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameterWithRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true >
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+            </some:awesome-parameter-group>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueSomeParameterDynamicWithRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true >
+            <some:awesome-parameter-group repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameterDynamicWithRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true >
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+            </some:awesome-parameter-group>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="repeatedNameParameter">
+        <some:one-required-parameter-resolver-operation repeatedNameParameter="hello cat!" />
+    </flow>
+
+    <flow name="complexParameterWithRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation>
+            <some:complex-parameter anotherParameter="#['hello bird!']" repeatedNameParameter="hi bird!"/>
+        </some:one-required-parameter-resolver-operation>
+    </flow>
+
+    <flow name="repeatedNameParameterDynamic">
+        <some:one-required-parameter-resolver-operation repeatedNameParameter="#[vars.repeatedNameParameter]" />
+    </flow>
+
+    <flow name="complexParameterWithRepeatedNameParameterDynamic">
+        <some:one-required-parameter-resolver-operation>
+            <some:complex-parameter anotherParameter="#['hello bird!']" repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+        </some:one-required-parameter-resolver-operation>
+    </flow>
+
 </mule>
