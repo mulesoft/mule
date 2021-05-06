@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.fail;
@@ -56,6 +57,7 @@ import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.security.AbstractSecurityProvider;
@@ -269,7 +271,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
-  public void reorderApplicationPolicy() throws Exception {
+  public void reorderApplicationPolicyDoesNotChangeParameters() throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
@@ -285,7 +287,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
 
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE);
+    parameters.put(POLICY_PROPERTY_KEY, FOO_POLICY_NAME);
     parameters.put("isPolicyReorder", "true");
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
@@ -294,7 +296,49 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(1);
+    assertThat(policyParametrization, startsWith(POLICY_PROPERTY_VALUE));
   }
+
+  @Test
+  public void reorderApplicationPolicy() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(barPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, FOO_POLICY_NAME),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2,
+                                                      singletonMap(POLICY_PROPERTY_KEY, BAR_POLICY_NAME),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    assertManualExecutionsCount(2);
+    assertThat(policyParametrization, startsWith(FOO_POLICY_NAME + BAR_POLICY_NAME));
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(POLICY_PROPERTY_KEY, FOO_POLICY_NAME);
+    parameters.put("isPolicyReorder", "true");
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 3,
+                                                      parameters,
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    policyParametrization = "";
+    assertManualExecutionsCount(4);
+    assertThat(policyParametrization, startsWith(BAR_POLICY_NAME + FOO_POLICY_NAME));
+  }
+
+
 
   @Test
   public void appliesApplicationPolicyWithNotificationListener() throws Exception {

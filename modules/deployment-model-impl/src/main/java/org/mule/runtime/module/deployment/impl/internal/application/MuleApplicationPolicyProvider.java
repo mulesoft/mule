@@ -14,7 +14,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.noAttributes;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyProvider;
