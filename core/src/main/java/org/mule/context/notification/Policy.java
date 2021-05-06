@@ -19,6 +19,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * For a particular configuration, this describes what events should be delivered where.
  * It is read-only and a lazy instance is cached by the
@@ -26,6 +29,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 class Policy
 {
+
+    private static final Logger LOGGER = LogManager.getLogger(Policy.class);
 
     // map from event to set of senders
     private Map<Class<? extends ServerNotification>, Collection<Sender>> eventToSenders = new HashMap<Class<? extends ServerNotification>, Collection<Sender>>();
@@ -169,6 +174,7 @@ class Policy
             try
             {
                 sender.dispatch(notification);
+                LOGGER.debug(notification.toString());
             }
             catch (Exception e)
             {
