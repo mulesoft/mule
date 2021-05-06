@@ -101,4 +101,62 @@
         </some:one-required-parameter-resolver-operation>
     </flow>
 
+    <flow name="dslTrueRepeatedParameterNameInComplexParameter">
+        <some:repeated-parameter-name-dsl-true>
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+            </some:awesome-parameter-group>
+        </some:repeated-parameter-name-dsl-true>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInComplexParameterDynamic">
+        <some:repeated-parameter-name-dsl-true>
+            <some:pojo-parameter anotherParameter="#['hello lizard!']" repeatedNameParameter="#['hi lizard!']"/>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="#['hello bird!']" repeatedNameParameter="#['hi bird!']"/>
+            </some:awesome-parameter-group>
+        </some:repeated-parameter-name-dsl-true>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInParameterGroup">
+        <some:repeated-parameter-name-dsl-true>
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+            <some:awesome-parameter-group repeatedNameParameter="hello cat!"/>
+        </some:repeated-parameter-name-dsl-true>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInParameterGroupDynamic">
+        <some:repeated-parameter-name-dsl-true>
+            <some:pojo-parameter anotherParameter="#['hello lizard!']" repeatedNameParameter="#['hi lizard!']"/>
+            <some:awesome-parameter-group repeatedNameParameter="#['hello cat!']"/>
+        </some:repeated-parameter-name-dsl-true>
+    </flow>
+
+    <flow name="repeatedParameterNameInComplexParameter">
+        <some:repeated-parameter-name>
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+            <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+        </some:repeated-parameter-name>
+    </flow>
+
+    <flow name="repeatedParameterNameInComplexParameterDynamic">
+        <some:repeated-parameter-name>
+            <some:pojo-parameter anotherParameter="#['hello lizard!']" repeatedNameParameter="#['hi lizard!']"/>
+            <some:complex-parameter anotherParameter="#['hello bird!']" repeatedNameParameter="#['hi bird!']"/>
+        </some:repeated-parameter-name>
+    </flow>
+
+    <flow name="repeatedParameterNameInParameterGroup">
+        <some:repeated-parameter-name repeatedNameParameter="hello cat!">
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+        </some:repeated-parameter-name>
+    </flow>
+
+    <flow name="repeatedParameterNameInParameterGroupDynamic">
+        <some:repeated-parameter-name repeatedNameParameter="#['hello cat!']">
+            <some:pojo-parameter anotherParameter="#['hello lizard!']" repeatedNameParameter="#['hi lizard!']"/>
+        </some:repeated-parameter-name>
+    </flow>
+
 </mule>

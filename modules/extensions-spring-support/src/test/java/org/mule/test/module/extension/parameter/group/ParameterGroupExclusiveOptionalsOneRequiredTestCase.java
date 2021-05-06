@@ -8,8 +8,11 @@ package org.mule.test.module.extension.parameter.group;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.some.extension.SomeParameterGroupOneRequiredConfig;
+
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -123,6 +126,62 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
     assertThat(config.getComplexParameter().getRepeatedNameParameter(), is("hi bird!"));
   }
 
+  @Test
+  public void testWithDslTrueRepeatedParameterNameInComplexParameter() throws Exception {
+    Map<String, String> values = runFlowAndGetValues("dslTrueRepeatedParameterNameInComplexParameter");
+    assertThat(values.get("pojoParameter"), is("hi lizard!"));
+    assertThat(values.get("oneParameterGroup"), is("hi bird!"));
+  }
+
+  @Test
+  public void testWithDslTrueRepeatedParameterNameInComplexParameterDynamic() throws Exception {
+    Map<String, String> values = runFlowAndGetValues("dslTrueRepeatedParameterNameInComplexParameterDynamic");
+    assertThat(values.get("pojoParameter"), is("hi lizard!"));
+    assertThat(values.get("oneParameterGroup"), is("hi bird!"));
+  }
+
+  @Test
+  public void testWithDslTrueRepeatedParameterNameInParameterGroup() throws Exception {
+    Map<String, String> values = runFlowAndGetValues("dslTrueRepeatedParameterNameInParameterGroup");
+    assertThat(values.get("pojoParameter"), is("hi lizard!"));
+    assertThat(values.get("oneParameterGroup"), is("hello cat!"));
+  }
+
+  @Test
+  public void testWithDslTrueRepeatedParameterNameInParameterGroupDynamic() throws Exception {
+    Map<String, String> values = runFlowAndGetValues("dslTrueRepeatedParameterNameInParameterGroupDynamic");
+    assertThat(values.get("pojoParameter"), is("hi lizard!"));
+    assertThat(values.get("oneParameterGroup"), is("hello cat!"));
+  }
+
+  @Test
+  public void testWithRepeatedParameterNameInComplexParameter() throws Exception {
+    Map<String, String> values = runFlowAndGetValues("repeatedParameterNameInComplexParameter");
+    assertThat(values.get("pojoParameter"), is("hi lizard!"));
+    assertThat(values.get("oneParameterGroup"), is("hi bird!"));
+  }
+
+  @Test
+  public void testWithRepeatedParameterNameInComplexParameterDynamic() throws Exception {
+    Map<String, String> values = runFlowAndGetValues("repeatedParameterNameInComplexParameterDynamic");
+    assertThat(values.get("pojoParameter"), is("hi lizard!"));
+    assertThat(values.get("oneParameterGroup"), is("hi bird!"));
+  }
+
+  @Test
+  public void testWithRepeatedParameterNameInParameterGroup() throws Exception {
+    Map<String, String> values = runFlowAndGetValues("repeatedParameterNameInParameterGroup");
+    assertThat(values.get("pojoParameter"), is("hi lizard!"));
+    assertThat(values.get("oneParameterGroup"), is("hello cat!"));;
+  }
+
+  @Test
+  public void testWithRepeatedParameterNameInParameterGroupDynamic() throws Exception {
+    Map<String, String> values = runFlowAndGetValues("repeatedParameterNameInParameterGroupDynamic");
+    assertThat(values.get("pojoParameter"), is("hi lizard!"));
+    assertThat(values.get("oneParameterGroup"), is("hello cat!"));
+  }
+
   private SomeParameterGroupOneRequiredConfig runFlowAndGetConfig(String flowName) throws Exception {
     return runFlowAndGetConfig(flowName, "", "");
   }
@@ -131,5 +190,9 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
       throws Exception {
     return (SomeParameterGroupOneRequiredConfig) flowRunner(flowName).withVariable(variableName, variableValue).run().getMessage()
         .getPayload().getValue();
+  }
+
+  private Map<String, String> runFlowAndGetValues(String flowName) throws Exception {
+    return (Map<String, String>) flowRunner(flowName).run().getMessage().getPayload().getValue();
   }
 }

@@ -7,6 +7,7 @@
 
 package org.mule.test.some.extension;
 
+import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.metadata.TypedValue;
@@ -18,6 +19,10 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -59,6 +64,37 @@ public class SomeOps {
   public SomeParameterGroupOneRequiredConfig oneRequiredParameterResolverOperationDslTrue(@ParameterGroup(
       name = "Awesome Parameter Group", showInDsl = true) SomeParameterGroupOneRequiredConfig oneParameterGroup) {
     return oneParameterGroup;
+  }
+
+  /**
+   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup and repeated parameter names.
+   */
+  public Map<String, String> repeatedParameterName(ComplexParameter pojoParameter, @ParameterGroup(
+      name = "Awesome Parameter Group") SomeParameterGroupOneRequiredConfig oneParameterGroup) {
+    Map<String, String> values = new HashMap<>();
+    values.put("pojoParameter", pojoParameter.getRepeatedNameParameter());
+    if (oneParameterGroup.getComplexParameter() != null) {
+      values.put("oneParameterGroup", oneParameterGroup.getComplexParameter().getRepeatedNameParameter());
+    } else if (oneParameterGroup.getRepeatedNameParameter() != null) {
+      values.put("oneParameterGroup", oneParameterGroup.getRepeatedNameParameter());
+    }
+    return values;
+  }
+
+  /**
+   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup with show in Dsl true and
+   * repeated parameter names.
+   */
+  public Map<String, String> repeatedParameterNameDslTrue(ComplexParameter pojoParameter, @ParameterGroup(
+      name = "Awesome Parameter Group", showInDsl = true) SomeParameterGroupOneRequiredConfig oneParameterGroup) {
+    Map<String, String> values = new HashMap<>();
+    values.put("pojoParameter", pojoParameter.getRepeatedNameParameter());
+    if (oneParameterGroup.getComplexParameter() != null) {
+      values.put("oneParameterGroup", oneParameterGroup.getComplexParameter().getRepeatedNameParameter());
+    } else if (oneParameterGroup.getRepeatedNameParameter() != null) {
+      values.put("oneParameterGroup", oneParameterGroup.getRepeatedNameParameter());
+    }
+    return values;
   }
 
   /**

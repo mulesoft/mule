@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.util;
 
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
@@ -27,6 +29,8 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
@@ -41,7 +45,9 @@ import java.util.Optional;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(ARTIFACT_AST)
 @Story(PARAMETER_AST)
@@ -50,6 +56,9 @@ public class MulExtensionUtilsTestCase extends AbstractMuleTestCase {
   private static final String PAYLOAD_EXPRESSION = "#[payload]";
   private static final String MALFORMED_EXPRESSION = "#[payload";
   private static final String DEFAULT_VALUE = "DEFAULT_VALUE";
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Test
   @Description("Parse mule expression")
@@ -81,145 +90,145 @@ public class MulExtensionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void parameterGroupExclusivenessForDslTrueSimpleParameter() throws ConfigurationException, ValueResolvingException {
-    ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
-    when(exclusiveParametersModel.getExclusiveParameterNames())
-        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
+  public void parameterGroupExclusivenessForDslTrueSomeParameter() throws ConfigurationException, ValueResolvingException {
+    Map<String, ValueResolver<?>> someParameterResolvers = new HashMap<>();
+    someParameterResolvers.put("someParameter", mock(StaticValueResolver.class));
+    ObjectBuilderValueResolver someParameter = mock(ObjectBuilderValueResolver.class);
+    when(someParameter.getParameters()).thenReturn(someParameterResolvers);
 
-    ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
-    when(parameterGroupModel.getExclusiveParametersModels()).thenReturn(singletonList(exclusiveParametersModel));
-    when(parameterGroupModel.isShowInDsl()).thenReturn(true);
-    List<ParameterGroupModel> groups = singletonList(parameterGroupModel);
-
-    Map<String, ValueResolver<?>> parameterResolvers = new HashMap<>();
-    parameterResolvers.put("someParameter", mock(StaticValueResolver.class));
-    ObjectBuilderValueResolver valueResolver = mock(ObjectBuilderValueResolver.class);
-    when(valueResolver.getParameters()).thenReturn(parameterResolvers);
     Map<String, ObjectBuilderValueResolver> parameters = new HashMap<>();
-    parameters.put("oneParameterGroup", valueResolver);
-    Map<String, String> aliasedParameterNames = new HashMap<>(0);
-    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), groups, parameters, aliasedParameterNames);
+    parameters.put("oneParameterGroup", someParameter);
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(true), parameters,
+                                     emptyMap());
   }
 
   @Test
   public void parameterGroupExclusivenessForDslTrueRepeatedNameParameter()
       throws ConfigurationException, ValueResolvingException {
-    ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
-    when(exclusiveParametersModel.getExclusiveParameterNames())
-        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
+    Map<String, ValueResolver<?>> repeatedNameParameterResolvers = new HashMap<>();
+    repeatedNameParameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
+    ObjectBuilderValueResolver repeatedNameParameter = mock(ObjectBuilderValueResolver.class);
+    when(repeatedNameParameter.getParameters()).thenReturn(repeatedNameParameterResolvers);
 
-    ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
-    when(parameterGroupModel.getExclusiveParametersModels()).thenReturn(singletonList(exclusiveParametersModel));
-    when(parameterGroupModel.isShowInDsl()).thenReturn(true);
-    List<ParameterGroupModel> groups = singletonList(parameterGroupModel);
+    Map<String, ValueResolver<?>> pojoParameterResolvers = new HashMap<>();
+    pojoParameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
+    pojoParameterResolvers.put("anotherParameter", mock(StaticValueResolver.class));
+    ObjectBuilderValueResolver pojoParameter = mock(ObjectBuilderValueResolver.class);
+    when(pojoParameter.getParameters()).thenReturn(pojoParameterResolvers);
 
-    Map<String, ValueResolver<?>> parameterResolvers = new HashMap<>();
-    parameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
-    ObjectBuilderValueResolver valueResolver = mock(ObjectBuilderValueResolver.class);
-    when(valueResolver.getParameters()).thenReturn(parameterResolvers);
     Map<String, ObjectBuilderValueResolver> parameters = new HashMap<>();
-    parameters.put("oneParameterGroup", valueResolver);
-    Map<String, String> aliasedParameterNames = new HashMap<>(0);
-    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), groups, parameters, aliasedParameterNames);
+    parameters.put("pojoParameter", pojoParameter);
+    parameters.put("oneParameterGroup", repeatedNameParameter);
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(true), parameters,
+                                     emptyMap());
   }
 
   @Test
-  public void parameterGroupExclusivenessDslTrueComplexParameter() throws ConfigurationException, ValueResolvingException {
-    ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
-    when(exclusiveParametersModel.getExclusiveParameterNames())
-        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
-
-    ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
-    when(parameterGroupModel.getExclusiveParametersModels()).thenReturn(singletonList(exclusiveParametersModel));
-    when(parameterGroupModel.isShowInDsl()).thenReturn(true);
-    List<ParameterGroupModel> groups = singletonList(parameterGroupModel);
-
-    Map<String, ValueResolver<?>> parameterResolvers = new HashMap<>();
-    parameterResolvers.put("complexParameter", mock(StaticValueResolver.class));
-    ObjectBuilderValueResolver valueResolver = mock(ObjectBuilderValueResolver.class);
-    when(valueResolver.getParameters()).thenReturn(parameterResolvers);
-    Map<String, ObjectBuilderValueResolver> parameters = new HashMap<>();
-    parameters.put("oneParameterGroup", valueResolver);
-    Map<String, String> aliasedParameterNames = new HashMap<>(0);
-    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), groups, parameters, aliasedParameterNames);
-  }
-
-  @Test
-  public void parameterGroupExclusivenessForDslFalseSimpleParameter() throws ConfigurationException {
-    ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
-    when(exclusiveParametersModel.getExclusiveParameterNames())
-        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
-
-    ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
-    when(parameterGroupModel.getExclusiveParametersModels()).thenReturn(singletonList(exclusiveParametersModel));
-    when(parameterGroupModel.isShowInDsl()).thenReturn(false);
-    List<ParameterGroupModel> groups = singletonList(parameterGroupModel);
-
+  public void parameterGroupExclusivenessForDslFalseSomeParameter() throws ConfigurationException {
     Map<String, StaticValueResolver> parameters = new HashMap<>();
     parameters.put("someParameter", mock(StaticValueResolver.class));
-    Map<String, String> aliasedParameterNames = new HashMap<>(0);
-    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), groups, parameters, aliasedParameterNames);
-  }
-
-  @Test
-  public void parameterGroupExclusivenessForDslFalseRepeatedNameParameter() throws ConfigurationException {
-    ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
-    when(exclusiveParametersModel.getExclusiveParameterNames())
-        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
-
-    ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
-    when(parameterGroupModel.getExclusiveParametersModels()).thenReturn(singletonList(exclusiveParametersModel));
-    when(parameterGroupModel.isShowInDsl()).thenReturn(false);
-    List<ParameterGroupModel> groups = singletonList(parameterGroupModel);
-
-    Map<String, StaticValueResolver> parameters = new HashMap<>();
-    parameters.put("repeatedNameParameter", mock(StaticValueResolver.class));
-    Map<String, String> aliasedParameterNames = new HashMap<>(0);
-    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), groups, parameters, aliasedParameterNames);
-  }
-
-  @Test
-  public void parameterGroupExclusivenessForDslFalseComplexParameter() throws ConfigurationException {
-    ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
-    when(exclusiveParametersModel.getExclusiveParameterNames())
-        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
-
-    ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
-    when(parameterGroupModel.getExclusiveParametersModels()).thenReturn(singletonList(exclusiveParametersModel));
-    when(parameterGroupModel.isShowInDsl()).thenReturn(false);
-    List<ParameterGroupModel> groups = singletonList(parameterGroupModel);
-
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("complexParameter", mock(ObjectBuilderValueResolver.class));
-    Map<String, String> aliasedParameterNames = new HashMap<>(0);
-    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), groups, parameters, aliasedParameterNames);
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(false), parameters,
+                                     emptyMap());
   }
 
   @Test
   public void parameterGroupExclusivenessForDslFalseComplexParameterDynamic()
       throws ConfigurationException, ValueResolvingException {
-    ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
-    when(exclusiveParametersModel.getExclusiveParameterNames())
-        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
+    Map<String, ValueResolver<?>> complexParameterResolvers = new HashMap<>();
+    complexParameterResolvers.put("anotherParameter", mock(StaticValueResolver.class));
+    complexParameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
+    ObjectBuilderValueResolver complexParameter = mock(ObjectBuilderValueResolver.class);
+    when(complexParameter.getParameters()).thenReturn(complexParameterResolvers);
 
-    ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
-    when(parameterGroupModel.getExclusiveParametersModels()).thenReturn(singletonList(exclusiveParametersModel));
-    when(parameterGroupModel.isShowInDsl()).thenReturn(false);
-    List<ParameterGroupModel> groups = singletonList(parameterGroupModel);
-
-    Map<String, ValueResolver<?>> parameterResolvers = new HashMap<>();
-    parameterResolvers.put("anotherParameter", mock(StaticValueResolver.class));
-    parameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
-    ObjectBuilderValueResolver valueResolver = mock(ObjectBuilderValueResolver.class);
-    when(valueResolver.getParameters()).thenReturn(parameterResolvers);
     Map<String, ObjectBuilderValueResolver> parameters = new HashMap<>();
-    parameters.put("complexParameter", valueResolver);
-    Map<String, String> aliasedParameterNames = new HashMap<>(0);
-    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), groups, parameters, aliasedParameterNames);
+    parameters.put("complexParameter", complexParameter);
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(false), parameters,
+                                     emptyMap());
+  }
+
+  @Test
+  public void parameterGroupExclusivenessForDslFalseRepeatedNameParameter()
+      throws ConfigurationException, ValueResolvingException {
+    Map<String, ValueResolver<?>> pojoParameterResolvers = new HashMap<>();
+    pojoParameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
+    pojoParameterResolvers.put("anotherParameter", mock(StaticValueResolver.class));
+    ObjectBuilderValueResolver pojoParameter = mock(ObjectBuilderValueResolver.class);
+    when(pojoParameter.getParameters()).thenReturn(pojoParameterResolvers);
+
+    Map<String, ValueResolver> parameters = new HashMap<>();
+    parameters.put("repeatedNameParameter", mock(StaticValueResolver.class));
+    parameters.put("pojoParameter", pojoParameter);
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(false), parameters,
+                                     emptyMap());
+  }
+
+  @Test
+  public void parameterGroupExclusivenessDslFalseComplexParameterDynamicAndPojoParameter()
+      throws ConfigurationException, ValueResolvingException {
+    Map<String, ValueResolver<?>> pojoParameterResolvers = new HashMap<>();
+    pojoParameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
+    pojoParameterResolvers.put("anotherParameter", mock(StaticValueResolver.class));
+    ObjectBuilderValueResolver pojoParameter = mock(ObjectBuilderValueResolver.class);
+    when(pojoParameter.getParameters()).thenReturn(pojoParameterResolvers);
+
+    Map<String, ObjectBuilderValueResolver> parameters = new HashMap<>();
+    parameters.put("pojoParameter", pojoParameter);
+    parameters.put("complexParameter", pojoParameter);
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(false), parameters,
+                                     emptyMap());
+  }
+
+  @Test
+  public void parameterGroupNameMissingAmongResolvedParameterNamesWithDslTrue() throws ConfigurationException {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("Was expecting a parameter with name [oneParameterGroup] among the resolved parameters");
+    Map<String, StaticValueResolver> parameters = new HashMap<>();
+    parameters.put("someParameter", mock(StaticValueResolver.class));
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(true), parameters,
+                                     emptyMap());
+  }
+
+  @Test
+  public void moreThanOneParameterSetInGroup() throws ConfigurationException, ValueResolvingException {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("In operation 'null', the following parameters cannot be set at the same time: [someParameter, complexParameter]");
+    Map<String, StaticValueResolver> parameters = new HashMap<>();
+    parameters.put("someParameter", mock(StaticValueResolver.class));
+    parameters.put("complexParameter", mock(StaticValueResolver.class));
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(false), parameters,
+                                     emptyMap());
+  }
+
+  @Test
+  public void noParametersSetInGroup() throws ConfigurationException, ValueResolvingException {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("Parameter group 'null' requires that one of its optional parameters should be set but all of them are missing. One of the following should be set: [someParameter, repeatedNameParameter, complexParameter]");
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(false), emptyMap(),
+                                     emptyMap());
   }
 
   private void assertOptional(Optional<String> defaultValue) {
     assertThat(defaultValue.isPresent(), is(true));
     assertThat(defaultValue.get(), is(DEFAULT_VALUE));
+  }
+
+  private List<ParameterGroupModel> getParameterGroupModels(boolean showInDsl) {
+    ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
+    when(exclusiveParametersModel.getExclusiveParameterNames())
+        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
+    when(exclusiveParametersModel.isOneRequired()).thenReturn(true);
+
+    ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
+    when(parameterGroupModel.getExclusiveParametersModels()).thenReturn(singletonList(exclusiveParametersModel));
+    when(parameterGroupModel.isShowInDsl()).thenReturn(showInDsl);
+
+    ExtensionParameter extensionParameter = mock(ExtensionParameter.class);
+    when(extensionParameter.getName()).thenReturn("oneParameterGroup");
+    ExtensionParameterDescriptorModelProperty property = mock(ExtensionParameterDescriptorModelProperty.class);
+    when(property.getExtensionParameter()).thenReturn(extensionParameter);
+    when(parameterGroupModel.getModelProperty(ExtensionParameterDescriptorModelProperty.class)).thenReturn(of(property));
+    return singletonList(parameterGroupModel);
   }
 }

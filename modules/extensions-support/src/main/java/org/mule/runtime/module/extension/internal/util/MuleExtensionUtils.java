@@ -93,6 +93,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
@@ -619,31 +620,9 @@ public class MuleExtensionUtils {
                                                       List<ParameterGroupModel> groups,
                                                       Map<String, ?> parameters, Map<String, String> aliasedParameterNames)
       throws ConfigurationException {
-    Set<String> explodedParameterNames = new HashSet<>();
-    Set<String> topLevelParameterNames = parameters.entrySet().stream()
-        .flatMap(entry -> {
-          if (entry.getValue() instanceof ParameterValueResolver) {
-            try {
-              ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                  .forEach(k -> explodedParameterNames.add(aliasedParameterNames.getOrDefault(k, k)));
-            } catch (ValueResolvingException e) {
-              throw new MuleRuntimeException(e);
-            }
-          }
-          String key = entry.getKey();
-          aliasedParameterNames.getOrDefault(key, key);
-          return Stream.of(key);
-        })
-        .collect(toSet());
-
-    Set<String> parameterNames;
     for (ParameterGroupModel group : groups) {
+      Set<String> parameterNames = resolveParameterNames(group, parameters, aliasedParameterNames);
       for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
-        if (group.isShowInDsl()) {
-          parameterNames = explodedParameterNames;
-        } else {
-          parameterNames = topLevelParameterNames;
-        }
         Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), parameterNames);
         if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
           throw new ConfigurationException((createStaticMessage(format(
@@ -665,6 +644,40 @@ public class MuleExtensionUtils {
           }
         }
       }
+    }
+  }
+
+  private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,
+                                                   Map<String, String> aliasedParameterNames)
+      throws ConfigurationException {
+    Set<String> topLevelParameterNames = new HashSet<>();
+    parameters.forEach((key, value) -> {
+      aliasedParameterNames.getOrDefault(key, key);
+      topLevelParameterNames.add(key);
+    });
+
+    if (group.isShowInDsl()) {
+      ExtensionParameterDescriptorModelProperty property = group.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+          .orElseThrow(() -> new ConfigurationException(createStaticMessage("Could not find ExtensionParameterDescriptorModelProperty for the parameter group %s",
+                                                                            group.getName())));
+      String containerName = property.getExtensionParameter().getName();
+      try {
+        Object parameter = parameters.get(containerName);
+        if (parameter == null) {
+          throw new ConfigurationException(createStaticMessage("Was expecting a parameter with name [%s] among the resolved parameters",
+                                                               containerName));
+        }
+        return ((ParameterValueResolver) parameters.get(containerName)).getParameters().keySet().stream()
+            .map(name -> aliasedParameterNames.getOrDefault(name, name)).collect(toSet());
+      } catch (ValueResolvingException e) {
+        throw new MuleRuntimeException(createStaticMessage("Failed to resolve the parameters for [%s]", containerName), e);
+      } catch (ClassCastException e) {
+        throw new MuleRuntimeException(createStaticMessage("Was expecting parameter with name [%s] to be of class ParameterValueResolver but was of class %s",
+                                                           containerName, parameters.get(containerName).getClass()),
+                                       e);
+      }
+    } else {
+      return topLevelParameterNames;
     }
   }
 }
