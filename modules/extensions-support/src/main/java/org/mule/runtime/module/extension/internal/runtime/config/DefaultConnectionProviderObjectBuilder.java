@@ -116,7 +116,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     final ClassLoader appRegionClassLoader = muleContext.getExecutionClassLoader().getParent();
 
     return ClassLoaderConnectionProviderWrapper
-        .newInstance(provider, from(appRegionClassLoader, extensionClassLoader));
+        .newInstance(provider, from(extensionClassLoader, appRegionClassLoader));
   }
 
 }

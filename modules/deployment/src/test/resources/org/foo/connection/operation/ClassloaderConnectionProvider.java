@@ -5,16 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.foo.connection;
+package org.foo.connection.operation;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.InputStream;
 
-public class ConnectionClassConnectionProvider implements ConnectionProvider<ClassConnection123>, Initialisable {
+public class ClassloaderConnectionProvider implements ConnectionProvider<ClassloaderConnection>, Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
@@ -22,17 +21,17 @@ public class ConnectionClassConnectionProvider implements ConnectionProvider<Cla
   }
 
   @Override
-  public ClassConnection123 connect() {
-    return new ClassConnection123();
+  public ClassloaderConnection connect() {
+    return new ClassloaderConnection();
   }
 
   @Override
-  public void disconnect(ClassConnection123 connection) {
+  public void disconnect(ClassloaderConnection connection) {
     connection.invalidate();
   }
 
   @Override
-  public ConnectionValidationResult validate(ClassConnection123 connection) {
+  public ConnectionValidationResult validate(ClassloaderConnection connection) {
     return null;
   }
 }

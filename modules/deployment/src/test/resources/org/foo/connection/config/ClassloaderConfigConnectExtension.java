@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.foo.connection;
+package org.foo.connection.config;
 
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -16,15 +16,15 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.io.InputStream;
 
-import org.foo.connection.ConnectionClassConnectionProvider;
+import org.foo.connection.config.ClassloaderConfigConnectionProvider;
 
 /**
  * Extension for testing purposes
  */
-@Extension(name = "Connect")
-@Operations({ConnectOperation.class})
-@ConnectionProviders(ConnectionClassConnectionProvider.class)
-public class ConnectExtension {
+@Extension(name = "ClassloaderConfigConnect")
+@Operations({ClassloaderConfigOperation.class})
+@ConnectionProviders(ClassloaderConfigConnectionProvider.class)
+public class ClassloaderConfigConnectExtension {
 
   private String fileMessage;
 

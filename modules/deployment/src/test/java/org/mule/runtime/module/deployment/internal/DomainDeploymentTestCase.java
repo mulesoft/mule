@@ -1950,12 +1950,12 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  // @Issue("MULE-18159")
-  public void pluginDeclaredInDomainWithConnectionIsAbleToLoadClassesExportedByTheAppWhereItIsUsed() throws Exception {
+  @Issue("MULE-19376")
+  public void pluginDeclaredInDomainWithConnectionIsAbleToCreateConnectionWithExtensionClassloader() throws Exception {
     // Given a plugin which loads classes.
     final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
     // Given a plugin which creates a connection.
-    final ArtifactPluginFileBuilder pluginWhichCreatesConnection = connectExtensionPlugin;
+    final ArtifactPluginFileBuilder pluginWhichCreatesConnection = classloaderConnectExtensionPlugin;
 
     // Given a domain depending on the plugin.
     DomainFileBuilder domainFileBuilder = new DomainFileBuilder("domain-with-test-plugin")
@@ -1979,23 +1979,42 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
-    String fileMessage = (String) withContextClassLoader(appClassLoader, () -> {
-      final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), "flowWhichConnects")
-          .withPayload(TEST_MESSAGE);
+    String fileMessage = executeApplicationFlowAndReturnMessage("flowWhichConnects");
+    assertThat(fileMessage, is(equalTo("extension file")));
+  }
 
-      CoreEvent result;
-      try {
-        result = flowRunner.run();
-      } finally {
-        flowRunner.dispose();
-      }
+  @Test
+  @Issue("MULE-19376")
+  public void pluginDeclaredInDomainWithConnectionIsAbleToCreateConnectionWithExtensionClassloaderSetInConfig() throws Exception {
+    // Given a plugin which loads classes.
+    final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
+    // Given a plugin which creates a connection.
+    final ArtifactPluginFileBuilder pluginWhichCreatesConnection = classloaderConfigConnectExtensionPlugin;
 
-      assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
+    // Given a domain depending on the plugin.
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("domain-with-test-plugin")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(pluginWhichLoadsClasses);
 
-      return result.getMessage().getPayload().getValue();
-    });
-    assertThat(fileMessage, is(equalTo("application file")));
+    // Given an app depending on the domain and exporting a class.
+    final ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("app-with-connection").definedBy("app-with-config-connection.xml")
+            .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+            .configuredWith(EXPORTED_PACKAGES, "org.foo")
+            .dependingOn(domainFileBuilder)
+            .dependingOn(pluginWhichCreatesConnection)
+            .containingResource("file.txt", "file.txt");
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    String fileMessage = executeApplicationFlowAndReturnMessage("flowWhichConnects");
+    assertThat(fileMessage, is(equalTo("extension file")));
   }
 
   private CompletionCallback<Object, Object> getCompletionCallback(String callbackName) {

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.foo.connection;
+package org.foo.connection.config;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
@@ -16,27 +16,27 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 
 import java.io.InputStream;
 
-public class ConnectOperation {
+public class ClassloaderConfigOperation {
 
   @MediaType(TEXT_PLAIN)
-  public String fooConfigOperation1(@Config ConnectExtension config){
+  public String fooConfigOperation1(@Config ClassloaderConfigConnectExtension config){
     return "this operation receives the FooConfig!";
   }
 
   @MediaType(TEXT_PLAIN)
-  public String fooConnectedOperation(@Connection ClassConnection123 connection){
+  public String fooConnectedOperation(@Connection ClassloaderConfigConnection connection){
     return "this operation receives ClassConnection!";
   }
 
   @MediaType(TEXT_PLAIN)
-  public String getFile(@Connection ClassConnection123 connection){
+  public String getFile(@Connection ClassloaderConfigConnection connection){
     InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("file.txt");
     return IOUtils.toString(stream);
   }
 
   @MediaType(TEXT_PLAIN)
-  public String getFileObtainedAtConfig(@Config ConnectExtension config, @Connection ClassConnection123 connection){
+  public String getFileObtainedAtConfig(@Config ClassloaderConfigConnectExtension config, @Connection ClassloaderConfigConnection connection){
 //    config.loadFileMessageFromResource();
-    return config.getFileMessage();
+    return connection.getFileContent();
   }
 }

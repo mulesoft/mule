@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:connect="http://www.mulesoft.org/schema/mule/connect"
+      xmlns:classloader-connect="http://www.mulesoft.org/schema/mule/classloader-connect"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-             http://www.mulesoft.org/schema/mule/connect http://www.mulesoft.org/schema/mule/connect/current/mule-connect.xsd">
+             http://www.mulesoft.org/schema/mule/classloader-connect http://www.mulesoft.org/schema/mule/classloader-connect/current/mule-classloader-connect.xsd">
 
-    <connect:config name="default"/>
+    <classloader-connect:config name="default"/>
 
     <flow name="flowWhichConnects">
-<!--        <connect:get-file />-->
-        <connect:get-file-obtained-at-config />
+        <classloader-connect:get-file />
     </flow>
 
 </mule>

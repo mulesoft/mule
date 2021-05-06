@@ -4,9 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.foo.connection;
+package org.foo.connection.config;
 
-public class ClassConnection123 {
+public class ClassloaderConfigConnection {
+
+  private String fileContent;
+
+  public ClassloaderConfigConnection(String fileContent){
+    this.fileContent = fileContent;
+  }
+
+  public String getFileContent(){
+    return fileContent;
+  }
 
   public void invalidate(){}
 }

@@ -253,7 +253,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static File oracleExtensionJarFile;
 
-  protected static File connectionExtensionJarFile;
+  protected static File classloaderConnectionExtensionJarFile;
+  protected static File classloaderConfigConnectionExtensionJarFile;
 
   private static File defaulServiceEchoJarFile;
 
@@ -338,12 +339,19 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                    getResourceFile("/org/foo/oracle/OracleOperation.java"))
         .compile("mule-module-oracle-1.0.0.jar", "1.0.0");
 
-    connectionExtensionJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/connection/ConnectExtension.java"),
-                   getResourceFile("/org/foo/connection/ConnectOperation.java"))
+    classloaderConnectionExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/connection/operation/ClassloaderConnectExtension.java"),
+                   getResourceFile("/org/foo/connection/operation/ClassloaderOperation.java"))
         .including(getResourceFile("/org/foo/connection/extension/file.txt"),
                    "file.txt")
         .compile("mule-module-connect-1.0.0.jar", "1.0.0");
+
+    classloaderConfigConnectionExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/connection/config/ClassloaderConfigConnectExtension.java"),
+                   getResourceFile("/org/foo/connection/config/ClassloaderConfigOperation.java"))
+        .including(getResourceFile("/org/foo/connection/extension/file.txt"),
+                   "file.txt")
+        .compile("mule-module-classloader-config-1.0.0.jar", "1.0.0");
 
     usingObjectStoreJarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/os/UsingObjectStoreExtension.java"))
@@ -395,7 +403,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder byeXmlExtensionPlugin = createByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder usingObjectStorePlugin = createUsingObjectStorePluginFileBuilder();
-  protected final ArtifactPluginFileBuilder connectExtensionPlugin = createConnectExtensionPluginFileBuilder();
+  protected final ArtifactPluginFileBuilder classloaderConnectExtensionPlugin =
+      createClassloaderConnectExtensionPluginFileBuilder();
+  protected final ArtifactPluginFileBuilder classloaderConfigConnectExtensionPlugin =
+      createClassloaderConfigConnectExtensionPluginFileBuilder();
 
   // Application file builders
   protected final ApplicationFileBuilder emptyAppFileBuilder =
@@ -1348,6 +1359,25 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     });
   }
 
+  protected String executeApplicationFlowAndReturnMessage(String flowName) throws Exception {
+    ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
+    return (String) withContextClassLoader(appClassLoader, () -> {
+      final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName)
+          .withPayload(TEST_MESSAGE);
+
+      CoreEvent result;
+      try {
+        result = flowRunner.run();
+      } finally {
+        flowRunner.dispose();
+      }
+
+      assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
+
+      return result.getMessage().getPayload().getValue();
+    });
+  }
+
   protected void assertNoZombiePresent(Map<String, Map<URI, Long>> zombieMap) {
     assertEquals("Wrong number of zombie artifacts registered.", 0, zombieMap.size());
   }
@@ -1603,18 +1633,34 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return pluginFileBuilder;
   }
 
-  private ArtifactPluginFileBuilder createConnectExtensionPluginFileBuilder() {
+  private ArtifactPluginFileBuilder createClassloaderConnectExtensionPluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("connectExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("connectExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("classloaderConnectExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("classloaderConnectExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.connection.ConnectExtension")
+        .addProperty("type", "org.foo.connection.operation.ClassloaderConnectExtension")
         .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder("connectExtensionPlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("connectExtension", connectionExtensionJarFile))
+    return new ArtifactPluginFileBuilder("classloaderConnectExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("classloaderConnectExtension", classloaderConnectionExtensionJarFile))
+        .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private ArtifactPluginFileBuilder createClassloaderConfigConnectExtensionPluginFileBuilder() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("classloaderConfigConnectExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("classloaderConfigConnectExtensionPlugin",
+                                                                 MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.connection.config.ClassloaderConfigConnectExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("classloaderConfigConnectExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("classloaderConfigConnectExtension", classloaderConfigConnectionExtensionJarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
 
