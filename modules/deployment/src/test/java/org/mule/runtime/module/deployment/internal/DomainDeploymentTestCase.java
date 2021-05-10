@@ -1951,7 +1951,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   @Issue("MULE-19376")
-  public void pluginDeclaredInDomainWithConnectionIsAbleToGetResourceWithSameNameFromExtension() throws Exception {
+  public void pluginDeclaredInDomainIsAbleToGetResourceWithSameNameInAppAndExtensionFromExtension() throws Exception {
     // Given a plugin which loads classes.
     final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
     // Given a plugin which creates a connection.
@@ -1985,7 +1985,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   @Issue("MULE-19376")
-  public void pluginDeclaredInDomainWithConnectionIsAbleToGetResourceWithSameNameFromExtensionInConfig() throws Exception {
+  public void pluginDeclaredInDomainIsAbleToGetResourceWithSameNameInAppAndExtensionFromExtensionInConfig() throws Exception {
     // Given a plugin which loads classes.
     final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
     // Given a plugin which creates a connection.

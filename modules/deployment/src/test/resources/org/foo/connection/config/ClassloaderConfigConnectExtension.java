@@ -31,9 +31,4 @@ public class ClassloaderConfigConnectExtension {
   public String getFileMessage() {
     return fileMessage;
   }
-
-//  public void loadFileMessageFromResource(){
-//    InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("file.txt");
-//    fileMessage = IOUtils.toString(stream);
-//  }
 }

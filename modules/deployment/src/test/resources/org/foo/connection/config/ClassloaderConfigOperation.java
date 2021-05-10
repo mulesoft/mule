@@ -36,7 +36,6 @@ public class ClassloaderConfigOperation {
 
   @MediaType(TEXT_PLAIN)
   public String getFileObtainedAtConfig(@Config ClassloaderConfigConnectExtension config, @Connection ClassloaderConfigConnection connection){
-//    config.loadFileMessageFromResource();
     return connection.getFileContent();
   }
 }
