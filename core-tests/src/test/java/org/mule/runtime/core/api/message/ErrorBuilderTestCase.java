@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -25,6 +26,7 @@ import static org.mule.runtime.internal.exception.SuppressedMuleException.suppre
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -41,14 +43,18 @@ import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 @Feature(ERROR_HANDLING)
@@ -60,7 +66,41 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   private final ErrorType anyError = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
   private final ErrorType testError =
       ErrorTypeBuilder.builder().namespace("MULE").identifier("TEST").parentErrorType(anyError).build();
+  private final Component mockFailingComponent = mock(Component.class);
 
+  @Rule
+  public ExpectedException expectedException = none();
+
+  @Test
+  public void errorCanNotBeNull() {
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage("error exception cannot be null");
+    builder().build();
+  }
+
+  @Test
+  public void errorTypeCanNotBeNull() {
+    RuntimeException exception = new RuntimeException(EXCEPTION_MESSAGE);
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage("errorType exception cannot be null");
+    builder(exception).build();
+  }
+
+  @Test
+  @Issue("MULE-19408")
+  public void errorCanBeSerializedByAnObjectOutputStreamEvenWhenFailingComponentIsNotSerializable() throws IOException {
+    when(mockFailingComponent.getRepresentation()).thenReturn("mock/representation");
+
+    RuntimeException exception = new RuntimeException(EXCEPTION_MESSAGE);
+    Error error = builder(exception).errorType(mockErrorType).failingComponent(mockFailingComponent).build();
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+      oos.writeObject(error);
+    }
+
+    assertThat(baos.toString(), containsString("mock/representation"));
+  }
 
   @Test
   public void buildErrorFromException() {

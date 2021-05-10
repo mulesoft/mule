@@ -272,7 +272,7 @@ public final class ErrorBuilder {
     private final Throwable exception;
     private final String description;
     private final String detailedDescription;
-    private final Component failingComponent;
+    private final String failingComponent;
     private final ErrorType errorType;
     private final Message muleMessage;
     private final List<Error> errors;
@@ -284,7 +284,7 @@ public final class ErrorBuilder {
       this.exception = exception;
       this.description = description;
       this.detailedDescription = detailedDescription;
-      this.failingComponent = failingComponent;
+      this.failingComponent = failingComponent != null ? failingComponent.getRepresentation() : null;
       this.errorType = errorType;
       this.muleMessage = errorMessage;
       this.errors = unmodifiableList(errors);
@@ -309,7 +309,7 @@ public final class ErrorBuilder {
 
     @Override
     public String getFailingComponent() {
-      return failingComponent != null ? failingComponent.getRepresentation() : null;
+      return failingComponent;
     }
 
     /**
