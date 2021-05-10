@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.sdk.api.annotation.binding.Binding;
-import org.mule.sdk.api.values.FieldValues;
+import org.mule.sdk.api.annotation.values.FieldValues;
 import org.mule.test.values.extension.connection.ChatConnection;
 import org.mule.test.values.extension.metadata.JsonTypeResolver;
 import org.mule.test.values.extension.resolver.ChannelsValueProvider;
