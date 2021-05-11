@@ -16,6 +16,8 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -25,6 +27,9 @@ import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilde
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+
+@Feature(DOMAIN_DEPLOYMENT)
 public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   private final DomainFileBuilder emptyDomain100FileBuilder =

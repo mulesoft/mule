@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
@@ -19,12 +20,15 @@ import org.mule.tck.util.CompilerUtils;
 import java.io.File;
 import java.util.List;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+
+@Feature(APP_DEPLOYMENT)
 @RunWith(Parameterized.class)
 public class ApplicationDeploymentLocalPackagesResourcesTestCase extends AbstractApplicationDeploymentTestCase {
 
@@ -37,7 +41,7 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
     });
   }
 
-  private String classloaderModelVersion;
+  private final String classloaderModelVersion;
 
   public ApplicationDeploymentLocalPackagesResourcesTestCase(boolean parallelDeployment, String classloaderModelVersion) {
     super(parallelDeployment);
@@ -159,6 +163,7 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
     executeApplicationFlow("main");
   }
 
+  @Override
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
     return new ApplicationFileBuilder(artifactId)
         .withClassloaderModelVersion(classloaderModelVersion);
