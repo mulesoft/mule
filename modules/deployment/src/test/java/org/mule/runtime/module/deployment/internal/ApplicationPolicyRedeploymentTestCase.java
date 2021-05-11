@@ -13,6 +13,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
@@ -28,9 +29,12 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+import io.qameta.allure.Feature;
+
 /**
  * Contains test for application deployment with policies on the default domain
  */
+@Feature(POLICY_DEPLOYMENT)
 public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTestCase {
 
   private static final String APP_WITH_SIMPLE_EXTENSION_CONFIG = "app-with-simple-flow-config.xml";

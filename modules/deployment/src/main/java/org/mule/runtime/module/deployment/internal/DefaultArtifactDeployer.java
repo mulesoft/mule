@@ -69,6 +69,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
           } catch (Throwable t) {
             artifact.dispose();
             logger.error("Failed to deploy artifact [{}]", artifact.getArtifactName());
+            throw t;
           }
         });
 

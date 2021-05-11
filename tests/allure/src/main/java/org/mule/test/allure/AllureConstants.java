@@ -63,6 +63,31 @@ public interface AllureConstants {
     }
   }
 
+  interface ArtifactDeploymentFeature {
+
+    String APP_DEPLOYMENT = "Application Deployment";
+    String DOMAIN_DEPLOYMENT = "Domain Deployment";
+    String POLICY_DEPLOYMENT = "Policy Deployment";
+
+    interface DeploymentSuccessfulStory {
+
+      String DEPLOYMENT_SUCCESS = "Deployment Success";
+
+    }
+
+    interface DeploymentFailureStory {
+
+      String DEPLOYMENT_FAILURE = "Deployment Failure";
+
+    }
+
+    interface UndeploymentFailureStory {
+
+      String UNDEPLOYMENT = "Undeployment";
+
+    }
+  }
+
   interface DeploymentTypeFeature {
 
     String DEPLOYMENT_TYPE = "Deployment type";
@@ -78,7 +103,7 @@ public interface AllureConstants {
     interface RedeploymentStory {
 
       String APPLICATION_REDEPLOYMENT = "Application Redeployment";
-      String APPLICATION_PATCHING = "Application Redeployment";
+      String APPLICATION_PATCHING = "Application Patching";
 
     }
   }

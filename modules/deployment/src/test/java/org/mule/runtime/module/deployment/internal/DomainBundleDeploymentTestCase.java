@@ -12,15 +12,20 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.reset;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainBundleFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+
 /**
  * Contains test for domain bundle deployment
  */
+@Feature(DOMAIN_DEPLOYMENT)
 public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
   public DomainBundleDeploymentTestCase(boolean parallelDeployment) {
