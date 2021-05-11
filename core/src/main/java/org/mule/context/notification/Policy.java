@@ -174,7 +174,10 @@ class Policy
             try
             {
                 sender.dispatch(notification);
-                LOGGER.debug(notification.toString());
+                if (LOGGER.isDebugEnabled())
+                {
+                    LOGGER.debug(notification.toString());
+                }
             }
             catch (Exception e)
             {
