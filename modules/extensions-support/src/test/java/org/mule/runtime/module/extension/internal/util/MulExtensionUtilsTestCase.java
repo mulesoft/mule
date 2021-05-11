@@ -234,11 +234,6 @@ public class MulExtensionUtilsTestCase extends AbstractMuleTestCase {
     when(property.getExtensionParameter()).thenReturn(extensionParameter);
     when(parameterGroupModel.getModelProperty(ExtensionParameterDescriptorModelProperty.class)).thenReturn(of(property));
 
-    AnnotatedElement container = mock(AnnotatedElement.class);
-    when(container.toString()).thenReturn("org.mule.test.some.extension.SomeParameterGroupOneRequiredConfig oneParameterGroup");
-    ParameterGroupDescriptor groupDescriptor = new ParameterGroupDescriptor("Name", mock(Type.class), null, container, null);
-    ParameterGroupModelProperty groupProperty = new ParameterGroupModelProperty(groupDescriptor);
-    when(parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(of(groupProperty));
     return singletonList(parameterGroupModel);
   }
 }
