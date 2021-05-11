@@ -108,7 +108,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-19408")
   @Description("An instance of the deprecated ErrorImplementation could be already serialized. We should be able to " +
-               "deserialize it")
+      "deserialize it")
   public void alreadySerializedErrorImplementationCanBeDeserialized() throws IOException, ClassNotFoundException {
     ErrorBuilder.ErrorImplementation deprecated = getDeprecatedImpl();
 
