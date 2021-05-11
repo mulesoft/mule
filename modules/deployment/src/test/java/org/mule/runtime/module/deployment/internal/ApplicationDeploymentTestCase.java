@@ -54,8 +54,14 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentFailureStory.DEPLOYMENT_FAILURE;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentSuccessfulStory.DEPLOYMENT_SUCCESS;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.UndeploymentFailureStory.UNDEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowStatePersistenceStory.FLOW_STATE_PERSISTENCE;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -100,6 +106,7 @@ import io.qameta.allure.Story;
 /**
  * Contains test for application deployment on the default domain
  */
+@Feature(APP_DEPLOYMENT)
 public class ApplicationDeploymentTestCase extends AbstractApplicationDeploymentTestCase {
 
   private static final String OVERWRITTEN_PROPERTY = "configFile";
@@ -146,6 +153,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipOnStartup() throws Exception {
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
@@ -164,6 +172,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void extensionManagerPresent() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     assertThat(app.getRegistry().<ExtensionManager>lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER).get(),
@@ -171,6 +180,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void appHomePropertyIsPresent() throws Exception {
     final ApplicationFileBuilder globalPropertyAppFileBuilder =
         appFileBuilder("property-app").definedBy("app-properties-config.xml");
@@ -193,23 +203,27 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception {
     Action deployExplodedWaitAppAction = () -> addExplodedAppFromBuilder(waitAppFileBuilder);
     deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployExplodedWaitAppAction);
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackagedAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception {
     Action deployPackagedWaitAppAction = () -> addPackedAppFromBuilder(waitAppFileBuilder);
     deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployPackagedWaitAppAction);
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipAfterStartup() throws Exception {
     deployAfterStartUp(dummyAppDescriptorFileBuilder);
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipWithExtensionUpperCaseAfterStartup() throws Exception {
     final ApplicationFileBuilder dummyAppDescriptorFileBuilderWithUpperCaseInExtension =
         appFileBuilder("dummy-app", true)
@@ -220,6 +234,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysAppWithNonExistentConfigResourceOnDeclaration() throws Exception {
     ApplicationFileBuilder appBundleNonExistentConfigResource = appFileBuilder("non-existent-app-config-resource")
         .definedBy("empty-config.xml").deployedWith(PROPERTY_CONFIG_RESOURCES, "mule-non-existent-config.xml");
@@ -232,6 +247,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysBrokenAppZipOnStartup() throws Exception {
     addPackedAppFromBuilder(brokenAppFileBuilder);
 
@@ -247,6 +263,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deployAndRedeployAppWithDeploymentProperties() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
@@ -269,6 +286,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-16688")
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deployAppWithDeploymentPropertiesInImportTag() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put("environment", "dev");
@@ -283,6 +301,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-16688")
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deployAppWithOverwrittenDeploymentPropertiesInImportTag() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put("oneProperty", "dev");
@@ -296,6 +315,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploymentPropertiesUsedInConfigurationProperties() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE);
@@ -308,6 +328,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-19040")
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
@@ -320,6 +341,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-19040")
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
 
@@ -335,6 +357,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
    * doesn't try to do it again, which is a behavior than can be seen in some file systems due to path handling issues
    */
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void doesNotRetriesBrokenAppWithFunkyName() throws Exception {
     addPackedAppFromBuilder(brokenAppWithFunkyNameAppFileBuilder);
 
@@ -360,6 +383,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysBrokenAppZipAfterStartup() throws Exception {
     startDeployment();
 
@@ -375,6 +399,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void redeploysAppZipDeployedOnStartup() throws Exception {
     startDeployment();
 
@@ -396,6 +421,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void removesPreviousAppFolderOnStart() throws Exception {
     addExplodedAppFromBuilder(emptyAppFileBuilder);
 
@@ -416,6 +442,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppOnStartup() throws Exception {
     addExplodedAppFromBuilder(emptyAppFileBuilder);
 
@@ -427,6 +454,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackagedAppOnStartupWhenExplodedAppIsAlsoPresent() throws Exception {
     addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
@@ -443,6 +471,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -454,6 +483,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedAppOnStartup() throws Exception {
     addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
 
@@ -467,6 +497,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -480,6 +511,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedOnlyOnce() throws Exception {
     startDeployment();
 
@@ -497,6 +529,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysBrokenExplodedAppOnStartup() throws Exception {
     addExplodedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -514,6 +547,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysBrokenExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -530,7 +564,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
-  public void removesZombieFilesAfterremovesZombieFilesAfterFailedAppIsDeleted() throws Exception {
+  @Story(DEPLOYMENT_FAILURE)
+  public void removesZombieFilesAfterRemovesZombieFilesAfterFailedAppIsDeleted() throws Exception {
     final String appName = "bad-config-app";
 
     final ApplicationFileBuilder badConfigAppFileBuilder = appFileBuilder(appName).definedBy("bad-app-config.xml");
@@ -555,16 +590,19 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void brokenAppArchiveWithoutArgument() throws Exception {
     doBrokenAppArchiveTest();
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void brokenAppArchiveAsArgument() throws Exception {
     testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, brokenAppFileBuilder.getId(), () -> doBrokenAppArchiveTest());
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidZipAppOnStartup() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.jar");
 
@@ -577,6 +615,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidZipAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -590,6 +629,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deployAppNameWithZipSuffix() throws Exception {
     final ApplicationFileBuilder applicationFileBuilder = appFileBuilder("empty-app.jar", emptyAppFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -607,6 +647,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackedAppsInOrderWhenAppArgumentIsUsed() throws Exception {
     assumeThat(parallelDeployment, is(false));
 
@@ -641,6 +682,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppsInOrderWhenAppArgumentIsUsed() throws Exception {
     assumeThat(parallelDeployment, is(false));
 
@@ -673,6 +715,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppJustOnce() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -691,6 +734,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void tracksAppConfigUpdateTime() throws Exception {
     addExplodedAppFromBuilder(emptyAppFileBuilder);
 
@@ -707,6 +751,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void receivesMuleContextDeploymentNotifications() throws Exception {
     // NOTE: need an integration test like this because DefaultMuleApplication
     // class cannot be unit tested.
@@ -720,6 +765,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysStoppedApp() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
@@ -730,6 +776,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-19040")
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
@@ -742,6 +789,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-19040")
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysStoppedAppDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
@@ -758,6 +806,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-19040")
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     assertStatus(app, STARTED);
@@ -890,6 +939,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysApplicationRemovingAnchorFile() throws Exception {
     Application app = deployApplication(emptyAppFileBuilder);
 
@@ -900,6 +950,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysAppCompletelyEvenOnStoppingException() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -927,6 +978,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploymentFailureWhenDomainNotFound() throws Exception {
     final DefaultDomainManager emptyDomainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
@@ -947,6 +999,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploymentSuccessWhenUsingDefaultDomain() throws Exception {
     final DefaultDomainManager domainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
@@ -964,6 +1017,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysAppCompletelyEvenOnDisposingException() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -989,6 +1043,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysIncompleteZipAppOnStartup() throws Exception {
     addPackedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -1007,6 +1062,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysIncompleteZipAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -1025,6 +1081,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void mantainsAppFolderOnExplodedAppDeploymentError() throws Exception {
     startDeployment();
 
@@ -1043,6 +1100,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipWithPlugin() throws Exception {
     final ApplicationFileBuilder echoPluginAppFileBuilder =
         appFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").dependingOn(echoPlugin);
@@ -1055,6 +1113,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipWithExtensionPlugin() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
                                                                                            helloExtensionV1Plugin);
@@ -1066,6 +1125,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void failsToDeploysAppZipWithInvalidPrivilegedExtensionPlugin() throws Exception {
     ArtifactPluginFileBuilder invalidPrivilegedPlugin =
         new ArtifactPluginFileBuilder("invalidPrivilegedPlugin")
@@ -1082,6 +1142,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Feature(XML_SDK)
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPlugin() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtensionXmlPlugin")
         .definedBy("app-with-extension-xml-plugin-module-bye.xml").dependingOn(byeXmlExtensionPlugin);
@@ -1102,6 +1164,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Feature(XML_SDK)
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPluginWithXmlDependencies() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtensionXmlPluginWithXmlDependencies")
         .definedBy("app-with-extension-xml-plugin-module-using-bye.xml")
@@ -1123,6 +1187,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Feature(XML_SDK)
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPluginWithDependencies() throws Exception {
     String moduleFileName = "module-using-java.xml";
     String extensionName = "using-java-extension";
@@ -1163,6 +1229,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Feature(XML_SDK)
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPluginWithResourcesOnly() throws Exception {
     final String dwlResourceTestFile = "module-resources-dwlSource.dwl";
     final String prefixModuleName = "module-resources";
@@ -1211,8 +1279,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertThat(IOUtils.toString(appDwlResource), is(expectedResource));
   }
 
-
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void failsToDeployWithExtensionThatHasNonExistingIdForExtensionModel() throws Exception {
     String extensionName = "extension-with-extension-model-id-non-existing";
     MulePluginModel.MulePluginModelBuilder builder =
@@ -1235,6 +1303,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppWithPluginBootstrapProperty() throws Exception {
     final ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("bootstrapPlugin")
         .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES)
@@ -1250,6 +1319,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void failsToDeployApplicationOnMissingService() throws Exception {
     ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
         .dependingOn(new JarFileBuilder("bundleExtensionv1", helloExtensionV1JarFile))
@@ -1264,6 +1334,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysMultipleAppsZipOnStartup() throws Exception {
     final int totalApps = 20;
 
@@ -1280,6 +1351,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesAppDeployFromClient() throws Exception {
     final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
@@ -1289,6 +1361,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void synchronizesAppUndeployFromClient() throws Exception {
     final Action action = () -> deploymentService.undeploy(emptyAppFileBuilder.getId());
 
@@ -1298,6 +1371,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void synchronizesAppRedeployFromClient() throws Exception {
     final Action action = () -> {
       // Clears notification from first deployment
@@ -1318,6 +1392,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesDeploymentOnStart() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -1363,6 +1438,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysAppRemovesTemporaryData() throws Exception {
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
@@ -1387,30 +1463,35 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void explodedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
                                () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void packedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
                                () -> addPackedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void packedAppRedeploymentWithExplodedDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
                                () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void explodedAppRedeploymentWithPackedDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
                                () -> addPackedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void deployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
@@ -1437,6 +1518,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void deployMethodRedeploysIfApplicationIsAlreadyDeployedExploded() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);

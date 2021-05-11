@@ -41,6 +41,7 @@ import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentP
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -95,6 +96,7 @@ import io.qameta.allure.Issue;
 /**
  * Contains test for application deployment with policies on the default domain
  */
+@Feature(POLICY_DEPLOYMENT)
 public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestCase {
 
   private static final String APP_WITH_SIMPLE_EXTENSION_CONFIG = "app-with-simple-extension-config.xml";
