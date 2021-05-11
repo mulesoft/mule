@@ -75,13 +75,17 @@ public interface HttpServer {
    *
    * @param tlsContextFactory The TLS context factory to be used when dynamically enabled TLS at this server
    */
-  void enableTls(TlsContextFactory tlsContextFactory);
+  default void enableTls(TlsContextFactory tlsContextFactory) {
+    throw new UnsupportedOperationException("TLS is not supported");
+  }
 
   /**
    * Disable TLS dynamically. It should work for when the TLS was dynamically enabled or even when the TLS was statically
    * configured in the listener configuration section of the application.
    */
-  void disableTls();
+  default void disableTls() {
+    throw new UnsupportedOperationException("TLS is not supported");
+  }
 
   /**
    * Adds a {@link RequestHandler} on the given path and for the given methods.

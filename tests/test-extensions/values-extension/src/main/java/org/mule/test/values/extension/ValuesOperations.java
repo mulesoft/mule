@@ -14,18 +14,22 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.sdk.api.annotation.binding.Binding;
+import org.mule.sdk.api.annotation.values.FieldValues;
 import org.mule.test.values.extension.metadata.JsonTypeResolver;
 import org.mule.test.values.extension.metadata.XmlTypeResolver;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
+import org.mule.test.values.extension.resolver.SdkMultiLevelValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
-import org.mule.test.values.extension.resolver.WithListParameterValueProvider;
+import org.mule.test.values.extension.resolver.TrueFalseValueProvider;
 import org.mule.test.values.extension.resolver.WithComplexActingParameter;
-import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
 import org.mule.test.values.extension.resolver.WithConfigValueProvider;
+import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
 import org.mule.test.values.extension.resolver.WithEnumParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithErrorValueProvider;
 import org.mule.test.values.extension.resolver.WithFourActingParametersValueProvider;
+import org.mule.test.values.extension.resolver.WithListParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithMapParameterValueProvider;
+import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
 import org.mule.test.values.extension.resolver.WithOptionalParameterSdkValueProvider;
 import org.mule.test.values.extension.resolver.WithOptionalParametersValueProvider;
 import org.mule.test.values.extension.resolver.WithOptionalParametersWithDefaultValueProvider;
@@ -35,7 +39,6 @@ import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupVal
 import org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
-import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
 import org.mule.test.values.extension.resolver.WithTwoActingParametersValueProvider;
 
 import java.io.InputStream;
@@ -233,5 +236,20 @@ public class ValuesOperations {
       bindings = {
           @Binding(actingParameter = "requiredValue", extractionExpression = "xmlBody.field")}) String parameterWithValues,
                                                           @TypeResolver(XmlTypeResolver.class) @Content InputStream xmlBody) {}
+
+  public void singleValuesEnabledParameterWithOneFieldValues(@TypeResolver(JsonTypeResolver.class) @Content @FieldValues(
+      targetSelectors = "simple.path",
+      value = SimpleValueProvider.class) InputStream body) {}
+
+  public void singleValuesEnabledParameterWithMoreThanOneFieldValues(@TypeResolver(JsonTypeResolver.class) @Content @FieldValues(
+      targetSelectors = "simple.path",
+      value = SimpleValueProvider.class) @FieldValues(targetSelectors = "another.simple.path",
+          value = TrueFalseValueProvider.class) InputStream body) {}
+
+  public void parameterWithMultilevelFieldValue(@TypeResolver(JsonTypeResolver.class) @Content @FieldValues(
+      targetSelectors = "channel",
+      value = SimpleValueProvider.class) @FieldValues(
+          targetSelectors = {"location.continent", "location.country", "location.city"},
+          value = SdkMultiLevelValueProvider.class) InputStream body) {}
 
 }

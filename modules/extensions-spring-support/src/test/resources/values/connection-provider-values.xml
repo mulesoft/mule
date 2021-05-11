@@ -53,4 +53,8 @@
                                                                    parameterTwo="another value"
                                                                    parameterThree="a value" parameterFour="last value"/>
     </values:config>
+
+    <values:config name="with-parameter-with-field-values-connection">
+        <values:with-parameter-with-field-values-connection channel="dummyValue"/>
+    </values:config>
 </mule>

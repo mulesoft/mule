@@ -91,6 +91,7 @@
             <values:values-group channels="#[payload ++ payload]" anyParameter="someValue"/>
         </values:values-inside-show-in-dsl-group>
     </flow>
+
     <flow name="withErrorValueProvider">
         <values:with-error-value-provider errorCode="CUSTOM_ERROR"/>
     </flow>
@@ -201,6 +202,18 @@
     <flow name="withBoundOptionalActingParameterFieldMissingPath">
         <values:with-bound-optional-acting-parameter-field
             actingParameter='#[output application/json --- { "otherField": "another value"}]'/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithOneFieldValues">
+        <values:single-values-enabled-parameter-with-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithMoreThanOneFieldValues">
+        <values:single-values-enabled-parameter-with-more-than-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="parameterWithMultilevelFieldValue">
+        <values:parameter-with-multilevel-field-value channels="dummyValue"/>
     </flow>
 
     <flow name="withBoundActingParameterFromContentField">

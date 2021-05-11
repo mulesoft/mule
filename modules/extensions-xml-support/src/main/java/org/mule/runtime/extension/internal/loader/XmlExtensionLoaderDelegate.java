@@ -8,6 +8,8 @@ package org.mule.runtime.extension.internal.loader;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.Math.max;
+import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
@@ -101,9 +103,9 @@ import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,9 +117,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
-import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -127,6 +128,9 @@ import org.jgrapht.Graph;
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.vibur.objectpool.ConcurrentPool;
+import org.vibur.objectpool.PoolService;
+import org.vibur.objectpool.util.ConcurrentLinkedQueueCollection;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -169,7 +173,6 @@ public final class XmlExtensionLoaderDelegate {
   private static final String ATTRIBUTE_VISIBILITY = "visibility";
   private static final String NAMESPACE_SEPARATOR = ":";
 
-  private static final String TRANSFORMATION_FOR_TNS_RESOURCE = "META-INF/transform_for_tns.xsl";
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   public static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
@@ -228,7 +231,13 @@ public final class XmlExtensionLoaderDelegate {
   private static final String XML_SUFFIX = ".xml";
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
-  final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
+  // Set a conservative value for how big the pool can get
+  private static final int FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE = max(1, getRuntime().availableProcessors() / 2);
+  private static final PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL =
+      new ConcurrentPool<>(new ConcurrentLinkedQueueCollection<>(), new ForTnsTransformerFactory(), 1,
+                           FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE, false);
+
+  private static final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
       newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
 
   private final String modulePath;
@@ -359,17 +368,15 @@ public final class XmlExtensionLoaderDelegate {
   private Optional<ExtensionModel> createTnsExtensionModel(URL resource, Set<ExtensionModel> extensionModels)
       throws IOException {
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-    try (InputStream in = getClass().getClassLoader().getResourceAsStream(TRANSFORMATION_FOR_TNS_RESOURCE)) {
-      final Source xslt = new StreamSource(in);
-      final Source moduleToTransform = new StreamSource(resource.openStream());
-      TransformerFactory.newInstance()
-          .newTransformer(xslt)
-          .transform(moduleToTransform, new StreamResult(resultStream));
+    final Transformer transformer = FOR_TNS_XSTL_TRANSFORMER_POOL.take();
+    try (BufferedInputStream resourceIS = new BufferedInputStream(resource.openStream())) {
+      transformer.transform(new StreamSource(resourceIS), new StreamResult(resultStream));
     } catch (TransformerException e) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage(format("There was an issue transforming the stream for the resource %s while trying to remove the content of the <body> element to generate an XSD",
+      throw new MuleRuntimeException(createStaticMessage(format("There was an issue transforming the stream for the resource %s while trying to remove the content of the <body> element to generate an XSD",
                                                                 resource.getFile())),
                                      e);
+    } finally {
+      FOR_TNS_XSTL_TRANSFORMER_POOL.restore(transformer);
     }
 
     final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
@@ -379,7 +386,7 @@ public final class XmlExtensionLoaderDelegate {
         .build();
 
     ArtifactAst transformedModuleAst =
-        xmlToAstParser.parse("transformed_" + resource.getFile(), new ByteArrayInputStream(resultStream.toByteArray()));
+        xmlToAstParser.parse("transformed_" + resource.getFile(), resultStream.toInputStream());
 
     if (transformedModuleAst.topLevelComponentsStream().findFirst().get().getRawParameterValue(XMLNS_TNS).isPresent()) {
       loadModuleExtension(extensionDeclarer, transformedModuleAst, true);
