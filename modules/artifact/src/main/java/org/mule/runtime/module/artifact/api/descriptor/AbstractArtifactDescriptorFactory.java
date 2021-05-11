@@ -12,6 +12,8 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -20,8 +22,6 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.IOUtils;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,6 +29,10 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Base class to create artifact descriptors
@@ -42,9 +46,11 @@ import java.util.Properties;
 public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleArtifactModel, T extends ArtifactDescriptor>
     implements ArtifactDescriptorFactory<T> {
 
+  private static final Logger LOGGER = getLogger(AbstractArtifactDescriptorFactory.class);
+
   public static final String ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR = "Artifact descriptor does not exists: ";
   protected final DescriptorLoaderRepository descriptorLoaderRepository;
-  private ArtifactDescriptorValidator artifactDescriptorValidator;
+  private final ArtifactDescriptorValidator artifactDescriptorValidator;
 
   /**
    * Creates a new factory
@@ -164,6 +170,10 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   }
 
   private String getDescriptorContent(File jsonFile) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
+    }
+
     try (InputStream stream = new FileInputStream(jsonFile)) {
       return IOUtils.toString(stream);
     } catch (IOException e) {
