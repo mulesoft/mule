@@ -14,6 +14,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -30,12 +32,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
+import io.qameta.allure.Feature;
+
 @SmallTest
+@Feature(DOMAIN_DEPLOYMENT)
 public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   public static final String DOMAIN_ZIP_PATH = "someZipFile";
@@ -46,8 +50,10 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
   public static final String NON_EXISTENT_DOMAIN_ID = "NonExistentDomainId";
 
   @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  public MockitoRule rule = MockitoJUnit.rule();
 
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Mock(lenient = true)
   private ArchiveDeployer<Domain> mockDomainDeployer;

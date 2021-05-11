@@ -48,6 +48,7 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
@@ -85,16 +86,19 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+
 /**
  * Contains test for domain deployment
  */
+@Feature(DOMAIN_DEPLOYMENT)
 public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   private static File pluginForbiddenJavaEchoTestClassFile;
