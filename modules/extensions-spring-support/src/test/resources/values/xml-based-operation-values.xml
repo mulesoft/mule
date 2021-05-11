@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:values="http://www.mulesoft.org/schema/mule/values"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
+
+    <flow name="textAsActingForAttributeValue">
+        <values:text-as-acting-for-attribute-value>
+            <values:xml-body>
+                <![CDATA[<nested><tag>Acting parameter value<some-tag/></tag></nested>]]>
+            </values:xml-body>
+        </values:text-as-acting-for-attribute-value>
+    </flow>
+
+    <flow name="attributeAsActingForTagContentValue">
+        <values:attribute-as-acting-for-tag-content-value>
+            <values:xml-body>
+                <![CDATA[<nested><anotherTag customAttribute="Acting parameter value"></anotherTag></nested>]]>
+            </values:xml-body>
+        </values:attribute-as-acting-for-tag-content-value>
+    </flow>
+
+    <flow name="tagContentAsActingForAttributeValue">
+        <values:tag-content-as-acting-for-attribute-value>
+            <values:xml-body>
+                <![CDATA[<nested><someTag>Acting parameter value</someTag></nested>]]>
+            </values:xml-body>
+        </values:tag-content-as-acting-for-attribute-value>
+    </flow>
+
+</mule>

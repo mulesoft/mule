@@ -251,5 +251,4 @@ public class ValuesOperations {
       value = SimpleValueProvider.class) @FieldValues(
           targetSelectors = {"location.continent", "location.country", "location.city"},
           value = SdkMultiLevelValueProvider.class) InputStream body) {}
-
 }

@@ -216,6 +216,18 @@
         <values:parameter-with-multilevel-field-value channels="dummyValue"/>
     </flow>
 
+    <flow name="singleValuesEnabledParameterWithOneFieldValues">
+        <values:single-values-enabled-parameter-with-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithMoreThanOneFieldValues">
+        <values:single-values-enabled-parameter-with-more-than-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="parameterWithMultilevelFieldValue">
+        <values:parameter-with-multilevel-field-value channels="dummyValue"/>
+    </flow>
+
     <flow name="withBoundActingParameterFromContentField">
         <values:with-bound-acting-parameter-from-content-field>
             <values:body>

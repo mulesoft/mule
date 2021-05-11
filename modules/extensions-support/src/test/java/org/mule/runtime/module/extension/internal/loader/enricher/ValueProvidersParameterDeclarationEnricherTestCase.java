@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
+import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -196,6 +198,30 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameter.getName(), is("requiredValue"));
     assertThat(parameter.isRequired(), is(true));
     assertThat(parameter.getExtractionExpression(), is("actingParameter.field"));
+  }
+
+  @Test
+  public void verifyParameterWithFieldValueProviderWithFieldActingParameters() {
+    ParameterDeclaration parameterDeclaration =
+        getParameterByOperationAndName("tagContentAsActingForAttributeValue", "xmlBody");
+
+    assertThat(parameterDeclaration, notNullValue());
+    assertThat(parameterDeclaration.getValueProviderModel(), nullValue());
+
+    assertThat(parameterDeclaration.getFieldValueProviderModels(), notNullValue());
+    assertThat(parameterDeclaration.getFieldValueProviderModels(), hasSize(1));
+
+    FieldValueProviderModel fieldValueProviderModel = parameterDeclaration.getFieldValueProviderModels().get(0);
+
+    assertThat(fieldValueProviderModel.getTargetSelector(), is("nested.tag.@customAttribute"));
+    assertThat(fieldValueProviderModel.getParameters(), hasSize(1));
+
+    ActingParameterModel parameter = fieldValueProviderModel.getParameters().get(0);
+
+    assertThat(parameter, notNullValue());
+    assertThat(parameter.getName(), is("requiredValue"));
+    assertThat(parameter.isRequired(), is(true));
+    assertThat(parameter.getExtractionExpression(), is("xmlBody.nested.someTag"));
   }
 
   private ParameterDeclaration getParameterByOperationAndName(String operationName, String parameterName) {

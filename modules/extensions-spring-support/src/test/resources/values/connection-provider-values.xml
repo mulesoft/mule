@@ -57,4 +57,5 @@
     <values:config name="with-parameter-with-field-values-connection">
         <values:with-parameter-with-field-values-connection channel="dummyValue"/>
     </values:config>
+
 </mule>
