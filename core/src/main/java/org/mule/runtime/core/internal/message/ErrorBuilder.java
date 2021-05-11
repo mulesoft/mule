@@ -270,6 +270,7 @@ public final class ErrorBuilder {
    *             it contains an attribute of type Component, which isn't Serializable.
    */
   @Deprecated
+  // TODO MULE-19411: Remove this implementation with DeserializableErrorImplementation.
   static final class ErrorImplementation implements PrivilegedError {
 
     private static final long serialVersionUID = -6904692174522094021L;
