@@ -17,10 +17,6 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 @Operations({OtherOps.class})
 public class ParameterGroupConfiguration {
 
-  /*
-   * @ParameterGroup(name = "other-parameter-group") SomeParameterGroupOneRequiredConfig someParameterGroup;
-   */
-
   @Parameter
   @Optional
   ComplexParameter complexParameter;
@@ -29,9 +25,12 @@ public class ParameterGroupConfiguration {
   @Optional
   String repeatedNameParameter;
 
-  /*
-   * public SomeParameterGroupOneRequiredConfig getSomeParameterGroup() { return someParameterGroup; }
-   */
+  @ParameterGroup(name = "other-parameter-group")
+  SomeParameterGroupOneRequiredConfig someParameterGroup;
+
+  public SomeParameterGroupOneRequiredConfig getSomeParameterGroup() {
+    return someParameterGroup;
+  }
 
   public ComplexParameter getComplexParameter() {
     return complexParameter;

@@ -7,6 +7,7 @@
 
     <some:pg-config name="configDslTrueParameterGroup" repeatedNameParameter="configParameter">
         <some:complex-parameter anotherParameter="complexParameter" repeatedNameParameter="complexParameter"/>
+        <some:other-parameter-group someParameter="parameterGroup" />
     </some:pg-config>
 
     <flow name="getConfig">
