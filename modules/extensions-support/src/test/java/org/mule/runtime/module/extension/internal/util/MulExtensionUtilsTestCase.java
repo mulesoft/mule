@@ -30,6 +30,9 @@ import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
@@ -37,6 +40,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -229,6 +233,12 @@ public class MulExtensionUtilsTestCase extends AbstractMuleTestCase {
     ExtensionParameterDescriptorModelProperty property = mock(ExtensionParameterDescriptorModelProperty.class);
     when(property.getExtensionParameter()).thenReturn(extensionParameter);
     when(parameterGroupModel.getModelProperty(ExtensionParameterDescriptorModelProperty.class)).thenReturn(of(property));
+
+    AnnotatedElement container = mock(AnnotatedElement.class);
+    when(container.toString()).thenReturn("org.mule.test.some.extension.SomeParameterGroupOneRequiredConfig oneParameterGroup");
+    ParameterGroupDescriptor groupDescriptor = new ParameterGroupDescriptor("Name", mock(Type.class), null, container, null);
+    ParameterGroupModelProperty groupProperty = new ParameterGroupModelProperty(groupDescriptor);
+    when(parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(of(groupProperty));
     return singletonList(parameterGroupModel);
   }
 }
