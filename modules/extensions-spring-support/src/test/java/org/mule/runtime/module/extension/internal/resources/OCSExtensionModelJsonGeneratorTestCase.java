@@ -23,7 +23,7 @@ public class OCSExtensionModelJsonGeneratorTestCase extends ExtensionModelJsonGe
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
     List<ResourceExtensionUnitTest> extensions =
-            singletonList(newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth-ocs.json"));
+        singletonList(newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth-ocs.json"));
     try {
       return callWithProperty(OCS_ENABLED, "true", () -> createExtensionModels(extensions));
     } catch (Throwable t) {

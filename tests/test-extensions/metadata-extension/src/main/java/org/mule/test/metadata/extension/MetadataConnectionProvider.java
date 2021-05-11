@@ -24,12 +24,12 @@ public class MetadataConnectionProvider implements ConnectionProvider<MetadataCo
   @Parameter
   @Optional
   @RequiredForMetadata
-          @Username
+  @Username
   String user;
 
   @Parameter
   @Optional
-          @Password
+  @Password
   String password;
 
   @Override

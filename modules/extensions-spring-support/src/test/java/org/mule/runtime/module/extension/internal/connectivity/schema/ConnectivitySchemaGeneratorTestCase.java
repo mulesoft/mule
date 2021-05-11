@@ -58,27 +58,27 @@ import org.skyscreamer.jsonassert.JSONAssert;
 public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameterizedExtensionModelTestCase {
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
-          getBoolean(SYSTEM_PROPERTY_PREFIX + "connectivitySchemas.updateExpectedFilesOnError");
+      getBoolean(SYSTEM_PROPERTY_PREFIX + "connectivitySchemas.updateExpectedFilesOnError");
 
 
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
     final List<ResourceExtensionUnitTest> extensions;
     extensions = asList(newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.json"),
-            newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.json"),
-            newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
-            newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.json"),
-            newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.json"),
-            newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.json"),
-            newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.json"),
-            newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.json"),
-            newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.json"),
-            newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.json"),
-            newUnitTest(JAVA_LOADER, SampleDataExtension.class, "sample-data.json"),
-            newUnitTest(JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.json"),
-            newUnitTest(JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.json"),
-            newUnitTest(JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.json"),
-            newUnitTest(JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.json"));
+                        newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.json"),
+                        newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
+                        newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.json"),
+                        newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.json"),
+                        newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.json"),
+                        newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.json"),
+                        newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.json"),
+                        newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.json"),
+                        newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.json"),
+                        newUnitTest(JAVA_LOADER, SampleDataExtension.class, "sample-data.json"),
+                        newUnitTest(JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.json"),
+                        newUnitTest(JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.json"),
+                        newUnitTest(JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.json"),
+                        newUnitTest(JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.json"));
 
     return createExtensionModels(extensions);
   }
@@ -87,11 +87,12 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
   private ExpressionLanguage expressionLanguage;
 
   private final ConnectivitySchemaGenerator generator = ConnectivitySchemaGeneratorBuilder.newInstance()
-          .setConnectionTermsExtractor(ConnectionProviderModel::getSemanticTerms)
-          .setParameterTermsExtractor(ParameterModel::getSemanticTerms)
-          .setTypeTermsExtractor(ExtensionMetadataTypeUtils::getSemanticTerms)
-          .setConnectorAssetDescriptor(new ExchangeAssetDescriptor("org.mule.runtime.test.extension", "mule-connectivity-schema-test", "1.0.0"))
-          .build();
+      .setConnectionTermsExtractor(ConnectionProviderModel::getSemanticTerms)
+      .setParameterTermsExtractor(ParameterModel::getSemanticTerms)
+      .setTypeTermsExtractor(ExtensionMetadataTypeUtils::getSemanticTerms)
+      .setConnectorAssetDescriptor(new ExchangeAssetDescriptor("org.mule.runtime.test.extension", "mule-connectivity-schema-test",
+                                                               "1.0.0"))
+      .build();
 
   private final ConnectivitySchemaJsonSerializer serializer = ConnectivitySchemaJsonSerializer.builder().build();
 
@@ -102,7 +103,7 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
 
   @Override
   protected boolean shouldUpdateExpectedFilesOnError() {
-//    return UPDATE_EXPECTED_FILES_ON_ERROR;
+    // return UPDATE_EXPECTED_FILES_ON_ERROR;
     return true;
   }
 
@@ -119,7 +120,7 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
   }
 
   @Override
-  protected void assertEquals(String expectedContent, String actualContent) throws Exception{
+  protected void assertEquals(String expectedContent, String actualContent) throws Exception {
     JSONAssert.assertEquals(expectedContent, actualContent, true);
   }
 }

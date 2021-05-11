@@ -62,30 +62,30 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
     final ClassLoader classLoader = ParameterizedExtensionModelTestCase.class.getClassLoader();
     final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
     when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
-            .thenReturn(singletonList(new JavaXmlDeclarationEnricher()));
+        .thenReturn(singletonList(new JavaXmlDeclarationEnricher()));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
 
       if (EXTENSION_MODELS.put(model.getName(), model) != null) {
         throw new IllegalArgumentException(format("Extension names must be unique. Name [%s] for extension [%s] was already used",
-                model.getName(), extension.getName()));
+                                                  model.getName(), extension.getName()));
       }
 
       return model;
     };
 
     return extensions.stream()
-            .map(e -> e.toTestParams(createExtensionModel))
-            .collect(toList());
+        .map(e -> e.toTestParams(createExtensionModel))
+        .collect(toList());
   }
 
   protected static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {
     Map<String, Object> params = of(TYPE_PROPERTY_NAME, clazz.getName(),
-            VERSION, getProductVersion(),
-            // TODO MULE-14517: This workaround should be replaced for a better and more complete
-            // mechanism
-            COMPILATION_MODE, true);
+                                    VERSION, getProductVersion(),
+                                    // TODO MULE-14517: This workaround should be replaced for a better and more complete
+                                    // mechanism
+                                    COMPILATION_MODE, true);
 
     // TODO MULE-11797: as this utils is consumed from
     // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
@@ -101,7 +101,7 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
           byte[] classBytes;
           try {
             classBytes =
-                    toByteArray(this.getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class"));
+                toByteArray(this.getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class"));
             return this.defineClass(null, classBytes, 0, classBytes.length);
           } catch (Exception e) {
             return super.loadClass(name);
@@ -143,7 +143,7 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
     }
 
     protected Object[] buildTestParams(ExtensionModel extensionModel) {
-      return new Object[]{extensionModel};
+      return new Object[] {extensionModel};
     }
   }
 }

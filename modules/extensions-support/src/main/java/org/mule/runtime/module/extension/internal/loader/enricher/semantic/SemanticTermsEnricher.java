@@ -50,7 +50,8 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
 
       @Override
       protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-        extractType(declaration).ifPresent(type -> addSemanticTerms(getConnectionTermsFromAnnotations(type::isAnnotatedWith), declaration));
+        extractType(declaration)
+            .ifPresent(type -> addSemanticTerms(getConnectionTermsFromAnnotations(type::isAnnotatedWith), declaration));
       }
 
       @Override
@@ -62,12 +63,14 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
 
       @Override
       protected void onSource(SourceDeclaration declaration) {
-        extractType(declaration).ifPresent(type -> addSemanticTerms(getAllTermsFromAnnotations(type::isAnnotatedWith), declaration));
+        extractType(declaration)
+            .ifPresent(type -> addSemanticTerms(getAllTermsFromAnnotations(type::isAnnotatedWith), declaration));
       }
 
       @Override
       protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration parameter) {
-        extractDeclaredParameter(parameter).ifPresent(e -> addSemanticTerms(getParameterTermsFromAnnotations(e::isAnnotatedWith), parameter));
+        extractDeclaredParameter(parameter)
+            .ifPresent(e -> addSemanticTerms(getParameterTermsFromAnnotations(e::isAnnotatedWith), parameter));
         Set<String> typeTerms = new LinkedHashSet<>(getSemanticTerms(parameter.getType()));
 
         addTermIfPresent(typeTerms, parameter, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER);

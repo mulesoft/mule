@@ -59,7 +59,7 @@ import org.junit.runners.Parameterized;
 public class DefaultExtensionSchemaGeneratorTestCase extends FileGenerationParameterizedExtensionModelTestCase {
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
-          getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionSchemas.updateExpectedFilesOnError");
+      getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionSchemas.updateExpectedFilesOnError");
 
   private final ExtensionSchemaGenerator generator = new DefaultExtensionSchemaGenerator();
 
@@ -69,29 +69,29 @@ public class DefaultExtensionSchemaGeneratorTestCase extends FileGenerationParam
 
     final List<ResourceExtensionUnitTest> extensions;
     extensions = asList(newUnitTest(JAVA_LOADER, MapConnector.class, "map.xsd"),
-            newUnitTest(JAVA_LOADER, ListConnector.class, "list.xsd"),
-            newUnitTest(JAVA_LOADER, TestConnector.class, "basic.xsd"),
-            newUnitTest(JAVA_LOADER, StringListConnector.class, "string-list.xsd"),
-            newUnitTest(JAVA_LOADER, GlobalPojoConnector.class, "global-pojo.xsd"),
-            newUnitTest(JAVA_LOADER, GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"),
-            newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.xsd"),
-            newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.xsd"),
-            newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.xsd"),
-            newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.xsd"),
-            newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.xsd"),
-            newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.xsd"),
-            newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.xsd"),
-            newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.xsd"),
-            newUnitTest(SOAP_LOADER, FootballSoapExtension.class, "soap.xsd"),
-            newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.xsd"),
-            newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.xsd"),
-            newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.xsd"),
-            newUnitTest(JAVA_LOADER, WeaveFunctionExtension.class, "test-fn.xsd"),
-            newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.xsd"),
-            newUnitTest(JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.xsd"),
-            newUnitTest(JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.xsd"),
-            newUnitTest(JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.xsd"),
-            newUnitTest(JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.xsd"));
+                        newUnitTest(JAVA_LOADER, ListConnector.class, "list.xsd"),
+                        newUnitTest(JAVA_LOADER, TestConnector.class, "basic.xsd"),
+                        newUnitTest(JAVA_LOADER, StringListConnector.class, "string-list.xsd"),
+                        newUnitTest(JAVA_LOADER, GlobalPojoConnector.class, "global-pojo.xsd"),
+                        newUnitTest(JAVA_LOADER, GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"),
+                        newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.xsd"),
+                        newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.xsd"),
+                        newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.xsd"),
+                        newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.xsd"),
+                        newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.xsd"),
+                        newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.xsd"),
+                        newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.xsd"),
+                        newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.xsd"),
+                        newUnitTest(SOAP_LOADER, FootballSoapExtension.class, "soap.xsd"),
+                        newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.xsd"),
+                        newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.xsd"),
+                        newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.xsd"),
+                        newUnitTest(JAVA_LOADER, WeaveFunctionExtension.class, "test-fn.xsd"),
+                        newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.xsd"),
+                        newUnitTest(JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.xsd"),
+                        newUnitTest(JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.xsd"),
+                        newUnitTest(JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.xsd"),
+                        newUnitTest(JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.xsd"));
 
     return createExtensionModels(extensions);
   }
