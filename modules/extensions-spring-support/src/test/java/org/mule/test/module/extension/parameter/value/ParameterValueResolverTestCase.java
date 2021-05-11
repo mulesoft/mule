@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.some.extension.SomeConfiguration;
+import org.mule.test.some.extension.SomeExtension;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,7 +50,7 @@ public class ParameterValueResolverTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void configurationWithZonedDateTimeParameter() throws Exception {
-    SomeConfiguration configuration = getPayload("configurationWithZonedDateTimeParameter");
+    SomeExtension configuration = getPayload("configurationWithZonedDateTimeParameter");
     boolean isEqual = ZONED_DATE_TIME_ON_CONFIG.isEqual(configuration.getZonedDateTime());
     assertThat(isEqual, is(true));
   }

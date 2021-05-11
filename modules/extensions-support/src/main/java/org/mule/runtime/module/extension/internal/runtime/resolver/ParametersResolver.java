@@ -209,27 +209,14 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
   protected ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
                                        List<ParameterModel> parameterModels, ResolverSet resolverSet)
       throws ConfigurationException {
-    Map<String, String> aliasedParameterNames = forSize(parameterModels.size());
     parameterModels
         .stream()
         .filter(p -> !p.isComponentId()
             // This model property exists only for non synthetic parameters, in which case the value resolver has to be created,
             // regardless of the parameter being the componentId
             || p.getModelProperty(ExtensionParameterDescriptorModelProperty.class).isPresent())
-        .forEach(p -> {
-          final String parameterName = getMemberName(p, p.getName());
-          if (!parameterName.equals(p.getName())) {
-            aliasedParameterNames.put(parameterName, p.getName());
-          }
-          ValueResolver<?> resolver = getParameterValueResolver(p);
-          if (resolver != null) {
-            resolverSet.add(parameterName, resolver);
-          } else if (p.isRequired()) {
-            throw new RequiredParameterNotSetException(p);
-          }
-        });
+        .forEach(p -> addToResolverSet(p, resolverSet, getParameterValueResolver(p)));
 
-    checkParameterGroupExclusiveness(model, groups, parameters, aliasedParameterNames);
     return resolverSet;
   }
 
