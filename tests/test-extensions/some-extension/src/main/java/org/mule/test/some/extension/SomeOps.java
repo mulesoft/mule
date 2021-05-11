@@ -7,7 +7,6 @@
 
 package org.mule.test.some.extension;
 
-import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.metadata.TypedValue;
@@ -20,9 +19,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -33,9 +30,9 @@ public class SomeOps {
 
   private final Logger LOGGER = getLogger(SomeOps.class);
 
-  public void someOp(@Connection String conn, @Config SomeExtension ext) {}
+  public void someOp(@Connection String conn, @Config SomeConfiguration ext) {}
 
-  public SomeExtension retrieveConfiguration(@Config SomeExtension config) {
+  public SomeConfiguration retrieveConfiguration(@Config SomeConfiguration config) {
     return config;
   }
 
