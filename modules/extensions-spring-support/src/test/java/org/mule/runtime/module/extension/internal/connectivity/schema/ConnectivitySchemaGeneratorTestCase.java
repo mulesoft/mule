@@ -86,12 +86,15 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
   @Inject
   private ExpressionLanguage expressionLanguage;
 
+  private final ExchangeAssetDescriptor exchangeAssetDescriptor = new ExchangeAssetDescriptor(
+          "org.mule.runtime.test.extension",
+          "mule-connectivity-schema-test",
+          "1.0.0");
+
   private final ConnectivitySchemaGenerator generator = ConnectivitySchemaGeneratorBuilder.newInstance()
       .setConnectionTermsExtractor(ConnectionProviderModel::getSemanticTerms)
       .setParameterTermsExtractor(ParameterModel::getSemanticTerms)
       .setTypeTermsExtractor(ExtensionMetadataTypeUtils::getSemanticTerms)
-      .setConnectorAssetDescriptor(new ExchangeAssetDescriptor("org.mule.runtime.test.extension", "mule-connectivity-schema-test",
-                                                               "1.0.0"))
       .build();
 
   private final ConnectivitySchemaJsonSerializer serializer = ConnectivitySchemaJsonSerializer.builder().build();
@@ -109,7 +112,7 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
   @Override
   protected String doGenerate(ExtensionModel extensionUnderTest) throws Exception {
     JSONArray array = new JSONArray();
-    List<ConnectivitySchema> schemas = generator.generateSchemas(extensionUnderTest);
+    List<ConnectivitySchema> schemas = generator.generateSchemas(extensionUnderTest, exchangeAssetDescriptor);
     for (ConnectivitySchema schema : schemas) {
       array.put(new JSONObject(serializer.serialize(schema)));
     }
