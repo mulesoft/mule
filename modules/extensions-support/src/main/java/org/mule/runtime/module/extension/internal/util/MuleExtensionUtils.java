@@ -649,12 +649,6 @@ public class MuleExtensionUtils {
   private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,
                                                    Map<String, String> aliasedParameterNames)
       throws ConfigurationException {
-    Set<String> topLevelParameterNames = new HashSet<>();
-    parameters.forEach((key, value) -> {
-      aliasedParameterNames.getOrDefault(key, key);
-      topLevelParameterNames.add(key);
-    });
-
     if (group.isShowInDsl()) {
       ExtensionParameterDescriptorModelProperty property = group.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
           .orElseThrow(() -> new ConfigurationException(createStaticMessage("Could not find ExtensionParameterDescriptorModelProperty for the parameter group %s",
@@ -666,16 +660,23 @@ public class MuleExtensionUtils {
           throw new ConfigurationException(createStaticMessage("Was expecting a parameter with name [%s] among the resolved parameters",
                                                                containerName));
         }
-        return ((ParameterValueResolver) parameters.get(containerName)).getParameters().keySet().stream()
-            .map(name -> aliasedParameterNames.getOrDefault(name, name)).collect(toSet());
+        if (parameter instanceof ParameterValueResolver) {
+          return ((ParameterValueResolver) parameter).getParameters().keySet().stream()
+              .map(name -> aliasedParameterNames.getOrDefault(name, name)).collect(toSet());
+        } else {
+          throw new MuleRuntimeException(createStaticMessage("Was expecting parameter with name [%s] to be of class ParameterValueResolver but was of class %s",
+                                                             containerName, parameters.get(containerName).getClass()));
+        }
       } catch (ValueResolvingException e) {
         throw new MuleRuntimeException(createStaticMessage("Failed to resolve the parameters for [%s]", containerName), e);
-      } catch (ClassCastException e) {
-        throw new MuleRuntimeException(createStaticMessage("Was expecting parameter with name [%s] to be of class ParameterValueResolver but was of class %s",
-                                                           containerName, parameters.get(containerName).getClass()),
-                                       e);
       }
     } else {
+      Set<String> topLevelParameterNames = new HashSet<>();
+      parameters.forEach((key, value) -> {
+        // TODO: MULE-19223
+        aliasedParameterNames.getOrDefault(key, key);
+        topLevelParameterNames.add(key);
+      });
       return topLevelParameterNames;
     }
   }
