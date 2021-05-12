@@ -34,9 +34,46 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
+      "system": "TODO",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {},
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "chat",
       "system": "TODO",
       "type": "connectivity.Connection"
     }
@@ -84,7 +121,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValueWithRequiredParam",
       "system": "TODO",
@@ -134,7 +171,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValuesWithRequiredParamsFromParamGroup",
       "system": "TODO",
@@ -184,7 +221,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValuesWithRequiredParamsFromShowInDslGroup",
       "system": "TODO",
@@ -230,9 +267,51 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "failure-connection",
+      "system": "TODO",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "urlFormat": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "with-parameter-with-field-values",
       "system": "TODO",
       "type": "connectivity.Connection"
     }
@@ -272,9 +351,67 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-value-parameter",
+      "system": "TODO",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "parameterOne": {
+              "range": "string",
+              "mandatory": true
+            },
+            "parameterFour": {
+              "range": "string",
+              "mandatory": true
+            },
+            "parameterWithValue": {
+              "range": "string",
+              "mandatory": true
+            },
+            "parameterThree": {
+              "range": "string",
+              "mandatory": true
+            },
+            "parameterTwo": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "withValueFourBoundActingParameters",
       "system": "TODO",
       "type": "connectivity.Connection"
     }

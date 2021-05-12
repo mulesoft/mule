@@ -43,7 +43,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "TODO",
@@ -94,7 +94,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "secure",
       "system": "TODO",

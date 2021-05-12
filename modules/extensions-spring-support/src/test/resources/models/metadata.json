@@ -1,14 +1,14 @@
 {
   "name": "Metadata",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.4.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "metadata",
     "namespace": "http://www.mulesoft.org/schema/mule/metadata",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.4.0-SNAPSHOT",
     "xsdFileName": "mule-metadata.xsd"
   },
   "resources": [],
@@ -20813,7 +20813,9 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.username"
+                  ],
                   "name": "user",
                   "description": "",
                   "modelProperties": {}
@@ -20842,7 +20844,9 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.password"
+                  ],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -37330,7 +37334,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.username"
+              ],
               "name": "user",
               "description": "",
               "modelProperties": {}
@@ -37359,7 +37365,9 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.password"
+              ],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -39914,7 +39922,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "label": "Person",
         "typeId": "http://example.com/example.json",
         "classInformation": {
           "classname": "void",
@@ -39927,7 +39934,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "label": "Person"
       },
       "open": {
         "type": "Any"

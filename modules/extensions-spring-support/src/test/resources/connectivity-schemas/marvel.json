@@ -34,7 +34,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "mystic",
       "system": "TODO",
@@ -76,7 +76,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooling-mystic",
       "system": "TODO",
@@ -118,7 +118,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "missile",
       "system": "TODO",
@@ -160,7 +160,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "odd-missile",
       "system": "TODO",

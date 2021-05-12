@@ -39,7 +39,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "TODO",
@@ -86,7 +86,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "invalid",
       "system": "TODO",
@@ -133,7 +133,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooled",
       "system": "TODO",
@@ -180,7 +180,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "transactional",
       "system": "TODO",
@@ -227,7 +227,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0",
+    "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "valid",
       "system": "TODO",

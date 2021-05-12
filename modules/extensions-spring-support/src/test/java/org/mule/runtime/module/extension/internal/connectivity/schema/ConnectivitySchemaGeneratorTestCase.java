@@ -103,8 +103,7 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
 
   @Override
   protected boolean shouldUpdateExpectedFilesOnError() {
-    // return UPDATE_EXPECTED_FILES_ON_ERROR;
-    return true;
+    return UPDATE_EXPECTED_FILES_ON_ERROR;
   }
 
   @Override
