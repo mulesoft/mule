@@ -404,9 +404,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder usingObjectStorePlugin = createUsingObjectStorePluginFileBuilder();
   protected final ArtifactPluginFileBuilder classloaderConnectExtensionPlugin =
-      createClassloaderConnectExtensionPluginFileBuilder();
+      createClassloaderConnectExtensionPluginFileBuilder(classloaderConnectionExtensionJarFile, "classloaderConnectExtension",
+                                                         "org.foo.connection.operation.ClassloaderConnectExtension");
   protected final ArtifactPluginFileBuilder classloaderConfigConnectExtensionPlugin =
-      createClassloaderConfigConnectExtensionPluginFileBuilder();
+      createClassloaderConnectExtensionPluginFileBuilder(classloaderConfigConnectionExtensionJarFile,
+                                                         "classloaderConfigConnectExtension",
+                                                         "org.foo.connection.config.ClassloaderConfigConnectExtension");
 
   // Application file builders
   protected final ApplicationFileBuilder emptyAppFileBuilder =
@@ -1336,9 +1339,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     executeApplicationFlow(flowName, null);
   }
 
-  protected void executeApplicationFlow(String flowName, String correlationId) throws Exception {
+  protected CoreEvent executeApplicationFlow(String flowName, String correlationId) throws Exception {
     ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
-    withContextClassLoader(appClassLoader, () -> {
+    return withContextClassLoader(appClassLoader, () -> {
       final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName)
           .withPayload(TEST_MESSAGE);
 
@@ -1356,25 +1359,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
 
       return result;
-    });
-  }
-
-  protected String executeApplicationFlowAndReturnMessage(String flowName) throws Exception {
-    ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
-    return (String) withContextClassLoader(appClassLoader, () -> {
-      final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName)
-          .withPayload(TEST_MESSAGE);
-
-      CoreEvent result;
-      try {
-        result = flowRunner.run();
-      } finally {
-        flowRunner.dispose();
-      }
-
-      assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
-
-      return result.getMessage().getPayload().getValue();
     });
   }
 
@@ -1633,34 +1617,20 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return pluginFileBuilder;
   }
 
-  private ArtifactPluginFileBuilder createClassloaderConnectExtensionPluginFileBuilder() {
+  private ArtifactPluginFileBuilder createClassloaderConnectExtensionPluginFileBuilder(File jarFile, String extensionName,
+                                                                                       String extensionPath) {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("classloaderConnectExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("classloaderConnectExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.connection.operation.ClassloaderConnectExtension")
-        .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder("classloaderConnectExtensionPlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("classloaderConnectExtension", classloaderConnectionExtensionJarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-  }
-
-  private ArtifactPluginFileBuilder createClassloaderConfigConnectExtensionPluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("classloaderConfigConnectExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("classloaderConfigConnectExtensionPlugin",
+        .setMinMuleVersion(MIN_MULE_VERSION).setName(extensionName + "Plugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName + "Plugin",
                                                                  MULE_EXTENSION_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.connection.config.ClassloaderConfigConnectExtension")
+        .addProperty("type", extensionPath)
         .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder("classloaderConfigConnectExtensionPlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("classloaderConfigConnectExtension", classloaderConfigConnectionExtensionJarFile))
+    return new ArtifactPluginFileBuilder(extensionName + "Plugin-1.0.0")
+        .dependingOn(new JarFileBuilder(extensionName, jarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
 
