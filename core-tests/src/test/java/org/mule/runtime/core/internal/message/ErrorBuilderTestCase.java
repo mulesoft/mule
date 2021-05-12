@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.message;
+package org.mule.runtime.core.internal.message;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -24,7 +26,7 @@ import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
-
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -41,14 +43,21 @@ import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
-
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 @Feature(ERROR_HANDLING)
@@ -61,6 +70,70 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   private final ErrorType testError =
       ErrorTypeBuilder.builder().namespace("MULE").identifier("TEST").parentErrorType(anyError).build();
 
+  @Rule
+  public ExpectedException expectedException = none();
+
+  @Test
+  public void errorCanNotBeNull() {
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage("error exception cannot be null");
+    builder().build();
+  }
+
+  @Test
+  public void errorTypeCanNotBeNull() {
+    RuntimeException exception = new RuntimeException(EXCEPTION_MESSAGE);
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage("errorType exception cannot be null");
+    builder(exception).build();
+  }
+
+  @Test
+  @Issue("MULE-19408")
+  public void errorCanBeSerializedByAnObjectOutputStreamEvenWhenFailingComponentIsNotSerializable() throws IOException {
+    Component mockNonSerializableFailingComponent = mock(Component.class);
+    when(mockNonSerializableFailingComponent.getRepresentation()).thenReturn("mock/representation");
+
+    RuntimeException exception = new RuntimeException(EXCEPTION_MESSAGE);
+    Error error = builder(exception).errorType(mockErrorType).failingComponent(mockNonSerializableFailingComponent).build();
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+      oos.writeObject(error);
+    }
+
+    assertThat(baos.toString(), containsString("mock/representation"));
+  }
+
+  @Test
+  @Issue("MULE-19408")
+  @Description("An instance of the deprecated ErrorImplementation could be already serialized. We should be able to " +
+      "deserialize it")
+  public void alreadySerializedErrorImplementationCanBeDeserialized() throws IOException, ClassNotFoundException {
+    ErrorBuilder.ErrorImplementation deprecated = getDeprecatedImpl();
+
+    // Serialize a deprecated object.
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+      oos.writeObject(deprecated);
+    }
+
+    // Deserialize the object and check it's now a non-deprecated object.
+    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+    try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+      Object o = ois.readObject();
+      assertThat(o, instanceOf(ErrorBuilder.DeserializableErrorImplementation.class));
+    }
+  }
+
+  private ErrorBuilder.ErrorImplementation getDeprecatedImpl() {
+    Component mockSerializableFailingComponent = mock(SerializableComponent.class);
+    RuntimeException exception = new RuntimeException(EXCEPTION_MESSAGE);
+    Error anError = builder(exception).errorType(mockErrorType).build();
+    return new ErrorBuilder.ErrorImplementation(anError.getCause(), anError.getDescription(), anError.getDetailedDescription(),
+                                                mockSerializableFailingComponent, anError.getErrorType(),
+                                                anError.getErrorMessage(), anError.getChildErrors(), emptyList());
+  }
 
   @Test
   public void buildErrorFromException() {
@@ -170,12 +243,12 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   public void givesStringRepresentation() {
     Error error = getComposedErrorMessageAwareWithSuppressionException();
     assertThat(error.toString(),
-               is(equalToIgnoringLineBreaks("\norg.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+               is(equalToIgnoringLineBreaks("\norg.mule.runtime.core.internal.message.ErrorBuilder$DeserializableErrorImplementation\n"
                    + "{\n"
                    + "  description=suppressed message\n"
                    + "  detailedDescription=message\n"
                    + "  errorType=MULE:TEST\n"
-                   + "  cause=org.mule.runtime.core.api.message.ErrorBuilderTestCase$TestMuleException\n"
+                   + "  cause=org.mule.runtime.core.internal.message.ErrorBuilderTestCase$TestMuleException\n"
                    + "  errorMessage=\n"
                    + "org.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n"
                    + "{\n"
@@ -185,18 +258,18 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
                    + "  attributesMediaType=*/*\n"
                    + "}\n"
                    + "  suppressedErrors=[\n"
-                   + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+                   + "org.mule.runtime.core.internal.message.ErrorBuilder$DeserializableErrorImplementation\n"
                    + "{\n"
                    + "  description=suppressed message\n"
                    + "  detailedDescription=suppressed message\n"
                    + "  errorType=MULE:TEST\n"
-                   + "  cause=org.mule.runtime.core.api.message.ErrorBuilderTestCase$TestMuleException\n"
+                   + "  cause=org.mule.runtime.core.internal.message.ErrorBuilderTestCase$TestMuleException\n"
                    + "  errorMessage=-\n"
                    + "  suppressedErrors=[]\n"
                    + "  childErrors=[]\n"
                    + "}]\n"
                    + "  childErrors=[\n"
-                   + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+                   + "org.mule.runtime.core.internal.message.ErrorBuilder$DeserializableErrorImplementation\n"
                    + "{\n"
                    + "  description=unknown description\n"
                    + "  detailedDescription=unknown description\n"
@@ -206,7 +279,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
                    + "  suppressedErrors=[]\n"
                    + "  childErrors=[]\n"
                    + "}, \n"
-                   + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+                   + "org.mule.runtime.core.internal.message.ErrorBuilder$DeserializableErrorImplementation\n"
                    + "{\n"
                    + "  description=unknown description\n"
                    + "  detailedDescription=unknown description\n"
@@ -290,7 +363,9 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     public Message getErrorMessage() {
       return of(TEST_PAYLOAD);
     }
+  }
 
+  private interface SerializableComponent extends Serializable, Component {
   }
 
 }
