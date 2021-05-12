@@ -30,9 +30,9 @@ public class SomeOps {
 
   private final Logger LOGGER = getLogger(SomeOps.class);
 
-  public void someOp(@Connection String conn, @Config SomeExtension ext) {}
+  public void someOp(@Connection String conn, @Config ParameterGroupConfig ext) {}
 
-  public SomeExtension retrieveConfiguration(@Config SomeExtension config) {
+  public ParameterGroupConfig retrieveConfiguration(@Config ParameterGroupConfig config) {
     return config;
   }
 
