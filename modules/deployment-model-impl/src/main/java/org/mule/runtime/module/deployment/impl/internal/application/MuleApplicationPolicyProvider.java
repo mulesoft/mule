@@ -38,7 +38,7 @@ import java.util.Optional;
  */
 public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider, PolicyProvider, Disposable {
 
-  private static final String IS_POLICY_REORDER = "isPolicyReorder";
+  public static final String IS_POLICY_REORDER = "isPolicyReorder";
 
   private final PolicyTemplateFactory policyTemplateFactory;
   private final PolicyInstanceProviderFactory policyInstanceProviderFactory;

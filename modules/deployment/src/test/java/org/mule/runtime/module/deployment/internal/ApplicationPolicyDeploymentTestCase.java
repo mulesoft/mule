@@ -37,6 +37,7 @@ import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistr
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.IS_POLICY_REORDER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
@@ -46,8 +47,8 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_REORDER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
-import static org.mule.test.allure.AllureConstants.PolicyZeroDowntimeFeature.PolicyReorderStory.POLICY_REORDER;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -251,13 +252,6 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   @Story(POLICY_REORDER)
   public void duplicatedApplicationPolicy() throws Exception {
-    expectedEx.expect(PolicyRegistrationException.class);
-    expectedEx.expectMessage(format("Error occured registering policy '%s'", FOO_POLICY_ID));
-
-    expectedEx.expectCause(allOf(
-      is(instanceOf(IllegalArgumentException.class)),
-      hasMessage(format("Policy already registered: '%s'", FOO_POLICY_ID))));
-
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
@@ -271,6 +265,13 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    expectedEx.expect(PolicyRegistrationException.class);
+    expectedEx.expectMessage(format("Error occured registering policy '%s'", FOO_POLICY_ID));
+
+    expectedEx.expectCause(allOf(
+      is(instanceOf(IllegalArgumentException.class)),
+      hasMessage(format("Policy already registered: '%s'", FOO_POLICY_ID))));
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
@@ -297,7 +298,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(POLICY_PROPERTY_KEY, FOO_POLICY_NAME);
-    parameters.put("isPolicyReorder", "true");
+    parameters.put(IS_POLICY_REORDER, "true");
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
@@ -336,7 +337,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(POLICY_PROPERTY_KEY, FOO_POLICY_NAME);
-    parameters.put("isPolicyReorder", "true");
+    parameters.put(IS_POLICY_REORDER, "true");
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 3,
