@@ -73,6 +73,7 @@ public interface AllureConstants {
     String APP_DEPLOYMENT = "Application Deployment";
     String DOMAIN_DEPLOYMENT = "Domain Deployment";
     String POLICY_DEPLOYMENT = "Policy Deployment";
+    String POLICY_REORDER = "Policy Reorder";
 
     interface DeploymentSuccessfulStory {
 
