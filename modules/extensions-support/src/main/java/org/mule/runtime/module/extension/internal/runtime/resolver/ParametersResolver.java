@@ -232,7 +232,9 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           }
         });
 
-    checkParameterGroupExclusiveness(model, groups, parameters, aliasedParameterNames);
+    if (!lazyInitEnabled) {
+      checkParameterGroupExclusiveness(model, groups, parameters, aliasedParameterNames);
+    }
     return resolverSet;
   }
 
