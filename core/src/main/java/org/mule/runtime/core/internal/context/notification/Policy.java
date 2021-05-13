@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.NotifierCallback;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class Policy {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(Policy.class);
+  private static final Logger LOGGER = getLogger(Policy.class);
 
   // map from event to set of senders
   private Map<Class<? extends Notification>, Collection<Sender>> eventToSenders =
