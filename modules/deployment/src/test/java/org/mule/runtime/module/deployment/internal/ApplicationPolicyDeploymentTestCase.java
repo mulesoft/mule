@@ -270,8 +270,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     expectedEx.expectMessage(format("Error occured registering policy '%s'", FOO_POLICY_ID));
 
     expectedEx.expectCause(allOf(
-      is(instanceOf(IllegalArgumentException.class)),
-      hasMessage(format("Policy already registered: '%s'", FOO_POLICY_ID))));
+                                 is(instanceOf(IllegalArgumentException.class)),
+                                 hasMessage(format("Policy already registered: '%s'", FOO_POLICY_ID))));
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
