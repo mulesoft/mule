@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <some:config name="parameterGroupConfigRepeatedNameParameter" repeatedNameParameter="inline" />
+
+    <some:config name="parameterGroupConfigComplexParameter">
+        <some:complex-parameter anotherParameter="complexParameter" repeatedNameParameter="complexParameter"/>
+    </some:config>
+
+    <some:config name="parameterGroupConfigRepeatedNameParameterDynamic" repeatedNameParameter="#[vars.repeatedNameParameter]" />
+
+    <some:config name="parameterGroupConfigComplexParameterDynamic">
+        <some:complex-parameter anotherParameter="#['another']" repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+    </some:config>
+
+    <some:dsl-config name="parameterGroupDslConfigRepeatedNameParameter">
+        <some:parameter-group-dsl repeatedNameParameter="dsl"/>
+    </some:dsl-config>
+
+    <some:dsl-config name="parameterGroupDslConfigComplexParameter">
+        <some:parameter-group-dsl>
+            <some:complex-parameter anotherParameter="complexParameterDsl" repeatedNameParameter="complexParameterDsl"/>
+        </some:parameter-group-dsl>
+    </some:dsl-config>
+
+    <some:dsl-config name="parameterGroupDslConfigRepeatedNameParameterDynamic">
+        <some:parameter-group-dsl repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+    </some:dsl-config>
+
+    <some:dsl-config name="parameterGroupDslConfigComplexParameterDynamic">
+        <some:parameter-group-dsl>
+            <some:complex-parameter anotherParameter="#['another']" repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+        </some:parameter-group-dsl>
+    </some:dsl-config>
+
+    <flow name="flowParameterGroupConfigRepeatedNameParameter">
+        <some:retrieve-configuration config-ref="parameterGroupConfigRepeatedNameParameter"/>
+    </flow>
+
+    <flow name="flowParameterGroupConfigComplexParameter">
+        <some:retrieve-configuration config-ref="parameterGroupConfigComplexParameter"/>
+    </flow>
+
+    <flow name="flowParameterGroupConfigRepeatedNameParameterDynamic">
+        <some:retrieve-configuration config-ref="parameterGroupConfigRepeatedNameParameterDynamic"/>
+    </flow>
+
+    <flow name="flowParameterGroupConfigComplexParameterDynamic">
+        <some:retrieve-configuration config-ref="parameterGroupConfigComplexParameterDynamic"/>
+    </flow>
+
+    <flow name="flowParameterGroupDslConfigRepeatedNameParameter">
+        <some:retrieve-configuration-dsl config-ref="parameterGroupDslConfigRepeatedNameParameter"/>
+    </flow>
+
+    <flow name="flowParameterGroupDslConfigComplexParameter">
+        <some:retrieve-configuration-dsl config-ref="parameterGroupDslConfigComplexParameter"/>
+    </flow>
+
+    <flow name="flowParameterGroupDslConfigRepeatedNameParameterDynamic">
+        <some:retrieve-configuration-dsl config-ref="parameterGroupDslConfigRepeatedNameParameterDynamic"/>
+    </flow>
+
+    <flow name="flowParameterGroupDslConfigComplexParameterDynamic">
+        <some:retrieve-configuration-dsl config-ref="parameterGroupDslConfigComplexParameterDynamic"/>
+    </flow>
+
+</mule>

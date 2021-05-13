@@ -6,19 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.collections.CollectionUtils.intersection;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
-import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.checkParameterGroupExclusiveness;
 
 import org.mule.metadata.api.model.ObjectFieldType;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -26,21 +19,14 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import com.google.common.base.Joiner;
 
 /**
  * This supports some scenarios where the validations have to be done at runtime because the validation is done on dynamically
@@ -97,56 +83,6 @@ final class ValidatingParametersResolver extends ParametersResolver {
     }
 
     super.addPropertyResolver(builder, valueResolver, field, objectField);
-  }
-
-  public void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model,
-                                               List<ParameterGroupModel> groups,
-                                               Map<String, ?> parameters, Map<String, String> aliasedParameterNames)
-      throws ConfigurationException {
-    Set<String> parameterValueResolvers = new HashSet<>();
-    Set<String> parameterNames = parameters.entrySet().stream()
-        .flatMap(entry -> {
-          if (entry.getValue() instanceof ParameterValueResolver) {
-            try {
-              parameterValueResolvers.add(aliasedParameterNames.getOrDefault(entry.getKey(), entry.getKey()));
-              return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                  .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
-            } catch (ValueResolvingException e) {
-              throw new MuleRuntimeException(e);
-            }
-          } else {
-            String key = entry.getKey();
-            aliasedParameterNames.getOrDefault(key, key);
-            return Stream.of(key);
-          }
-        })
-        .collect(toSet());
-    parameterNames.addAll(parameterValueResolvers);
-
-    for (ParameterGroupModel group : groups) {
-      for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
-        Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), parameterNames);
-        if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
-          throw new ConfigurationException((createStaticMessage(format(
-                                                                       "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
-                                                                           + "One of the following should be set: [%s]",
-                                                                       group.getName(),
-                                                                       Joiner.on(", ")
-                                                                           .join(exclusiveModel
-                                                                               .getExclusiveParameterNames())))));
-        } else if (definedExclusiveParameters.size() > 1) {
-          if (model.isPresent()) {
-            throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
-                                                                        getComponentModelTypeName(model.get()),
-                                                                        getModelName(model.get()),
-                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
-          } else {
-            throw new ConfigurationException(createStaticMessage(format("The following parameters cannot be set at the same time: [%s]",
-                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
-          }
-        }
-      }
-    }
   }
 
 }

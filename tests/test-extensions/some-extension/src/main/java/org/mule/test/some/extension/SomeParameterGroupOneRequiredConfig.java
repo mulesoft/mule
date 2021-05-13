@@ -19,10 +19,18 @@ public class SomeParameterGroupOneRequiredConfig {
 
   @Parameter
   @Optional
+  private String repeatedNameParameter;
+
+  @Parameter
+  @Optional
   private ComplexParameter complexParameter;
 
   public String getSomeParameter() {
     return someParameter;
+  }
+
+  public String getRepeatedNameParameter() {
+    return repeatedNameParameter;
   }
 
   public ComplexParameter getComplexParameter() {
