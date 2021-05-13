@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
@@ -166,7 +167,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   /**
    * Sets the {@link List} of {@link String}s containing the extra boot packages defined to be appended to the container in
    * addition to the pre-defined ones.
-   * 
+   *
    * @param extraBootPackages {@link List} of {@link String}s containing the extra boot packages defined to be appended to the
    *                          container in addition to the pre-defined ones.
    * @return this
@@ -315,9 +316,22 @@ public class ArtifactIsolatedClassLoaderBuilder {
     logger.debug("Reading rootArtifact from pom file: {}", pomFile);
     Model model = MavenModelFactory.createMavenProject(pomFile);
 
-    return new DefaultArtifact(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId(),
-                               model.getArtifactId(), model.getPackaging(),
-                               model.getVersion() != null ? model.getVersion() : model.getParent().getVersion());
+    return new DefaultArtifact(
+                               model.getGroupId() != null ? searchingProperties(model, Model::getGroupId)
+                                   : searchingProperties(model, m -> m.getParent().getGroupId()),
+                               searchingProperties(model, Model::getArtifactId),
+                               searchingProperties(model, Model::getPackaging),
+                               model.getVersion() != null ? searchingProperties(model, Model::getVersion)
+                                   : searchingProperties(model, m -> m.getParent().getVersion()));
+  }
+
+  private String searchingProperties(Model model, Function<Model, String> extractor) {
+    String value = extractor.apply(model);
+    if (value.startsWith("${")) {
+      String propertyKey = value.substring(value.indexOf("{") + 1, value.indexOf("}"));
+      return model.getProperties().getProperty(propertyKey);
+    }
+    return value;
   }
 
 }
