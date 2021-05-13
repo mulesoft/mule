@@ -6472,7 +6472,8 @@
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {}
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -17934,7 +17935,8 @@
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {}
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -25319,7 +25321,8 @@
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {}
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -33612,7 +33615,8 @@
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {}
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
@@ -41418,7 +41422,8 @@
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
-                    "isOpen": true
+                    "isOpen": true,
+                    "modelProperties": {}
                   },
                   "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",

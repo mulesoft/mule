@@ -20,11 +20,13 @@ public class OfValueInformation {
   private final Class<?> value;
   private final boolean isOpen;
   private final Binding[] bindings;
+  private final boolean fromLegacyAnnotation;
 
-  public OfValueInformation(Class<?> clazz, boolean isOpen, Binding[] bindings) {
+  public OfValueInformation(Class<?> clazz, boolean isOpen, Binding[] bindings, boolean fromLegacyAnnotation) {
     this.value = clazz;
     this.isOpen = isOpen;
     this.bindings = bindings;
+    this.fromLegacyAnnotation = fromLegacyAnnotation;
   }
 
   public Class<?> getValue() {
@@ -37,5 +39,9 @@ public class OfValueInformation {
 
   public Binding[] getBindings() {
     return bindings;
+  }
+
+  public boolean isFromLegacyAnnotation() {
+    return fromLegacyAnnotation;
   }
 }
