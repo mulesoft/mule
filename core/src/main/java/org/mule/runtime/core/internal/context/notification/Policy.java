@@ -10,7 +10,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
-import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.NotifierCallback;
 
@@ -140,6 +139,9 @@ public class Policy {
   private void dispatchToSenders(Notification notification, Collection<Sender> senders, NotifierCallback notifier) {
     for (Sender sender : senders) {
       try {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Sending notification: " + notification.toString());
+        }
         sender.dispatch(notification, notifier);
       } catch (Throwable e) {
         LOGGER.info("NotificationListener {} was unable to fire notification {} due to an exception: {}.", sender.getListener(),
