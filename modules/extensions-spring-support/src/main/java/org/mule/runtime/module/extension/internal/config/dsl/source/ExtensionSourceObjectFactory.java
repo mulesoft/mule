@@ -10,11 +10,13 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.checkParameterGroupExclusiveness;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -81,9 +83,10 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   @Override
   public ExtensionMessageSource doGetObject() {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
-      getParametersResolver().checkParameterGroupExclusiveness(Optional.of(sourceModel),
-                                                               sourceModel.getParameterGroupModels(),
-                                                               parameters, new SmallMap<>());
+      if (!isLazyInitMode(properties)) {
+        checkParameterGroupExclusiveness(Optional.of(sourceModel), sourceModel.getParameterGroupModels(), parameters,
+                                         new SmallMap<>());
+      }
       ResolverSet nonCallbackParameters = getNonCallbackParameters();
 
       if (hasDynamicNonCallbackParameters(nonCallbackParameters)) {
