@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
@@ -53,6 +54,7 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOM
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -72,6 +74,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,6 +82,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
@@ -1943,6 +1947,61 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     CompletionCallback<Object, Object> completionCallback = getCompletionCallback("SavedCallback");
     ClassLoader anotherClassLoader = mock(ClassLoader.class);
     withContextClassLoader(anotherClassLoader, () -> completionCallback.error(new NullPointerException()));
+  }
+
+  @Test
+  @Issue("MULE-19376")
+  @Description("When both the app as the extension share a resource with the same name, the runtime should choose the extension's when the resource is obtained at an operation")
+  public void pluginDeclaredInDomainIsAbleToGetResourceWithSameNameInAppAndExtensionFromExtension() throws Exception {
+    String resourceFileName = "file.txt";
+
+    final ApplicationFileBuilder applicationFileBuilder =
+        getApplicationWithResourceFileBuilder(classloaderConnectExtensionPlugin, "app-with-connection", resourceFileName);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    assertObtainedResourceIsCorrect("/org/foo/connection/extension/" + resourceFileName, "flowWhichConnects");
+  }
+
+  @Test
+  @Issue("MULE-19376")
+  @Description("When both the app as the extension share a resource with the same name, the runtime should choose the extension's when the resource is obtained at config")
+  public void pluginDeclaredInDomainIsAbleToGetResourceWithSameNameInAppAndExtensionFromExtensionInConfig() throws Exception {
+    String resourceFileName = "file.txt";
+
+    final ApplicationFileBuilder applicationFileBuilder =
+        getApplicationWithResourceFileBuilder(classloaderConfigConnectExtensionPlugin, "app-with-config-connection",
+                                              resourceFileName);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    assertObtainedResourceIsCorrect("/org/foo/connection/extension/" + resourceFileName, "flowWhichConnects");
+  }
+
+  private void assertObtainedResourceIsCorrect(String correctResourceLocation, String flowName) throws Exception {
+    File resourceFile = getResourceFile(correctResourceLocation);
+    BufferedReader reader = Files.newBufferedReader(resourceFile.toPath(), defaultCharset());
+
+    CoreEvent result = executeApplicationFlow(flowName, null);
+    assertThat(result.getMessage().getPayload().getValue(), is(equalTo(reader.readLine())));
+  }
+
+  private ApplicationFileBuilder getApplicationWithResourceFileBuilder(ArtifactPluginFileBuilder classloaderConfigConnectExtensionPlugin,
+                                                                       String appName, String resourceName) {
+    // Given a plugin which creates a connection.
+    final ArtifactPluginFileBuilder pluginWhichCreatesConnection = classloaderConfigConnectExtensionPlugin;
+
+    return new ApplicationFileBuilder(appName).definedBy(appName + ".xml")
+        .dependingOn(pluginWhichCreatesConnection)
+        .containingResource(resourceName, resourceName);
   }
 
   private CompletionCallback<Object, Object> getCompletionCallback(String callbackName) {
