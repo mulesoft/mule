@@ -10,21 +10,18 @@ package org.mule.test.runner.api;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classloader.IsolatedClassLoaderFactory;
-import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
-import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -314,24 +311,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private Artifact getRootArtifact(File rootArtifactClassesFolder) {
     File pomFile = new File(rootArtifactClassesFolder.getParentFile().getParentFile(), POM_XML);
     logger.debug("Reading rootArtifact from pom file: {}", pomFile);
-    Model model = MavenModelFactory.createMavenProject(pomFile);
-
-    return new DefaultArtifact(
-                               model.getGroupId() != null ? searchingProperties(model, Model::getGroupId)
-                                   : searchingProperties(model, m -> m.getParent().getGroupId()),
-                               searchingProperties(model, Model::getArtifactId),
-                               searchingProperties(model, Model::getPackaging),
-                               model.getVersion() != null ? searchingProperties(model, Model::getVersion)
-                                   : searchingProperties(model, m -> m.getParent().getVersion()));
-  }
-
-  private String searchingProperties(Model model, Function<Model, String> extractor) {
-    String value = extractor.apply(model);
-    if (value.startsWith("${")) {
-      String propertyKey = value.substring(value.indexOf("{") + 1, value.indexOf("}"));
-      return model.getProperties().getProperty(propertyKey);
-    }
-    return value;
+    return createFromPomFile(pomFile);
   }
 
 }
