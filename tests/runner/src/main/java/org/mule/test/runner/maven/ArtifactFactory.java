@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 
 /**
  * Utils static class for creating {@link Artifact}s
+ *
+ * @since 4.3.1, 4.4.0
  */
 public final class ArtifactFactory {
 
@@ -49,6 +51,5 @@ public final class ArtifactFactory {
     }
     return value;
   }
-
 
 }

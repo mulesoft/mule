@@ -14,9 +14,11 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
+import io.qameta.allure.Issue;
 import org.eclipse.aether.artifact.Artifact;
 import org.junit.Test;
 
+@Issue("MULE-19417")
 public class ArtifactFactoryTestCase {
 
   private static final String ROOT_RESOURCES_FOLDER = "test-poms";
