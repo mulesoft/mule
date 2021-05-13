@@ -830,4 +830,17 @@ public interface AllureConstants {
 
     }
   }
+
+  interface PolicyZeroDowntimeFeature {
+
+    String POLICY_ZERO_DOWNTIME = "Zero Downtime";
+
+    interface PolicyReorderStory {
+
+      String POLICY_REORDER = "Policy Reorder";
+
+    }
+
+  }
+
 }
