@@ -30,6 +30,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.checkParameterGroupExclusiveness;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 
 import org.mule.metadata.api.model.BooleanType;
@@ -390,60 +391,6 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         .orElseThrow(() -> new IllegalModelDefinitionException(format("Class '%s' does not contain field %s",
                                                                       objectClass.getName(),
                                                                       key)));
-  }
-
-  public void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model,
-                                               List<ParameterGroupModel> groups,
-                                               Map<String, ?> parameters, Map<String, String> aliasedParameterNames)
-      throws ConfigurationException {
-    if (lazyInitEnabled) {
-      return;
-    }
-
-    Set<String> parameterValueResolvers = new HashSet<>();
-    Set<String> parameterNames = parameters.entrySet().stream()
-        .flatMap(entry -> {
-          if (entry.getValue() instanceof ParameterValueResolver) {
-            try {
-              parameterValueResolvers.add(aliasedParameterNames.getOrDefault(entry.getKey(), entry.getKey()));
-              return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                  .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
-            } catch (ValueResolvingException e) {
-              throw new MuleRuntimeException(e);
-            }
-          } else {
-            String key = entry.getKey();
-            aliasedParameterNames.getOrDefault(key, key);
-            return Stream.of(key);
-          }
-        })
-        .collect(toSet());
-    parameterNames.addAll(parameterValueResolvers);
-
-    for (ParameterGroupModel group : groups) {
-      for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
-        Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), parameterNames);
-        if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
-          throw new ConfigurationException((createStaticMessage(format(
-                                                                       "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
-                                                                           + "One of the following should be set: [%s]",
-                                                                       group.getName(),
-                                                                       Joiner.on(", ")
-                                                                           .join(exclusiveModel
-                                                                               .getExclusiveParameterNames())))));
-        } else if (definedExclusiveParameters.size() > 1) {
-          if (model.isPresent()) {
-            throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
-                                                                        getComponentModelTypeName(model.get()),
-                                                                        getModelName(model.get()),
-                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
-          } else {
-            throw new ConfigurationException(createStaticMessage(format("The following parameters cannot be set at the same time: [%s]",
-                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
-          }
-        }
-      }
-    }
   }
 
   /**

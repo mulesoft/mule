@@ -11,6 +11,9 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.collections.CollectionUtils.intersection;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
@@ -18,6 +21,8 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NON
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 
@@ -25,6 +30,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
@@ -38,11 +44,15 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -78,21 +88,28 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -541,5 +558,84 @@ public class MuleExtensionUtils {
               || connectableComponentModel.getModelProperty(PagedOperationModelProperty.class).isPresent()));
     }
     return false;
+  }
+
+  /**
+   * Checks the given {@link ParameterGroupModel}s against the given resolved parameters and validates that the group
+   * exclusiveness is honored.
+   *
+   * @param model                 the model that owns the parameter groups
+   * @param groups                the parameter groups in the model whose exclusiveness must be honored
+   * @param parameters            the resolved parameters
+   * @param aliasedParameterNames the alias for each parameter if it has one
+   *
+   * @throws ConfigurationException if the group exclusiveness is not honored by the resolved parameters.
+   *
+   * @since 4.4.0
+   */
+  public static void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model,
+                                                      List<ParameterGroupModel> groups,
+                                                      Map<String, ?> parameters, Map<String, String> aliasedParameterNames)
+      throws ConfigurationException {
+    for (ParameterGroupModel group : groups) {
+      for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
+        Set<String> parameterNames = resolveParameterNames(group, parameters, aliasedParameterNames);
+        Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), parameterNames);
+        if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
+          throw new ConfigurationException((createStaticMessage(format(
+                                                                       "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
+                                                                           + "One of the following should be set: [%s]",
+                                                                       group.getName(),
+                                                                       Joiner.on(", ")
+                                                                           .join(exclusiveModel
+                                                                               .getExclusiveParameterNames())))));
+        } else if (definedExclusiveParameters.size() > 1) {
+          if (model.isPresent()) {
+            throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+                                                                        getComponentModelTypeName(model.get()),
+                                                                        getModelName(model.get()),
+                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
+          } else {
+            throw new ConfigurationException(createStaticMessage(format("The following parameters cannot be set at the same time: [%s]",
+                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
+          }
+        }
+      }
+    }
+  }
+
+  private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,
+                                                   Map<String, String> aliasedParameterNames)
+      throws ConfigurationException {
+    if (group.isShowInDsl()) {
+      ExtensionParameterDescriptorModelProperty property = group.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+          .orElseThrow(() -> new ConfigurationException(createStaticMessage("Could not find ExtensionParameterDescriptorModelProperty for the parameter group %s",
+                                                                            group.getName())));
+      String containerName = property.getExtensionParameter().getName();
+      try {
+        Object parameter = parameters.get(containerName);
+        if (parameter == null) {
+          throw new ConfigurationException(createStaticMessage("Was expecting a parameter with name [%s] among the resolved parameters",
+                                                               containerName));
+        }
+        if (parameter instanceof ParameterValueResolver) {
+          return ((ParameterValueResolver) parameter).getParameters().keySet().stream()
+              .map(name -> aliasedParameterNames.getOrDefault(name, name)).collect(toSet());
+        } else {
+          throw new MuleRuntimeException(createStaticMessage("Was expecting parameter with name [%s] to be of class ParameterValueResolver but was of class %s",
+                                                             containerName, parameters.get(containerName).getClass()));
+        }
+      } catch (ValueResolvingException e) {
+        throw new MuleRuntimeException(createStaticMessage("Failed to resolve the parameters for [%s]", containerName), e);
+      }
+    } else {
+      Set<String> topLevelParameterNames = new HashSet<>();
+      parameters.forEach((key, value) -> {
+        // TODO: MULE-19223
+        aliasedParameterNames.getOrDefault(key, key);
+        topLevelParameterNames.add(key);
+      });
+      return topLevelParameterNames;
+    }
   }
 }
