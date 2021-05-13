@@ -103,7 +103,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "api-key",
-      "system": "TODO",
+      "system": "Semantic Terms",
       "type": "connectivity.ApiKeyAuthenticationConnection"
     }
   },
@@ -216,7 +216,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "basic-auth",
-      "system": "TODO",
+      "system": "Semantic Terms",
       "type": "connectivity.BasicAuthenticationConnection"
     }
   },
@@ -329,7 +329,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "client-secret",
-      "system": "TODO",
+      "system": "Semantic Terms",
       "type": "connectivity.ApiKeyAuthenticationConnection"
     }
   },
@@ -472,7 +472,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "custom",
-      "system": "TODO",
+      "system": "Semantic Terms",
       "type": "connectivity.Connection"
     }
   },
@@ -575,7 +575,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "digest",
-      "system": "TODO",
+      "system": "Semantic Terms",
       "type": "connectivity.DigestAuthenticationConnection"
     }
   },
@@ -678,7 +678,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "kerberos",
-      "system": "TODO",
+      "system": "Semantic Terms",
       "type": "connectivity.KerberosAuthenticationConnection"
     }
   },
@@ -781,7 +781,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "unsecured",
-      "system": "TODO",
+      "system": "Semantic Terms",
       "type": "connectivity.UnsecureConnection"
     }
   }

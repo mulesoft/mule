@@ -37,7 +37,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   },
@@ -74,7 +74,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "chat",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   },
@@ -124,7 +124,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValueWithRequiredParam",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   },
@@ -174,7 +174,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValuesWithRequiredParamsFromParamGroup",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   },
@@ -224,7 +224,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValuesWithRequiredParamsFromShowInDslGroup",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   },
@@ -270,7 +270,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "failure-connection",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   },
@@ -312,7 +312,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-parameter-with-field-values",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   },
@@ -354,7 +354,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-value-parameter",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   },
@@ -412,7 +412,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "withValueFourBoundActingParameters",
-      "system": "TODO",
+      "system": "Values",
       "type": "connectivity.Connection"
     }
   }

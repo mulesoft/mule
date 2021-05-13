@@ -105,7 +105,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
-      "system": "TODO",
+      "system": "Test OAuth Extension",
       "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
@@ -215,7 +215,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "scopeless",
-      "system": "TODO",
+      "system": "Test OAuth Extension",
       "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
@@ -325,7 +325,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "validated-connection",
-      "system": "TODO",
+      "system": "Test OAuth Extension",
       "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
@@ -451,7 +451,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-params-connection",
-      "system": "TODO",
+      "system": "Test OAuth Extension",
       "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
@@ -531,7 +531,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "client-credentials",
-      "system": "TODO",
+      "system": "Test OAuth Extension",
       "type": "connectivity.OAuthClientCredentialsConnection"
     }
   },
@@ -641,7 +641,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooled",
-      "system": "TODO",
+      "system": "Test OAuth Extension",
       "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   },
@@ -751,7 +751,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "refresh-validation",
-      "system": "TODO",
+      "system": "Test OAuth Extension",
       "type": "connectivity.OAuthAuthorizationCodeConnection"
     }
   }

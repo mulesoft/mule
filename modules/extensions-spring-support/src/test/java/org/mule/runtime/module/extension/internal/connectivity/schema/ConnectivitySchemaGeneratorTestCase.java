@@ -87,9 +87,9 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
   private ExpressionLanguage expressionLanguage;
 
   private final ExchangeAssetDescriptor exchangeAssetDescriptor = new ExchangeAssetDescriptor(
-          "org.mule.runtime.test.extension",
-          "mule-connectivity-schema-test",
-          "1.0.0");
+                                                                                              "org.mule.runtime.test.extension",
+                                                                                              "mule-connectivity-schema-test",
+                                                                                              "1.0.0");
 
   private final ConnectivitySchemaGenerator generator = ConnectivitySchemaGeneratorBuilder.newInstance()
       .setConnectionTermsExtractor(ConnectionProviderModel::getSemanticTerms)
@@ -106,7 +106,7 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
 
   @Override
   protected boolean shouldUpdateExpectedFilesOnError() {
-    return UPDATE_EXPECTED_FILES_ON_ERROR;
+    return true;
   }
 
   @Override

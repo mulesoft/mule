@@ -43,7 +43,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
-      "system": "TODO",
+      "system": "Metadata",
       "type": "connectivity.Connection"
     }
   }

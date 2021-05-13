@@ -32,7 +32,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "apple",
-      "system": "TODO",
+      "system": "vegan",
       "type": "connectivity.Connection"
     }
   },
@@ -74,7 +74,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "BananaPlantain",
-      "system": "TODO",
+      "system": "vegan",
       "type": "connectivity.Connection"
     }
   },
@@ -144,7 +144,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "grape-connection",
-      "system": "TODO",
+      "system": "vegan",
       "type": "connectivity.Connection"
     }
   },
@@ -181,7 +181,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "kiwi",
-      "system": "TODO",
+      "system": "vegan",
       "type": "connectivity.Connection"
     }
   },
@@ -218,7 +218,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
-      "system": "TODO",
+      "system": "vegan",
       "type": "connectivity.Connection"
     }
   }

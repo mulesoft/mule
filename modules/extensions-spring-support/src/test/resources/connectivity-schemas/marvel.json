@@ -37,7 +37,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "mystic",
-      "system": "TODO",
+      "system": "Marvel",
       "type": "connectivity.Connection"
     }
   },
@@ -79,7 +79,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooling-mystic",
-      "system": "TODO",
+      "system": "Marvel",
       "type": "connectivity.Connection"
     }
   },
@@ -121,7 +121,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "missile",
-      "system": "TODO",
+      "system": "Marvel",
       "type": "connectivity.Connection"
     }
   },
@@ -163,7 +163,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "odd-missile",
-      "system": "TODO",
+      "system": "Marvel",
       "type": "connectivity.Connection"
     }
   }

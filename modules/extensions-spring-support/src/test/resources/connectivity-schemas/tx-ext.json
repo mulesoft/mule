@@ -37,7 +37,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
-      "system": "TODO",
+      "system": "transactional",
       "type": "connectivity.Connection"
     }
   },
@@ -79,7 +79,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "non-pooling",
-      "system": "TODO",
+      "system": "transactional",
       "type": "connectivity.Connection"
     }
   }

@@ -42,7 +42,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
-      "system": "TODO",
+      "system": "petstore",
       "type": "connectivity.Connection"
     }
   },
@@ -89,7 +89,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "invalid",
-      "system": "TODO",
+      "system": "petstore",
       "type": "connectivity.Connection"
     }
   },
@@ -136,7 +136,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooled",
-      "system": "TODO",
+      "system": "petstore",
       "type": "connectivity.Connection"
     }
   },
@@ -183,7 +183,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "transactional",
-      "system": "TODO",
+      "system": "petstore",
       "type": "connectivity.Connection"
     }
   },
@@ -230,7 +230,7 @@
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "valid",
-      "system": "TODO",
+      "system": "petstore",
       "type": "connectivity.Connection"
     }
   }
