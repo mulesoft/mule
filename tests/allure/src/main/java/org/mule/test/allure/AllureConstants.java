@@ -63,6 +63,12 @@ public interface AllureConstants {
     }
   }
 
+  interface ArtifactDeploymentFeature {
+
+    String POLICY_REORDER = "Policy Reorder";
+
+  }
+
   interface DeploymentTypeFeature {
 
     String DEPLOYMENT_TYPE = "Deployment type";

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.String.format;
 import static java.lang.reflect.Modifier.FINAL;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -15,14 +16,17 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
@@ -33,6 +37,7 @@ import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistr
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.IS_POLICY_REORDER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
@@ -41,22 +46,9 @@ import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentP
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_REORDER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runners.Parameterized;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -74,8 +66,8 @@ import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.core.api.security.AbstractSecurityProvider;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -84,9 +76,26 @@ import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 
-import io.qameta.allure.Issue;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runners.Parameterized;
 
 /**
  * Contains test for application deployment with policies on the default domain
@@ -202,6 +211,109 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(2));
+  }
+
+  @Test
+  @Story(POLICY_REORDER)
+  public void duplicatedApplicationPolicy() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    expectedEx.expect(PolicyRegistrationException.class);
+    expectedEx.expectMessage(format("Error occured registering policy '%s'", FOO_POLICY_ID));
+
+    expectedEx.expectCause(allOf(
+                                 is(instanceOf(IllegalArgumentException.class)),
+                                 hasMessage(format("Policy already registered: '%s'", FOO_POLICY_ID))));
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+  }
+
+  @Test
+  @Story(POLICY_REORDER)
+  public void reorderApplicationPolicyDoesNotChangeParameters() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(POLICY_PROPERTY_KEY, FOO_POLICY_NAME);
+    parameters.put(IS_POLICY_REORDER, "true");
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
+                                                      parameters,
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+    assertThat(policyParametrization, startsWith(POLICY_PROPERTY_VALUE));
+  }
+
+  @Test
+  @Story(POLICY_REORDER)
+  public void reorderApplicationPolicy() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(barPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, FOO_POLICY_NAME),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2,
+                                                      singletonMap(POLICY_PROPERTY_KEY, BAR_POLICY_NAME),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(2));
+    assertThat(policyParametrization, startsWith(FOO_POLICY_NAME + BAR_POLICY_NAME));
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(POLICY_PROPERTY_KEY, FOO_POLICY_NAME);
+    parameters.put(IS_POLICY_REORDER, "true");
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 3,
+                                                      parameters,
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    policyParametrization = "";
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(4));
+    assertThat(policyParametrization, startsWith(BAR_POLICY_NAME + FOO_POLICY_NAME));
   }
 
   @Test
