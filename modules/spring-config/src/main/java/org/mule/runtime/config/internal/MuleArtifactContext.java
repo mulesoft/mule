@@ -712,12 +712,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-    findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER)
-        .ifPresent(config -> {
-          ((BeanDefinitionRegistry) beanFactory).registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
-                                                                        genericBeanDefinition(MuleConfigurationConfigurator.class)
-                                                                            .getBeanDefinition());
-        });
+    Optional<ComponentAst> configurationOptional = findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER);
+    if (configurationOptional.isPresent()) {
+      return;
+    }
+    BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+    beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
+                                                  genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
   }
 
   private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {

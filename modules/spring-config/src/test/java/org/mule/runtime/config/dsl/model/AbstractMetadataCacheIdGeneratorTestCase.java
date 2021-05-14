@@ -21,11 +21,9 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
@@ -225,10 +223,6 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   private MetadataCacheIdGenerator<ComponentAst> createModelBasedGenerator(ArtifactAst app) {
     return new ModelBasedMetadataCacheIdGeneratorFactory()
         .create(dslResolvingContext, new ModelBasedTypeMetadataCacheKeyGeneratorTestCase.Locator(app));
-  }
-
-  private MetadataCacheIdGenerator<ComponentAst> createAstBasedGenerator(ApplicationModel app) {
-    return new ComponentAstBasedMetadataCacheIdGenerator(new ModelBasedTypeMetadataCacheKeyGeneratorTestCase.Locator(app));
   }
 
   private MetadataCacheIdGenerator<DslElementModel<?>> createDslBasedGenerator(ArtifactAst app,
