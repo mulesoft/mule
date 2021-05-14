@@ -259,8 +259,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private ArtifactAst createApplicationModel(ArtifactDeclaration artifactDeclaration,
-                                                  ConfigResource[] artifactConfigResources,
-                                                  FeatureFlaggingService featureFlaggingService) {
+                                             ConfigResource[] artifactConfigResources,
+                                             FeatureFlaggingService featureFlaggingService) {
     try {
       final ArtifactAst artifactAst;
 
