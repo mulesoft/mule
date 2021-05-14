@@ -1748,7 +1748,9 @@
                 "order": 29
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -16889,7 +16891,8 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "connectivity.port"
+                    "connectivity.port",
+                    "telephone"
                   ],
                   "name": "saulPhoneNumber",
                   "description": "",
@@ -16938,7 +16941,9 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "hairy"
+                  ],
                   "name": "fullyBald",
                   "description": "",
                   "modelProperties": {}
@@ -17294,7 +17299,8 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "connectivity.port"
+                    "connectivity.port",
+                    "telephone"
                   ],
                   "name": "saulPhoneNumber",
                   "description": "",
@@ -17898,7 +17904,9 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "hairy"
+                  ],
                   "name": "fullyBald",
                   "description": "",
                   "modelProperties": {}
@@ -30868,7 +30876,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -30971,7 +30981,9 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -36125,7 +36137,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -49021,7 +49035,8 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "connectivity.port"
+                "connectivity.port",
+                "telephone"
               ],
               "name": "saulPhoneNumber",
               "description": "",
@@ -49070,7 +49085,9 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -49426,7 +49443,8 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "connectivity.port"
+                "connectivity.port",
+                "telephone"
               ],
               "name": "saulPhoneNumber",
               "description": "",
@@ -50030,7 +50048,9 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}

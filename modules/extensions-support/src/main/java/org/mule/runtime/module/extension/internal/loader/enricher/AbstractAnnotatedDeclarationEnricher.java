@@ -88,7 +88,7 @@ public abstract class AbstractAnnotatedDeclarationEnricher implements Declaratio
    */
   protected <T extends ExecutableComponentDeclaration> Optional<Method> extractImplementingMethod(ExecutableComponentDeclaration<T> declaration) {
     return declaration.getModelProperty(ImplementingMethodModelProperty.class)
-            .map(ImplementingMethodModelProperty::getMethod);
+        .map(ImplementingMethodModelProperty::getMethod);
   }
 
   /**

@@ -436,11 +436,6 @@
               "range": "number",
               "mandatory": true
             },
-            "secretNumber": {
-              "propertyTerm": "connectivity.secret",
-              "range": "string",
-              "mandatory": true
-            },
             "domain": {
               "propertyTerm": "connectivity.domain",
               "range": "string",

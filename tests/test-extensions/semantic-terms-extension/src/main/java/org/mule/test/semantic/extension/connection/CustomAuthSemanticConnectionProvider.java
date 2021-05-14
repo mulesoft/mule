@@ -8,6 +8,7 @@ package org.mule.test.semantic.extension.connection;
 
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 import org.mule.sdk.api.annotation.semantics.security.AccountId;
 import org.mule.sdk.api.annotation.semantics.security.ConnectionId;
 import org.mule.sdk.api.annotation.semantics.security.Secret;
@@ -54,6 +55,7 @@ public class CustomAuthSemanticConnectionProvider extends SemanticTermsConnectio
 
   @Parameter
   @Secret
+  @ExcludeFromConnectivitySchema
   private String secretNumber;
 
 }

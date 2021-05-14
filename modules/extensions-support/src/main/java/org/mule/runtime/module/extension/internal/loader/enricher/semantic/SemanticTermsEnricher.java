@@ -64,11 +64,11 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
       @Override
       protected void onOperation(OperationDeclaration declaration) {
         extractImplementingMethod(declaration)
-                .map(method -> new MethodWrapper(method, typeLoader))
-                .ifPresent(method -> {
-                  addSemanticTerms(getAllTermsFromAnnotations(method::isAnnotatedWith), declaration);
-                  addCustomTerms(method, declaration);
-                });
+            .map(method -> new MethodWrapper(method, typeLoader))
+            .ifPresent(method -> {
+              addSemanticTerms(getAllTermsFromAnnotations(method::isAnnotatedWith), declaration);
+              addCustomTerms(method, declaration);
+            });
       }
 
       @Override
@@ -106,8 +106,8 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
       @Override
       protected void onFunction(FunctionDeclaration declaration) {
         declaration.getModelProperty(ImplementingMethodModelProperty.class)
-                .map(ImplementingMethodModelProperty::getMethod)
-                .ifPresent(method -> addCustomTerms(new MethodWrapper<>(method, typeLoader), declaration));
+            .map(ImplementingMethodModelProperty::getMethod)
+            .ifPresent(method -> addCustomTerms(new MethodWrapper<>(method, typeLoader), declaration));
       }
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }
@@ -127,7 +127,6 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
       declaration.addSemanticTerm(mappedTerm);
     }
   }
-
 
   private void addSemanticTerms(Set<String> terms, WithSemanticTermsDeclaration declaration) {
     terms.forEach(declaration::addSemanticTerm);
