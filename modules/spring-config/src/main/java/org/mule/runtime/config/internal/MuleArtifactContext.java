@@ -367,12 +367,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                                               .getExecutionClassLoader()),
                                                                           ofNullable(featureFlaggingService));
 
-      try {
-        initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
-      } catch (InitialisationException e) {
-        throw new MuleRuntimeException(e);
-      }
-
+      initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
       artifactAst.updatePropertiesResolver(configurationProperties.getConfigurationPropertiesResolver());
       validateArtifact(artifactAst);
       return artifactAst;
