@@ -79,9 +79,10 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
     assertThat(ps.onProcessor(processor), is(not(sameInstance(processor))));
   }
 
-  private static class NonBlockingWithProcessingTypeBlockingProcessor implements ReactiveProcessor {
+  private static class NonBlockingWithProcessingTypeBlockingProcessor implements ComponentInnerProcessor {
 
-    protected boolean isBlocking() {
+    @Override
+    public boolean isBlocking() {
       // Return false to indicate that this processor has a completion callback.
       return false;
     }
