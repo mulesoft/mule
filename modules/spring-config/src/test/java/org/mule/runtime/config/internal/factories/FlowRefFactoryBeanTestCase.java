@@ -459,7 +459,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private MuleArtifactContext createMuleArtifactContextStub(DefaultListableBeanFactory mockedBeanFactory) {
     MuleArtifactContext muleArtifactContext =
         new MuleArtifactContext(mockMuleContext, emptyArtifact(),
-                                mock(OptionalObjectsController.class), empty(), emptyMap(), APP, true,
+                                mock(OptionalObjectsController.class), empty(), emptyMap(), APP,
                                 new DefaultComponentBuildingDefinitionRegistryFactory()) {
 
           @Override

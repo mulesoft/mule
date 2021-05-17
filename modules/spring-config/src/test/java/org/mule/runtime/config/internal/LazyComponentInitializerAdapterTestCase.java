@@ -218,8 +218,8 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   private LazyMuleArtifactContext createLazyMuleArtifactContextStub(ObjectProviderAwareBeanFactory beanFactory) {
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext, toArtifactast(getSimpleApp(), getExtensions(muleContext.getExtensionManager())),
-                                    optionalObjectsController, emptyMap(), APP,
-                                    empty(), empty(), true, lockFactory,
+                                    optionalObjectsController, empty(), emptyMap(), APP,
+                                    empty(), lockFactory,
                                     new DefaultComponentBuildingDefinitionRegistryFactory()) {
 
           @Override
