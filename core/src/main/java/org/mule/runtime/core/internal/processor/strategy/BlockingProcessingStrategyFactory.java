@@ -24,6 +24,9 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Processing strategy that processes the {@link Pipeline} in the caller thread and does not schedule the processing of any
  * {@link Processor} in a different thread pool regardless of their {@link ProcessingType}.
@@ -61,7 +64,7 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.getProcessingType() == CPU_LITE_ASYNC) {
+      if (needsMonoBlock(processor)) {
         return publisher -> subscriberContext()
             .flatMapMany(ctx -> from(publisher).handle((event, sink) -> {
               try {
@@ -81,5 +84,27 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
       }
     }
 
+    /**
+     * This strategy adds a Mono.block call in order to preserve the thread, because it's a precondition to
+     * transactions to work.
+     * However, there are some operations that don't need to use a Mono.block, because they have a synchronous
+     * execution. It allows us to make a performance optimization for those operations, and this method is intended to
+     * detect which operations do need a Mono.block and which don't.
+     *
+     * @param processor The processor.
+     * @return true if a Mono.block call is needed to wait for operation completion.
+     */
+    private static boolean needsMonoBlock(ReactiveProcessor processor) {
+      try {
+        // This method is added in the SDK, and it's return value is false for those operations which include a
+        // completion callback. That completion callback is the way to implement a non-blocking operations, so if this
+        // method returns true, we'll need a Mono.block call to wait the operation completion.
+        Method isBlockingMethod = processor.getClass().getDeclaredMethod("isBlocking");
+        isBlockingMethod.setAccessible(true);
+        return !(boolean) isBlockingMethod.invoke(processor);
+      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        return processor.getProcessingType() == CPU_LITE_ASYNC;
+      }
+    }
   }
 }
