@@ -13,11 +13,12 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
@@ -51,8 +52,7 @@ public class OptionalObjectsLoadedTestCase extends AbstractMuleTestCase {
                            new SimpleConfigurationBuilder(singletonMap(OBJECT_NOTIFICATION_HANDLER,
                                                                        mock(ServerNotificationManager.class))),
                            new MockExtensionManagerConfigurationBuilder(),
-                           new SpringXmlConfigurationBuilder(new String[0],
-                                                             emptyMap()));
+                           createConfigurationBuilder(new String[0], emptyMap(), APP, false, false));
     muleContext.start();
     muleContext.getRegistry().lookupByType(Calendar.class);
   }
