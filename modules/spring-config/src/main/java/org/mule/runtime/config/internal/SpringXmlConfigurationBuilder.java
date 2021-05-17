@@ -90,8 +90,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
 
   private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
-                                       ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
-                                       LockFactory runtimeLockFactory)
+                                        ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
+                                        LockFactory runtimeLockFactory)
       throws ConfigurationException {
     super(configResources, artifactProperties);
     this.artifactType = artifactType;
