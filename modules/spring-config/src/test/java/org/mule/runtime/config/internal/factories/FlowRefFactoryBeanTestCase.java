@@ -8,8 +8,10 @@ package org.mule.runtime.config.internal.factories;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -34,6 +36,8 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -59,7 +63,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.config.internal.ObjectProviderAwareBeanFactory;
@@ -67,7 +70,6 @@ import org.mule.runtime.config.internal.OptionalObjectsController;
 import org.mule.runtime.config.internal.dsl.model.CoreComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -81,15 +83,12 @@ import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorCha
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
-import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -459,8 +458,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private MuleArtifactContext createMuleArtifactContextStub(DefaultListableBeanFactory mockedBeanFactory) {
     MuleArtifactContext muleArtifactContext =
-        new MuleArtifactContext(mockMuleContext, new ConfigResource[0], new ArtifactDeclaration(),
-                                mock(OptionalObjectsController.class), Optional.empty(), new HashMap<>(), ArtifactType.APP, true,
+        new MuleArtifactContext(mockMuleContext, emptyArtifact(),
+                                mock(OptionalObjectsController.class), empty(), emptyMap(), APP, true,
                                 new DefaultComponentBuildingDefinitionRegistryFactory()) {
 
           @Override

@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,6 +25,7 @@ import static org.mule.runtime.api.component.location.Location.builderFromString
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
+import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
@@ -54,10 +56,8 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
-import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -217,8 +217,8 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
 
   private LazyMuleArtifactContext createLazyMuleArtifactContextStub(ObjectProviderAwareBeanFactory beanFactory) {
     LazyMuleArtifactContext muleArtifactContext =
-        new LazyMuleArtifactContext(muleContext, new ConfigResource[0], getSimpleApp(),
-                                    optionalObjectsController, new HashMap<>(), APP,
+        new LazyMuleArtifactContext(muleContext, toArtifactast(getSimpleApp(), getExtensions(muleContext.getExtensionManager())),
+                                    optionalObjectsController, emptyMap(), APP,
                                     empty(), empty(), true, lockFactory,
                                     new DefaultComponentBuildingDefinitionRegistryFactory()) {
 
@@ -232,5 +232,9 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
 
     return muleArtifactContext;
 
+  }
+
+  private Set<ExtensionModel> getExtensions(ExtensionManager extensionManager) {
+    return extensionManager == null ? emptySet() : extensionManager.getExtensions();
   }
 }

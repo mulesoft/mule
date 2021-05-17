@@ -31,7 +31,6 @@ import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.g
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
@@ -59,7 +58,6 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
@@ -83,7 +81,6 @@ import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.io.File;
@@ -147,17 +144,16 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    * @since 4.0
    */
-  public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
-                                 ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
+  public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
+                                 OptionalObjectsController optionalObjectsController,
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations,
                                  LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory)
       throws BeansException {
-    super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController, parentConfigurationProperties,
-          extendArtifactProperties(artifactProperties),
-          artifactType, disableXmlValidations, componentBuildingDefinitionRegistryFactory);
+    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
+          artifactProperties, artifactType, disableXmlValidations, componentBuildingDefinitionRegistryFactory);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
@@ -247,12 +243,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     super.prepareBeanFactory(beanFactory);
     trackingPostProcessor = new TrackingPostProcessor();
     addBeanPostProcessors(beanFactory, trackingPostProcessor);
-  }
-
-  private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
-    Map<String, String> extendedArtifactProperties = new HashMap<>(artifactProperties);
-    extendedArtifactProperties.put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "true");
-    return extendedArtifactProperties;
   }
 
   private void applyLifecycle(List<Object> components, boolean applyStartPhase) {
