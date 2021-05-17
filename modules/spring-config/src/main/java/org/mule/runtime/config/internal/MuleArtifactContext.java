@@ -15,6 +15,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -34,7 +35,10 @@ import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifac
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
+import static org.mule.runtime.config.internal.model.ApplicationModel.findComponentDefinitionModel;
+import static org.mule.runtime.config.internal.model.ApplicationModel.prepareAstForRuntime;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
+import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createConfigurationAttributeResolver;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
@@ -43,6 +47,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
@@ -61,6 +66,7 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
@@ -78,6 +84,7 @@ import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -167,7 +174,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final Optional<ConfigurationProperties> parentConfigurationProperties;
   private final DefaultRegistry serviceDiscoverer;
   private final DefaultResourceLocator resourceLocator;
-  private final ApplicationModel applicationModel;
+  private PropertiesResolverConfigurationProperties configurationProperties;
+  private ArtifactAst applicationModel;
   private final MuleContextWithRegistry muleContext;
   private final BeanDefinitionFactory beanDefinitionFactory;
   private final ArtifactType artifactType;
@@ -250,9 +258,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     });
   }
 
-  private ApplicationModel createApplicationModel(ArtifactDeclaration artifactDeclaration,
-                                                  ConfigResource[] artifactConfigResources,
-                                                  FeatureFlaggingService featureFlaggingService) {
+  private ArtifactAst createApplicationModel(ArtifactDeclaration artifactDeclaration,
+                                             ConfigResource[] artifactConfigResources,
+                                             FeatureFlaggingService featureFlaggingService) {
     try {
       final ArtifactAst artifactAst;
 
@@ -353,13 +361,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
       }
 
-      final ApplicationModel applicationModel = new ApplicationModel(artifactAst,
-                                                                     artifactProperties, parentConfigurationProperties,
-                                                                     new ClassLoaderResourceProvider(muleContext
-                                                                         .getExecutionClassLoader()),
-                                                                     featureFlaggingService);
-      validateArtifact(applicationModel);
-      return applicationModel;
+      this.configurationProperties = createConfigurationAttributeResolver(artifactAst, parentConfigurationProperties,
+                                                                          artifactProperties,
+                                                                          new ClassLoaderResourceProvider(muleContext
+                                                                              .getExecutionClassLoader()),
+                                                                          ofNullable(featureFlaggingService));
+
+      initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
+      artifactAst.updatePropertiesResolver(configurationProperties.getConfigurationPropertiesResolver());
+      validateArtifact(artifactAst);
+      return artifactAst;
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -419,7 +430,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   public void initialize() {
-    applicationModel.prepareAstForRuntime(getExtensions());
+    applicationModel = prepareAstForRuntime(applicationModel, getExtensions());
     validateAllConfigElementHaveParsers();
   }
 
@@ -449,8 +460,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected void prepareObjectProviders() {
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
-        new ImmutableObjectProviderConfiguration(applicationModel.getConfigurationProperties(),
-                                                 muleArtifactObjectProvider);
+        new ImmutableObjectProviderConfiguration(configurationProperties, muleArtifactObjectProvider);
     for (ConfigurableObjectProvider objectProvider : objectProviders) {
       objectProvider.configure(providerConfiguration);
     }
@@ -494,7 +504,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   public void close() {
     if (isRunning()) {
       super.close();
-      applicationModel.close();
+      disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
     }
   }
 
@@ -683,7 +693,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
     new SpringMuleContextServiceConfigurator(muleContext,
-                                             applicationModel.getConfigurationProperties(),
+                                             configurationProperties,
                                              artifactType,
                                              optionalObjectsController,
                                              beanFactory,
@@ -697,8 +707,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-    Optional<ComponentAst> configurationOptional =
-        applicationModel.findComponentDefinitionModel(CONFIGURATION_IDENTIFIER);
+    Optional<ComponentAst> configurationOptional = findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER);
     if (configurationOptional.isPresent()) {
       return;
     }
@@ -795,7 +804,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return extensionManager == null ? emptySet() : extensionManager.getExtensions();
   }
 
-  public ApplicationModel getApplicationModel() {
+  public ArtifactAst getApplicationModel() {
     return applicationModel;
   }
 

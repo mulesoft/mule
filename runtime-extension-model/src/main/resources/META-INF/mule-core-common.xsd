@@ -49,7 +49,7 @@
     <xsd:element name="mule" type="muleType">
         <xsd:annotation>
             <xsd:documentation>
-                Either the root element of a Mule configuration, or a "top-level" element in a Spring configuration that contains further Mule elements.
+                The root element of a Mule configuration.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

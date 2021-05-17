@@ -19,16 +19,22 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.SmartFactoryBean;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ObjectFactoryClassRepositoryTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Test
   public void cacheEnableForCGLib()
@@ -52,9 +58,17 @@ public class ObjectFactoryClassRepositoryTestCase {
   @Test
   public void compositeClassLoadersAreCorrectlyCached() throws Exception {
     final ComponentBuildingDefinition componentBuildingDefinition = mock(ComponentBuildingDefinition.class);
-    ClassLoader classLoader1 = new URLClassLoader(((URLClassLoader) this.getClass().getClassLoader()).getURLs(),
+
+    String classpath = System.getProperty("java.class.path");
+    String[] entries = classpath.split(File.pathSeparator);
+    URL[] unitTestClassLoaderUrls = new URL[entries.length];
+    for (int i = 0; i < entries.length; i++) {
+      unitTestClassLoaderUrls[i] = Paths.get(entries[i]).toAbsolutePath().toUri().toURL();
+    }
+
+    ClassLoader classLoader1 = new URLClassLoader(unitTestClassLoaderUrls,
                                                   this.getClass().getClassLoader().getParent());
-    ClassLoader classLoader2 = new URLClassLoader(((URLClassLoader) this.getClass().getClassLoader()).getURLs(),
+    ClassLoader classLoader2 = new URLClassLoader(unitTestClassLoaderUrls,
                                                   this.getClass().getClassLoader().getParent());
 
     Class factoryClass1 = classLoader1.loadClass(FakeObjectConnectionProviderObjectFactory.class.getName());

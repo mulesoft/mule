@@ -9,7 +9,6 @@ package org.mule.runtime.config.dsl.model;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -28,6 +27,7 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
@@ -71,7 +71,6 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
@@ -533,14 +532,12 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   }
 
   protected Optional<ElementDeclaration> getDeclaration(ArtifactDeclaration app, String location) {
-    return app.findElement(org.mule.runtime.app.declaration.api.component.location.Location
-        .builderFromStringRepresentation(location).build());
+    return app.findElement(builderFromStringRepresentation(location).build());
   }
 
 
-  protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
-    return new ApplicationModel(toArtifactast(declaration, extensions), emptyMap(), empty(),
-                                uri -> getClass().getResourceAsStream(uri), getFeatureFlaggingService());
+  protected ArtifactAst loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
+    return toArtifactast(declaration, extensions);
   }
 
   private String collectLog(ValueProviderCacheId valueProviderCacheId, int level) {
