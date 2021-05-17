@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal;
 
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.stream;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
@@ -20,7 +19,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
@@ -110,33 +108,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       throws ConfigurationException {
     this(configResources, artifactProperties, artifactType, enableLazyInit, disableXmlValidations,
          getRuntimeLockFactory());
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String configResources, Map<String, String> artifactProperties, ArtifactType artifactType)
-      throws ConfigurationException {
-    this(new String[] {configResources}, artifactProperties, artifactType, false, false);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String configResource) throws ConfigurationException {
-    this(configResource, emptyMap(), APP);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String[] configFiles, Map<String, String> artifactProperties)
-      throws ConfigurationException {
-    this(configFiles, artifactProperties, APP, false, false);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String[] configFiles, boolean enableLazyInit, boolean disableXmlValidations)
-      throws ConfigurationException {
-    this(configFiles, emptyMap(), APP, enableLazyInit, disableXmlValidations, getRuntimeLockFactory());
   }
 
   public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,

@@ -72,8 +72,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
         muleContext.setExtensionManager(defaultExtensionManager);
       }
     });
-    builders.add(createConfigurationBuilder(new String[] {configuration}, emptyMap(), APP, enableLazyInit(),
-                                            disableXmlValidations()));
+    builders.add(createConfigurationBuilder(configuration, emptyMap(), APP, enableLazyInit(), disableXmlValidations()));
     builders.add(testServicesConfigurationBuilder);
     builders.add(new TestPolicyProviderConfigurationBuilder());
     builders.add(new TestNotificationListenerRegistryConfigurationBuilder());
