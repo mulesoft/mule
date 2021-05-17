@@ -78,13 +78,13 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
       return result;
     } catch (MessagingException e) {
       if (processOnException) {
-        rollbackTransaction(resolveStartedTransaction || mustResolveAnyTransaction);
+        rollbackTransactionIfRequired(resolveStartedTransaction || mustResolveAnyTransaction);
       }
       throw e;
     }
   }
 
-  private void rollbackTransaction(boolean mustResolveTransaction) {
+  private void rollbackTransactionIfRequired(boolean mustResolveTransaction) {
     Transaction transaction = TransactionCoordination.getInstance().getTransaction();
     if (mustResolveTransaction && transaction != null) {
       TransactionCoordination.getInstance().rollbackCurrentTransaction();
