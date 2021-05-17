@@ -28,32 +28,44 @@ public final class SpringXmlConfigurationBuilderFactory {
     // Nothing to do
   }
 
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String configResource) throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(configResource);
   }
 
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String configResource, boolean lazyInit)
       throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit, true);
   }
 
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String configResource, boolean lazyInit,
                                                                 boolean disableXmlValidations)
       throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit, disableXmlValidations);
   }
 
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, boolean lazyInit)
       throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(configResources, lazyInit, true);
   }
 
+  // TODO: MULE-19422 Remove testing infrastructure usages
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(ArtifactDeclaration artifactDeclaration)
       throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(new String[0], artifactDeclaration, emptyMap(), APP, false, false,
                                              getRuntimeLockFactory());
   }
 
+  // TODO: MULE-19422 Remove testing infrastructure usages
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, MuleContext domainContext)
       throws ConfigurationException {
     final SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
@@ -64,18 +76,22 @@ public final class SpringXmlConfigurationBuilderFactory {
     return springXmlConfigurationBuilder;
   }
 
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String configResource, Map<String, String> artifactProperties,
                                                                 ArtifactType artifactType)
       throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(configResource, artifactProperties, artifactType);
   }
 
+  // Prod code usage
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                                                 ArtifactType artifactType)
       throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(configResources, artifactProperties, artifactType, false, false);
   }
 
+  // TODO: MULE-19422 Remove testing infrastructure usages
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String configResource, Map<String, String> artifactProperties,
                                                                 ArtifactType artifactType, boolean enableLazyInit,
                                                                 boolean disableXmlValidations)
@@ -84,6 +100,8 @@ public final class SpringXmlConfigurationBuilderFactory {
                                              disableXmlValidations);
   }
 
+  // TODO: MULE-19422 Remove testing infrastructure usages
+  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                                                 ArtifactType artifactType, boolean enableLazyInit,
                                                                 boolean disableXmlValidations)
