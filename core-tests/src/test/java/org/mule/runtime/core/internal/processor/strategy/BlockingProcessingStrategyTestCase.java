@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
@@ -62,6 +63,7 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
   }
 
   @Test
+  @Issue("MULE-19426")
   @Description("In order to improve performance, we don't need to add a Mono#block on a blocking processor, because it "
       + "will run synchronously")
   public void blockingProcessorDoesNotNeedToBeDecorated() {
@@ -69,6 +71,7 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
   }
 
   @Test
+  @Issue("MULE-19426")
   @Description("Processors with a completion callback should be decorated with a Mono#block to ensure they run "
       + "synchronously")
   public void processorsWithCompletionCallbackNeedToBeDecorated() {
