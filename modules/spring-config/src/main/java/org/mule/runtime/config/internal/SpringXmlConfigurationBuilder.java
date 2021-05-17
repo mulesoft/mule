@@ -89,7 +89,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private final LockFactory runtimeLockFactory;
   private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
 
-  public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
+  private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                        ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
                                        LockFactory runtimeLockFactory)
       throws ConfigurationException {
@@ -107,25 +107,28 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
          getRuntimeLockFactory());
   }
 
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
   public SpringXmlConfigurationBuilder(String configResources, Map<String, String> artifactProperties, ArtifactType artifactType)
       throws ConfigurationException {
     this(new String[] {configResources}, artifactProperties, artifactType, false, false);
   }
 
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
   public SpringXmlConfigurationBuilder(String configResource) throws ConfigurationException {
     this(configResource, emptyMap(), APP);
   }
 
-  public SpringXmlConfigurationBuilder(String[] configFiles, Map<String, String> artifactProperties, ArtifactType artifactType)
-      throws ConfigurationException {
-    this(configFiles, artifactProperties, artifactType, false, false);
-  }
-
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
   public SpringXmlConfigurationBuilder(String[] configFiles, Map<String, String> artifactProperties)
       throws ConfigurationException {
     this(configFiles, artifactProperties, APP, false, false);
   }
 
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
   public SpringXmlConfigurationBuilder(String[] configFiles, boolean enableLazyInit, boolean disableXmlValidations)
       throws ConfigurationException {
     this(configFiles, emptyMap(), APP, enableLazyInit, disableXmlValidations, getRuntimeLockFactory());
@@ -206,9 +209,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (enableLazyInit) {
       muleArtifactContext = new LazyMuleArtifactContext(muleContext, artifactAst,
                                                         optionalObjectsController,
+                                                        resolveParentConfigurationProperties(),
                                                         getArtifactProperties(), artifactType,
                                                         resolveComponentModelInitializer(),
-                                                        resolveParentConfigurationProperties(), disableXmlValidations,
                                                         runtimeLockFactory,
                                                         componentBuildingDefinitionRegistryFactory);
     } else {
@@ -216,7 +219,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     optionalObjectsController,
                                                     resolveParentConfigurationProperties(),
                                                     getArtifactProperties(), artifactType,
-                                                    disableXmlValidations,
                                                     componentBuildingDefinitionRegistryFactory);
       muleArtifactContext.initialize();
     }

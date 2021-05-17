@@ -180,14 +180,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * registry implementation to wraps the spring ApplicationContext
    *
    * @param muleContext                                the {@link MuleContext} that own this context
-   * @param artifactConfigResources
-   * @param artifactDeclaration                        the mule configuration defined programmatically
+   * @param artifactAst                                the definition of the artifact to create a context for
    * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *                                                   org.mule.runtime.config.internal.SpringRegistry
-   * @param parentConfigurationProperties
-   * @param artifactProperties
-   * @param artifactType
-   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
+   * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
+   *                                                   in this artifact.
+   * @param artifactProperties                         map of properties that can be referenced from the
+   *                                                   {@code artifactConfigResources} as external configuration values
+   * @param artifactType                               the type of artifact to determine the base objects of the created context.
    * @param componentBuildingDefinitionRegistryFactory
    * @since 3.7.0
    */
@@ -195,7 +195,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              OptionalObjectsController optionalObjectsController,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
-                             boolean disableXmlValidations,
                              ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;

@@ -15,13 +15,13 @@ import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfigurationBuilder;
+import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,7 +33,10 @@ import java.util.Properties;
  * Configures Mule from a configuration resource or comma separated list of configuration resources by auto-detecting the
  * ConfigurationBuilder to use for each resource. This is resolved by either checking the classpath for config modules e.g.
  * spring-config or by using the file extension or a combination.
+ *
+ * @deprecated Use SpringXmlConfigurationBuilder instead
  */
+@Deprecated
 public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder
     implements ParentMuleContextAwareConfigurationBuilder {
 
@@ -43,17 +46,6 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
   public AutoConfigurationBuilder(String resource, Map<String, String> artifactProperties, ArtifactType artifactType)
       throws ConfigurationException {
     super(resource, artifactProperties);
-    this.artifactType = artifactType;
-  }
-
-  public AutoConfigurationBuilder(String[] resources, Map<String, String> artifactProperties, ArtifactType artifactType)
-      throws ConfigurationException {
-    super(resources, artifactProperties);
-    this.artifactType = artifactType;
-  }
-
-  public AutoConfigurationBuilder(ConfigResource[] resources, Map<String, String> artifactProperties, ArtifactType artifactType) {
-    super(resources, artifactProperties);
     this.artifactType = artifactType;
   }
 

@@ -135,25 +135,29 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * registry implementation to wraps the spring ApplicationContext
    *
    * @param muleContext                                the {@link MuleContext} that own this context
-   * @param artifactDeclaration                        the mule configuration defined programmatically
+   * @param artifactAst                                the definition of the artifact to create a context for
    * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *                                                   org.mule.runtime.config.internal.SpringRegistry
-   * @param parentConfigurationProperties
-   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
-   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
+   *                                                   in this artifact.
+   * @param artifactProperties                         map of properties that can be referenced from the
+   *                                                   {@code artifactConfigResources} as external configuration values
+   * @param artifactType                               the type of artifact to determine the base objects of the created context.
+   * @param parentComponentModelInitializer
+   * @param runtimeLockFactory
+   * @param componentBuildingDefinitionRegistryFactory
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
                                  OptionalObjectsController optionalObjectsController,
+                                 Optional<ConfigurationProperties> parentConfigurationProperties,
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
-                                 Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations,
                                  LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory)
       throws BeansException {
     super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
-          artifactProperties, artifactType, disableXmlValidations, componentBuildingDefinitionRegistryFactory);
+          artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
