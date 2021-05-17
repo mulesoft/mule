@@ -24,9 +24,6 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 /**
  * Processing strategy that processes the {@link Pipeline} in the caller thread and does not schedule the processing of any
  * {@link Processor} in a different thread pool regardless of their {@link ProcessingType}.
@@ -94,14 +91,9 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
      * @return true if a Mono.block call is needed to wait for operation completion.
      */
     private static boolean needsMonoBlock(ReactiveProcessor processor) {
-      try {
-        // This method is added in the SDK, and it's return value is false for those operations which include a
-        // completion callback. That completion callback is the way to implement a non-blocking operations, so if this
-        // method returns true, we'll need a Mono.block call to wait the operation completion.
-        Method isBlockingMethod = processor.getClass().getDeclaredMethod("isBlocking");
-        isBlockingMethod.setAccessible(true);
-        return !(boolean) isBlockingMethod.invoke(processor);
-      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+      if (processor instanceof ComponentInnerProcessor) {
+        return !((ComponentInnerProcessor) processor).isBlocking();
+      } else {
         return processor.getProcessingType() == CPU_LITE_ASYNC;
       }
     }
