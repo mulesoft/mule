@@ -698,7 +698,7 @@ class MuleExtensionModelDeclarer {
 
     parallelForeach.withChain();
 
-    parallelForeach.onDefaultParameterGroup()
+    ParameterDeclarer collectionParam = parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
@@ -707,6 +707,15 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(REQUIRED)
         .defaultingTo("#[payload]")
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
+    if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
+      try {
+        collectionParam = collectionParam
+            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+      } catch (InstantiationException | IllegalAccessException e) {
+        // ignore
+      }
+    }
+
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
