@@ -179,7 +179,7 @@ public final class TransactionCoordination {
   }
 
   public void resumeSuspendedTransaction() throws TransactionException {
-    Transaction tx = suspendedTransaction.get().pop();
+    Transaction tx = (suspendedTransaction.get() == null) ? null : suspendedTransaction.get().pop();
     if (logger.isDebugEnabled()) {
       logger.debug("Re-binding and Resuming " + tx);
     }
