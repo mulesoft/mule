@@ -518,7 +518,7 @@ class MuleExtensionModelDeclarer {
 
     forEach.withChain();
 
-    forEach.onDefaultParameterGroup()
+    ParameterDeclarer collectionParam = forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
@@ -526,6 +526,14 @@ class MuleExtensionModelDeclarer {
         .defaultingTo("#[payload]")
         .withExpressionSupport(REQUIRED)
         .describedAs("Expression that defines the collection to iterate over.");
+    if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
+      try {
+        collectionParam = collectionParam
+            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+      } catch (InstantiationException | IllegalAccessException e) {
+        // ignore
+      }
+    }
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
