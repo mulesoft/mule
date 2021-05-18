@@ -31,12 +31,13 @@ import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
+public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint, Serializable
 {
     private static final long serialVersionUID = 8860985949279708638L;
     private List<String> responseProperties;
