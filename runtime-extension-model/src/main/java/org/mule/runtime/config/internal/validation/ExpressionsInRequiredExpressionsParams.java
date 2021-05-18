@@ -11,8 +11,7 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
-import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
+import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
@@ -22,13 +21,14 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * No expressions are provided for parameters that do not support expressions.
+ * Expressions are provided for parameters that require expressions.
  */
 public class ExpressionsInRequiredExpressionsParams implements Validation {
 
@@ -54,15 +54,19 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
     // According to the extension model, no collections or target-value for foreach, parallel-foreach, etc...
     // must be defined by an expression, but this was not enforced. This check is needed to avoid breaking on
     // legacy cases
-    return WARN;
+    return ERROR;
   }
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(component -> component.getModel(ParameterizedModel.class).isPresent())
-        .and(currentElemement(equalsIdentifier(CONFIGURATION_IDENTIFIER))
-            // This specific case is already handled by ExpressionsInConfigurationParams
-            .negate());
+    return currentElemement(component -> component.getModel(ParameterizedModel.class)
+        .map(pmz -> pmz.getAllParameterModels())
+        .orElse(emptyList())
+        .stream()
+        .filter(pm -> REQUIRED.equals(pm.getExpressionSupport())
+            && !pm.getModelProperty(AllowsExpressionWithoutMarkersModelProperty.class).isPresent())
+        .findAny()
+        .isPresent());
   }
 
   @Override
@@ -71,7 +75,8 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
         .map(pmz -> pmz.getAllParameterModels())
         .orElse(emptyList())
         .stream()
-        .filter(pm -> REQUIRED.equals(pm.getExpressionSupport()))
+        .filter(pm -> REQUIRED.equals(pm.getExpressionSupport())
+            && !pm.getModelProperty(AllowsExpressionWithoutMarkersModelProperty.class).isPresent())
         .map(pm -> component.getParameter(pm.getName()))
         .filter(param -> {
           if (param.getValue().isRight() && param.getValue().getRight() instanceof String) {

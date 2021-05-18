@@ -518,7 +518,7 @@ class MuleExtensionModelDeclarer {
 
     forEach.withChain();
 
-    forEach.onDefaultParameterGroup()
+    ParameterDeclarer collectionParam = forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
@@ -526,6 +526,14 @@ class MuleExtensionModelDeclarer {
         .defaultingTo("#[payload]")
         .withExpressionSupport(REQUIRED)
         .describedAs("Expression that defines the collection to iterate over.");
+    if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
+      try {
+        collectionParam = collectionParam
+            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+      } catch (InstantiationException | IllegalAccessException e) {
+        // ignore
+      }
+    }
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
@@ -698,7 +706,7 @@ class MuleExtensionModelDeclarer {
 
     parallelForeach.withChain();
 
-    parallelForeach.onDefaultParameterGroup()
+    ParameterDeclarer collectionParam = parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
@@ -707,6 +715,15 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(REQUIRED)
         .defaultingTo("#[payload]")
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
+    if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
+      try {
+        collectionParam = collectionParam
+            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+      } catch (InstantiationException | IllegalAccessException e) {
+        // ignore
+      }
+    }
+
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
