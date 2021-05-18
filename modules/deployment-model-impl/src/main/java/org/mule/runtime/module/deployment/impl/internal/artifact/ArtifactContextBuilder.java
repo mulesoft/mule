@@ -31,6 +31,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -43,6 +44,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
@@ -58,6 +60,7 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
+import org.mule.runtime.module.deployment.impl.internal.config.DeploymentFeatureFlaggingServiceBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.application.PolicyMuleContextBuilder;
@@ -123,6 +126,8 @@ public class ArtifactContextBuilder {
   private Optional<Properties> properties = empty();
   private String dataFolderName;
   private LockFactory runtimeLockFactory;
+  private DeploymentFeatureFlaggingServiceBuilder deploymentFeatureFlaggingServiceBuilder =
+      new DeploymentFeatureFlaggingServiceBuilder();
 
   private ArtifactContextBuilder() {}
 
@@ -440,6 +445,14 @@ public class ArtifactContextBuilder {
               serviceConfigurators.add(customizationService -> customizationService
                   .registerCustomServiceImpl(OBJECT_POLICY_PROVIDER, policyProvider));
             }
+            // Feature flagging service setup
+            serviceConfigurators.add(customizationService -> customizationService
+                .registerCustomServiceImpl(FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY,
+                                           deploymentFeatureFlaggingServiceBuilder.withMuleContext(muleContext)
+                                               .contextConfigurations(FeatureFlaggingRegistry.getInstance()
+                                                   .getFeatureConfigurations())
+                                               .build()));
+
             ArtifactContextConfiguration.ArtifactContextConfigurationBuilder artifactContextConfigurationBuilder =
                 ArtifactContextConfiguration.builder()
                     .setMuleContext(muleContext)
@@ -565,6 +578,10 @@ public class ArtifactContextBuilder {
     this.extensionManagerFactory = extensionManagerFactory;
 
     return this;
+  }
+
+  public void withFeatureFlaggingServiceBuilder(DeploymentFeatureFlaggingServiceBuilder deploymentFeatureFlaggingServiceBuilder) {
+    this.deploymentFeatureFlaggingServiceBuilder = deploymentFeatureFlaggingServiceBuilder;
   }
 
 }

@@ -50,7 +50,7 @@ public final class FeatureFlaggingServiceBuilder {
     Map<Feature, Boolean> features = new HashMap<>();
     LOGGER.debug("Configuring feature flags...");
 
-    final String id = context.getConfiguration().getId();
+    final String id = context.getId();
     configurations.forEach((feature, p) -> {
       boolean enabled;
 

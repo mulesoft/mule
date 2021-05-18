@@ -9,6 +9,9 @@ package org.mule.runtime.core.internal.context;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -41,14 +44,18 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
+import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -76,6 +83,7 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
@@ -135,6 +143,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
@@ -265,10 +274,21 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private LifecycleStrategy lifecycleStrategy = new DefaultLifecycleStrategy();
 
+  private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
+
+
   static {
     // Log dropped events/errors
     Hooks.onErrorDropped(error -> LOGGER.debug("ERROR DROPPED", error));
     Hooks.onNextDropped(event -> LOGGER.debug("EVENT DROPPED {}", event));
+    // Feature flags (see FeatureFlaggingService)
+    if (!areFeatureFlagsConfigured.getAndSet(true)) {
+      configurePropertiesResolverFeatureFlag();
+      configureSplitterExceptionHandlingFeature();
+      configureBatchFixedAggregatorTransactionRecordBuffer();
+      configureComputeConnectionErrorsInStats();
+      configureToStringTransformerTransformIteratorElements();
+    }
   }
 
   public DefaultMuleContext() {
@@ -1166,5 +1186,29 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private org.mule.runtime.api.artifact.Registry getApiRegistry() {
     return getRegistry().lookupObject(OBJECT_REGISTRY);
+  }
+
+  private static void configureSplitterExceptionHandlingFeature() {
+    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+    ffRegistry.registerFeature(HANDLE_SPLITTER_EXCEPTION,
+                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.atLeast("4.4.0")).orElse(false));
+  }
+
+  private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
+    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+    ffRegistry.registerFeature(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, ctx -> false);
+  }
+
+  /**
+   * Configures {@link FeatureFlaggingService} to revert MULE-17659 for applications with <code>minMuleVersion</code> lesser than
+   * or equal to 4.2.2, or if system property {@link MuleRuntimeFeature#HONOUR_RESERVED_PROPERTIES} is set. See MULE-17659 and
+   * MULE-19038.
+   *
+   * @since 4.4.0 4.3.0
+   */
+  public static void configurePropertiesResolverFeatureFlag() {
+    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+    ffRegistry.registerFeature(HONOUR_RESERVED_PROPERTIES,
+                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.newerThan("4.2.2")).orElse(false));
   }
 }

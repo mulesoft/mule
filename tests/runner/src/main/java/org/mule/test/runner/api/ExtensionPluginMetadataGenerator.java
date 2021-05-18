@@ -119,6 +119,10 @@ class ExtensionPluginMetadataGenerator {
         return registryCreator.get();
       }
 
+      @Override
+      public String getId() {
+        return "Extension plugin metadata generator";
+      }
     };
     try {
       initialiseIfNeeded(extensionManager, muleContext);
