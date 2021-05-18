@@ -258,6 +258,13 @@ public interface AllureConstants {
       String LOGGER = "Logger";
 
     }
+
+    interface ParseTemplateStory {
+
+      String PARSE_TEMPLATE = "Parse Template";
+
+    }
+
   }
 
   interface FtpFeature {
@@ -363,7 +370,7 @@ public interface AllureConstants {
 
   interface ForkJoinStrategiesFeature {
 
-    String FORK_JOIN_STRATEGIES = "Fork/Join Strategies used by scatter-gather and foreach routers";
+    String FORK_JOIN_STRATEGIES = "Fork/Join Strategies used by scatter-gather and parallel-foreach routers";
 
     interface ForkJoinStrategiesStory {
 

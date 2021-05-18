@@ -37,7 +37,6 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new RequiredParametersPresent(),
                   new ParameterGroupExclusiveness(),
                   new ExpressionsInRequiredExpressionsParams(),
-                  new ExpressionsInConfigurationParams(),
                   new PollingSourceHasSchedulingStrategy(),
                   new ScatterGatherRoutes()
 
