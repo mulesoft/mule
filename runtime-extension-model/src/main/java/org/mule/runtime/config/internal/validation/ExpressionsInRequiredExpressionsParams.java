@@ -21,6 +21,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,7 +63,8 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
         .map(pmz -> pmz.getAllParameterModels())
         .orElse(emptyList())
         .stream()
-        .filter(pm -> REQUIRED.equals(pm.getExpressionSupport()))
+        .filter(pm -> REQUIRED.equals(pm.getExpressionSupport())
+            && !pm.getModelProperty(AllowsExpressionWithoutMarkersModelProperty.class).isPresent())
         .findAny()
         .isPresent());
   }
@@ -73,7 +75,8 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
         .map(pmz -> pmz.getAllParameterModels())
         .orElse(emptyList())
         .stream()
-        .filter(pm -> REQUIRED.equals(pm.getExpressionSupport()))
+        .filter(pm -> REQUIRED.equals(pm.getExpressionSupport())
+            && !pm.getModelProperty(AllowsExpressionWithoutMarkersModelProperty.class).isPresent())
         .map(pm -> component.getParameter(pm.getName()))
         .filter(param -> {
           if (param.getValue().isRight() && param.getValue().getRight() instanceof String) {
