@@ -8,7 +8,7 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * No expressions are provided for parameters that do not support expressions.
+ * Expressions are provided for parameters that require expressions.
  */
 public class ExpressionsInConfigurationParams extends ExpressionsInRequiredExpressionsParams {
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    return WARN;
   }
 
   @Override
