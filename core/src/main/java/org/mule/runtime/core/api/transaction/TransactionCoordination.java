@@ -15,6 +15,8 @@ import org.apache.commons.collections.ArrayStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Stack;
+
 public final class TransactionCoordination {
 
   protected static final Logger logger = LoggerFactory.getLogger(TransactionCoordination.class);
@@ -27,7 +29,7 @@ public final class TransactionCoordination {
    * {@link #bindTransaction(Transaction)}, it may be more consistent to have it as an instance variable.
    */
   private final ThreadLocal<Transaction> transactions = new ThreadLocal<>();
-  private final ThreadLocal<Transaction> suspendedTransaction = new ThreadLocal<>();
+  private final ThreadLocal<Stack<Transaction>> suspendedTransaction = new ThreadLocal<>();
   private final ThreadLocal<ArrayStack> isolatedTransactions = new ThreadLocal<>();
 
   /** Lock variable that is used to access {@link #txCounter}. */
@@ -111,8 +113,7 @@ public final class TransactionCoordination {
 
   public void resumeXaTransactionIfAvailable() {
     try {
-      Transaction tx = suspendedTransaction.get();
-      if (tx != null) {
+      if (suspendedTransaction.get() != null && suspendedTransaction.get().peek() != null) {
         resumeSuspendedTransaction();
       }
     } catch (TransactionException e) {
@@ -171,20 +172,25 @@ public final class TransactionCoordination {
     }
 
     TransactionCoordination.getInstance().unbindTransaction(tx);
-    suspendedTransaction.set(tx);
+    if (suspendedTransaction.get() == null) {
+      suspendedTransaction.set(new Stack<>());
+    }
+    suspendedTransaction.get().push(tx);
   }
 
   public void resumeSuspendedTransaction() throws TransactionException {
-    Transaction tx = suspendedTransaction.get();
+    Transaction tx = (suspendedTransaction.get() == null) ? null : suspendedTransaction.get().pop();
     if (logger.isDebugEnabled()) {
       logger.debug("Re-binding and Resuming " + tx);
     }
     TransactionCoordination.getInstance().bindTransaction(tx);
-    suspendedTransaction.remove();
     tx.resume();
   }
 
   public void clear() {
+    if (suspendedTransaction.get() != null) {
+      suspendedTransaction.get().clear();
+    }
     suspendedTransaction.remove();
     transactions.remove();
     if (isolatedTransactions.get() != null) {
