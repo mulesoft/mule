@@ -11,6 +11,8 @@ import org.mule.runtime.api.meta.MuleVersion;
 
 /**
  * Decoupled context used to evaluate {@link org.mule.runtime.api.config.Feature} flags.
+ * 
+ * @since 4.4.0
  */
 public class FeatureContext {
 

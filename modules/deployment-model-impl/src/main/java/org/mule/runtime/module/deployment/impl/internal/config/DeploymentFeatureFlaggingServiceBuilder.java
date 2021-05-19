@@ -42,6 +42,7 @@ public final class DeploymentFeatureFlaggingServiceBuilder {
 
   private ArtifactDescriptor artifactDescriptor;
   private MuleContext muleContext;
+  private String artifact = "";
 
   private final Map<Feature, Predicate<FeatureContext>> artifactConfigurations = new HashMap<>();
   private final Map<Feature, Predicate<MuleContext>> contextConfigurations = new HashMap<>();
@@ -54,6 +55,7 @@ public final class DeploymentFeatureFlaggingServiceBuilder {
    * @return This {@link DeploymentFeatureFlaggingServiceBuilder}.
    */
   public DeploymentFeatureFlaggingServiceBuilder withDescriptor(ArtifactDescriptor artifactDescriptor) {
+    this.artifact = artifactDescriptor.getName();
     this.artifactDescriptor = artifactDescriptor;
     return this;
   }
@@ -61,11 +63,15 @@ public final class DeploymentFeatureFlaggingServiceBuilder {
   /**
    * Sets the {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)} evaluation.
    * 
-   * @param context {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)} evaluation.
+   * @param muleContext {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)}
+   *                    evaluation.
    * @return This {@link DeploymentFeatureFlaggingServiceBuilder}.
    */
-  public DeploymentFeatureFlaggingServiceBuilder withMuleContext(MuleContext context) {
-    this.muleContext = context;
+  public DeploymentFeatureFlaggingServiceBuilder withMuleContext(MuleContext muleContext) {
+    if (this.artifact.isEmpty()) {
+      this.artifact = muleContext.getId();
+    }
+    this.muleContext = muleContext;
     return this;
   }
 
@@ -126,11 +132,11 @@ public final class DeploymentFeatureFlaggingServiceBuilder {
     if (systemPropertyName.isPresent() && getProperty(systemPropertyName.get()) != null) {
       enabled = getBoolean(systemPropertyName.get());
       LOGGER.debug("Setting feature {} = {} for artifact [{}] because of System Property '{}'", feature, enabled,
-                   artifactDescriptor.getName(),
+                   artifact,
                    systemPropertyName);
     } else {
       enabled = featurePredicate.test(featureContext);
-      LOGGER.debug("Setting feature {} = {} for artifact [{}]", feature, enabled, artifactDescriptor.getName());
+      LOGGER.debug("Setting feature {} = {} for artifact [{}]", feature, enabled, artifact);
     }
     return enabled;
   }
