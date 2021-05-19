@@ -384,6 +384,7 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasValues("Acting parameter value"));
   }
 
+  @Test
   public void singleValuesEnabledParameterWithMoreThanOneFieldValues() throws Exception {
     ValueResult result1 = getValueResult("singleValuesEnabledParameterWithMoreThanOneFieldValues", "body", "simple.path");
     assertThat(result1.getValues(), hasSize(3));

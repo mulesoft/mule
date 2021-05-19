@@ -69,6 +69,20 @@
         </sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
     </flow>
 
+    <flow name="connectionLessWithTwoBoundActingParameterFromXMLContentTag">
+        <sample-data:connection-less-with-two-bound-acting-parameter-from-xml-content-tag
+                message='#[output application/xml --- { "nested": { "payloadXmlTag": "my payload", "attributesXmlTag": "my attributes" } }]'/>
+    </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute">
+        <sample-data:connection-less-with-two-bound-acting-parameter-from-xml-content-tag-attribute
+            message='#[output application/xml --- { "nested": { "xmlTag" @(payloadXmlAttribute: "my payload", attributesXmlAttribute:  "my attributes"): "This is content" } }]'/>
+    </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameterOneWithAnAlias">
+        <sample-data:connection-less-with-two-bound-acting-parameter-one-with-an-alias payloadParameterAlias="my payload" attributes="my attributes" />
+    </flow>
+
     <flow name="useConnectionWithTwoBoundActingParameter">
         <sample-data:use-connection-with-two-bound-acting-parameter payload="my payload" attributes="my attributes" config-ref="config"/>
     </flow>
@@ -77,9 +91,34 @@
         <sample-data:use-connection-with-two-bound-acting-parameter payload="my payload" config-ref="config"/>
     </flow>
 
+    <flow name="missingBoundActingParameterFromContentField">
+        <sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
+            <sample-data:message>
+                { "payload" : "my payload" }
+            </sample-data:message>
+        </sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
+    </flow>
+
     <flow name="complexBoundActingParameter">
         <sample-data:complex-bound-acting-parameter>
             <sample-data:complex payload="my payload" attributes="my attributes" />
         </sample-data:complex-bound-acting-parameter>
     </flow>
+
+    <flow name="pojoBoundActingParameter">
+        <sample-data:pojo-bound-acting-parameter actingParameter='#[output application/json --- { "pojoFields" : {
+          "payload" : "my payload" , "attributes" : "my attributes" } }]'/>
+    </flow>
+
+    <flow name="boundActingParameterFromPojoFieldWithExpression">
+        <sample-data:bound-acting-parameter-from-pojo-field complex='#[output application/json --- {
+          "payload" : "my payload" , "attributes" : "my attributes" }]'/>
+    </flow>
+
+    <flow name="boundActingParameterFromPojoFieldWithExpressionDsl">
+        <sample-data:bound-acting-parameter-from-pojo-field>
+            <sample-data:complex payload="my payload" attributes="my attributes" />
+        </sample-data:bound-acting-parameter-from-pojo-field>
+    </flow>
+
 </mule>

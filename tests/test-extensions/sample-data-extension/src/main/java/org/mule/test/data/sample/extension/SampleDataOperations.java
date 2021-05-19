@@ -6,12 +6,12 @@
  */
 package org.mule.test.data.sample.extension;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.data.sample.extension.SampleDataExtension.NULL_VALUE;
 
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.sdk.api.annotation.binding.Binding;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.data.sample.extension.metadata.JsonTypeResolver;
+import org.mule.test.data.sample.extension.metadata.XmlTypeResolver;
 import org.mule.test.data.sample.extension.provider.ComplexActingParameterSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ComplexTypeSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ConfigAwareTestSampleDataProvider;
@@ -38,9 +39,6 @@ import org.mule.test.data.sample.extension.provider.SimplestTestSampleDataProvid
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-
-import com.google.gson.Gson;
-import org.apache.commons.io.IOUtils;
 
 public class SampleDataOperations {
 
@@ -167,14 +165,51 @@ public class SampleDataOperations {
   @MediaType(TEXT_PLAIN)
   public Result<String, String> connectionLessWithTwoBoundActingParameterFromContentField(@TypeResolver(JsonTypeResolver.class) @Content InputStream message)
       throws Exception {
-    Gson gson = new Gson();
-    Message myMessage = gson.fromJson(IOUtils.toString(message, UTF_8), Message.class);
-
     return Result.<String, String>builder()
-        .output(myMessage.getPayload())
+        .output("Some payload")
         .mediaType(APPLICATION_JSON)
-        .attributes(myMessage.getAttributes() != null ? myMessage.getAttributes() : NULL_VALUE)
+        .attributes("Some attributes")
+        .attributesMediaType(APPLICATION_JSON)
+        .build();
+  }
+
+  @SampleData(value = ParameterizedTestSampleDataProvider.class,
+      bindings = {@Binding(actingParameter = "payload", extractionExpression = "message.nested.payloadXmlTag"),
+          @Binding(actingParameter = "attributes", extractionExpression = "message.nested.attributesXmlTag")})
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> connectionLessWithTwoBoundActingParameterFromXMLContentTag(@TypeResolver(XmlTypeResolver.class) InputStream message) {
+    return Result.<String, String>builder()
+        .output("Some payload")
+        .mediaType(APPLICATION_XML)
+        .attributes("Some attributes")
         .attributesMediaType(APPLICATION_XML)
+        .build();
+  }
+
+  @SampleData(value = ParameterizedTestSampleDataProvider.class,
+      bindings = {@Binding(actingParameter = "payload", extractionExpression = "message.nested.xmlTag.@payloadXmlAttribute"),
+          @Binding(actingParameter = "attributes", extractionExpression = "message.nested.xmlTag.@attributesXmlAttribute")})
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute(@TypeResolver(XmlTypeResolver.class) InputStream message) {
+    return Result.<String, String>builder()
+        .output("Some payload")
+        .mediaType(APPLICATION_XML)
+        .attributes("Some attributes")
+        .attributesMediaType(APPLICATION_XML)
+        .build();
+  }
+
+  @SampleData(value = ParameterizedTestSampleDataProvider.class,
+      bindings = {@Binding(actingParameter = "payload", extractionExpression = "payloadParameterAlias"),
+          @Binding(actingParameter = "attributes", extractionExpression = "attributes")})
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> connectionLessWithTwoBoundActingParameterOneWithAnAlias(@Alias("payloadParameterAlias") String payload,
+                                                                                        String attributes) {
+    return Result.<String, String>builder()
+        .output(payload)
+        .mediaType(APPLICATION_JSON)
+        .attributes(attributes != null ? attributes : NULL_VALUE)
+        .attributesMediaType(APPLICATION_JSON)
         .build();
   }
 
@@ -195,22 +230,24 @@ public class SampleDataOperations {
     return connectionLess(complex.getPayload(), complex.getAttributes());
   }
 
-  private static class Message {
-
-    private final String payload;
-    private final String attributes;
-
-    public Message(String payload, String attributes) {
-      this.payload = payload;
-      this.attributes = attributes;
-    }
-
-    public String getPayload() {
-      return payload;
-    }
-
-    public String getAttributes() {
-      return attributes;
-    }
+  @SampleData(value = ComplexActingParameterSampleDataProvider.class,
+      bindings = {@Binding(actingParameter = "complex", extractionExpression = "actingParameter.pojoFields")})
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> pojoBoundActingParameter(@TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {
+    return Result.<String, String>builder()
+        .output("Some payload")
+        .mediaType(APPLICATION_JSON)
+        .attributes("Some attributes")
+        .attributesMediaType(APPLICATION_JSON)
+        .build();
   }
+
+  @SampleData(value = ParameterizedTestSampleDataProvider.class,
+      bindings = {@Binding(actingParameter = "payload", extractionExpression = "complex.payload"),
+          @Binding(actingParameter = "attributes", extractionExpression = "complex.attributes")})
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> boundActingParameterFromPojoField(ComplexActingParameter complex) {
+    return connectionLess(complex.getPayload(), complex.getAttributes());
+  }
+
 }
