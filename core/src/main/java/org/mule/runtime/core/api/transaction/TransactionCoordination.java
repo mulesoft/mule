@@ -15,7 +15,7 @@ import org.apache.commons.collections.ArrayStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 public final class TransactionCoordination {
 
@@ -29,7 +29,7 @@ public final class TransactionCoordination {
    * {@link #bindTransaction(Transaction)}, it may be more consistent to have it as an instance variable.
    */
   private final ThreadLocal<Transaction> transactions = new ThreadLocal<>();
-  private final ThreadLocal<Stack<Transaction>> suspendedTransaction = new ThreadLocal<>();
+  private final ThreadLocal<ArrayDeque<Transaction>> suspendedTransaction = new ThreadLocal<>();
   private final ThreadLocal<ArrayStack> isolatedTransactions = new ThreadLocal<>();
 
   /** Lock variable that is used to access {@link #txCounter}. */
@@ -173,7 +173,7 @@ public final class TransactionCoordination {
 
     TransactionCoordination.getInstance().unbindTransaction(tx);
     if (suspendedTransaction.get() == null) {
-      suspendedTransaction.set(new Stack<>());
+      suspendedTransaction.set(new ArrayDeque<>());
     }
     suspendedTransaction.get().push(tx);
   }
