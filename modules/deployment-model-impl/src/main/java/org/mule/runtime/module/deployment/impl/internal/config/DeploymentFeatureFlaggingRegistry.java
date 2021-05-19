@@ -75,4 +75,11 @@ public class DeploymentFeatureFlaggingRegistry {
     return unmodifiableMap(configurations);
   }
 
+  /**
+   * Cleans up all the previously registered configurations. This method is meant to be used just for test purposes.
+   */
+  protected void clearFeatureConfigurations() {
+    configurations.clear();
+  }
+
 }
