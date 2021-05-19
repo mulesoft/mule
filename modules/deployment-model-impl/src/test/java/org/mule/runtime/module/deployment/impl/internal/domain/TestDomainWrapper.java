@@ -13,6 +13,7 @@ import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -39,6 +40,11 @@ public class TestDomainWrapper implements Domain {
   @Override
   public Registry getRegistry() {
     return delegate.getArtifactContext().getRegistry();
+  }
+
+  @Override
+  public ArtifactContext getArtifactContext() {
+    return delegate.getArtifactContext();
   }
 
   @Override

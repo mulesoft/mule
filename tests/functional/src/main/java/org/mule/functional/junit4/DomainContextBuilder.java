@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -48,7 +48,7 @@ public class DomainContextBuilder {
 
   public ArtifactContext build() throws Exception {
     List<ConfigurationBuilder> builders = new ArrayList<>(3);
-    SpringXmlConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
+    ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
     builders.add(extensionManagerWithMuleExtModelBuilder());
     builders.add(new TestPolicyProviderConfigurationBuilder());
     builders.add(cfgBuilder);
@@ -72,14 +72,14 @@ public class DomainContextBuilder {
     };
     domainContext.getNotificationManager().addListener(listener);
 
-    return cfgBuilder.createArtifactContext();
+    return ((ArtifactContextFactory) cfgBuilder).createArtifactContext();
   }
 
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     builders.add(testServicesConfigBuilder);
   }
 
-  private SpringXmlConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
+  private ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
     return createConfigurationBuilder(configResources, emptyMap(), DOMAIN, false, false);
   }
 }

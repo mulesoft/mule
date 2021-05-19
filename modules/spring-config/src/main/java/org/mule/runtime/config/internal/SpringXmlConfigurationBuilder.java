@@ -34,6 +34,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.util.BaseArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
+import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
@@ -41,7 +42,6 @@ import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPro
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
@@ -77,7 +77,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * name-spaces. Multiple configuration files can be loaded from this builder (specified as a comma-separated list).
  */
 public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder
-    implements ParentMuleContextAwareConfigurationBuilder {
+    implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory {
 
   private ArtifactDeclaration artifactDeclaration;
   private boolean enableLazyInit = false;
@@ -145,17 +145,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this(configurationFiles, artifactProperties, artifactType, enableLazyInitialisation, disableXmlValidations,
          runtimeLockFactory);
     this.artifactDeclaration = artifactDeclaration;
-  }
-
-  public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, MuleContext domainContext,
-                                                                boolean enableLazyInitialisation, boolean disableXmlValidations)
-      throws ConfigurationException {
-    final SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
-        new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP, enableLazyInitialisation, disableXmlValidations);
-    if (domainContext != null) {
-      springXmlConfigurationBuilder.setParentContext(domainContext);
-    }
-    return springXmlConfigurationBuilder;
   }
 
   @Override
@@ -406,6 +395,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
   }
 
+  @Override
   public ArtifactContext createArtifactContext() {
     return new SpringArtifactContext(muleArtifactContext);
   }
