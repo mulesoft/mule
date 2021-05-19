@@ -22,7 +22,8 @@ import static org.mule.tck.junit4.matcher.StringContainsIgnoringLineBreaks.conta
 import static org.mule.test.allure.AllureConstants.ArtifactPatchingFeature.ARTIFACT_PATCHING;
 
 @Feature(ARTIFACT_PATCHING)
-public class MuleContainerStartupSplashScreenEmbeddedTestCase extends AbstractSplashScreenTestCase<MuleContainerStartupSplashScreen> {
+public class MuleContainerStartupSplashScreenEmbeddedTestCase
+    extends AbstractSplashScreenTestCase<MuleContainerStartupSplashScreen> {
 
   private static final String FIRST_PATCH = "SE-4242-3.8.0.jar";
   private static final String SECOND_PATCH = "SE-9999-3.7.3.jar";
