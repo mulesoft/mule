@@ -80,4 +80,81 @@ public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTes
   public void complexActingParameter() throws Exception {
     assertMessage(getOperationSampleByLocation("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameter() throws Exception {
+    assertMessage(getOperationSampleByLocation("connectionLessWithTwoBoundActingParameter"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterOneWithAnAlias() throws Exception {
+    assertMessage(getOperationSampleByLocation("connectionLessWithTwoBoundActingParameterOneWithAnAlias"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromContentField() throws Exception {
+    assertMessage(getOperationSampleByLocation("connectionLessWithTwoBoundActingParameterFromContentField"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromXMLContentTag() throws Exception {
+    assertMessage(getOperationSampleByLocation("connectionLessWithTwoBoundActingParameterFromXMLContentTag"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute() throws Exception {
+    assertMessage(getOperationSampleByLocation("connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute"),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void useConnectionWithTwoBoundActingParameter() throws Exception {
+    assertMessage(getOperationSampleByLocation("useConnectionWithTwoBoundActingParameter"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void missingBoundActingParameter() throws Exception {
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getOperationSampleByLocation("missingBoundActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void missingBoundActingParameterFromContentField() throws Exception {
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getOperationSampleByLocation("missingBoundActingParameterFromContentField"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void complexBoundActingParameter() throws Exception {
+    assertMessage(getOperationSampleByLocation("complexBoundActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void pojoBoundActingParameter() throws Exception {
+    assertMessage(getOperationSampleByLocation("pojoBoundActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void boundActingParameterFromPojoFieldWithExpression() throws Exception {
+    assertMessage(getOperationSampleByLocation("boundActingParameterFromPojoFieldWithExpression"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void boundActingParameterFromPojoFieldWithDsl() throws Exception {
+    assertMessage(getOperationSampleByLocation("boundActingParameterFromPojoFieldWithExpression"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
 }

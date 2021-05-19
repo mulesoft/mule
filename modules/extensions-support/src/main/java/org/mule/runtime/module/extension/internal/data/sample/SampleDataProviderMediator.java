@@ -133,7 +133,8 @@ public class SampleDataProviderMediator {
                                                                            connectionSupplier,
                                                                            configurationSupplier,
                                                                            reflectionCache,
-                                                                           muleContext);
+                                                                           muleContext,
+                                                                           componentModel);
 
       SampleDataProvider provider = factory.createSampleDataProvider();
       Result result = withRefreshToken(connectionProviderSupplier, () -> provider.getSample());

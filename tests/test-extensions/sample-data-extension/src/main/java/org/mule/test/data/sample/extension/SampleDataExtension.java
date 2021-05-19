@@ -22,6 +22,7 @@ import org.mule.test.data.sample.extension.source.MuleContextAwareTestSampleData
 import org.mule.test.data.sample.extension.source.ParameterGroupListener;
 import org.mule.test.data.sample.extension.source.ShowInDslParameterGroupListener;
 import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
+import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListenerWithTwoBoundActingParameters;
 
 @Extension(name = SampleDataExtension.EXTENSION_NAME)
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/sample-data", prefix = "sample-data")
@@ -29,7 +30,8 @@ import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
 @Operations(SampleDataOperations.class)
 @Sources({SimpleTestSampleDataListener.class, ConnectedTestSampleDataListener.class, ConfigTestSampleDataListener.class,
     ParameterGroupListener.class, ShowInDslParameterGroupListener.class, AliasedParameterGroupListener.class,
-    ComplexParameterGroupListener.class, MuleContextAwareTestSampleDataListener.class
+    ComplexParameterGroupListener.class, MuleContextAwareTestSampleDataListener.class,
+    SimpleTestSampleDataListenerWithTwoBoundActingParameters.class
 })
 public class SampleDataExtension {
 

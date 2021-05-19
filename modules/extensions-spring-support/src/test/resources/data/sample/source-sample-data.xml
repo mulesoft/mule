@@ -67,4 +67,10 @@
         </sample-data:complex-acting-parameter-listener>
         <logger />
     </flow>
+
+    <flow name="connectionLessWithBoundActingParameter">
+        <sample-data:listener-with-two-bound-acting-parameters payload="my payload" attributes="my attributes" />
+        <logger />
+    </flow>
+
 </mule>
