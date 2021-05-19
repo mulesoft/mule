@@ -85,7 +85,8 @@ public class DeploymentFeatureFlaggingServiceBuilderTestCase extends AbstractMul
     when(artifactDescriptor.getName()).thenReturn("fake-name");
   }
 
-  public DeploymentFeatureFlaggingServiceBuilderTestCase(Feature feature, boolean enabled, String systemPropertyValue, boolean expected) {
+  public DeploymentFeatureFlaggingServiceBuilderTestCase(Feature feature, boolean enabled, String systemPropertyValue,
+                                                         boolean expected) {
     Map<Feature, Predicate<MuleContext>> legacyConfigs = new HashMap<>();
     Map<Feature, Predicate<FeatureContext>> configs = new HashMap<>();
     legacyConfigs.put(feature, c -> enabled);
@@ -114,9 +115,9 @@ public class DeploymentFeatureFlaggingServiceBuilderTestCase extends AbstractMul
   @Test
   public void testBuildUsingConfigurations() {
     FeatureFlaggingService featureFlaggingService = new DeploymentFeatureFlaggingServiceBuilder()
-            .withDescriptor(artifactDescriptor)
-            .withFeatureContextConfigurations(configs)
-            .build();
+        .withDescriptor(artifactDescriptor)
+        .withFeatureContextConfigurations(configs)
+        .build();
 
     assertThat(featureFlaggingService.isEnabled(feature), is(expected));
   }
