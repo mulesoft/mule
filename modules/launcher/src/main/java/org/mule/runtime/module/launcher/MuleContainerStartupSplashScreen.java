@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
@@ -78,17 +81,19 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     // TODO maybe be more precise and count from container bootstrap time?
     doBody(CoreMessages.serverStartedAt(System.currentTimeMillis()).getMessage());
 
-    doBody(String.format("JDK: %s (%s)", System.getProperty("java.version"), System.getProperty("java.vm.info")));
+    doBody(String.format("JDK: %s (%s)", getProperty("java.version"), getProperty("java.vm.info")));
     listJavaSystemProperties();
 
-    String patch = System.getProperty("sun.os.patch.level", null);
+    String patch = getProperty("sun.os.patch.level", null);
 
-    doBody(String.format("OS: %s%s (%s, %s)", System.getProperty("os.name"),
+    doBody(String.format("OS: %s%s (%s, %s)", getProperty("os.name"),
                          (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : ""),
-                         System.getProperty("os.version"), System.getProperty("os.arch")));
+                         getProperty("os.version"), getProperty("os.arch")));
 
-    doBody(String.format("Wrapper PID: %d", getWrapperPID()));
-    doBody(String.format("Java PID: %d", getJavaPID()));
+    if (!isEmbedded()) {
+      doBody(String.format("Wrapper PID: %d", getWrapperPID()));
+      doBody(String.format("Java PID: %d", getJavaPID()));
+    }
 
     try {
       InetAddress host = NetworkUtils.getLocalHost();
@@ -105,6 +110,10 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
       listPatchesIfPresent();
       listMuleSystemProperties();
     }
+  }
+
+  private boolean isEmbedded() {
+    return parseBoolean(getProperty("mule.mode.embedded"));
   }
 
   private void listServerPluginsIfPresent() {
@@ -137,12 +146,12 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   private void listMuleSystemProperties() {
     Map<String, String> muleProperties = new HashMap<>();
     System.getProperties().stringPropertyNames().stream().filter(property -> property.startsWith(SYSTEM_PROPERTY_PREFIX))
-        .forEach(property -> muleProperties.put(property, System.getProperty(property)));
+        .forEach(property -> muleProperties.put(property, getProperty(property)));
     listItems(muleProperties, "Mule system properties:");
   }
 
   private void listJavaSystemProperties() {
     listItems(Stream.of("java.vendor", "java.vm.name", "java.home")
-        .collect(toMap(String::toString, propertyName -> System.getProperty(propertyName))), "JDK properties:");
+        .collect(toMap(String::toString, propertyName -> getProperty(propertyName))), "JDK properties:");
   }
 }
