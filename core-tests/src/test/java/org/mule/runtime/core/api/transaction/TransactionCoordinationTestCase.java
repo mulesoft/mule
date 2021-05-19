@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
@@ -251,6 +252,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-19430")
   public void suspendMultipleTransactions() throws TransactionException {
     assertThat(tc.getTransaction(), nullValue());
     Transaction tx1 = mock(Transaction.class);
