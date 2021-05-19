@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
+import java.util.Deque;
 
 public final class TransactionCoordination {
 
@@ -29,7 +30,7 @@ public final class TransactionCoordination {
    * {@link #bindTransaction(Transaction)}, it may be more consistent to have it as an instance variable.
    */
   private final ThreadLocal<Transaction> transactions = new ThreadLocal<>();
-  private final ThreadLocal<ArrayDeque<Transaction>> suspendedTransaction = new ThreadLocal<>();
+  private final ThreadLocal<Deque<Transaction>> suspendedTransaction = new ThreadLocal<>();
   private final ThreadLocal<ArrayStack> isolatedTransactions = new ThreadLocal<>();
 
   /** Lock variable that is used to access {@link #txCounter}. */
