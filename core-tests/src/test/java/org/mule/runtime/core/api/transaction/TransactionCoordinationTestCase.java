@@ -250,4 +250,32 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     verify(tx, times(1)).commit();
   }
 
+  @Test
+  public void suspendMultipleTransactions() throws TransactionException {
+    assertThat(tc.getTransaction(), nullValue());
+    Transaction tx1 = mock(Transaction.class);
+    Transaction tx2 = mock(Transaction.class);
+
+    tc.bindTransaction(tx1);
+    tc.suspendCurrentTransaction();
+    assertNull(tc.getTransaction());
+
+    tc.bindTransaction(tx2);
+    tc.suspendCurrentTransaction();
+    assertNull(tc.getTransaction());
+
+    tc.resumeSuspendedTransaction();
+    assertThat(tc.getTransaction(), is(tx2));
+    tc.unbindTransaction(tx2);
+    assertNull(tc.getTransaction());
+    tc.resumeSuspendedTransaction();
+    assertThat(tc.getTransaction(), is(tx1));
+
+    verify(tx1, times(1)).suspend();
+    verify(tx1, times(1)).resume();
+    verify(tx2, times(1)).suspend();
+    verify(tx2, times(1)).resume();
+
+  }
+
 }
