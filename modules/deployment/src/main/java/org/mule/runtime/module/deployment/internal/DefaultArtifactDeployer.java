@@ -19,7 +19,6 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
@@ -187,11 +186,9 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
   @Override
   public void doNotPersistArtifactStop(T artifact) {
-    Registry artifactRegistry = artifact.getArtifactContext().getRegistry();
-
-    if (artifactRegistry != null) {
+    if (artifact.getArtifactContext() != null && artifact.getArtifactContext().getRegistry() != null) {
       Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
-          artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
+          artifact.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
       optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
     }
   }
