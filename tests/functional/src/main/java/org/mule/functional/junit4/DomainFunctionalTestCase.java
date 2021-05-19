@@ -16,12 +16,10 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-
-import org.junit.After;
-import org.junit.Before;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import org.junit.After;
+import org.junit.Before;
 
 public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
@@ -68,7 +69,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
   }
 
   private final Map<String, MuleContext> muleContexts = new HashMap<>();
-  private Map<String, ArtifactInstanceInfrastructure> applsInfrastructures = new HashMap<>();
+  private final Map<String, ArtifactInstanceInfrastructure> applsInfrastructures = new HashMap<>();
   private final List<MuleContext> disposedContexts = new ArrayList<>();
   private MuleContext domainContext;
   private ArtifactInstanceInfrastructure domainInfrastructure;
@@ -114,13 +115,14 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
         .setContextId(this.getClass().getSimpleName())
         .setDomainConfig(getDomainConfigs());
 
-    domainContext = domainContextBuilder.build();
+    final ArtifactContext domainArtifactContext = domainContextBuilder.build();
+    domainContext = domainArtifactContext.getMuleContext();
     domainInfrastructure = new ArtifactInstanceInfrastructure();
     domainContext.getInjector().inject(domainInfrastructure);
     ApplicationConfig[] applicationConfigs = getConfigResources();
 
     for (ApplicationConfig applicationConfig : applicationConfigs) {
-      MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources);
+      MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources, domainArtifactContext);
       muleContexts.put(applicationConfig.applicationName, muleContext);
 
       ArtifactInstanceInfrastructure appInfrasturcture = new ArtifactInstanceInfrastructure();
@@ -148,10 +150,10 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     domainInfrastructure = null;
   }
 
-  protected MuleContext createAppMuleContext(String... configResource) throws Exception {
+  private MuleContext createAppMuleContext(String[] configResource, ArtifactContext domainArtifactContext) throws Exception {
     return new ApplicationContextBuilder()
         .setContextId(this.getClass().getSimpleName())
-        .setDomainContext(domainContext)
+        .setDomainArtifactContext(domainArtifactContext)
         .setApplicationResources(configResource)
         .build();
   }

@@ -452,7 +452,10 @@ public class ArtifactContextBuilder {
                     .setServiceConfigurators(serviceConfigurators)
                     .setRuntimeLockFactory(runtimeLockFactory);
 
-            withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
+            if (parentArtifact.getArtifactContext() != null) {
+              artifactContextConfigurationBuilder.setParentArtifactContext(parentArtifact.getArtifactContext());
+            }
+
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
             ((DefaultMuleConfiguration) muleContext.getConfiguration()).setDataFolderName(dataFolderName);

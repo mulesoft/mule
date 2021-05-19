@@ -10,7 +10,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
@@ -24,7 +23,7 @@ import java.util.List;
 
 public class TestDomainWrapper implements Domain {
 
-  private Domain delegate;
+  private final Domain delegate;
   private boolean failOnPurpose;
   private boolean failOnDispose;
 
@@ -39,7 +38,7 @@ public class TestDomainWrapper implements Domain {
 
   @Override
   public Registry getRegistry() {
-    return delegate.getRegistry();
+    return delegate.getArtifactContext().getRegistry();
   }
 
   @Override

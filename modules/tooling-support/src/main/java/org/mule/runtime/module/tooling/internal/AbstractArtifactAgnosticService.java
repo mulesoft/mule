@@ -74,7 +74,7 @@ public abstract class AbstractArtifactAgnosticService {
           try {
             application.lazyInit(!isLazyInitEnableXmlValidations());
             // Force the initialization of the app components so that the registry is populated with the configs
-            application.getRegistry().lookupByType(LazyComponentInitializer.class)
+            application.getArtifactContext().getRegistry().lookupByType(LazyComponentInitializer.class)
                 .ifPresent(lazyInit -> lazyInit.initializeComponents(comp -> true));
           } catch (Exception e) {
             if (e.getCause() instanceof ConfigurationException) {

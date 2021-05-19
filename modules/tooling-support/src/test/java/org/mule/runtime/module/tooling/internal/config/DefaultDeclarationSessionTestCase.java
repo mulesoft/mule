@@ -23,6 +23,7 @@ import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -60,6 +61,9 @@ public class DefaultDeclarationSessionTestCase extends AbstractMuleTestCase {
     when(application.getDescriptor()).thenReturn(new ApplicationDescriptor("app", of(deploymentProperties)));
     final Registry registry = mock(Registry.class);
     when(registry.lookupByType(any(Class.class))).thenReturn(empty());
+    final ArtifactContext artifactContext = mock(ArtifactContext.class);
+    when(artifactContext.getRegistry()).thenReturn(registry);
+    when(application.getArtifactContext()).thenReturn(artifactContext);
     when(application.getRegistry()).thenReturn(registry);
   }
 

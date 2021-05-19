@@ -62,7 +62,6 @@ import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.security.AbstractSecurityProvider;
@@ -91,7 +90,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import io.qameta.allure.Story;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -102,6 +100,7 @@ import org.junit.runners.Parameterized;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 /**
  * Contains test for application deployment with policies on the default domain
@@ -476,7 +475,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     Properties flowDeploymentProperties = resolveFlowDeploymentProperties(applicationFileBuilder.getId(), empty());
     final Application app = findApp(applicationFileBuilder.getId(), 1);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flowDeploymentProperties.get(flow.getName() + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY), is("true"));
     }
     assertStatus(app, STARTED);

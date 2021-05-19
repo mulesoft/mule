@@ -13,12 +13,14 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
@@ -44,9 +46,9 @@ public class DomainContextBuilder {
     return this;
   }
 
-  public MuleContext build() throws Exception {
+  public ArtifactContext build() throws Exception {
     List<ConfigurationBuilder> builders = new ArrayList<>(3);
-    ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
+    SpringXmlConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
     builders.add(extensionManagerWithMuleExtModelBuilder());
     builders.add(new TestPolicyProviderConfigurationBuilder());
     builders.add(cfgBuilder);
@@ -70,14 +72,14 @@ public class DomainContextBuilder {
     };
     domainContext.getNotificationManager().addListener(listener);
 
-    return domainContext;
+    return cfgBuilder.createArtifactContext();
   }
 
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     builders.add(testServicesConfigBuilder);
   }
 
-  protected ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
-    return createConfigurationBuilder(configResources, emptyMap(), DOMAIN);
+  private SpringXmlConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
+    return createConfigurationBuilder(configResources, emptyMap(), DOMAIN, false, false);
   }
 }

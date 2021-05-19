@@ -100,8 +100,8 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
   private void addFlowStoppedListeners(T artifact) {
     appsFlowStoppedListeners.put(artifact.getArtifactName(), new ArrayList<>());
-    if (artifact.getRegistry() != null) {
-      for (Flow flow : artifact.getRegistry().lookupAllByType(Flow.class)) {
+    if (artifact.getArtifactContext().getRegistry() != null) {
+      for (Flow flow : artifact.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
         FlowStoppedPersistenceListener flowStoppedPersistenceListener =
             new FlowStoppedDeploymentPersistenceListener(flow.getName(), artifact.getArtifactName());
         ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedPersistenceListener);
@@ -187,7 +187,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
   @Override
   public void doNotPersistArtifactStop(T artifact) {
-    Registry artifactRegistry = artifact.getRegistry();
+    Registry artifactRegistry = artifact.getArtifactContext().getRegistry();
 
     if (artifactRegistry != null) {
       Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =

@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import java.util.List;
 public class ApplicationContextBuilder {
 
   private String contextId;
-  private MuleContext domainContext;
+  private ArtifactContext domainArtifactContext;
   private String[] applicationResources = new String[0];
 
   private final MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(APP);
@@ -34,8 +35,8 @@ public class ApplicationContextBuilder {
     return this;
   }
 
-  public ApplicationContextBuilder setDomainContext(MuleContext domainContext) {
-    this.domainContext = domainContext;
+  public ApplicationContextBuilder setDomainArtifactContext(ArtifactContext domainArtifactContext) {
+    this.domainArtifactContext = domainArtifactContext;
     return this;
   }
 
@@ -76,7 +77,7 @@ public class ApplicationContextBuilder {
   }
 
   protected ConfigurationBuilder getAppBuilder(String[] configResource) throws Exception {
-    return createConfigurationBuilder(configResource, domainContext);
+    return createConfigurationBuilder(configResource, domainArtifactContext);
   }
 
   /**

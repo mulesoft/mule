@@ -13,16 +13,21 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_PROPERTIES_STORY;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.Calendar;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mule.runtime.api.time.TimeSupplier;
+import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
@@ -32,13 +37,6 @@ import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
-
-import java.util.Calendar;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.slf4j.Logger;
 
 import io.qameta.allure.Feature;
@@ -54,7 +52,7 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
-  private final TimeSupplier timeSupplier = mock(TimeSupplier.class);
+  private TimeSupplier timeSupplier = mock(TimeSupplier.class);
 
   private MuleContextWithRegistry muleContext;
 
@@ -65,7 +63,8 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
                            new SimpleConfigurationBuilder(singletonMap(OBJECT_TIME_SUPPLIER,
                                                                        timeSupplier)),
                            new MockExtensionManagerConfigurationBuilder(),
-                           createConfigurationBuilder(new String[0], emptyMap(), APP, false, false));
+                           new SpringXmlConfigurationBuilder(new String[0],
+                                                             emptyMap()));
     muleContext.start();
     muleContext.getRegistry().lookupByType(Calendar.class);
   }

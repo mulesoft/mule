@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -16,6 +17,7 @@ import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
@@ -34,10 +36,12 @@ import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
@@ -55,6 +59,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
+import org.mule.runtime.properties.internal.DefaultConfigurationProperty;
 
 import java.io.InputStream;
 import java.util.List;
@@ -80,6 +85,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   private SpringRegistry registry;
 
+  private ArtifactAst parentArtifactAst;
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
   private final ArtifactType artifactType;
@@ -104,6 +110,33 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
          getRuntimeLockFactory());
   }
 
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
+  public SpringXmlConfigurationBuilder(String configResources, Map<String, String> artifactProperties, ArtifactType artifactType)
+      throws ConfigurationException {
+    this(new String[] {configResources}, artifactProperties, artifactType, false, false);
+  }
+
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
+  public SpringXmlConfigurationBuilder(String configResource) throws ConfigurationException {
+    this(configResource, emptyMap(), APP);
+  }
+
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
+  public SpringXmlConfigurationBuilder(String[] configFiles, Map<String, String> artifactProperties)
+      throws ConfigurationException {
+    this(configFiles, artifactProperties, APP, false, false);
+  }
+
+  // TODO: MULE-19422 Remove specific tests usages
+  @Deprecated
+  public SpringXmlConfigurationBuilder(String[] configFiles, boolean enableLazyInit, boolean disableXmlValidations)
+      throws ConfigurationException {
+    this(configFiles, emptyMap(), APP, enableLazyInit, disableXmlValidations, getRuntimeLockFactory());
+  }
+
   public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
                                        Map<String, String> artifactProperties, ArtifactType artifactType,
                                        boolean enableLazyInitialisation, boolean disableXmlValidations,
@@ -112,6 +145,17 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this(configurationFiles, artifactProperties, artifactType, enableLazyInitialisation, disableXmlValidations,
          runtimeLockFactory);
     this.artifactDeclaration = artifactDeclaration;
+  }
+
+  public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, MuleContext domainContext,
+                                                                boolean enableLazyInitialisation, boolean disableXmlValidations)
+      throws ConfigurationException {
+    final SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
+        new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP, enableLazyInitialisation, disableXmlValidations);
+    if (domainContext != null) {
+      springXmlConfigurationBuilder.setParentContext(domainContext);
+    }
+    return springXmlConfigurationBuilder;
   }
 
   @Override
@@ -223,7 +267,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   protected AstXmlParser createMuleXmlParser(ErrorTypeRepository errorTypeRepository, Set<ExtensionModel> extensions,
                                              Map<String, String> artifactProperties, boolean disableXmlValidations) {
-    DefaultConfigurationPropertiesResolver propertyResolver =
+    ConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
 
           final ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
@@ -234,24 +278,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
             if (propertyValue == null) {
               return parentProvider.provide(configurationAttributeKey);
+            } else {
+              return of(new DefaultConfigurationProperty(this, propertyValue, configurationAttributeKey));
             }
-            return of(new ConfigurationProperty() {
-
-              @Override
-              public Object getSource() {
-                return this;
-              }
-
-              @Override
-              public String getValue() {
-                return propertyValue;
-              }
-
-              @Override
-              public String getKey() {
-                return configurationAttributeKey;
-              }
-            });
           }
 
           @Override
@@ -300,8 +329,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (disableXmlValidations) {
       builder = builder.withSchemaValidationsDisabled();
     }
-    final AstXmlParser parser = builder.build();
-    return parser;
+    return builder.build();
   }
 
   private ConfigResource[] resolveArtifactConfigResources() {
@@ -383,7 +411,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   @Override
-  public void setParentContext(MuleContext domainContext) {
+  public void setParentContext(MuleContext domainContext, ArtifactAst parentAst) {
     this.parentContext = ((MuleContextWithRegistry) domainContext).getRegistry().get("springApplicationContext");
   }
 

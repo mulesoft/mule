@@ -35,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
@@ -69,7 +70,6 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
@@ -167,7 +167,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
 
     // Checks that the configuration's ID was properly configured
-    assertThat(app.getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
+    assertThat(app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
                equalTo(dummyAppDescriptorFileBuilder.getId()));
   }
 
@@ -175,7 +175,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(DEPLOYMENT_SUCCESS)
   public void extensionManagerPresent() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
-    assertThat(app.getRegistry().<ExtensionManager>lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER).get(),
+    assertThat(app.getArtifactContext().getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get(),
                is(notNullValue()));
   }
 
@@ -193,7 +193,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Application app = findApp(globalPropertyAppFileBuilder.getId(), 1);
 
     Optional<ConfigurationProperties> configurationProperties =
-        app.getRegistry().lookupByType(ConfigurationProperties.class);
+        app.getArtifactContext().getRegistry().lookupByType(ConfigurationProperties.class);
     assertThat(configurationProperties.isPresent(), is(true));
 
     File appHome = new File(configurationProperties.get().resolveStringProperty("appHome")
@@ -333,7 +333,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
 
-    assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(app.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
@@ -345,7 +345,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
 
-    assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(app.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(app);
 
     Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), empty());
@@ -543,7 +543,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     String appId = incompleteAppFileBuilder.getId();
     assertArtifactIsRegisteredAsZombie(appId, deploymentService.getZombieApplications());
-    assertThat(deploymentService.findApplication(appId).getRegistry(), nullValue());
+    assertThat(deploymentService.findApplication(appId).getArtifactContext().getRegistry(), nullValue());
   }
 
   @Test
@@ -560,7 +560,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
-    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getRegistry(), nullValue());
+    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getArtifactContext().getRegistry(),
+               nullValue());
   }
 
   @Test
@@ -822,7 +823,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(FLOW_STATE_PERSISTENCE)
   public void undeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
@@ -855,7 +856,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
@@ -873,7 +874,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
@@ -881,7 +882,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
-    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(false));
       flow.start();
       assertThat(flow.getLifecycleState().isStarted(), is(true));
@@ -894,7 +895,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(FLOW_STATE_PERSISTENCE)
   public void stopsAndStartsAppWithStoppedFlowAndDoesNotStartIt() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
     app.stop();
@@ -923,7 +924,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Issue("MULE-19127")
   public void stopsAndStartsAppWithStoppedFlowWithInitialStateStoppedAndStartsIt() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorWithStoppedFlowFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.start();
       flow.stop();
     }
@@ -931,7 +932,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.redeploy(dummyAppDescriptorWithStoppedFlowFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorWithStoppedFlowFileBuilder, STARTED);
-    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(false));
       flow.start();
       assertThat(flow.getLifecycleState().isStarted(), is(true));
@@ -1313,7 +1314,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("app-with-plugin-bootstrap")
         .definedBy("app-with-plugin-bootstrap.xml").dependingOn(pluginFileBuilder);
     final Application application = deployApplication(applicationFileBuilder);
-    final Optional<Object> lookupObject = application.getRegistry().lookupByName("plugin.echotest");
+    final Optional<Object> lookupObject = application.getArtifactContext().getRegistry().lookupByName("plugin.echotest");
     assertThat(lookupObject.isPresent(), is(true));
     assertThat(lookupObject.get().getClass().getName(), equalTo("org.foo.EchoTest"));
   }
@@ -1575,7 +1576,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   private File getAppMetaFolder(Application app) {
-    return new File((app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION).get()
+    return new File((app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get()
         .getWorkingDirectory()));
   }
 
@@ -1664,7 +1665,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   private void assertIfFlowsHaveStarted(Application app, boolean started) {
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(started));
     }
   }

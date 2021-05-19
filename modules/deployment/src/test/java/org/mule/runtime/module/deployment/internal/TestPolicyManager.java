@@ -139,7 +139,7 @@ public class TestPolicyManager implements DeploymentListener {
 
   /**
    * Retrieves the source policies that match the given {@link PolicyPointcutParameters}
-   * 
+   *
    * @param appName                  application from which to look for the policies. Non empty.
    * @param policyPointcutParameters parameters to match against existing policies
    * @return List of source {@link Policy}s that matched the parameters
@@ -151,7 +151,7 @@ public class TestPolicyManager implements DeploymentListener {
   /**
    * Retrieves the operation policies that match the given {@link PolicyPointcutParameters}Retrieves the source policies that
    * match the given {@link PolicyPointcutParameters}
-   * 
+   *
    * @param appName                  application from which to look for the policies. Non empty.
    * @param policyPointcutParameters parameters to match against existing policies
    * @return List of operation {@link Policy}s that matched the parameters
@@ -166,7 +166,7 @@ public class TestPolicyManager implements DeploymentListener {
       throw new IllegalArgumentException("Cannot find application named: " + appName);
     }
 
-    return application.getRegistry().lookupByType(PolicyProvider.class)
+    return application.getArtifactContext().getRegistry().lookupByType(PolicyProvider.class)
         .orElseThrow(() -> new IllegalArgumentException("Cannot find a Polict Provider in application named: " + appName));
   }
 

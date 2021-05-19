@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.artifact;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -22,7 +23,7 @@ import org.mule.runtime.module.artifact.api.Artifact;
  */
 public class SpringArtifactContext implements ArtifactContext {
 
-  private MuleArtifactContext muleArtifactContext;
+  private final MuleArtifactContext muleArtifactContext;
 
   /**
    * Creates an {@link ArtifactContext}.
@@ -46,4 +47,8 @@ public class SpringArtifactContext implements ArtifactContext {
     return this.muleArtifactContext.getRegistry();
   }
 
+  @Override
+  public ArtifactAst getArttifactAst() {
+    return this.muleArtifactContext.getApplicationModel();
+  }
 }
