@@ -16,7 +16,6 @@ import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
