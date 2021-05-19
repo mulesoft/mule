@@ -452,7 +452,7 @@ public class ArtifactContextBuilder {
                     .setServiceConfigurators(serviceConfigurators)
                     .setRuntimeLockFactory(runtimeLockFactory);
 
-            if (parentArtifact.getArtifactContext() != null) {
+            if (parentArtifact != null && parentArtifact.getArtifactContext() != null) {
               artifactContextConfigurationBuilder.setParentArtifactContext(parentArtifact.getArtifactContext());
             }
 
