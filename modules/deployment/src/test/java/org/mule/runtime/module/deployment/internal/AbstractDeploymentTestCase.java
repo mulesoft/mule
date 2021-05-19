@@ -1344,7 +1344,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return withContextClassLoader(appClassLoader, () -> {
       final FlowRunner flowRunner =
           new FlowRunner(deploymentService.getApplications().get(0).getArtifactContext().getRegistry(), flowName)
-          .withPayload(TEST_MESSAGE);
+              .withPayload(TEST_MESSAGE);
 
       if (correlationId != null) {
         flowRunner.withSourceCorrelationId(correlationId);
