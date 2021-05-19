@@ -112,6 +112,7 @@ public class MuleContainer {
 
   private final ServiceManager serviceManager;
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
+  private boolean embeddedMode = false;
 
   /**
    * Application entry point.
@@ -278,7 +279,7 @@ public class MuleContainer {
   }
 
   protected void showSplashScreen() {
-    final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen();
+    final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen(isEmbeddedMode());
     splashScreen.doBody();
     log(splashScreen.toString());
   }
@@ -388,6 +389,14 @@ public class MuleContainer {
 
   public static void setStartupPropertiesFile(String startupPropertiesFile) {
     MuleContainer.startupPropertiesFile = startupPropertiesFile;
+  }
+
+  public void setEmbeddedMode(boolean embeddedMode) {
+    this.embeddedMode = embeddedMode;
+  }
+
+  public boolean isEmbeddedMode() {
+    return embeddedMode;
   }
 
   /**

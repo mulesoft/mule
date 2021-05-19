@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.launcher;
 
-import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.lang.System.setProperty;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
@@ -49,6 +48,11 @@ import org.slf4j.LoggerFactory;
 public class MuleContainerStartupSplashScreen extends SplashScreen {
 
   private Logger LOGGER = LoggerFactory.getLogger(MuleContainerStartupSplashScreen.class);
+  private boolean embeddedMode = false;
+
+  public MuleContainerStartupSplashScreen(boolean embeddedMode) {
+    this.embeddedMode = embeddedMode;
+  }
 
   public void doBody() {
 
@@ -68,8 +72,8 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     Attributes att = mf.getMainAttributes();
     if (att.values().size() > 0) {
       doBody(defaultString(MuleManifest.getProductDescription(), notset));
-      doBody(String.format("%s Build: %s", CoreMessages.version().getMessage(),
-                           defaultString(MuleManifest.getBuildNumber(), notset)));
+      doBody(format("%s Build: %s", CoreMessages.version().getMessage(),
+                    defaultString(MuleManifest.getBuildNumber(), notset)));
 
       doBody(defaultString(MuleManifest.getVendorName(), notset));
       doBody(defaultString(MuleManifest.getProductMoreInfo(), notset));
@@ -81,23 +85,23 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     // TODO maybe be more precise and count from container bootstrap time?
     doBody(CoreMessages.serverStartedAt(System.currentTimeMillis()).getMessage());
 
-    doBody(String.format("JDK: %s (%s)", getProperty("java.version"), getProperty("java.vm.info")));
+    doBody(format("JDK: %s (%s)", getProperty("java.version"), getProperty("java.vm.info")));
     listJavaSystemProperties();
 
     String patch = getProperty("sun.os.patch.level", null);
 
-    doBody(String.format("OS: %s%s (%s, %s)", getProperty("os.name"),
-                         (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : ""),
-                         getProperty("os.version"), getProperty("os.arch")));
+    doBody(format("OS: %s%s (%s, %s)", getProperty("os.name"),
+                  (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : ""),
+                  getProperty("os.version"), getProperty("os.arch")));
 
-    if (!isEmbedded()) {
-      doBody(String.format("Wrapper PID: %d", getWrapperPID()));
-      doBody(String.format("Java PID: %d", getJavaPID()));
+    if (!isEmbeddedMode()) {
+      doBody(format("Wrapper PID: %d", getWrapperPID()));
+      doBody(format("Java PID: %d", getJavaPID()));
     }
 
     try {
       InetAddress host = NetworkUtils.getLocalHost();
-      doBody(String.format("Host: %s (%s)", host.getHostName(), host.getHostAddress()));
+      doBody(format("Host: %s (%s)", host.getHostName(), host.getHostAddress()));
     } catch (UnknownHostException e) {
       // ignore
     }
@@ -110,10 +114,6 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
       listPatchesIfPresent();
       listMuleSystemProperties();
     }
-  }
-
-  private boolean isEmbedded() {
-    return parseBoolean(getProperty("mule.mode.embedded"));
   }
 
   private void listServerPluginsIfPresent() {
@@ -153,5 +153,9 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   private void listJavaSystemProperties() {
     listItems(Stream.of("java.vendor", "java.vm.name", "java.home")
         .collect(toMap(String::toString, propertyName -> getProperty(propertyName))), "JDK properties:");
+  }
+
+  private boolean isEmbeddedMode() {
+    return embeddedMode;
   }
 }

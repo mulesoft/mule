@@ -61,7 +61,7 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 
   @Before
   public void setUp() {
-    splashScreen = new MuleContainerStartupSplashScreen();
+    splashScreen = new MuleContainerStartupSplashScreen(false);
   }
 
   @Override
