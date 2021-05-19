@@ -21,6 +21,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -67,11 +68,13 @@ public abstract class TransientRegistry extends AbstractRegistry {
       defaultEntries.put(ErrorTypeRepository.class.getName(), muleContext.getErrorTypeRepository());
       defaultEntries.put(ErrorTypeLocator.class.getName(), ((PrivilegedMuleContext) muleContext).getErrorTypeLocator());
       defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) muleContext).getNotificationManager());
-      // Initial feature flagging service setup. It will be later overwritten by the ArtifactContext.
+      // Initial feature flagging service setup
       FeatureFlaggingRegistry ffRegistry = getInstance();
       FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
-          .context(muleContext)
-          .configurations(ffRegistry.getFeatureConfigurations())
+          .withContext(muleContext)
+          .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null), muleContext.getId()))
+          .withMuleContextConfigurations(ffRegistry.getFeatureConfigurations())
+          .withFeatureContextConfigurations(ffRegistry.getDecoupledConfigurations())
           .build();
       defaultEntries.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
     }

@@ -19,56 +19,121 @@ import java.util.function.Predicate;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.core.api.config.FeatureContext;
 import org.slf4j.Logger;
 
 /**
- * This builder creates a {@link FeatureFlaggingService}.
+ * <p>
+ * This builder creates a {@link FeatureFlaggingService} whose {@link Feature} flags can be configured using a
+ * {@link FeatureContext}.
+ * </p>
+ * <p>
+ * Maintains backward compatibility with a legacy {@link org.mule.runtime.api.meta.MuleVersion} evaluation.
+ * </p>
  *
  * @see FeatureFlaggingService
- * 
  * @since 4.4.0
  */
 public final class FeatureFlaggingServiceBuilder {
 
   private static final Logger LOGGER = getLogger(FeatureFlaggingServiceBuilder.class);
 
-  private MuleContext context;
+  private MuleContext muleContext;
+  private FeatureContext featureContext;
+  private String artifactName = "";
 
-  private Map<Feature, Predicate<MuleContext>> configurations;
+  private final Map<Feature, Predicate<FeatureContext>> featureContextFlags = new HashMap<>();
+  private final Map<Feature, Predicate<MuleContext>> muleContextFlags = new HashMap<>();
 
-  public FeatureFlaggingServiceBuilder context(MuleContext context) {
-    this.context = context;
+  /**
+   * Sets the {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)} evaluation.
+   *
+   * @param muleContext {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)}
+   *                    evaluation.
+   * @return This {@link FeatureFlaggingServiceBuilder}.
+   */
+  public FeatureFlaggingServiceBuilder withContext(MuleContext muleContext) {
+    if (this.artifactName.isEmpty()) {
+      this.artifactName = muleContext.getId();
+    }
+    this.muleContext = muleContext;
     return this;
   }
 
-  public FeatureFlaggingServiceBuilder configurations(Map<Feature, Predicate<MuleContext>> cofigurations) {
-    this.configurations = cofigurations;
+  /**
+   * Sets the {@link FeatureContext} that will be used for the legacy {@link #withFeatureContextConfigurations(Map)} evaluation.
+   *
+   * @param featureContext {@link FeatureContext} that will be used for the legacy {@link #withFeatureContextConfigurations(Map)}
+   *                       evaluation.
+   * @return This {@link FeatureFlaggingServiceBuilder}.
+   */
+  public FeatureFlaggingServiceBuilder withContext(FeatureContext featureContext) {
+    artifactName = featureContext.getArtifactName();
     return this;
   }
 
+  /**
+   * Features whose flags will be set by evaluating a predicate against a {@link FeatureContext}.
+   *
+   * @param configurations The features and their corresponding predicates.
+   * @return This {@link FeatureFlaggingServiceBuilder}.
+   */
+  public FeatureFlaggingServiceBuilder withFeatureContextConfigurations(Map<Feature, Predicate<FeatureContext>> configurations) {
+    this.featureContextFlags.putAll(configurations);
+    return this;
+  }
+
+  /**
+   * Features whose flags will be set by evaluating a predicate against a {@link MuleContext}.
+   *
+   * @param configurations The features and their corresponding predicates.
+   * @return This {@link FeatureFlaggingServiceBuilder}.
+   */
+  public FeatureFlaggingServiceBuilder withMuleContextConfigurations(Map<Feature, Predicate<MuleContext>> configurations) {
+    this.muleContextFlags.putAll(configurations);
+    return this;
+  }
+
+  /**
+   * Creates the {@link FeatureFlaggingService} instance configured by this {@link FeatureFlaggingServiceBuilder}.
+   *
+   * @return The {@link FeatureFlaggingService} instance.
+   */
   public FeatureFlaggingService build() {
     Map<Feature, Boolean> features = new HashMap<>();
     LOGGER.debug("Configuring feature flags...");
-
-    final String id = context.getId();
-    configurations.forEach((feature, p) -> {
-      boolean enabled;
-
-      Optional<String> systemPropertyName = feature.getOverridingSystemPropertyName();
-      if (systemPropertyName.isPresent() && getProperty(systemPropertyName.get()) != null) {
-        enabled = getBoolean(systemPropertyName.get());
-        LOGGER.debug("Setting feature {} = {} for artifact [{}] because of System Property '{}'", feature, enabled, id,
-                     systemPropertyName);
-      } else {
-        enabled = p.test(context);
-        LOGGER.debug("Setting feature {} = {} for artifact [{}]", feature, enabled, id);
-      }
-
-      features.put(feature, enabled);
-    });
-
+    if (muleContext != null) {
+      muleContextFlags.forEach((feature, artifactDescriptorPredicate) -> features
+          .put(feature, isFeatureFlagEnabled(feature, muleContext, artifactDescriptorPredicate)));
+    }
+    if (featureContext != null) {
+      featureContextFlags.forEach((feature, artifactDescriptorPredicate) -> features
+          .put(feature, isFeatureFlagEnabled(feature, featureContext, artifactDescriptorPredicate)));
+    }
     return new DefaultFeatureFlaggingService(features);
+  }
 
+  /**
+   * True if a feature flag is enabled under a determined feature context.
+   *
+   * @param feature          The feature whose feature flag must be evaluated.
+   * @param featureContext   The feature context that must be used to set the feature flag.
+   * @param featurePredicate The predicate that will be evaluated against the feature context.
+   * @return True if a feature flag is enabled.
+   */
+  private <T> boolean isFeatureFlagEnabled(Feature feature, T featureContext, Predicate<T> featurePredicate) {
+    boolean enabled;
+    Optional<String> systemPropertyName = feature.getOverridingSystemPropertyName();
+    if (systemPropertyName.isPresent() && getProperty(systemPropertyName.get()) != null) {
+      enabled = getBoolean(systemPropertyName.get());
+      LOGGER.debug("Setting feature {} = {} for artifact [{}] because of System Property '{}'", feature, enabled,
+                   artifactName,
+                   systemPropertyName);
+    } else {
+      enabled = featurePredicate.test(featureContext);
+      LOGGER.debug("Setting feature {} = {} for artifact [{}]", feature, enabled, artifactName);
+    }
+    return enabled;
   }
 
 }

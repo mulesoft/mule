@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.config;
+package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.api.meta.MuleVersion;
 
@@ -16,13 +16,19 @@ import org.mule.runtime.api.meta.MuleVersion;
  */
 public class FeatureContext {
 
+  private String artifactName;
   private final MuleVersion artifactMinMuleVersion;
 
-  public FeatureContext(MuleVersion artifactMinMuleVersion) {
+  public FeatureContext(MuleVersion artifactMinMuleVersion, String artifactName) {
     this.artifactMinMuleVersion = artifactMinMuleVersion;
+    this.artifactName = artifactName;
   }
 
   public MuleVersion getArtifactMinMuleVersion() {
     return artifactMinMuleVersion;
+  }
+
+  public String getArtifactName() {
+    return artifactName;
   }
 }

@@ -47,6 +47,7 @@ public class FeatureFlaggingRegistry {
   public static final String CONDITION_CAN_NOT_BE_NULL = "Error registering %s: condition can not be null";
 
   private final Map<Feature, Predicate<MuleContext>> configurations = new ConcurrentHashMap<>();
+  private final Map<Feature, Predicate<FeatureContext>> decoupledConfigurations = new ConcurrentHashMap<>();
 
   private static final FeatureFlaggingRegistry INSTANCE = new FeatureFlaggingRegistry();
 
@@ -72,27 +73,41 @@ public class FeatureFlaggingRegistry {
    *                  is being created for this application.
    */
   public void registerFeature(Feature feature, Predicate<MuleContext> condition) {
-    if (feature == null) {
-      throw new IllegalArgumentException(FEATURE_CAN_NOT_BE_NULL);
-    }
-
-    if (condition == null) {
-      throw new IllegalArgumentException(format(CONDITION_CAN_NOT_BE_NULL, feature));
-    }
-
+    validate(feature, condition);
     Predicate<MuleContext> added = configurations.putIfAbsent(feature, condition);
     if (added != null) {
       throw new IllegalArgumentException(format(FEATURE_ALREADY_REGISTERED, feature));
     }
   }
 
+  public void registerDecoupledFeature(Feature feature, Predicate<FeatureContext> condition) {
+    validate(feature, condition);
+    Predicate<FeatureContext> added = decoupledConfigurations.putIfAbsent(feature, condition);
+    if (added != null) {
+      throw new IllegalArgumentException(format(FEATURE_ALREADY_REGISTERED, feature));
+    }
+  }
+
+  private void validate(Feature feature, Predicate<?> condition) {
+    if (feature == null) {
+      throw new IllegalArgumentException(FEATURE_CAN_NOT_BE_NULL);
+    }
+    if (condition == null) {
+      throw new IllegalArgumentException(format(CONDITION_CAN_NOT_BE_NULL, feature));
+    }
+  }
+
   /**
    * Returns all the configurations that were registered by using {@link #registerFeature(Feature, Predicate)}
-   * 
+   *
    * @return An unmodifiable map with the registered features.
    */
   public Map<Feature, Predicate<MuleContext>> getFeatureConfigurations() {
     return unmodifiableMap(configurations);
+  }
+
+  public Map<Feature, Predicate<FeatureContext>> getDecoupledConfigurations() {
+    return decoupledConfigurations;
   }
 
   /**
