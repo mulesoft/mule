@@ -9,10 +9,12 @@ package org.mule.runtime.module.deployment.impl.internal.config;
 
 import org.mule.runtime.api.meta.MuleVersion;
 
-// TODO: See if this can be done more "predicate friendly" (easier chain of multiple conditions)
+/**
+ * Decoupled context used to evaluate {@link org.mule.runtime.api.config.Feature} flags.
+ */
 public class FeatureContext {
 
-  private MuleVersion artifactMinMuleVersion;
+  private final MuleVersion artifactMinMuleVersion;
 
   public FeatureContext(MuleVersion artifactMinMuleVersion) {
     this.artifactMinMuleVersion = artifactMinMuleVersion;

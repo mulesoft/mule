@@ -449,7 +449,7 @@ public class ArtifactContextBuilder {
             serviceConfigurators.add(customizationService -> customizationService
                 .registerCustomServiceImpl(FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY,
                                            deploymentFeatureFlaggingServiceBuilder.withMuleContext(muleContext)
-                                               .contextConfigurations(FeatureFlaggingRegistry.getInstance()
+                                               .withMuleContextConfigurations(FeatureFlaggingRegistry.getInstance()
                                                    .getFeatureConfigurations())
                                                .build()));
 

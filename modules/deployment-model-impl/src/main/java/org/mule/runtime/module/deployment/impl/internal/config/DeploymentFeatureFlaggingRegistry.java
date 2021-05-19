@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.config;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +22,14 @@ import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.CONDITION
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.FEATURE_ALREADY_REGISTERED;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.FEATURE_CAN_NOT_BE_NULL;
 
+/**
+ * Service used to register feature flags which will be evaluated by the {@link DeploymentFeatureFlaggingServiceBuilder} at
+ * deployment time against a decoupled {@link FeatureContext}, instead of the legacy {@link MuleContext} evaluation.
+ * 
+ * @see org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder
+ * @see FeatureFlaggingRegistry
+ * @since 4.4.0
+ */
 public class DeploymentFeatureFlaggingRegistry {
 
   private final Map<Feature, Predicate<FeatureContext>> configurations = new ConcurrentHashMap<>();
@@ -29,7 +38,7 @@ public class DeploymentFeatureFlaggingRegistry {
 
   /**
    * Returns a single instance of this service.
-   * 
+   *
    * @return A unique instance of the service
    */
   public static DeploymentFeatureFlaggingRegistry getInstance() {

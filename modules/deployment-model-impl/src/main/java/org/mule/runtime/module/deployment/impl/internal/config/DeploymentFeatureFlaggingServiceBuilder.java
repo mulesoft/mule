@@ -24,10 +24,16 @@ import static java.lang.System.getProperty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * This builder creates a {@link FeatureFlaggingService}.
- *
- * @see FeatureFlaggingService
+ * <p>
+ * This builder creates a {@link FeatureFlaggingService} whose {@link Feature} flags can be configured using a decoupled
+ * {@link FeatureContext} (instead of the legacy {@link MuleContext} evaluation).
+ * </p>
+ * <p>
+ * Maintains backward compatibility with {@link org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder}.
+ * </p>
  * 
+ * @see FeatureFlaggingService
+ * @see DeploymentFeatureFlaggingRegistry
  * @since 4.4.0
  */
 public final class DeploymentFeatureFlaggingServiceBuilder {
@@ -40,42 +46,81 @@ public final class DeploymentFeatureFlaggingServiceBuilder {
   private final Map<Feature, Predicate<FeatureContext>> artifactConfigurations = new HashMap<>();
   private final Map<Feature, Predicate<MuleContext>> contextConfigurations = new HashMap<>();
 
+  /**
+   * Sets the {@link ArtifactDescriptor} that will be used for the {@link FeatureContext}, necessary for the decoupled
+   * {@link #withFeatureContextConfigurations(Map)} evaluation.
+   * 
+   * @param artifactDescriptor {@link ArtifactDescriptor} that will be used for the {@link FeatureContext} construction.
+   * @return This {@link DeploymentFeatureFlaggingServiceBuilder}.
+   */
   public DeploymentFeatureFlaggingServiceBuilder withDescriptor(ArtifactDescriptor artifactDescriptor) {
     this.artifactDescriptor = artifactDescriptor;
     return this;
   }
 
+  /**
+   * Sets the {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)} evaluation.
+   * 
+   * @param context {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)} evaluation.
+   * @return This {@link DeploymentFeatureFlaggingServiceBuilder}.
+   */
   public DeploymentFeatureFlaggingServiceBuilder withMuleContext(MuleContext context) {
     this.muleContext = context;
     return this;
   }
 
-  public DeploymentFeatureFlaggingServiceBuilder artifactConfigurations(Map<Feature, Predicate<FeatureContext>> configurations) {
+  /**
+   * Feature flags that will be configured by evaluating a {@link FeatureContext}.
+   * 
+   * @param configurations Feature flags.
+   * @see DeploymentFeatureFlaggingRegistry
+   * @return This {@link DeploymentFeatureFlaggingServiceBuilder}.
+   */
+  public DeploymentFeatureFlaggingServiceBuilder withFeatureContextConfigurations(Map<Feature, Predicate<FeatureContext>> configurations) {
     this.artifactConfigurations.putAll(configurations);
     return this;
   }
 
-  public DeploymentFeatureFlaggingServiceBuilder contextConfigurations(Map<Feature, Predicate<MuleContext>> contextConfigurations) {
-    this.contextConfigurations.putAll(contextConfigurations);
+  /**
+   * Legacy feature flags that will be configured by evaluating a {@link MuleContext}.
+   * 
+   * @param configurations Legacy feature flags.
+   * @return This {@link DeploymentFeatureFlaggingServiceBuilder}.
+   */
+  public DeploymentFeatureFlaggingServiceBuilder withMuleContextConfigurations(Map<Feature, Predicate<MuleContext>> configurations) {
+    this.contextConfigurations.putAll(configurations);
     return this;
   }
 
+  /**
+   * Creates the {@link FeatureFlaggingService} instance configured by this {@link DeploymentFeatureFlaggingServiceBuilder}.
+   * 
+   * @return The {@link FeatureFlaggingService} instance.
+   */
   public FeatureFlaggingService build() {
     Map<Feature, Boolean> features = new HashMap<>();
     LOGGER.debug("Configuring feature flags...");
     if (artifactDescriptor != null) {
       FeatureContext featureContext = new FeatureContext(artifactDescriptor.getMinMuleVersion());
       artifactConfigurations.forEach((feature, artifactDescriptorPredicate) -> features
-          .put(feature, isFeatureEnabled(feature, featureContext, artifactDescriptorPredicate)));
+          .put(feature, isFeatureFlagEnabled(feature, featureContext, artifactDescriptorPredicate)));
     }
     if (muleContext != null) {
       contextConfigurations.forEach((feature, artifactDescriptorPredicate) -> features
-          .put(feature, isFeatureEnabled(feature, muleContext, artifactDescriptorPredicate)));
+          .put(feature, isFeatureFlagEnabled(feature, muleContext, artifactDescriptorPredicate)));
     }
     return new DefaultFeatureFlaggingService(features);
   }
 
-  private <T> boolean isFeatureEnabled(Feature feature, T featureContext, Predicate<T> featurePredicate) {
+  /**
+   * True if a feature flag is enabled under a determined feature context.
+   * 
+   * @param feature          The feature whose feature flag must be evaluated.
+   * @param featureContext   The feature context that must be used to set the feature flag.
+   * @param featurePredicate The predicate that will be evaluated against the feature context.
+   * @return True if a feature flag is enabled.
+   */
+  private <T> boolean isFeatureFlagEnabled(Feature feature, T featureContext, Predicate<T> featurePredicate) {
     boolean enabled;
     Optional<String> systemPropertyName = feature.getOverridingSystemPropertyName();
     if (systemPropertyName.isPresent() && getProperty(systemPropertyName.get()) != null) {
