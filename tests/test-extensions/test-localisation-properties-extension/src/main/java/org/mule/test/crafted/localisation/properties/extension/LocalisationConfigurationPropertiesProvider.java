@@ -22,9 +22,14 @@ import java.util.Optional;
 public class LocalisationConfigurationPropertiesProvider extends DefaultConfigurationPropertiesProvider {
 
   private final static String LOCALE_PREFIX = "locale::";
+  private final String language;
+  private final String region;
 
-  public LocalisationConfigurationPropertiesProvider(ResourceProvider resourceProvider, String file) {
+  public LocalisationConfigurationPropertiesProvider(ResourceProvider resourceProvider, String file, String locale) {
     super(file, resourceProvider);
+    String[] localeElements = locale.split("_");
+    this.language = localeElements[0];
+    this.region = localeElements[1];
   }
 
   /**
@@ -47,7 +52,7 @@ public class LocalisationConfigurationPropertiesProvider extends DefaultConfigur
 
         @Override
         public String getValue() {
-          NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "PT"));
+          NumberFormat nf = NumberFormat.getInstance(new Locale(language, region));
           DecimalFormat formatter = (DecimalFormat) nf;
           formatter.applyPattern(property.getValue());
           return formatter.format(Double.parseDouble(effectiveKey));

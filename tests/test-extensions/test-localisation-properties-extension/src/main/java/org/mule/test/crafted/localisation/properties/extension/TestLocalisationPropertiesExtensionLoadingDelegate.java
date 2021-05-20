@@ -31,5 +31,8 @@ public class TestLocalisationPropertiesExtensionLoadingDelegate implements Exten
     ParameterGroupDeclarer defaultParameterGroup = configurationDeclarer.onDefaultParameterGroup();
     defaultParameterGroup
         .withRequiredParameter("file").ofType(BaseTypeBuilder.create(JAVA).stringType().build());
+    ParameterGroupDeclarer parameterGroupDeclarer =
+        configurationDeclarer.onParameterGroup("language").withDslInlineRepresentation(true);
+    parameterGroupDeclarer.withRequiredParameter("locale").ofType(BaseTypeBuilder.create(JAVA).stringType().build());
   }
 }
