@@ -68,7 +68,8 @@ public final class FeatureFlaggingServiceBuilder {
    * @return This {@link FeatureFlaggingServiceBuilder}.
    */
   public FeatureFlaggingServiceBuilder withContext(FeatureContext featureContext) {
-    artifactName = featureContext.getArtifactName();
+    this.artifactName = featureContext.getArtifactName();
+    this.featureContext = featureContext;
     return this;
   }
 

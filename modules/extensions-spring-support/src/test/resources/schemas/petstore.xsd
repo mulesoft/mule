@@ -1055,7 +1055,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FeatureFlaggedEchoType" substitutionGroup="mule:abstract-operator" name="feature-flagged-echo"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FeatureFlaggedEchoType" substitutionGroup="mule:abstract-operator" name="feature-flagged-echo-mule-context"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FeatureFlaggedEchoType" substitutionGroup="mule:abstract-operator" name="feature-flagged-echo-feature-context"></xs:element>
   <xs:complexType name="FeatureFlaggedEchoType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">

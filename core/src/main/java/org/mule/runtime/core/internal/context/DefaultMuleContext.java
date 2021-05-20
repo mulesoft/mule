@@ -1189,14 +1189,14 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   private static void configureSplitterExceptionHandlingFeature() {
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-    ffRegistry.registerFeature(HANDLE_SPLITTER_EXCEPTION,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.atLeast("4.4.0")).orElse(false));
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerDecoupledFeature(HANDLE_SPLITTER_EXCEPTION, featureContext -> featureContext
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 
   private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-    ffRegistry.registerFeature(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, ctx -> false);
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerDecoupledFeature(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, featureContext -> false);
   }
 
   /**
@@ -1207,8 +1207,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    * @since 4.4.0 4.3.0
    */
   public static void configurePropertiesResolverFeatureFlag() {
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-    ffRegistry.registerFeature(HONOUR_RESERVED_PROPERTIES,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.newerThan("4.2.2")).orElse(false));
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerDecoupledFeature(HONOUR_RESERVED_PROPERTIES, featureContext -> featureContext
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.2.2")).isPresent());
   }
 }

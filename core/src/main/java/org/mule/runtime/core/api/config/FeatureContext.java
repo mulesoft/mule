@@ -9,26 +9,31 @@ package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.api.meta.MuleVersion;
 
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
+
 /**
- * Decoupled context used to evaluate {@link org.mule.runtime.api.config.Feature} flags.
- * 
+ * Decoupled {@link org.mule.runtime.core.api.MuleContext} metadata, used to evaluate {@link org.mule.runtime.api.config.Feature}
+ * flags.
+ *
  * @since 4.4.0
  */
 public class FeatureContext {
 
-  private String artifactName;
+  private final String artifactName;
   private final MuleVersion artifactMinMuleVersion;
 
   public FeatureContext(MuleVersion artifactMinMuleVersion, String artifactName) {
-    this.artifactMinMuleVersion = artifactMinMuleVersion;
     this.artifactName = artifactName;
+    this.artifactMinMuleVersion = artifactMinMuleVersion;
   }
 
-  public MuleVersion getArtifactMinMuleVersion() {
-    return artifactMinMuleVersion;
+  public Optional<MuleVersion> getArtifactMinMuleVersion() {
+    return ofNullable(artifactMinMuleVersion);
   }
 
   public String getArtifactName() {
-    return artifactName;
+    return ofNullable(artifactName).orElse("");
   }
 }
