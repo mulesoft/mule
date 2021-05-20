@@ -23,7 +23,10 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.BeforeClass;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.MuleContext;
@@ -116,6 +119,8 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Story(FEATURE_FLAGGING)
+  @Issue("MULE-19402")
   public void buildSettingLegacyFeatureFlag() throws Exception {
     ArtifactContext artifactContext =
         newBuilder(new TestServicesConfigurationBuilder()).setExecutionClassloader(currentThread().getContextClassLoader())
