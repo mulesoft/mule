@@ -1,0 +1,419 @@
+[
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "someParameter": {
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "connection",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {},
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "chat",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "required1": {
+              "range": "string",
+              "mandatory": true
+            },
+            "required2": {
+              "range": "string",
+              "mandatory": true
+            },
+            "channel": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "WithValueWithRequiredParam",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "valueParam": {
+              "range": "string",
+              "mandatory": true
+            },
+            "channels": {
+              "range": "string",
+              "mandatory": true
+            },
+            "anyParameter": {
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "WithValuesWithRequiredParamsFromParamGroup",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "valueParam": {
+              "range": "string",
+              "mandatory": true
+            },
+            "channels": {
+              "range": "string",
+              "mandatory": true
+            },
+            "anyParameter": {
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "WithValuesWithRequiredParamsFromShowInDslGroup",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "values": {
+              "range": "string",
+              "mandatory": true
+            },
+            "errorCode": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "failure-connection",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "urlFormat": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "with-parameter-with-field-values",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "channel": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "with-value-parameter",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-values-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "parameterOne": {
+              "range": "string",
+              "mandatory": true
+            },
+            "parameterFour": {
+              "range": "string",
+              "mandatory": true
+            },
+            "parameterWithValue": {
+              "range": "string",
+              "mandatory": true
+            },
+            "parameterThree": {
+              "range": "string",
+              "mandatory": true
+            },
+            "parameterTwo": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "withValueFourBoundActingParameters",
+      "system": "Values",
+      "type": "connectivity.Connection"
+    }
+  }
+]

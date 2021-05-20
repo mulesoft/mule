@@ -1,14 +1,14 @@
 {
   "name": "Semantic Terms",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.4.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "semantic-terms",
     "namespace": "http://www.mulesoft.org/schema/mule/semantic-terms",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/semantic-terms/current/mule-semantic-terms.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.4.0-SNAPSHOT",
     "xsdFileName": "mule-semantic-terms.xsd"
   },
   "resources": [],
@@ -4994,9 +4994,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [
-                "connectivity.password"
-              ],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}

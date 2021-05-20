@@ -1,14 +1,14 @@
 {
   "name": "petstore",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.4.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "petstore",
     "namespace": "http://www.mulesoft.org/schema/mule/petstore",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.4.0-SNAPSHOT",
     "xsdFileName": "mule-petstore.xsd"
   },
   "resources": [],
@@ -7832,7 +7832,9 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.username"
+                  ],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -7861,9 +7863,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [
-                    "connectivity.password"
-                  ],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -8900,7 +8900,9 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.username"
+                  ],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -8929,9 +8931,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [
-                    "connectivity.password"
-                  ],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -9972,7 +9972,9 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.username"
+                  ],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -10001,9 +10003,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [
-                    "connectivity.password"
-                  ],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -11255,7 +11255,9 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.username"
+                  ],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -11284,9 +11286,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [
-                    "connectivity.password"
-                  ],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -12323,7 +12323,9 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.username"
+                  ],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -12352,9 +12354,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [
-                    "connectivity.password"
-                  ],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -22490,7 +22490,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.username"
+              ],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -22519,9 +22521,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [
-                "connectivity.password"
-              ],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -23558,7 +23558,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.username"
+              ],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -23587,9 +23589,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [
-                "connectivity.password"
-              ],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -24630,7 +24630,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.username"
+              ],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -24659,9 +24661,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [
-                "connectivity.password"
-              ],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -25913,7 +25913,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.username"
+              ],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -25942,9 +25944,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [
-                "connectivity.password"
-              ],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -26981,7 +26981,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.username"
+              ],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -27010,9 +27012,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [
-                "connectivity.password"
-              ],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}

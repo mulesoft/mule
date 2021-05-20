@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -86,7 +86,7 @@ public abstract class AbstractAnnotatedDeclarationEnricher implements Declaratio
    * @return an {@link Optional} {@link Method}
    * @since 4.4.0
    */
-  protected Optional<Method> extractImplementingMethod(OperationDeclaration declaration) {
+  protected <T extends ExecutableComponentDeclaration> Optional<Method> extractImplementingMethod(ExecutableComponentDeclaration<T> declaration) {
     return declaration.getModelProperty(ImplementingMethodModelProperty.class)
         .map(ImplementingMethodModelProperty::getMethod);
   }

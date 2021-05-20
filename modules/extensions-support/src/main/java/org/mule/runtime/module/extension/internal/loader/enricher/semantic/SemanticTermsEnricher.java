@@ -6,19 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher.semantic;
 
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION_PARAMETER;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.PROXY_CONFIGURATION_PARAMETER;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.PROXY_CONFIGURATION_TYPE;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.SCALAR_SECRET;
-import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.SECRET;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION_PARAMETER;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.PROXY_CONFIGURATION_PARAMETER;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.PROXY_CONFIGURATION_TYPE;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.SCALAR_SECRET;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.SECRET;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getAllTermsFromAnnotations;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getConnectionTermsFromAnnotations;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getParameterTermsFromAnnotations;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSemanticTerms;
-import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getTermsFromAnnotations;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
@@ -29,7 +33,9 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.enricher.AbstractAnnotatedDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
+import org.mule.sdk.api.annotation.semantics.SemanticTerms;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -49,40 +55,71 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
 
       @Override
       protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-        extractType(declaration).ifPresent(type -> addSemanticTerms(declaration, type));
+        extractType(declaration).ifPresent(type -> {
+          addSemanticTerms(getConnectionTermsFromAnnotations(type::isAnnotatedWith), declaration);
+          addCustomTerms(type, declaration);
+        });
       }
 
       @Override
       protected void onOperation(OperationDeclaration declaration) {
         extractImplementingMethod(declaration)
             .map(method -> new MethodWrapper(method, typeLoader))
-            .ifPresent(method -> addSemanticTerms(declaration, method));
+            .ifPresent(method -> {
+              addSemanticTerms(getAllTermsFromAnnotations(method::isAnnotatedWith), declaration);
+              addCustomTerms(method, declaration);
+            });
       }
 
       @Override
       protected void onSource(SourceDeclaration declaration) {
-        extractType(declaration).ifPresent(type -> addSemanticTerms(declaration, type));
+        extractType(declaration).ifPresent(type -> {
+          addSemanticTerms(getAllTermsFromAnnotations(type::isAnnotatedWith), declaration);
+          addCustomTerms(type, declaration);
+        });
       }
 
       @Override
       protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration parameter) {
-        extractDeclaredParameter(parameter).ifPresent(e -> addSemanticTerms(parameter, e));
-        Set<String> typeTerms = new LinkedHashSet<>(getSemanticTerms(parameter.getType()));
+        extractDeclaredParameter(parameter).ifPresent(param -> {
+          addSemanticTerms(getParameterTermsFromAnnotations(param::isAnnotatedWith), parameter);
 
-        addTermIfPresent(typeTerms, parameter, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER);
-        addTermIfPresent(typeTerms, parameter, NTLM_PROXY_CONFIGURATION, NTLM_PROXY_CONFIGURATION_PARAMETER);
-        if (typeTerms.contains(SECRET)) {
-          parameter.getType().accept(new BasicTypeMetadataVisitor() {
+          Set<String> typeTerms = new LinkedHashSet<>(getSemanticTerms(parameter.getType()));
 
-            @Override
-            protected void visitBasicType(MetadataType metadataType) {
-              typeTerms.remove(SECRET);
-              typeTerms.add(SCALAR_SECRET);
-            }
-          });
-        }
+          addTermIfPresent(typeTerms, parameter, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER);
+          addTermIfPresent(typeTerms, parameter, NTLM_PROXY_CONFIGURATION, NTLM_PROXY_CONFIGURATION_PARAMETER);
+          if (typeTerms.contains(SECRET)) {
+            parameter.getType().accept(new BasicTypeMetadataVisitor() {
+
+              @Override
+              protected void visitBasicType(MetadataType metadataType) {
+                typeTerms.remove(SECRET);
+                typeTerms.add(SCALAR_SECRET);
+              }
+            });
+          }
+
+          addCustomTerms(param, parameter);
+        });
+      }
+
+      @Override
+      protected void onFunction(FunctionDeclaration declaration) {
+        declaration.getModelProperty(ImplementingMethodModelProperty.class)
+            .map(ImplementingMethodModelProperty::getMethod)
+            .ifPresent(method -> addCustomTerms(new MethodWrapper<>(method, typeLoader), declaration));
       }
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+  }
+
+  private void addCustomTerms(WithAnnotations annotated, WithSemanticTermsDeclaration declaration) {
+    annotated.getAnnotation(SemanticTerms.class).ifPresent(a -> {
+      for (String term : a.value()) {
+        if (!isBlank(term)) {
+          declaration.addSemanticTerm(term.trim());
+        }
+      }
+    });
   }
 
   private void addTermIfPresent(Set<String> terms, WithSemanticTermsDeclaration declaration, String term, String mappedTerm) {
@@ -91,7 +128,7 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
     }
   }
 
-  private void addSemanticTerms(WithSemanticTermsDeclaration declaration, WithAnnotations base) {
-    getTermsFromAnnotations(base::isAnnotatedWith).forEach(declaration::addSemanticTerm);
+  private void addSemanticTerms(Set<String> terms, WithSemanticTermsDeclaration declaration) {
+    terms.forEach(declaration::addSemanticTerm);
   }
 }

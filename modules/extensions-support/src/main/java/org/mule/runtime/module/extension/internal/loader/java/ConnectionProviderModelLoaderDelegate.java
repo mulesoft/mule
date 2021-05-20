@@ -17,6 +17,7 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
+import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
@@ -33,6 +34,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Connectio
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
+import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -93,6 +95,10 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
     providerDeclarer
         .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0)))
         .withModelProperty(new ExtensionTypeDescriptorModelProperty(providerType));
+
+    if (providerType.isAnnotatedWith(ExcludeFromConnectivitySchema.class)) {
+      providerDeclarer.withModelProperty(new ExcludeFromConnectivitySchemaModelProperty());
+    }
 
     loader.parseExternalLibs(providerType, providerDeclarer);
 

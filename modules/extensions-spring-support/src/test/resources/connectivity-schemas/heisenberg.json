@@ -1,0 +1,104 @@
+[
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-heisenberg-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "fullyBald": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "beardTrimming": {
+              "range": "string",
+              "mandatory": false
+            },
+            "saulPhoneNumber": {
+              "propertyTerm": "connectivity.port",
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "connection",
+      "system": "Heisenberg",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-heisenberg-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "fullyBald": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "beardTrimming": {
+              "range": "string",
+              "mandatory": false
+            },
+            "saulPhoneNumber": {
+              "propertyTerm": "connectivity.port",
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "secure",
+      "system": "Heisenberg",
+      "type": "connectivity.Connection"
+    }
+  }
+]

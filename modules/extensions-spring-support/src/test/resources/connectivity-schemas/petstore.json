@@ -1,0 +1,237 @@
+[
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-petstore-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "password": {
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "connection",
+      "system": "petstore",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-petstore-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "password": {
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "invalid",
+      "system": "petstore",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-petstore-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "password": {
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "pooled",
+      "system": "petstore",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-petstore-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "password": {
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "transactional",
+      "system": "petstore",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-petstore-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "password": {
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "valid",
+      "system": "petstore",
+      "type": "connectivity.Connection"
+    }
+  }
+]

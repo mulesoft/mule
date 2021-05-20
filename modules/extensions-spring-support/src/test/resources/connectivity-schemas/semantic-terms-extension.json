@@ -1,0 +1,783 @@
+[
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-semantic-terms-apikeyauthenticationconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
+        "Connection": {
+          "mapping": {
+            "endpoint": {
+              "propertyTerm": "apiContract.endPoint",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiKey": {
+              "propertyTerm": "connectivity.apiKey",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "domain": {
+              "propertyTerm": "connectivity.domain",
+              "range": "string",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "urlPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ApiKeyAuthenticationConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "api-key",
+      "system": "Semantic Terms",
+      "type": "connectivity.ApiKeyAuthenticationConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-semantic-terms-basicauthenticationconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
+        "Connection": {
+          "mapping": {
+            "endpoint": {
+              "propertyTerm": "apiContract.endPoint",
+              "range": "string",
+              "mandatory": true
+            },
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "domain": {
+              "propertyTerm": "connectivity.domain",
+              "range": "string",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "urlPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.BasicAuthenticationConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "basic-auth",
+      "system": "Semantic Terms",
+      "type": "connectivity.BasicAuthenticationConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-semantic-terms-apikeyauthenticationconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
+        "Connection": {
+          "mapping": {
+            "endpoint": {
+              "propertyTerm": "apiContract.endPoint",
+              "range": "string",
+              "mandatory": true
+            },
+            "clientId": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "domain": {
+              "propertyTerm": "connectivity.domain",
+              "range": "string",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "clientSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "urlPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ApiKeyAuthenticationConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "client-secret",
+      "system": "Semantic Terms",
+      "type": "connectivity.ApiKeyAuthenticationConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-semantic-terms-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
+        "Connection": {
+          "mapping": {
+            "tokenId": {
+              "propertyTerm": "connectivity.tokenId",
+              "range": "string",
+              "mandatory": true
+            },
+            "secretToken": {
+              "propertyTerm": "connectivity.secretToken",
+              "range": "string",
+              "mandatory": true
+            },
+            "sessionId": {
+              "propertyTerm": "connectivity.sessionId",
+              "range": "string",
+              "mandatory": true
+            },
+            "urlPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "securityToken": {
+              "propertyTerm": "connectivity.securityToken",
+              "range": "string",
+              "mandatory": true
+            },
+            "accountId": {
+              "propertyTerm": "connectivity.accountId",
+              "range": "string",
+              "mandatory": true
+            },
+            "endpoint": {
+              "propertyTerm": "apiContract.endPoint",
+              "range": "string",
+              "mandatory": true
+            },
+            "tenantName": {
+              "propertyTerm": "connectivity.tenant",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "domain": {
+              "propertyTerm": "connectivity.domain",
+              "range": "string",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "connectionId": {
+              "propertyTerm": "connectivity.connectionId",
+              "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "custom",
+      "system": "Semantic Terms",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-semantic-terms-digestauthenticationconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
+        "Connection": {
+          "mapping": {
+            "endpoint": {
+              "propertyTerm": "apiContract.endPoint",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "domain": {
+              "propertyTerm": "connectivity.domain",
+              "range": "string",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "urlPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.DigestAuthenticationConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "digest",
+      "system": "Semantic Terms",
+      "type": "connectivity.DigestAuthenticationConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-semantic-terms-kerberosauthenticationconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
+        "Connection": {
+          "mapping": {
+            "endpoint": {
+              "propertyTerm": "apiContract.endPoint",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "domain": {
+              "propertyTerm": "connectivity.domain",
+              "range": "string",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "urlPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.KerberosAuthenticationConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "kerberos",
+      "system": "Semantic Terms",
+      "type": "connectivity.KerberosAuthenticationConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-semantic-terms-unsecureconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "org.mule.test.semantic.extension.ProxyConfiguration": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "username": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.ProxyConfiguration"
+        },
+        "Connection": {
+          "mapping": {
+            "endpoint": {
+              "propertyTerm": "apiContract.endPoint",
+              "range": "string",
+              "mandatory": true
+            },
+            "port": {
+              "propertyTerm": "connectivity.port",
+              "range": "number",
+              "mandatory": true
+            },
+            "domain": {
+              "propertyTerm": "connectivity.domain",
+              "range": "string",
+              "mandatory": true
+            },
+            "host": {
+              "propertyTerm": "connectivity.host",
+              "range": "string",
+              "mandatory": true
+            },
+            "urlPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "url": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": true
+            },
+            "proxyConfiguration": {
+              "propertyTerm": "connectivity.proxyConfiguration",
+              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.UnsecureConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "unsecured",
+      "system": "Semantic Terms",
+      "type": "connectivity.UnsecureConnection"
+    }
+  }
+]

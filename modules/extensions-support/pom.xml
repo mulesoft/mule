@@ -39,6 +39,14 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-connectivity-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-connectivity-api-persistence</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -97,6 +105,13 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
             <version>${muleExtensionsApiVersion}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-connectivity-api</artifactId>
+            <version>${muleConnectivityApiVersion}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

@@ -1,14 +1,14 @@
 {
   "name": "RAM",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.4.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "ram",
     "namespace": "http://www.mulesoft.org/schema/mule/ram",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/ram/current/mule-ram.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.4.0-SNAPSHOT",
     "xsdFileName": "mule-ram.xsd"
   },
   "resources": [],
@@ -1398,7 +1398,9 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "wsdlUrl",
                   "description": "",
                   "modelProperties": {}
@@ -1427,7 +1429,9 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.endPoint"
+                  ],
                   "name": "service",
                   "description": "",
                   "modelProperties": {}
@@ -1456,7 +1460,9 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.port"
+                  ],
                   "name": "port",
                   "description": "",
                   "modelProperties": {}

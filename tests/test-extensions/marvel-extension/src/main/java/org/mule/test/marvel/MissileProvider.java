@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Path;
+import org.mule.sdk.api.annotation.semantics.file.FilePath;
 import org.mule.test.marvel.model.Missile;
 
 @Alias(NAME)
@@ -27,6 +28,7 @@ public class MissileProvider implements ConnectionProvider<Missile> {
   @Path(type = DIRECTORY)
   @Parameter
   @Optional
+  @FilePath
   private String missileConfigurationDirectory;
 
   @Override

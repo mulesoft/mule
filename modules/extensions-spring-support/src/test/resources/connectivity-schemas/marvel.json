@@ -1,0 +1,170 @@
+[
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-marvel-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "multipleConfig": {
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "mystic",
+      "system": "Marvel",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-marvel-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "multipleConfig": {
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "pooling-mystic",
+      "system": "Marvel",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-marvel-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "missileConfigurationDirectory": {
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "missile",
+      "system": "Marvel",
+      "type": "connectivity.Connection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-marvel-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "missileConfigurationDirectory": {
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "odd-missile",
+      "system": "Marvel",
+      "type": "connectivity.Connection"
+    }
+  }
+]

@@ -9,10 +9,11 @@ package org.mule.test.soap.extension;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
-
-import com.google.common.collect.ImmutableList;
+import org.mule.sdk.api.annotation.semantics.connectivity.Url;
 
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 public class LaLigaServiceProvider implements SoapServiceProvider {
 
@@ -27,6 +28,7 @@ public class LaLigaServiceProvider implements SoapServiceProvider {
   private String secondDivision;
 
   @Parameter
+  @Url
   private String wsdlLocation;
 
   public LaLigaServiceProvider() {}

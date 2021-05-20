@@ -39,6 +39,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
+import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -70,6 +71,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeM
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
+import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -144,6 +146,7 @@ public final class ParameterModelsLoaderDelegate {
       parseNullSafe(extensionParameter, parameter);
       parseLayout(extensionParameter, parameter);
       parseExclusiveOptional(extensionParameter, groupDeclarer, parameter);
+      parseExcludeFromConnectivitySchema(extensionParameter, parameter);
       parameter.withModelProperty(new ExtensionParameterDescriptorModelProperty(extensionParameter));
       extensionParameter.getDeclaringElement().ifPresent(element -> addImplementingTypeModelProperty(element, parameter));
       parseParameterDsl(extensionParameter, parameter);
@@ -189,6 +192,11 @@ public final class ParameterModelsLoaderDelegate {
                                                     exclusiveParametersDeclaration.isRequiresOne());
           parameter.withModelProperty(new ExclusiveOptionalModelProperty(exclusiveParametersModel));
         });
+  }
+
+  private void parseExcludeFromConnectivitySchema(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
+    extensionParameter.getAnnotation(ExcludeFromConnectivitySchema.class)
+        .ifPresent(a -> parameter.withModelProperty(new ExcludeFromConnectivitySchemaModelProperty()));
   }
 
   private void parseConfigOverride(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {

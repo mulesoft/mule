@@ -1,0 +1,50 @@
+[
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-metadata-connection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "password": {
+              "propertyTerm": "connectivity.password",
+              "range": "string",
+              "mandatory": false
+            },
+            "user": {
+              "propertyTerm": "connectivity.username",
+              "range": "string",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.Connection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "connection",
+      "system": "Metadata",
+      "type": "connectivity.Connection"
+    }
+  }
+]

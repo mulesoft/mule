@@ -1,14 +1,14 @@
 {
   "name": "Heisenberg",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.4.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "SELECT",
   "xmlDsl": {
     "prefix": "heisenberg",
     "namespace": "http://www.mulesoft.org/schema/mule/heisenberg",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.4.0-SNAPSHOT",
     "xsdFileName": "mule-heisenberg.xsd"
   },
   "resources": [
@@ -1748,7 +1748,9 @@
                 "order": 29
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -16888,7 +16890,10 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.port",
+                    "telephone"
+                  ],
                   "name": "saulPhoneNumber",
                   "description": "",
                   "modelProperties": {}
@@ -16936,7 +16941,9 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "hairy"
+                  ],
                   "name": "fullyBald",
                   "description": "",
                   "modelProperties": {}
@@ -17291,7 +17298,10 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.port",
+                    "telephone"
+                  ],
                   "name": "saulPhoneNumber",
                   "description": "",
                   "modelProperties": {}
@@ -17894,7 +17904,9 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "hairy"
+                  ],
                   "name": "fullyBald",
                   "description": "",
                   "modelProperties": {}
@@ -30864,7 +30876,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -30967,7 +30981,9 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -36121,7 +36137,9 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -49016,7 +49034,10 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.port",
+                "telephone"
+              ],
               "name": "saulPhoneNumber",
               "description": "",
               "modelProperties": {}
@@ -49064,7 +49085,9 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -49419,7 +49442,10 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.port",
+                "telephone"
+              ],
               "name": "saulPhoneNumber",
               "description": "",
               "modelProperties": {}
@@ -50022,7 +50048,9 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "hairy"
+              ],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
