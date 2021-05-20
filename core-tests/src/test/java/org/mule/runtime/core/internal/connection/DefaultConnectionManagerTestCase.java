@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -38,6 +39,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
+
+  private static final String CONNECTION_CREATION_FAILURE_MESSAGE = "Invalid credentials! Connection failed to create";
 
   private Apple config = new Apple();
 
@@ -173,6 +176,21 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
     verify(connectionProvider).connect();
     verify(connectionProvider, atLeastOnce()).validate(connection);
     verify(connectionProvider, never()).disconnect(connection);
+  }
+
+  @Test
+  public void connectionProviderFailsToCreateConnectionOnConnectivityTest() throws Exception {
+    when(testeableConnectionProvider.connect())
+        .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
+    ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
+
+    assertThat(result.isValid(), is(false));
+    assertThat(result.getMessage(), is(CONNECTION_CREATION_FAILURE_MESSAGE));
+    assertThat(result.getException(), instanceOf(ConnectionException.class));
+
+    verify(testeableConnectionProvider).connect();
+    verify(testeableConnectionProvider, never()).validate(connection);
+    verify(testeableConnectionProvider, never()).disconnect(connection);
   }
 
 }
