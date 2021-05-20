@@ -108,7 +108,7 @@ public class FeatureFlaggingServiceBuilderTestCase extends AbstractMuleTestCase 
   public void testBuildUsingMuleContextConfigs() {
     FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
         .withContext(muleContext)
-        .withMuleContextConfigurations(muleContextConfigs)
+        .withMuleContextFlags(muleContextConfigs)
         .build();
     assertThat(featureFlaggingService.isEnabled(feature), is(expected));
   }
@@ -117,7 +117,7 @@ public class FeatureFlaggingServiceBuilderTestCase extends AbstractMuleTestCase 
   public void testBuildUsingFeatureContextConfigs() {
     FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
         .withContext(featureContext)
-        .withFeatureContextConfigurations(featureContextConfigs)
+        .withFeatureContextFlags(featureContextConfigs)
         .build();
     assertThat(featureFlaggingService.isEnabled(feature), is(expected));
   }

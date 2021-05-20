@@ -24,7 +24,8 @@ import org.slf4j.Logger;
 
 /**
  * <p>
- * This builder creates a {@link FeatureFlaggingService} whose {@link Feature} flags can be configured using a
+ * This builder creates a {@link FeatureFlaggingService} whose {@link Feature} flags are set by evaluating the features registered
+ * via {@link org.mule.runtime.core.api.config.FeatureFlaggingRegistry#registerFeatureFlag(Feature, Predicate)} against a
  * {@link FeatureContext}.
  * </p>
  * <p>
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
  * </p>
  *
  * @see FeatureFlaggingService
+ * @see org.mule.runtime.core.api.config.FeatureFlaggingRegistry
  * @since 4.4.0
  */
 public final class FeatureFlaggingServiceBuilder {
@@ -46,10 +48,9 @@ public final class FeatureFlaggingServiceBuilder {
   private final Map<Feature, Predicate<MuleContext>> muleContextFlags = new HashMap<>();
 
   /**
-   * Sets the {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)} evaluation.
+   * Sets the {@link MuleContext} that will be used for the legacy {@link #withMuleContextFlags(Map)} evaluation.
    *
-   * @param muleContext {@link MuleContext} that will be used for the legacy {@link #withMuleContextConfigurations(Map)}
-   *                    evaluation.
+   * @param muleContext {@link MuleContext} that will be used for the legacy {@link #withMuleContextFlags(Map)} evaluation.
    * @return This {@link FeatureFlaggingServiceBuilder}.
    */
   public FeatureFlaggingServiceBuilder withContext(MuleContext muleContext) {
@@ -61,9 +62,9 @@ public final class FeatureFlaggingServiceBuilder {
   }
 
   /**
-   * Sets the {@link FeatureContext} that will be used for the legacy {@link #withFeatureContextConfigurations(Map)} evaluation.
+   * Sets the {@link FeatureContext} that will be used for the {@link #withFeatureContextFlags(Map)} evaluation.
    *
-   * @param featureContext {@link FeatureContext} that will be used for the legacy {@link #withFeatureContextConfigurations(Map)}
+   * @param featureContext {@link FeatureContext} that will be used for the legacy {@link #withFeatureContextFlags(Map)}
    *                       evaluation.
    * @return This {@link FeatureFlaggingServiceBuilder}.
    */
@@ -79,7 +80,7 @@ public final class FeatureFlaggingServiceBuilder {
    * @param configurations The features and their corresponding predicates.
    * @return This {@link FeatureFlaggingServiceBuilder}.
    */
-  public FeatureFlaggingServiceBuilder withFeatureContextConfigurations(Map<Feature, Predicate<FeatureContext>> configurations) {
+  public FeatureFlaggingServiceBuilder withFeatureContextFlags(Map<Feature, Predicate<FeatureContext>> configurations) {
     this.featureContextFlags.putAll(configurations);
     return this;
   }
@@ -90,7 +91,7 @@ public final class FeatureFlaggingServiceBuilder {
    * @param configurations The features and their corresponding predicates.
    * @return This {@link FeatureFlaggingServiceBuilder}.
    */
-  public FeatureFlaggingServiceBuilder withMuleContextConfigurations(Map<Feature, Predicate<MuleContext>> configurations) {
+  public FeatureFlaggingServiceBuilder withMuleContextFlags(Map<Feature, Predicate<MuleContext>> configurations) {
     this.muleContextFlags.putAll(configurations);
     return this;
   }

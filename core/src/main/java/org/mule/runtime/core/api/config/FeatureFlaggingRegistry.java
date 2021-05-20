@@ -71,7 +71,9 @@ public class FeatureFlaggingRegistry {
    * @param feature   Name representing the registered feature
    * @param condition This predicate will be evaluated at deployment time. The {@link MuleContext} corresponds to the context that
    *                  is being created for this application.
+   * @deprecated Use {@link #registerFeatureFlag(Feature, Predicate)} instead.
    */
+  @Deprecated
   public void registerFeature(Feature feature, Predicate<MuleContext> condition) {
     validate(feature, condition);
     Predicate<MuleContext> added = configurations.putIfAbsent(feature, condition);
@@ -111,11 +113,18 @@ public class FeatureFlaggingRegistry {
    * Returns all the configurations that were registered by using {@link #registerFeature(Feature, Predicate)}
    *
    * @return An unmodifiable map with the registered features.
+   * @deprecated Use {@link #registerFeatureFlag(Feature, Predicate)} and {@link #getFeatureFlagConfigurations()} instead.
    */
+  @Deprecated
   public Map<Feature, Predicate<MuleContext>> getFeatureConfigurations() {
     return unmodifiableMap(configurations);
   }
 
+  /**
+   * Returns all the configurations that were registered by using {@link #registerFeatureFlag(Feature, Predicate)}
+   *
+   * @return An unmodifiable map with the registered features.
+   */
   public Map<Feature, Predicate<FeatureContext>> getFeatureFlagConfigurations() {
     return featureFlagConfigurations;
   }
