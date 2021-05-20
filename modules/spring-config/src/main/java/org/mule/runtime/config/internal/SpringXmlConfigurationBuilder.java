@@ -22,7 +22,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
@@ -30,8 +29,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.util.BaseArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
@@ -39,7 +36,7 @@ import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -52,22 +49,16 @@ import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfiguration
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
-import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.CompositeMuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
-import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
-import org.mule.runtime.properties.api.ConfigurationProperty;
-import org.mule.runtime.properties.internal.DefaultConfigurationProperty;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -187,17 +178,16 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private MuleArtifactContext doCreateApplicationContext(MuleContext muleContext,
                                                          ArtifactDeclaration artifactDeclaration,
                                                          OptionalObjectsController optionalObjectsController) {
-    MuleArtifactContext muleArtifactContext;
-
     ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
         this.componentBuildingDefinitionRegistryFactory
             .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
 
     final ArtifactAst artifactAst =
-        createApplicationModel(muleContext.getErrorTypeRepository(), getExtensions(muleContext.getExtensionManager()),
+        createApplicationModel(getExtensions(muleContext.getExtensionManager()),
                                artifactDeclaration, resolveArtifactConfigResources(), getArtifactProperties(),
                                disableXmlValidations);
 
+    MuleArtifactContext muleArtifactContext;
     if (enableLazyInit) {
       muleArtifactContext = new LazyMuleArtifactContext(muleContext, artifactAst,
                                                         optionalObjectsController,
@@ -222,7 +212,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     return extensionManager == null ? emptySet() : extensionManager.getExtensions();
   }
 
-  private ArtifactAst createApplicationModel(ErrorTypeRepository errorTypeRepository, Set<ExtensionModel> extensions,
+  private ArtifactAst createApplicationModel(Set<ExtensionModel> extensions,
                                              ArtifactDeclaration artifactDeclaration,
                                              ConfigResource[] artifactConfigResources,
                                              Map<String, String> artifactProperties,
@@ -235,7 +225,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           artifactAst = emptyArtifact();
         } else {
           final AstXmlParser parser =
-              createMuleXmlParser(errorTypeRepository, extensions, artifactProperties, disableXmlValidations);
+              createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
 
           artifactAst = parser.parse(stream(artifactConfigResources)
               .map((CheckedFunction<ConfigResource, Pair<String, InputStream>>) (configFile -> new Pair<>(configFile
@@ -254,32 +244,10 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
   }
 
-  protected AstXmlParser createMuleXmlParser(ErrorTypeRepository errorTypeRepository, Set<ExtensionModel> extensions,
-                                             Map<String, String> artifactProperties, boolean disableXmlValidations) {
+  private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
+                                           Map<String, String> artifactProperties, boolean disableXmlValidations) {
     ConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
-
-          final ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
-
-          @Override
-          public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
-            final String propertyValue = artifactProperties.get(configurationAttributeKey);
-
-            if (propertyValue == null) {
-              return parentProvider.provide(configurationAttributeKey);
-            } else {
-              return of(new DefaultConfigurationProperty(this, configurationAttributeKey, propertyValue));
-            }
-          }
-
-          @Override
-          public String getDescription() {
-            return "Deployment properties";
-          }
-        });
-
-    final ErrorTypeRepository parentErrorTypeRepository =
-        ((ContributedErrorTypeRepository) errorTypeRepository).getDelegate();
+        new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
 
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
@@ -287,34 +255,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // declared in the policy, with a feature flag for getting the ones from the app as well (ref:
         // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
         .withExtensionModels(extensions)
-        // TODO MULE-19204 get and pass the actual parent artifact
-        .withParentArtifact(new BaseArtifactAst() {
-
-          @Override
-          public void updatePropertiesResolver(UnaryOperator<String> newPropertiesResolver) {
-            // nothing to do
-          }
-
-          @Override
-          public Stream<ComponentAst> topLevelComponentsStream() {
-            return Stream.empty();
-          }
-
-          @Override
-          public ErrorTypeRepository getErrorTypeRepository() {
-            return parentErrorTypeRepository;
-          }
-
-          @Override
-          public Set<ExtensionModel> dependencies() {
-            return emptySet();
-          }
-
-          @Override
-          public Optional<ArtifactAst> getParent() {
-            return empty();
-          }
-        });
+        .withParentArtifact(parentArtifactAst);
     if (disableXmlValidations) {
       builder = builder.withSchemaValidationsDisabled();
     }
