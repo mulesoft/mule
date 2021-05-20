@@ -74,7 +74,7 @@ public abstract class TransientRegistry extends AbstractRegistry {
           .withContext(muleContext)
           .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null), muleContext.getId()))
           .withMuleContextConfigurations(ffRegistry.getFeatureConfigurations())
-          .withFeatureContextConfigurations(ffRegistry.getDecoupledConfigurations())
+          .withFeatureContextConfigurations(ffRegistry.getFeatureFlagConfigurations())
           .build();
       defaultEntries.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
     }

@@ -17,7 +17,7 @@ public class FeatureFlaggingUtils {
 
   public static boolean isFeatureFlagEnabled(Feature feature, ArtifactDescriptor artifactDescriptor) {
     FeatureContext featureContext = new FeatureContext(artifactDescriptor.getMinMuleVersion(), artifactDescriptor.getName());
-    return FeatureFlaggingRegistry.getInstance().getDecoupledConfigurations().get(feature).test(featureContext);
+    return FeatureFlaggingRegistry.getInstance().getFeatureFlagConfigurations().get(feature).test(featureContext);
   }
 
 }

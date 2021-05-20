@@ -47,7 +47,7 @@ public class FeatureFlaggingRegistry {
   public static final String CONDITION_CAN_NOT_BE_NULL = "Error registering %s: condition can not be null";
 
   private final Map<Feature, Predicate<MuleContext>> configurations = new ConcurrentHashMap<>();
-  private final Map<Feature, Predicate<FeatureContext>> decoupledConfigurations = new ConcurrentHashMap<>();
+  private final Map<Feature, Predicate<FeatureContext>> featureFlagConfigurations = new ConcurrentHashMap<>();
 
   private static final FeatureFlaggingRegistry INSTANCE = new FeatureFlaggingRegistry();
 
@@ -92,7 +92,7 @@ public class FeatureFlaggingRegistry {
    */
   public void registerFeatureFlag(Feature feature, Predicate<FeatureContext> condition) {
     validate(feature, condition);
-    Predicate<FeatureContext> added = decoupledConfigurations.putIfAbsent(feature, condition);
+    Predicate<FeatureContext> added = featureFlagConfigurations.putIfAbsent(feature, condition);
     if (added != null) {
       throw new IllegalArgumentException(format(FEATURE_ALREADY_REGISTERED, feature));
     }
@@ -116,8 +116,8 @@ public class FeatureFlaggingRegistry {
     return unmodifiableMap(configurations);
   }
 
-  public Map<Feature, Predicate<FeatureContext>> getDecoupledConfigurations() {
-    return decoupledConfigurations;
+  public Map<Feature, Predicate<FeatureContext>> getFeatureFlagConfigurations() {
+    return featureFlagConfigurations;
   }
 
   /**
@@ -125,5 +125,6 @@ public class FeatureFlaggingRegistry {
    */
   protected void clearFeatureConfigurations() {
     configurations.clear();
+    featureFlagConfigurations.clear();
   }
 }
