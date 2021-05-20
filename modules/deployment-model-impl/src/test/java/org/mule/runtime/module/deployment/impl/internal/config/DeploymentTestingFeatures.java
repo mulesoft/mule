@@ -7,16 +7,30 @@
 package org.mule.runtime.module.deployment.impl.internal.config;
 
 import org.mule.runtime.api.config.Feature;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Features meant to be used in {@link Feature} flag related tests.
+ * 
+ * @see FeatureFlaggingUtils
+ * @see org.mule.runtime.api.config.FeatureFlaggingService
+ * @since 4.4.0
+ */
 public enum DeploymentTestingFeatures implements Feature {
 
-  TESTING_FEATURE("Testing feature", "MULE-123", "4.4.0"),
+  ALWAYS_ON_FEATURE("Testing feature", "MULE-123", "4.4.0");
 
-  TESTING_FEATURE_OVERRIDDEN_WITH_SYSTEM_PROPERTY("Testing feature", "MULE-123", "4.4.0", "mule.testing.feature-flagging");
+  private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
+  static {
+    if (!areFeatureFlagsConfigured.getAndSet(true)) {
+      FeatureFlaggingRegistry.getInstance().registerFeatureFlag(ALWAYS_ON_FEATURE, featureContext -> true);
+    }
+  }
 
   private final String description;
   private final String issue;

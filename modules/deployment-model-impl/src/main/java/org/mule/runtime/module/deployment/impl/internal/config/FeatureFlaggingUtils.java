@@ -22,7 +22,7 @@ public class FeatureFlaggingUtils {
   private FeatureFlaggingUtils() {}
 
   /**
-   * True if a {@link Feature} must be enabled, assuming that the given {@link ArtifactDescriptor} provides relevant
+   * True if a {@link Feature} is enabled, assuming that the given {@link ArtifactDescriptor} provides relevant
    * {@link FeatureContext} metadata.
    * 
    * @param feature            The {@link Feature}
