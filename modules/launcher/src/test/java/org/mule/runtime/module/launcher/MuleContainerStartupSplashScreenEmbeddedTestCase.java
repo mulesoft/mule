@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.module.launcher;
 
-import io.qameta.allure.Feature;
-import java.io.File;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
-
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.contains;
@@ -21,7 +14,16 @@ import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.junit4.matcher.StringContainsIgnoringLineBreaks.containsStringIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ArtifactPatchingFeature.ARTIFACT_PATCHING;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import java.io.File;
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
+
 @Feature(ARTIFACT_PATCHING)
+@Issue("MULE-19416")
 public class MuleContainerStartupSplashScreenEmbeddedTestCase
     extends AbstractSplashScreenTestCase<MuleContainerStartupSplashScreen> {
 

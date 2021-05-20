@@ -50,6 +50,10 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   private Logger LOGGER = LoggerFactory.getLogger(MuleContainerStartupSplashScreen.class);
   private boolean embeddedMode = false;
 
+  /**
+   * @param embeddedMode When true it means the splash screen should only display information relevant to the embedded mode thus
+   *                     avoiding consulting the tanuki WrapperManager
+   */
   public MuleContainerStartupSplashScreen(boolean embeddedMode) {
     this.embeddedMode = embeddedMode;
   }

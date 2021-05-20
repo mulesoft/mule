@@ -391,10 +391,19 @@ public class MuleContainer {
     MuleContainer.startupPropertiesFile = startupPropertiesFile;
   }
 
+  /**
+   * This flag can be set to true to indicate that the container is being ran in embedded mode which can be used to adapt some
+   * behaviours such as the info in the splash screen
+   * 
+   * @param embeddedMode set to true for embedded mode
+   */
   public void setEmbeddedMode(boolean embeddedMode) {
     this.embeddedMode = embeddedMode;
   }
 
+  /**
+   * @return true if the container is set to embedded mode (instead of standalone)
+   */
   public boolean isEmbeddedMode() {
     return embeddedMode;
   }
