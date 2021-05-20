@@ -80,7 +80,17 @@ public class FeatureFlaggingRegistry {
     }
   }
 
-  public void registerDecoupledFeature(Feature feature, Predicate<FeatureContext> condition) {
+  /**
+   * Registers a {@link Predicate} associated with a String which represents a given feature. The {@link Predicate} will be
+   * evaluated at deployment time, exposing all the features through a per-application overridden {@link FeatureFlaggingService}
+   *
+   * @see FeatureFlaggingService
+   *
+   * @param feature   Name representing the registered feature
+   * @param condition This predicate will be evaluated at deployment time. The {@link FeatureContext} metadata corresponds to the
+   *                  context that is being created for this application.
+   */
+  public void registerFeatureFlag(Feature feature, Predicate<FeatureContext> condition) {
     validate(feature, condition);
     Predicate<FeatureContext> added = decoupledConfigurations.putIfAbsent(feature, condition);
     if (added != null) {

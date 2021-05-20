@@ -72,7 +72,7 @@ public class PetStoreOperations {
         .registerFeature(LEGACY_FEATURE_ONE,
                          c -> c.getConfiguration().getMinMuleVersion().isPresent()
                              && !c.getConfiguration().getMinMuleVersion().get().newerThan("4.2.2"));
-    getInstance().registerDecoupledFeature(LEGACY_FEATURE_TWO, featureContext -> featureContext.getArtifactMinMuleVersion()
+    getInstance().registerFeatureFlag(LEGACY_FEATURE_TWO, featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> !muleVersion.newerThan("4.2.2")).isPresent());
   }
 

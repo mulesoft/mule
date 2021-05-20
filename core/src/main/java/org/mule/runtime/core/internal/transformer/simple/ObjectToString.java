@@ -159,10 +159,10 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
    */
   public static void configureToStringTransformerTransformIteratorElements() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerDecoupledFeature(TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS,
-                                                     featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                         .filter(muleVersion -> muleVersion.atLeast("4.4.0")
-                                                             || muleVersion.atLeast("4.3.1"))
-                                                         .isPresent());
+    featureFlaggingRegistry.registerFeatureFlag(TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")
+                                                        || muleVersion.atLeast("4.3.1"))
+                                                    .isPresent());
   }
 }

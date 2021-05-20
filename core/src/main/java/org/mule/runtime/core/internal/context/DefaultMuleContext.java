@@ -1190,13 +1190,13 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private static void configureSplitterExceptionHandlingFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerDecoupledFeature(HANDLE_SPLITTER_EXCEPTION, featureContext -> featureContext
+    featureFlaggingRegistry.registerFeatureFlag(HANDLE_SPLITTER_EXCEPTION, featureContext -> featureContext
         .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 
   private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerDecoupledFeature(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, featureContext -> false);
+    featureFlaggingRegistry.registerFeatureFlag(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, featureContext -> false);
   }
 
   /**
@@ -1208,7 +1208,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    */
   public static void configurePropertiesResolverFeatureFlag() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerDecoupledFeature(HONOUR_RESERVED_PROPERTIES, featureContext -> featureContext
+    featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES, featureContext -> featureContext
         .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.2.2")).isPresent());
   }
 }
