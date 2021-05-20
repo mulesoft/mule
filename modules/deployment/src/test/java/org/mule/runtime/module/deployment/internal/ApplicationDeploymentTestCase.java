@@ -543,7 +543,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     String appId = incompleteAppFileBuilder.getId();
     assertArtifactIsRegisteredAsZombie(appId, deploymentService.getZombieApplications());
-    assertThat(deploymentService.findApplication(appId).getArtifactContext().getRegistry(), nullValue());
+    assertThat(deploymentService.findApplication(appId).getArtifactContext(), nullValue());
   }
 
   @Test
@@ -560,8 +560,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
-    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getArtifactContext().getRegistry(),
-               nullValue());
+    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getArtifactContext(), nullValue());
   }
 
   @Test

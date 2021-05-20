@@ -63,7 +63,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       return;
     }
 
-    if (getArtifactContext() != null) {
+    if (getArtifactContext() != null && getArtifactContext().getRegistry() != null) {
       for (Flow flow : getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
         ((DefaultFlowBuilder.DefaultFlow) flow).doNotPersist();
       }

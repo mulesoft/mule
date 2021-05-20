@@ -268,7 +268,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             if (propertyValue == null) {
               return parentProvider.provide(configurationAttributeKey);
             } else {
-              return of(new DefaultConfigurationProperty(this, propertyValue, configurationAttributeKey));
+              return of(new DefaultConfigurationProperty(this, configurationAttributeKey, propertyValue));
             }
           }
 
