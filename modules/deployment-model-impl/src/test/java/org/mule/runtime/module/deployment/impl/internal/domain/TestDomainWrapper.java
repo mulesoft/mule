@@ -39,7 +39,7 @@ public class TestDomainWrapper implements Domain {
 
   @Override
   public Registry getRegistry() {
-    return delegate.getArtifactContext().getRegistry();
+    return delegate.getArtifactContext() == null ? null : delegate.getArtifactContext().getRegistry();
   }
 
   @Override

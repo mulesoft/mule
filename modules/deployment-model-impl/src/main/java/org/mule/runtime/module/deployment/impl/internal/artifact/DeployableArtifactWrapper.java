@@ -51,7 +51,7 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
 
   @Override
   public Registry getRegistry() {
-    return delegate.getArtifactContext().getRegistry();
+    return delegate.getArtifactContext() == null ? null : delegate.getArtifactContext().getRegistry();
   }
 
   @Override

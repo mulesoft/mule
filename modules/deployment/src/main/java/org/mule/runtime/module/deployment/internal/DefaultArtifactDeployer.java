@@ -99,7 +99,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
   private void addFlowStoppedListeners(T artifact) {
     appsFlowStoppedListeners.put(artifact.getArtifactName(), new ArrayList<>());
-    if (artifact.getArtifactContext().getRegistry() != null) {
+    if (artifact.getArtifactContext() != null && artifact.getArtifactContext().getRegistry() != null) {
       for (Flow flow : artifact.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
         FlowStoppedPersistenceListener flowStoppedPersistenceListener =
             new FlowStoppedDeploymentPersistenceListener(flow.getName(), artifact.getArtifactName());
