@@ -356,9 +356,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     public void complete(Object value) {
       if (isEnabled) {
         delegate.complete(value);
-      } {
+      } else {
         this.result = value;
-        isErrorCalled = true;
+        isCompleteCalled = true;
       }
     }
 
