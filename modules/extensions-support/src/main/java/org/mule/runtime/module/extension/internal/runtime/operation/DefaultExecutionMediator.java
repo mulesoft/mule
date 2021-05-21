@@ -19,9 +19,11 @@ import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -111,15 +113,62 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
 
     try {
+      DeferredExecutorCallback deferredCallback =
+          new DeferredExecutorCallback(getDelegateExecutorCallback(stats, callback, context));
+
       withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
-        executeWithInterceptors(executor, context, stats, callback);
+        executeWithInterceptors(executor, context, deferredCallback);
         return null;
       });
+
+      deferredCallback.enable();
     } catch (Exception e) {
       callback.error(e);
     } catch (Throwable t) {
       callback.error(wrapFatal(t));
     }
+  }
+
+  private ExecutorCallback getDelegateExecutorCallback(final MutableConfigurationStats stats,
+                                                       ExecutorCallback callback,
+                                                       ExecutionContextAdapter<M> context) {
+    return new ExecutorCallback() {
+
+      @Override
+      public void complete(Object value) {
+        // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
+        // Race conditions appear otherwise, specially in connection pooling scenarios.
+        if (stats != null) {
+          if (!isConnectedStreamingOperation(operationModel)) {
+            stats.discountActiveComponent();
+          }
+          stats.discountInflightOperation();
+        }
+        try {
+          interceptorChain.onSuccess(context, value);
+          callback.complete(value);
+        } catch (Throwable t) {
+          try {
+            t = handleError(t, context);
+          } finally {
+            callback.error(t);
+          }
+        }
+      }
+
+      @Override
+      public void error(Throwable t) {
+        try {
+          t = handleError(t, context);
+        } finally {
+          if (stats != null) {
+            stats.discountInflightOperation();
+            stats.discountActiveComponent();
+          }
+          callback.error(t);
+        }
+      }
+    };
   }
 
   private void executeWithRetry(ExecutionContextAdapter<M> context,
@@ -148,52 +197,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
   private void executeWithInterceptors(CompletableComponentExecutor<M> executor,
                                        ExecutionContextAdapter<M> context,
-                                       MutableConfigurationStats stats,
                                        ExecutorCallback executorCallback) {
-
-    ExecutorCallback callbackDelegate = new ExecutorCallback() {
-
-      @Override
-      public void complete(Object value) {
-        // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
-        // Race conditions appear otherwise, specially in connection pooling scenarios.
-        if (stats != null) {
-          if (!isConnectedStreamingOperation(operationModel)) {
-            stats.discountActiveComponent();
-          }
-          stats.discountInflightOperation();
-        }
-        try {
-          interceptorChain.onSuccess(context, value);
-          executorCallback.complete(value);
-        } catch (Throwable t) {
-          try {
-            t = handleError(t, context);
-          } finally {
-            executorCallback.error(t);
-          }
-        }
-      }
-
-      @Override
-      public void error(Throwable t) {
-        try {
-          t = handleError(t, context);
-        } finally {
-          if (stats != null) {
-            stats.discountInflightOperation();
-            stats.discountActiveComponent();
-          }
-          executorCallback.error(t);
-        }
-      }
-    };
-
     RetryPolicyTemplate retryPolicy = context.getRetryPolicyTemplate().orElse(null);
     if (retryPolicy != null && retryPolicy.isEnabled()) {
-      executeWithRetry(context, retryPolicy, callback -> executeCommand(executor, context, callback), callbackDelegate);
+      executeWithRetry(context, retryPolicy, callback -> executeCommand(executor, context, callback), executorCallback);
     } else {
-      executeCommand(executor, context, callbackDelegate);
+      executeCommand(executor, context, executorCallback);
     }
   }
 
@@ -324,6 +333,54 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     @Override
     public void error(Throwable e) {
       delegate.error(e);
+    }
+  }
+
+  private static class DeferredExecutorCallback implements ExecutorCallback {
+
+    private Throwable error = null;
+    private boolean isErrorCalled = false;
+
+    private Object result = null;
+    private boolean isCompleteCalled = false;
+
+    private final ExecutorCallback delegate;
+
+    private boolean isEnabled = false;
+
+    DeferredExecutorCallback(ExecutorCallback delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void complete(Object value) {
+      if (isEnabled) {
+        delegate.complete(value);
+      } {
+        this.result = value;
+        isErrorCalled = true;
+      }
+    }
+
+    @Override
+    public void error(Throwable e) {
+      if (isEnabled) {
+        delegate.error(e);
+      } else {
+        this.error = e;
+        isErrorCalled = true;
+      }
+    }
+
+    public void enable() {
+      isEnabled = true;
+      if (isErrorCalled) {
+        delegate.error(error);
+      }
+
+      if (isCompleteCalled) {
+        delegate.complete(result);
+      }
     }
   }
 }
