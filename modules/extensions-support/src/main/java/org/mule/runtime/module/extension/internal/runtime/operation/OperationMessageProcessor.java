@@ -147,13 +147,13 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   @Override
-  protected boolean mayJumpThreads() {
+  protected boolean mayCompleteInDifferentThread() {
     // If the operation is non blocking we can guarantee that that the processor will jump threads.
     if (!isBlocking()) {
       return true;
     }
 
-    return super.mayJumpThreads();
+    return super.mayCompleteInDifferentThread();
   }
 
   @Override
