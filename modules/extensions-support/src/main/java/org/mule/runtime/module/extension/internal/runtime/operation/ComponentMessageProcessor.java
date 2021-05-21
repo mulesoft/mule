@@ -302,11 +302,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     return subscriberContext()
         .flatMapMany(ctx -> {
-          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, mayCompleteInDifferentThread, ctx)
-              .doOnNext(result -> {
-                removeSdkInternalContextFromResult(location, result);
-              })
-              .map(propagateErrorResponseMapper());
+          Flux<CoreEvent> transformed =
+              createOuterFlux(from(publisher), localOperatorErrorHook, mayCompleteInDifferentThread, ctx)
+                  .doOnNext(result -> {
+                    removeSdkInternalContextFromResult(location, result);
+                  })
+                  .map(propagateErrorResponseMapper());
 
           if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
             return transformed
