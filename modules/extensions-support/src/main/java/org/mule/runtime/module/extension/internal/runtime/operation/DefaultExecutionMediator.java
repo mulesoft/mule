@@ -112,16 +112,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       stats.addInflightOperation();
     }
 
-    try {
-      DeferredExecutorCallback deferredCallback =
-          new DeferredExecutorCallback(getDelegateExecutorCallback(stats, callback, context));
-
+    try (DeferredExecutorCallback deferredCallback =
+        new DeferredExecutorCallback(getDelegateExecutorCallback(stats, callback, context))) {
       withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
         executeWithInterceptors(executor, context, deferredCallback);
         return null;
       });
-
-      deferredCallback.enable();
     } catch (Exception e) {
       callback.error(e);
     } catch (Throwable t) {
@@ -336,7 +332,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
-  private static class DeferredExecutorCallback implements ExecutorCallback {
+  private static class DeferredExecutorCallback implements ExecutorCallback, AutoCloseable {
 
     private Throwable error = null;
     private boolean isErrorCalled = false;
@@ -372,7 +368,8 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       }
     }
 
-    public void enable() {
+    @Override
+    public void close() throws Exception {
       isEnabled = true;
       if (isErrorCalled) {
         delegate.error(error);
