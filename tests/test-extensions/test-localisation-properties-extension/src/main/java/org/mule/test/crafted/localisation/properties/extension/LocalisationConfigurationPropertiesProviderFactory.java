@@ -6,11 +6,11 @@
  */
 package org.mule.test.crafted.localisation.properties.extension;
 
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.test.crafted.localisation.properties.extension.TestLocalisationPropertiesExtensionLoadingDelegate.EXTENSION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ResourceProvider;
@@ -33,7 +33,7 @@ public class LocalisationConfigurationPropertiesProviderFactory implements Confi
                                                                     UnaryOperator<String> localResolver,
                                                                     ResourceProvider externalResourceProvider) {
     String file = providerElementDeclaration.getParameter("file").getResolvedRawValue();
-    Preconditions.checkArgument(file != null, "Required attribute 'file' of 'locale-configuration-properties' not found");
+    requireNonNull(file, "Required attribute 'file' of 'locale-configuration-properties' not found");
 
     ComponentIdentifier languageComponentIdentifier =
         ComponentIdentifier.builder().namespace(EXTENSION_NAME).name("language").build();
