@@ -63,14 +63,14 @@ public class FeatureFlaggingRegistry {
   private FeatureFlaggingRegistry() {}
 
   /**
-   * Registers a {@link Predicate} associated with a String which represents a given feature. The {@link Predicate} will be
-   * evaluated at deployment time, exposing all the features through a per-application overridden {@link FeatureFlaggingService}
-   * 
+   * Registers a feature flag, represented by a {@link Feature} and a {@link Predicate}. Registered feature flags will be
+   * evaluated during deploy and exposed through a per-artifact {@link FeatureFlaggingService}.
+   *
    * @see FeatureFlaggingService
    * 
-   * @param feature   Name representing the registered feature
-   * @param condition This predicate will be evaluated at deployment time. The {@link MuleContext} corresponds to the context that
-   *                  is being created for this application.
+   * @param feature   {@link Feature} whose feature flag will be registered.
+   * @param condition {@link Predicate} That will be evaluated at deployment time. The {@link MuleContext} corresponds to the
+   *                  context that is being created for the artifact that is being deployed.
    * @deprecated Use {@link #registerFeatureFlag(Feature, Predicate)} instead.
    */
   @Deprecated
@@ -83,14 +83,14 @@ public class FeatureFlaggingRegistry {
   }
 
   /**
-   * Registers a {@link Predicate} associated with a String which represents a given feature. The {@link Predicate} will be
-   * evaluated at deployment time, exposing all the features through a per-application overridden {@link FeatureFlaggingService}
+   * Registers a feature flag, represented by a {@link Feature} and a {@link Predicate}. Registered feature flags will be
+   * evaluated during deploy and exposed through a per-artifact {@link FeatureFlaggingService}.
    *
    * @see FeatureFlaggingService
    *
-   * @param feature   Name representing the registered feature
-   * @param condition This predicate will be evaluated at deployment time. The {@link FeatureContext} metadata corresponds to the
-   *                  context that is being created for this application.
+   * @param feature   {@link Feature} whose feature flag will be registered.
+   * @param condition {@link Predicate} That will be evaluated at deployment time. The {@link FeatureContext} metadata corresponds
+   *                  to the artifact that is being deployed.
    */
   public void registerFeatureFlag(Feature feature, Predicate<FeatureContext> condition) {
     validate(feature, condition);

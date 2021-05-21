@@ -23,14 +23,11 @@ import org.mule.runtime.core.api.config.FeatureContext;
 import org.slf4j.Logger;
 
 /**
- * <p>
  * This builder creates a {@link FeatureFlaggingService} whose {@link Feature} flags are set by evaluating the features registered
  * via {@link org.mule.runtime.core.api.config.FeatureFlaggingRegistry#registerFeatureFlag(Feature, Predicate)} against a
  * {@link FeatureContext}.
- * </p>
  * <p>
  * Maintains backward compatibility with a legacy {@link org.mule.runtime.api.meta.MuleVersion} evaluation.
- * </p>
  *
  * @see FeatureFlaggingService
  * @see org.mule.runtime.core.api.config.FeatureFlaggingRegistry
