@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
@@ -104,6 +105,7 @@ public class FeatureFlaggingServiceBuilderTestCase extends AbstractMuleTestCase 
   }
 
   @Test
+  @Issue("MULE-19402")
   public void testBuildUsingMuleContextConfigs() {
     FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
         .withContext(muleContext)
@@ -113,6 +115,7 @@ public class FeatureFlaggingServiceBuilderTestCase extends AbstractMuleTestCase 
   }
 
   @Test
+  @Issue("MULE-19402")
   public void testBuildUsingFeatureContextConfigs() {
     FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
         .withContext(featureContext)
