@@ -21,7 +21,6 @@ import static org.mule.runtime.module.extension.internal.manager.DefaultConfigur
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -76,9 +75,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   @Inject
   private ExpressionManager expressionManager;
-
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
 
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
