@@ -838,4 +838,14 @@ public interface AllureConstants {
 
     }
   }
+  interface VariablesValues {
+
+    String VARIABLES_VALUES = "Variables";
+
+    interface NullValue {
+
+      String NULL_VALUE = "Null value";
+    }
+
+  }
 }
