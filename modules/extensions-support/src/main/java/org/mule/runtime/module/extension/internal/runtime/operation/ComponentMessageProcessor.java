@@ -60,25 +60,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -163,12 +144,30 @@ import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDeleg
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
 /**
@@ -298,16 +297,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
-    final boolean mayJumpThreads = mayJumpThreads();
+    final boolean mayCompleteInDifferentThread = mayCompleteInDifferentThread();
     final ComponentLocation location = getLocation();
 
     return subscriberContext()
         .flatMapMany(ctx -> {
-          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, mayJumpThreads, ctx)
-              .doOnNext(result -> {
-                removeSdkInternalContextFromResult(location, result);
-              })
-              .map(propagateErrorResponseMapper());
+          Flux<CoreEvent> transformed =
+              createOuterFlux(from(publisher), localOperatorErrorHook, mayCompleteInDifferentThread, ctx)
+                  .doOnNext(result -> {
+                    removeSdkInternalContextFromResult(location, result);
+                  })
+                  .map(propagateErrorResponseMapper());
 
           if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
             return transformed
@@ -335,7 +335,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Flux<Either<Throwable, CoreEvent>> createOuterFlux(final Flux<CoreEvent> publisher,
                                                              final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook,
-                                                             final boolean mayJumpThreads, Context ctx) {
+                                                             final boolean mayCompleteInDifferentThread,
+                                                             Context ctx) {
     final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
@@ -387,7 +388,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 }
               };
 
-              if (!mayJumpThreads && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
+              if (!mayCompleteInDifferentThread && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
                 onEvent(event, executorCallback, ctx);
@@ -418,7 +419,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public ProcessingType getProcessingType() {
-    if (mayJumpThreads()) {
+    if (mayCompleteInDifferentThread()) {
       // In this case, any thread switch will be done in the innerFlux
       return CPU_LITE;
     } else {
@@ -1019,7 +1020,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
 
   protected boolean isBlocking() {
-    return !mayJumpThreads();
+    return !mayCompleteInDifferentThread();
   }
 
   /**
@@ -1028,7 +1029,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    * 
    * @return whether it may jump threads.
    */
-  protected boolean mayJumpThreads() {
+  protected boolean mayCompleteInDifferentThread() {
     if (!requiresConfig()) {
       return false;
     }
