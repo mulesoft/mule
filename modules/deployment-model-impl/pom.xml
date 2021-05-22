@@ -113,7 +113,13 @@
             <groupId>org.mule.tools.maven</groupId>
             <artifactId>mule-classloader-model</artifactId>
         </dependency>
-        
+
+        <dependency>
+            <groupId>com.mulesoft.mule.tests</groupId>
+            <artifactId>mule-tests-allure</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>

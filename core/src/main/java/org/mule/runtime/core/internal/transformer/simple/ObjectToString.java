@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -153,22 +152,17 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
     this.featureFlags = featureFlags;
   }
 
-  private static final AtomicBoolean configured = new AtomicBoolean();
-
   /**
    * Configures {@link FeatureFlaggingService} for MULE-19323.
    *
    * @since 4.4
    */
   public static void configureToStringTransformerTransformIteratorElements() {
-
-    if (!configured.getAndSet(true)) {
-      FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-
-      ffRegistry.registerFeature(TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS,
-                                 ctx -> ctx.getConfiguration().getMinMuleVersion()
-                                     .map(v -> v.atLeast("4.4.0") || v.atLeast("4.3.1"))
-                                     .orElse(false));
-    }
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")
+                                                        || muleVersion.atLeast("4.3.1"))
+                                                    .isPresent());
   }
 }

@@ -12,11 +12,11 @@ import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstan
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
-import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE;
+import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE_ONE;
+import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE_TWO;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -66,11 +66,14 @@ public class PetStoreOperations {
   MuleVersion muleVersion;
 
   static {
-    // Register a feature that behaves differently with runtime versions older than 4.2.2
+    // Register features that behaves differently with runtime versions older than 4.2.2, enabling integration testing of both
+    // legacy and decoupled context feature flag set.
     getInstance()
-        .registerFeature(LEGACY_FEATURE,
+        .registerFeature(LEGACY_FEATURE_ONE,
                          c -> c.getConfiguration().getMinMuleVersion().isPresent()
                              && !c.getConfiguration().getMinMuleVersion().get().newerThan("4.2.2"));
+    getInstance().registerFeatureFlag(LEGACY_FEATURE_TWO, featureContext -> featureContext.getArtifactMinMuleVersion()
+        .filter(muleVersion -> !muleVersion.newerThan("4.2.2")).isPresent());
   }
 
   @Inject
@@ -97,9 +100,18 @@ public class PetStoreOperations {
   }
 
   @MediaType(TEXT_PLAIN)
-  public String featureFlaggedEcho(String message) {
+  public String featureFlaggedEchoMuleContext(String message) {
     // noinspection deprecation
-    if (ffService.isEnabled(LEGACY_FEATURE)) {
+    if (ffService.isEnabled(LEGACY_FEATURE_ONE)) {
+      return format("%s [old way]", message);
+    }
+    return message;
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String featureFlaggedEchoFeatureContext(String message) {
+    // noinspection deprecation
+    if (ffService.isEnabled(LEGACY_FEATURE_TWO)) {
       return format("%s [old way]", message);
     }
     return message;
