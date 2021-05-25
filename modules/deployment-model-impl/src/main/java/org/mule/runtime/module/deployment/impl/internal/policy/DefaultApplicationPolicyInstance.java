@@ -7,8 +7,6 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.lang.Boolean.getBoolean;
-import static java.lang.System.getProperty;
 import static java.util.Collections.singleton;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -47,8 +45,10 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
+import org.mule.runtime.module.deployment.impl.internal.config.FeatureFlaggingUtils;
 import org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
@@ -112,7 +112,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
             .setServiceRepository(serviceRepository)
             .setClassLoaderRepository(classLoaderRepository)
-            .setArtifactPlugins(featureFlaggedArtifactPlugins())
+            .setArtifactPlugins(featureFlaggedArtifactPlugins(template.getDescriptor()))
             .setParentArtifact(application)
             .setExtensionManagerFactory(featureFlaggedExtensionManagerFactory())
             .setMuleContextListener(muleContextListener);
@@ -140,16 +140,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    *
    * @return The policy artifact plugins.
    */
-  private List<ArtifactPlugin> featureFlaggedArtifactPlugins() {
-    // TODO: Create MULE with necessary FeatureFlaggingService improvements and list it here
-    boolean isPolicyIsolationEnabled;
-    Optional<String> policyIsolationPropertyName = ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName();
-    if (policyIsolationPropertyName.isPresent() && getProperty(policyIsolationPropertyName.get()) != null) {
-      isPolicyIsolationEnabled = getBoolean(policyIsolationPropertyName.get());
-    } else {
-      isPolicyIsolationEnabled = template.getArtifactClassLoader().getArtifactDescriptor().getMinMuleVersion().atLeast("4.4.0");
-    }
-    if (isPolicyIsolationEnabled) {
+  private List<ArtifactPlugin> featureFlaggedArtifactPlugins(ArtifactDescriptor policyArtifactDescriptor) {
+    if (FeatureFlaggingUtils.isFeatureEnabled(ENABLE_POLICY_ISOLATION, policyArtifactDescriptor)) {
       // Returns all the artifact plugins that the policy depends on.
       return template.getOwnArtifactPlugins();
     } else {
