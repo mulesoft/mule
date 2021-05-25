@@ -11,10 +11,15 @@ import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import java.util.Optional;
+
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
+
 /**
  * Utility class meant to provide a {@link org.mule.runtime.api.config.FeatureFlaggingService} substitute during the earlier
  * stages of the deployment, when such service is not available yet.
- * 
+ *
  * @since 4.4.0
  */
 public class FeatureFlaggingUtils {
@@ -24,14 +29,18 @@ public class FeatureFlaggingUtils {
   /**
    * True if a {@link Feature} is enabled, assuming that the given {@link ArtifactDescriptor} provides relevant
    * {@link FeatureContext} metadata.
-   * 
+   *
    * @param feature            The {@link Feature}
    * @param artifactDescriptor Relevant {@link ArtifactDescriptor}
    * @return True if the {@link Feature} must be enabled.
    */
   public static boolean isFeatureEnabled(Feature feature, ArtifactDescriptor artifactDescriptor) {
     FeatureContext featureContext = new FeatureContext(artifactDescriptor.getMinMuleVersion(), artifactDescriptor.getName());
-    return FeatureFlaggingRegistry.getInstance().getFeatureFlagConfigurations().get(feature).test(featureContext);
+    Optional<String> systemPropertyName = feature.getOverridingSystemPropertyName();
+    if (systemPropertyName.isPresent() && getProperty(systemPropertyName.get()) != null) {
+      return getBoolean(systemPropertyName.get());
+    } else {
+      return FeatureFlaggingRegistry.getInstance().getFeatureFlagConfigurations().get(feature).test(featureContext);
+    }
   }
-
 }
