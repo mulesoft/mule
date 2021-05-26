@@ -174,7 +174,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     retryPolicy.applyPolicy(() -> {
       CompletableFuture<Object> future = new CompletableFuture<>();
-      executeCommand.accept(new FutureExecutionCallbackDecorator(future));
+      executeCommand.accept(new FutureExecutionCallbackAdapter(future));
       return future;
     },
                             e -> shouldRetry(e, context),
@@ -283,26 +283,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
-  private static class FutureExecutionCallbackDecorator implements ExecutorCallback {
-
-    private final CompletableFuture<Object> future;
-
-    private FutureExecutionCallbackDecorator(CompletableFuture<Object> future) {
-      this.future = future;
-    }
-
-    @Override
-    public void complete(Object value) {
-      future.complete(value);
-    }
-
-    @Override
-    public void error(Throwable e) {
-      future.completeExceptionally(e);
-    }
-  }
-
-
   private static class TransformingExecutionCallbackDecorator<M extends ComponentModel> implements ExecutorCallback {
 
     private final ExecutorCallback delegate;
@@ -329,55 +309,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     @Override
     public void error(Throwable e) {
       delegate.error(e);
-    }
-  }
-
-  private static class DeferredExecutorCallback implements ExecutorCallback, AutoCloseable {
-
-    private Throwable error = null;
-    private boolean isErrorCalled = false;
-
-    private Object result = null;
-    private boolean isCompleteCalled = false;
-
-    private final ExecutorCallback delegate;
-
-    private boolean isEnabled = false;
-
-    DeferredExecutorCallback(ExecutorCallback delegate) {
-      this.delegate = delegate;
-    }
-
-    @Override
-    public void complete(Object value) {
-      if (isEnabled) {
-        delegate.complete(value);
-      } else {
-        this.result = value;
-        isCompleteCalled = true;
-      }
-    }
-
-    @Override
-    public void error(Throwable e) {
-      if (isEnabled) {
-        delegate.error(e);
-      } else {
-        this.error = e;
-        isErrorCalled = true;
-      }
-    }
-
-    @Override
-    public void close() throws Exception {
-      isEnabled = true;
-      if (isErrorCalled) {
-        delegate.error(error);
-      }
-
-      if (isCompleteCalled) {
-        delegate.complete(result);
-      }
     }
   }
 }
