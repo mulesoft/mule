@@ -29,4 +29,30 @@
         <set-payload value="SUCCESS"/>
     </flow>
 
+    <flow name="streamingReconnectWithParameterGroup">
+        <petstore:get-pets-with-parameter-group config-ref="petstore" name="jo" signature="#[vars.signature]"/>
+    </flow>
+
+    <flow name="streamingReconnectWithParameterGroupShowDsl">
+        <petstore:get-pets-with-parameter-group-show-dsl config-ref="petstore">
+            <petstore:owner name="jo" signature="#[vars.signature]"/>
+        </petstore:get-pets-with-parameter-group-show-dsl>
+    </flow>
+
+    <flow name="streamingReconnectWithParameterGroupShowDslWithTypedParameter">
+        <petstore:get-pets-with-parameter-group-show-dsl config-ref="petstore">
+            <petstore:owner name="jo" signature="#[vars.signature]" address="#[vars.address]"/>
+        </petstore:get-pets-with-parameter-group-show-dsl>
+    </flow>
+
+    <flow name="streamingReconnectWithParameterGroupShowDslWithParameterWithAlias">
+        <petstore:get-pets-with-parameter-group-show-dsl-parameter-with-alias config-ref="petstore">
+            <petstore:owner name="jo" signature="#[vars.signature]" certificate="#[vars.certificate]"/>
+        </petstore:get-pets-with-parameter-group-show-dsl-parameter-with-alias>
+    </flow>
+
+    <flow name="streamingReconnectWithTypedParameter">
+        <petstore:get-pets-with-typed-input-stream-parameter config-ref="petstore" owner="jo" signature="#[vars.signature]"/>
+    </flow>
+
 </mule>
