@@ -11,11 +11,9 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.test.crafted.localisation.properties.extension.TestLocalisationPropertiesExtensionLoadingDelegate.EXTENSION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
-import org.mule.runtime.properties.api.ResourceProvider;
-
-import java.util.function.UnaryOperator;
+import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 
 public class LocalisationConfigurationPropertiesProviderFactory implements ConfigurationPropertiesProviderFactory {
 
@@ -29,22 +27,14 @@ public class LocalisationConfigurationPropertiesProviderFactory implements Confi
   }
 
   @Override
-  public LocalisationConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
-                                                                    UnaryOperator<String> localResolver,
+  public LocalisationConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
                                                                     ResourceProvider externalResourceProvider) {
-    String file = providerElementDeclaration.getParameter("file").getResolvedRawValue();
+    String file = parameters.getStringParameter("file");
     requireNonNull(file, "Required attribute 'file' of 'locale-configuration-properties' not found");
 
     ComponentIdentifier languageComponentIdentifier =
         ComponentIdentifier.builder().namespace(EXTENSION_NAME).name("language").build();
-
-    ComponentAst language = providerElementDeclaration
-        .directChildrenStream()
-        .filter(c -> c.getIdentifier().equals(languageComponentIdentifier))
-        .findFirst()
-        .get();
-
-    String locale = language.getRawParameterValue("locale").orElseThrow(() -> new RuntimeException("A locale must be specified"));
+    String locale = parameters.getComplexConfigurationParameter(languageComponentIdentifier).get(0).getStringParameter("locale");
 
     return new LocalisationConfigurationPropertiesProvider(externalResourceProvider, file, locale);
   }

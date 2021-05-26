@@ -10,9 +10,9 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.runtime.properties.api.ConfigurationProperty;
-import org.mule.runtime.properties.api.DefaultConfigurationPropertiesProvider;
-import org.mule.runtime.properties.api.ResourceProvider;
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -39,10 +39,11 @@ public class LocalisationConfigurationPropertiesProvider extends DefaultConfigur
    * @return an Optional with the formatted value of the given key or {@link Optional#empty()} otherwise.
    */
   @Override
-  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
+  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
     if (configurationAttributeKey.startsWith(LOCALE_PREFIX)) {
       String effectiveKey = configurationAttributeKey.substring(LOCALE_PREFIX.length());
-      ConfigurationProperty property = super.provide("language.pattern").get();
+      // ConfigurationProperty property = super.getConfigurationProperty("language.pattern").get();
+      // ConfigurationProperty property = configurationAttributes.get("language.pattern");
       return of(new ConfigurationProperty() {
 
         @Override
@@ -51,10 +52,11 @@ public class LocalisationConfigurationPropertiesProvider extends DefaultConfigur
         }
 
         @Override
-        public String getValue() {
+        public Object getRawValue() {
           NumberFormat nf = NumberFormat.getInstance(new Locale(language, region));
           DecimalFormat formatter = (DecimalFormat) nf;
-          formatter.applyPattern(property.getValue());
+          // formatter.applyPattern(property.getRawValue().toString());
+          formatter.applyPattern("#,##0.00");
           return formatter.format(Double.parseDouble(effectiveKey));
         }
 
