@@ -512,7 +512,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
         try {
           resolvedTarget = resolveTargetFlowOrSubflow(event);
         } catch (MuleException e) {
-          return error(e);
+          throw new MuleRuntimeException(e);
         }
 
         Optional<Flow> targetAsFlow = resolvedTarget instanceof Flow ? of((Flow) resolvedTarget) : empty();
