@@ -57,24 +57,16 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
     if (key == null) {
       LOGGER.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
-    } else {
-      TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
-
-      if (typedValue.getValue() == null) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(format(
-                              "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
-                              key, valueEvaluator.getRawValue()));
-        }
-        return removeProperty((PrivilegedEvent) event, key);
-      } else {
-        typedValue = handleStreaming(typedValue, event, streamingManager);
-
-        return addProperty((PrivilegedEvent) event, key, typedValue
-            .getValue(), DataType.builder().type(typedValue.getDataType().getType())
-                .mediaType(getMediaType(typedValue)).charset(resolveEncoding(typedValue)).build());
-      }
     }
+    TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
+
+    if (typedValue.getValue() != null) {
+      typedValue = handleStreaming(typedValue, event, streamingManager);
+    }
+
+    return addProperty((PrivilegedEvent) event, key, typedValue.getValue(),
+                       DataType.builder().type(typedValue.getDataType().getType()).mediaType(getMediaType(typedValue))
+                           .charset(resolveEncoding(typedValue)).build());
   }
 
   protected TypedValue<T> handleStreaming(TypedValue<T> typedValue, CoreEvent event, StreamingManager streamingManager) {
