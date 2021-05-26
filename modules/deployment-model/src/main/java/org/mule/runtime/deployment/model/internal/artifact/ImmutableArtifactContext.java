@@ -40,7 +40,7 @@ public class ImmutableArtifactContext implements ArtifactContext {
   }
 
   @Override
-  public ArtifactAst getArttifactAst() {
+  public ArtifactAst getArtifactAst() {
     return emptyArtifact();
   }
 }

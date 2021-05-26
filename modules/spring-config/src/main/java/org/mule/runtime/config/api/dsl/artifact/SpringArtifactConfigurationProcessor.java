@@ -46,7 +46,7 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
                                           artifactContextConfiguration.getRuntimeLockFactory());
     artifactContextConfiguration.getParentArtifactContext()
         .ifPresent(parentContext -> springXmlConfigurationBuilder.setParentContext(parentContext.getMuleContext(),
-                                                                                   parentContext.getArttifactAst()));
+                                                                                   parentContext.getArtifactAst()));
     artifactContextConfiguration.getServiceConfigurators().stream()
         .forEach(springXmlConfigurationBuilder::addServiceConfigurator);
     springXmlConfigurationBuilder.configure(artifactContextConfiguration.getMuleContext());

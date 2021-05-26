@@ -33,6 +33,6 @@ public interface ArtifactContext {
   /**
    * @return the ast representation of this artifact.
    */
-  ArtifactAst getArttifactAst();
+  ArtifactAst getArtifactAst();
 
 }

@@ -72,7 +72,7 @@ public final class SpringXmlConfigurationBuilderFactory {
         new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP, false, false);
     if (domainArtifactContext != null) {
       springXmlConfigurationBuilder.setParentContext(domainArtifactContext.getMuleContext(),
-                                                     domainArtifactContext.getArttifactAst());
+                                                     domainArtifactContext.getArtifactAst());
     }
     return springXmlConfigurationBuilder;
   }
