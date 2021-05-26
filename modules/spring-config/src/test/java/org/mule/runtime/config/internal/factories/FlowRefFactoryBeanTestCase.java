@@ -82,7 +82,6 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -344,8 +343,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
                                                                                  eq(NULL_BINDING_CONTEXT), any(CoreEvent.class),
                                                                                  any(ComponentLocation.class), eq(true));
 
-    expectedException.expect(instanceOf(RoutePathNotFoundException.class));
-    getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT, "flow", applicationContext)).process(testEvent());
+    expectedException.expect(instanceOf(MuleRuntimeException.class));
+    getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT, "flow", applicationContext))
+        .process(testEvent());
   }
 
   @Test()
