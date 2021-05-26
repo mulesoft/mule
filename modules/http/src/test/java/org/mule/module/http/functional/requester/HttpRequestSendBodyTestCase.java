@@ -81,8 +81,12 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
         flow.process(event);
 
         assertThat(body, equalTo(""));
-        assertThat(headers.containsKey("Content-Length"), is(true));
-        assertThat(headers.get("Content-Length").iterator().next(), is("0"));
+        if (method.equals("POST")) {
+            assertThat(headers.containsKey("Content-Length"), is(true));
+            assertThat(headers.get("Content-Length").iterator().next(), is("0"));
+        } else {
+            assertThat(headers.containsKey("Content-Length"), is(false));
+        }
     }
 
     private void assertNotEmptyBody(String flowName, Object payload, String method) throws Exception
