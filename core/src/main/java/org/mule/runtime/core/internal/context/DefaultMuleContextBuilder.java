@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
@@ -92,7 +93,9 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     // values to be provided at a later time.
     final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
     muleContext.setErrorTypeRepository(contributedErrorTypeRepository);
-    muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
+    final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
+    contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
+    muleContext.setErrorTypeLocator(contributedErrorTypeLocator);
 
     final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
     muleContext.setRegistry(registry);
