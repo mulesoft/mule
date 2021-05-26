@@ -42,8 +42,7 @@ public class LocalisationConfigurationPropertiesProvider extends DefaultConfigur
   public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
     if (configurationAttributeKey.startsWith(LOCALE_PREFIX)) {
       String effectiveKey = configurationAttributeKey.substring(LOCALE_PREFIX.length());
-      // ConfigurationProperty property = super.getConfigurationProperty("language.pattern").get();
-      // ConfigurationProperty property = configurationAttributes.get("language.pattern");
+      ConfigurationProperty property = super.getConfigurationProperty("language.pattern").get();
       return of(new ConfigurationProperty() {
 
         @Override
@@ -55,8 +54,7 @@ public class LocalisationConfigurationPropertiesProvider extends DefaultConfigur
         public Object getRawValue() {
           NumberFormat nf = NumberFormat.getInstance(new Locale(language, region));
           DecimalFormat formatter = (DecimalFormat) nf;
-          // formatter.applyPattern(property.getRawValue().toString());
-          formatter.applyPattern("#,##0.00");
+          formatter.applyPattern(property.getRawValue().toString());
           return formatter.format(Double.parseDouble(effectiveKey));
         }
 
