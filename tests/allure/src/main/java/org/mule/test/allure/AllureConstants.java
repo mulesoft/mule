@@ -741,5 +741,5 @@ public interface AllureConstants {
     }
 
   }
-  
+
 }
