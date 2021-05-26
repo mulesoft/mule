@@ -23,7 +23,7 @@ import java.util.Optional;
 public final class StaticConfigurationPropertiesProvider implements ConfigurationPropertiesProvider {
 
   // this is static to avoid reading and processing the environment properties every time
-  private static final ConfigurationPropertiesProvider environmentProvider = new EnvironmentPropertiesConfigurationProvider();
+  private final ConfigurationPropertiesProvider environmentProvider = new EnvironmentPropertiesConfigurationProvider();
 
   private final Map<String, String> artifactProperties;
 
