@@ -85,6 +85,7 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
             assertThat(headers.containsKey("Content-Length"), is(true));
             assertThat(headers.get("Content-Length").iterator().next(), is("0"));
         } else {
+            // Issue: MULE-19019, this is the correct behaviour as of RFC7231: https://tools.ietf.org/html/rfc7231#section-4.3
             assertThat(headers.containsKey("Content-Length"), is(false));
         }
     }
