@@ -210,33 +210,45 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
   protected final MessageProcessorChain nestedChain;
+
   private final ReflectionCache reflectionCache;
   private final ResultTransformer resultTransformer;
   private final boolean hasNestedChain;
   private final long outerFluxTerminationTimeout;
   private final Object fluxSupplierDisposeLock = new Object();
+
   private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
+
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
   protected PolicyManager policyManager;
   private Optional<TransactionConfig> transactionConfig;
+
   @Inject
   private ErrorTypeLocator errorTypeLocator;
+
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
+
   @Inject
   private ExtensionConnectionSupplier extensionConnectionSupplier;
+
   @Inject
   private CursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
+
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
   private boolean initialised = false;
+
   private ProcessingStrategy processingStrategy;
   private boolean ownedProcessingStrategy = false;
   private FluxSinkSupplier<CoreEvent> fluxSupplier;
+
   private Scheduler outerFluxCompletionScheduler;
+
   private CursorComponentDecoratorFactory componentDecoratorFactory;
+
   /*
    * TODO: MULE-18483 When a policy is applied to an operation that has defined a target, it's necessary to wait until the policy
    * finishes to calculate the return value with {@link #returnDelegate}. But in this case, because of in order to execute the

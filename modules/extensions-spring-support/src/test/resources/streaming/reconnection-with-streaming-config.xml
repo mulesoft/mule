@@ -46,9 +46,9 @@
     </flow>
 
     <flow name="streamingReconnectWithParameterGroupShowDslWithParameterWithAlias">
-        <petstore:get-pets-with-parameter-group-show-dsl-parameter-with-alias config-ref="petstore">
+        <petstore:get-pets-with-parameter-group-show-dsl config-ref="petstore">
             <petstore:owner name="jo" signature="#[vars.signature]" certificate="#[vars.certificate]"/>
-        </petstore:get-pets-with-parameter-group-show-dsl-parameter-with-alias>
+        </petstore:get-pets-with-parameter-group-show-dsl>
     </flow>
 
     <flow name="streamingReconnectWithTypedParameter">

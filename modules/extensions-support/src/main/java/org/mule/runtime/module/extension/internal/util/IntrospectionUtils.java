@@ -1691,7 +1691,7 @@ public final class IntrospectionUtils {
     Map<ParameterGroupModel, Set<ParameterModel>> filteredParameters = new HashMap<>();
     componentModel.getParameterGroupModels().forEach(parameterGroupModel -> {
       parameterGroupModel.getParameterModels().stream()
-          .filter(p -> filter.test(p))
+          .filter(filter)
           .forEach(p -> filteredParameters.computeIfAbsent(parameterGroupModel, k -> new HashSet<>()).add(p));
     });
     return filteredParameters;
@@ -1743,6 +1743,4 @@ public final class IntrospectionUtils {
     }
     throw new NoSuchFieldException();
   }
-
-
 }

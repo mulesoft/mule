@@ -147,16 +147,11 @@ public class PetStoreOperations {
     if (owner.getAddress() != null) {
       IOUtils.toString(owner.getAddress().getValue());
     }
-    return getPets(client, config, owner.getName(), owner.getSignature());
-  }
 
-  public List<String> getPetsWithParameterGroupShowDslParameterWithAlias(@Connection PetStoreClient client,
-                                                                         @Config PetStoreConnector config,
-                                                                         @ParameterGroup(name = "Owner",
-                                                                             showInDsl = true) PetOwner owner) {
     if (owner.getOwnershipCertificate() != null) {
       IOUtils.toString(owner.getOwnershipCertificate());
     }
+
     return getPets(client, config, owner.getName(), owner.getSignature());
   }
 
