@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -21,8 +22,8 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isF
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getDefaultValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGroupKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
@@ -57,6 +58,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -165,12 +167,19 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
     Optional<ParameterGroupDescriptor> descriptor = group.getModelProperty(ParameterGroupModelProperty.class)
         .map(ParameterGroupModelProperty::getDescriptor);
 
-    String groupKey = descriptor
-        .map(d -> getContainerName(d.getContainer()))
-        .orElseGet(group::getName);
+    String groupKey = getGroupKey(group, descriptor);
 
     if (parameters.containsKey(groupKey)) {
-      resolverSet.add(groupKey, toValueResolver(parameters.get(groupKey), group.getModelProperties()));
+      Object value = parameters.get(groupKey);
+      if (value instanceof ObjectBuilderValueResolver) {
+        ObjectBuilderValueResolver objectResolver = (ObjectBuilderValueResolver) value;
+        try {
+          objectResolver.getParameters().forEach((k, v) -> resolverSet.add(groupKey + "." + k, (ValueResolver) v));
+        } catch (ValueResolvingException e) {
+          throw new MuleRuntimeException(createStaticMessage("Could not evaluate group resolves"), e);
+        }
+      }
+      resolverSet.add(groupKey, toValueResolver(value, group.getModelProperties()));
     } else if (descriptor.isPresent()) {
       resolverSet.add(groupKey,
                       NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
@@ -190,6 +199,8 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
       resolverSet.add(groupKey, MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext));
     }
   }
+
+
 
   public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameters, MuleContext context)
       throws ConfigurationException {

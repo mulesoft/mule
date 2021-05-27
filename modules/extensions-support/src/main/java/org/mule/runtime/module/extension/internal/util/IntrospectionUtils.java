@@ -108,6 +108,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -1744,5 +1745,14 @@ public final class IntrospectionUtils {
     throw new NoSuchFieldException();
   }
 
+  public static String getGroupKey(ParameterGroupModel group) {
+    return getGroupKey(group, group.getModelProperty(ParameterGroupModelProperty.class)
+        .map(ParameterGroupModelProperty::getDescriptor));
+  }
 
+  public static String getGroupKey(ParameterGroupModel group, Optional<ParameterGroupDescriptor> descriptor) {
+    return descriptor
+        .map(d -> getContainerName(d.getContainer()))
+        .orElseGet(group::getName);
+  }
 }

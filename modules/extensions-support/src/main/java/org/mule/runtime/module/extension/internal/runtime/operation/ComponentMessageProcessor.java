@@ -50,6 +50,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSO
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGroupKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
@@ -143,25 +144,23 @@ import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDele
 import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -169,7 +168,6 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -198,45 +196,58 @@ import reactor.util.context.Context;
 public abstract class ComponentMessageProcessor<T extends ComponentModel> extends ExtensionComponent<T>
     implements Processor, ParametersResolverProcessor<T>, Lifecycle {
 
-  public static final String COMPONENT_DECORATOR_FACTORY_KEY = "componentDecoratorFactory";
-  public static final String PROCESSOR_PATH_MDC_KEY = "processorPath";
-  static final String INVALID_TARGET_MESSAGE =
-      "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
+  public static final String COMPONENT_DECORATOR_FACTORY_KEY = "componentDecoratorFactory";
+
+  static final String INVALID_TARGET_MESSAGE =
+      "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
+  public static final String PROCESSOR_PATH_MDC_KEY = "processorPath";
+
+  private final ReflectionCache reflectionCache;
+  private final ResultTransformer resultTransformer;
+
   protected final ExtensionModel extensionModel;
+  private final boolean hasNestedChain;
   protected final ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
   protected final MessageProcessorChain nestedChain;
-  private final ReflectionCache reflectionCache;
-  private final ResultTransformer resultTransformer;
-  private final boolean hasNestedChain;
+
+  private Optional<TransactionConfig> transactionConfig;
   private final long outerFluxTerminationTimeout;
   private final Object fluxSupplierDisposeLock = new Object();
+
   private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
-  protected ExecutionMediator executionMediator;
-  protected CompletableComponentExecutor componentExecutor;
-  protected ReturnDelegate returnDelegate;
-  protected PolicyManager policyManager;
-  private Optional<TransactionConfig> transactionConfig;
+
   @Inject
   private ErrorTypeLocator errorTypeLocator;
+
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
+
   @Inject
   private ExtensionConnectionSupplier extensionConnectionSupplier;
+
   @Inject
   private CursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
+
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
   private boolean initialised = false;
+
   private ProcessingStrategy processingStrategy;
   private boolean ownedProcessingStrategy = false;
   private FluxSinkSupplier<CoreEvent> fluxSupplier;
+
   private Scheduler outerFluxCompletionScheduler;
+
   private CursorComponentDecoratorFactory componentDecoratorFactory;
+
+  protected ExecutionMediator executionMediator;
+  protected CompletableComponentExecutor componentExecutor;
+  protected ReturnDelegate returnDelegate;
   /*
    * TODO: MULE-18483 When a policy is applied to an operation that has defined a target, it's necessary to wait until the policy
    * finishes to calculate the return value with {@link #returnDelegate}. But in this case, because of in order to execute the
@@ -247,6 +258,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    * transforms an {@link Object} into a {@link CoreEvent}.
    */
   private ReturnDelegate valueReturnDelegate;
+  protected PolicyManager policyManager;
   private String processorPath = null;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
@@ -1147,17 +1159,31 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
-    Map<ParameterGroupModel, Set<ParameterModel>> streamParameters =
-        IntrospectionUtils.getFilteredParameters(componentModel, getStreamParameterFilter());
-    if (!streamParameters.isEmpty()) {
-      chainBuilder.addInterceptor(new CursorResetInterceptor(streamParameters, reflectionCache));
-    }
-  }
+    List<String> streamParams = new ArrayList<>(5);
+    componentModel.getParameterGroupModels().forEach(
+                                                     group -> group.getParameterModels().forEach(
+                                                                                                 p -> getType(p.getType(),
+                                                                                                              getClassLoader(extensionModel))
+                                                                                                                  .filter(clazz -> InputStream.class
+                                                                                                                      .isAssignableFrom(clazz)
+                                                                                                                      || Iterator.class
+                                                                                                                          .isAssignableFrom(clazz))
+                                                                                                                  .ifPresent(clazz -> {
+                                                                                                                    String key =
+                                                                                                                        group
+                                                                                                                            .isShowInDsl()
+                                                                                                                                ? getGroupKey(group)
+                                                                                                                                    + "."
+                                                                                                                                    + p.getName()
+                                                                                                                                : p.getName();
 
-  private Predicate<ParameterModel> getStreamParameterFilter() {
-    return p -> getType(p.getType(), getClassLoader(extensionModel))
-        .filter(clazz -> InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz))
-        .isPresent();
+                                                                                                                    streamParams
+                                                                                                                        .add(key);
+                                                                                                                  })));
+
+    if (!streamParams.isEmpty()) {
+      chainBuilder.addInterceptor(new CursorResetInterceptor(streamParams));
+    }
   }
 
   /**

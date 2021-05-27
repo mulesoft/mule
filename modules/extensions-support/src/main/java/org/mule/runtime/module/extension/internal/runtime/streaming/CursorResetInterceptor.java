@@ -10,20 +10,13 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This interceptor tracks all the {@link Cursor cursors} that were resolved as parameters of a given operation execution and the
@@ -38,18 +31,23 @@ import java.util.Set;
 public class CursorResetInterceptor implements Interceptor<OperationModel> {
 
   public static final String CURSOR_RESET_HANDLER_VARIABLE = "CURSOR_RESET_HANDLER";
-  private final Map<ParameterGroupModel, Set<ParameterModel>> cursorParametersMap;
-  private final ReflectionCache reflectionCache;
 
-  public CursorResetInterceptor(Map<ParameterGroupModel, Set<ParameterModel>> cursorParametersMap,
-                                ReflectionCache reflectionCache) {
-    this.cursorParametersMap = cursorParametersMap;
-    this.reflectionCache = reflectionCache;
+  private final List<String> cursorParamNames;
+
+  public CursorResetInterceptor(List<String> cursorParamNames) {
+    this.cursorParamNames = cursorParamNames;
   }
 
   @Override
   public void before(ExecutionContext<OperationModel> ctx) throws Exception {
-    List<Cursor> cursors = getParameterCursors(ctx);
+    List<Cursor> cursors = new ArrayList<>(cursorParamNames.size());
+    for (String cursorParamName : cursorParamNames) {
+      Object value = ctx.getParameterOrDefault(cursorParamName, null);
+      if (value instanceof Cursor) {
+        cursors.add((Cursor) value);
+      }
+    }
+
     if (!cursors.isEmpty()) {
       ((ExecutionContextAdapter<OperationModel>) ctx).setVariable(CURSOR_RESET_HANDLER_VARIABLE,
                                                                   new CursorResetHandler(cursors));
@@ -67,29 +65,5 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
     });
 
     return exception;
-  }
-
-  private List<Cursor> getParameterCursors(ExecutionContext<OperationModel> ctx) {
-    List<Cursor> cursors = new ArrayList<>();
-    cursorParametersMap.forEach(((parameterGroupModel, parameterModels) -> {
-      parameterModels.forEach(parameterModel -> {
-        Object value = getParameterValue(ctx, parameterGroupModel, parameterModel);
-        if (value instanceof Cursor) {
-          cursors.add((Cursor) value);
-        }
-      });
-    }));
-    return cursors;
-  }
-
-  private Object getParameterValue(ExecutionContext<OperationModel> ctx, ParameterGroupModel parameterGroupModel,
-                                   ParameterModel parameterModel) {
-    // TODO MULE-19446: Fix ExecutionContext API to correctly handle parameters value retrieval when defined within a parameter
-    // group with showInDsl=true
-    Object value = IntrospectionUtils.getParameterOrDefault(ctx, parameterGroupModel, parameterModel, null, reflectionCache);
-    if (value instanceof TypedValue) {
-      value = ((TypedValue) value).getValue();
-    }
-    return value;
   }
 }
