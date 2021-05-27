@@ -14,6 +14,7 @@ import org.mule.runtime.api.message.ErrorType;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 
 public class ContributedErrorTypeRepository implements ErrorTypeRepository {
@@ -69,7 +70,18 @@ public class ContributedErrorTypeRepository implements ErrorTypeRepository {
     this.delegate = delegate;
   }
 
+  @Override
+  public Set<ErrorType> getErrorTypes() {
+    return delegate.getErrorTypes();
+  }
+
+  @Override
+  public Set<ErrorType> getInternalErrorTypes() {
+    return delegate.getInternalErrorTypes();
+  }
+
   public ErrorTypeRepository getDelegate() {
     return delegate;
   }
+
 }
