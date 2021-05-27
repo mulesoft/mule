@@ -197,7 +197,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       "org.mule.runtime.module.deployment.internal.AbstractDeploymentTestCase$TestComponentOnRedeploy";
   protected static final String FLOW_PROPERTY_NAME_VALUE = "flow1";
   protected static final String FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY = "flow2";
-  private static final int DEPLOYMENT_TIMEOUT = 10000;
+  private static final int DEPLOYMENT_TIMEOUT = 20000;
   protected static final String[] NONE = new String[0];
   protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
   protected static final String MULE_POLICY_CLASSIFIER = "mule-policy";
