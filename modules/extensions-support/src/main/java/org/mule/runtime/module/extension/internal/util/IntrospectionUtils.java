@@ -97,6 +97,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueType
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -143,6 +144,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -154,12 +156,13 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -176,6 +179,8 @@ public final class IntrospectionUtils {
   static {
     setWeakHashCaches();
   }
+
+  private IntrospectionUtils() {}
 
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
@@ -195,8 +200,6 @@ public final class IntrospectionUtils {
       }
     }
   }
-
-  private IntrospectionUtils() {}
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
@@ -1674,5 +1677,70 @@ public final class IntrospectionUtils {
   public static void setValueIntoField(Object target, Object value, Field field) {
     FieldSetter setter = new FieldSetter<>(field);
     setter.set(target, value);
+  }
+
+  /**
+   * Returns, for each parameter group defined on the component model, all the parameters matching with the given filter
+   * 
+   * @param componentModel the component model used to filter the parameters
+   * @param filter         the filter to apply to the group model parameters
+   * @return The map having the parameter group as key and a set of its parameters matching the filter as value
+   */
+  public static Map<ParameterGroupModel, Set<ParameterModel>> getFilteredParameters(ComponentModel componentModel,
+                                                                                    Predicate<ParameterModel> filter) {
+    Map<ParameterGroupModel, Set<ParameterModel>> filteredParameters = new HashMap<>();
+    componentModel.getParameterGroupModels().forEach(parameterGroupModel -> {
+      parameterGroupModel.getParameterModels().stream()
+          .filter(filter)
+          .forEach(p -> filteredParameters.computeIfAbsent(parameterGroupModel, k -> new HashSet<>()).add(p));
+    });
+    return filteredParameters;
+  }
+
+  /**
+   * Returns the value associated to a parameter with model {@code parameterModel} on the group {@code parameterGroupModel} or
+   * {@code defaultValue} if such parameter is not present
+   * 
+   * @param ctx                 the execution where to look for the parameter
+   * @param parameterGroupModel the parameter group where the parameter is defined
+   * @param parameterModel      the parameter model which value will be returned
+   * @param defaultValue        the default value to return in case the parameter is not present
+   * @param reflectionCache     the {@link ReflectionCache} used to introspect the parameter value
+   * @param <T>                 the returned value's generic type
+   * @return the parameter's value or {@code defaultValue}
+   */
+  public static <T> T getParameterOrDefault(ExecutionContext<? extends ComponentModel> ctx,
+                                            ParameterGroupModel parameterGroupModel,
+                                            ParameterModel parameterModel, T defaultValue, ReflectionCache reflectionCache) {
+    if (!parameterGroupModel.isShowInDsl()) {
+      return ctx.getParameterOrDefault(parameterModel.getName(), defaultValue);
+    } else {
+      try {
+        Object container = ctx.getParameterOrDefault(getGroupModelContainerName(parameterGroupModel), defaultValue);
+        return (T) getParameterValue(container, parameterModel, reflectionCache);
+      } catch (Exception e) {
+        return defaultValue;
+      }
+    }
+  }
+
+  /**
+   * Returns the value for the given parameter of an object instance
+   *
+   * @param object          The object where to grab the parameter value from
+   * @param parameterModel  The parameter model for the parameter to obtain the value
+   * @param reflectionCache the cache for expensive reflection lookups
+   * @return The value of the parameter with the given parameter model on the object instance
+   * @throws IllegalAccessException if is unavailable to access to the field
+   * @throws NoSuchFieldException   if the field doesn't exist in the given object instance
+   */
+  public static Object getParameterValue(Object object, ParameterModel parameterModel,
+                                         ReflectionCache reflectionCache)
+      throws IllegalAccessException, NoSuchFieldException {
+    Optional<Field> field = getField(object.getClass(), parameterModel, reflectionCache);
+    if (field.isPresent()) {
+      return getFieldValue(object, field.get().getName(), reflectionCache);
+    }
+    throw new NoSuchFieldException();
   }
 }
