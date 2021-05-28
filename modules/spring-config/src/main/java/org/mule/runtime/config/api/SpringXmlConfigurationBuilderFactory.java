@@ -12,10 +12,10 @@ import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRu
 
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 import java.util.Map;
 
@@ -66,12 +66,13 @@ public final class SpringXmlConfigurationBuilderFactory {
 
   // TODO: MULE-19422 Remove testing infrastructure usages
   @Deprecated
-  public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, MuleContext domainContext)
+  public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, ArtifactContext domainArtifactContext)
       throws ConfigurationException {
     final SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
         new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP, false, false);
-    if (domainContext != null) {
-      springXmlConfigurationBuilder.setParentContext(domainContext);
+    if (domainArtifactContext != null) {
+      springXmlConfigurationBuilder.setParentContext(domainArtifactContext.getMuleContext(),
+                                                     domainArtifactContext.getArtifactAst());
     }
     return springXmlConfigurationBuilder;
   }

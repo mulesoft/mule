@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -14,35 +15,51 @@ import org.mule.runtime.api.message.ErrorType;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
+public class FilteredErrorTypeRepository implements ErrorTypeRepository {
 
-public class ContributedErrorTypeRepository implements ErrorTypeRepository {
+  private final ErrorTypeRepository delegate;
+  private final Set<String> filteredNamespaces;
 
-  private ErrorTypeRepository delegate = MULE_CORE_ERROR_TYPE_REPOSITORY;
+  public FilteredErrorTypeRepository(ErrorTypeRepository delegate, Set<String> filteredNamespaces) {
+    this.delegate = delegate;
+    this.filteredNamespaces = filteredNamespaces;
+  }
 
   @Override
   public ErrorType addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
-    return delegate.addErrorType(errorTypeIdentifier, parentErrorType);
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public ErrorType addInternalErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
-    return delegate.addInternalErrorType(errorTypeIdentifier, parentErrorType);
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Optional<ErrorType> lookupErrorType(ComponentIdentifier errorTypeComponentIdentifier) {
-    return delegate.lookupErrorType(errorTypeComponentIdentifier);
+    if (filteredNamespaces.contains(errorTypeComponentIdentifier.getNamespace())) {
+      return delegate.lookupErrorType(errorTypeComponentIdentifier);
+    } else {
+      return empty();
+    }
   }
 
   @Override
   public Optional<ErrorType> getErrorType(ComponentIdentifier errorTypeIdentifier) {
-    return delegate.getErrorType(errorTypeIdentifier);
+    if (filteredNamespaces.contains(errorTypeIdentifier.getNamespace())) {
+      return delegate.getErrorType(errorTypeIdentifier);
+    } else {
+      return empty();
+    }
   }
 
   @Override
   public Collection<String> getErrorNamespaces() {
-    return delegate.getErrorNamespaces();
+    return delegate.getErrorNamespaces().stream()
+        .filter(filteredNamespaces::contains)
+        .collect(toList());
   }
 
   @Override
@@ -65,11 +82,4 @@ public class ContributedErrorTypeRepository implements ErrorTypeRepository {
     return delegate.getCriticalErrorType();
   }
 
-  public void setDelegate(ErrorTypeRepository delegate) {
-    this.delegate = delegate;
-  }
-
-  public ErrorTypeRepository getDelegate() {
-    return delegate;
-  }
 }

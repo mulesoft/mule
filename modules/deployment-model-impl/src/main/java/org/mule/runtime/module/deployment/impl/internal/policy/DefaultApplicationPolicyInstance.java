@@ -120,7 +120,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setMuleContextListener(muleContextListener);
 
     artifactBuilder.withServiceConfigurator(customizationService -> {
-      Registry applicationRegistry = application.getRegistry();
+      Registry applicationRegistry = application.getArtifactContext().getRegistry();
 
       addPolicyCustomizationOverride(OBJECT_LOCK_PROVIDER, customizationService, applicationRegistry);
       addPolicyCustomizationOverride(BASE_PERSISTENT_OBJECT_STORE_KEY, customizationService, applicationRegistry);

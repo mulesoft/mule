@@ -7,7 +7,9 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.MuleContext;
@@ -96,7 +98,7 @@ public class ArtifactFactoryUtils {
    * @since 4.2
    */
   public static Optional<MuleContext> getMuleContext(DeployableArtifact artifact) {
-    return artifact != null && artifact.getRegistry() != null ? artifact.getRegistry().lookupByType(MuleContext.class) : empty();
+    return artifact == null ? empty() : ofNullable(artifact.getArtifactContext().getMuleContext());
   }
 
   /**

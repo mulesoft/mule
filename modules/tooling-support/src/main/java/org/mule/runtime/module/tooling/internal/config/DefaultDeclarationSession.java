@@ -62,21 +62,23 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
 
     final InternalDeclarationSession internalDeclarationService =
         new InternalDeclarationSession(application.getDescriptor().getArtifactDeclaration());
-    InternalDeclarationSession internalDeclarationSession = application.getRegistry()
-        .lookupByType(MuleContext.class)
-        .map(muleContext -> {
-          try {
-            return muleContext.getInjector().inject(internalDeclarationService);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(createStaticMessage("Could not inject values into DeclarationSession"));
-          }
-        })
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find injector to create InternalDeclarationSession")));
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Creation of declaration session to delegate calls took [{}ms]", currentTimeMillis() - startTime);
+    final MuleContext muleContext = application.getArtifactContext().getMuleContext();
+    if (muleContext == null) {
+      throw new MuleRuntimeException(createStaticMessage("Could not find injector to create InternalDeclarationSession"));
     }
 
-    return internalDeclarationSession;
+    try {
+      InternalDeclarationSession internalDeclarationSession = muleContext.getInjector().inject(internalDeclarationService);
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Creation of declaration session to delegate calls took [{}ms]", currentTimeMillis() - startTime);
+      }
+
+      return internalDeclarationSession;
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not inject values into DeclarationSession"));
+    }
+
   }
 
   private <T> T withInternalDeclarationSession(String functionName, Function<DeclarationSession, T> function) {

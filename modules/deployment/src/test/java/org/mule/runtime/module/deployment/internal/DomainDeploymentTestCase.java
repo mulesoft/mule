@@ -413,7 +413,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
+    assertNotNull(domain.getArtifactContext().getRegistry());
     assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
   }
 
@@ -469,7 +469,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(dummyDomainBundleFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
+    assertNotNull(domain.getArtifactContext().getRegistry());
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
     assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
@@ -534,7 +534,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
+    assertNotNull(domain.getArtifactContext().getRegistry());
     assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
   }
 
@@ -1155,7 +1155,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     domain.stop();
 
-    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
     Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
@@ -1173,7 +1173,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
 
-    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(domain);
 
     Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
@@ -1401,7 +1401,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     final Domain domain = findADomain(dummyDomainFileBuilder.getId());
-    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
 
@@ -1437,7 +1437,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     // Ensure resources are registered at domain's registry
     Domain domain = findADomain(sharedDomainFileBuilder.getId());
-    assertThat(domain.getRegistry().lookupByName("http-listener-config").isPresent(), is(true));
+    assertThat(domain.getArtifactContext().getRegistry().lookupByName("http-listener-config").isPresent(), is(true));
 
     ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
 
@@ -2005,7 +2005,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   private CompletionCallback<Object, Object> getCompletionCallback(String callbackName) {
-    Registry registry = deploymentService.getApplications().get(0).getRegistry();
+    Registry registry = deploymentService.getApplications().get(0).getArtifactContext().getRegistry();
     Map<String, CompletionCallback<Object, Object>> callbacksMap =
         (Map<String, CompletionCallback<Object, Object>>) registry.lookupByName("completion.callbacks").get();
     PollingProber.probe(() -> callbacksMap.containsKey(callbackName));

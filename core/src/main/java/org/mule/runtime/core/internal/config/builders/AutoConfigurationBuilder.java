@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.getResource;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -42,6 +43,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
   private final ArtifactType artifactType;
   private MuleContext parentContext;
+  private ArtifactAst parentAst;
 
   public AutoConfigurationBuilder(String resource, Map<String, String> artifactProperties, ArtifactType artifactType)
       throws ConfigurationException {
@@ -85,7 +87,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
                 configs.stream().map(ConfigResource::getResourceName).toArray(String[]::new), getArtifactProperties(),
                 artifactType});
         if (parentContext != null && cb instanceof ParentMuleContextAwareConfigurationBuilder) {
-          ((ParentMuleContextAwareConfigurationBuilder) cb).setParentContext(parentContext);
+          ((ParentMuleContextAwareConfigurationBuilder) cb).setParentContext(parentContext, parentAst);
         } else if (parentContext != null) {
           throw new MuleRuntimeException(createStaticMessage(format("ConfigurationBuilder %s does not support domain context",
                                                                     cb.getClass().getCanonicalName())));
@@ -100,7 +102,8 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
   }
 
   @Override
-  public void setParentContext(MuleContext parentContext) {
+  public void setParentContext(MuleContext parentContext, ArtifactAst parentAst) {
     this.parentContext = parentContext;
+    this.parentAst = parentAst;
   }
 }

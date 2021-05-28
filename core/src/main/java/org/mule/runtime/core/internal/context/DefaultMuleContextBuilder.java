@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.context;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 
@@ -64,8 +63,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected ObjectSerializer objectSerializer;
 
-  private ErrorTypeRepository errorTypeRepository;
-
   private Optional<Properties> deploymentProperties = empty();
 
   private List<MuleContextListener> listeners = new ArrayList<>();
@@ -91,17 +88,14 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
     muleContext.setArtifactType(artifactType);
 
+    // Instances of the repository and locator need to be injected into another objects before actually determining the possible
+    // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual
+    // values to be provided at a later time.
     final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
-    if (errorTypeRepository == null) {
-      contributedErrorTypeRepository.setDelegate(getCoreErrorTypeRepo());
-    } else {
-      contributedErrorTypeRepository.setDelegate(errorTypeRepository);
-    }
-
     muleContext.setErrorTypeRepository(contributedErrorTypeRepository);
-    final ContributedErrorTypeLocator errorTypeLocator = new ContributedErrorTypeLocator();
-    errorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
-    muleContext.setErrorTypeLocator(errorTypeLocator);
+    final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
+    contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
+    muleContext.setErrorTypeLocator(contributedErrorTypeLocator);
 
     final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
     muleContext.setRegistry(registry);
@@ -191,7 +185,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
    */
   @Override
   public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {
-    this.errorTypeRepository = errorTypeRepository;
+    // Nothing to do
   }
 
   private <T> T injectMuleContextIfRequired(T object, MuleContext muleContext) {

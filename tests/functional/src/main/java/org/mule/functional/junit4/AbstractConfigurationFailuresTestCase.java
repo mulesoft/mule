@@ -7,6 +7,7 @@
 package org.mule.functional.junit4;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.core.Is.is;
@@ -71,7 +72,8 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
         muleContext.setExtensionManager(defaultExtensionManager);
       }
     });
-    builders.add(createConfigurationBuilder(configuration, enableLazyInit(), disableXmlValidations()));
+    builders.add(createConfigurationBuilder(new String[] {configuration}, emptyMap(), APP, enableLazyInit(),
+                                            disableXmlValidations()));
     builders.add(testServicesConfigurationBuilder);
     builders.add(new TestPolicyProviderConfigurationBuilder());
     builders.add(new TestNotificationListenerRegistryConfigurationBuilder());

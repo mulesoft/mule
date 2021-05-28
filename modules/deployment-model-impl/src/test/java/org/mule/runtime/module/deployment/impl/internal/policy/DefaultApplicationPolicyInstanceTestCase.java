@@ -52,7 +52,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
     Application application = mock(Application.class, RETURNS_DEEP_STUBS);
 
-    Registry registry = application.getRegistry();
+    Registry registry = application.getArtifactContext().getRegistry();
     doReturn(of(mockContextWithServices())).when(registry).lookupByType(MuleContext.class);
     doReturn(of(mock(ExtensionManager.class))).when(registry).lookupByName(OBJECT_EXTENSION_MANAGER);
 

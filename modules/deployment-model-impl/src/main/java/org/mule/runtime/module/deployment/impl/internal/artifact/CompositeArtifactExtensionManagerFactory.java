@@ -50,7 +50,7 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
   @Override
   public ExtensionManager create(MuleContext muleContext) {
     ExtensionManager parentExtensionManager =
-        parentArtifact.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get();
+        parentArtifact.getArtifactContext().getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get();
 
     ExtensionManager extensionManager = super.create(muleContext, parentExtensionManager.getExtensions());
 

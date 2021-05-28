@@ -97,14 +97,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
     String configResources = getConfigResources();
     if (configResources != null) {
-      return createConfigurationBuilder(configResources, emptyMap(), APP, enableLazyInit(), disableXmlValidations());
+      return createConfigurationBuilder(new String[] {configResources}, emptyMap(), APP, enableLazyInit(),
+                                        disableXmlValidations());
     }
     configResources = getConfigFile();
     if (configResources != null) {
       if (configResources.contains(",")) {
         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
       }
-      return createConfigurationBuilder(configResources, artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
+      return createConfigurationBuilder(new String[] {configResources}, artifactProperties(), APP, enableLazyInit(),
+                                        disableXmlValidations());
     }
     return createConfigurationBuilder(getConfigFiles(), artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
   }

@@ -1342,8 +1342,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected CoreEvent executeApplicationFlow(String flowName, String correlationId) throws Exception {
     ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
     return withContextClassLoader(appClassLoader, () -> {
-      final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName)
-          .withPayload(TEST_MESSAGE);
+      final FlowRunner flowRunner =
+          new FlowRunner(deploymentService.getApplications().get(0).getArtifactContext().getRegistry(), flowName)
+              .withPayload(TEST_MESSAGE);
 
       if (correlationId != null) {
         flowRunner.withSourceCorrelationId(correlationId);
