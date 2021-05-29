@@ -43,6 +43,10 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
       "Operation [%s] in extension [%s] has a '%s' as return type but their generics "
           +
           "were not provided. Please provide the Payload and Attributes generics.";
+
+  private static final String INVALID_GENERICS_ERROR_MESSAGE =
+      "Operation [%s] in extension [%s] has a '%s' as return type with Void type for output but non Void type for attributes";
+
   private final List<Class<?>> illegalReturnTypes = ImmutableList.of(CoreEvent.class, Message.class);
 
   @Override
@@ -88,9 +92,16 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
     operationMethod.getParameters().stream()
         .filter(p -> p.getType().isSameType(CompletionCallback.class))
         .findFirst().ifPresent(p -> {
-          if (p.getType().getGenerics().isEmpty()) {
+          List<TypeGeneric> generics = p.getType().getGenerics();
+          if (generics.isEmpty()) {
             problemsReporter.addError(new Problem(p, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
                                                             extensionModel.getName(), CompletionCallback.class.getName())));
+          } else {
+            if (generics.get(0).getConcreteType().isSameType(Void.class) &&
+                !generics.get(1).getConcreteType().isSameType(Void.class)) {
+              problemsReporter.addError(new Problem(p, format(INVALID_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                              extensionModel.getName(), CompletionCallback.class.getName())));
+            }
           }
         });
   }

@@ -100,11 +100,21 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void completitionCallbackWithoutGenerics() {
+  public void completionCallbackWithoutGenerics() {
     when(operationElement.getReturnType()).thenReturn(new TypeWrapper(forType(new TypeToken<Void>() {}.getType()), typeLoader));
     ExtensionParameter completionCallbackParam = mock(ExtensionParameter.class);
     when(completionCallbackParam.getType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<CompletionCallback>() {}.getType()), typeLoader));
+    when(operationElement.getParameters()).thenReturn(singletonList(completionCallbackParam));
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void completionCallbackWithInvalidGenerics() {
+    when(operationElement.getReturnType()).thenReturn(new TypeWrapper(forType(new TypeToken<Void>() {}.getType()), typeLoader));
+    ExtensionParameter completionCallbackParam = mock(ExtensionParameter.class);
+    when(completionCallbackParam.getType())
+        .thenReturn(new TypeWrapper(forType(new TypeToken<CompletionCallback<Void, String>>() {}.getType()), typeLoader));
     when(operationElement.getParameters()).thenReturn(singletonList(completionCallbackParam));
     validate(extensionModel, validator);
   }
