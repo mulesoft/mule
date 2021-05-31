@@ -14,14 +14,11 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKN
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
 import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
 
-
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.InjectableParameterResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -125,7 +122,7 @@ public class ValueProviderFactory {
       if (parameterValue != null) {
         setValueIntoField(resolver, parameterValue, injectableParam.getParameterName(), reflectionCache);
       } else if (injectableParam.isRequired()) {
-        missingParameters.add(injectableParam.getParameterName());
+        missingParameters.add(injectableParam.getExtractionExpression());
       }
     }
 
