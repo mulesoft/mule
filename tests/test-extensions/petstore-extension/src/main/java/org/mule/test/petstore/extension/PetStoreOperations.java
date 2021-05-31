@@ -18,6 +18,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
@@ -46,8 +47,6 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,11 +55,17 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 public class PetStoreOperations {
 
+  public static boolean shouldFailWithConnectionException;
+  public static AtomicInteger operationExecutionCounter = new AtomicInteger(0);
+
   static {
-    // Register a feature that behaves differently with runtime versions older than 4.2.2
-    // noinspection deprecation
+    // Register features that behaves differently with runtime versions older than 4.2.2, enabling integration testing of both
+    // legacy and decoupled context feature flag set.
     getInstance()
         .registerFeature(LEGACY_FEATURE,
                          c -> c.getConfiguration().getMinMuleVersion().isPresent()
@@ -70,9 +75,6 @@ public class PetStoreOperations {
   @Inject
   @Named(FEATURE_FLAGGING_SERVICE_KEY)
   private FeatureFlaggingService ffService;
-
-  public static boolean shouldFailWithConnectionException;
-  public static AtomicInteger operationExecutionCounter = new AtomicInteger(0);
 
   public Long getConnectionAge(@Connection PetStoreClient client,
                                @Config PetStoreConnector config) {
@@ -109,6 +111,33 @@ public class PetStoreOperations {
     }
 
     return client.getPets(ownerName, config);
+  }
+
+  public List<String> getPetsWithParameterGroup(@Connection PetStoreClient client,
+                                                @Config PetStoreConnector config,
+                                                @ParameterGroup(name = "Owner") PetOwner owner) {
+    return getPets(client, config, owner.getName(), owner.getSignature());
+  }
+
+  public List<String> getPetsWithParameterGroupShowDsl(@Connection PetStoreClient client,
+                                                       @Config PetStoreConnector config,
+                                                       @ParameterGroup(name = "Owner", showInDsl = true) PetOwner owner) {
+    if (owner.getAddress() != null) {
+      IOUtils.toString(owner.getAddress().getValue());
+    }
+
+    if (owner.getOwnershipCertificate() != null) {
+      IOUtils.toString(owner.getOwnershipCertificate());
+    }
+
+    return getPets(client, config, owner.getName(), owner.getSignature());
+  }
+
+  public List<String> getPetsWithTypedInputStreamParameter(@Connection PetStoreClient client,
+                                                           @Config PetStoreConnector config,
+                                                           String owner,
+                                                           TypedValue<InputStream> signature) {
+    return getPets(client, config, owner, signature.getValue());
   }
 
   @MediaType(TEXT_PLAIN)
