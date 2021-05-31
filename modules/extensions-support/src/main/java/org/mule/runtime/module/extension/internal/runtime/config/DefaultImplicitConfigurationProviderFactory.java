@@ -46,6 +46,8 @@ import java.util.concurrent.Callable;
 public final class DefaultImplicitConfigurationProviderFactory implements ImplicitConfigurationProviderFactory {
 
   @Inject
+  MuleContext muleContext;
+  @Inject
   FeatureFlaggingService featureFlaggingService;
 
   /**
@@ -56,8 +58,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                                    ConfigurationModel configurationModel,
                                                                    CoreEvent event,
                                                                    ReflectionCache reflectionCache,
-                                                                   ExpressionManager expressionManager,
-                                                                   MuleContext muleContext) {
+                                                                   ExpressionManager expressionManager) {
     if (configurationModel == null || !canBeUsedImplicitly(configurationModel)) {
       throw new IllegalStateException("Could not find a config for extension '" + extensionModel.getName()
           + "' and none can be created automatically. Please define one");
@@ -67,7 +68,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
     ClassLoader pluginClassloader = getClassLoader(extensionModel);
     final ResolverSet resolverSet = withContextClassLoader(pluginClassloader, resolverSetCallable);
     try {
-      final String providerName = resolveImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext);
+      final String providerName = resolveImplicitConfigurationProviderName(extensionModel, configurationModel);
       ImplicitConnectionProviderValueResolver implicitConnectionProviderValueResolver =
           new ImplicitConnectionProviderValueResolver(configurationModel.getName(), extensionModel,
                                                       configurationModel, reflectionCache, expressionManager,
@@ -124,10 +125,9 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
    * {@inheritDoc}
    */
   @Override
-  public String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel,
-                                                         MuleContext muleContext) {
+  public String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel) {
     if (muleContext.getArtifactType().equals(POLICY)) {
-      return featureFlaggedPolicyExtensionsImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext);
+      return featureFlaggedPolicyExtensionsImplicitConfigurationProviderName(extensionModel, configurationModel);
     } else {
       return getImplicitConfigurationProviderName(extensionModel, configurationModel);
     }
@@ -139,12 +139,10 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
    * 
    * @param extensionModel     The configurable {@link ExtensionModel}.
    * @param configurationModel The {@link ConfigurationModel} that represents the extensionModel configuration.
-   * @param muleContext        The corresponding {@link MuleContext}.
    * @return The {@link ConfigurationProvider} name.
    */
   private String featureFlaggedPolicyExtensionsImplicitConfigurationProviderName(ExtensionModel extensionModel,
-                                                                                 ConfigurationModel configurationModel,
-                                                                                 MuleContext muleContext) {
+                                                                                 ConfigurationModel configurationModel) {
     if (featureFlaggingService != null && featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
       // Implicit configuration providers cannot be inherited from the parent (application) MuleContext registry, so a different
       // name is returned,

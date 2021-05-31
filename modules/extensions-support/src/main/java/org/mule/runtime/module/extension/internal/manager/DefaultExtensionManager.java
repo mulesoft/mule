@@ -86,11 +86,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   public void initialise() throws InitialisationException {
     extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
     extensionActivator = new ExtensionActivator(muleContext);
-    try {
-      initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
+    initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
   }
 
   /**
@@ -198,7 +194,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     }
     return extensionConfigurationModel
         .flatMap(c -> getConfigurationProvider(implicitConfigurationProviderFactory
-            .resolveImplicitConfigurationProviderName(extensionModel, c, muleContext)));
+            .resolveImplicitConfigurationProviderName(extensionModel, c)));
   }
 
   /**
@@ -215,7 +211,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                             CoreEvent muleEvent) {
 
     String implicitConfigurationProviderName = implicitConfigurationProviderFactory
-        .resolveImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext);
+        .resolveImplicitConfigurationProviderName(extensionModel, configurationModel);
 
     return extensionRegistry.getConfigurationProvider(implicitConfigurationProviderName).orElseGet(() -> {
       synchronized (extensionModel) {
@@ -226,8 +222,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                                                        configurationModel,
                                                                                        muleEvent,
                                                                                        getReflectionCache(),
-                                                                                       expressionManager,
-                                                                                       muleContext);
+                                                                                       expressionManager);
           registerConfigurationProvider(implicitConfigurationProvider);
           return implicitConfigurationProvider;
         });

@@ -142,6 +142,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
     }
   }
 
+  // TODO MULE-19350 move this validation to the artifact AST construction
   private void validatePolicyIsolation(ConfigurationProvider configurationProvider) {
     if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)
         && muleContext.getArtifactType().equals(POLICY)

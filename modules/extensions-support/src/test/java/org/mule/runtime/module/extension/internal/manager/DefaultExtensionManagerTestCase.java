@@ -273,7 +273,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     registerIntoMockContext(muleContext,
                             new DefaultImplicitConfigurationProviderFactory()
                                 .resolveImplicitConfigurationProviderName(extensionModel1,
-                                                                          extension1ConfigurationModel, muleContext),
+                                                                          extension1ConfigurationModel),
                             extension1ConfigurationProvider);
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
@@ -295,7 +295,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
       registerIntoMockContext(muleContext,
                               new DefaultImplicitConfigurationProviderFactory()
                                   .resolveImplicitConfigurationProviderName(extensionModel1,
-                                                                            extension1ConfigurationModel, muleContext),
+                                                                            extension1ConfigurationModel),
                               extension1ConfigurationProvider);
       new Thread(() -> extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event)).start();
       joinerLatch.countDown();
