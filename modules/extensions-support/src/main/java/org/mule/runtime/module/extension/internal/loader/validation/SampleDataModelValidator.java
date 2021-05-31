@@ -181,6 +181,12 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
                                 format("SampleDataProvider [%s] does not specify generics definition", providerClass.getName())));
       return;
     }
+    if (isVoid(providerGenericTypes.getFirst())) {
+      problemsReporter
+          .addError(new Problem(model,
+                                format("SampleDataProvider [%s] cannot have a Void return type", providerClass.getName())));
+      return;
+    }
 
     Pair<Type, Type> outputGenericTypes = getOutputTypes(model, providerClass.getClassLoader());
     if (!validateIfPaged(model, providerClass, outputGenericTypes, providerGenericTypes, problemsReporter)) {
