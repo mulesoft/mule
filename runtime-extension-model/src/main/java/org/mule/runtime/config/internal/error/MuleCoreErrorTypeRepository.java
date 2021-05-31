@@ -50,8 +50,10 @@ import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public final class MuleCoreErrorTypeRepository implements ErrorTypeRepository {
 
@@ -201,4 +203,13 @@ public final class MuleCoreErrorTypeRepository implements ErrorTypeRepository {
     return CRITICAL_ERROR_TYPE;
   }
 
+  @Override
+  public Set<ErrorType> getErrorTypes() {
+    return new HashSet<>(errorTypes.values());
+  }
+
+  @Override
+  public Set<ErrorType> getInternalErrorTypes() {
+    return new HashSet<>(internalErrorTypes.values());
+  }
 }

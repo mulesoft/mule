@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.ciore.api.management.stats;
+package org.mule.runtime.core.api.management.stats;
 
 
 import static org.hamcrest.Matchers.equalTo;

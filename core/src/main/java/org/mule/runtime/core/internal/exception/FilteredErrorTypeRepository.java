@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -80,6 +81,23 @@ public class FilteredErrorTypeRepository implements ErrorTypeRepository {
   @Override
   public ErrorType getCriticalErrorType() {
     return delegate.getCriticalErrorType();
+  }
+
+
+  @Override
+  public Set<ErrorType> getErrorTypes() {
+    return delegate.getErrorTypes()
+        .stream()
+        .filter(err -> filteredNamespaces.contains(err.getNamespace()))
+        .collect(toSet());
+  }
+
+  @Override
+  public Set<ErrorType> getInternalErrorTypes() {
+    return delegate.getInternalErrorTypes()
+        .stream()
+        .filter(err -> filteredNamespaces.contains(err.getNamespace()))
+        .collect(toSet());
   }
 
 }
