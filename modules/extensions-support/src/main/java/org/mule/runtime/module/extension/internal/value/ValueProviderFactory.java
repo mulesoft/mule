@@ -122,7 +122,12 @@ public class ValueProviderFactory {
       if (parameterValue != null) {
         setValueIntoField(resolver, parameterValue, injectableParam.getParameterName(), reflectionCache);
       } else if (injectableParam.isRequired()) {
-        missingParameters.add(injectableParam.getExtractionExpression());
+        if (injectableParam.getParameterName().equals(injectableParam.getExtractionExpression())) {
+          missingParameters.add(injectableParam.getExtractionExpression());
+        } else {
+          missingParameters
+              .add(injectableParam.getParameterName() + "(taken from: " + injectableParam.getExtractionExpression() + ")");
+        }
       }
     }
 

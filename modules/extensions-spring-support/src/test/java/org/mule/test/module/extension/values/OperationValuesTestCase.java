@@ -263,7 +263,7 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     ValueResult result = getValueResult("withMissingBoundActingParameter", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(true));
     assertThat(result.getFailure().get().getMessage(),
-               is("Unable to retrieve values. There are missing required parameters for the resolution: [actingParameter.field]"));
+               is("Unable to retrieve values. There are missing required parameters for the resolution: [requiredValue(taken from: actingParameter.field)]"));
   }
 
   @Test
