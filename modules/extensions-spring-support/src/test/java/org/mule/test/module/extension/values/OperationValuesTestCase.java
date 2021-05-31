@@ -259,6 +259,14 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
+  public void withMissingBoundActingParameter() throws Exception {
+    ValueResult result = getValueResult("withMissingBoundActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(true));
+    assertThat(result.getFailure().get().getMessage(),
+               is("Unable to retrieve values. There are missing required parameters for the resolution: [requiredValue(taken from: actingParameter.field)]"));
+  }
+
+  @Test
   public void withPojoFieldBoundActingParameterFieldExpression() throws Exception {
     ValueResult result = getValueResult("withPojoFieldBoundActingParameterFieldExpression", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
