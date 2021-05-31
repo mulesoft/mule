@@ -126,6 +126,22 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   }
 
   @Override
+  public ValueResult getFieldValues(ParameterizedElementDeclaration component, String providerName, String targetSelector) {
+    try {
+      return withInternalDeclarationSession("getFieldValues()",
+                                            session -> session.getFieldValues(component, providerName, targetSelector));
+    } catch (Throwable t) {
+      LOGGER
+          .error(format("Error while resolving field values on component: '%s:%s' for providerName: '%s' with targetSelector: '%s'",
+                        component.getDeclaringExtension(),
+                        component.getName(), providerName,
+                        targetSelector),
+                 t);
+      throw t;
+    }
+  }
+
+  @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component) {
     try {
       return withInternalDeclarationSession("getMetadataKeys()", session -> session.getMetadataKeys(component));

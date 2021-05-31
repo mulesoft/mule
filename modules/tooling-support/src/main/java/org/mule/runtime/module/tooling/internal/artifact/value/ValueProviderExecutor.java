@@ -20,6 +20,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.ResolvingFailure;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
@@ -40,6 +41,7 @@ import org.mule.runtime.module.tooling.internal.artifact.sampledata.SampleDataEx
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -59,10 +61,49 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
   }
 
   public ValueResult resolveValues(ParameterizedModel parameterizedModel,
-                                   ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName) {
+                                   ParameterizedElementDeclaration parameterizedElementDeclaration,
+                                   String providerName) {
+
+    return resolveValues(
+                         parameterizedModel,
+                         parameterizedElementDeclaration,
+                         providerName,
+                         (mediator, resolver, context) -> mediator.getValues(providerName,
+                                                                             resolver,
+                                                                             connectionSupplier(context),
+                                                                             configSupplier(context),
+                                                                             context.getConnectionProvider().orElse(null)),
+                         "");
+
+  }
+
+  public ValueResult resolveFieldValues(ParameterizedModel parameterizedModel,
+                                        ParameterizedElementDeclaration parameterizedElementDeclaration,
+                                        String providerName,
+                                        String targetSelector) {
+    return resolveValues(
+                         parameterizedModel,
+                         parameterizedElementDeclaration,
+                         providerName,
+                         (mediator, resolver, context) -> mediator.getValues(providerName,
+                                                                             resolver,
+                                                                             targetSelector,
+                                                                             connectionSupplier(context),
+                                                                             configSupplier(context),
+                                                                             context.getConnectionProvider().orElse(null)),
+                         " with targetSelector: " + targetSelector);
+
+  }
+
+  private ValueResult resolveValues(ParameterizedModel parameterizedModel,
+                                    ParameterizedElementDeclaration parameterizedElementDeclaration,
+                                    String providerName,
+                                    ValueProviderFunction valueProviderFunction,
+                                    String loggingSuffix) {
     try {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolve value provider: {} STARTED for component: {}", providerName, parameterizedModel.getName());
+        LOGGER.debug("Resolve value provider: {} STARTED for component: {} {}", providerName, parameterizedModel.getName(),
+                     loggingSuffix);
       }
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(parameterizedModel, parameterizedElementDeclaration, providerName);
@@ -75,16 +116,16 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(parameterizedElementDeclaration));
       try {
         if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Invoking connector's value provider: {} for component: {}", providerName,
-                       parameterizedModel.getName());
+          LOGGER.debug("Invoking connector's value provider: {} for component: {} {}",
+                       providerName,
+                       parameterizedModel.getName(),
+                       loggingSuffix);
         }
-        return resultFrom(withContextClassLoader(extensionClassLoader, () -> valueProviderMediator.getValues(providerName,
-                                                                                                             parameterValueResolver,
-                                                                                                             connectionSupplier(context),
-                                                                                                             configSupplier(context),
-                                                                                                             context
-                                                                                                                 .getConnectionProvider()
-                                                                                                                 .orElse(null)),
+        return resultFrom(
+                          withContextClassLoader(
+                                                 extensionClassLoader,
+                                                 () -> valueProviderFunction.apply(valueProviderMediator, parameterValueResolver,
+                                                                                   context),
                                                  ValueResolvingException.class,
                                                  e -> {
                                                    throw new ExecutorExceptionWrapper(e);
@@ -94,8 +135,10 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       }
     } catch (ValueResolvingException e) {
       if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s", e.getFailureCode(),
-                           parameterizedModel.getName()),
+        LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s %s",
+                           e.getFailureCode(),
+                           parameterizedModel.getName(),
+                           loggingSuffix),
                     e);
       }
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
@@ -107,8 +150,10 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       if (cause instanceof ValueResolvingException) {
         ValueResolvingException valueResolvingException = (ValueResolvingException) cause;
         if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s",
-                             valueResolvingException.getFailureCode(), parameterizedModel.getName()),
+          LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s %s",
+                             valueResolvingException.getFailureCode(),
+                             parameterizedModel.getName(),
+                             loggingSuffix),
                       cause);
         }
         ResolvingFailure.Builder failureBuilder = newFailure(cause);
@@ -122,7 +167,8 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       throw new MuleRuntimeException(e);
     } finally {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolve value provider: {} FINISHED for component: {}", providerName, parameterizedModel.getName());
+        LOGGER.debug("Resolve value provider: {} FINISHED for component: {} {}", providerName, parameterizedModel.getName(),
+                     loggingSuffix);
       }
 
     }
@@ -178,6 +224,15 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       return ofNullable(((ComponentElementDeclaration) component).getConfigRef());
     }
     return empty();
+  }
+
+  @FunctionalInterface
+  private interface ValueProviderFunction {
+
+    Set<Value> apply(ValueProviderMediator<?> valueProviderMediator, ParameterValueResolver parameterValueResolver,
+                     ExtensionResolvingContext extensionResolvingContext)
+        throws ValueResolvingException;
+
   }
 
 }
