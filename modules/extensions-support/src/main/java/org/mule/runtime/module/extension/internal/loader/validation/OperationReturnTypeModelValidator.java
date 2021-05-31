@@ -7,8 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isCompileTime;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
@@ -97,10 +99,12 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
             problemsReporter.addError(new Problem(p, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
                                                             extensionModel.getName(), CompletionCallback.class.getName())));
           } else {
-            if (generics.get(0).getConcreteType().isSameType(Void.class) &&
-                !generics.get(1).getConcreteType().isSameType(Void.class)) {
-              problemsReporter.addError(new Problem(p, format(INVALID_GENERICS_ERROR_MESSAGE, operationModel.getName(),
-                                                              extensionModel.getName(), CompletionCallback.class.getName())));
+            if (isCompileTime(extensionModel)) {
+              if (generics.get(0).getConcreteType().isSameType(Void.class) &&
+                  !generics.get(1).getConcreteType().isSameType(Void.class)) {
+                problemsReporter.addError(new Problem(p, format(INVALID_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                extensionModel.getName(), CompletionCallback.class.getName())));
+              }
             }
           }
         });
@@ -109,9 +113,19 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
   private void validateResultReturnType(Type returnType, ProblemsReporter problemsReporter, OperationModel operationModel,
                                         ExtensionModel extensionModel) {
     if (returnType.isAssignableTo(Result.class)) {
-      if (returnType.getGenerics().isEmpty()) {
+      List<TypeGeneric> generics = returnType.getGenerics();
+      if (generics.isEmpty()) {
         problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
                                                                      extensionModel.getName(), Result.class)));
+      } else {
+        if (isCompileTime(extensionModel)) {
+          if (generics.get(0).getConcreteType().isSameType(Void.class) &&
+              !generics.get(1).getConcreteType().isSameType(Void.class)) {
+            problemsReporter.addError(new Problem(operationModel, format(INVALID_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                         extensionModel.getName(),
+                                                                         Result.class.getName())));
+          }
+        }
       }
     }
   }
@@ -122,9 +136,21 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
       List<TypeGeneric> generics = returnType.getGenerics();
       if (!generics.isEmpty()) {
         Type concreteType = generics.get(0).getConcreteType();
-        if (concreteType.isAssignableTo(Result.class) && concreteType.getGenerics().isEmpty()) {
-          problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
-                                                                       extensionModel.getName(), Result.class)));
+        if (concreteType.isAssignableTo(Result.class)) {
+          List<TypeGeneric> concreteTypeGenerics = concreteType.getGenerics();
+          if (concreteTypeGenerics.isEmpty()) {
+            problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                         extensionModel.getName(), Result.class)));
+          }
+          if (isCompileTime(extensionModel)) {
+            if (concreteTypeGenerics.get(0).getConcreteType().isSameType(Void.class) &&
+                !concreteTypeGenerics.get(1).getConcreteType().isSameType(Void.class)) {
+              problemsReporter.addError(new Problem(operationModel,
+                                                    format(INVALID_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                           extensionModel.getName(),
+                                                           Result.class.getName())));
+            }
+          }
         }
       }
     }
@@ -134,4 +160,5 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
     throw new IllegalOperationModelDefinitionException(format("Operation '%s' in Extension '%s' is missing a return type",
                                                               operationModel.getName(), model.getName()));
   }
+
 }
