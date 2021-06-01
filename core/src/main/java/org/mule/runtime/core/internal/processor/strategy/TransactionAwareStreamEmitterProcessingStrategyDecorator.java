@@ -86,8 +86,8 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
         });
   }
 
-  private Boolean isTxActive(Context ctx) {
-    return ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> txScopes.size() > 0).orElse(false);
+  private boolean isTxActive(Context ctx) {
+    return ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> !txScopes.isEmpty()).orElse(false);
   }
 
   /**
