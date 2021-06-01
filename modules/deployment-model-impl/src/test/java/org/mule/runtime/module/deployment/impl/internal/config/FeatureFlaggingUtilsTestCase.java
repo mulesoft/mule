@@ -9,8 +9,10 @@ package org.mule.runtime.module.deployment.impl.internal.config;
 import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,12 +20,17 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
+import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.OVERRIDEABLE_FEATURE;
+import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.OVERRIDEABLE_FEATURE_OVERRIDE;
 
 @SmallTest
 @Issue("MULE-19402")
 public class FeatureFlaggingUtilsTestCase {
 
   private final ArtifactDescriptor artifactDescriptor = mock(ArtifactDescriptor.class);
+
+  @Rule
+  public SystemProperty systemProperty = new SystemProperty(OVERRIDEABLE_FEATURE_OVERRIDE, "true");
 
   @BeforeClass
   public static void registerTestingFeatures() {
@@ -38,8 +45,14 @@ public class FeatureFlaggingUtilsTestCase {
 
   @Test
   @Issue("MULE-19402")
-  public void testFeatureUsingUtil() {
+  public void testFeature() {
     assertThat(FeatureFlaggingUtils.isFeatureEnabled(ALWAYS_ON_FEATURE, artifactDescriptor), is(true));
+  }
+
+  @Test
+  @Issue("MULE-19402")
+  public void testOverriddenFeature() {
+    assertThat(FeatureFlaggingUtils.isFeatureEnabled(OVERRIDEABLE_FEATURE, artifactDescriptor), is(true));
   }
 
 }
