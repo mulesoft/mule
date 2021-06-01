@@ -98,9 +98,14 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
     return false;
   }
 
+  @Override
+  protected boolean mustRegenerateExtensionModels() {
+    return true;
+  }
+
   /**
    * Parameter to re-type operations' output if exists. It should map to
-   * 
+   *
    * @return the string of the parameter that represents the declaration file.
    */
   protected Optional<String> operationsOutputPath() {
@@ -109,7 +114,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
 
   /**
    * Parameter to add resources to the {@link ExtensionModel} generation.
-   * 
+   *
    * @return the collection of resources that must be exported
    */
   protected Optional<List<String>> resourcesPaths() {
