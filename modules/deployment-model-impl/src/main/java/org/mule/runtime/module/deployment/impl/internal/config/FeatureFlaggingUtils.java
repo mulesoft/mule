@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.config;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -13,17 +14,14 @@ import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
-import reactor.util.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
-import static com.google.common.cache.CacheBuilder.newBuilder;
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -43,13 +41,7 @@ public class FeatureFlaggingUtils {
 
   private static final LoadingCache<ArtifactDescriptor, FeatureFlaggingService> featureFlags = newBuilder()
       .weakKeys()
-      .build(new CacheLoader<ArtifactDescriptor, FeatureFlaggingService>() {
-
-        @Override
-        public FeatureFlaggingService load(@NonNull ArtifactDescriptor artifactDescriptor) {
-          return buildFeatureFlaggingService(artifactDescriptor);
-        }
-      });
+      .build(FeatureFlaggingUtils::buildFeatureFlaggingService);
 
   /**
    * True if a {@link Feature} is enabled, assuming that the given {@link ArtifactDescriptor} provides relevant
@@ -60,13 +52,7 @@ public class FeatureFlaggingUtils {
    * @return True if the {@link Feature} must be enabled.
    */
   public static boolean isFeatureEnabled(Feature feature, ArtifactDescriptor artifactDescriptor) {
-    try {
-      return featureFlags.get(artifactDescriptor).isEnabled(feature);
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(createStaticMessage("Error creating deployment FeatureFlaggingService for artifact [{%s}]",
-                                                         artifactDescriptor.getName()),
-                                     e);
-    }
+    return Objects.requireNonNull(featureFlags.get(artifactDescriptor)).isEnabled(feature);
   }
 
   /**
