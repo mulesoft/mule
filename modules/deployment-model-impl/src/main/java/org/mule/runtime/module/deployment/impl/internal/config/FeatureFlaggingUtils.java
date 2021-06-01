@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.config;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
+import static java.util.Objects.requireNonNull;
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -14,18 +20,12 @@ import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import org.slf4j.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
-import static java.lang.Boolean.getBoolean;
-import static java.lang.System.getProperty;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * Utility class meant to provide a {@link org.mule.runtime.api.config.FeatureFlaggingService} substitute during the earlier
@@ -52,7 +52,7 @@ public class FeatureFlaggingUtils {
    * @return True if the {@link Feature} must be enabled.
    */
   public static boolean isFeatureEnabled(Feature feature, ArtifactDescriptor artifactDescriptor) {
-    return Objects.requireNonNull(featureFlags.get(artifactDescriptor)).isEnabled(feature);
+    return requireNonNull(featureFlags.get(artifactDescriptor)).isEnabled(feature);
   }
 
   /**
