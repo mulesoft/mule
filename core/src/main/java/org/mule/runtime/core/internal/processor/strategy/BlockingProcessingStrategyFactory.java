@@ -83,9 +83,9 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
 
     /**
      * This strategy adds a Mono.block call in order to preserve the thread because it's a precondition for transactions to work.
-     * However, there are some operations that don't need to use a Mono.block because they have a synchronous execution. It
-     * allows us to make a performance optimization for those operations. This method is intended to detect which operations
-     * do need a Mono.block and which don't.
+     * However, there are some operations that don't need to use a Mono.block because they have a synchronous execution. It allows
+     * us to make a performance optimization for those operations. This method is intended to detect which operations do need a
+     * Mono.block and which don't.
      *
      * @param processor The processor.
      * @return true if a Mono.block call is needed to wait for operation completion.
