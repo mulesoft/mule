@@ -102,7 +102,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
    * XML SDK tests add their own test extensions done with the XML SDK.
    */
   @Override
-  protected boolean addsOwnExtensionModels() {
+  protected boolean mustRegenerateAstXmlParser() {
     return true;
   }
 

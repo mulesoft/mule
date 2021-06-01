@@ -234,7 +234,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     if (builder instanceof SpringXmlConfigurationBuilder) {
       if (mustRegenerateComponentBuildingDefinitionRegistryFactory()
           || mustRegenerateExtensionModels()
-          || addsOwnExtensionModels()) {
+          || mustRegenerateAstXmlParser()) {
         ((SpringXmlConfigurationBuilder) builder)
             .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
       } else {
@@ -319,7 +319,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    *
    * @return whether the tests on this class add extensions to use in its tests.
    */
-  protected boolean addsOwnExtensionModels() {
+  protected boolean mustRegenerateAstXmlParser() {
     return false;
   }
 
