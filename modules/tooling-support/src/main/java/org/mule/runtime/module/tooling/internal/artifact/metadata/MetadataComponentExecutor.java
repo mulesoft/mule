@@ -19,7 +19,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
-import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
@@ -28,8 +27,11 @@ import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
@@ -40,7 +42,6 @@ import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -52,8 +53,10 @@ public class MetadataComponentExecutor extends MetadataExecutor {
   private static final Logger LOGGER = LoggerFactory.getLogger(MetadataComponentExecutor.class);
 
   public MetadataComponentExecutor(ConnectionManager connectionManager, ReflectionCache reflectionCache,
-                                   ExpressionManager expressionManager, ArtifactHelper artifactHelper) {
-    super(connectionManager, reflectionCache, expressionManager, artifactHelper);
+                                   ExpressionManager expressionManager, ArtifactHelper artifactHelper,
+                                   MetadataCacheIdGenerator<ElementDeclaration> metadataCacheIdGenerator,
+                                   MetadataCacheManager metadataCacheManager) {
+    super(connectionManager, reflectionCache, expressionManager, artifactHelper, metadataCacheIdGenerator, metadataCacheManager);
     this.expressionManager = expressionManager;
   }
 
@@ -82,7 +85,8 @@ public class MetadataComponentExecutor extends MetadataExecutor {
       }
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
 
-      return resolveMetadata(componentModel, optionalConfigurationInstance, metadataKey, extensionClassLoader);
+      return resolveMetadata(componentElementDeclaration, componentModel, optionalConfigurationInstance, metadataKey,
+                             extensionClassLoader);
     } catch (MetadataResolvingException e) {
       if (LOGGER.isWarnEnabled()) {
         LOGGER.warn(format("Resolve component metadata has FAILED with code: %s for component: %s", e.getFailure(),
@@ -133,26 +137,30 @@ public class MetadataComponentExecutor extends MetadataExecutor {
   }
 
 
-  private MetadataResult<ComponentMetadataTypesDescriptor> resolveMetadata(ComponentModel componentModel,
+  private MetadataResult<ComponentMetadataTypesDescriptor> resolveMetadata(ComponentElementDeclaration componentElementDeclaration,
+                                                                           ComponentModel componentModel,
                                                                            Optional<ConfigurationInstance> configurationInstance,
                                                                            MetadataKey metadataKey,
                                                                            ClassLoader extensionClassLoader)
       throws MetadataResolvingException {
     MetadataMediator<? extends ComponentModel> metadataMediator = new MetadataMediator<>(componentModel);
 
-    MetadataContext metadataContext = createMetadataContext(configurationInstance, extensionClassLoader);
-
-    return withContextClassLoader(extensionClassLoader, () -> withMetadataContext(metadataContext, () -> {
-      MetadataResult<InputMetadataDescriptor> inputMetadata = metadataMediator
-          .getInputMetadata(metadataContext, metadataKey);
-      MetadataResult<OutputMetadataDescriptor> outputMetadata = null;
-      if (componentModel instanceof HasOutputModel) {
-        outputMetadata = metadataMediator.getOutputMetadata(metadataContext, metadataKey);
-      }
-      return collectMetadata(inputMetadata, outputMetadata);
-    }), MetadataResolvingException.class, e -> {
-      throw new ExecutorExceptionWrapper(e);
-    });
+    return withContextClassLoader(extensionClassLoader,
+                                  () -> runWithMetadataContext(componentElementDeclaration, configurationInstance,
+                                                               extensionClassLoader, metadataContext -> {
+                                                                 MetadataResult<InputMetadataDescriptor> inputMetadata =
+                                                                     metadataMediator
+                                                                         .getInputMetadata(metadataContext, metadataKey);
+                                                                 MetadataResult<OutputMetadataDescriptor> outputMetadata = null;
+                                                                 if (componentModel instanceof HasOutputModel) {
+                                                                   outputMetadata = metadataMediator
+                                                                       .getOutputMetadata(metadataContext, metadataKey);
+                                                                 }
+                                                                 return collectMetadata(inputMetadata, outputMetadata);
+                                                               }),
+                                  MetadataResolvingException.class, e -> {
+                                    throw new ExecutorExceptionWrapper(e);
+                                  });
   }
 
   private MetadataResult<ComponentMetadataTypesDescriptor> collectMetadata(@Nonnull MetadataResult<InputMetadataDescriptor> inputMetadataResult,

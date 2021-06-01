@@ -8,6 +8,8 @@ package org.mule.runtime.module.tooling.internal.config;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static org.mule.runtime.config.internal.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
@@ -21,6 +23,7 @@ import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
 
 import com.google.common.collect.ImmutableMap;
 
+import java.io.File;
 import java.util.Map;
 
 public class DefaultDeclarationSessionBuilder
@@ -41,7 +44,12 @@ public class DefaultDeclarationSessionBuilder
              String.valueOf(!valueOf(getProperty(MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY, "false"))))
         .put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, TRUE)
         .put(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY, TRUE)
+        .put(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH, getToolingWorkingDir().getAbsolutePath())
         .build();
+  }
+
+  private File getToolingWorkingDir() {
+    return new File(getExecutionFolder(), "tooling");
   }
 
   @Override

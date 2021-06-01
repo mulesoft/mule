@@ -24,10 +24,13 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.api.sampledata.SampleDataFailure;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
@@ -36,7 +39,6 @@ import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolv
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
-import org.mule.sdk.api.data.sample.SampleDataException;
 
 import java.util.Optional;
 
@@ -51,8 +53,11 @@ public class MetadataKeysExecutor extends MetadataExecutor {
       new FailureCode(AbstractParameterResolverExecutor.INVALID_PARAMETER_VALUE);
 
   public MetadataKeysExecutor(ConnectionManager connectionManager, ReflectionCache reflectionCache,
-                              ExpressionManager expressionManager, ArtifactHelper artifactHelper) {
-    super(connectionManager, reflectionCache, expressionManager, artifactHelper);
+                              ExpressionManager expressionManager, ArtifactHelper artifactHelper,
+                              MetadataCacheIdGenerator<ElementDeclaration> metadataCacheIdGenerator,
+                              MetadataCacheManager metadataCacheManager) {
+    super(connectionManager, reflectionCache, expressionManager, artifactHelper, metadataCacheIdGenerator,
+          metadataCacheManager);
   }
 
   public MetadataResult<MetadataKeysContainer> resolveMetadataKeys(ComponentModel componentModel,
@@ -71,14 +76,15 @@ public class MetadataKeysExecutor extends MetadataExecutor {
 
       MetadataMediator<ComponentModel> metadataMediator = new MetadataMediator<>(componentModel);
 
-      MetadataContext metadataContext =
-          createMetadataContext(optionalConfigurationInstance, extensionClassLoader);
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Invoking connector's metadata key resolver for component: {}", componentModel.getName());
       }
       return withContextClassLoader(extensionClassLoader,
-                                    () -> withMetadataContext(metadataContext, () -> metadataMediator
-                                        .getMetadataKeys(metadataContext, metadataKey, reflectionCache)),
+                                    () -> runWithMetadataContext(componentElementDeclaration, optionalConfigurationInstance,
+                                                                 extensionClassLoader,
+                                                                 (metadataContext) -> metadataMediator
+                                                                     .getMetadataKeys(metadataContext, metadataKey,
+                                                                                      reflectionCache)),
                                     MetadataResolvingException.class, e -> {
                                       throw new ExecutorExceptionWrapper(e);
                                     });

@@ -97,6 +97,11 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
   public void open(String partitionName) throws ObjectStoreException {
     lock.lock();
     try {
+      // As partitions are stored in an static field in order to be shared between deployments/muleContext, when a partition
+      // is opened we would need to validate if what we have in memory is still valid and partition still exists in FS.
+      if (partitionsByName.containsKey(partitionName) && !partitionsByName.get(partitionName).getPartitionDirectory().exists()) {
+        partitionsByName.remove(partitionName);
+      }
       super.open(partitionName);
     } finally {
       lock.unlock();
