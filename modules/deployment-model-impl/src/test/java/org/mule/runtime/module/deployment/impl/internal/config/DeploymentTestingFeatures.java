@@ -23,15 +23,18 @@ import static java.util.Optional.ofNullable;
  */
 public enum DeploymentTestingFeatures implements Feature {
 
-  ALWAYS_ON_FEATURE("Testing feature", "MULE-123", "4.4.0");
+  ALWAYS_ON_FEATURE("Testing feature", "MULE-123", "4.4.0"), OVERRIDEABLE_FEATURE("Testing feature", "MULE-123", "4.4.0",
+      "overrideable.feature.override");
 
   private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
   static {
     if (!areFeatureFlagsConfigured.getAndSet(true)) {
       FeatureFlaggingRegistry.getInstance().registerFeatureFlag(ALWAYS_ON_FEATURE, featureContext -> true);
+      FeatureFlaggingRegistry.getInstance().registerFeatureFlag(OVERRIDEABLE_FEATURE, featureContext -> false);
     }
   }
 
+  public static final String OVERRIDEABLE_FEATURE_OVERRIDE = "overrideable.feature.override";
   private final String description;
   private final String issue;
   private final String since;
