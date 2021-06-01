@@ -193,7 +193,7 @@ public class TypeWrapper implements Type {
 
   @Override
   public boolean isSameType(Class<?> clazz) {
-    return aClass.equals(clazz);
+    return aClass != null && aClass.equals(clazz);
   }
 
   @Override

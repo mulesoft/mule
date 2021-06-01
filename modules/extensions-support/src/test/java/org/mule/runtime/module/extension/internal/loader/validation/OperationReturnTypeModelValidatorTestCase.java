@@ -10,6 +10,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,6 +27,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -111,33 +114,6 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void completionCallbackWithInvalidGenericsCompileTime() {
-    setCompileTime(true);
-    when(operationElement.getReturnType()).thenReturn(new TypeWrapper(forType(new TypeToken<Void>() {}.getType()), typeLoader));
-    ExtensionParameter completionCallbackParam = mock(ExtensionParameter.class);
-    when(completionCallbackParam.getType())
-        .thenReturn(new TypeWrapper(forType(new TypeToken<CompletionCallback<Void, String>>() {}.getType()), typeLoader));
-    when(operationElement.getParameters()).thenReturn(singletonList(completionCallbackParam));
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void resultWithInvalidGenericsCompileTime() {
-    setCompileTime(true);
-    when(operationElement.getReturnType())
-        .thenReturn(new TypeWrapper(forType(new TypeToken<Result<Void, String>>() {}.getType()), typeLoader));
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void resultCollectionWithInvalidGenericsCompileTime() {
-    setCompileTime(true);
-    when(operationElement.getReturnType())
-        .thenReturn(new TypeWrapper(forType(new TypeToken<List<Result<Void, String>>>() {}.getType()), typeLoader));
-    validate(extensionModel, validator);
-  }
-
   @Test
   public void completionCallbackWithInvalidGenerics() {
     when(operationElement.getReturnType()).thenReturn(new TypeWrapper(forType(new TypeToken<Void>() {}.getType()), typeLoader));
@@ -145,23 +121,24 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     when(completionCallbackParam.getType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<CompletionCallback<Void, String>>() {}.getType()), typeLoader));
     when(operationElement.getParameters()).thenReturn(singletonList(completionCallbackParam));
-    validate(extensionModel, validator);
+    ProblemsReporter problemsReporter = validate(extensionModel, validator);
+    assertThat(problemsReporter.getWarnings(), hasSize(1));
   }
 
   @Test
   public void resultWithInvalidGenerics() {
-    setCompileTime(true);
     when(operationElement.getReturnType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<Result<Void, String>>() {}.getType()), typeLoader));
-    validate(extensionModel, validator);
+    ProblemsReporter problemsReporter = validate(extensionModel, validator);
+    assertThat(problemsReporter.getWarnings(), hasSize(1));
   }
 
   @Test
   public void resultCollectionWithInvalidGenerics() {
-    setCompileTime(true);
     when(operationElement.getReturnType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<List<Result<Void, String>>>() {}.getType()), typeLoader));
-    validate(extensionModel, validator);
+    ProblemsReporter problemsReporter = validate(extensionModel, validator);
+    assertThat(problemsReporter.getWarnings(), hasSize(1));
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
@@ -178,8 +155,4 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     validate(extensionModel, validator);
   }
 
-  private void setCompileTime(boolean compileTime) {
-    when(extensionModel.getModelProperty(CompileTimeModelProperty.class))
-        .thenReturn(ofNullable(compileTime ? new CompileTimeModelProperty() : null));
-  }
 }
