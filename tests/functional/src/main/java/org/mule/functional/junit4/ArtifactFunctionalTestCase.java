@@ -232,7 +232,9 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   protected void configureSpringXmlConfigurationBuilder(ConfigurationBuilder builder) {
     builder.addServiceConfigurator(serviceConfigurator);
     if (builder instanceof SpringXmlConfigurationBuilder) {
-      if (mustRegenerateComponentBuildingDefinitionRegistryFactory() || mustRegenerateExtensionModels()) {
+      if (mustRegenerateComponentBuildingDefinitionRegistryFactory()
+          || mustRegenerateExtensionModels()
+          || addsOwnExtensionModels()) {
         ((SpringXmlConfigurationBuilder) builder)
             .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
       } else {
@@ -308,6 +310,16 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    * @return whether the tests on this class need for extensions model to be generated again.
    */
   protected boolean mustRegenerateExtensionModels() {
+    return false;
+  }
+
+  /**
+   * Subclasses can override this method to indicate that tests from a given test subclass may add extensions to use in test in
+   * addition to the ones declared in the test module pom.xml file.
+   *
+   * @return whether the tests on this class add extensions to use in its tests.
+   */
+  protected boolean addsOwnExtensionModels() {
     return false;
   }
 
