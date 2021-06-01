@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static java.lang.Integer.min;
-import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
-import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
-import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ONE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -25,8 +21,6 @@ import java.util.NoSuchElementException;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConnectionManagementStrategy} which returns connections obtained from a {@link #pool}
@@ -35,8 +29,6 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementStrategy<C> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
 
   private final PoolingProfile poolingProfile;
   private final ObjectPool<C> pool;
@@ -114,41 +106,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     config.timeBetweenEvictionRunsMillis = poolingProfile.getEvictionCheckIntervalMillis();
     GenericObjectPool genericPool = new GenericObjectPool(new ObjectFactoryAdapter(), config);
 
-    applyInitialisationPolicy(genericPool);
-
     return genericPool;
-  }
-
-  protected void applyInitialisationPolicy(GenericObjectPool pool) {
-    int initialConnections;
-    switch (poolingProfile.getInitialisationPolicy()) {
-      case INITIALISE_NONE:
-        initialConnections = 0;
-        break;
-      case INITIALISE_ONE:
-        initialConnections = 1;
-        break;
-      case INITIALISE_ALL:
-        if (poolingProfile.getMaxActive() < 0) {
-          initialConnections = poolingProfile.getMaxIdle();
-        } else if (poolingProfile.getMaxIdle() < 0) {
-          initialConnections = poolingProfile.getMaxActive();
-        } else {
-          initialConnections = min(poolingProfile.getMaxActive(), poolingProfile.getMaxIdle());
-        }
-        break;
-      default:
-        throw new IllegalStateException("Unexpected value for pooling profile initialization policy: "
-            + poolingProfile.getInitialisationPolicy());
-    }
-
-    for (int t = 0; t < initialConnections; t++) {
-      try {
-        pool.addObject();
-      } catch (Exception e) {
-        LOGGER.warn("Failed to create a connection while applying the pool initialization policy.", e);
-      }
-    }
   }
 
   public PoolingProfile getPoolingProfile() {
