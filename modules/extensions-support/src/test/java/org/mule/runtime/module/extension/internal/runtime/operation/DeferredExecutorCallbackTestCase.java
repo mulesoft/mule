@@ -13,11 +13,15 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
+@Issue("MULE-19431")
 public class DeferredExecutorCallbackTestCase {
 
   @Test
+  @Description("During the lifetime of the deferred executor, the real complete method isn't called")
   public void completeIsNotDelegatedWhileDeferredCallbackIsNotClosed() throws Exception {
     TestExecutorCallback testExecutorCallback = new TestExecutorCallback();
     try (DeferredExecutorCallback deferredCallback = new DeferredExecutorCallback(testExecutorCallback)) {
@@ -27,6 +31,7 @@ public class DeferredExecutorCallbackTestCase {
   }
 
   @Test
+  @Description("During the lifetime of the deferred executor, the real error method isn't called")
   public void errorIsNotDelegatedWhileDeferredCallbackIsNotClosed() throws Exception {
     TestExecutorCallback testExecutorCallback = new TestExecutorCallback();
     try (DeferredExecutorCallback deferredCallback = new DeferredExecutorCallback(testExecutorCallback)) {
@@ -36,6 +41,7 @@ public class DeferredExecutorCallbackTestCase {
   }
 
   @Test
+  @Description("After the lifetime of the deferred executor, the real complete method is called")
   public void completeIsDelegatedWhenDeferredCallbackIsClosed() throws Exception {
     TestExecutorCallback testExecutorCallback = new TestExecutorCallback();
     try (DeferredExecutorCallback deferredCallback = new DeferredExecutorCallback(testExecutorCallback)) {
@@ -45,6 +51,7 @@ public class DeferredExecutorCallbackTestCase {
   }
 
   @Test
+  @Description("After the lifetime of the deferred executor, the real error method is called")
   public void errorIsDelegatedWhenDeferredCallbackIsClosed() throws Exception {
     TestExecutorCallback testExecutorCallback = new TestExecutorCallback();
     try (DeferredExecutorCallback deferredCallback = new DeferredExecutorCallback(testExecutorCallback)) {
@@ -54,6 +61,27 @@ public class DeferredExecutorCallbackTestCase {
   }
 
   @Test
+  @Description("After the lifetime of the deferred executor, the real complete method isn't called if the deferred method was neither called")
+  public void completeIsNotDelegatedWhenDeferredCallbackIsNotCalled() throws Exception {
+    TestExecutorCallback testExecutorCallback = new TestExecutorCallback();
+    try (DeferredExecutorCallback deferredCallback = new DeferredExecutorCallback(testExecutorCallback)) {
+      // Do nothing.
+    }
+    assertThat(testExecutorCallback.isErrorCalled(), is(false));
+  }
+
+  @Test
+  @Description("After the lifetime of the deferred executor, the real error method isn't called if the deferred method was neither called")
+  public void errorIsNotDelegatedWhenDeferredCallbackIsNotCalled() throws Exception {
+    TestExecutorCallback testExecutorCallback = new TestExecutorCallback();
+    try (DeferredExecutorCallback deferredCallback = new DeferredExecutorCallback(testExecutorCallback)) {
+      // Do nothing.
+    }
+    assertThat(testExecutorCallback.isErrorCalled(), is(false));
+  }
+
+  @Test
+  @Description("The completion class loader is preserved")
   public void completionClassLoaderIsPreserved() throws Exception {
     ClassLoader completionClassLoader = mock(ClassLoader.class);
     TestExecutorCallback testExecutorCallback = new TestExecutorCallback();
