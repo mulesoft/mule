@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.config.internal.SpringXmlConfigurationBuilder.createMuleXmlParser;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
@@ -22,6 +23,7 @@ import org.mule.functional.services.NullPolicyProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
@@ -120,6 +122,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   private static TestComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
       new TestComponentBuildingDefinitionRegistryFactory();
+
+  private static AstXmlParser astXmlParser;
 
   @BeforeClass
   public static void configureClassLoaderRepository() {
@@ -232,6 +236,14 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
         ((SpringXmlConfigurationBuilder) builder)
             .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
       } else {
+        if (astXmlParser == null) {
+          astXmlParser = createMuleXmlParser(extensionsManagerConfigurationBuilder.getExtensionModels(), null,
+                                             emptyMap(), false);
+        }
+
+        if (artifactProperties().isEmpty() && !disableXmlValidations()) {
+          ((SpringXmlConfigurationBuilder) builder).setAstXmlParser(astXmlParser);
+        }
         ((SpringXmlConfigurationBuilder) builder)
             .setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
       }

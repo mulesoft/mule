@@ -4,6 +4,46 @@
       "ignore": [
         {
           "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(===java.lang.String===) throws org.mule.runtime.core.api.config.ConfigurationException",
+          "new": "parameter org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(===org.mule.runtime.app.declaration.api.ArtifactDeclaration===) throws org.mule.runtime.core.api.config.ConfigurationException",
+          "oldType": "java.lang.String",
+          "newType": "org.mule.runtime.app.declaration.api.ArtifactDeclaration",
+          "package": "org.mule.runtime.config.api",
+          "classSimpleName": "SpringXmlConfigurationBuilderFactory",
+          "methodName": "createConfigurationBuilder",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "MULE-19422: Used only internally by testing infrastructure"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(java.lang.String, boolean) throws org.mule.runtime.core.api.config.ConfigurationException",
+          "package": "org.mule.runtime.config.api",
+          "classSimpleName": "SpringXmlConfigurationBuilderFactory",
+          "methodName": "createConfigurationBuilder",
+          "elementKind": "method",
+          "justification": "MULE-19422: Used only internally by testing infrastructure"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(java.lang.String, java.util.Map<java.lang.String, java.lang.String>, org.mule.runtime.core.api.config.bootstrap.ArtifactType) throws org.mule.runtime.core.api.config.ConfigurationException",
+          "package": "org.mule.runtime.config.api",
+          "classSimpleName": "SpringXmlConfigurationBuilderFactory",
+          "methodName": "createConfigurationBuilder",
+          "elementKind": "method",
+          "justification": "MULE-19422: Used only internally by testing infrastructure"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(java.lang.String[], boolean) throws org.mule.runtime.core.api.config.ConfigurationException",
+          "package": "org.mule.runtime.config.api",
+          "classSimpleName": "SpringXmlConfigurationBuilderFactory",
+          "methodName": "createConfigurationBuilder",
+          "elementKind": "method",
+          "justification": "MULE-19422: Used only internally by testing infrastructure"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
           "old": "parameter org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(java.lang.String[], ===org.mule.runtime.core.api.MuleContext===) throws org.mule.runtime.core.api.config.ConfigurationException",
           "new": "parameter org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(java.lang.String[], ===org.mule.runtime.deployment.model.api.artifact.ArtifactContext===) throws org.mule.runtime.core.api.config.ConfigurationException",
           "oldType": "org.mule.runtime.core.api.MuleContext",
