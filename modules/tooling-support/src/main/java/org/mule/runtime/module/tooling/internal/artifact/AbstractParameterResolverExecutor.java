@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact;
 
-import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterGroupElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
@@ -29,6 +31,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBase
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
@@ -93,12 +96,23 @@ public class AbstractParameterResolverExecutor {
         final ParameterModel parameterModel = parameterGroupModel.getParameter(parameterName)
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find parameter with name: '%s' in parameter group: '%s'",
                                                                             parameterName, parameterGroupName)));
-        Object value = extractValue(parameterElement.getValue(),
-                                    artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration));
-        if (!parameterModel.getExpressionSupport().equals(NOT_SUPPORTED) && isExpression(value)) {
-          throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
-                                                           parameterName));
+        Class<?> parameterClass = artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration);
+        Object value = extractValue(parameterElement.getValue(), parameterClass);
+
+        // TODO: CCNS-26. Improve this.
+        if (value instanceof String && isExpression(value)) {
+          value = new TypeSafeExpressionValueResolver<>(
+                                                        (String) value,
+                                                        TypedValue.class,
+                                                        DataType.TYPED_VALUE);
+          try {
+            muleContext.getInjector().inject(value);
+            initialiseIfNeeded(value);
+          } catch (MuleException e) {
+            throw new MuleRuntimeException(createStaticMessage("Could not inject ValueResolver properly"), e);
+          }
         }
+
         parametersMap.put(parameterName, value);
       }
     }
