@@ -283,7 +283,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         builders.add(new MockExtensionManagerConfigurationBuilder());
         builders.add(getBuilder());
         MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
-        DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+        DefaultMuleConfiguration muleConfiguration = createMuleConfiguration();
         String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
         LOGGER.info("Using working directory for test: " + workingDirectory);
         muleConfiguration.setWorkingDirectory(workingDirectory);
@@ -305,6 +305,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
     }
     return context;
+  }
+
+  protected DefaultMuleConfiguration createMuleConfiguration() {
+    return new DefaultMuleConfiguration();
   }
 
   /**

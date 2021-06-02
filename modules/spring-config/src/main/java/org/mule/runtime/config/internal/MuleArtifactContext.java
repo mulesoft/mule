@@ -238,7 +238,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                   muleContext.getErrorTypeRepository());
 
     this.applicationModel = createApplicationModel(getMuleRegistry()
-            .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
+        .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
   }
 
   protected MuleRegistry getMuleRegistry() {
