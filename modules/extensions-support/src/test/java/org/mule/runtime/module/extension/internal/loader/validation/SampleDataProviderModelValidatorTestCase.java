@@ -293,6 +293,15 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
+  public void operationWithBoxedVoidReturnType() {
+    mockComponent(operationModel, builder(VoidReturnTypeSampleDataProvider.class),
+                  VoidAttributesSampleDataProvider.class.getSimpleName());
+
+    validate();
+    assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$VoidReturnTypeSampleDataProvider] cannot have a Void return type"));
+  }
+
+  @Test
   public void pagingOperationWithInputStreamPayload() {
     Method method = getPagedOperationMethod();
     mockInputStreamPaging(method);
@@ -583,6 +592,19 @@ public class SampleDataProviderModelValidatorTestCase {
 
     @Override
     public Result<String, Void> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class VoidReturnTypeSampleDataProvider implements SampleDataProvider<Void, Void> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<Void, Void> getSample() throws SampleDataException {
       return null;
     }
   }
