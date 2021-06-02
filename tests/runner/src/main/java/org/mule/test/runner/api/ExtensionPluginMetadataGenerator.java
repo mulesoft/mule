@@ -20,6 +20,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
@@ -138,6 +139,7 @@ class ExtensionPluginMetadataGenerator {
       }
 
     };
+    muleContext.setMuleConfiguration(new DefaultMuleConfiguration());
     try {
       initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {

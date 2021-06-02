@@ -14,15 +14,15 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>AllStatistics</code> TODO
@@ -154,10 +154,9 @@ public class AllStatistics {
   }
 
   public static void configureComputeConnectionErrorsInStats() {
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-
-    ffRegistry.registerFeature(COMPUTE_CONNECTION_ERRORS_IN_STATS,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
-                                   && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(COMPUTE_CONNECTION_ERRORS_IN_STATS,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }

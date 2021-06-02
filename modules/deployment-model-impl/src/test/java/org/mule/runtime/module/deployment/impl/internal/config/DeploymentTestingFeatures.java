@@ -4,30 +4,44 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.petstore.extension;
+package org.mule.runtime.module.deployment.impl.internal.config;
 
 import org.mule.runtime.api.config.Feature;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Optional.ofNullable;
 
-public enum PetStoreFeatures implements Feature {
+/**
+ * Features meant to be used in {@link Feature} flag related tests.
+ * 
+ * @see FeatureFlaggingUtils
+ * @see org.mule.runtime.core.api.config.FeatureFlaggingService
+ * @since 4.3.1 4.4.0
+ */
+public enum DeploymentTestingFeatures implements Feature {
 
-  LEGACY_FEATURE_ONE("Feature legacy, just for testing", "MULE-123", "4.4.0", "mule.pet.store.legacy-behavior"),
+  ALWAYS_ON_FEATURE("Testing feature", "MULE-123", "4.4.0");
 
-  LEGACY_FEATURE_TWO("Feature legacy, just for testing", "MULE-123", "4.4.0", "mule.pet.store.legacy-behavior");
+  private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
+  static {
+    if (!areFeatureFlagsConfigured.getAndSet(true)) {
+      FeatureFlaggingRegistry.getInstance().registerFeatureFlag(ALWAYS_ON_FEATURE, featureContext -> true);
+    }
+  }
 
+  private final String description;
   private final String issue;
   private final String since;
-  private final String description;
   private final String overridingSystemPropertyName;
 
-  PetStoreFeatures(String description, String issue, String since) {
+  DeploymentTestingFeatures(String description, String issue, String since) {
     this(description, issue, since, null);
   }
 
-  PetStoreFeatures(String description, String issue, String since, String overridingSystemPropertyName) {
+  DeploymentTestingFeatures(String description, String issue, String since, String overridingSystemPropertyName) {
     this.description = description;
     this.issue = issue;
     this.since = since;

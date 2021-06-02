@@ -14,7 +14,6 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
@@ -25,7 +24,6 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.parserErrorType;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
@@ -38,7 +36,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
@@ -81,7 +78,6 @@ import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -91,7 +87,6 @@ import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
-import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -145,11 +140,6 @@ import org.xml.sax.EntityResolver;
 public class MuleArtifactContext extends AbstractRefreshableConfigApplicationContext implements ArtifactConfigResolverContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleArtifactContext.class);
-  static {
-    configurePropertiesResolverFeatureFlag();
-    configureBatchFixedAggregatorTransactionRecordBuffer();
-    configureComputeConnectionErrorsInStats();
-  }
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
@@ -247,16 +237,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(), componentBuildingDefinitionRegistry,
                                   muleContext.getErrorTypeRepository());
 
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-
-    FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
-        .context(muleContext)
-        .configurations(ffRegistry.getFeatureConfigurations())
-        .build();
-
-    muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
-
-    this.applicationModel = createApplicationModel(featureFlaggingService);
+    this.applicationModel = createApplicationModel(getMuleRegistry()
+            .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -820,12 +802,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public ClassLoader getExecutionClassLoader() {
     return muleContext.getExecutionClassLoader();
-  }
-
-  private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-
-    ffRegistry.registerFeature(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, ctx -> false);
   }
 
 }
