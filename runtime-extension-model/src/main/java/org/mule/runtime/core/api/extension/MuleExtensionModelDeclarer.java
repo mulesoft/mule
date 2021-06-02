@@ -559,7 +559,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer untilSuccessful = extensionDeclarer.withConstruct("untilSuccessful")
-        .describedAs("Attempts to route a message to the message processor it contains in a synchronous manner. " +
+        .describedAs("Attempts to route a message to its inner chain in a synchronous manner. " +
             "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.");
 
     untilSuccessful.withChain();
