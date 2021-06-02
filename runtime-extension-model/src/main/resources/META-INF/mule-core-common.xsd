@@ -2533,7 +2533,7 @@
     <xsd:element name="until-successful" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Attempts to route a message to the message processor it contains in an asynchronous manner.
+                Attempts to route a message to its inner chain in a synchronous manner.
                 Routing is considered successful if no error has been raised and, optionally, if the response matches an expression
             </xsd:documentation>
         </xsd:annotation>
