@@ -31,7 +31,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  * Utility class meant to provide a {@link FeatureFlaggingService} substitute during the earlier
  * stages of the deployment, when such service is not available yet.
  *
- * @since 4.4.0
+ * @since 4.3.1 4.4.0
  */
 public class FeatureFlaggingUtils {
 

@@ -17,7 +17,7 @@ import static java.util.Optional.ofNullable;
  * Decoupled {@link org.mule.runtime.core.api.MuleContext} metadata, used to evaluate {@link org.mule.runtime.api.config.Feature}
  * flags.
  *
- * @since 4.4.0
+ * @since 4.3.1 4.4.0
  */
 public class FeatureContext {
 
