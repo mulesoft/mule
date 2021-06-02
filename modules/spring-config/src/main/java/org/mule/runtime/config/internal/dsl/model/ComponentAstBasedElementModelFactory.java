@@ -41,7 +41,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NA
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
@@ -430,7 +429,7 @@ class ComponentAstBasedElementModelFactory {
 
     ComponentAst groupComponent = getSingleComponentConfiguration(innerComponents, identifier);
     if (groupComponent != null) {
-      groupElementBuilder.withConfig(groupComponent);
+      // groupElementBuilder.withConfig(groupComponent);
 
       Multimap<ComponentIdentifier, ComponentAst> groupInnerComponents = getNestedComponents(groupComponent);
       group.getParameterModels()
@@ -506,21 +505,26 @@ class ComponentAstBasedElementModelFactory {
 
     ComponentAst paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramSyntax));
 
-    // TODO MULE-19168 remove this
-    if (isInfrastructure(paramModel)) {
-      handleInfrastructure(paramModel, paramSyntax, innerComponents, parameters,
-                           groupElementBuilder);
-      return;
-    }
+    // // TODO MULE-19168 remove this
+    // if (isInfrastructure(paramModel)) {
+    // handleInfrastructure(paramModel, paramSyntax, innerComponents, parameters,
+    // groupElementBuilder);
+    // return;
+    // }
 
     if (paramSyntax.isWrapped()) {
       resolveWrappedElement(groupElementBuilder, paramModel, paramComponent);
       return;
     }
 
-    String value = paramSyntax.supportsAttributeDeclaration()
-        ? parameters.get(paramSyntax.getAttributeName())
-        : null;
+    String value;
+    if (parameters.containsKey(paramModel.getName())) {
+      value = parameters.get(paramModel.getName());
+    } else {
+      value = paramSyntax.supportsAttributeDeclaration()
+          ? parameters.get(paramSyntax.getAttributeName())
+          : null;
+    }
 
     Optional<String> defaultValue = getDefaultValue(paramModel);
     if (paramComponent != null || !isBlank(value) || defaultValue.isPresent()) {
