@@ -2704,7 +2704,7 @@
         }
       ],
       "name": "untilSuccessful",
-      "description": "Attempts to route a message to the message processor it contains in an asynchronous manner. Routing is considered successful if no exception has been raised and, optionally, if the response matches an expression",
+      "description": "Attempts to route a message to its inner chain in a synchronous manner. Routing is considered successful if no exception has been raised and, optionally, if the response matches an expression",
       "modelProperties": {},
       "kind": "construct"
     }
