@@ -15003,7 +15003,6 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
-      "semanticTerms": [],
       "stereotype": {
         "type": "FEATURE_FLAGGED_ECHO_MULE_CONTEXT",
         "namespace": "PETSTORE",
@@ -15028,7 +15027,6 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
-              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -15043,7 +15041,6 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
               "name": "message",
               "description": "",
               "modelProperties": {}
@@ -15072,7 +15069,6 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
-              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -15088,7 +15084,6 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15105,7 +15100,6 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
-              "fieldValueProviderModels": [],
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -15122,7 +15116,6 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15140,135 +15133,6 @@
           },
           "showInDsl": false,
           "name": "Output",
-          "description": "",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Array",
-                "annotations": {
-                  "description": {
-                    "value": "Determines that an error thrown by this operation should be mapped to another"
-                  },
-                  "typeDsl": {
-                    "allowInlineDefinition": true,
-                    "allowTopLevelDefinition": false
-                  }
-                },
-                "item": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "errorMapping"
-                  },
-                  "fields": [
-                    {
-                      "key": {
-                        "name": "source"
-                      },
-                      "model": {
-                        "format": {
-                          "id": "text",
-                          "label": "Text",
-                          "validMimeTypes": [
-                            "text/plain"
-                          ]
-                        },
-                        "type": "String",
-                        "annotations": {
-                          "typeId": "errorTypeMatcher",
-                          "enum": {
-                            "type": "[Ljava.lang.String;",
-                            "values": [
-                              "ANY",
-                              "REDELIVERY_EXHAUSTED",
-                              "TRANSFORMATION",
-                              "EXPRESSION",
-                              "SECURITY",
-                              "CLIENT_SECURITY",
-                              "SERVER_SECURITY",
-                              "ROUTING",
-                              "CONNECTIVITY",
-                              "RETRY_EXHAUSTED",
-                              "TIMEOUT"
-                            ]
-                          }
-                        }
-                      }
-                    },
-                    {
-                      "key": {
-                        "name": "target",
-                        "required": "true"
-                      },
-                      "model": {
-                        "format": {
-                          "id": "text",
-                          "label": "Text",
-                          "validMimeTypes": [
-                            "text/plain"
-                          ]
-                        },
-                        "type": "String",
-                        "annotations": {
-                          "typeId": "errorTypeDefinition"
-                        }
-                      }
-                    }
-                  ]
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4,
-                "tabName": "Error Mapping"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "errorMappings",
-              "description": "Set of error mappings",
-              "modelProperties": {
-                "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
-                    "prefix": "mule"
-                  }
-                },
-                "sinceMuleVersion": {
-                  "version": "4.4.0"
-                },
-                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                  "sequence": 12
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 3
-          },
-          "showInDsl": false,
-          "name": "Error Mappings",
           "description": "",
           "modelProperties": {}
         }
