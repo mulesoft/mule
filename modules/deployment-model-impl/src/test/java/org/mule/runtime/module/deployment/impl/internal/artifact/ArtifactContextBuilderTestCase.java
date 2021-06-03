@@ -11,6 +11,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_WAS_NOT_SET;
@@ -21,9 +22,15 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_CONFIGURATOR_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import org.junit.BeforeClass;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -41,6 +48,12 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @BeforeClass
+  public static void beforeClass() {
+    // Ensure that the testing feature flags are registered.
+    ALWAYS_ON_FEATURE.getClass();
+  }
 
   @Test
   public void emptyBuilder() throws Exception {
@@ -60,19 +73,19 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void setNullArtifactProperties() throws Exception {
+  public void setNullArtifactProperties() {
     expectedException.expectMessage(MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL);
     newBuilder().setArtifactProperties(null);
   }
 
   @Test
-  public void setNullClassLoaderRepository() throws Exception {
+  public void setNullClassLoaderRepository() {
     expectedException.expectMessage(CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL);
     newBuilder().setClassLoaderRepository(null);
   }
 
   @Test
-  public void setNullServiceConfigurator() throws Exception {
+  public void setNullServiceConfigurator() {
     expectedException.expectMessage(SERVICE_CONFIGURATOR_CANNOT_BE_NULL);
     newBuilder().withServiceConfigurator(null);
   }
@@ -99,8 +112,21 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void setNullServiceRepository() throws Exception {
+  public void setNullServiceRepository() {
     expectedException.expectMessage(SERVICE_REPOSITORY_CANNOT_BE_NULL);
     newBuilder().setServiceRepository(null);
   }
+
+  @Test
+  @Story(FEATURE_FLAGGING_SERVICE_KEY)
+  @Issue("MULE-19402")
+  public void buildSettingLegacyFeatureFlag() throws Exception {
+    ArtifactContext artifactContext =
+        newBuilder(new TestServicesConfigurationBuilder()).setExecutionClassloader(currentThread().getContextClassLoader())
+            .setClassLoaderRepository(mock(ClassLoaderRepository.class)).build();
+    FeatureFlaggingService featureFlaggingService = (FeatureFlaggingService) artifactContext.getRegistry()
+        .lookupByName(FEATURE_FLAGGING_SERVICE_KEY).get();
+    assertThat(featureFlaggingService.isEnabled(ALWAYS_ON_FEATURE), is(true));
+  }
+
 }

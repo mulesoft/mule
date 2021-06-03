@@ -46,6 +46,7 @@ public class FeatureFlaggingRegistry {
   public static final String CONDITION_CAN_NOT_BE_NULL = "Error registering %s: condition can not be null";
 
   private final Map<Feature, Predicate<MuleContext>> configurations = new ConcurrentHashMap<>();
+  private final Map<Feature, Predicate<FeatureContext>> featureFlagConfigurations = new ConcurrentHashMap<>();
 
   private static final FeatureFlaggingRegistry INSTANCE = new FeatureFlaggingRegistry();
 
@@ -61,24 +62,19 @@ public class FeatureFlaggingRegistry {
   private FeatureFlaggingRegistry() {}
 
   /**
-   * Registers a {@link Predicate} associated with a String which represents a given feature. The {@link Predicate} will be
-   * evaluated at deployment time, exposing all the features through a per-application overridden {@link FeatureFlaggingService}
-   * 
+   * Registers a feature flag, represented by a {@link Feature} and a {@link Predicate}. Registered feature flags will be
+   * evaluated during deploy and exposed through a per-artifact {@link FeatureFlaggingService}.
+   *
    * @see FeatureFlaggingService
    * 
-   * @param feature Name representing the registered feature
-   * @param condition This predicate will be evaluated at deployment time. The {@link MuleContext} corresponds to the context that
-   *        is being created for this application.
+   * @param feature   {@link Feature} whose feature flag will be registered.
+   * @param condition {@link Predicate} That will be evaluated at deployment time. The {@link MuleContext} corresponds to the
+   *                  context that is being created for the artifact that is being deployed.
+   * @deprecated Use {@link #registerFeatureFlag(Feature, Predicate)} instead.
    */
+  @Deprecated
   public void registerFeature(Feature feature, Predicate<MuleContext> condition) {
-    if (feature == null) {
-      throw new IllegalArgumentException(FEATURE_CAN_NOT_BE_NULL);
-    }
-
-    if (condition == null) {
-      throw new IllegalArgumentException(format(CONDITION_CAN_NOT_BE_NULL, feature));
-    }
-
+    validate(feature, condition);
     Predicate<MuleContext> added = configurations.putIfAbsent(feature, condition);
     if (added != null) {
       throw new IllegalArgumentException(format(FEATURE_ALREADY_REGISTERED, feature));
@@ -86,12 +82,50 @@ public class FeatureFlaggingRegistry {
   }
 
   /**
-   * Returns all the configurations that were registered by using {@link #registerFeature(Feature, Predicate)}
-   * 
-   * @return An unmodifiable map with the registered features.
+   * Registers a feature flag, represented by a {@link Feature} and a {@link Predicate}. Registered feature flags will be
+   * evaluated during deploy and exposed through a per-artifact {@link FeatureFlaggingService}.
+   *
+   * @see FeatureFlaggingService
+   *
+   * @param feature   {@link Feature} whose feature flag will be registered.
+   * @param condition {@link Predicate} That will be evaluated at deployment time. The {@link FeatureContext} metadata corresponds
+   *                  to the artifact that is being deployed.
    */
+  public void registerFeatureFlag(Feature feature, Predicate<FeatureContext> condition) {
+    validate(feature, condition);
+    Predicate<FeatureContext> added = featureFlagConfigurations.putIfAbsent(feature, condition);
+    if (added != null) {
+      throw new IllegalArgumentException(format(FEATURE_ALREADY_REGISTERED, feature));
+    }
+  }
+
+  private void validate(Feature feature, Predicate<?> condition) {
+    if (feature == null) {
+      throw new IllegalArgumentException(FEATURE_CAN_NOT_BE_NULL);
+    }
+    if (condition == null) {
+      throw new IllegalArgumentException(format(CONDITION_CAN_NOT_BE_NULL, feature));
+    }
+  }
+
+  /**
+   * Returns all the configurations that were registered by using {@link #registerFeature(Feature, Predicate)}
+   *
+   * @return An unmodifiable map with the registered features.
+   * @deprecated Use {@link #registerFeatureFlag(Feature, Predicate)} and {@link #getFeatureFlagConfigurations()} instead.
+   */
+  @Deprecated
   public Map<Feature, Predicate<MuleContext>> getFeatureConfigurations() {
     return unmodifiableMap(configurations);
+  }
+
+  /**
+   * Returns all the configurations that were registered by using {@link #registerFeatureFlag(Feature, Predicate)}
+   *
+   * @return An unmodifiable map with the registered features.
+   */
+  public Map<Feature, Predicate<FeatureContext>> getFeatureFlagConfigurations() {
+    return featureFlagConfigurations;
   }
 
   /**
@@ -99,5 +133,6 @@ public class FeatureFlaggingRegistry {
    */
   protected void clearFeatureConfigurations() {
     configurations.clear();
+    featureFlagConfigurations.clear();
   }
 }

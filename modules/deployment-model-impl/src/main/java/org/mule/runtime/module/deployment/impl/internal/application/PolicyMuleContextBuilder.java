@@ -10,12 +10,13 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 
 import java.util.Map;
 
 /**
  * Takes Mule policy descriptor into account when building the context.
- * 
+ *
  *  @since 4.1
  */
 public class PolicyMuleContextBuilder extends SupportsPropertiesMuleContextBuilder {
@@ -37,6 +38,10 @@ public class PolicyMuleContextBuilder extends SupportsPropertiesMuleContextBuild
     final String encoding = defaultEncoding;
     if (!isBlank(encoding)) {
       configuration.setDefaultEncoding(encoding);
+    }
+    if (executionClassLoader instanceof MuleArtifactClassLoader) {
+      configuration
+          .setMinMuleVersion(((MuleArtifactClassLoader) executionClassLoader).getArtifactDescriptor().getMinMuleVersion());
     }
     return configuration;
   }
