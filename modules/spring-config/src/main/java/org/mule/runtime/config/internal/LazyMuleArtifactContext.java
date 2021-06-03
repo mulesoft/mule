@@ -166,7 +166,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     final CustomizationService customizationService = muleContext.getCustomizationService();
 
-    customizationService.overrideDefaultServiceImpl(OBJECT_EXPRESSION_MANAGER, new LazyExpressionManager());
+    customizationService.overrideDefaultServiceImpl(OBJECT_EXPRESSION_MANAGER,
+                                                    new LazyExpressionManager(muleContext.getExecutionClassLoader()));
     customizationService.overrideDefaultServiceImpl(OBJECT_CONNECTIVITY_TESTER_FACTORY, new NoOpConnectivityTesterFactory());
     customizationService.overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
                                                     new LazyConnectivityTestingService(this, () -> getRegistry()
