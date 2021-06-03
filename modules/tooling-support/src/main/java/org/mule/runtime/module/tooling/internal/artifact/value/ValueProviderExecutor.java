@@ -73,7 +73,8 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
                                                                              connectionSupplier(context),
                                                                              configSupplier(context),
                                                                              context.getConnectionProvider().orElse(null)),
-                         "");
+                         "",
+                         false);
 
   }
 
@@ -91,7 +92,8 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
                                                                              connectionSupplier(context),
                                                                              configSupplier(context),
                                                                              context.getConnectionProvider().orElse(null)),
-                         " with targetSelector: " + targetSelector);
+                         " with targetSelector: " + targetSelector,
+                         true);
 
   }
 
@@ -99,7 +101,8 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
                                     ParameterizedElementDeclaration parameterizedElementDeclaration,
                                     String providerName,
                                     ValueProviderFunction valueProviderFunction,
-                                    String loggingSuffix) {
+                                    String loggingSuffix,
+                                    boolean overrideExpressionSupport) {
     try {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Resolve value provider: {} STARTED for component: {} {}", providerName, parameterizedModel.getName(),
@@ -108,7 +111,8 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(parameterizedModel, parameterizedElementDeclaration, providerName);
 
-      ParameterValueResolver parameterValueResolver = parameterValueResolver(parameterizedElementDeclaration, parameterizedModel);
+      ParameterValueResolver parameterValueResolver =
+          parameterValueResolver(parameterizedElementDeclaration, parameterizedModel, overrideExpressionSupport);
       ValueProviderMediator valueProviderMediator = createValueProviderMediator(parameterizedModel);
 
       ExtensionResolvingContext context = new ExtensionResolvingContext(() -> optionalConfigurationInstance,

@@ -40,7 +40,7 @@ public class ParameterExtractor implements ParameterValueVisitor {
   // TODO: CCNS-26. This approach is no longer valid. e.g: If the expected type is an stream, this fails.
   public static Object extractValue(ParameterValue parameterValue, Class<?> type) {
     Object extractedValue = extractValue(parameterValue);
-    if (extractedValue instanceof String) {
+    if (!type.isPrimitive() && extractedValue instanceof String) {
       return extractedValue;
     }
     return objectMapper.convertValue(extractValue(parameterValue), type);

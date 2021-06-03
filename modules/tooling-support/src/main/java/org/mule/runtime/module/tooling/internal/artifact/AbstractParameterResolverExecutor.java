@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact;
 
+import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
@@ -57,9 +59,11 @@ public class AbstractParameterResolverExecutor {
   }
 
   protected ParameterValueResolver parameterValueResolver(ParameterizedElementDeclaration parameterizedElementDeclaration,
-                                                          ParameterizedModel parameterizedModel)
+                                                          ParameterizedModel parameterizedModel,
+                                                          boolean overrideExpressionSupport)
       throws ExpressionNotSupportedException {
-    Map<String, Object> parametersMap = parametersMap(parameterizedElementDeclaration, parameterizedModel);
+    Map<String, Object> parametersMap =
+        parametersMap(parameterizedElementDeclaration, parameterizedModel, overrideExpressionSupport);
 
     try {
       final ResolverSet resolverSet =
@@ -76,7 +80,8 @@ public class AbstractParameterResolverExecutor {
   }
 
   protected Map<String, Object> parametersMap(ParameterizedElementDeclaration parameterizedElementDeclaration,
-                                              ParameterizedModel parameterizedModel)
+                                              ParameterizedModel parameterizedModel,
+                                              boolean overrideExpressionSupport)
       throws ExpressionNotSupportedException {
     Map<String, Object> parametersMap = new HashMap<>();
 
@@ -101,8 +106,13 @@ public class AbstractParameterResolverExecutor {
 
         // TODO: CCNS-26. Improve this.
         if (value instanceof String && isExpression(value)) {
-          value = new TypeSafeExpressionValueResolver<>(
-                                                        (String) value,
+
+          if (!parameterModel.getExpressionSupport().equals(NOT_SUPPORTED) && !overrideExpressionSupport) {
+            throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
+                                                             parameterName));
+          }
+
+          value = new TypeSafeExpressionValueResolver<>((String) value,
                                                         TypedValue.class,
                                                         DataType.TYPED_VALUE);
           try {
@@ -112,7 +122,6 @@ public class AbstractParameterResolverExecutor {
             throw new MuleRuntimeException(createStaticMessage("Could not inject ValueResolver properly"), e);
           }
         }
-
         parametersMap.put(parameterName, value);
       }
     }

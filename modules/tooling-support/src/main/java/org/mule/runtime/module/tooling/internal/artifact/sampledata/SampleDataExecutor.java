@@ -11,12 +11,9 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.sampledata.SampleDataFailure.Builder.newFailure;
 import static org.mule.runtime.api.sampledata.SampleDataResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 
@@ -25,7 +22,6 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.data.sample.SampleDataProviderModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.sampledata.SampleDataFailure;
 import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
@@ -34,7 +30,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -48,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +122,7 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
   private Map<String, Object> parameterMapWithDefaults(ParameterizedElementDeclaration componentElementDeclaration,
                                                        ComponentModel componentModel) {
-    Map<String, Object> explicitParameterMaps = parametersMap(componentElementDeclaration, componentModel);
+    Map<String, Object> explicitParameterMaps = parametersMap(componentElementDeclaration, componentModel, false);
     if (componentModel instanceof HasOutputModel) {
       ((HasOutputModel) componentModel).getSampleDataProviderModel().ifPresent(model -> {
         // No need to identify the acting parameter is required or not, maybe be required but DSL on component
@@ -139,7 +133,8 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
         // Now we get the default values for those optional parameters from model that are marked as acting
         // parameters
-        ParameterValueResolver parameterValueResolver = parameterValueResolver(componentElementDeclaration, componentModel);
+        ParameterValueResolver parameterValueResolver =
+            parameterValueResolver(componentElementDeclaration, componentModel, false);
 
         componentModel.getAllParameterModels().stream()
             .filter(p -> actingParameters.contains(p.getName()))
