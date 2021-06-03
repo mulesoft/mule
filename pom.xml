@@ -122,7 +122,7 @@
 
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-        <groovyVersion>2.4.15</groovyVersion>
+        <groovyVersion>2.4.21</groovyVersion>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
         <maven.eclipse.plugin.version>2.10</maven.eclipse.plugin.version>
         <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
@@ -227,7 +227,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
-        <muleMvelVersion>2.1.9-MULE-025</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-026</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>3.1.28</ognlVersion>
@@ -257,7 +257,7 @@
         <wrapperVersion>3.2.3</wrapperVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xmlSecurityVersion>1.5.8</xmlSecurityVersion>
-        <xstreamVersion>1.4.15</xstreamVersion>
+        <xstreamVersion>1.4.16</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <openSamlVersion>2.6.6</openSamlVersion>
     </properties>

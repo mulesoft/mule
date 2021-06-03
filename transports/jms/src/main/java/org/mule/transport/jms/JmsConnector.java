@@ -7,9 +7,11 @@
 package org.mule.transport.jms;
 
 
+import static java.lang.Boolean.getBoolean;
 import static org.mule.api.config.MuleProperties.MULE_JMS_REDELIVERY_DELAY;
 import static org.mule.api.config.MuleProperties.MULE_JMS_MAX_REDELIVERY_DELAY;
 import static org.mule.api.config.MuleProperties.MULE_JMS_INITIAL_REDELIVERY_DELAY;
+import static org.mule.api.config.MuleProperties.MULE_JMS_CLOSE_CONNECTION_ON_STOP;
 
 import org.mule.api.Closeable;
 import org.mule.api.DefaultMuleException;
@@ -48,9 +50,7 @@ import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 import org.mule.util.BeanUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Timer;
@@ -775,16 +775,17 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     protected void doStart() throws MuleException
     {
         //TODO: This should never be null or an exception should be thrown
-        if (connection != null)
+
+        try
         {
-            try
-            {
-                connection.start();
+            if(connection==null){
+                connection = createConnection();
             }
-            catch (JMSException e)
-            {
-                throw new StartException(CoreMessages.failedToStart("Jms Connection"), e, this);
-            }
+            connection.start();
+        }
+        catch (JMSException e)
+        {
+            throw new StartException(CoreMessages.failedToStart("Jms Connection"), e, this);
         }
 
         if (jndiNameResolver != null)
@@ -826,6 +827,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 stopping = true;
                 connection.stop();
+                if(getBoolean(MULE_JMS_CLOSE_CONNECTION_ON_STOP))
+                {
+                    closeConnection(connection, connectionFactory);
+                    connection = null;
+                }
             }
             catch (Exception e)
             {

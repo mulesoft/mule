@@ -10,6 +10,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.api.config.MuleProperties.MULE_JMS_CLOSE_CONNECTION_ON_STOP;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
@@ -263,6 +266,40 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         spy.doStop();
         verify(connection, times(1)).stop();
     }
+
+    @Test
+    public void closeConnectionOnStop() throws Exception
+    {
+        try
+        {
+            System.setProperty(MULE_JMS_CLOSE_CONNECTION_ON_STOP, "true");
+            Connection connection = mock(Connection.class);
+            JmsConnector connector = new JmsConnector(muleContext);
+            ConnectionFactory connectionFactory = mock(CachingConnectionFactory.class);
+            connector.setConnectionFactory(connectionFactory);
+            connector.setConnection(connection);
+            connector.doStop();
+            assertNull(connector.getConnection());
+        }
+        finally
+        {
+            System.setProperty(MULE_JMS_CLOSE_CONNECTION_ON_STOP, "false");
+        }
+    }
+
+    @Test
+    public void doNotCloseConnectionOnStop() throws Exception
+    {
+            Connection connection = mock(Connection.class);
+            JmsConnector connector = new JmsConnector(muleContext);
+            JmsConnector spy = spy(connector);
+            ConnectionFactory connectionFactory = mock(CachingConnectionFactory.class);
+            connector.setConnectionFactory(connectionFactory);
+            connector.setConnection(connection);
+            spy.doStop();
+            assertNotNull(connector.getConnection());
+    }
+
 
     @Test
     public void doNotChangeConnectionFactoryWhenNotUsingXAConnectionFactory() throws Exception
