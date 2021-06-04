@@ -140,9 +140,12 @@ public abstract class MetadataExecutor {
     }
   }
 
-  private void updateCache(String key, MetadataCache metadataCache) {
+  private void updateCache(String id, MetadataCache metadataCache) {
     try {
-      metadataCacheManager.updateCache(key, metadataCache);
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("Updating MetadataCache entry for id: {}", id);
+      }
+      metadataCacheManager.updateCache(id, metadataCache);
     } catch (Exception e) {
       LOGGER
           .warn("Couldn't update the MetadataCache due to an internal error, data would be lost and resolvers couldn't share resources between resolutions.",
@@ -150,9 +153,12 @@ public abstract class MetadataExecutor {
     }
   }
 
-  private MetadataCache getOrCreateCache(String key) {
+  private MetadataCache getOrCreateCache(String id) {
     try {
-      return metadataCacheManager.getOrCreateCache(key);
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("Creating new MetadataCache with id: {}", id);
+      }
+      return metadataCacheManager.getOrCreateCache(id);
     } catch (Exception e) {
       LOGGER
           .warn("Couldn't create a MetadataCache due to an internal error, resolvers won't be able to store resources between resolutions. Using an in memory cache.",
@@ -165,7 +171,7 @@ public abstract class MetadataExecutor {
     return metadataCacheIdGenerator.getIdForGlobalMetadata(componentElementDeclaration)
         .map(id -> {
           if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(id.getParts().toString());
+            LOGGER.debug("ID generated for MetadataCache with value: {}", id.getParts().toString());
           }
           return id;
         })
@@ -177,7 +183,11 @@ public abstract class MetadataExecutor {
 
   public void disposeMetadataCache(ComponentElementDeclaration componentElementDeclaration) {
     try {
-      metadataCacheManager.dispose(getMetadataCacheId(componentElementDeclaration).getValue());
+      String id = getMetadataCacheId(componentElementDeclaration).getValue();
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("Disposing MetadataCache entry for id: {}", id);
+      }
+      metadataCacheManager.dispose(id);
     } catch (Exception e) {
       LOGGER.warn("Couldn't dispose MetadataCache due to an internal error.", e);
     }
