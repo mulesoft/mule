@@ -48,6 +48,7 @@
         <module>resource-extension</module>
         <module>custom-object-store-extension</module>
         <module>semantic-terms-extension</module>
+        <module>reusable-app</module>
     </modules>
 
     <build>

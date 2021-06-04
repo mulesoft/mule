@@ -21,7 +21,7 @@ public class LazyExpressionManager extends DefaultExpressionManager {
 
   @Override
   protected ExtendedExpressionLanguageAdaptor createExpressionLanguageAdaptor(DefaultExpressionLanguageFactoryService service) {
-    return new LazyExpressionLanguageAdaptor(() -> createWeaveExpressionLanguageAdaptor(service));
+    return new LazyExpressionLanguageAdaptor(() -> super.createExpressionLanguageAdaptor(service));
   }
 
 }
