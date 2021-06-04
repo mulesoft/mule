@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOI
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
@@ -130,8 +131,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public class MuleExtensionUtils {
 
-  private static final String IMPLICIT_CONFIGURATION_SUFFIX = "-implicit";
-  public static final String HYPHEN = "-";
+  private static final String IMPLICIT_CONFIGURATION_SUFFIX = DASH + "implicit";
 
   /**
    * @param componentModel a {@link ComponentModel}
@@ -494,7 +494,7 @@ public class MuleExtensionUtils {
    * @param extensionModel                         The {@link ExtensionModel} of the extension.
    * @param configurationModel                     The {@link ConfigurationModel} of the extension.
    * @param extendedArtifactType                   The {@link ArtifactType} of the extended artifact.
-   * @param extendedArtifactId                     The unique id of the extended artifact.MuleExtensionUtils.
+   * @param extendedArtifactId                     The unique id of the extended artifact.
    * @param extendedArtifactFeatureFlaggingService The {@link FeatureFlaggingService} of the extended artifact.
    * @return The {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name.
    */
@@ -522,7 +522,7 @@ public class MuleExtensionUtils {
                                                                                            ConfigurationModel configurationModel,
                                                                                            String extendedArtifactId,
                                                                                            FeatureFlaggingService featureFlaggingService) {
-    if (featureFlaggingService != null && featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
+    if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
       // Implicit configuration providers cannot be inherited from the parent (application) MuleContext registry, so a different
       // name is returned,
       // which will force the instantiation of a new ConfigurationProvider that will be stored in the policy MuleContext registry.
@@ -537,9 +537,9 @@ public class MuleExtensionUtils {
                                                              ConfigurationModel implicitConfigurationModel,
                                                              String extendedArtifactId) {
     return extensionModel.getName() +
-        HYPHEN +
+        DASH +
         implicitConfigurationModel.getName() +
-        HYPHEN +
+        DASH +
         extendedArtifactId +
         IMPLICIT_CONFIGURATION_SUFFIX;
   }
@@ -547,7 +547,7 @@ public class MuleExtensionUtils {
   private static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
                                                              ConfigurationModel implicitConfigurationModel) {
     return extensionModel.getName() +
-        HYPHEN +
+        DASH +
         implicitConfigurationModel.getName() +
         IMPLICIT_CONFIGURATION_SUFFIX;
   }

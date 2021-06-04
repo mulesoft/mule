@@ -79,7 +79,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   private ExpressionManager expressionManager;
 
   @Inject
-  FeatureFlaggingService featureFlaggingService;
+  private FeatureFlaggingService featureFlaggingService;
 
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;

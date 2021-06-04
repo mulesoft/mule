@@ -44,9 +44,9 @@ import java.util.concurrent.Callable;
 public final class DefaultImplicitConfigurationProviderFactory implements ImplicitConfigurationProviderFactory {
 
   @Inject
-  MuleContext muleContext;
+  private MuleContext muleContext;
   @Inject
-  FeatureFlaggingService featureFlaggingService;
+  private FeatureFlaggingService featureFlaggingService;
 
   /**
    * {@inheritDoc}

@@ -188,9 +188,10 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    */
   private Set<ExtensionModel> getInheritedExtensionModels() {
     Set<ExtensionModel> inheritedExtensionModels = new HashSet<>(2);
-    application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("HTTP")
+    ExtensionManager extensionManager = application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get();
+    extensionManager.getExtension("HTTP")
         .ifPresent(inheritedExtensionModels::add);
-    application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("Sockets")
+    extensionManager.getExtension("Sockets")
         .ifPresent(inheritedExtensionModels::add);
     return inheritedExtensionModels;
   }
