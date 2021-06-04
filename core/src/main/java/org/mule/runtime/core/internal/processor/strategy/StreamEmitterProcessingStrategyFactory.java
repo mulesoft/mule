@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Long.MIN_VALUE;
+import static java.lang.Math.min;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.nanoTime;
@@ -19,13 +20,12 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.buildPipelineProcessingStrategyTransformerFrom;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.util.LazyValue;
@@ -295,7 +295,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     protected int getSinksCount() {
       int coresLoad = CORES * 2;
-      return maxConcurrency < coresLoad ? maxConcurrency : coresLoad;
+      return min(maxConcurrency, coresLoad);
     }
 
     protected MuleRuntimeException resolveSubscriptionErrorCause(AtomicReference<Throwable> failedSubscriptionCause) {
@@ -321,10 +321,10 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getFlowDispatcherScheduler()));
-      return publisher -> from(publisher).publishOn(scheduler)
-          .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-          .transform(pipeline);
+      return buildPipelineProcessingStrategyTransformerFrom(pipeline, executionClassloader)
+          .withScheduler(getFlowDispatcherScheduler())
+          .withSchedulerDecorator(this::decorateScheduler)
+          .build();
     }
 
     @Override
