@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.util.Collections.singleton;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
@@ -55,8 +54,10 @@ import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.policy.api.PolicyPointcut;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Default implementation of {@link ApplicationPolicyInstance} that depends on a {@link PolicyTemplate} artifact.
@@ -112,9 +113,9 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
             .setServiceRepository(serviceRepository)
             .setClassLoaderRepository(classLoaderRepository)
-            .setArtifactPlugins(featureFlaggedArtifactPlugins(template.getDescriptor()))
+            .setArtifactPlugins(getFeatureFlaggedArtifactPlugins(template.getDescriptor()))
             .setParentArtifact(application)
-            .setExtensionManagerFactory(featureFlaggedExtensionManagerFactory())
+            .setExtensionManagerFactory(getFeatureFlaggedExtensionManagerFactory())
             .setMuleContextListener(muleContextListener);
 
     artifactBuilder.withServiceConfigurator(customizationService -> {
@@ -140,7 +141,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    *
    * @return The policy artifact plugins.
    */
-  private List<ArtifactPlugin> featureFlaggedArtifactPlugins(ArtifactDescriptor policyArtifactDescriptor) {
+  private List<ArtifactPlugin> getFeatureFlaggedArtifactPlugins(ArtifactDescriptor policyArtifactDescriptor) {
     if (FeatureFlaggingUtils.isFeatureEnabled(ENABLE_POLICY_ISOLATION, policyArtifactDescriptor)) {
       // Returns all the artifact plugins that the policy depends on.
       return template.getOwnArtifactPlugins();
@@ -156,7 +157,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    *
    * @return {@link ExtensionManagerFactory} instance.
    */
-  private ExtensionManagerFactory featureFlaggedExtensionManagerFactory() {
+  private ExtensionManagerFactory getFeatureFlaggedExtensionManagerFactory() {
     return muleContext -> {
       try {
         FeatureFlaggingService featureFlaggingService =
@@ -166,14 +167,14 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
           ArtifactExtensionManagerFactory artifactExtensionManagerFactory =
               new ArtifactExtensionManagerFactory(template.getOwnArtifactPlugins(), extensionModelLoaderRepository,
                                                   new DefaultExtensionManagerFactory());
-          // HTTP extension model must be added if found in the application extensions (backward compatibility for API Gateway).
-          Optional<ExtensionModel> httpExtensionModel =
-              application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("HTTP");
-          if (httpExtensionModel.isPresent()) {
-            return artifactExtensionManagerFactory.create(muleContext, singleton(httpExtensionModel.get()));
-          } else {
-            return artifactExtensionManagerFactory.create(muleContext);
-          }
+          // HTTP and Sockets extension models must be added if found in the application extensions (backward compatibility for
+          // API Gateway).
+          Set<ExtensionModel> inheritedExtensionModels = new HashSet<>(2);
+          application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("HTTP")
+              .ifPresent(inheritedExtensionModels::add);
+          application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("Sockets")
+              .ifPresent(inheritedExtensionModels::add);
+          return artifactExtensionManagerFactory.create(muleContext, inheritedExtensionModels);
         } else {
           // The policy will share extension models and configuration providers with the application that is being applied to.
           return new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,

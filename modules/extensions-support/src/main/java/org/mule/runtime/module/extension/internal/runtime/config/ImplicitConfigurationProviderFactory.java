@@ -38,16 +38,4 @@ public interface ImplicitConfigurationProviderFactory {
                                                             CoreEvent muleEvent,
                                                             ReflectionCache reflectionCache,
                                                             ExpressionManager expressionManager);
-
-  /**
-   * Returns an implicit {@link ConfigurationProvider} name, that can be used to look it up.
-   *
-   * @param extensionModel     The configurable {@link ExtensionModel}.
-   * @param configurationModel The {@link ConfigurationModel} that represents the extensionModel configuration.
-   * @return The {@link ConfigurationProvider} name.
-   * @see org.mule.runtime.module.extension.internal.manager.ExtensionRegistry#getConfigurationProvider(String)
-   * @since 4.4.0
-   */
-  String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel);
-
 }

@@ -19,8 +19,10 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigu
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -75,6 +77,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   @Inject
   private ExpressionManager expressionManager;
+
+  @Inject
+  FeatureFlaggingService featureFlaggingService;
 
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
@@ -193,8 +198,10 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
       throw new NoConfigRefFoundException(extensionModel, componentModel);
     }
     return extensionConfigurationModel
-        .flatMap(c -> getConfigurationProvider(implicitConfigurationProviderFactory
-            .resolveImplicitConfigurationProviderName(extensionModel, c)));
+        .flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(extensionModel, c,
+                                                                                    muleContext.getArtifactType(),
+                                                                                    muleContext.getId(),
+                                                                                    featureFlaggingService)));
   }
 
   /**
@@ -210,8 +217,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                             ConfigurationModel configurationModel,
                                                             CoreEvent muleEvent) {
 
-    String implicitConfigurationProviderName = implicitConfigurationProviderFactory
-        .resolveImplicitConfigurationProviderName(extensionModel, configurationModel);
+    String implicitConfigurationProviderName =
+        getImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext.getArtifactType(),
+                                             muleContext.getId(), featureFlaggingService);
 
     return extensionRegistry.getConfigurationProvider(implicitConfigurationProviderName).orElseGet(() -> {
       synchronized (extensionModel) {

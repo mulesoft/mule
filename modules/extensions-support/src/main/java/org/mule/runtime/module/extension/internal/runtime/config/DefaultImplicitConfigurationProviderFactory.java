@@ -7,17 +7,15 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.canBeUsedImplicitly;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -68,7 +66,9 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
     ClassLoader pluginClassloader = getClassLoader(extensionModel);
     final ResolverSet resolverSet = withContextClassLoader(pluginClassloader, resolverSetCallable);
     try {
-      final String providerName = resolveImplicitConfigurationProviderName(extensionModel, configurationModel);
+      final String providerName =
+          getImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext.getArtifactType(),
+                                               muleContext.getId(), featureFlaggingService);
       ImplicitConnectionProviderValueResolver implicitConnectionProviderValueResolver =
           new ImplicitConnectionProviderValueResolver(configurationModel.getName(), extensionModel,
                                                       configurationModel, reflectionCache, expressionManager,
@@ -119,45 +119,6 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                  ImplicitConnectionProviderValueResolver implicitConnectionProviderValueResolver) {
     return !getConnectedComponents(extensionModel, configurationModel).isEmpty()
         && implicitConnectionProviderValueResolver.isDynamic();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel) {
-    if (muleContext.getArtifactType().equals(POLICY)) {
-      return featureFlaggedPolicyExtensionsImplicitConfigurationProviderName(extensionModel, configurationModel);
-    } else {
-      return getImplicitConfigurationProviderName(extensionModel, configurationModel);
-    }
-  }
-
-  /**
-   * Resolves the {@link ConfigurationProvider} name for a policy extension, taking into account the
-   * {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature flag.
-   * 
-   * @param extensionModel     The configurable {@link ExtensionModel}.
-   * @param configurationModel The {@link ConfigurationModel} that represents the extensionModel configuration.
-   * @return The {@link ConfigurationProvider} name.
-   */
-  private String featureFlaggedPolicyExtensionsImplicitConfigurationProviderName(ExtensionModel extensionModel,
-                                                                                 ConfigurationModel configurationModel) {
-    if (featureFlaggingService != null && featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
-      // Implicit configuration providers cannot be inherited from the parent (application) MuleContext registry, so a different
-      // name is returned,
-      // which will force the instantiation of a new ConfigurationProvider that will be stored in the policy MuleContext registry.
-      return format("%s-%s", muleContext.getId(),
-                    getImplicitConfigurationProviderName(extensionModel, configurationModel));
-    } else {
-      // Implicit configuration provider is inherited from the parent (application) MuleContext registry.
-      return getImplicitConfigurationProviderName(extensionModel, configurationModel);
-    }
-  }
-
-  private String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
-                                                      ConfigurationModel implicitConfigurationModel) {
-    return format("%s-%s-implicit", extensionModel.getName(), implicitConfigurationModel.getName());
   }
 
 }
