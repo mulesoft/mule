@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVID
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+import static org.mule.runtime.module.deployment.impl.internal.config.FeatureFlaggingUtils.isFeatureEnabled;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -47,7 +48,6 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
-import org.mule.runtime.module.deployment.impl.internal.config.FeatureFlaggingUtils;
 import org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
@@ -142,7 +142,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    * @return The policy artifact plugins.
    */
   private List<ArtifactPlugin> getFeatureFlaggedArtifactPlugins(ArtifactDescriptor policyArtifactDescriptor) {
-    if (FeatureFlaggingUtils.isFeatureEnabled(ENABLE_POLICY_ISOLATION, policyArtifactDescriptor)) {
+    if (isFeatureEnabled(ENABLE_POLICY_ISOLATION, policyArtifactDescriptor)) {
       // Returns all the artifact plugins that the policy depends on.
       return template.getOwnArtifactPlugins();
     } else {
