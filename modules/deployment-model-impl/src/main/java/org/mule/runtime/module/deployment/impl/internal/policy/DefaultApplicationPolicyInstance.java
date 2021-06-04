@@ -167,14 +167,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
           ArtifactExtensionManagerFactory artifactExtensionManagerFactory =
               new ArtifactExtensionManagerFactory(template.getOwnArtifactPlugins(), extensionModelLoaderRepository,
                                                   new DefaultExtensionManagerFactory());
-          // HTTP and Sockets extension models must be added if found in the application extensions (backward compatibility for
-          // API Gateway).
-          Set<ExtensionModel> inheritedExtensionModels = new HashSet<>(2);
-          application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("HTTP")
-              .ifPresent(inheritedExtensionModels::add);
-          application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("Sockets")
-              .ifPresent(inheritedExtensionModels::add);
-          return artifactExtensionManagerFactory.create(muleContext, inheritedExtensionModels);
+          return artifactExtensionManagerFactory.create(muleContext, getInheritedExtensionModels());
         } else {
           // The policy will share extension models and configuration providers with the application that is being applied to.
           return new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
@@ -185,6 +178,21 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
         throw new MuleRuntimeException(e);
       }
     };
+  }
+
+  /**
+   * HTTP and Sockets extension models must be added if found in the parent artifact extensions (backward compatibility for API
+   * Gateway).
+   * 
+   * @return Set containing the parent artifact HTTP and Sockets extension models (if present).
+   */
+  private Set<ExtensionModel> getInheritedExtensionModels() {
+    Set<ExtensionModel> inheritedExtensionModels = new HashSet<>(2);
+    application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("HTTP")
+        .ifPresent(inheritedExtensionModels::add);
+    application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get().getExtension("Sockets")
+        .ifPresent(inheritedExtensionModels::add);
+    return inheritedExtensionModels;
   }
 
   private void addPolicyCustomizationOverride(String objectKey, CustomizationService customizationService,
