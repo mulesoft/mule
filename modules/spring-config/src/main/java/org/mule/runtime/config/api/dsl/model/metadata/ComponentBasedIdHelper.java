@@ -11,8 +11,6 @@ import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
-import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -20,19 +18,29 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
+import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ComponentBasedIdHelper {
 
-  static String getSourceElementName(ComponentAst elementModel) {
-    return elementModel.getIdentifier().toString()
-        + getModelNameAst(elementModel).orElse(elementModel.getComponentId().map(n -> "[" + n + "]").orElse(""));
+  static Optional<String> getDslPrefix(ComponentAst component) {
+    return component.getGenerationInformation().getSyntax().map(DslElementSyntax::getPrefix);
   }
+
+  static String getSourceElementName(ComponentAst component) {
+    return getDslPrefix(component)
+            .map(p ->
+                    p + ":" + getModelNameAst(component).orElse(component.getIdentifier().getName()) +
+                            component.getComponentId().map(id -> "[" + id + "]").orElse(""))
+            .orElse(component.getIdentifier().toString());
+  }
+
 
   static Optional<String> getModelNameAst(ComponentAst component) {
     final Optional<NamedObject> namedObjectModel = component.getModel(NamedObject.class);
@@ -67,33 +75,38 @@ public class ComponentBasedIdHelper {
   }
 
   /**
-   * @deprecated Use {@link ComponentBasedIdHelper#computeIdFor(ComponentAst, ComponentParameterAst)} and get the value.
+   * @deprecated This should not have been public.
    */
   @Deprecated
   public static int computeHashFor(ComponentParameterAst componentParameterAst) {
     return DeprecatedParameterVisitorFunctions.computeHashFor(componentParameterAst);
   }
 
-  static ValueProviderCacheId computeIdFor(ComponentAst containerComponent,
-                                           ComponentParameterAst componentParameterAst) {
-    return ParameterVisitorFunctions.computeIdFor(containerComponent, componentParameterAst);
+  static <K> K computeIdFor(ComponentAst containerComponent,
+                            ComponentParameterAst componentParameterAst,
+                            Supplier<CacheIdBuilderAdapter<K>> cacheIdBuilderSupplier) {
+    return ParameterVisitorFunctions.computeIdFor(containerComponent, componentParameterAst, cacheIdBuilderSupplier);
   }
 
-  private static class ParameterVisitorFunctions {
+  private static class ParameterVisitorFunctions<K> {
 
-    private static ValueProviderCacheId computeIdFor(ComponentAst containerComponent, ComponentParameterAst parameter) {
-      return aValueProviderCacheId(new ParameterVisitorFunctions(containerComponent, parameter).idBuilder);
+    private static <T> T computeIdFor(ComponentAst containerComponent,
+                                      ComponentParameterAst parameter,
+                                      Supplier<CacheIdBuilderAdapter<T>> cacheIdBuilderSupplier) {
+      return new ParameterVisitorFunctions<>(containerComponent, parameter, cacheIdBuilderSupplier).idBuilder.build();
     }
 
-    private static ValueProviderCacheId computeIdFor(ComponentAst componentAst) {
-      return aValueProviderCacheId(new ParameterVisitorFunctions(componentAst).idBuilder);
+    private static <T> T computeIdFor(ComponentAst componentAst,
+                                      Supplier<CacheIdBuilderAdapter<T>> cacheIdBuilderSupplier) {
+      return new ParameterVisitorFunctions<>(componentAst, cacheIdBuilderSupplier).idBuilder.build();
     }
 
-    private ValueProviderCacheId.ValueProviderCacheIdBuilder idBuilder;
-    private final Function<String, Void> leftFunction = this::hashForLeft;
-    private final Function<Object, Void> rightFunction = this::hashForRight;
+    private final Supplier<CacheIdBuilderAdapter<K>> idBuilderSupplier;
+    private final CacheIdBuilderAdapter<K> idBuilder;
 
-    private ParameterVisitorFunctions(ComponentAst containerComponent, ComponentParameterAst parameterAst) {
+    private ParameterVisitorFunctions(ComponentAst containerComponent,
+                                      ComponentParameterAst parameterAst,
+                                      Supplier<CacheIdBuilderAdapter<K>> cacheKeyBuilderSupplier) {
       String name = parameterAst
           .getGenerationInformation()
           .getSyntax()
@@ -104,37 +117,40 @@ public class ComponentBasedIdHelper {
             return s.getPrefix() + ":" + s.getElementName();
           })
           .orElse(sourceElementNameFromSimpleValue(containerComponent, parameterAst));
-      this.idBuilder = fromElementWithName(name).withHashValueFrom(name);
-      parameterAst.getValue().reduce(leftFunction, rightFunction);
+      this.idBuilderSupplier = cacheKeyBuilderSupplier;
+      this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(hash(name));
+      parameterAst.getValue().reduce(this::hashForLeft, this::hashForRight);
     }
 
-    private ParameterVisitorFunctions(ComponentAst component) {
-      String name = component.getIdentifier().toString();
-      this.idBuilder = fromElementWithName(name).withHashValueFrom(name);
-      this.idBuilder.containing(component.getParameters().stream().map(p -> computeIdFor(component, p)).collect(toList()));
+    private ParameterVisitorFunctions(ComponentAst component,
+                                      Supplier<CacheIdBuilderAdapter<K>> cacheKeyBuilderSupplier) {
+      String name = getSourceElementName(component);
+      this.idBuilderSupplier = cacheKeyBuilderSupplier;
+      this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(hash(name));
+      this.idBuilder.containing(component.getParameters().stream().map(p -> computeIdFor(component, p, cacheKeyBuilderSupplier))
+          .collect(toList()));
     }
 
     private Void hashForLeft(String s) {
-      this.idBuilder.withHashValueFrom(s);
+      this.idBuilder.withHashValue(hash(s));
       return null;
     }
 
     private Void hashForRight(Object o) {
       if (o instanceof Collection) {
         final Collection<ComponentAst> collection = (Collection<ComponentAst>) o;
-        this.idBuilder.containing(
-                                  collection.stream()
-                                      .map(ParameterVisitorFunctions::computeIdFor)
-                                      .collect(toList()));
+        this.idBuilder.containing(collection.stream()
+            .map(e -> computeIdFor(e, idBuilderSupplier))
+            .collect(toList()));
       } else if (o instanceof ComponentAst) {
         final ComponentAst c = (ComponentAst) o;
         this.idBuilder.containing(c.getParameters()
             .stream()
             .sorted(comparing(p -> p.getModel().getName()))
-            .map(p -> computeIdFor(c, p))
+            .map(p -> computeIdFor(c, p, idBuilderSupplier))
             .collect(toList()));
       } else {
-        this.idBuilder.withHashValueFrom(o.toString());
+        this.idBuilder.withHashValue(hash(o.toString()));
       }
       return null;
     }
