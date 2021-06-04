@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.some.extension.SomeAliasedParameterGroupOneRequiredConfig;
 import org.mule.test.some.extension.SomeParameterGroupOneRequiredConfig;
 
 import java.util.Map;
@@ -183,62 +184,63 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
   }
 
   public void testShowInDslTrueWithSimpleParameterAlias() throws Exception {
-    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueSomeParameter");
+    SomeAliasedParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueSomeParameterAlias");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
 
   @Test
   public void testShowInDslTrueWithComplexParameterAlias() throws Exception {
-    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueComplexParameter");
+    SomeAliasedParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueComplexParameterAlias");
     assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
   }
 
   @Test
   public void testShowInDslTrueWithDynamicSimpleParameterAlias() throws Exception {
-    SomeParameterGroupOneRequiredConfig config =
-        runFlowAndGetConfig("dslTrueSomeParameterDynamic", "someParameter", "hello dog!");
+    SomeAliasedParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("dslTrueSomeParameterAliasDynamic", "someParameter", "hello dog!");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
 
   @Test
   public void testShowInDslTrueWithDynamicComplexParameterAlias() throws Exception {
-    SomeParameterGroupOneRequiredConfig config =
-        runFlowAndGetConfig("dslTrueComplexParameterDynamic", "anotherParameter", "hello bird!");
+    SomeAliasedParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("dslTrueComplexParameterAliasDynamic", "anotherParameter", "hello bird!");
     assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
   }
 
   @Test
   public void testWithSimpleParameterAlias() throws Exception {
-    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("someParameter");
+    SomeAliasedParameterGroupOneRequiredConfig config = runFlowAndGetConfig("someParameterAlias");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
 
   @Test
   public void testWithComplexParameterAlias() throws Exception {
-    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("complexParameter");
+    SomeAliasedParameterGroupOneRequiredConfig config = runFlowAndGetConfig("complexParameterAlias");
     assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
   }
 
   @Test
   public void testWithDynamicSimpleParameterAlias() throws Exception {
-    SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("someParameterDynamic", "someParameter", "hello dog!");
+    SomeAliasedParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("someParameterAliasDynamic", "someParameter", "hello dog!");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
 
   @Test
   public void testWithDynamicComplexParameterAlias() throws Exception {
-    SomeParameterGroupOneRequiredConfig config =
-        runFlowAndGetConfig("complexParameterDynamic", "anotherParameter", "hello bird!");
+    SomeAliasedParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("complexParameterAliasDynamic", "anotherParameter", "hello bird!");
     assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
   }
 
-  private SomeParameterGroupOneRequiredConfig runFlowAndGetConfig(String flowName) throws Exception {
+  private <T> T runFlowAndGetConfig(String flowName) throws Exception {
     return runFlowAndGetConfig(flowName, "", "");
   }
 
-  private SomeParameterGroupOneRequiredConfig runFlowAndGetConfig(String flowName, String variableName, String variableValue)
+  private <T> T runFlowAndGetConfig(String flowName, String variableName, String variableValue)
       throws Exception {
-    return (SomeParameterGroupOneRequiredConfig) flowRunner(flowName).withVariable(variableName, variableValue).run().getMessage()
+    return (T) flowRunner(flowName).withVariable(variableName, variableValue).run().getMessage()
         .getPayload().getValue();
   }
 

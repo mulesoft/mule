@@ -10,20 +10,18 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.checkParameterGroupExclusiveness;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ARTIFACT_AST;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARAMETER_AST;
-
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
@@ -42,16 +40,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @Feature(ARTIFACT_AST)
 @Story(PARAMETER_AST)
-public class MulExtensionUtilsTestCase extends AbstractMuleTestCase {
+public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
 
   private static final String PAYLOAD_EXPRESSION = "#[payload]";
   private static final String MALFORMED_EXPRESSION = "#[payload";
@@ -209,15 +209,76 @@ public class MulExtensionUtilsTestCase extends AbstractMuleTestCase {
                                      emptyMap());
   }
 
+
+  @Test
+  public void parameterGroupExclusivenessForDslFalseWithSimpleParameterWithAlias()
+      throws ConfigurationException, ValueResolvingException {
+    Map<String, StaticValueResolver> parameters = new HashMap<>();
+    parameters.put("some-parameter-alias", mock(StaticValueResolver.class));
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)),
+                                     getParameterGroupModelsWithAlias(false), parameters,
+                                     getAliasedParameters());
+  }
+
+  @Test
+  public void parameterGroupExclusivenessForDslFalseWithComplexParameterWithAlias()
+      throws ConfigurationException, ValueResolvingException {
+    Map<String, ValueResolver<?>> pojoParameterResolvers = new HashMap<>();
+    pojoParameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
+    pojoParameterResolvers.put("anotherParameter", mock(StaticValueResolver.class));
+    ObjectBuilderValueResolver pojoParameter = mock(ObjectBuilderValueResolver.class);
+    when(pojoParameter.getParameters()).thenReturn(pojoParameterResolvers);
+    Map<String, ObjectBuilderValueResolver> parameters = new HashMap<>();
+    parameters.put("complex-parameter-alias", pojoParameter);
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)),
+                                     getParameterGroupModelsWithAlias(false), parameters,
+                                     getAliasedParameters());
+  }
+
+  @Test
+  public void parameterGroupExclusivenessForDslFalseWithMultipleParametersWithAlias()
+      throws ConfigurationException, ValueResolvingException {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage("In operation 'null', the following parameters cannot be set at the same time: [some-parameter-alias, complex-parameter-alias]");
+    Map<String, ValueResolver<?>> pojoParameterResolvers = new HashMap<>();
+    pojoParameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
+    pojoParameterResolvers.put("anotherParameter", mock(StaticValueResolver.class));
+    ObjectBuilderValueResolver pojoParameter = mock(ObjectBuilderValueResolver.class);
+    when(pojoParameter.getParameters()).thenReturn(pojoParameterResolvers);
+    Map<String, ValueResolver> parameters = new HashMap<>();
+    parameters.put("some-parameter-alias", mock(StaticValueResolver.class));
+    parameters.put("complex-parameter-alias", pojoParameter);
+    checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)),
+                                     getParameterGroupModelsWithAlias(false), parameters,
+                                     getAliasedParameters());
+  }
+
   private void assertOptional(Optional<String> defaultValue) {
     assertThat(defaultValue.isPresent(), is(true));
     assertThat(defaultValue.get(), is(DEFAULT_VALUE));
   }
 
+  private Map<String, String> getAliasedParameters() {
+    Map<String, String> aliasedParameters = new HashMap<>();
+    aliasedParameters.put("someParameter", "some-parameter-alias");
+    aliasedParameters.put("repeatedNameParameter", "repeated-nameParameter-alias");
+    aliasedParameters.put("complexParameter", "complex-parameter-alias");
+    return aliasedParameters;
+  }
+
   private List<ParameterGroupModel> getParameterGroupModels(boolean showInDsl) {
+    return getParameterGroupModels(showInDsl, "someParameter", "repeatedNameParameter", "complexParameter");
+  }
+
+  private List<ParameterGroupModel> getParameterGroupModelsWithAlias(boolean showInDsl) {
+    return getParameterGroupModels(showInDsl, "some-parameter-alias", "repeated-nameParameter-alias", "complex-parameter-alias");
+  }
+
+  private List<ParameterGroupModel> getParameterGroupModels(boolean showInDsl, String... parameters) {
     ExclusiveParametersModel exclusiveParametersModel = mock(ExclusiveParametersModel.class);
     when(exclusiveParametersModel.getExclusiveParameterNames())
-        .thenReturn(new HashSet<>(asList("someParameter", "repeatedNameParameter", "complexParameter")));
+        .thenReturn(new HashSet<>(asList(parameters)));
     when(exclusiveParametersModel.isOneRequired()).thenReturn(true);
 
     ParameterGroupModel parameterGroupModel = mock(ParameterGroupModel.class);
