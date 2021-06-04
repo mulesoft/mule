@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -43,10 +44,11 @@ public class MavenTestUtils {
   }
 
   private static File packageArtifact(File explodedArtifactFile, Model pomModel) {
-    String fileNameInRepo = pomModel.getArtifactId()
-        + "-" + pomModel.getVersion()
-        + (pomModel.getPackaging() != null && !pomModel.getPackaging().equalsIgnoreCase("jar") ? "-" + pomModel.getPackaging()
-            : "")
+    String fileNameInRepo = resolveProperty(pomModel.getArtifactId(), pomModel.getProperties())
+        + "-" + resolveProperty(pomModel.getVersion(), pomModel.getProperties())
+        + resolveProperty((pomModel.getPackaging() != null && !pomModel.getPackaging().equalsIgnoreCase("jar")
+            ? "-" + pomModel.getPackaging()
+            : ""), pomModel.getProperties())
         + ".jar";
     File compressedFile = new File(explodedArtifactFile, fileNameInRepo);
     compress(compressedFile, listFiles(explodedArtifactFile, null, true).stream()
@@ -68,9 +70,10 @@ public class MavenTestUtils {
 
   private static void installArtifact(File artifactFile, File repositoryLocation, Model pomModel)
       throws IOException {
-    List<String> artifactLocationInRepo = new ArrayList<>(asList(pomModel.getGroupId().split("\\.")));
-    artifactLocationInRepo.add(pomModel.getArtifactId());
-    artifactLocationInRepo.add(pomModel.getVersion());
+    List<String> artifactLocationInRepo =
+        new ArrayList<>(asList(resolveProperty(pomModel.getGroupId(), pomModel.getProperties()).split("\\.")));
+    artifactLocationInRepo.add(resolveProperty(pomModel.getArtifactId(), pomModel.getProperties()));
+    artifactLocationInRepo.add(resolveProperty(pomModel.getVersion(), pomModel.getProperties()));
 
     Path pathToArtifactLocationInRepo =
         Paths.get(repositoryLocation.getAbsolutePath(), artifactLocationInRepo.toArray(new String[0]));
@@ -83,6 +86,16 @@ public class MavenTestUtils {
     // Copy the pom without the classifier.
     String pomFileName = artifactFile.getName().replaceFirst("(.*\\.[0-9]*\\.[0-9]*\\.?[0-9]?).*", "$1") + ".pom";
     copyFile(pomModel.getPomFile(), new File(pathToArtifactLocationInRepo.toString(), pomFileName), true);
+  }
+
+  public static String resolveProperty(String value, Properties properties) {
+    if (value == null) {
+      return value;
+    } else if (value.startsWith("${") && value.endsWith("}")) {
+      return properties.getOrDefault(value.substring(2, value.length() - 1), value).toString();
+    } else {
+      return value;
+    }
   }
 
 }

@@ -109,16 +109,32 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
         model = getPomModelFromJar(artifactFile);
       }
 
-      String version = model.getVersion() != null ? model.getVersion() : model.getParent().getVersion();
+      String version = resolveProperty(model.getVersion() != null
+          ? model.getVersion()
+          : model.getParent().getVersion(),
+                                       model.getProperties());
       return new BundleDescriptor.Builder()
-          .setArtifactId(model.getArtifactId())
-          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
+          .setArtifactId(resolveProperty(model.getArtifactId(), model.getProperties()))
+          .setGroupId(resolveProperty(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId(),
+                                      model.getProperties()))
           .setVersion(version)
           .setBaseVersion(version)
           .setType(JAR)
           // Handle manually the packaging for mule plugin as the mule plugin maven plugin defines the packaging as mule-extension
-          .setClassifier(artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
+          .setClassifier(artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER
+              : resolveProperty(model.getPackaging(),
+                                model.getProperties()))
           .build();
+    }
+  }
+
+  public String resolveProperty(String value, Properties properties) {
+    if (value == null) {
+      return value;
+    } else if (value.startsWith("${") && value.endsWith("}")) {
+      return properties.getOrDefault(value.substring(2, value.length() - 1), value).toString();
+    } else {
+      return value;
     }
   }
 

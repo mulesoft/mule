@@ -333,6 +333,26 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
+  public void classLoaderModelWithPluginDependencyWithPropertiesInPom() throws Exception {
+    installArtifact(getArtifact("dependencies/plugin-with-properties"), new File(repositoryLocation.getValue()));
+
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-properties");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    final String expectedPluginArtifactId = "plugin-with-properties";
+
+    assertThat(classLoaderModel.getUrls().length, is(1));
+    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+
+    ArtifactPluginDescriptor pluginDescriptor = desc.getPlugins().stream().findFirst().get();
+
+    assertThat(pluginDescriptor.getBundleDescriptor().getGroupId(), equalTo("test"));
+    assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
+    assertThat(pluginDescriptor.getBundleDescriptor().getVersion(), equalTo("1.0.0"));
+  }
+
+  @Test
   public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweight() throws Exception {
     assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight");
   }
