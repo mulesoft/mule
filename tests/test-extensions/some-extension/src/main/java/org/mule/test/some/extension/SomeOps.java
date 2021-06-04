@@ -104,8 +104,8 @@ public class SomeOps {
 
 
   /**
-   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup with aliased parameters
-   * where show in Dsl is true.
+   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup with aliased parameters where
+   * show in Dsl is true.
    */
   public SomeAliasedParameterGroupOneRequiredConfig oneRequiredAliasedParameterResolverOperationDslTrue(@ParameterGroup(
       name = "Aliased Parameter Group", showInDsl = true) SomeAliasedParameterGroupOneRequiredConfig oneAliasedParameterGroup) {
@@ -113,8 +113,8 @@ public class SomeOps {
   }
 
   /**
-   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup with aliased parameters
-   * where show in Dsl is off.
+   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup with aliased parameters where
+   * show in Dsl is off.
    */
   public SomeAliasedParameterGroupOneRequiredConfig oneRequiredAliasedParameterResolverOperation(@ParameterGroup(
       name = "Aliased Parameter Group") SomeAliasedParameterGroupOneRequiredConfig oneAliasedParameterGroup) {

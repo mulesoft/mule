@@ -22,7 +22,7 @@ import org.mule.test.heisenberg.extension.HeisenbergErrors;
 @ErrorTypes(HeisenbergErrors.class)
 @Export(classes = CustomConnectionException.class)
 @Sources({SomeEmittingSource.class, AnotherEmittingSource.class, YetAnotherEmittingSource.class,
-    ParameterEmittingSource.class})
+    ParameterEmittingSource.class, ExclusiveOptionalsEmittingSource.class, AnotherExclusiveOptionalsEmittingSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/some", prefix = "some")
 public class SomeExtension {
 }
