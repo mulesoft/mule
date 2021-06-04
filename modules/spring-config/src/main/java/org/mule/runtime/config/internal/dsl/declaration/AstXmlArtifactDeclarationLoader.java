@@ -52,7 +52,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATE
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
@@ -126,6 +125,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
@@ -271,13 +271,13 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
           Map<String, String> attributes = resolveAttributes(component, param -> !param.getModel().isComponentId());
 
-          List<ComponentAst> configComplexParameters = component.directChildrenStream()
+          component.directChildrenStream()
               .filter(config -> declareAsConnectionProvider(component.getExtension(), model, configurationDeclarer,
                                                             config, extensionElementsDeclarer))
               .collect(toList());
 
           declareParameterizedComponent(model, component.getGenerationInformation().getSyntax().get(),
-                                        configurationDeclarer, attributes, component, configComplexParameters);
+                                        configurationDeclarer, attributes, component);
           artifactDeclarer.withGlobalElement(configurationDeclarer.getDeclaration());
         });
 
@@ -365,7 +365,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     ConnectionElementDeclarer connectionDeclarer = extensionElementsDeclarer.newConnection(providerModel.getName());
     declareParameterizedComponent(providerModel, component.getGenerationInformation().getSyntax().get(), connectionDeclarer,
                                   resolveAttributes(component, alwaysTrue()),
-                                  component, component.directChildrenStream().collect(toList()));
+                                  component);
 
     configurationDeclarer.withConnection(connectionDeclarer.getDeclaration());
     return false;
@@ -379,31 +379,30 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
       declarer.withConfig(parameter.getResolvedRawValue());
     }
 
-    final List<ComponentAst> children = component.directChildrenStream().collect(toList());
     final DslElementSyntax elementDsl = component.getGenerationInformation().getSyntax().get();
 
     model.getParameterGroupModels()
-        .forEach(group -> declareParameterGroup(component, model, declarer, children, elementDsl, group,
+        .forEach(group -> declareParameterGroup(component, model, declarer, elementDsl, group,
                                                 model.getParameterGroupModels().get(0) == group,
                                                 pm -> component.getParameter(pm.getName())));
 
     if (model instanceof SourceModel) {
       ((SourceModel) model).getSuccessCallback()
           .ifPresent(callbackModel -> callbackModel.getParameterGroupModels()
-              .forEach(group -> declareParameterGroup(component, model, declarer, children, elementDsl, group, false,
+              .forEach(group -> declareParameterGroup(component, model, declarer, elementDsl, group, false,
                                                       pm -> component.getParameter(group.getName(), pm.getName()))));
 
       ((SourceModel) model).getErrorCallback()
           .ifPresent(callbackModel -> callbackModel.getParameterGroupModels()
-              .forEach(group -> declareParameterGroup(component, model, declarer, children, elementDsl, group, false,
+              .forEach(group -> declareParameterGroup(component, model, declarer, elementDsl, group, false,
                                                       pm -> component.getParameter(group.getName(), pm.getName()))));
     }
 
-    declareComposableModel(model, elementDsl, children.stream(), declarer);
+    declareComposableModel(model, elementDsl, component.directChildrenStream(), declarer);
   }
 
   private void declareParameterGroup(ComponentAst component, ComponentModel model, ComponentElementDeclarer declarer,
-                                     final List<ComponentAst> children, final DslElementSyntax elementDsl,
+                                     final DslElementSyntax elementDsl,
                                      ParameterGroupModel group, boolean processDocAttributes,
                                      final Function<? super ParameterModel, ? extends ComponentParameterAst> mapper) {
     final List<ComponentParameterAst> groupParams = group.getParameterModels()
@@ -428,14 +427,14 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         copyExplicitAttributes(model, resolveDocAttributes(component), declarer);
       }
 
-      declareNonInlineParameterGroup(declarer, children, elementDsl, group, groupDeclarer, groupAttributes);
+      declareNonInlineParameterGroup(declarer, component, elementDsl, group, groupDeclarer, groupAttributes);
     }
     if (!groupDeclarer.getDeclaration().getParameters().isEmpty()) {
       declarer.withParameterGroup(groupDeclarer.getDeclaration());
     }
   }
 
-  private void declareNonInlineParameterGroup(ParameterizedElementDeclarer declarer, final List<ComponentAst> children,
+  private void declareNonInlineParameterGroup(ParameterizedElementDeclarer declarer, ComponentAst paramsOwner,
                                               final DslElementSyntax elementDsl, ParameterGroupModel group,
                                               ParameterGroupElementDeclarer groupDeclarer,
                                               final Map<String, ComponentParameterAst> groupAttributes) {
@@ -445,11 +444,25 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .filter(pm -> !groupAttributes.containsKey(pm.getName()))
         .forEach(param -> elementDsl.getChild(param.getName())
             .ifPresent(paramDsl -> {
-              // TODO MULE-19168 remove this
-              if (isInfrastructure(param)) {
-                handleInfrastructure(param, children, declarer);
+
+              // if (paramsOwner.getParameter(param.getName()).getValue().getRight() instanceof ComponentAst) {
+              // ComponentAst paramComponent = (ComponentAst) paramsOwner.getParameter(param.getName()).getValue().getRight();
+              // // } else {
+              // // paramsOwner.getParameter(param.getName());
+              // param.getType()
+              // .accept(getParameterDeclarerVisitor(paramComponent, paramDsl,
+              // value -> groupDeclarer.withParameter(param.getName(),
+              // value)));
+              // }
+
+              // if (isInfrastructure(param)) {
+              // System.out.println("");
+              // }
+              // // TODO MULE-19168 remove this
+              if (ExtensionModelUtils.isInfrastructure(param)) {
+                handleInfrastructure(param, paramsOwner.directChildrenStream().collect(toList()), declarer);
               } else {
-                children.stream()
+                paramsOwner.directChildrenStream()
                     .filter(c -> c.getIdentifier().getName().equals(paramDsl.getElementName()))
                     .findFirst()
                     .ifPresent(paramConfig -> {
@@ -534,8 +547,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           Map<String, String> attributes = resolveAttributes(child, alwaysTrue());
 
           declareParameterizedComponent((ParameterizedModel) nestedModel,
-                                        routeDsl, routeDeclarer, attributes, child,
-                                        child.directChildrenStream().collect(toList()));
+                                        routeDsl, routeDeclarer, attributes, child);
           declareComposableModel((ComposableModel) nestedModel, elementDsl, child.directChildrenStream(), routeDeclarer);
           return routeDeclarer.getDeclaration();
         });
@@ -544,14 +556,12 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   private void declareParameterizedComponent(ParameterizedModel model, DslElementSyntax elementDsl,
                                              ParameterizedElementDeclarer declarer,
                                              Map<String, String> rawParams,
-                                             ComponentAst component,
-                                             List<ComponentAst> children) {
+                                             ComponentAst component) {
     copyExplicitAttributes(model, rawParams, declarer);
-    declareChildParameters(model, elementDsl, component, children, declarer);
+    declareChildParameters(model, elementDsl, component, declarer);
   }
 
   private void declareChildParameters(ParameterizedModel model, DslElementSyntax modelDsl, ComponentAst component,
-                                      List<ComponentAst> children,
                                       ParameterizedElementDeclarer declarer) {
 
     model.getParameterGroupModels()
@@ -574,7 +584,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                                  resolveParams(component, param -> groupParams.contains(param)));
             }
           } else {
-            declareNonInlineParameterGroup(declarer, children, modelDsl, group, groupDeclarer, emptyMap());
+            declareNonInlineParameterGroup(declarer, component, modelDsl, group, groupDeclarer, emptyMap());
           }
 
           if (!groupDeclarer.getDeclaration().getParameters().isEmpty()) {
