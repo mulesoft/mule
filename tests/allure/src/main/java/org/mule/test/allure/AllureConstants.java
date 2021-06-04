@@ -368,6 +368,18 @@ public interface AllureConstants {
 
   }
 
+  interface ManagementFeature {
+
+    String MANAGEMENT = "Management";
+
+    interface ProcessingStrategyExecutionProfiler {
+
+      String LOGGER_PROCESSING_STRATEGY_EXECUTION_PROFILER = "Logger Processing Strategy Execution Profiler";
+
+    }
+
+  }
+
   interface ForkJoinStrategiesFeature {
 
     String FORK_JOIN_STRATEGIES = "Fork/Join Strategies used by scatter-gather and parallel-foreach routers";

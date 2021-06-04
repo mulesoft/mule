@@ -60,6 +60,7 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -270,6 +271,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .stream()
         .map(FlowInterceptorFactoryAdapter::new)
         .collect(toList()), muleContext.getInjector()));
+
+    doInitialiseProcessingStrategy();
   }
 
   /**
@@ -499,6 +502,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                            "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
       }
     }
+  }
+
+  @Override
+  protected void doInitialiseProcessingStrategy() throws MuleException {
+    LOGGER.debug("Initialising processing strategy ({}) of flow '{}'...", processingStrategy, getName());
+    super.doInitialiseProcessingStrategy();
+    initialiseIfNeeded(processingStrategy, muleContext);
   }
 
   @Override

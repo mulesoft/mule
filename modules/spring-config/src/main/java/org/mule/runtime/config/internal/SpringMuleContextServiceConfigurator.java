@@ -59,6 +59,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLI
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_FACTORY_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MANAGEMENT_UTILS_PROVIDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
@@ -125,6 +126,7 @@ import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvid
 import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
+import org.mule.runtime.core.internal.management.provider.DefaultMuleManagementUtilsProvider;
 import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.internal.management.stats.PayloadStatisticsCursorDecoratorFactory;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -254,6 +256,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
       .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
+      .put(MULE_MANAGEMENT_UTILS_PROVIDER, getBeanDefinition(DefaultMuleManagementUtilsProvider.class))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;

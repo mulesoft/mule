@@ -64,6 +64,7 @@ public class DefaultPolicyInstance extends AbstractComponent
     initialiseIfNeeded(sourcePolicyChain, muleContext);
     lifecycleStateManager.fireInitialisePhase((phaseNam, object) -> {
     });
+    initialiseIfNeeded(processingStrategy, muleContext);
   }
 
   private ProcessingStrategyFactory defaultProcessingStrategy() {

@@ -374,12 +374,19 @@ public class MuleProperties {
       MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 
   /**
+   * Specifies the injected bean from which management utils can be required.
+   * 
+   * @since 4.4.0, 4.3.1
+   */
+  public static final String MULE_MANAGEMENT_UTILS_PROVIDER = "mule.management.utils.provider";
+
+  private MuleProperties() {}
+
+  /**
    * @return Whether MEL is set as the default EL according to {@link #MULE_MEL_AS_DEFAULT}
    * @since 4.2.0
    */
   public static boolean isMelDefault() {
     return valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
   }
-
-  private MuleProperties() {}
 }

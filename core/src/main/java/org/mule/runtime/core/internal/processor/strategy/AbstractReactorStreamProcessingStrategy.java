@@ -7,23 +7,25 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.management.provider.MuleManagementUtilsProvider;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteAsyncNonBlockingProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBlockingProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.DefaultProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingStrategyEnricher;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import javax.inject.Inject;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,13 +33,17 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy
-    implements Startable, Stoppable, Disposable {
+    implements Lifecycle {
 
   private final Supplier<Scheduler> cpuLightSchedulerSupplier;
   private final int parallelism;
   private final AtomicInteger inFlightEvents = new AtomicInteger();
   private final BiConsumer<CoreEvent, Throwable> inFlightDecrementCallback = (e, t) -> inFlightEvents.decrementAndGet();
 
+  @Inject
+  protected MuleManagementUtilsProvider managementUtilsProvider;
+
+  protected ProcessingStrategyEnricher processingStrategyEnricher;
   private Scheduler cpuLightScheduler;
 
   AbstractReactorStreamProcessingStrategy(int subscribers,
@@ -52,17 +58,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
 
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-      reactor.core.scheduler.Scheduler cpuLiteScheduler = fromExecutorService(getNonBlockingTaskScheduler());
-      return publisher -> from(publisher)
-          .transform(processor)
-          .publishOn(cpuLiteScheduler)
-          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-    } else {
-      return publisher -> from(publisher)
-          .transform(processor)
-          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-    }
+    return processingStrategyEnricher.enrich(processor);
   }
 
   protected ScheduledExecutorService getNonBlockingTaskScheduler() {
@@ -108,8 +104,32 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
   }
 
   @Override
+  public void initialise() throws InitialisationException {}
+
+  @Override
   public void start() throws MuleException {
-    this.cpuLightScheduler = createCpuLightScheduler(cpuLightSchedulerSupplier);
+    this.processingStrategyEnricher = getProcessingStrategyEnricher();
+  }
+
+  /**
+   * ?
+   * 
+   * @return a chain of responsibility for enriching the {@link ReactiveProcessor} so that the processing strategy is applied.
+   */
+  protected ProcessingStrategyEnricher getProcessingStrategyEnricher() {
+    cpuLightScheduler = createCpuLightScheduler(cpuLightSchedulerSupplier);
+
+    ProcessingStrategyEnricher defaultEnricher =
+        new DefaultProcessingStrategyEnricher(null, managementUtilsProvider,
+                                              () -> cpuLightScheduler);
+
+    ProcessingStrategyEnricher cpuLiteEnricher =
+        new CpuLiteNonBlockingProcessingStrategyEnricher(defaultEnricher, managementUtilsProvider,
+                                                         () -> cpuLightScheduler);
+
+    return new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(cpuLiteEnricher, managementUtilsProvider,
+                                                                 () -> cpuLightScheduler,
+                                                                 () -> getNonBlockingTaskScheduler());
   }
 
   @Override

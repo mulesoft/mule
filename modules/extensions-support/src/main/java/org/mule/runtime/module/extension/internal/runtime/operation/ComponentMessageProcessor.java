@@ -632,7 +632,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     } else {
       LOGGER.debug("Initializing own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       ownedProcessingStrategy = true;
-      initialiseIfNeeded(processingStrategy);
+      initialiseIfNeeded(processingStrategy, muleContext);
     }
   }
 
@@ -691,6 +691,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         @Override
         public boolean isBlocking() {
           return ComponentMessageProcessor.this.isBlocking();
+        }
+
+        @Override
+        public ComponentLocation getLocation() {
+          return ComponentMessageProcessor.this.getLocation();
         }
       };
 

@@ -6,26 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Long.MIN_VALUE;
-import static java.lang.System.currentTimeMillis;
-import static java.lang.System.getProperty;
-import static java.lang.System.nanoTime;
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.sleep;
-import static java.time.Duration.ofMillis;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.util.LazyValue;
@@ -39,6 +20,9 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.RejectionCallbackExecutorServiceDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import reactor.core.publisher.EmitterProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,16 +30,24 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.IntUnaryOperator;
-import java.util.function.LongUnaryOperator;
-import java.util.function.Supplier;
+import java.util.function.*;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
-import reactor.core.publisher.EmitterProcessor;
+import static java.lang.Long.MIN_VALUE;
+import static java.lang.Math.min;
+import static java.lang.System.*;
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
+import static java.time.Duration.ofMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyTransformerBuilder.buildPipelineProcessingStrategyTransformerFrom;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 
 /**
  * {@link AbstractStreamProcessingStrategyFactory} implementation for Reactor streams using a {@link EmitterProcessor}
@@ -68,14 +60,16 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new StreamEmitterProcessingStrategy(getBufferSize(),
                                                getSubscriberCount(),
-                                               getFlowDispatchSchedulerSupplier(muleContext, schedulersNamePrefix),
+                                               getFlowDispatchSchedulerSupplier(muleContext,
+                                                                                schedulersNamePrefix),
                                                getCpuLightSchedulerSupplier(
                                                                             muleContext,
                                                                             schedulersNamePrefix),
                                                resolveParallelism(),
                                                getMaxConcurrency(),
                                                isMaxConcurrencyEagerCheck(),
-                                               () -> muleContext.getConfiguration().getShutdownTimeout());
+                                               () -> muleContext.getConfiguration()
+                                                   .getShutdownTimeout());
   }
 
   @Override
@@ -114,6 +108,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     private final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
     private final AtomicInteger queuedEvents = new AtomicInteger();
     private final BiConsumer<CoreEvent, Throwable> queuedDecrementCallback = (e, t) -> queuedEvents.decrementAndGet();
+
     private final LongUnaryOperator lastRetryTimestampCheckOperator =
         v -> nanoTime() - v < SCHEDULER_BUSY_RETRY_INTERVAL_NS * 2
             ? v
@@ -295,7 +290,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     protected int getSinksCount() {
       int coresLoad = CORES * 2;
-      return maxConcurrency < coresLoad ? maxConcurrency : coresLoad;
+      return min(maxConcurrency, coresLoad);
     }
 
     protected MuleRuntimeException resolveSubscriptionErrorCause(AtomicReference<Throwable> failedSubscriptionCause) {
@@ -321,10 +316,11 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getFlowDispatcherScheduler()));
-      return publisher -> from(publisher).publishOn(scheduler)
-          .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-          .transform(pipeline);
+      return buildPipelineProcessingStrategyTransformerFrom(pipeline, executionClassloader)
+          .withProfiler(managementUtilsProvider.getProcessingStrategyPipelineProfiler(pipeline))
+          .withScheduler(getFlowDispatcherScheduler())
+          .withSchedulerDecorator(this::decorateScheduler)
+          .build();
     }
 
     @Override

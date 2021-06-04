@@ -6,34 +6,26 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Math.max;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
-import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
-import org.mule.runtime.api.component.location.ComponentProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory.StreamEmitterProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.enricher.BlockingProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.CpuIntensiveProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Supplier;
-
 import org.slf4j.Logger;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import java.util.function.Supplier;
+
+import static java.lang.Math.min;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Creates {@link AsyncProcessingStrategyFactory} instance that implements the proactor pattern by de-multiplexing incoming events
@@ -57,17 +49,24 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
                                                        cpuLightSchedulerSupplier,
                                                        cpuLightSchedulerSupplier,
                                                        () -> muleContext.getSchedulerService()
-                                                           .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                           .ioScheduler(muleContext
+                                                               .getSchedulerBaseConfig()
                                                                .withName(
-                                                                         schedulersNamePrefix + "." + BLOCKING.name())),
+                                                                         schedulersNamePrefix
+                                                                             + "."
+                                                                             + BLOCKING.name())),
                                                        () -> muleContext.getSchedulerService()
-                                                           .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
-                                                               .withName(schedulersNamePrefix + "."
+                                                           .cpuIntensiveScheduler(muleContext
+                                                               .getSchedulerBaseConfig()
+                                                               .withName(schedulersNamePrefix
+                                                                   + "."
                                                                    + CPU_INTENSIVE.name())),
                                                        resolveParallelism(),
                                                        getMaxConcurrency(),
                                                        isMaxConcurrencyEagerCheck(),
-                                                       () -> muleContext.getConfiguration().getShutdownTimeout());
+                                                       () -> muleContext.getConfiguration()
+                                                           .getShutdownTimeout());
+
   }
 
   @Override
@@ -104,13 +103,11 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     @Override
     public void start() throws MuleException {
       super.start();
-      this.blockingScheduler = blockingSchedulerSupplier.get();
-      this.cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
     }
 
     @Override
     protected int getSinksCount() {
-      return maxConcurrency < CORES ? maxConcurrency : CORES;
+      return min(maxConcurrency, CORES);
     }
 
     @Override
@@ -122,94 +119,54 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     @Override
     protected boolean stopSchedulersIfNeeded() {
       if (super.stopSchedulersIfNeeded()) {
-
-        if (blockingScheduler != null) {
-          blockingScheduler.stop();
-          blockingScheduler = null;
-        }
-        if (cpuIntensiveScheduler != null) {
-          cpuIntensiveScheduler.stop();
-          cpuIntensiveScheduler = null;
-        }
-
+        stopScheduler(blockingScheduler);
+        stopScheduler(cpuIntensiveScheduler);
+        blockingScheduler = null;
+        cpuIntensiveScheduler = null;
         return true;
       }
 
       return false;
     }
 
+    private void stopScheduler(Scheduler scheduler) {
+      if (scheduler != null) {
+        scheduler.stop();
+      }
+    }
+
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.getProcessingType() == BLOCKING || processor.getProcessingType() == IO_RW) {
-        return proactor(processor, blockingScheduler);
-      } else if (processor.getProcessingType() == CPU_INTENSIVE) {
-        return proactor(processor, cpuIntensiveScheduler);
-      } else {
-        return super.onProcessor(processor);
-      }
+      return processingStrategyEnricher.enrich(processor);
     }
 
-    protected ReactiveProcessor proactor(ReactiveProcessor processor, ScheduledExecutorService scheduler) {
-      LOGGER.debug("Doing proactor() for {} on {}. maxConcurrency={}, parallelism={}, subscribers={}", processor, scheduler,
-                   maxConcurrency, getParallelism(), subscribers);
+    @Override
+    protected ProcessingStrategyEnricher getProcessingStrategyEnricher() {
+      blockingScheduler = blockingSchedulerSupplier.get();
+      cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
+      ProcessingStrategyEnricher blockingCustomizer =
+          new BlockingProcessingStrategyEnricher(super.getProcessingStrategyEnricher(),
+                                                 managementUtilsProvider,
+                                                 () -> blockingScheduler,
+                                                 getSchedulerDecorator().compose(this::getRetryScheduler),
+                                                 maxConcurrency,
+                                                 getParallelism(),
+                                                 subscribers);
 
-      final ScheduledExecutorService retryScheduler = getRetryScheduler(scheduler);
-
-      // FlatMap is the way reactor has to do parallel processing. Since this proactor method is used for the processors that are
-      // not CPU_LITE, parallelism is wanted when the processor is blocked to do IO or doing long CPU work.
-      if (maxConcurrency == 1) {
-        // If no concurrency needed, execute directly on the same Flux
-        return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
-            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
-      } else if (maxConcurrency == MAX_VALUE) {
-        if (processor instanceof ComponentInnerProcessor && !((ComponentInnerProcessor) processor).isBlocking()) {
-          // For a no concurrency limit non blocking processor, the java SDK already handles parallelism internally, so no need to
-          // do that here.
-          return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
-              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
-        } else {
-          // For no limit, pass through the no limit meaning to Reactor's flatMap
-          return publisher -> from(publisher)
-              .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
-                  .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
-                       MAX_VALUE);
-        }
-      } else {
-        // Otherwise, enforce the concurrency limit from the config,
-        return publisher -> from(publisher)
-            .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
-                .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
-                     max(maxConcurrency / (getParallelism() * subscribers), 1));
-      }
-    }
-
-    private Mono<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
-                                              Mono<CoreEvent> eventFlux) {
-      return scheduleWithLogging(processor, processorScheduler, eventFlux);
-    }
-
-    private Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
-                                              Flux<CoreEvent> eventFlux) {
-      return scheduleWithLogging(processor, processorScheduler, eventFlux);
-    }
-
-    private Mono<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
-                                                Mono<CoreEvent> eventFlux) {
-      return Mono.from(eventFlux)
-          .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
-          .transform(processor);
-    }
-
-    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
-                                                Flux<CoreEvent> eventFlux) {
-      return Flux.from(eventFlux)
-          .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
-          .transform(processor);
+      return new CpuIntensiveProcessingStrategyEnricher(blockingCustomizer,
+                                                        managementUtilsProvider,
+                                                        () -> cpuIntensiveScheduler,
+                                                        getSchedulerDecorator().compose(this::getRetryScheduler),
+                                                        maxConcurrency,
+                                                        getParallelism(),
+                                                        subscribers);
     }
 
     @Override
     protected Scheduler getFlowDispatcherScheduler() {
       return getCpuLightScheduler();
     }
+
   }
+
 }
