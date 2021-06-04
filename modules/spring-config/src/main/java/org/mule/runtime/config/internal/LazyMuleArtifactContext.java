@@ -63,7 +63,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.lazy.LazyExpressionManager;
+import org.mule.runtime.config.internal.lazy.LazyExpressionManagerFactoryBean;
 import org.mule.runtime.config.internal.lazy.NoOpConnectivityTesterFactory;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
@@ -166,8 +166,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     final CustomizationService customizationService = muleContext.getCustomizationService();
 
-    customizationService.overrideDefaultServiceImpl(OBJECT_EXPRESSION_MANAGER,
-                                                    new LazyExpressionManager(muleContext.getExecutionClassLoader()));
+    customizationService.overrideDefaultServiceClass(OBJECT_EXPRESSION_MANAGER, LazyExpressionManagerFactoryBean.class);
     customizationService.overrideDefaultServiceImpl(OBJECT_CONNECTIVITY_TESTER_FACTORY, new NoOpConnectivityTesterFactory());
     customizationService.overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
                                                     new LazyConnectivityTestingService(this, () -> getRegistry()

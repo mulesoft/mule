@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.config.internal;
+package org.mule.runtime.config.internal.lazy;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
@@ -19,7 +19,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -34,6 +33,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.COMPONENT_LIFE_CYCLE;
+import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -48,6 +48,10 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.api.LazyComponentInitializer.ComponentLocationFilter;
 import org.mule.runtime.config.dsl.model.AbstractDslModelTestCase;
+import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.LazyMuleArtifactContext;
+import org.mule.runtime.config.internal.ObjectProviderAwareBeanFactory;
+import org.mule.runtime.config.internal.OptionalObjectsController;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
@@ -70,10 +74,11 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import com.google.common.collect.ImmutableSet;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
-@Feature(CONFIGURATION_COMPONENT_LOCATOR)
+@Features({@Feature(LAZY_INITIALIZATION), @Feature(CONFIGURATION_COMPONENT_LOCATOR)})
 @Story(COMPONENT_LIFE_CYCLE)
 public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTestCase {
 
@@ -86,6 +91,9 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
 
   @Mock
   private ExtensionManager extensionManager;
+
+  @Mock
+  private CustomServiceRegistry customizationService;
 
   @Mock
   private OptionalObjectsController optionalObjectsController;
@@ -117,7 +125,7 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
     when(extensionManager.getExtensions()).thenReturn(extensions);
     when(muleContext.getExecutionClassLoader()).thenReturn(currentThread().getContextClassLoader());
     when(muleContext.getExtensionManager()).thenReturn(extensionManager);
-    when(muleContext.getCustomizationService()).thenReturn(mock(CustomServiceRegistry.class));
+    when(muleContext.getCustomizationService()).thenReturn(customizationService);
     when(mockedRegistry.lookupObject(MY_FLOW)).thenReturn(messageProcessorChainBuilder);
     when(mockedRegistry.get(OBJECT_REGISTRY)).thenReturn(new DefaultRegistry(muleContext));
 

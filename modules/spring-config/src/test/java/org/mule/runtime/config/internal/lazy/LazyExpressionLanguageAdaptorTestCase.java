@@ -11,6 +11,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -27,7 +29,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+
 @SmallTest
+@Features({@Feature(LAZY_INITIALIZATION), @Feature(EXPRESSION_LANGUAGE)})
 public class LazyExpressionLanguageAdaptorTestCase extends AbstractMuleTestCase {
 
   @Rule

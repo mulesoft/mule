@@ -22,6 +22,9 @@ import java.util.Iterator;
 /**
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as XML, Java, scripting and
  * annotations.
+ * <p>
+ * Callers must ensure that the proper threadContexClassloader, being able to access any class or resource required by the
+ * expression, is used when calling any of the methods defined here or in the inherited interfaces.
  */
 @NoImplement
 public interface ExpressionManager extends MuleExpressionLanguage {

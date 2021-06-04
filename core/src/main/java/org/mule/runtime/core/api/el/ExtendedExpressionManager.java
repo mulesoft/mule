@@ -16,6 +16,9 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 /**
  * Extends the {@link ExpressionManager} supporting mutating operations and the propagation of more variables.
  * <p>
+ * Callers must ensure that the proper threadContexClassloader, being able to access any class or resource required by the
+ * expression, is used when calling any of the methods defined here or in the inherited interfaces.
+ * <p>
  * Only meant to distinguish the Mule 3 inherited behaviour from the current approach.
  *
  * @since 4.0
