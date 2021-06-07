@@ -30,11 +30,13 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
   /**
    * Creates a new factory
    *
-   * @param serviceRepository contains available service instances. Non null.
-   * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
-   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
+   * @param serviceRepository                          contains available service instances. Non null.
+   * @param classLoaderRepository                      contains the registered classloaders that can be used to load serialized
+   *                                                   classes. Non null.
+   * @param extensionModelLoaderRepository             {@link ExtensionModelLoaderRepository} with the available extension
+   *                                                   loaders. Non null.
    * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    */
   public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository,
                                               ClassLoaderRepository classLoaderRepository,
@@ -57,8 +59,6 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
                                           PolicyParametrization parametrization) {
     return new DefaultApplicationPolicyInstance(application, policyTemplate, parametrization, serviceRepository,
                                                 classLoaderRepository,
-                                                policyTemplate.getArtifactPlugins(),
-                                                policyTemplate.getOwnArtifactPlugins(),
                                                 extensionModelLoaderRepository, null,
                                                 runtimeComponentBuildingDefinitionProvider);
   }
