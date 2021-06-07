@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.some.extension.SomeAliasedParameterGroupOneRequiredConfig;
 import org.mule.test.some.extension.SomeParameterGroupOneRequiredConfig;
 
 import java.util.Map;
@@ -182,13 +183,64 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
     assertThat(values.get("oneParameterGroup"), is("hello cat!"));
   }
 
-  private SomeParameterGroupOneRequiredConfig runFlowAndGetConfig(String flowName) throws Exception {
+  public void testShowInDslTrueWithSimpleParameterAlias() throws Exception {
+    SomeAliasedParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueSomeParameterAlias");
+    assertThat(config.getSomeParameter(), is("hello dog!"));
+  }
+
+  @Test
+  public void testShowInDslTrueWithComplexParameterAlias() throws Exception {
+    SomeAliasedParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueComplexParameterAlias");
+    assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
+  }
+
+  @Test
+  public void testShowInDslTrueWithDynamicSimpleParameterAlias() throws Exception {
+    SomeAliasedParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("dslTrueSomeParameterAliasDynamic", "someParameter", "hello dog!");
+    assertThat(config.getSomeParameter(), is("hello dog!"));
+  }
+
+  @Test
+  public void testShowInDslTrueWithDynamicComplexParameterAlias() throws Exception {
+    SomeAliasedParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("dslTrueComplexParameterAliasDynamic", "anotherParameter", "hello bird!");
+    assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
+  }
+
+  @Test
+  public void testWithSimpleParameterAlias() throws Exception {
+    SomeAliasedParameterGroupOneRequiredConfig config = runFlowAndGetConfig("someParameterAlias");
+    assertThat(config.getSomeParameter(), is("hello dog!"));
+  }
+
+  @Test
+  public void testWithComplexParameterAlias() throws Exception {
+    SomeAliasedParameterGroupOneRequiredConfig config = runFlowAndGetConfig("complexParameterAlias");
+    assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
+  }
+
+  @Test
+  public void testWithDynamicSimpleParameterAlias() throws Exception {
+    SomeAliasedParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("someParameterAliasDynamic", "someParameter", "hello dog!");
+    assertThat(config.getSomeParameter(), is("hello dog!"));
+  }
+
+  @Test
+  public void testWithDynamicComplexParameterAlias() throws Exception {
+    SomeAliasedParameterGroupOneRequiredConfig config =
+        runFlowAndGetConfig("complexParameterAliasDynamic", "anotherParameter", "hello bird!");
+    assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
+  }
+
+  private <T> T runFlowAndGetConfig(String flowName) throws Exception {
     return runFlowAndGetConfig(flowName, "", "");
   }
 
-  private SomeParameterGroupOneRequiredConfig runFlowAndGetConfig(String flowName, String variableName, String variableValue)
+  private <T> T runFlowAndGetConfig(String flowName, String variableName, String variableValue)
       throws Exception {
-    return (SomeParameterGroupOneRequiredConfig) flowRunner(flowName).withVariable(variableName, variableValue).run().getMessage()
+    return (T) flowRunner(flowName).withVariable(variableName, variableValue).run().getMessage()
         .getPayload().getValue();
   }
 

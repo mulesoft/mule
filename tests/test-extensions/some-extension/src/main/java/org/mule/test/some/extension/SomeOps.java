@@ -101,4 +101,23 @@ public class SomeOps {
       name = "Awesome Parameter Group") SomeParameterGroupOneRequiredConfig oneParameterGroup) {
     return oneParameterGroup;
   }
+
+
+  /**
+   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup with aliased parameters where
+   * show in Dsl is true.
+   */
+  public SomeAliasedParameterGroupOneRequiredConfig oneRequiredAliasedParameterResolverOperationDslTrue(@ParameterGroup(
+      name = "Aliased Parameter Group", showInDsl = true) SomeAliasedParameterGroupOneRequiredConfig oneAliasedParameterGroup) {
+    return oneAliasedParameterGroup;
+  }
+
+  /**
+   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup with aliased parameters where
+   * show in Dsl is off.
+   */
+  public SomeAliasedParameterGroupOneRequiredConfig oneRequiredAliasedParameterResolverOperation(@ParameterGroup(
+      name = "Aliased Parameter Group") SomeAliasedParameterGroupOneRequiredConfig oneAliasedParameterGroup) {
+    return oneAliasedParameterGroup;
+  }
 }

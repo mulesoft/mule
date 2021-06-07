@@ -110,7 +110,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -119,6 +118,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -737,13 +737,7 @@ public class MuleExtensionUtils {
         throw new MuleRuntimeException(createStaticMessage("Failed to resolve the parameters for [%s]", containerName), e);
       }
     } else {
-      Set<String> topLevelParameterNames = new HashSet<>();
-      parameters.forEach((key, value) -> {
-        // TODO: MULE-19223
-        aliasedParameterNames.getOrDefault(key, key);
-        topLevelParameterNames.add(key);
-      });
-      return topLevelParameterNames;
+      return parameters.keySet().stream().map(name -> aliasedParameterNames.getOrDefault(name, name)).collect(Collectors.toSet());
     }
   }
 }
