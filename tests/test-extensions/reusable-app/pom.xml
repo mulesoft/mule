@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-<!-- Something in the parent pom prevents the mule-artifact.json form being present in the app -->
-<!--     <parent> -->
-<!--         <groupId>org.mule.tests</groupId> -->
-<!--         <artifactId>mule-test-extensions-parent</artifactId> -->
-<!--         <version>4.4.0-SNAPSHOT</version> -->
-<!--     </parent> -->
+<!-- Something in the test-extensions parent pom prevents the mule-artifact.json form being present in the app -->
+    <parent>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule</artifactId>
+        <version>4.4.0-SNAPSHOT</version>
+    </parent>
 
     <groupId>org.mule.tests</groupId>
     <artifactId>test-reusable-app</artifactId>
