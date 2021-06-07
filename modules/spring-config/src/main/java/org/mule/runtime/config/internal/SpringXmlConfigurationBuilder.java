@@ -16,6 +16,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_PROACTIVELY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
@@ -26,6 +27,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -260,6 +262,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     ConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
 
+    FeatureFlaggingService featureFlaggingService = this.muleArtifactContext.getMuleRegistry().get(FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY);
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
         // TODO MULE-19203 for policies this includes all extensions from the app as well. It should be just the ones
@@ -267,8 +270,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
         .withExtensionModels(extensions)
         .withParentArtifact(resolveParentArtifact());
+    if (featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_PROACTIVELY)) {
+      builder.withLegacyFailStrategy();
+    }
     if (disableXmlValidations) {
-      builder = builder.withSchemaValidationsDisabled();
+      builder.withSchemaValidationsDisabled();
     }
     return builder.build();
   }

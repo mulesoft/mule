@@ -26,6 +26,7 @@ import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_PROACTIVELY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -44,6 +45,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
 import org.mule.metadata.catalog.api.TypeResolverException;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
@@ -104,7 +106,6 @@ import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -115,6 +116,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.xml.transform.Transformer;
@@ -242,6 +244,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private final String modulePath;
   private final boolean validateXml;
+  private final boolean entityResolverLegacyFailStrategy;
   private final Optional<String> declarationPath;
   private final List<String> resourcesPaths;
   private TypeResolver typeResolver;
@@ -255,12 +258,13 @@ public final class XmlExtensionLoaderDelegate {
    * @param resourcesPaths  set of resources that will be exported in the {@link ExtensionModel}
    */
   public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml, Optional<String> declarationPath,
-                                    List<String> resourcesPaths) {
+                                    List<String> resourcesPaths, Supplier<FeatureFlaggingService> featureFlaggingServiceSupplier) {
     checkArgument(!isEmpty(modulePath), "modulePath must not be empty");
     this.modulePath = modulePath;
     this.validateXml = validateXml;
     this.declarationPath = declarationPath;
     this.resourcesPaths = resourcesPaths;
+    this.entityResolverLegacyFailStrategy = featureFlaggingServiceSupplier.get().isEnabled(ENTITY_RESOLVER_FAIL_PROACTIVELY);
   }
 
   public void declare(ExtensionLoadingContext context) {
@@ -346,9 +350,12 @@ public final class XmlExtensionLoaderDelegate {
 
   private ArtifactAst getModuleDocument(Set<ExtensionModel> extensions, URL resource) {
     Builder parserBuilder = AstXmlParser.builder()
-        .withExtensionModels(extensions);
+            .withExtensionModels(extensions);
+    if (entityResolverLegacyFailStrategy) {
+      parserBuilder.withLegacyFailStrategy();
+    }
     if (!validateXml) {
-      parserBuilder = parserBuilder.withSchemaValidationsDisabled();
+      parserBuilder.withSchemaValidationsDisabled();
     }
     AstXmlParser xmlToAstParser = parserBuilder
         .build();
@@ -380,10 +387,13 @@ public final class XmlExtensionLoaderDelegate {
     }
 
     final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
-    AstXmlParser xmlToAstParser = AstXmlParser.builder()
-        .withExtensionModels(extensionModels)
-        .withSchemaValidationsDisabled()
-        .build();
+    Builder parserBuilder = AstXmlParser.builder()
+            .withExtensionModels(extensionModels)
+            .withSchemaValidationsDisabled();
+    if (entityResolverLegacyFailStrategy) {
+      parserBuilder.withLegacyFailStrategy();
+    }
+    AstXmlParser xmlToAstParser = parserBuilder.build();
 
     ArtifactAst transformedModuleAst =
         xmlToAstParser.parse("transformed_" + resource.getFile(), resultStream.toInputStream());

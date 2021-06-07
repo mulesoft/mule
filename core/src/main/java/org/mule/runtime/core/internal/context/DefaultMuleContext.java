@@ -13,6 +13,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_PROACTIVELY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -290,6 +291,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureComputeConnectionErrorsInStats();
       configureToStringTransformerTransformIteratorElements();
       configureEnablePolicyIsolation();
+      configureEntityResolverFailProactivelyFeature();
     }
   }
 
@@ -1218,5 +1220,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_POLICY_ISOLATION, featureContext -> featureContext
         .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+  }
+
+  /**
+   * Configures {@link FeatureFlaggingService} to revert EE-7827 for applications with <code>minMuleVersion</code> lesser than
+   * 4.4.0, or if system property {@link MuleRuntimeFeature#HONOUR_RESERVED_PROPERTIES} is set.
+   *
+   * @since 4.4.0
+   */
+  private static void configureEntityResolverFailProactivelyFeature() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_PROACTIVELY, featureContext -> featureContext
+            .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }
