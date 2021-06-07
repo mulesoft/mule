@@ -109,29 +109,28 @@ class ComponentAstBasedElementModelFactory {
                                     DslElementModel.Builder typeBuilder) {
     LOGGER.trace("populateObjectFields: type: '{}'", type);
 
-    type.getFields()
-        .forEach(field -> {
+    type.getFields().forEach(field -> {
 
-          if (field.getValue() instanceof ObjectType && field.getAnnotation(FlattenedTypeAnnotation.class).isPresent()) {
-            ((ObjectType) field.getValue()).getFields().forEach(nested -> {
-              final String name = getLocalPart(nested);
-              LOGGER.trace("populateObjectFields: type: '{}', flattened: {}, field: {}", type, field.getValue(), name);
-              typeDsl.getContainedElement(name)
-                  .ifPresent(fieldDsl -> nested.getValue()
-                      .accept(getComponentChildVisitor(typeBuilder, configuration, nested, name, fieldDsl,
-                                                       getDefaultValue(name, field.getValue()))));
+      if (field.getValue() instanceof ObjectType && field.getAnnotation(FlattenedTypeAnnotation.class).isPresent()) {
+        ((ObjectType) field.getValue()).getFields().forEach(nested -> {
+          final String name = getLocalPart(nested);
+          LOGGER.trace("populateObjectFields: type: '{}', flattened: {}, field: {}", type, field.getValue(), name);
+          typeDsl.getContainedElement(name)
+              .ifPresent(fieldDsl -> nested.getValue()
+                  .accept(getComponentChildVisitor(typeBuilder, configuration, nested, name, fieldDsl,
+                                                   getDefaultValue(name, field.getValue()))));
 
-            });
-
-          } else {
-            final String name = getLocalPart(field);
-            LOGGER.trace("populateObjectFields: type: '{}', field: {}", type, name);
-            typeDsl.getContainedElement(name)
-                .ifPresent(fieldDsl -> field.getValue()
-                    .accept(getComponentChildVisitor(typeBuilder, configuration, field, name, fieldDsl,
-                                                     getDefaultValue(name, type))));
-          }
         });
+
+      } else {
+        final String name = getLocalPart(field);
+        LOGGER.trace("populateObjectFields: type: '{}', field: {}", type, name);
+        typeDsl.getContainedElement(name)
+            .ifPresent(fieldDsl -> field.getValue()
+                .accept(getComponentChildVisitor(typeBuilder, configuration, field, name, fieldDsl,
+                                                 getDefaultValue(name, type))));
+      }
+    });
   }
 
   private Multimap<ComponentIdentifier, ComponentAst> getNestedComponents(ComponentAst configuration) {

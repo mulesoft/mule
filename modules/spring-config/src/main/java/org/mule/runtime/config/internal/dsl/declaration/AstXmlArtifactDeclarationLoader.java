@@ -10,6 +10,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Predicates.alwaysTrue;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.sort;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -29,6 +30,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIG
 import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.extension.api.util.LayoutOrderComparator.BY_LAYOUT_ORDER;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
@@ -667,19 +669,21 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
     copyExplicitAttributes(resolveAttributes(component, param -> !param.getModel().isComponentId()), objectValue, objectType);
 
-    objectType.getFields()
-        .forEach(fieldType -> {
-          final ComponentParameterAst param = component.getParameter(getLocalPart(fieldType));
-          if (param != null && param.getValue().getRight() != null && param.getValue().getRight() instanceof ComponentAst) {
-            fieldType.getValue().accept(getParameterDeclarerVisitor(param.getValue().getRight(),
-                                                                    paramDsl
-                                                                        .getContainedElement(getLocalPart(fieldType))
-                                                                        .get(),
-                                                                    fieldValue -> objectValue
-                                                                        .withParameter(getLocalPart(fieldType),
-                                                                                       fieldValue)));
-          }
-        });
+    final List<ObjectFieldType> fields = new ArrayList<>(objectType.getFields());
+    sort(fields, BY_LAYOUT_ORDER);
+
+    fields.forEach(fieldType -> {
+      final ComponentParameterAst param = component.getParameter(getLocalPart(fieldType));
+      if (param != null && param.getValue().getRight() != null && param.getValue().getRight() instanceof ComponentAst) {
+        fieldType.getValue().accept(getParameterDeclarerVisitor(param.getValue().getRight(),
+                                                                paramDsl
+                                                                    .getContainedElement(getLocalPart(fieldType))
+                                                                    .get(),
+                                                                fieldValue -> objectValue
+                                                                    .withParameter(getLocalPart(fieldType),
+                                                                                   fieldValue)));
+      }
+    });
   }
 
   private MetadataType getChildMetadataType(MetadataType parentMetadataType, String modelParamName) {
