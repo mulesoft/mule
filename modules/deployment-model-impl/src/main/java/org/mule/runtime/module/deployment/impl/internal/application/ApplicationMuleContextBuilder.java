@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 
 import java.util.Map;
 
@@ -37,9 +37,9 @@ public class ApplicationMuleContextBuilder extends SupportsPropertiesMuleContext
     if (!isBlank(encoding)) {
       configuration.setDefaultEncoding(encoding);
     }
-    if (executionClassLoader instanceof MuleApplicationClassLoader) {
+    if (executionClassLoader instanceof MuleArtifactClassLoader) {
       configuration
-          .setMinMuleVersion(((MuleApplicationClassLoader) executionClassLoader).getArtifactDescriptor().getMinMuleVersion());
+          .setMinMuleVersion(((MuleArtifactClassLoader) executionClassLoader).getArtifactDescriptor().getMinMuleVersion());
     }
     return configuration;
   }

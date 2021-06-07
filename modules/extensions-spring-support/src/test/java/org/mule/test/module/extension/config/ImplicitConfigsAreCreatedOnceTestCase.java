@@ -12,7 +12,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 
-import org.hamcrest.core.IsCollectionContaining;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -20,7 +19,6 @@ import org.junit.Test;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ImplicitConfigsAreCreatedOnceTestCase extends AbstractExtensionFunctionalTestCase {
 

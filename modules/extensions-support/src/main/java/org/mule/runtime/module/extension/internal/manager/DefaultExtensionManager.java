@@ -178,7 +178,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                                                        componentModel));
     if (configurationModel.isPresent()) {
       createImplicitConfiguration(extensionModel, configurationModel.get(), muleEvent);
-      return of(getConfiguration(getImplicitConfigurationProviderName(extensionModel, configurationModel.get()),
+      return of(getConfiguration(getImplicitConfigurationProviderName(extensionModel, configurationModel.get(), muleContext.getArtifactType(),
+              muleContext.getId(),
+              featureFlaggingService),
                                  muleEvent));
     }
 
@@ -188,11 +190,16 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   @Override
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
     Set<ConfigurationModel> configurationsForComponent = getConfigurationForComponent(extensionModel, componentModel);
-    Optional<ConfigurationModel> config = getConfigurationModelForExtension(extensionModel, configurationsForComponent);
-    if (!config.isPresent() && requiresConfig(extensionModel, componentModel)) {
+    Optional<ConfigurationModel> extensionConfigurationModel =
+        getConfigurationModelForExtension(extensionModel, configurationsForComponent);
+    if (!extensionConfigurationModel.isPresent() && requiresConfig(extensionModel, componentModel)) {
       throw new NoConfigRefFoundException(extensionModel, componentModel);
     }
-    return config.flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(extensionModel, c)));
+    return extensionConfigurationModel
+        .flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(extensionModel, c,
+                                                                                    muleContext.getArtifactType(),
+                                                                                    muleContext.getId(),
+                                                                                    featureFlaggingService)));
   }
 
   /**
@@ -206,7 +213,10 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   private void createImplicitConfiguration(ExtensionModel extensionModel, ConfigurationModel implicitConfigurationModel,
                                            CoreEvent muleEvent) {
-    String implicitConfigurationProviderName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
+    String implicitConfigurationProviderName =
+            getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel, muleContext.getArtifactType(),
+                    muleContext.getId(), featureFlaggingService);
+
     if (!extensionRegistry
         .getConfigurationProvider(implicitConfigurationProviderName)
         .isPresent()) {
