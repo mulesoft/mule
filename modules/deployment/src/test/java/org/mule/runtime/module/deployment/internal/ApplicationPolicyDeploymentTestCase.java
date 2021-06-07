@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -49,7 +50,9 @@ import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExten
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_REORDER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
 
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -117,6 +120,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
   private static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
   private static final String FOO_POLICY_NAME = "fooPolicy";
+  private static final String ISOLATED_POLICY_NAME = "isolatedPolicy";
 
   private static File simpleExtensionJarFile;
   private static File withErrorDeclarationExtensionJarFile;
@@ -127,12 +131,19 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Rule
   public SystemProperty shareErrorTypeRepoSystemProperty;
 
+  @Rule
+  public SystemProperty enablePolicyIsolationSystemProperty;
+
   private final boolean shareErrorTypeRepository;
 
-  @Parameterized.Parameters(name = "Parallel: {0} - Share ErrorType repo: {1}")
+  @Parameterized.Parameters(name = "Parallel: {0} - Share ErrorType repo: {1} - Enable policy isolation {2}")
   public static List<Object[]> parameters() {
     // Only run without parallel deployment since this configuration does not affect policy deployment at all
-    return asList(new Object[] {false, false}, new Object[] {false, true});
+    return asList(
+                  new Object[] {false, false, false},
+                  new Object[] {false, false, true},
+                  new Object[] {false, true, true},
+                  new Object[] {false, true, false});
   }
 
   // Policy artifact file builders
@@ -148,11 +159,26 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
-  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType) {
+  private final PolicyFileBuilder policyWithPolicyIsolationFileBuilder =
+      new PolicyFileBuilder(ISOLATED_POLICY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
+          .setMinMuleVersion(MIN_MULE_VERSION)
+          .setName(ISOLATED_POLICY_NAME)
+          .setRequiredProduct(MULE)
+          .withBundleDescriptorLoader(createBundleDescriptorLoader(ISOLATED_POLICY_NAME,
+                                                                   MULE_POLICY_CLASSIFIER,
+                                                                   PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .withClassLoaderModelDescriptorLoader(
+                                                new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+          .build());
+
+  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation) {
     super(parallelDeployment);
     this.shareErrorTypeRepository = shareErrorType;
     this.shareErrorTypeRepoSystemProperty =
         new SystemProperty(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY, Boolean.toString(shareErrorType));
+    this.enablePolicyIsolationSystemProperty =
+        new SystemProperty((MuleRuntimeFeature.ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
+                           Boolean.toString(enablePolicyIsolation));
   }
 
   @BeforeClass
@@ -485,7 +511,12 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyUsingAppPlugin() throws Exception {
-    policyManager.registerPolicyTemplate(policyUsingAppPluginFileBuilder.getArtifactFile());
+    PolicyFileBuilder policyFileBuilder = policyUsingAppPluginFileBuilder;
+    if (isIsolatedPolicy()) {
+      // Since the feature flag ENABLE_POLICY_ISOLATION is active, the policy must declare as dependencies all the extensions
+      policyFileBuilder = policyFileBuilder.dependingOn(helloExtensionV1Plugin);
+    }
+    policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
                                                                                            helloExtensionV1Plugin);
@@ -818,6 +849,69 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Issue("MULE-19226")
+  @Feature(CLASSLOADING_ISOLATION)
+  public void policyDependencyInjectionIsolation() throws Exception {
+    try {
+      deployAppAndApplyPolicyWithDependencyInjectionExtension("app-with-extension-declaring-internal-dependency.xml",
+                                                              "policy-with-extension-declaring-internal-dependency.xml");
+    } catch (PolicyRegistrationException e) {
+      if (!isIsolatedPolicy()) {
+        // Expected error since the feature flag ENABLE_POLICY_ISOLATION (which fixes this error) is set to false.
+        return;
+      } else {
+        // Unexpected error.
+        throw e;
+      }
+    }
+    assertThat("Only an isolated policy should be able to inject all dependencies", isIsolatedPolicy(), is(true));
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  @Feature(CLASSLOADING_ISOLATION)
+  @Feature(APPLICATION_CONFIGURATION)
+  public void policyImplicitConfigurationIsolation() throws Exception {
+    deployAppAndApplyPolicyWithPolicyConfigurationExtension("app-with-policy-isolation-extension-and-implicit-configuration.xml",
+                                                            "policy-with-policy-isolation-extension-and-implicit-configuration.xml");
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  @Feature(CLASSLOADING_ISOLATION)
+  @Feature(APPLICATION_CONFIGURATION)
+  public void policyExplicitConfigurationIsolation() throws Exception {
+    deployAppAndApplyPolicyWithPolicyConfigurationExtension("app-with-policy-isolation-extension-and-explicit-configuration.xml",
+                                                            "policy-with-policy-isolation-extension-and-explicit-configuration.xml");
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  @Feature(CLASSLOADING_ISOLATION)
+  @Feature(APPLICATION_CONFIGURATION)
+  public void policyExplicitConfigurationInheritance() throws Exception {
+    try {
+      deployAppAndApplyPolicyWithPolicyConfigurationExtension("app-with-policy-isolation-extension-and-explicit-configuration.xml",
+                                                              "policy-with-policy-isolation-extension-and-inherited-explicit-configuration.xml");
+    } catch (PolicyRegistrationException e) {
+      if (isIsolatedPolicy()) {
+        // Expected error since the feature flag ENABLE_POLICY_ISOLATION (which prevents the policy from using the application
+        // configuration) is set to true.
+        return;
+      } else {
+        // Unexpected error.
+        throw e;
+      }
+    }
+    assertThat("Only a non-isolated policy should be able to use the application configuration", isIsolatedPolicy(), is(false));
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
   @Feature(CLASSLOADING_ISOLATION)
   public void policyWithExtensionUsingObjectStore() throws Exception {
     policyManager.registerPolicyTemplate(policyWithPluginUsingObjectStore().getArtifactFile());
@@ -1009,6 +1103,38 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .describedBy(mulePluginModelBuilder.build());
   }
 
+  private ArtifactPluginFileBuilder createPolicyDependencyInjectionExtensionDependencyPlugin() {
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("policyDependencyInjectionExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("policyDependencyInjectionExtensionPlugin",
+                                                                 MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.policyIsolation.PolicyDependencyInjectionExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("policyDependencyInjectionExtensionPlugin")
+        .dependingOn(new JarFileBuilder("policyDependencyInjectionExtension", policyDependencyInjectionExtensionJarFile))
+        .describedBy(mulePluginModelBuilder.build());
+  }
+
+  private ArtifactPluginFileBuilder createPolicyConfigurationExtensionDependencyPlugin() {
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("policyConfigurationExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("policyConfigurationExtensionPlugin",
+                                                                 MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.policyIsolation.PolicyConfigurationExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("policyConfigurationPlugin")
+        .dependingOn(new JarFileBuilder("policyConfigurationExtension", policyConfigurationExtensionJarFile))
+        .describedBy(mulePluginModelBuilder.build());
+  }
+
   private ArtifactPluginFileBuilder createInjectedHelloExtensionPluginFileBuilder() throws URISyntaxException {
     File injectedHelloExtensionJarFile =
         new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/injected/InjectedHelloExtension.java"),
@@ -1047,9 +1173,13 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   private void configureSimpleAppAndPolicyWithErrorDeclarationExtensionAndErrorMapping() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
     ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
-
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.dependingOn(withErrorDeclarationExtensionPlugin)
-        .getArtifactFile());
+    PolicyFileBuilder withErrorDeclarationPolicyFileBuilder =
+        policyIncludingPluginFileBuilder.dependingOn(withErrorDeclarationExtensionPlugin);
+    if (isIsolatedPolicy()) {
+      // Since the feature flag ENABLE_POLICY_ISOLATION is active, the policy must declare as dependencies all the extensions
+      withErrorDeclarationPolicyFileBuilder = withErrorDeclarationPolicyFileBuilder.dependingOn(simpleExtensionPlugin);
+    }
+    policyManager.registerPolicyTemplate(withErrorDeclarationPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
                                                                                            simpleExtensionPlugin);
@@ -1083,6 +1213,51 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-with-error-mapping.xml"),
+                                                      emptyList()));
+  }
+
+  private boolean isIsolatedPolicy() {
+    return parseBoolean(enablePolicyIsolationSystemProperty.getValue());
+  }
+
+  private void deployAppAndApplyPolicyWithDependencyInjectionExtension(String applicationConfigurationFileName,
+                                                                       String policyConfigurationFileName)
+      throws Exception {
+    ArtifactPluginFileBuilder policyDependencyInjectionDependencyPlugin =
+        createPolicyDependencyInjectionExtensionDependencyPlugin();
+    policyManager.registerPolicyTemplate(policyWithPolicyIsolationFileBuilder
+        .dependingOn(policyDependencyInjectionDependencyPlugin)
+        .getArtifactFile());
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices(applicationConfigurationFileName,
+                                               policyDependencyInjectionDependencyPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyWithPolicyIsolationFileBuilder
+        .dependingOn(policyDependencyInjectionDependencyPlugin).getArtifactId(),
+                            new PolicyParametrization(ISOLATED_POLICY_NAME, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/" + policyConfigurationFileName),
+                                                      emptyList()));
+  }
+
+  private void deployAppAndApplyPolicyWithPolicyConfigurationExtension(String applicationConfigurationFileName,
+                                                                       String policyConfigurationFileName)
+      throws Exception {
+    ArtifactPluginFileBuilder policyConfigurationExtensionDependencyPlugin = createPolicyConfigurationExtensionDependencyPlugin();
+    policyManager.registerPolicyTemplate(policyWithPolicyIsolationFileBuilder
+        .dependingOn(policyConfigurationExtensionDependencyPlugin)
+        .getArtifactFile());
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices(applicationConfigurationFileName,
+                                               policyConfigurationExtensionDependencyPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyWithPolicyIsolationFileBuilder
+        .dependingOn(policyConfigurationExtensionDependencyPlugin).getArtifactId(),
+                            new PolicyParametrization(ISOLATED_POLICY_NAME, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/" + policyConfigurationFileName),
                                                       emptyList()));
   }
 
