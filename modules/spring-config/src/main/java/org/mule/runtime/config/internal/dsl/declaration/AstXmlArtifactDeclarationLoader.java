@@ -16,6 +16,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.BOOLEAN;
@@ -98,6 +99,7 @@ import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -401,7 +403,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     }
   }
 
-  private void declareNonInlineParameterGroup(ParameterizedElementDeclarer declarer, ComponentAst paramsOwner,
+  private void declareNonInlineParameterGroup(ParameterizedElementDeclarer<?, ?> declarer, ComponentAst paramsOwner,
                                               final DslElementSyntax elementDsl, ParameterGroupModel group,
                                               ParameterGroupElementDeclarer groupDeclarer,
                                               final Map<String, ComponentParameterAst> groupAttributes) {
@@ -411,24 +413,17 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .filter(pm -> !groupAttributes.containsKey(pm.getName()))
         .forEach(param -> elementDsl.getChild(param.getName())
             .ifPresent(paramDsl -> {
+              final Object paramValue = paramsOwner.getParameter(param.getName()).getValue().getRight();
 
-              if (paramsOwner.getParameter(param.getName()).getValue().getRight() instanceof ComponentAst) {
-                param.getType()
-                    .accept(getParameterDeclarerVisitor2(paramsOwner, param, paramDsl,
-                                                         value -> groupDeclarer.withParameter(param.getName(),
-                                                                                              value)));
-              } else {
-                // TODO MULE-17711 remove this
-                paramsOwner.directChildrenStream()
-                    .filter(c -> c.getIdentifier().getName().equals(paramDsl.getElementName()))
-                    .findFirst()
-                    .ifPresent(paramConfig -> {
-                      param.getType()
-                          .accept(getParameterDeclarerVisitor(paramConfig, paramDsl,
-                                                              value -> groupDeclarer.withParameter(param.getName(),
-                                                                                                   value)));
-                    });
+              if (paramValue == null) {
+                return;
               }
+
+              param.getType()
+                  .accept(getParameterDeclarerVisitor(paramValue,
+                                                      paramDsl,
+                                                      value -> groupDeclarer.withParameter(param.getName(),
+                                                                                           value)));
             }));
   }
 
@@ -576,21 +571,22 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
               .filter(paramModel -> paramModel.equals(child.getModel()))
               .findFirst()
               .ifPresent(param -> param.getType()
-                  .accept(getParameterDeclarerVisitor((ComponentAst) child.getValue().getRight(),
+                  .accept(getParameterDeclarerVisitor(child.getValue().getRight(),
                                                       groupDsl.getChild(param.getName()).get(),
                                                       value -> groupBuilder.withParameter(param.getName(), value))));
         });
   }
 
-  private MetadataTypeVisitor getParameterDeclarerVisitor(final ComponentAst component,
+  private MetadataTypeVisitor getParameterDeclarerVisitor(final Object paramValue,
                                                           final DslElementSyntax paramDsl,
                                                           final Consumer<ParameterValue> valueConsumer) {
     return new MetadataTypeVisitor() {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        ParameterListValue.Builder listBuilder = ElementDeclarer.newListValue();
-        component.directChildrenStream()
+        ParameterListValue.Builder listBuilder = newListValue();
+
+        ((Collection<ComponentAst>) (paramValue))
             .forEach(item -> arrayType.getType().accept(getParameterDeclarerVisitor(item,
                                                                                     paramDsl.getGeneric(arrayType.getType())
                                                                                         .get(),
@@ -600,21 +596,16 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (component.getParameters().isEmpty() && component.directChildrenStream().count() == 0) {
-          defaultVisit(objectType);
-          return;
-        }
-
-        ParameterObjectValue.Builder objectValue = ElementDeclarer.newObjectValue();
+        ParameterObjectValue.Builder objectValue = newObjectValue();
         if (isMap(objectType)) {
-          createMapValue(objectValue, component, objectType.getOpenRestriction().orElse(null));
+          createMapValue(objectValue,
+                         (Collection<ComponentAst>) paramValue,
+                         objectType.getOpenRestriction().orElse(null));
         } else {
           if (paramDsl.isWrapped()) {
-            if (component.directChildrenStream().count() == 1) {
-              createWrappedObject(objectType, objectValue, component);
-            }
+            createWrappedObject(objectType, objectValue, (ComponentAst) paramValue);
           } else {
-            createObjectValueFromType(objectType, objectValue, component, paramDsl);
+            createObjectValueFromType(objectType, objectValue, (ComponentAst) paramValue, paramDsl);
           }
         }
         valueConsumer.accept(objectValue.build());
@@ -622,58 +613,16 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
       @Override
       public void visitUnion(UnionType unionType) {
-        final MetadataType actualType = getChildMetadataTypeFromUnion(unionType, component.getIdentifier().getName());
+        final MetadataType actualType =
+            getChildMetadataTypeFromUnion(unionType, ((ComponentAst) paramValue).getIdentifier().getName());
         visitObject((ObjectType) actualType);
       }
     };
   }
 
-  private MetadataTypeVisitor getParameterDeclarerVisitor2(final ComponentAst paramsOwner,
-                                                           final ParameterModel param,
-                                                           final DslElementSyntax paramDsl,
-                                                           final Consumer<ParameterValue> valueConsumer) {
-    return new MetadataTypeVisitor() {
-
-      // @Override
-      // public void visitArrayType(ArrayType arrayType) {
-      // ParameterListValue.Builder listBuilder = ElementDeclarer.newListValue();
-      // paramValue.directChildrenStream()
-      // .forEach(item -> arrayType.getType().accept(getParameterDeclarerVisitor2(item,
-      // paramDsl.getGeneric(arrayType.getType())
-      // .get(),
-      // listBuilder::withValue)));
-      // valueConsumer.accept(listBuilder.build());
-      // }
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        ParameterObjectValue.Builder objectValue = ElementDeclarer.newObjectValue();
-        if (isMap(objectType)) {
-          // createMapValue(objectValue, paramValue, objectType.getOpenRestriction().orElse(null));
-        } else {
-          ComponentAst paramComponent = (ComponentAst) paramsOwner.getParameter(param.getName()).getValue().getRight();
-
-          if (paramDsl.isWrapped()) {
-            createWrappedObject2(objectType, objectValue, paramComponent);
-          } else {
-            createObjectValueFromType(objectType, objectValue, paramComponent, paramDsl);
-          }
-        }
-        valueConsumer.accept(objectValue.build());
-      }
-
-      @Override
-      public void visitUnion(UnionType unionType) {
-        ComponentAst paramComponent = (ComponentAst) paramsOwner.getParameter(param.getName()).getValue().getRight();
-        final MetadataType actualType = getChildMetadataTypeFromUnion(unionType, paramComponent.getIdentifier().getName());
-        visitObject((ObjectType) actualType);
-      }
-    };
-  }
-
-  private void createMapValue(ParameterObjectValue.Builder objectValue, ComponentAst component,
+  private void createMapValue(ParameterObjectValue.Builder objectValue, Collection<ComponentAst> items,
                               MetadataType elementMetadataType) {
-    component.directChildrenStream()
+    items
         .forEach(comp -> {
           final ComponentParameterAst keyParam = comp.getParameter(KEY_ATTRIBUTE_NAME);
           final ComponentParameterAst valueParam = comp.getParameter(VALUE_ATTRIBUTE_NAME);
@@ -685,11 +634,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         });
   }
 
-  private void createWrappedObject(ObjectType objectType, ParameterObjectValue.Builder objectValue, ComponentAst component) {
-    createWrappedObject2(objectType, objectValue, component.directChildrenStream().findFirst().get());
-  }
-
-  private void createWrappedObject2(ObjectType objectType, ParameterObjectValue.Builder objectValue, ComponentAst wrappedConfig) {
+  private void createWrappedObject(ObjectType objectType, ParameterObjectValue.Builder objectValue, ComponentAst wrappedConfig) {
     Set<ObjectType> subTypes = context.getTypeCatalog().getSubTypes(objectType);
     if (!subTypes.isEmpty()) {
       subTypes.stream()
@@ -722,18 +667,17 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
     copyExplicitAttributes(resolveAttributes(component, param -> !param.getModel().isComponentId()), objectValue, objectType);
 
-
     objectType.getFields()
         .forEach(fieldType -> {
           final ComponentParameterAst param = component.getParameter(getLocalPart(fieldType));
           if (param != null && param.getValue().getRight() != null && param.getValue().getRight() instanceof ComponentAst) {
-            fieldType.getValue().accept(getParameterDeclarerVisitor2(component, param.getModel(),
-                                                                     paramDsl
-                                                                         .getContainedElement(getLocalPart(fieldType))
-                                                                         .get(),
-                                                                     fieldValue -> objectValue
-                                                                         .withParameter(getLocalPart(fieldType),
-                                                                                        fieldValue)));
+            fieldType.getValue().accept(getParameterDeclarerVisitor(param.getValue().getRight(),
+                                                                    paramDsl
+                                                                        .getContainedElement(getLocalPart(fieldType))
+                                                                        .get(),
+                                                                    fieldValue -> objectValue
+                                                                        .withParameter(getLocalPart(fieldType),
+                                                                                       fieldValue)));
           }
         });
   }
