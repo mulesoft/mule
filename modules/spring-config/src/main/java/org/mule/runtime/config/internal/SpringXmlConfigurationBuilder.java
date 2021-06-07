@@ -262,7 +262,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     ConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
 
-    FeatureFlaggingService featureFlaggingService = this.muleArtifactContext.getMuleRegistry().get(FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY);
+    FeatureFlaggingService featureFlaggingService =
+        this.muleArtifactContext.getMuleRegistry().get(FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY);
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
         // TODO MULE-19203 for policies this includes all extensions from the app as well. It should be just the ones

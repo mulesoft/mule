@@ -1231,6 +1231,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEntityResolverFailProactivelyFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_PROACTIVELY, featureContext -> featureContext
-            .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }

@@ -64,7 +64,8 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
    *
    * @param containerClassLoader {@link ClassLoader} from the container.
    */
-  public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader, Supplier<FeatureFlaggingService> featureFlaggingServiceSupplier) {
+  public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader,
+                                         Supplier<FeatureFlaggingService> featureFlaggingServiceSupplier) {
     checkNotNull(containerClassLoader, "containerClassLoader cannot be null");
 
     this.containerClassLoader = containerClassLoader;

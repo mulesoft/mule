@@ -258,7 +258,8 @@ public final class XmlExtensionLoaderDelegate {
    * @param resourcesPaths  set of resources that will be exported in the {@link ExtensionModel}
    */
   public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml, Optional<String> declarationPath,
-                                    List<String> resourcesPaths, Supplier<FeatureFlaggingService> featureFlaggingServiceSupplier) {
+                                    List<String> resourcesPaths,
+                                    Supplier<FeatureFlaggingService> featureFlaggingServiceSupplier) {
     checkArgument(!isEmpty(modulePath), "modulePath must not be empty");
     this.modulePath = modulePath;
     this.validateXml = validateXml;
@@ -350,7 +351,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private ArtifactAst getModuleDocument(Set<ExtensionModel> extensions, URL resource) {
     Builder parserBuilder = AstXmlParser.builder()
-            .withExtensionModels(extensions);
+        .withExtensionModels(extensions);
     if (entityResolverLegacyFailStrategy) {
       parserBuilder.withLegacyFailStrategy();
     }
@@ -388,8 +389,8 @@ public final class XmlExtensionLoaderDelegate {
 
     final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
     Builder parserBuilder = AstXmlParser.builder()
-            .withExtensionModels(extensionModels)
-            .withSchemaValidationsDisabled();
+        .withExtensionModels(extensionModels)
+        .withSchemaValidationsDisabled();
     if (entityResolverLegacyFailStrategy) {
       parserBuilder.withLegacyFailStrategy();
     }

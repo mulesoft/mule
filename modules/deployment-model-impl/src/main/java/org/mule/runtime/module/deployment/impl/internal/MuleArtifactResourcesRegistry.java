@@ -177,7 +177,8 @@ public class MuleArtifactResourcesRegistry {
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new ServiceRegistry())));
-    extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader, () -> findFeatureFlaggingService(serviceManager));
+    extensionModelLoaderManager =
+        new MuleExtensionModelLoaderManager(containerClassLoader, () -> findFeatureFlaggingService(serviceManager));
     domainFactory = new DefaultDomainFactory(domainDescriptorFactory, domainManager,
                                              artifactClassLoaderManager, serviceManager,
                                              pluginDependenciesResolver, domainClassLoaderBuilderFactory,
@@ -317,7 +318,7 @@ public class MuleArtifactResourcesRegistry {
   public static FeatureFlaggingService findFeatureFlaggingService(ServiceRepository serviceManager) {
     final List<Service> services = serviceManager.getServices();
     return (FeatureFlaggingService) services.stream().filter(s -> s instanceof FeatureFlaggingService).findFirst()
-            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Feature flagging service not found.")));
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Feature flagging service not found.")));
   }
 
 }
