@@ -280,7 +280,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         .withExtensionModels(extensions)
         .withParentArtifact(resolveParentArtifact());
     if (featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_PROACTIVELY)) {
-      builder.withLegacyFailStrategy();
+      builder.withProactiveFailStrategy();
     }
     if (disableXmlValidations) {
       builder.withSchemaValidationsDisabled();
