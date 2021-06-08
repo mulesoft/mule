@@ -118,7 +118,7 @@ public class InjectableParameterResolver {
       }
 
       if (value != null) {
-        if(!(value instanceof TypedValue)) {
+        if (!(value instanceof TypedValue)) {
           String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
