@@ -29,6 +29,7 @@ import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRu
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
@@ -76,6 +77,8 @@ import java.util.stream.Stream;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import javax.inject.Inject;
+
 /**
  * <code>SpringXmlConfigurationBuilder</code> enables Mule to be configured from a Spring XML Configuration file used with Mule
  * name-spaces. Multiple configuration files can be loaded from this builder (specified as a comma-separated list).
@@ -95,6 +98,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
   private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                         ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
@@ -198,7 +204,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     final ArtifactAst artifactAst =
         createApplicationModel(getExtensions(muleContext.getExtensionManager()),
                                artifactDeclaration, resolveArtifactConfigResources(), getArtifactProperties(),
-                               disableXmlValidations);
+                               disableXmlValidations, muleContext);
 
     MuleArtifactContext muleArtifactContext;
     if (enableLazyInit) {
@@ -229,7 +235,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                              ArtifactDeclaration artifactDeclaration,
                                              ConfigResource[] artifactConfigResources,
                                              Map<String, String> artifactProperties,
-                                             boolean disableXmlValidations) {
+                                             boolean disableXmlValidations, MuleContext muleContext) {
     try {
       final ArtifactAst artifactAst;
 
@@ -238,7 +244,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           artifactAst = emptyArtifact();
         } else {
           final AstXmlParser parser =
-              createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
+              createMuleXmlParser(extensions, artifactProperties, disableXmlValidations, muleContext);
 
           artifactAst = parser.parse(stream(artifactConfigResources)
               .map((CheckedFunction<ConfigResource, Pair<String, InputStream>>) (configFile -> new Pair<>(configFile
@@ -258,12 +264,14 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
-                                           Map<String, String> artifactProperties, boolean disableXmlValidations) {
+                                           Map<String, String> artifactProperties, boolean disableXmlValidations,
+                                           MuleContext muleContext)
+      throws MuleException {
     ConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
 
-    FeatureFlaggingService featureFlaggingService =
-        this.muleArtifactContext.getMuleRegistry().get(FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY);
+    muleContext.getInjector().inject(this);
+
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
         // TODO MULE-19203 for policies this includes all extensions from the app as well. It should be just the ones

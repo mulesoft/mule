@@ -7,14 +7,9 @@
 package org.mule.runtime.module.deployment.impl.internal;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.service.Service;
-import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
@@ -67,8 +62,6 @@ import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscove
 import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
 import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
-
-import java.util.List;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.
@@ -177,8 +170,7 @@ public class MuleArtifactResourcesRegistry {
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new ServiceRegistry())));
-    extensionModelLoaderManager =
-        new MuleExtensionModelLoaderManager(containerClassLoader, () -> findFeatureFlaggingService(serviceManager));
+    extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
     domainFactory = new DefaultDomainFactory(domainDescriptorFactory, domainManager,
                                              artifactClassLoaderManager, serviceManager,
                                              pluginDependenciesResolver, domainClassLoaderBuilderFactory,
@@ -308,17 +300,6 @@ public class MuleArtifactResourcesRegistry {
    */
   public ServerLockFactory getRuntimeLockFactory() {
     return runtimeLockFactory;
-  }
-
-
-  /**
-   * @param serviceManager the manager to do the lookup of the service in.
-   * @return the instance of the {@link FeatureFlaggingService} from within the given {@code serviceManager}.
-   */
-  public static FeatureFlaggingService findFeatureFlaggingService(ServiceRepository serviceManager) {
-    final List<Service> services = serviceManager.getServices();
-    return (FeatureFlaggingService) services.stream().filter(s -> s instanceof FeatureFlaggingService).findFirst()
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Feature flagging service not found.")));
   }
 
 }

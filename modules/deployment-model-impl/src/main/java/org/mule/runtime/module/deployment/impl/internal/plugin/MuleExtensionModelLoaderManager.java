@@ -17,8 +17,6 @@ import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
@@ -30,7 +28,6 @@ import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderMan
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -48,7 +45,6 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
 
   private final ArtifactClassLoader containerClassLoader;
   private final Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
-  private final Supplier<FeatureFlaggingService> featureFlaggingServiceSupplier;
 
   /**
    * Creates an instance of the manager.
@@ -56,20 +52,9 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
    * @param containerClassLoader {@link ClassLoader} from the container.
    */
   public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader) {
-    this(containerClassLoader, null);
-  }
-
-  /**
-   * Creates an instance of the manager.
-   *
-   * @param containerClassLoader {@link ClassLoader} from the container.
-   */
-  public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader,
-                                         Supplier<FeatureFlaggingService> featureFlaggingServiceSupplier) {
     checkNotNull(containerClassLoader, "containerClassLoader cannot be null");
 
     this.containerClassLoader = containerClassLoader;
-    this.featureFlaggingServiceSupplier = featureFlaggingServiceSupplier;
   }
 
   /**
@@ -113,10 +98,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
     }
 
     extensionModelLoaders.stream()
-        .forEach(extensionModelLoader -> {
-          extensionModelLoader.setFeatureFlaggingServiceSupplier(featureFlaggingServiceSupplier);
-          this.extensionModelLoaders.put(extensionModelLoader.getId(), extensionModelLoader);
-        });
+        .forEach(extensionModelLoader -> this.extensionModelLoaders.put(extensionModelLoader.getId(), extensionModelLoader));
     if (logger.isDebugEnabled()) {
       logger.debug("ExtensionModelLoader registered identifiers: {}", printExtensionModelLoaderIDs());
     }
