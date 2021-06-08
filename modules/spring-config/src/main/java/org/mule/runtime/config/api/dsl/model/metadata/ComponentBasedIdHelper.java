@@ -35,10 +35,9 @@ public class ComponentBasedIdHelper {
 
   static String getSourceElementName(ComponentAst component) {
     return getDslPrefix(component)
-            .map(p ->
-                    p + ":" + getModelNameAst(component).orElse(component.getIdentifier().getName()) +
-                            component.getComponentId().map(id -> "[" + id + "]").orElse(""))
-            .orElse(component.getIdentifier().toString());
+        .map(p -> p + ":" + getModelNameAst(component).orElse(component.getIdentifier().getName()) +
+            component.getComponentId().map(id -> "[" + id + "]").orElse(""))
+        .orElse(component.getIdentifier().toString());
   }
 
 
