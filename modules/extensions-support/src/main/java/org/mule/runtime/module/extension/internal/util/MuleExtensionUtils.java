@@ -13,13 +13,16 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.intersection;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
@@ -28,6 +31,7 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -53,6 +57,8 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -119,6 +125,8 @@ import com.google.common.collect.ImmutableMap;
  * @since 3.7.0
  */
 public class MuleExtensionUtils {
+
+  private static final String IMPLICIT_CONFIGURATION_SUFFIX = DASH + "implicit";
 
   /**
    * @param componentModel a {@link ComponentModel}
@@ -476,9 +484,68 @@ public class MuleExtensionUtils {
     return new DefaultJavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
-  public static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
-                                                            ConfigurationModel implicitConfigurationModel) {
-    return format("%s-%s-implicit", extensionModel.getName(), implicitConfigurationModel.getName());
+  /**
+   * Resolves the {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name for an extension.
+   *
+   * @param extensionModel                         The {@link ExtensionModel} of the extension.
+   * @param configurationModel                     The {@link ConfigurationModel} of the extension.
+   * @param extendedArtifactType                   The {@link ArtifactType} of the extended artifact.
+   * @param extendedArtifactId                     The unique id of the extended artifact.
+   * @param extendedArtifactFeatureFlaggingService The {@link FeatureFlaggingService} of the extended artifact.
+   * @return The {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name.
+   */
+  public static String getImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel,
+                                                            ArtifactType extendedArtifactType, String extendedArtifactId,
+                                                            FeatureFlaggingService extendedArtifactFeatureFlaggingService) {
+    if (extendedArtifactType.equals(POLICY)) {
+      return getFeatureFlaggedPolicyExtensionsImplicitConfigurationProviderName(extensionModel, configurationModel,
+                                                                                extendedArtifactId,
+                                                                                extendedArtifactFeatureFlaggingService);
+    } else {
+      return getImplicitConfigurationProviderName(extensionModel, configurationModel);
+    }
+  }
+
+  /**
+   * Resolves the {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name for a policy extension, taking
+   * into account the {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature flag.
+   *
+   * @param extensionModel     The configurable {@link ExtensionModel}.
+   * @param configurationModel The {@link ConfigurationModel} that represents the extension configuration.
+   * @return The {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name.
+   */
+  private static String getFeatureFlaggedPolicyExtensionsImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                                                           ConfigurationModel configurationModel,
+                                                                                           String extendedArtifactId,
+                                                                                           FeatureFlaggingService featureFlaggingService) {
+    if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
+      // Implicit configuration providers cannot be inherited from the parent (application) MuleContext registry, so a different
+      // name is returned,
+      // which will force the instantiation of a new ConfigurationProvider that will be stored in the policy MuleContext registry.
+      return getImplicitConfigurationProviderName(extensionModel, configurationModel, extendedArtifactId);
+    } else {
+      // Implicit configuration provider is inherited from the parent (application) MuleContext registry.
+      return getImplicitConfigurationProviderName(extensionModel, configurationModel);
+    }
+  }
+
+  private static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                             ConfigurationModel implicitConfigurationModel,
+                                                             String extendedArtifactId) {
+    return extensionModel.getName() +
+        DASH +
+        implicitConfigurationModel.getName() +
+        DASH +
+        extendedArtifactId +
+        IMPLICIT_CONFIGURATION_SUFFIX;
+  }
+
+  private static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                             ConfigurationModel implicitConfigurationModel) {
+    return extensionModel.getName() +
+        DASH +
+        implicitConfigurationModel.getName() +
+        IMPLICIT_CONFIGURATION_SUFFIX;
   }
 
   /**

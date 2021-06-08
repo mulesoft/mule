@@ -7,8 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -24,6 +26,7 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -33,6 +36,8 @@ import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediato
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import javax.inject.Inject;
 
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}
@@ -46,6 +51,9 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   private final EntityMetadataMediator entityMetadataMediator;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
@@ -110,12 +118,26 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
    */
   @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
+    validatePolicyIsolation(configurationProvider);
     ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
     if (!configurationModel.getOperationModel(componentModel.getName()).isPresent() &&
         !configurationProvider.getExtensionModel().getOperationModel(componentModel.getName()).isPresent()) {
       throw new IllegalOperationException(format(
                                                  "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                      + "The selected config does not support that operation.",
+                                                 getLocation().getRootContainerName(), componentModel.getName(),
+                                                 configurationProvider.getName()));
+    }
+  }
+
+  // TODO MULE-19350 move this validation to the artifact AST construction
+  private void validatePolicyIsolation(ConfigurationProvider configurationProvider) {
+    if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)
+        && muleContext.getArtifactType().equals(POLICY)
+        && configurationProvider.getExtensionModel() != extensionModel) {
+      throw new IllegalOperationException(format(
+                                                 "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                     + "The selected config is not part of the policy declaration and cannot be shared.",
                                                  getLocation().getRootContainerName(), componentModel.getName(),
                                                  configurationProvider.getName()));
     }

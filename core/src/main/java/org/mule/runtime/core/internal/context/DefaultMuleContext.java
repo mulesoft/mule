@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -282,6 +283,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configurePropertiesResolverFeatureFlag();
       configureBatchFixedAggregatorTransactionRecordBuffer();
       configureComputeConnectionErrorsInStats();
+      configureEnablePolicyIsolation();
     }
   }
 
@@ -1200,5 +1202,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES, featureContext -> featureContext
         .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.2.2")).isPresent());
+  }
+
+  private static void configureEnablePolicyIsolation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_POLICY_ISOLATION, featureContext -> featureContext
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }

@@ -31,6 +31,7 @@ import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
@@ -151,7 +152,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws MuleException {
     muleContext = mockContextWithServices();
-
+    when(muleContext.getArtifactType()).thenReturn(APP);
     DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
     extensionsManager.setMuleContext(muleContext);
     extensionsManager.initialise();
@@ -269,7 +270,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getConfigurationThroughImplicitConfiguration() throws Exception {
-    registerIntoMockContext(muleContext, getImplicitConfigurationProviderName(extensionModel1, extension1ConfigurationModel),
+    registerIntoMockContext(muleContext, getImplicitConfigurationProviderName(extensionModel1,
+                                                                              extension1ConfigurationModel,
+                                                                              muleContext.getArtifactType(), muleContext.getId(),
+                                                                              feature -> false),
                             extension1ConfigurationProvider);
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
@@ -288,7 +292,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     MuleRegistry registry = muleContext.getRegistry();
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     doAnswer(invocation -> {
-      registerIntoMockContext(muleContext, getImplicitConfigurationProviderName(extensionModel1, extension1ConfigurationModel),
+      registerIntoMockContext(muleContext, getImplicitConfigurationProviderName(extensionModel1,
+                                                                                extension1ConfigurationModel,
+                                                                                muleContext.getArtifactType(),
+                                                                                muleContext.getId(), feature -> false),
                               extension1ConfigurationProvider);
       new Thread(() -> extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event)).start();
       joinerLatch.countDown();
