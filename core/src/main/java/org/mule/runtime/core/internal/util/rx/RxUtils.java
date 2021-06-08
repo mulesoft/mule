@@ -245,8 +245,8 @@ public class RxUtils {
     return doPropagateCompletion(upstream, downstream, transformer,
                                  new AtomicInteger(0), completer, errorForwarder,
                                  () -> delayedExecutor.schedule(() -> {
-                                   LOGGER.warn("Propagating completion after {} milliseconds\nDSL Source:\n{}",
-                                               completionTimeoutMillis, dslSource);
+                                   LOGGER.debug("Propagating completion after {} milliseconds\nDSL Source:\n{}",
+                                                completionTimeoutMillis, dslSource);
                                    completer.runOnce();
                                  }, completionTimeoutMillis, MILLISECONDS));
   }
