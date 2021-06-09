@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-test-extensions-parent</artifactId>
-        <version>4.3.0-20210601</version>
+        <version>4.3.0-20210609</version>
     </parent>
 
     <artifactId>mule-marvel-extension</artifactId>
