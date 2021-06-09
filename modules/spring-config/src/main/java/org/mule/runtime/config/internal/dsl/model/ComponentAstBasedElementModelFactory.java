@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -18,30 +17,9 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
-import static org.mule.runtime.config.internal.model.ApplicationModel.EXPIRATION_POLICY_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.NON_REPEATABLE_ITERABLE_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.NON_REPEATABLE_STREAM_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECTION_CONFIG_PARAMETER_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECT_FOREVER_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECT_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.REPEATABLE_FILE_STORE_ITERABLE_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.REPEATABLE_FILE_STORE_STREAM_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.REPEATABLE_IN_MEMORY_ITERABLE_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.REPEATABLE_IN_MEMORY_STREAM_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.SCHEDULING_STRATEGY_IDENTIFIER;
-import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
@@ -74,7 +52,6 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -504,17 +481,16 @@ class ComponentAstBasedElementModelFactory {
       return;
     }
 
-    ComponentAst paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramSyntax));
-
-    // TODO MULE-19168 remove this
-    if (isInfrastructure(paramModel)) {
-      handleInfrastructure(paramModel, paramSyntax, innerComponents, parameters,
-                           groupElementBuilder);
-      return;
+    ComponentAst paramComponent;
+    if (configuration.getParameter(paramModel.getName()).getValue().getRight() instanceof ComponentAst) {
+      paramComponent = (ComponentAst) configuration.getParameter(paramModel.getName()).getValue().getRight();
+    } else {
+      // TODO MULE-17711 remove this
+      paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramSyntax));
     }
 
     if (paramSyntax.isWrapped()) {
-      resolveWrappedElement(groupElementBuilder, paramModel, paramComponent);
+      resolveWrappedElement(groupElementBuilder, paramModel, paramComponent, paramSyntax);
       return;
     }
 
@@ -596,16 +572,13 @@ class ComponentAstBasedElementModelFactory {
   }
 
   private void resolveWrappedElement(DslElementModel.Builder<ParameterGroupModel> groupElementBuilder, ParameterModel p,
-                                     ComponentAst paramComponent) {
+                                     ComponentAst paramComponent, DslElementSyntax paramSyntax) {
     if (paramComponent != null) {
       DslElementModel.Builder<ParameterModel> paramElement = DslElementModel.<ParameterModel>builder()
           .withModel(p)
-          .withDsl(paramComponent.getGenerationInformation().getSyntax().get())
-          .withConfig(paramComponent);
+          .withDsl(paramSyntax);
 
-      paramComponent.directChildrenStream()
-          .findFirst()
-          .flatMap(wrapper -> this.create(wrapper))
+      create(paramComponent)
           .ifPresent(paramElement::containing);
 
       groupElementBuilder.containing(paramElement.build());
@@ -621,137 +594,6 @@ class ComponentAstBasedElementModelFactory {
     }
 
     return empty();
-  }
-
-  private void handleInfrastructure(final ParameterModel paramModel, final DslElementSyntax paramDsl,
-                                    final Multimap<ComponentIdentifier, ComponentAst> nested,
-                                    final Map<String, String> parameters,
-                                    final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
-
-    switch (paramModel.getName()) {
-      case RECONNECTION_CONFIG_PARAMETER_NAME:
-        ComponentAst reconnection =
-            getSingleComponentConfiguration(nested, of(RECONNECTION_CONFIG_PARAMETER_IDENTIFIER));
-
-        if (reconnection != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, reconnection));
-        }
-        break;
-
-      case RECONNECTION_STRATEGY_PARAMETER_NAME:
-        handleReconnectionStrategy(paramModel, nested, groupElementBuilder);
-        break;
-
-      case REDELIVERY_POLICY_PARAMETER_NAME:
-        ComponentAst redelivery =
-            getSingleComponentConfiguration(nested, of(REDELIVERY_POLICY_IDENTIFIER));
-        if (redelivery != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, redelivery));
-        }
-        break;
-
-      case EXPIRATION_POLICY_PARAMETER_NAME:
-        ComponentAst expiration =
-            getSingleComponentConfiguration(nested, of(EXPIRATION_POLICY_IDENTIFIER));
-        if (expiration != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, expiration));
-        }
-        break;
-
-      case POOLING_PROFILE_PARAMETER_NAME:
-        ComponentAst pooling = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
-        if (pooling != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, pooling));
-        }
-        break;
-
-      case STREAMING_STRATEGY_PARAMETER_NAME:
-        Set<ComponentIdentifier> streaming =
-            newHashSet(NON_REPEATABLE_STREAM_IDENTIFIER,
-                       REPEATABLE_IN_MEMORY_STREAM_IDENTIFIER,
-                       REPEATABLE_FILE_STORE_STREAM_IDENTIFIER,
-                       REPEATABLE_IN_MEMORY_ITERABLE_IDENTIFIER,
-                       REPEATABLE_FILE_STORE_ITERABLE_IDENTIFIER,
-                       NON_REPEATABLE_ITERABLE_IDENTIFIER);
-
-        streaming.stream().filter(nested::containsKey).findFirst()
-            .ifPresent(s -> groupElementBuilder
-                .containing(newElementModel(paramModel, getSingleComponentConfiguration(nested, of(s)))));
-        break;
-
-      case TLS_PARAMETER_NAME:
-        handleTlsParameter(paramModel, paramDsl, nested, parameters, groupElementBuilder);
-        break;
-
-      case SCHEDULING_STRATEGY_PARAMETER_NAME:
-        handleSchedulingStrategy(paramModel, nested, groupElementBuilder);
-        break;
-
-      default:
-        return;
-    }
-  }
-
-  private void handleReconnectionStrategy(final ParameterModel paramModel,
-                                          final Multimap<ComponentIdentifier, ComponentAst> nested,
-                                          final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
-    ComponentAst config = nested.containsKey(RECONNECT_IDENTIFIER)
-        ? getSingleComponentConfiguration(nested, of(RECONNECT_IDENTIFIER))
-        : getSingleComponentConfiguration(nested,
-                                          of(RECONNECT_FOREVER_IDENTIFIER));
-
-    if (config != null) {
-      groupElementBuilder.containing(newElementModel(paramModel, config));
-    }
-  }
-
-  private void handleTlsParameter(final ParameterModel paramModel, final DslElementSyntax paramDsl,
-                                  final Multimap<ComponentIdentifier, ComponentAst> nested, final Map<String, String> parameters,
-                                  final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
-    ComponentAst tls = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
-    if (tls != null) {
-      groupElementBuilder.containing(newElementModel(paramModel, tls));
-    } else if (!isBlank(parameters.get(TLS_PARAMETER_NAME))) {
-      groupElementBuilder.containing(DslElementModel.builder()
-          .withModel(paramModel)
-          .withDsl(paramDsl)
-          .withValue(parameters.get(TLS_PARAMETER_NAME))
-          .build());
-    }
-  }
-
-  private void handleSchedulingStrategy(final ParameterModel paramModel,
-                                        final Multimap<ComponentIdentifier, ComponentAst> nested,
-                                        final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
-    ComponentAst schedulingStrategyWrapper =
-        getSingleComponentConfiguration(nested, of(SCHEDULING_STRATEGY_IDENTIFIER));
-    if (schedulingStrategyWrapper != null) {
-      DslElementModel.Builder wrapper = DslElementModel.builder()
-          .withModel(paramModel)
-          .withDsl(schedulingStrategyWrapper.getGenerationInformation().getSyntax().get())
-          .withConfig(schedulingStrategyWrapper);
-
-      Iterator<ComponentAst> nestedIt = schedulingStrategyWrapper.directChildrenStream().iterator();
-      if (nestedIt.hasNext()) {
-        final ComponentAst strategy = nestedIt.next();
-        strategy.getGenerationInformation().getSyntax()
-            .ifPresent(typeDsl -> wrapper.containing(DslElementModel.builder()
-                .withModel(strategy.getType())
-                .withDsl(typeDsl)
-                .withConfig(strategy)
-                .build()));
-      }
-
-      groupElementBuilder.containing(wrapper.build());
-    }
-  }
-
-  private DslElementModel newElementModel(ParameterModel paramModel, ComponentAst configuration) {
-    return DslElementModel.builder()
-        .withModel(paramModel)
-        .withDsl(configuration.getGenerationInformation().getSyntax().get())
-        .withConfig(configuration)
-        .build();
   }
 
 }
