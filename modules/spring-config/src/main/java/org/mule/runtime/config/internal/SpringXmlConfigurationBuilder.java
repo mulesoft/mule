@@ -279,8 +279,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
         .withExtensionModels(extensions)
         .withParentArtifact(resolveParentArtifact());
-    if (featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_PROACTIVELY)) {
-      builder.withProactiveFailStrategy();
+    if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_PROACTIVELY)) {
+      builder.withLegacyFailStrategy();
     }
     if (disableXmlValidations) {
       builder.withSchemaValidationsDisabled();
