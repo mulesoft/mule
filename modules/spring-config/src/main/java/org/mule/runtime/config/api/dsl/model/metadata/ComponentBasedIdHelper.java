@@ -19,7 +19,6 @@ import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
 import java.util.Collection;
@@ -29,40 +28,34 @@ import java.util.function.Supplier;
 
 public class ComponentBasedIdHelper {
 
-  static Optional<String> getDslPrefix(ComponentAst component) {
-    return component.getGenerationInformation().getSyntax().map(DslElementSyntax::getPrefix);
-  }
-
-  static String getSourceElementName(ComponentAst component) {
-    return getDslPrefix(component)
-        .map(p -> p + ":" + getModelNameAst(component).orElse(component.getIdentifier().getName()) +
-            component.getComponentId().map(id -> "[" + id + "]").orElse(""))
-        .orElse(component.getIdentifier().toString());
-  }
-
-
   static Optional<String> getModelNameAst(ComponentAst component) {
     final Optional<NamedObject> namedObjectModel = component.getModel(NamedObject.class);
     if (namedObjectModel.isPresent()) {
-      return namedObjectModel.map(n -> n.getName());
+      try {
+        return namedObjectModel.map(NamedObject::getName);
+      } catch (IllegalArgumentException e) {
+        return empty();
+      }
     }
 
     final Optional<Typed> typedObjectModel = component.getModel(Typed.class);
     if (typedObjectModel.isPresent()) {
       return typedObjectModel.map(t -> ExtensionMetadataTypeUtils.getId(t.getType()).toString());
     }
-
     return empty();
   }
 
-  static String sourceElementNameFromSimpleValue(ComponentAst element) {
+  static String sourceElementName(ComponentAst element) {
     return getModelNameAst(element)
         .map(modelName -> element.getIdentifier().getNamespace() + ":" + modelName)
         .orElseGet(() -> element.getIdentifier().toString());
   }
 
-  static String sourceElementNameFromSimpleValue(ComponentAst owner, ComponentParameterAst element) {
-    return owner.getIdentifier().getNamespace() + ":" + element.getModel().getName();
+  static String sourceElementNameFromSimpleValue(ComponentAst element) {
+    return getModelNameAst(element)
+        .map(modelName -> element.getIdentifier().getNamespace() + ":" + modelName
+            + element.getComponentId().map(n -> "[" + n + "]").orElse(""))
+        .orElseGet(() -> element.getIdentifier().toString());
   }
 
   static Optional<String> resolveConfigName(ComponentAst elementModel) {
@@ -115,7 +108,7 @@ public class ComponentBasedIdHelper {
             }
             return s.getPrefix() + ":" + s.getElementName();
           })
-          .orElse(sourceElementNameFromSimpleValue(containerComponent, parameterAst));
+          .orElse(containerComponent.getIdentifier().getNamespace() + ":" + parameterAst.getModel().getName());
       this.idBuilderSupplier = cacheKeyBuilderSupplier;
       this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(hash(name));
       parameterAst.getValue().reduce(this::hashForLeft, this::hashForRight);
@@ -123,7 +116,7 @@ public class ComponentBasedIdHelper {
 
     private ParameterVisitorFunctions(ComponentAst component,
                                       Supplier<CacheIdBuilderAdapter<K>> cacheKeyBuilderSupplier) {
-      String name = getSourceElementName(component);
+      String name = component.getIdentifier().toString();
       this.idBuilderSupplier = cacheKeyBuilderSupplier;
       this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(hash(name));
       this.idBuilder.containing(component.getParameters().stream().map(p -> computeIdFor(component, p, cacheKeyBuilderSupplier))
@@ -149,7 +142,9 @@ public class ComponentBasedIdHelper {
             .map(p -> computeIdFor(c, p, idBuilderSupplier))
             .collect(toList()));
       } else {
-        this.idBuilder.withHashValue(hash(o.toString()));
+        if (o != null) {
+          this.idBuilder.withHashValue(hash(o.toString()));
+        }
       }
       return null;
     }

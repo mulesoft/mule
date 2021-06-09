@@ -83,8 +83,6 @@ import com.google.common.collect.ImmutableList;
 
 import io.qameta.allure.Issue;
 
-//@RunWith(FlakinessDetectorTestRunner.class)
-//@FlakyTest
 public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadataCacheIdGeneratorTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelBasedMetadataCacheKeyGeneratorTestCase.class);
