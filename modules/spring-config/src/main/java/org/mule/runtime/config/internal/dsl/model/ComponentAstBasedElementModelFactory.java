@@ -482,8 +482,9 @@ class ComponentAstBasedElementModelFactory {
     }
 
     ComponentAst paramComponent;
-    if (configuration.getParameter(paramModel.getName()).getValue().getRight() instanceof ComponentAst) {
-      paramComponent = (ComponentAst) configuration.getParameter(paramModel.getName()).getValue().getRight();
+    final ComponentParameterAst parameter = configuration.getParameter(paramModel.getName());
+    if (parameter != null && parameter.getValue().getRight() instanceof ComponentAst) {
+      paramComponent = (ComponentAst) parameter.getValue().getRight();
     } else {
       // TODO MULE-17711 remove this
       paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramSyntax));
@@ -496,7 +497,9 @@ class ComponentAstBasedElementModelFactory {
 
     String value = paramSyntax.supportsAttributeDeclaration()
         ? parameters.get(paramSyntax.getAttributeName())
-        : null;
+        : (parameter != null
+            ? parameter.getRawValue()
+            : null);
 
     Optional<String> defaultValue = getDefaultValue(paramModel);
     if (paramComponent != null || !isBlank(value) || defaultValue.isPresent()) {
