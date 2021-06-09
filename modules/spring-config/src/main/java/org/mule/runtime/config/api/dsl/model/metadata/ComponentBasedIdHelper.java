@@ -47,14 +47,14 @@ public class ComponentBasedIdHelper {
 
   static String sourceElementName(ComponentAst element) {
     return getModelNameAst(element)
-        .map(modelName -> element.getIdentifier().getNamespace() + ":" + modelName)
+        .map(modelName -> element.getIdentifier().getNamespace() + ":" + modelName
+            + element.getComponentId().map(n -> "[" + n + "]").orElse(""))
         .orElseGet(() -> element.getIdentifier().toString());
   }
 
   static String sourceElementNameFromSimpleValue(ComponentAst element) {
     return getModelNameAst(element)
-        .map(modelName -> element.getIdentifier().getNamespace() + ":" + modelName
-            + element.getComponentId().map(n -> "[" + n + "]").orElse(""))
+        .map(modelName -> element.getIdentifier().getNamespace() + ":" + modelName)
         .orElseGet(() -> element.getIdentifier().toString());
   }
 

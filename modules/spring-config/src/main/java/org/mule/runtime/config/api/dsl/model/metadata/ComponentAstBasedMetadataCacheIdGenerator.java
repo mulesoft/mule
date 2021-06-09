@@ -17,7 +17,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeIdFor;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getModelNameAst;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -128,7 +128,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
           resolveGlobalElement(elementModel)
               .ifPresent(keyParts::add);
 
-          return new MetadataCacheId(keyParts, sourceElementNameFromSimpleValue(elementModel));
+          return new MetadataCacheId(keyParts, sourceElementName(elementModel));
         })
         .orElseGet(() -> {
           Optional<MetadataCacheId> configId = resolveConfigId(elementModel);
@@ -136,7 +136,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
             keyParts.add(configId.get());
             resolveCategoryId(elementModel)
                 .ifPresent(keyParts::add);
-            return new MetadataCacheId(keyParts, sourceElementNameFromSimpleValue(elementModel));
+            return new MetadataCacheId(keyParts, sourceElementName(elementModel));
           }
 
           return resolveDslTagId(elementModel);
@@ -185,9 +185,9 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
 
     return of(new MetadataCacheId(keyParts,
                                   typeInformation.getComponentTypeMetadataCacheId().getSourceElementName()
-                                      .map(sourceElementName -> format("(%s):(%s)", sourceElementNameFromSimpleValue(component),
+                                      .map(sourceElementName -> format("(%s):(%s)", sourceElementName(component),
                                                                        sourceElementName))
-                                      .orElse(format("(%s):(%s)", sourceElementNameFromSimpleValue(component), "Unknown Type"))));
+                                      .orElse(format("(%s):(%s)", sourceElementName(component), "Unknown Type"))));
   }
 
   private Optional<MetadataCacheId> resolveDslTagNamespace(ComponentAst elementModel) {
@@ -211,7 +211,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
         .orElseGet(() -> resolveGlobalElement(elementModel))
         .ifPresent(keyParts::add);
 
-    return of(new MetadataCacheId(keyParts, sourceElementNameFromSimpleValue(elementModel)));
+    return of(new MetadataCacheId(keyParts, sourceElementName(elementModel)));
   }
 
   private MetadataCacheId resolveDslTagId(ComponentAst elementModel) {

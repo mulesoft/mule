@@ -14,8 +14,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeIdFor;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
 
@@ -114,7 +114,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
-    String id = sourceElementNameFromSimpleValue(containerComponent);
+    String id = sourceElementName(containerComponent);
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
         .containing(parts)));
   }
@@ -190,7 +190,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
             return empty();
           }
 
-          String sourceElementName = sourceElementName(injectedElement);
+          String sourceElementName = sourceElementNameFromSimpleValue(injectedElement);
 
           return of(aValueProviderCacheId(fromElementWithName(sourceElementName).withHashValueFrom(sourceElementName)
               .containing(parts)));
