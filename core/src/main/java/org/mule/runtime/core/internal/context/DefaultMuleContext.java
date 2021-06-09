@@ -1224,7 +1224,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   /**
    * Configures {@link FeatureFlaggingService} to revert EE-7827 for applications with <code>minMuleVersion</code> lesser than
-   * 4.4.0, or if system property {@link MuleRuntimeFeature#HONOUR_RESERVED_PROPERTIES} is set.
+   * 4.4.0, or if system property {@link MuleRuntimeFeature#ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR} is set.
    *
    * @since 4.4.0
    */
