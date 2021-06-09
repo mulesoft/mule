@@ -37,7 +37,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
 
   protected Registry registry;
   protected TestEventBuilder eventBuilder = new TestEventBuilder();
-  private CoreEvent requestEvent;
+  protected CoreEvent requestEvent;
 
   /**
    * Prepares the given data to be sent as the payload of the {@link CoreEvent} to the configured flow.

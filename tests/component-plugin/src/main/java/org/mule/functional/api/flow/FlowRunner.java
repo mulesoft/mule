@@ -6,11 +6,13 @@
  */
 package org.mule.functional.api.flow;
 
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,6 +31,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 import org.mule.tck.junit4.matcher.EventMatcher;
@@ -216,36 +219,38 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private ExecutionCallback<CoreEvent> getFlowRunCallback() {
     return () -> {
-      Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
+      Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>();
 
-      CoreEvent result;
       try {
-        result = Flux.<CoreEvent>create(fluxSink -> {
+        CoreEvent result = Flux.<CoreEvent>create(fluxSink -> {
           fluxSink.next(getOrBuildEvent());
           sinkReference.set(fluxSink);
-        }).transform(flow::apply).blockFirst();
+        }).transform(eventPub -> applyWithChildContext(eventPub, flow.referenced(), empty())).blockFirst();
+        ((BaseEventContext) requestEvent.getContext()).success(result);
+        return result;
       } catch (RuntimeException ex) {
         if (ex.getCause() instanceof MuleException) {
+          ((BaseEventContext) requestEvent.getContext()).error(ex.getCause());
           throw (MuleException) ex.getCause();
         } else {
+          ((BaseEventContext) requestEvent.getContext()).error(ex);
           throw ex;
         }
+      } finally {
+        sinkReference.get().complete();
       }
-
-      sinkReference.get().complete();
-      return result;
     };
   }
 
   private ExecutionCallback<CoreEvent> getFlowDispatchCallback() {
     return () -> {
-      Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
+      Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>();
 
       try {
         Flux.<CoreEvent>create(fluxSink -> {
           fluxSink.next(getOrBuildEvent());
           sinkReference.set(fluxSink);
-        }).transform(flow::apply).blockFirst();
+        }).transform(eventPub -> applyWithChildContext(eventPub, flow.referenced(), empty())).blockFirst();
       } catch (RuntimeException ex) {
         if (ex.getCause() instanceof MuleException) {
           throw (MuleException) ex.getCause();
