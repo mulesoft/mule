@@ -16,7 +16,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_PROACTIVELY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
@@ -279,7 +279,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
         .withExtensionModels(extensions)
         .withParentArtifact(resolveParentArtifact());
-    if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_PROACTIVELY)) {
+    if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)) {
       builder.withLegacyFailStrategy();
     }
     if (disableXmlValidations) {

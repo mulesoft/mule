@@ -13,7 +13,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_PROACTIVELY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -291,7 +291,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureComputeConnectionErrorsInStats();
       configureToStringTransformerTransformIteratorElements();
       configureEnablePolicyIsolation();
-      configureEntityResolverFailProactivelyFeature();
+      configureEntityResolverFailOnFirstErrorFeature();
     }
   }
 
@@ -1228,9 +1228,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    *
    * @since 4.4.0
    */
-  private static void configureEntityResolverFailProactivelyFeature() {
+  private static void configureEntityResolverFailOnFirstErrorFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_PROACTIVELY, featureContext -> featureContext
+    featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR, featureContext -> featureContext
         .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }
