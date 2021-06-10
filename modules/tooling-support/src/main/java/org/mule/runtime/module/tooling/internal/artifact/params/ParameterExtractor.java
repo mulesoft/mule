@@ -7,11 +7,14 @@
 package org.mule.runtime.module.tooling.internal.artifact.params;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,7 +27,6 @@ import java.util.TimeZone;
 public class ParameterExtractor implements ParameterValueVisitor {
 
   private static final ObjectMapper objectMapper;
-
   static {
     // This was added to handle complex parameters and transforming from a Map<String, Object>
     // to the actual object of type defined my the model.
@@ -36,8 +38,12 @@ public class ParameterExtractor implements ParameterValueVisitor {
 
   private Object value;
 
-  public static <T> T extractValue(ParameterValue parameterValue, Class<T> type) {
-    return objectMapper.convertValue(extractValue(parameterValue), type);
+  public static Object extractValue(ParameterValue parameterValue, Class<?> type) {
+    Object value = extractValue(parameterValue);
+    if (isExpression(value) && value instanceof String) {
+      return value;
+    }
+    return objectMapper.convertValue(value, type);
   }
 
   private static Object extractValue(ParameterValue parameterValue) {

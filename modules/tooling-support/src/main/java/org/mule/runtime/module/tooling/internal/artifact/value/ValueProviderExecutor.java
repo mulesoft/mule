@@ -35,6 +35,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
+import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionEvaluationException;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.artifact.sampledata.SampleDataExecutor;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
@@ -99,7 +100,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
                     e);
       }
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
-    } catch (ExpressionNotSupportedException e) {
+    } catch (ExpressionNotSupportedException | ExpressionEvaluationException e) {
       return resultFrom(newFailure(new ValueResolvingException(e.getMessage(), INVALID_PARAMETER_VALUE))
           .withFailureCode(INVALID_PARAMETER_VALUE).build());
     } catch (ExecutorExceptionWrapper e) {
