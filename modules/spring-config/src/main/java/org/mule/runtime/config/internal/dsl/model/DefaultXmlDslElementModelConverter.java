@@ -46,6 +46,7 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,6 +73,9 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
                                                                   RECONNECTION_STRATEGY_PARAMETER_NAME,
                                                                   REDELIVERY_POLICY_PARAMETER_NAME,
                                                                   TARGET_PARAMETER_NAME);
+
+  private final List<String> TLS_CONTEXT_CHILDREN_NAMES_ORDERED = asList("trust-store", "key-store", "revocation-check");
+
   private static final String XMLNS_ATTRIBUTE_NAMESPACE = "http://www.w3.org/2000/xmlns/";
   private static final String XMLNS = "xmlns:";
 
@@ -240,7 +244,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
             Optional<ComponentConfiguration> config = e.getConfiguration();
             config.ifPresent(c -> {
               if (c.getIdentifier().getNamespace().contains(TLS_PREFIX)) {
-                element.appendChild(createTLS(c));
+                element.appendChild(createTLS(c, e.getDsl()));
               } else if (c.getIdentifier().getNamespace().contains(EE_PREFIX)) {
                 element.appendChild(createEE(c));
               } else {
@@ -312,15 +316,20 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     return transform;
   }
 
-  private Element createTLS(ComponentConfiguration config) {
+  private Element createTLS(ComponentConfiguration config, DslElementSyntax containerDsl) {
     String namespaceURI = "http://www.mulesoft.org/schema/mule/tls";
     String tlsSchemaLocation = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
 
     addNamespaceDeclarationIfNeeded(TLS_PREFIX, namespaceURI, tlsSchemaLocation);
 
+    final List<ComponentConfiguration> nestedComponents = new ArrayList<>(config.getNestedComponents());
+    nestedComponents.sort((c1, c2) -> TLS_CONTEXT_CHILDREN_NAMES_ORDERED.indexOf(c1.getIdentifier().getName())
+        - TLS_CONTEXT_CHILDREN_NAMES_ORDERED.indexOf(c2.getIdentifier().getName()));
+
     Element nested = doc.createElementNS(namespaceURI, TLS_PREFIX + ":" + config.getIdentifier().getName());
     config.getParameters().forEach(nested::setAttribute);
-    config.getNestedComponents().forEach(inner -> nested.appendChild(createTLS(inner)));
+    nestedComponents
+        .forEach(inner -> nested.appendChild(createTLS(inner, containerDsl)));
     return nested;
   }
 
