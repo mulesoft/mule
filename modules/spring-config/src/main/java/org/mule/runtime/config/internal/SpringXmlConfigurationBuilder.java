@@ -164,7 +164,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       return;
     }
 
-    initialiseIfNeeded(featureFlaggingService, muleContext);
+    initialiseIfNeeded(this, muleContext);
 
     muleArtifactContext = createApplicationContext(muleContext);
     createSpringRegistry(muleContext, muleArtifactContext);
