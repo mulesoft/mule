@@ -7,7 +7,6 @@
 package org.mule.runtime.config.api.dsl.model.metadata;
 
 import static java.util.Comparator.comparing;
-import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
@@ -22,6 +21,7 @@ import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -110,7 +110,7 @@ public class ComponentBasedIdHelper {
           })
           .orElse(containerComponent.getIdentifier().getNamespace() + ":" + parameterAst.getModel().getName());
       this.idBuilderSupplier = cacheKeyBuilderSupplier;
-      this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(hash(name));
+      this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(Objects.hashCode(name));
       parameterAst.getValue().reduce(v -> hashForLeft(parameterAst.getRawValue()), this::hashForRight);
     }
 
@@ -118,13 +118,13 @@ public class ComponentBasedIdHelper {
                                       Supplier<CacheIdBuilderAdapter<K>> cacheKeyBuilderSupplier) {
       String name = component.getIdentifier().toString();
       this.idBuilderSupplier = cacheKeyBuilderSupplier;
-      this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(hash(name));
+      this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(Objects.hashCode(name));
       this.idBuilder.containing(component.getParameters().stream().map(p -> computeIdFor(component, p, cacheKeyBuilderSupplier))
           .collect(toList()));
     }
 
     private Void hashForLeft(String s) {
-      this.idBuilder.withHashValue(hash(s));
+      this.idBuilder.withHashValue(Objects.hashCode(s));
       return null;
     }
 
@@ -143,7 +143,7 @@ public class ComponentBasedIdHelper {
             .collect(toList()));
       } else {
         if (o != null) {
-          this.idBuilder.withHashValue(hash(o.toString()));
+          this.idBuilder.withHashValue(Objects.hashCode(o.toString()));
         }
       }
       return null;
@@ -154,7 +154,7 @@ public class ComponentBasedIdHelper {
   private static class DeprecatedParameterVisitorFunctions {
 
     private static int computeHashFor(ComponentParameterAst parameter) {
-      return hash(new DeprecatedParameterVisitorFunctions(parameter).hashBuilder.toString());
+      return Objects.hashCode(new DeprecatedParameterVisitorFunctions(parameter).hashBuilder.toString());
     }
 
     private StringBuilder hashBuilder = new StringBuilder();
