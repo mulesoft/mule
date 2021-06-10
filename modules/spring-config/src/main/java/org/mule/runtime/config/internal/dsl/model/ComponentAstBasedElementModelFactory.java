@@ -340,15 +340,28 @@ class ComponentAstBasedElementModelFactory {
         .forEach(group -> addInlineGroup(configuration, innerComponents, parameters, builder, group,
                                          paramFetcher.apply(group)));
 
-    List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInDsl)
-        .flatMap(g -> g.getParameterModels().stream())
-        .collect(toList());
 
-    model.getAllParameterModels().stream()
-        .filter(p -> !inlineGroupedParameters.contains(p))
-        .forEach(p -> addElementParameter(configuration, innerComponents, parameters, elementDsl, builder, p,
-                                          paramModel -> configuration.getParameter(paramModel.getName())));
+    model.getParameterGroupModels()
+        .forEach(g -> {
+          g.getParameterModels().forEach(p -> {
+            if (!g.isShowInDsl()) {
+              addElementParameter(configuration, innerComponents, parameters, elementDsl, builder, p,
+                                  paramModel -> configuration.getParameter(paramModel.getName()));
+            }
+          });
+        });
+
+
+
+    // List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
+    // .filter(ParameterGroupModel::isShowInDsl)
+    // .flatMap(g -> g.getParameterModels().stream())
+    // .collect(toList());
+    //
+    // model.getAllParameterModels().stream()
+    // .filter(p -> !inlineGroupedParameters.contains(p))
+    // .forEach(p -> addElementParameter(configuration, innerComponents, parameters, elementDsl, builder, p,
+    // paramModel -> configuration.getParameter(paramModel.getName())));
   }
 
   private void populateConnectionProviderElements(DslElementModel.Builder builder, ComponentAst configuration) {
