@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -160,6 +161,32 @@ public class InternalDeclarationSession implements DeclarationSession {
     }
     return valueProviderExecutor().resolveValues(optionalParameterizedModel.get(), parameterizedElementDeclaration,
                                                  providerName);
+  }
+
+  @Override
+  public ValueResult getFieldValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName,
+                                    String targetSelector) {
+    Optional<ExtensionModel> optionalExtensionModel = artifactHelper().findExtension(parameterizedElementDeclaration);
+    if (!optionalExtensionModel.isPresent()) {
+      return resultFrom(newFailure()
+          .withMessage(extensionNotFoundErrorMessage(parameterizedElementDeclaration.getDeclaringExtension()))
+          .withFailureCode(COMPONENT_NOT_FOUND.getName())
+          .build());
+    }
+
+    Optional<? extends ParameterizedModel> optionalParameterizedModel =
+        artifactHelper().findModel(optionalExtensionModel.get(), parameterizedElementDeclaration);
+    if (!optionalParameterizedModel.isPresent()) {
+      return resultFrom(newFailure()
+          .withMessage(couldNotFindComponentErrorMessage(parameterizedElementDeclaration))
+          .withFailureCode(COMPONENT_NOT_FOUND.getName())
+          .build());
+    }
+    return valueProviderExecutor().resolveFieldValues(
+                                                      optionalParameterizedModel.get(),
+                                                      parameterizedElementDeclaration,
+                                                      providerName,
+                                                      targetSelector);
   }
 
   @Override

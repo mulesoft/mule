@@ -118,9 +118,12 @@ public class InjectableParameterResolver {
       }
 
       if (value != null) {
-        String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
-        DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
-        bindingContextBuilder.addBinding(parameterModel.getName(), new TypedValue(value, valueDataType));
+        if (!(value instanceof TypedValue)) {
+          String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
+          DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
+          value = new TypedValue<>(value, valueDataType);
+        }
+        bindingContextBuilder.addBinding(parameterModel.getName(), (TypedValue) value);
       }
     }
     return bindingContextBuilder.build();

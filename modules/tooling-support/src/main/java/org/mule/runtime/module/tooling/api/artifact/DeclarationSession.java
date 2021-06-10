@@ -57,6 +57,23 @@ public interface DeclarationSession {
   ValueResult getValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName);
 
   /**
+   * Retrieve all {@link org.mule.runtime.api.value.Value} that can be configured for the field in the given parameter.
+   *
+   * @param parameterizedElementDeclaration a {@link ParameterizedElementDeclaration} for the component from which the available
+   *                                        values can be used on the parameter {@param providerName}. In case the value provider
+   *                                        requires any acting parameters to be able to resolve this values, those parameters
+   *                                        should be populated in this declaration. Also, if the Component requires values from a
+   *                                        Configuration, then its reference name should be specified in the declaration.
+   * @param providerName                    the name of the value provider for which to resolve the
+   *                                        {@link org.mule.runtime.api.value.Value}s
+   * @param targetSelector                  The path to locate the field within the given parameter
+   * @return a {@link ValueResult} with the accepted parameter values to use
+   * @throws BundleNotFoundException if any of the dependencies defined for the session could not be resolved
+   */
+  ValueResult getFieldValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName,
+                             String targetSelector);
+
+  /**
    * Returns the list of keys that can be resolved associated to the specified component.
    *
    * @param component the location of the {@link org.mule.runtime.api.metadata.MetadataKeyProvider} component to query for its
