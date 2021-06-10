@@ -7,6 +7,7 @@
 package org.mule.runtime.module.tooling.internal.artifact.params;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
@@ -40,7 +41,7 @@ public class ParameterExtractor implements ParameterValueVisitor {
   // TODO: CCNS-26. This approach is no longer valid. e.g: If the expected type is an stream, this fails.
   public static Object extractValue(ParameterValue parameterValue, Class<?> type) {
     Object extractedValue = extractValue(parameterValue);
-    if (!type.isPrimitive() && extractedValue instanceof String) {
+    if (isExpression(extractedValue)) {
       return extractedValue;
     }
     return objectMapper.convertValue(extractValue(parameterValue), type);
