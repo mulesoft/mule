@@ -30,7 +30,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIG
 import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.extension.api.util.LayoutOrderComparator.BY_LAYOUT_ORDER;
+import static org.mule.runtime.extension.api.util.LayoutOrderComparator.OBJECTS_FIELDS_BY_LAYOUT_ORDER;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
@@ -670,7 +670,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     copyExplicitAttributes(resolveAttributes(component, param -> !param.getModel().isComponentId()), objectValue, objectType);
 
     final List<ObjectFieldType> fields = new ArrayList<>(objectType.getFields());
-    sort(fields, BY_LAYOUT_ORDER);
+    sort(fields, OBJECTS_FIELDS_BY_LAYOUT_ORDER);
 
     fields.forEach(fieldType -> {
       final ComponentParameterAst param = component.getParameter(getLocalPart(fieldType));
