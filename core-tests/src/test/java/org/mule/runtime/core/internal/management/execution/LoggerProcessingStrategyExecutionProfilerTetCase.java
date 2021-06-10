@@ -17,17 +17,14 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.management.execution.LoggerProcessingStrategyExecutionProfiler;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 
 import java.util.function.Consumer;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.internal.management.execution.LoggerProcessingStrategyExecutionProfiler.UNKNOWN_LOCATION_TAG;
-import static org.mule.runtime.core.internal.management.execution.LoggerProcessingStrategyExecutionProfiler.LOG_BEFORE_COMPONENT_PROCESSING_TEMPLATE;
-import static org.mule.runtime.core.internal.management.execution.LoggerProcessingStrategyExecutionProfiler.LOG_BEFORE_DISPATCHING_TO_PROCESSOR_TEMPLATE;
+import static org.mockito.Mockito.*;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.internal.management.execution.LoggerProcessingStrategyExecutionProfiler.*;
 import static org.mule.test.allure.AllureConstants.ManagementFeature.MANAGEMENT;
 import static org.mule.test.allure.AllureConstants.ManagementFeature.ProcessingStrategyExecutionProfiler.LOGGER_PROCESSING_STRATEGY_EXECUTION_PROFILER;
 
@@ -52,37 +49,53 @@ public class LoggerProcessingStrategyExecutionProfilerTetCase {
   @Before
   public void before() {
     when(processor.toString()).thenReturn(LOCATION);
+    when(processor.getProcessingType()).thenReturn(CPU_LITE);
     when(event.getCorrelationId()).thenReturn(CORRELATION_ID);
-    streamInterceptor = spy(new TestStreamProcessingStrategyExecutionProfiler(processor));
+    streamInterceptor = spy(new TestStreamProcessingStrategyExecutionProfiler(processor, processor.getProcessingType()));
   }
 
   @Test
   public void logBeforeDispatchingToProcessor() {
     verifyLog(streamInterceptor, event, e -> streamInterceptor.profileBeforeDispatchingToProcessor(event),
               LOG_BEFORE_DISPATCHING_TO_PROCESSOR_TEMPLATE,
-              event.getCorrelationId(), UNKNOWN_LOCATION_TAG);
+              event.getCorrelationId(), CPU_LITE.toString(),
+              UNKNOWN_LOCATION_TAG);
   }
 
   @Test
   public void logBeforeComponentProcessing() {
-    streamInterceptor.profileBeforeDispatchingToProcessor(event);
     verifyLog(streamInterceptor, event, e -> streamInterceptor.profileBeforeComponentProcessing(event),
               LOG_BEFORE_COMPONENT_PROCESSING_TEMPLATE,
-              event.getCorrelationId(), UNKNOWN_LOCATION_TAG);
+              event.getCorrelationId(),
+              CPU_LITE.toString(),
+              UNKNOWN_LOCATION_TAG);
   }
 
   @Test
   public void logAfterDispatchingToFlow() {
-    streamInterceptor.profileAfterDispatchingToFlow(event);
-    verify(streamInterceptor).log(anyString(), anyString(), anyString(), anyString());
+    verifyLog(streamInterceptor, event, e -> streamInterceptor.profileAfterDispatchingToFlow(event),
+              LOG_AFTER_DISPATCHING_TO_FLOW,
+              event.getCorrelationId(),
+              UNKNOWN_LOCATION_TAG);
   }
 
   private void verifyLog(LoggerProcessingStrategyExecutionProfiler streamInterceptor, CoreEvent event,
                          Consumer<CoreEvent> traceConsumer,
                          String logTemplate,
-                         String... parameters) {
+                         String correlationId,
+                         String location) {
     traceConsumer.accept(event);
-    verify(streamInterceptor).log(logTemplate, parameters);
+    verify(streamInterceptor).log(eq(logTemplate), eq(correlationId), eq(location), anyString(), anyString());
+  }
+
+  private void verifyLog(LoggerProcessingStrategyExecutionProfiler streamInterceptor, CoreEvent event,
+                         Consumer<CoreEvent> traceConsumer,
+                         String logTemplate,
+                         String correlationId,
+                         String processingType,
+                         String location) {
+    traceConsumer.accept(event);
+    verify(streamInterceptor).log(eq(logTemplate), eq(correlationId), eq(processingType), eq(location), anyString());
   }
 
   /**
@@ -90,8 +103,9 @@ public class LoggerProcessingStrategyExecutionProfilerTetCase {
    */
   private class TestStreamProcessingStrategyExecutionProfiler extends LoggerProcessingStrategyExecutionProfiler {
 
-    public TestStreamProcessingStrategyExecutionProfiler(ReactiveProcessor processor) {
-      super(null);
+    public TestStreamProcessingStrategyExecutionProfiler(ReactiveProcessor processor,
+                                                         ProcessingType processingType) {
+      super(null, processingType);
     }
 
     @Override

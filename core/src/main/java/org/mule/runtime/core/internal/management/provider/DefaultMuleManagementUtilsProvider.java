@@ -28,7 +28,7 @@ public class DefaultMuleManagementUtilsProvider implements MuleManagementUtilsPr
 
   @Override
   public ProcessingStrategyExecutionProfiler getProcessingStrategyExecutionProfiler(ReactiveProcessor processor) {
-    return new LoggerProcessingStrategyExecutionProfiler(getLocation(processor));
+    return new LoggerProcessingStrategyExecutionProfiler(getLocation(processor), processor.getProcessingType());
   }
 
   @Override
@@ -41,6 +41,7 @@ public class DefaultMuleManagementUtilsProvider implements MuleManagementUtilsPr
     return new LoggerProcessingStrategyPipelineProfiler(getLocation(pipeline));
   }
 
+  // TODO This should be refactored MULE-19482
   private ComponentLocation getLocation(ReactiveProcessor processor) {
     if (processor instanceof ComponentInnerProcessor) {
       return ((ComponentInnerProcessor) processor).getLocation();
