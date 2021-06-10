@@ -111,7 +111,7 @@ public class ComponentBasedIdHelper {
           .orElse(containerComponent.getIdentifier().getNamespace() + ":" + parameterAst.getModel().getName());
       this.idBuilderSupplier = cacheKeyBuilderSupplier;
       this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(hash(name));
-      parameterAst.getValue().reduce(this::hashForLeft, this::hashForRight);
+      parameterAst.getValue().reduce(v -> hashForLeft(parameterAst.getRawValue()), this::hashForRight);
     }
 
     private ParameterVisitorFunctions(ComponentAst component,
