@@ -96,10 +96,11 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
     return withKeyLock(id, key -> {
       try {
         if (metadataStore.get().contains(key)) {
+          LOGGER.debug(format("Retrieving cache from OS with ID '%s'", id));
           return metadataStore.get().retrieve(key);
         }
 
-        LOGGER.debug("Creating new cache " + id);
+        LOGGER.debug(format("Creating new cache in OS with ID '%s'", id));
         DefaultMetadataCache metadataCache = new DefaultMetadataCache();
         metadataStore.get().store(key, metadataCache);
         return metadataCache;
@@ -117,7 +118,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
   public void updateCache(String id, MetadataCache cache) {
     withKeyLock(id, key -> {
       try {
-        LOGGER.debug("updateCache Key: " + id);
+        LOGGER.debug(format("Updating cache in OS with ID '%s'", id));
         if (metadataStore.get().contains(key)) {
           metadataStore.get().remove(key);
         }
@@ -139,6 +140,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
         if (isBlank(keyHash)) {
           clearMetadataCaches();
         } else {
+          LOGGER.debug(format("Removing cache in OS with ID '%s'", key));
           metadataStore.get().remove(key);
         }
       } catch (ObjectDoesNotExistException e) {
@@ -177,6 +179,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
 
   private void clearMetadataCaches() {
     try {
+      LOGGER.debug("Clearing cache from OS");
       metadataStore.get().clear();
     } catch (ObjectStoreException e) {
       String msg = format("An error occurred while clearing MetadataCaches: %s", e.getMessage());
