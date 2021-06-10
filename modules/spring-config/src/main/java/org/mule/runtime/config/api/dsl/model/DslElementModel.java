@@ -7,24 +7,36 @@
 package org.mule.runtime.config.api.dsl.model;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -223,6 +235,10 @@ public class DslElementModel<T> {
     }
 
     private ComponentConfiguration from(ComponentAst element) {
+      return from2(element, "  ");
+    }
+
+    private ComponentConfiguration from2(ComponentAst element, String pad) {
       InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
           .withIdentifier(element.getIdentifier())
           .withValue(element.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null));
@@ -230,15 +246,125 @@ public class DslElementModel<T> {
       element.getModel(ParameterizedModel.class)
           .ifPresent(pm -> element.getParameters()
               .stream()
-              .filter(param -> param.getResolvedRawValue() != null)
-              .forEach(param -> builder.withParameter(param.getModel().getName(), param.getResolvedRawValue())));
+              .sorted((p1, p2) -> p1.getModel().getLayoutModel().flatMap(LayoutModel::getOrder).orElse(-1)
+                  - p2.getModel().getLayoutModel().flatMap(LayoutModel::getOrder).orElse(-1))
+              .forEach(param -> {
+                handleParam(param, param.getModel().getType(), builder, pad);
+              }));
 
-      element.directChildrenStream().forEach(i -> builder.withNestedComponent(from(i)));
+      final List<String> paramsAsChildrenNames = element.getModel(ParameterizedModel.class)
+          .map(pmz -> pmz.getAllParameterModels()
+              .stream()
+              .map(pm -> hyphenize(pm.getName()))
+              .collect(toList()))
+          .orElse(emptyList());
+
+      element.directChildrenStream()
+          // TODO MULE-17711 Remove this filter
+          .filter(c -> !paramsAsChildrenNames.contains(c.getIdentifier().getName())
+              && !c.getModel(ParameterModel.class).isPresent())
+          .forEach(i -> {
+            builder.withNestedComponent(from2(i, pad + "  "));
+          });
       element.getMetadata().getParserAttributes().forEach(builder::withProperty);
       builder.withComponentLocation(element.getLocation());
       builder.withProperty(COMPONENT_AST_KEY, element);
 
       return builder.build();
+    }
+
+    protected void handleParam(ComponentParameterAst param, MetadataType type, InternalComponentConfiguration.Builder builder,
+                               String pad) {
+      type.accept(new MetadataTypeVisitor() {
+
+        @Override
+        protected void defaultVisit(MetadataType metadataType) {
+          if (param.getResolvedRawValue() != null) {
+            builder.withParameter(param.getModel().getName(), param.getResolvedRawValue());
+          }
+        }
+
+        @Override
+        public void visitArrayType(ArrayType arrayType) {
+          param.getGenerationInformation().getSyntax()
+              .ifPresent(dslElementSyntax -> {
+                final ComponentIdentifier listWrapperIdentifier = ComponentIdentifier.builder()
+                    .namespaceUri(dslElementSyntax.getNamespace())
+                    .namespace(dslElementSyntax.getPrefix())
+                    .name(dslElementSyntax.getElementName()).build();
+
+                InternalComponentConfiguration.Builder listWrapperBuilder = InternalComponentConfiguration.builder()
+                    .withIdentifier(listWrapperIdentifier);
+
+                Collection<ComponentAst> arrayValues = (Collection<ComponentAst>) param.getValue().getRight();
+                if (arrayValues != null) {
+                  for (ComponentAst child : arrayValues) {
+                    listWrapperBuilder.withNestedComponent(from2(child, pad + "    "));
+                  }
+                }
+
+                builder.withNestedComponent(listWrapperBuilder.build());
+              });
+        }
+
+        @Override
+        public void visitObject(ObjectType objectType) {
+          if (param.getValue().getRight() instanceof String) {
+            builder.withParameter(param.getModel().getName(), (String) param.getValue().getRight());
+          }
+
+          if (isMap(objectType)) {
+            param.getGenerationInformation().getSyntax()
+                .ifPresent(dslElementSyntax -> {
+                  final ComponentIdentifier listWrapperIdentifier = ComponentIdentifier.builder()
+                      .namespaceUri(dslElementSyntax.getNamespace())
+                      .namespace(dslElementSyntax.getPrefix())
+                      .name(dslElementSyntax.getElementName()).build();
+
+                  InternalComponentConfiguration.Builder listWrapperBuilder = InternalComponentConfiguration.builder()
+                      .withIdentifier(listWrapperIdentifier);
+
+                  // Collection mapValues = (Collection) param.getValue().getRight();
+                  Collection<ComponentAst> mapValues = (Collection<ComponentAst>) param.getValue().getRight();
+                  if (mapValues != null) {
+                    for (ComponentAst child : mapValues) {
+                      listWrapperBuilder.withNestedComponent(from2(child, pad + "    "));
+                    }
+                  }
+
+                  builder.withNestedComponent(listWrapperBuilder.build());
+                });
+          }
+
+          if (param.getValue().getRight() instanceof ComponentAst) {
+            builder.withNestedComponent(from2((ComponentAst) param.getValue().getRight(), pad + "  "));
+          }
+        }
+
+        @Override
+        public void visitUnion(UnionType unionType) {
+          param.getGenerationInformation().getSyntax()
+              .ifPresent(dslElementSyntax -> {
+                unionType.getTypes()
+                    .stream()
+                    .filter(type -> type.equals(((ComponentAst) (param.getValue().getRight())).getType()))
+                    .findAny()
+                    .ifPresent(type -> {
+                      final ComponentIdentifier unionWrapperIdentifier = ComponentIdentifier.builder()
+                          .namespaceUri(dslElementSyntax.getNamespace())
+                          .namespace(dslElementSyntax.getPrefix())
+                          .name(dslElementSyntax.getElementName()).build();
+
+                      InternalComponentConfiguration.Builder unionWrapperBuilder = InternalComponentConfiguration.builder()
+                          .withIdentifier(unionWrapperIdentifier);
+
+                      handleParam(param, type, unionWrapperBuilder, pad + "  ");
+
+                      builder.withNestedComponent(unionWrapperBuilder.build());
+                    });
+              });
+        }
+      });
     }
 
     public Builder<M> withValue(String value) {

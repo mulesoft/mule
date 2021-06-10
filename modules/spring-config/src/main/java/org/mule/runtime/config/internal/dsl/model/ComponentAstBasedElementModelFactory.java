@@ -508,10 +508,11 @@ class ComponentAstBasedElementModelFactory {
         DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
             .withModel(paramModel)
             .withDsl(paramComponent.getGenerationInformation().getSyntax().get());
-        paramElementBuilder.withConfig(paramComponent);
+        // paramElementBuilder.withConfig(paramComponent);
 
         final Optional<ParameterizedModel> parameterized = paramComponent.getModel(ParameterizedModel.class);
         if (parameterized.isPresent()) {
+          paramElementBuilder.withConfig(paramComponent);
           enrichElementModel(parameterized.get(), groupDsl, paramComponent, paramElementBuilder);
         } else {
           paramModel.getType().accept(new MetadataTypeVisitor() {
@@ -541,6 +542,7 @@ class ComponentAstBasedElementModelFactory {
                 return;
               }
 
+              paramElementBuilder.withConfig(paramComponent);
               populateObjectFields(objectType, paramComponent, paramSyntax, paramElementBuilder);
             }
           });
