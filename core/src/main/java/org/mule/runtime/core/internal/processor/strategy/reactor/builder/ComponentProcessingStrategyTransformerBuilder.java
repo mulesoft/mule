@@ -13,6 +13,7 @@ import org.mule.runtime.core.internal.management.execution.DefaultExecutionOrche
 import org.mule.runtime.core.internal.management.execution.DefaultProcessingStrategyExecutionProfiler;
 import org.mule.runtime.core.internal.management.execution.ExecutionOrchestrator;
 import org.mule.runtime.core.internal.management.execution.ProcessingStrategyExecutionProfiler;
+import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -76,28 +77,34 @@ public class ComponentProcessingStrategyTransformerBuilder {
   }
 
   private Mono<CoreEvent> doBuildFromMono(CoreEvent event) {
-    return Mono.just(event)
-        .doOnNext(e -> processingStrategyExecutionProfiler.profileBeforeDispatchingToProcessor(e))
-        .publishOn(fromExecutorService(executionOrchestrator.getDispatcherScheduler()))
-        .doOnNext(e -> processingStrategyExecutionProfiler.profileBeforeComponentProcessing(e))
-        .transform(processor)
-        .doOnNext(e -> processingStrategyExecutionProfiler.profileBeforeComponentProcessing(e))
-        .publishOn(fromExecutorService(executionOrchestrator.getCallbackScheduler()))
-        .doOnNext(e -> processingStrategyExecutionProfiler.profileAfterDispatchingToFlow(e))
-        .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, executionOrchestrator.getContextScheduler()));
+    Mono<CoreEvent> mono = Mono.just(event);
+    if (!executionOrchestrator.getDispatcherScheduler().equals(ImmediateScheduler.IMMEDIATE_SCHEDULER)) {
+      mono = mono.publishOn(fromExecutorService(executionOrchestrator.getDispatcherScheduler()));
+    }
+
+    mono = mono.transform(processor);
+
+    if (!executionOrchestrator.getCallbackScheduler().equals(ImmediateScheduler.IMMEDIATE_SCHEDULER)) {
+      mono = mono.publishOn(fromExecutorService(executionOrchestrator.getCallbackScheduler()));
+    }
+
+    return mono.subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, executionOrchestrator.getContextScheduler()));
   }
 
 
   private Flux<CoreEvent> doBuildFromFlux(Publisher<CoreEvent> publisher) {
-    return Flux.from(publisher)
-        .doOnNext(e -> processingStrategyExecutionProfiler.profileBeforeDispatchingToProcessor(e))
-        .publishOn(fromExecutorService(executionOrchestrator.getDispatcherScheduler()))
-        .doOnNext(e -> processingStrategyExecutionProfiler.profileBeforeComponentProcessing(e))
-        .transform(processor)
-        .doOnNext(e -> processingStrategyExecutionProfiler.profileBeforeComponentProcessing(e))
-        .publishOn(fromExecutorService(executionOrchestrator.getCallbackScheduler()))
-        .doOnNext(e -> processingStrategyExecutionProfiler.profileAfterDispatchingToFlow(e))
-        .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, executionOrchestrator.getContextScheduler()));
+    Flux<CoreEvent> flux = Flux.from(publisher);
+    if (!executionOrchestrator.getDispatcherScheduler().equals(ImmediateScheduler.IMMEDIATE_SCHEDULER)) {
+      flux = flux.publishOn(fromExecutorService(executionOrchestrator.getDispatcherScheduler()));
+    }
+
+    flux = flux.transform(processor);
+
+    if (!executionOrchestrator.getCallbackScheduler().equals(ImmediateScheduler.IMMEDIATE_SCHEDULER)) {
+      flux = flux.publishOn(fromExecutorService(executionOrchestrator.getCallbackScheduler()));
+    }
+
+    return flux.subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, executionOrchestrator.getContextScheduler()));
   }
 
   public ReactiveProcessor build() {
