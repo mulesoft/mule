@@ -16,6 +16,7 @@ import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -30,13 +31,13 @@ import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
-import com.google.common.base.Objects;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
 
 public class DslElementBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<DslElementModel<?>> {
 
@@ -72,7 +73,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
       return ((ParameterizedModel) containerComponent.getModel())
           .getAllParameterModels()
           .stream()
-          .filter(p -> Objects.equal(parameterName, p.getName()))
+          .filter(p -> Objects.equals(parameterName, p.getName()))
           .findAny();
     }
     return empty();

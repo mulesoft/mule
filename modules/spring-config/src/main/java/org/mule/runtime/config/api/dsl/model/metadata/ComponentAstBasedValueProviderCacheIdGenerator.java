@@ -12,33 +12,36 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeHashFor;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getSourceElementName;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeIdFor;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-
-import com.google.common.base.Objects;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.google.common.base.Objects;
 
 /**
  * A {@link ComponentAst} based implementation of a {@link ValueProviderCacheIdGenerator}
@@ -87,7 +90,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     return containerComponent.getModel(ParameterizedModel.class)
         .map(parameterizedModel -> containerComponent.getParameters()
             .stream()
-            .map(p -> new ParameterModelInformation(p))
+            .map(ParameterModelInformation::new)
             .collect(toMap(i -> i.getParameterModel().getName(), identity())));
   }
 
@@ -111,7 +114,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
-    String id = getSourceElementName(containerComponent);
+    String id = sourceElementName(containerComponent);
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
         .containing(parts)));
   }
@@ -126,7 +129,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
-    String id = getSourceElementName(containerComponent);
+    String id = containerComponent.getIdentifier().toString();
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
         .containing(parts)));
   }
@@ -202,8 +205,9 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
   private List<ValueProviderCacheId> resolveActingParameterIds(ComponentAst containerComponent,
                                                                ValueProviderModel valueProviderModel,
                                                                Map<String, ParameterModelInformation> parameterModelsInformation) {
-    return valueProviderModel.getActingParameters()
+    return valueProviderModel.getParameters()
         .stream()
+        .map(ActingParameterModel::getName)
         .filter(parameterModelsInformation::containsKey)
         .map(ap -> resolveParameterId(containerComponent, parameterModelsInformation.get(ap).getParameterAst()))
         .collect(toList());
@@ -211,12 +215,10 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
 
   private ValueProviderCacheId resolveParameterId(ComponentAst containerComponent,
                                                   ComponentParameterAst componentParameterAst) {
-    return aValueProviderCacheId(fromElementWithName("param:"
-        + sourceElementNameFromSimpleValue(containerComponent, componentParameterAst))
-            .withHashValue(computeHashFor(componentParameterAst)));
+    return computeIdFor(containerComponent, componentParameterAst, ValueProviderCacheIdBuilderAdapter::new);
   }
 
-  private class ParameterModelInformation {
+  private static class ParameterModelInformation {
 
     private final ComponentParameterAst parameterAst;
 
@@ -233,5 +235,44 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     }
 
   }
+
+  private static class ValueProviderCacheIdBuilderAdapter implements CacheIdBuilderAdapter<ValueProviderCacheId> {
+
+    private ValueProviderCacheId.ValueProviderCacheIdBuilder builder;
+
+    @Override
+    public CacheIdBuilderAdapter<ValueProviderCacheId> withSourceElementName(String name) {
+      this.builder = fromElementWithName(name);
+      return this;
+    }
+
+    @Override
+    public CacheIdBuilderAdapter<ValueProviderCacheId> withHashValue(int value) {
+      validateInitialized();
+      this.builder.withHashValue(value);
+      return this;
+    }
+
+    @Override
+    public CacheIdBuilderAdapter<ValueProviderCacheId> containing(List<ValueProviderCacheId> parts) {
+      validateInitialized();
+      this.builder.containing(parts);
+      return this;
+    }
+
+    @Override
+    public ValueProviderCacheId build() {
+      validateInitialized();
+      return aValueProviderCacheId(this.builder);
+    }
+
+    private void validateInitialized() {
+      if (this.builder == null) {
+        throw new RuntimeException("withSourceElementName() never called");
+      }
+    }
+
+  }
+
 
 }

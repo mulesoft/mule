@@ -14,11 +14,12 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeIdFor;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getModelNameAst;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getSourceElementName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -42,6 +43,7 @@ import org.mule.runtime.config.api.dsl.model.metadata.types.OutputMetadataResolu
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
@@ -126,7 +128,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
           resolveGlobalElement(elementModel)
               .ifPresent(keyParts::add);
 
-          return new MetadataCacheId(keyParts, getSourceElementName(elementModel));
+          return new MetadataCacheId(keyParts, sourceElementName(elementModel));
         })
         .orElseGet(() -> {
           Optional<MetadataCacheId> configId = resolveConfigId(elementModel);
@@ -134,7 +136,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
             keyParts.add(configId.get());
             resolveCategoryId(elementModel)
                 .ifPresent(keyParts::add);
-            return new MetadataCacheId(keyParts, getSourceElementName(elementModel));
+            return new MetadataCacheId(keyParts, sourceElementName(elementModel));
           }
 
           return resolveDslTagId(elementModel);
@@ -183,9 +185,9 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
 
     return of(new MetadataCacheId(keyParts,
                                   typeInformation.getComponentTypeMetadataCacheId().getSourceElementName()
-                                      .map(sourceElementName -> format("(%s):(%s)", getSourceElementName(component),
+                                      .map(sourceElementName -> format("(%s):(%s)", sourceElementName(component),
                                                                        sourceElementName))
-                                      .orElse(format("(%s):(%s)", getSourceElementName(component), "Unknown Type"))));
+                                      .orElse(format("(%s):(%s)", sourceElementName(component), "Unknown Type"))));
   }
 
   private Optional<MetadataCacheId> resolveDslTagNamespace(ComponentAst elementModel) {
@@ -209,7 +211,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
         .orElseGet(() -> resolveGlobalElement(elementModel))
         .ifPresent(keyParts::add);
 
-    return of(new MetadataCacheId(keyParts, getSourceElementName(elementModel)));
+    return of(new MetadataCacheId(keyParts, sourceElementName(elementModel)));
   }
 
   private MetadataCacheId resolveDslTagId(ComponentAst elementModel) {
@@ -283,63 +285,57 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
   }
 
   private MetadataCacheId resolveKeyFromSimpleValue(ComponentAst elementModel, ComponentParameterAst param) {
-    final String sourceElementName = sourceElementNameFromSimpleValue(elementModel, param);
+    final MetadataCacheId notCheckingReferences = computeIdFor(elementModel, param, MetadataCacheIdBuilderAdapter::new);
+    return param.getValue().reduce(v -> notCheckingReferences,
+                                   v -> {
+                                     Reference<MetadataCacheId> reference = new Reference<>();
+                                     if (v instanceof ComponentAst) {
+                                       param.getModel().getType().accept(new MetadataTypeVisitor() {
 
-    return param.getValue().reduce(v -> {
-      return new MetadataCacheId(v.hashCode(), sourceElementName);
-    }, v -> {
-      Reference<MetadataCacheId> reference = new Reference<>();
-      final MetadataCacheId valuePart = new MetadataCacheId(v.hashCode(), sourceElementName);
+                                         @Override
+                                         public void visitArrayType(ArrayType arrayType) {
+                                           getHashedGlobal(param.getResolvedRawValue()).ifPresent(reference::set);
+                                         }
 
-      if (v instanceof ComponentAst) {
-        param.getModel().getType().accept(new MetadataTypeVisitor() {
+                                         @Override
+                                         public void visitObject(ObjectType objectType) {
+                                           boolean canBeGlobal = objectType.getAnnotation(TypeDslAnnotation.class)
+                                               .map(TypeDslAnnotation::allowsTopLevelDefinition).orElse(false);
 
-          @Override
-          public void visitArrayType(ArrayType arrayType) {
-            getHashedGlobal(param.getResolvedRawValue()).ifPresent(reference::set);
-          }
+                                           if (canBeGlobal) {
+                                             getHashedGlobal(param.getResolvedRawValue()).ifPresent(reference::set);
+                                           }
+                                         }
+                                       });
+                                     } else {
+                                       final ParameterModel paramModel = param.getModel();
+                                       paramModel.getType().accept(new MetadataTypeVisitor() {
 
-          @Override
-          public void visitObject(ObjectType objectType) {
-            boolean canBeGlobal = objectType.getAnnotation(TypeDslAnnotation.class)
-                .map(TypeDslAnnotation::allowsTopLevelDefinition).orElse(false);
+                                         @Override
+                                         public void visitString(StringType stringType) {
+                                           if (!paramModel.getAllowedStereotypes().isEmpty()) {
+                                             getHashedGlobal(v.toString()).ifPresent(reference::set);
+                                           }
+                                         }
 
-            if (canBeGlobal) {
-              getHashedGlobal(param.getResolvedRawValue()).ifPresent(reference::set);
-            }
-          }
-        });
-      } else {
-        final ParameterModel paramModel = param.getModel();
-        paramModel.getType().accept(new MetadataTypeVisitor() {
+                                         @Override
+                                         public void visitArrayType(ArrayType arrayType) {
+                                           if (paramModel.getDslConfiguration().allowsReferences() && v instanceof String) {
+                                             getHashedGlobal(v.toString()).ifPresent(reference::set);
+                                           }
+                                         }
 
-          @Override
-          public void visitString(StringType stringType) {
-            if (!paramModel.getAllowedStereotypes().isEmpty()) {
-              getHashedGlobal(v.toString()).ifPresent(reference::set);
-            }
-          }
+                                         @Override
+                                         public void visitObject(ObjectType objectType) {
+                                           if (paramModel.getDslConfiguration().allowsReferences()) {
+                                             getHashedGlobal(v.toString()).ifPresent(reference::set);
+                                           }
+                                         }
 
-          @Override
-          public void visitArrayType(ArrayType arrayType) {
-            if (paramModel.getDslConfiguration().allowsReferences() && v instanceof String) {
-              getHashedGlobal(v.toString()).ifPresent(reference::set);
-            }
-          }
-
-          @Override
-          public void visitObject(ObjectType objectType) {
-            if (paramModel.getDslConfiguration().allowsReferences()) {
-              getHashedGlobal(v.toString()).ifPresent(reference::set);
-            }
-          }
-
-        });
-
-      }
-
-      return reference.get() == null ? valuePart : reference.get();
-    });
+                                       });
+                                     }
+                                     return reference.get() == null ? notCheckingReferences : reference.get();
+                                   });
   }
 
   private MetadataCacheId createCategoryMetadataCacheId(String category) {
@@ -356,5 +352,38 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
           .map(global -> doResolve(global).orElse(null));
     }
     return empty();
+  }
+
+  private static class MetadataCacheIdBuilderAdapter implements CacheIdBuilderAdapter<MetadataCacheId> {
+
+    private String name;
+    private int value;
+    private List<MetadataCacheId> parts = new ArrayList<>();
+
+    @Override
+    public CacheIdBuilderAdapter<MetadataCacheId> withSourceElementName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    @Override
+    public CacheIdBuilderAdapter<MetadataCacheId> withHashValue(int value) {
+      this.value = value;
+      return this;
+    }
+
+    @Override
+    public CacheIdBuilderAdapter<MetadataCacheId> containing(List<MetadataCacheId> parts) {
+      this.parts.addAll(parts);
+      return this;
+    }
+
+    @Override
+    public MetadataCacheId build() {
+      if (parts.isEmpty()) {
+        return new MetadataCacheId(value, name);
+      }
+      return new MetadataCacheId(parts, name);
+    }
   }
 }

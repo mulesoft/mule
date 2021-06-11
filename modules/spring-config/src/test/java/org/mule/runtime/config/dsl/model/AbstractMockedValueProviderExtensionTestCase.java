@@ -52,6 +52,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
@@ -80,6 +81,7 @@ import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 import org.mule.runtime.extension.api.model.config.ImmutableConfigurationModel;
 import org.mule.runtime.extension.api.model.connection.ImmutableConnectionProviderModel;
 import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
+import org.mule.runtime.extension.api.model.parameter.ImmutableActingParameterModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterGroupModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
@@ -179,7 +181,9 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
   protected ParameterModel complexActingParameter;
 
-  protected ParameterGroupModel parameterGroup;
+  protected ParameterGroupModel componentParameterGroup;
+
+  protected ParameterGroupModel configParameterGroup;
 
   protected ParameterModel errorMappingsParameter;
 
@@ -217,13 +221,23 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(valueProviderModel.getProviderName()).thenReturn(VALUE_PROVIDER_NAME);
     when(valueProviderModel.getProviderId()).thenReturn(VALUE_PROVIDER_ID);
     when(valueProviderModel.getActingParameters()).thenReturn(asList(ACTING_PARAMETER_NAME, PARAMETER_IN_GROUP_NAME));
+
+    ActingParameterModel actingParameterActingModel = new ImmutableActingParameterModel(ACTING_PARAMETER_NAME, true);
+    ActingParameterModel parameterInGroupActingModel = new ImmutableActingParameterModel(PARAMETER_IN_GROUP_NAME, true);
+
+    when(valueProviderModel.getParameters()).thenReturn(asList(actingParameterActingModel, parameterInGroupActingModel));
     when(valueProviderModel.requiresConfiguration()).thenReturn(false);
     when(valueProviderModel.requiresConnection()).thenReturn(false);
 
     when(complexValueProviderModel.getPartOrder()).thenReturn(0);
     when(complexValueProviderModel.getProviderName()).thenReturn(COMPLEX_VALUE_PROVIDER_NAME);
     when(complexValueProviderModel.getProviderId()).thenReturn(COMPLEX_VALUE_PROVIDER_ID);
-    when(complexValueProviderModel.getActingParameters()).thenReturn(asList(COMPLEX_ACTING_PARAMETER_NAME));
+
+    ActingParameterModel complexActingParameterActingModel =
+        new ImmutableActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME, true);
+    when(complexValueProviderModel.getParameters()).thenReturn(singletonList(complexActingParameterActingModel));
+
+    when(complexValueProviderModel.getActingParameters()).thenReturn(singletonList(COMPLEX_ACTING_PARAMETER_NAME));
     when(complexValueProviderModel.requiresConfiguration()).thenReturn(false);
     when(complexValueProviderModel.requiresConnection()).thenReturn(false);
 
@@ -261,37 +275,50 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     errorMappingsParameterGroup = new ImmutableParameterGroupModel(ERROR_MAPPINGS, "", asList(errorMappingsParameter),
                                                                    emptyList(), false, null, null, emptySet());
 
-    parameterGroup = new ImmutableParameterGroupModel(DEFAULT_GROUP_NAME, "", asList(nameParameter,
-                                                                                     configRefParameter,
-                                                                                     actingParameter,
-                                                                                     providedParameter,
-                                                                                     parameterRequiredForMetadata,
-                                                                                     complexActingParameter,
-                                                                                     providedParameterFromComplex),
-                                                      emptyList(), false,
-                                                      null, null, emptySet());
+    componentParameterGroup = new ImmutableParameterGroupModel(DEFAULT_GROUP_NAME, "", asList(configRefParameter,
+                                                                                              actingParameter,
+                                                                                              providedParameter,
+                                                                                              parameterRequiredForMetadata,
+                                                                                              complexActingParameter,
+                                                                                              providedParameterFromComplex),
+                                                               emptyList(), false,
+                                                               null, null, emptySet());
+
+    configParameterGroup = new ImmutableParameterGroupModel(DEFAULT_GROUP_NAME, "",
+                                                            asList(
+                                                                   nameParameter,
+                                                                   actingParameter,
+                                                                   providedParameter,
+                                                                   parameterRequiredForMetadata,
+                                                                   complexActingParameter,
+                                                                   providedParameterFromComplex),
+                                                            emptyList(), false, null, null, emptySet());
 
     RequiredForMetadataModelProperty requiredForMetadataModelProperty =
         new RequiredForMetadataModelProperty(asList(PARAMETER_REQUIRED_FOR_METADATA_NAME));
 
     connectionProvider =
-        new ImmutableConnectionProviderModel(CONNECTION_PROVIDER_NAME, "", asList(parameterGroup, actingParametersGroup), NONE,
+        new ImmutableConnectionProviderModel(CONNECTION_PROVIDER_NAME, "", asList(componentParameterGroup, actingParametersGroup),
+                                             NONE,
                                              false, emptySet(), null,
                                              CONNECTION, Collections.singleton(requiredForMetadataModelProperty));
 
-    operation = createOperationModel(OPERATION_NAME, asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
+    operation =
+        createOperationModel(OPERATION_NAME, asList(componentParameterGroup, actingParametersGroup, errorMappingsParameterGroup));
     otherOperation =
-        createOperationModel(OTHER_OPERATION_NAME, asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
+        createOperationModel(OTHER_OPERATION_NAME,
+                             asList(componentParameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
-    source = new ImmutableSourceModel(SOURCE_NAME, "", false, false, asList(parameterGroup, actingParametersGroup), emptyList(),
+    source = new ImmutableSourceModel(SOURCE_NAME, "", false, false, asList(componentParameterGroup, actingParametersGroup),
+                                      emptyList(),
                                       null, null, empty(), empty(), empty(), false, false, false, null, null, emptySet(),
                                       emptySet(), emptySet(), null);
 
-    configuration = new ImmutableConfigurationModel(CONFIGURATION_NAME, "", asList(parameterGroup, actingParametersGroup),
+    configuration = new ImmutableConfigurationModel(CONFIGURATION_NAME, "", asList(configParameterGroup, actingParametersGroup),
                                                     asList(operation, otherOperation), asList(connectionProvider), asList(source),
                                                     emptySet(), null, CONFIG, singleton(requiredForMetadataModelProperty));
     otherConfiguration =
-        new ImmutableConfigurationModel(OTHER_CONFIGURATION_NAME, "", asList(parameterGroup, actingParametersGroup),
+        new ImmutableConfigurationModel(OTHER_CONFIGURATION_NAME, "", asList(configParameterGroup, actingParametersGroup),
                                         emptyList(), asList(connectionProvider), emptyList(),
                                         emptySet(), null, CONFIG, singleton(requiredForMetadataModelProperty));
 
