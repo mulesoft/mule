@@ -31,6 +31,10 @@ public class DefaultDeclarationSessionBuilder
     implements DeclarationSessionBuilder {
 
   private static final String TRUE = "true";
+  private static final String FALSE = "false";
+
+  // System Property to allow disable cache storage for Metadata resolution on Runtime side.
+  public static final String MULE_METADATA_CACHE_DISABLE = "mule.metadata.cache.disabled";
 
   public DefaultDeclarationSessionBuilder(DefaultApplicationFactory defaultApplicationFactory) {
     super(defaultApplicationFactory);
@@ -38,14 +42,18 @@ public class DefaultDeclarationSessionBuilder
 
   @Override
   protected Map<String, String> forcedDeploymentProperties() {
-    return ImmutableMap.<String, String>builder()
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String>builder()
         // System Property for user allow to force enable logs, but internal property is meant to disable logs if it is true
         .put(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY,
-             String.valueOf(!valueOf(getProperty(MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY, "false"))))
+             String.valueOf(!valueOf(getProperty(MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY, FALSE))))
         .put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, TRUE)
-        .put(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY, TRUE)
-        .put(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH, getToolingWorkingDir().getAbsolutePath())
-        .build();
+        .put(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY, TRUE);
+    if (!valueOf(getProperty(MULE_METADATA_CACHE_DISABLE, FALSE))) {
+      // Setting the deployment property that enables the shared persistent for Metadata cache using OS.
+      builder.put(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH, getToolingWorkingDir().getAbsolutePath());
+    }
+
+    return builder.build();
   }
 
   private File getToolingWorkingDir() {
