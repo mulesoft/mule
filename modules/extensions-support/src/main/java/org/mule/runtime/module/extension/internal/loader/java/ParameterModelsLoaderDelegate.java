@@ -21,6 +21,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensi
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
+import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.getParameterGroupInfo;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -72,11 +73,13 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
+import org.mule.runtime.module.extension.internal.loader.utils.ParameterGroupInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -101,7 +104,8 @@ public final class ParameterModelsLoaderDelegate {
                                          ParameterDeclarationContext declarationContext,
                                          ParameterGroupDeclarer parameterGroupDeclarer) {
     List<ParameterDeclarer> declarerList = new ArrayList<>();
-    checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, Config.class, MetadataKeyId.class);
+    checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, org.mule.sdk.api.annotation.param.Connection.class,
+                                        Config.class, org.mule.sdk.api.annotation.param.Config.class, MetadataKeyId.class);
 
     boolean supportsNestedElements = component instanceof HasNestedComponentsDeclarer;
     for (ExtensionParameter extensionParameter : parameters) {
@@ -214,12 +218,12 @@ public final class ParameterModelsLoaderDelegate {
                                                   ExtensionParameter groupParameter)
       throws IllegalParameterModelDefinitionException {
 
-    ParameterGroup groupAnnotation = groupParameter.getAnnotation(ParameterGroup.class).orElse(null);
-    if (groupAnnotation == null) {
+    ParameterGroupInfo groupInfo = getParameterGroupInfo(groupParameter).orElse(null);
+    if (groupInfo == null) {
       return emptyList();
     }
 
-    final String groupName = groupAnnotation.name();
+    final String groupName = groupInfo.getName();
     if (DEFAULT_GROUP_NAME.equals(groupName)) {
       throw new IllegalParameterModelDefinitionException(
                                                          format("%s '%s' defines parameter group of name '%s' which is the default one. "
@@ -234,7 +238,8 @@ public final class ParameterModelsLoaderDelegate {
 
     final Type type = groupParameter.getType();
 
-    final List<FieldElement> nestedGroups = type.getAnnotatedFields(ParameterGroup.class);
+    final List<FieldElement> nestedGroups = new LinkedList<>(type.getAnnotatedFields(ParameterGroup.class));
+    nestedGroups.addAll(type.getAnnotatedFields(org.mule.sdk.api.annotation.param.ParameterGroup.class));
     if (!nestedGroups.isEmpty()) {
       throw new IllegalParameterModelDefinitionException(format(
                                                                 "Class '%s' is used as a @%s but contains fields which also hold that annotation. Nesting groups is not allowed. "
@@ -293,7 +298,7 @@ public final class ParameterModelsLoaderDelegate {
       declarer.withExclusiveOptionals(optionalParamNames, annotation.isOneRequired());
     });
 
-    declarer.withDslInlineRepresentation(groupAnnotation.showInDsl());
+    declarer.withDslInlineRepresentation(groupInfo.isShowInDsl());
 
     groupParameter.getAnnotation(DisplayName.class)
         .ifPresent(displayName -> declarer.withDisplayModel(DisplayModel.builder().displayName(displayName.value()).build()));
@@ -310,7 +315,8 @@ public final class ParameterModelsLoaderDelegate {
   }
 
   private boolean isParameterGroup(ExtensionParameter groupParameter) {
-    return groupParameter.getAnnotation(ParameterGroup.class).isPresent();
+    return groupParameter.getAnnotation(ParameterGroup.class).isPresent()
+        || groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class).isPresent();
   }
 
   private void parseParameterRole(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
@@ -330,7 +336,8 @@ public final class ParameterModelsLoaderDelegate {
                                                                + "The default value for this parameter will come from the configuration parameter",
                                                                   extensionParameter.getName(), NullSafe.class.getSimpleName()));
       }
-      if (extensionParameter.isRequired() && !extensionParameter.isAnnotatedWith(ParameterGroup.class)) {
+      if (extensionParameter.isRequired() && !(extensionParameter.isAnnotatedWith(ParameterGroup.class)
+          || extensionParameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.ParameterGroup.class))) {
         throw new IllegalParameterModelDefinitionException(
                                                            format("Parameter '%s' is required but annotated with '@%s', which is redundant",
                                                                   extensionParameter.getName(), NullSafe.class.getSimpleName()));

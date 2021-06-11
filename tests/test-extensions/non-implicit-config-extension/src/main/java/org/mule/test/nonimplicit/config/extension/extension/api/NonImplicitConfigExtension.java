@@ -43,7 +43,7 @@ public class NonImplicitConfigExtension implements Initialisable, Startable, Mul
   @Optional(defaultValue = "#[vars.number]")
   private Integer optionalWithDefault;
 
-  @ParameterGroup(name = "nullSafeGroup")
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "nullSafeGroup")
   private NullSafeParameterGroup nullSafeGroup;
 
   @ParameterGroup(name = "nullSafeGroupShowInDsl", showInDsl = true)

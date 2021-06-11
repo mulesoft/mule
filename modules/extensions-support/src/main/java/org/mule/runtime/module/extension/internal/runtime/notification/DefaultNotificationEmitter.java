@@ -16,8 +16,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
-import org.mule.runtime.extension.api.notification.NotificationEmitter;
+import org.mule.sdk.api.notification.NotificationActionDefinition;
+import org.mule.sdk.api.notification.NotificationEmitter;
 
 import java.util.function.Supplier;
 

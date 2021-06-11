@@ -36,7 +36,7 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
   public void configurationWithDynamicParameterResolvers() throws Exception {
     ParameterResolverConfig config = getPayload("configurationWithDynamicParameterResolvers");
 
-    ParameterResolver<KnockeableDoor> doorResolver = config.getDoorResolver();
+    org.mule.sdk.api.runtime.parameter.ParameterResolver<KnockeableDoor> doorResolver = config.getDoorResolver();
     ParameterResolver<String> stringResolver = config.getStringResolver();
 
     assertParameterResolver(doorResolver, of("#[app.registry.staticDoor]"), is(instanceOf(KnockeableDoor.class)));
@@ -48,7 +48,7 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
   public void configurationWithStaticParameterResolvers() throws Exception {
     ParameterResolverConfig config = getPayload("configurationWithStaticParameterResolvers");
 
-    ParameterResolver<KnockeableDoor> doorResolver = config.getDoorResolver();
+    org.mule.sdk.api.runtime.parameter.ParameterResolver<KnockeableDoor> doorResolver = config.getDoorResolver();
     ParameterResolver<String> stringResolver = config.getStringResolver();
 
     assertParameterResolver(doorResolver, empty(), is(instanceOf(KnockeableDoor.class)));

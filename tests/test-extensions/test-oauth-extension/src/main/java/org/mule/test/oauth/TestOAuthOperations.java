@@ -131,7 +131,7 @@ public class TestOAuthOperations {
   @MediaType(TEXT_PLAIN)
   public Result<String, String> anotherMetadataOperation(@MetadataKeyId(RefreshedOAuthMetadataResolver.class) String metadataKey,
                                                          @TypeResolver(RefreshedOAuthMetadataResolver.class) Object inputParameter,
-                                                         @Connection TestOAuthConnection connection) {
+                                                         @org.mule.sdk.api.annotation.param.Connection TestOAuthConnection connection) {
     return Result.<String, String>builder().output("Operation Result").attributes("Operation Attributes").build();
   }
 

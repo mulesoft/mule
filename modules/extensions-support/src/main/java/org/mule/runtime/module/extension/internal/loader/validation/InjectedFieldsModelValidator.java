@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Stream.of;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
@@ -43,10 +45,12 @@ import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Validates that the fields which are annotated with {@link RefName} or {@link DefaultEncoding} honor that:
@@ -76,30 +80,34 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
           @Override
           protected void onSource(HasSourceModels owner, SourceModel model) {
             Optional<Class> implementingType = getImplementingType(model);
-            validateFields(model, implementingType, DefaultEncoding.class, String.class);
-            validateFields(model, implementingType, RuntimeVersion.class, MuleVersion.class);
+            validateFields(model, implementingType, String.class, DefaultEncoding.class,
+                           org.mule.sdk.api.annotation.param.DefaultEncoding.class);
+            validateFields(model, implementingType, MuleVersion.class, RuntimeVersion.class);
           }
 
           @Override
           protected void onConfiguration(ConfigurationModel model) {
             Optional<Class> implementingType = getImplementingType(model);
-            validateFields(model, implementingType, DefaultEncoding.class, String.class);
-            validateFields(model, implementingType, RefName.class, String.class);
-            validateFields(model, implementingType, RuntimeVersion.class, MuleVersion.class);
+            validateFields(model, implementingType, String.class, DefaultEncoding.class,
+                           org.mule.sdk.api.annotation.param.DefaultEncoding.class);
+            validateFields(model, implementingType, String.class, RefName.class);
+            validateFields(model, implementingType, MuleVersion.class, RuntimeVersion.class);
           }
 
           @Override
           protected void onOperation(HasOperationModels owner, OperationModel model) {
             validateArguments(model, model.getModelProperty(ExtensionOperationDescriptorModelProperty.class),
-                              DefaultEncoding.class);
+                              DefaultEncoding.class, org.mule.sdk.api.annotation.param.DefaultEncoding.class);
           }
 
           @Override
           protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
             Optional<Class> implementingType = getImplementingType(model);
-            validateFields(model, implementingType, DefaultEncoding.class, String.class);
-            validateFields(model, implementingType, RefName.class, String.class);
-            validateFields(model, implementingType, RuntimeVersion.class, MuleVersion.class);
+            validateFields(model, getImplementingType(model), String.class, DefaultEncoding.class,
+                           org.mule.sdk.api.annotation.param.DefaultEncoding.class);
+            validateFields(model, getImplementingType(model), String.class, RefName.class);
+            validateFields(model, implementingType, MuleVersion.class, RuntimeVersion.class);
+
           }
 
           @Override
@@ -113,7 +121,8 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
                     try {
                       Class<?> type = getType(objectType, classLoaderModelProperty.getClassLoader());
                       if (validatedTypes.add(type)) {
-                        validateType(model, type, DefaultEncoding.class, String.class);
+                        validateType(model, type, String.class, DefaultEncoding.class,
+                                     org.mule.sdk.api.annotation.param.DefaultEncoding.class);
                       }
                     } catch (Exception e) {
                       problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
@@ -125,59 +134,65 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
           }
 
           private void validateArguments(NamedObject model, Optional<ExtensionOperationDescriptorModelProperty> modelProperty,
-                                         Class<? extends Annotation> annotationClass) {
+                                         Class<? extends Annotation>... annotationClasses) {
             modelProperty.ifPresent(operationDescriptorModelProperty -> {
               MethodElement operation = operationDescriptorModelProperty.getOperationElement();
-              int size = operation.getParametersAnnotatedWith(annotationClass).size();
-
+              List<ExtensionParameter> annotatedExtensionParameters = new ArrayList<>();
+              of(annotationClasses).forEach(annotationClass -> annotatedExtensionParameters
+                  .addAll(operation.getParametersAnnotatedWith(annotationClass)));
+              int size = annotatedExtensionParameters.size();
               if (size == 0) {
                 return;
               } else if (size > 1) {
                 problemsReporter
                     .addError(new Problem(model,
-                                          format("Operation method '%s' has %d arguments annotated with @%s. Only one argument may carry that annotation",
+                                          format("Operation method '%s' has %d arguments annotated with [@%s]. Only one argument may carry that annotation",
                                                  operation.getName(), size,
-                                                 annotationClass.getSimpleName())));
+                                                 of(annotationClasses).map(annotationClass -> annotationClass.getName())
+                                                     .collect(joining(", @")))));
               }
 
-              ExtensionParameter argument = operation.getParametersAnnotatedWith(annotationClass).get(0);
+              ExtensionParameter argument = annotatedExtensionParameters.get(0);
               if (!argument.getType().isSameType(String.class)) {
                 problemsReporter
                     .addError(new Problem(model,
-                                          format("Operation method '%s' declares an argument '%s' which is annotated with @%s and is of type '%s'. Only "
+                                          format("Operation method '%s' declares an argument '%s' which is annotated with [@%s] and is of type '%s'. Only "
                                               + "arguments of type String are allowed to carry such annotation",
                                                  operation.getName(),
-                                                 argument.getName(), annotationClass.getSimpleName(),
+                                                 argument.getName(), of(annotationClasses)
+                                                     .map(annotationClass -> annotationClass.getName()).collect(joining(", @")),
                                                  argument.getType().getName())));
               }
             });
           }
 
-          private void validateFields(NamedObject model, Optional<Class> implementingType,
-                                      Class<? extends Annotation> annotationClass, Class implementingClass) {
-            implementingType.ifPresent(type -> validateType(model, type, annotationClass, implementingClass));
+          private void validateFields(NamedObject model, Optional<Class> implementingType, Class implementingClass,
+                                      Class<? extends Annotation>... annotationClasses) {
+            implementingType.ifPresent(type -> validateType(model, type, implementingClass, annotationClasses));
           }
 
-          private void validateType(NamedObject model, Class<?> type, Class<? extends Annotation> annotationClass,
-                                    Class implementingClass) {
-            List<Field> fields = getAnnotatedFields(type, annotationClass);
+          private void validateType(NamedObject model, Class<?> type, Class implementingClass,
+                                    Class<? extends Annotation>... annotationClasses) {
+            List<Field> fields = getAnnotatedFields(type, annotationClasses);
             if (fields.isEmpty()) {
               return;
             } else if (fields.size() > 1) {
               problemsReporter
                   .addError(new Problem(model,
-                                        format("Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
-                                               type.getName(), fields.size(), annotationClass.getSimpleName())));
+                                        format("Class '%s' has %d fields annotated with one of [@%s]. Only one field may carry that annotation",
+                                               type.getName(), fields.size(), of(annotationClasses)
+                                                   .map(annotationClass -> annotationClass.getName()).collect(joining(", @")))));
             }
 
             Field field = fields.get(0);
             if (!implementingClass.equals(field.getType())) {
               problemsReporter
                   .addError(new Problem(model,
-                                        format("Class '%s' declares the field '%s' which is annotated with @%s and is of type '%s'. Only "
-                                            + "fields of type %s are allowed to carry such annotation", type.getName(),
-                                               field.getName(), annotationClass.getSimpleName(), field.getType().getName(),
-                                               implementingClass)));
+                                        format("Class '%s' declares the field '%s' which is annotated with one of [@%s] and is of type '%s'. Only "
+                                            + "fields of type String are allowed to carry such annotation", type.getName(),
+                                               field.getName(), of(annotationClasses)
+                                                   .map(annotationClass -> annotationClass.getName()).collect(joining(", @")),
+                                               field.getType().getName())));
             }
           }
         }.walk(extensionModel);

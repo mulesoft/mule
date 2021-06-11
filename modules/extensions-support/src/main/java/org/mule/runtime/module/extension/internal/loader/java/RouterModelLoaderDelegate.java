@@ -47,8 +47,9 @@ import java.util.Optional;
 final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String CONSTRUCT = "Construct";
-  private static final List<Class<?>> VALID_CALLBACK_PARAMETERS = asList(RouterCompletionCallback.class,
-                                                                         VoidCompletionCallback.class);
+  private static final List<Class<?>> VALID_CALLBACK_PARAMETERS =
+      asList(RouterCompletionCallback.class, org.mule.sdk.api.runtime.process.RouterCompletionCallback.class,
+             VoidCompletionCallback.class, org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
 
   private final Map<MethodElement, ConstructDeclarer> constructDeclarers = new HashMap<>();
 

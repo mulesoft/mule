@@ -92,6 +92,7 @@ abstract class AbstractModelLoaderDelegate {
 
   void processComponentConnectivity(ExecutableComponentDeclarer componentDeclarer, WithParameters component, WithAlias alias) {
     final List<ExtensionParameter> connectionParameters = component.getParametersAnnotatedWith(Connection.class);
+    connectionParameters.addAll(component.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Connection.class));
     if (connectionParameters.isEmpty()) {
       componentDeclarer.requiresConnection(false).transactional(false);
     } else if (connectionParameters.size() == 1) {

@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
@@ -484,11 +485,15 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   private <T> Optional<FieldSetter<Object, T>> fetchConfigurationField() {
-    return fetchField(Config.class).map(FieldSetter::new);
+    Optional<Field> legacyConfigurationField = fetchField(Config.class);
+    Optional<Field> configurationField = fetchField(org.mule.sdk.api.annotation.param.Config.class);
+    return ofNullable(legacyConfigurationField.orElse(configurationField.orElse(null))).map(FieldSetter::new);
   }
 
   private <T> Optional<FieldSetter<Object, T>> fetchConnectionProviderField() {
-    return fetchField(Connection.class).map(field -> {
+    Optional<Field> legacyConnectionField = fetchField(Connection.class);
+    Optional<Field> connectionField = fetchField(org.mule.sdk.api.annotation.param.Connection.class);
+    return ofNullable(legacyConnectionField.orElse(connectionField.orElse(null))).map(field -> {
       if (!ConnectionProvider.class.equals(field.getType())) {
         throw new IllegalModelDefinitionException(format(
                                                          "Message Source defined on class '%s' has field '%s' of type '%s' annotated with @%s. That annotation can only be "

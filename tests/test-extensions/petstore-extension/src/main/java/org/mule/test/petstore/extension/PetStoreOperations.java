@@ -91,8 +91,9 @@ public class PetStoreOperations {
 
   @MediaType(ANY)
   public void scopeWithMuleStereotype(@AllowedStereotypes(ValidatorStereotype.class) Chain validators,
-                                      CompletionCallback<String, String> completionCallback) {
-    completionCallback.success((Result.<String, String>builder().output("Ok").attributes("Attributes").build()));
+                                      org.mule.sdk.api.runtime.process.CompletionCallback<String, String> completionCallback) {
+    completionCallback.success((org.mule.sdk.api.runtime.operation.Result.<String, String>builder().output("Ok")
+        .attributes("Attributes").build()));
   }
 
   @MediaType(TEXT_PLAIN)
@@ -230,6 +231,11 @@ public class PetStoreOperations {
     return correlationInfo;
   }
 
+  @OutputResolver(output = SdkCorrelationInfoOutputResolver.class)
+  public org.mule.sdk.api.runtime.parameter.CorrelationInfo getSdkPetCorrelation(org.mule.sdk.api.runtime.parameter.CorrelationInfo correlationInfo) {
+    return correlationInfo;
+  }
+
   public ExclusivePetBreeder getBreeder(@ParameterGroup(name = "Exclusive") ExclusivePetBreeder breeder) {
     return breeder;
   }
@@ -248,7 +254,7 @@ public class PetStoreOperations {
 
   @MediaType(TEXT_PLAIN)
   public String getDefaultEncoding(boolean usePhoneNumber, @Optional PhoneNumber phoneNumber,
-                                   @DefaultEncoding String encoding) {
+                                   @org.mule.sdk.api.annotation.param.DefaultEncoding String encoding) {
     return usePhoneNumber ? phoneNumber.getCountryEncoding() : encoding;
   }
 
@@ -316,6 +322,19 @@ public class PetStoreOperations {
     @Override
     public String getCategoryName() {
       return "correlationInfo";
+    }
+  }
+
+  public static class SdkCorrelationInfoOutputResolver implements OutputTypeResolver<CorrelationInfo> {
+
+    @Override
+    public MetadataType getOutputType(MetadataContext context, CorrelationInfo key) {
+      return context.getTypeLoader().load(org.mule.sdk.api.runtime.parameter.CorrelationInfo.class);
+    }
+
+    @Override
+    public String getCategoryName() {
+      return "sdkCorrelationInfo";
     }
   }
 

@@ -193,11 +193,15 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   Optional<ExtensionParameter> getConfigParameter(WithParameters element) {
-    return element.getParametersAnnotatedWith(Config.class).stream().findFirst();
+    List<ExtensionParameter> configParameter = element.getParametersAnnotatedWith(Config.class);
+    configParameter.addAll(element.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Config.class));
+    return configParameter.stream().findFirst();
   }
 
   Optional<ExtensionParameter> getConnectionParameter(WithParameters element) {
-    return element.getParametersAnnotatedWith(Connection.class).stream().findFirst();
+    List<ExtensionParameter> connectionParameter = element.getParametersAnnotatedWith(Connection.class);
+    connectionParameter.addAll(element.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Connection.class));
+    return connectionParameter.stream().findFirst();
   }
 
   ConfigModelLoaderDelegate getConfigLoaderDelegate() {

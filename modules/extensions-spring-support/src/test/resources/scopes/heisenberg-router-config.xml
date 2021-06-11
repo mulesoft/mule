@@ -141,6 +141,16 @@
         </heisenberg:void-router>
     </flow>
 
+    <flow name="sdkVoidRouter">
+        <heisenberg:sdk-void-router>
+            <heisenberg:when message="myString">
+                <heisenberg:lifecycle-validator expected="#[payload]"/>
+                <set-variable variableName="newAttributes" value="ATTRIBUTES_VAR"/>
+                <set-payload value="MODIFIED"/>
+            </heisenberg:when>
+        </heisenberg:sdk-void-router>
+    </flow>
+
     <flow name="routerField">
         <heisenberg:router-field expected="#[vars.expected]" newValue="#[vars.newValue]"/>
     </flow>

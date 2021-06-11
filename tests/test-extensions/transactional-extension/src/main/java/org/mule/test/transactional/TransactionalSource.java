@@ -101,7 +101,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
   }
 
   @OnSuccess
-  public void onSuccess(SourceCallbackContext ctx)
+  public void onSuccess(org.mule.sdk.api.runtime.source.SourceCallbackContext ctx)
       throws TransactionException {
     ctx.getTransactionHandle().commit();
     isSuccess = true;
@@ -115,7 +115,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
   }
 
   @OnTerminate
-  public void onTerminate(SourceCallbackContext ctx) {
+  public void onTerminate(org.mule.sdk.api.runtime.source.SourceCallbackContext ctx) {
     Boolean isXa = (Boolean) ctx.getVariable(IS_XA).get();
     if (isXa) {
       TestXaTransactionalConnection connection = ctx.getConnection();

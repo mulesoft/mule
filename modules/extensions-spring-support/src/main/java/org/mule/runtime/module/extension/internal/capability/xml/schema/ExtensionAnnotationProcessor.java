@@ -33,6 +33,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
 import java.lang.annotation.Annotation;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -166,7 +167,8 @@ public final class ExtensionAnnotationProcessor {
         DeclaredType annotationType = compound.getAnnotationType();
         if (annotationType != null) {
           Class annotationClass = classFor((TypeElement) compound.getAnnotationType().asElement(), env).get();
-          if (ParameterGroup.class.isAssignableFrom(annotationClass)) {
+          if (ParameterGroup.class.isAssignableFrom(annotationClass)
+              || org.mule.sdk.api.annotation.param.ParameterGroup.class.isAssignableFrom(annotationClass)) {
             try {
               getOperationParameterGroupDocumentation((TypeElement) env.getTypeUtils().asElement(variable.asType()), docs, env);
             } catch (Exception e) {
@@ -191,8 +193,11 @@ public final class ExtensionAnnotationProcessor {
     getFieldsAnnotatedWith(groupElement, Parameter.class)
         .forEach((key, value) -> parameterDocs.put(key, getJavaDocSummary(processingEnvironment, value)));
 
-    getFieldsAnnotatedWith(groupElement, ParameterGroup.class)
-        .values()
+    Map<String, VariableElement> parameterGroupAnnotatedFields =
+        new HashMap<>(getFieldsAnnotatedWith(groupElement, org.mule.sdk.api.annotation.param.ParameterGroup.class));
+    parameterGroupAnnotatedFields.putAll(getFieldsAnnotatedWith(groupElement, ParameterGroup.class));
+
+    parameterGroupAnnotatedFields.values()
         .forEach(field -> getOperationParameterGroupDocumentation((TypeElement) processingEnvironment.getTypeUtils()
             .asElement(field.asType()), parameterDocs, processingEnvironment));
   }

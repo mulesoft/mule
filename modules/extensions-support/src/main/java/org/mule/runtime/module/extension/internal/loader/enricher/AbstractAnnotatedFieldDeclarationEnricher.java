@@ -11,9 +11,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
 
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -25,12 +23,12 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
 
 /**
  * Base class for implementations of {@link DeclarationEnricher} that works on {@link ConfigurationDeclaration} and
@@ -47,47 +45,47 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+    Predicate<Field> fieldHasAnnotationPredicate = getFieldHasAnnotationPredicate();
     new IdempotentDeclarationWalker() {
 
       @Override
       public void onConfiguration(ConfigurationDeclaration declaration) {
-        doEnrich(declaration);
+        doEnrich(declaration, fieldHasAnnotationPredicate);
       }
 
       @Override
       protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-        doEnrich(declaration);
+        doEnrich(declaration, fieldHasAnnotationPredicate);
       }
 
       @Override
       protected void onSource(SourceDeclaration declaration) {
-        doEnrich(declaration);
+        doEnrich(declaration, fieldHasAnnotationPredicate);
       }
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }
 
-  protected void doEnrich(BaseDeclaration<?> declaration) {
-    Class annotationClass = getAnnotation();
+  protected void doEnrich(BaseDeclaration<?> declaration, Predicate<Field> fieldHasAnnotationPredicate) {
     Class implementingType = getImplementingClass();
 
     declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(typeProperty -> {
-      Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(annotationClass));
+      Collection<Field> fields = getAllFields(typeProperty.getType(), fieldHasAnnotationPredicate);
       if (isEmpty(fields)) {
         return;
       }
 
-      validate(fields, typeProperty, annotationClass, implementingType);
+      validate(fields, typeProperty, getAnnotationName(), implementingType);
 
       declaration.addModelProperty(getModelProperty(fields.iterator().next()));
     });
   }
 
-  protected void validate(Collection<Field> fields, ImplementingTypeModelProperty typeProperty, Class annotation,
+  protected void validate(Collection<Field> fields, ImplementingTypeModelProperty typeProperty, String annotationName,
                           Class implementingClass) {
     if (fields.size() > 1) {
       throw new IllegalConfigurationModelDefinitionException(format("Only one field is allowed to be annotated" +
           "with @%s, but class '%s' has %d fields with such annotation. Offending fields are: [%s]",
-                                                                    annotation.getSimpleName(),
+                                                                    annotationName,
                                                                     typeProperty.getType().getName(),
                                                                     fields.size(),
                                                                     Joiner.on(", ").join(fields.stream().map(Field::getName)
@@ -101,7 +99,7 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
           "annotation",
                                                                     typeProperty.getType().getName(),
                                                                     field.getName(),
-                                                                    annotation.getSimpleName(),
+                                                                    annotationName,
                                                                     field.getType().getName(),
                                                                     implementingClass));
     }
@@ -109,7 +107,9 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
 
   protected abstract ModelProperty getModelProperty(Field field);
 
-  protected abstract Class getAnnotation();
+  protected abstract Predicate<Field> getFieldHasAnnotationPredicate();
+
+  protected abstract String getAnnotationName();
 
   protected abstract Class getImplementingClass();
 

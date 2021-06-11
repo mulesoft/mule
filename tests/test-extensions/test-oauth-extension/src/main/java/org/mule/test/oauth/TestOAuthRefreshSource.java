@@ -39,7 +39,7 @@ public class TestOAuthRefreshSource extends Source<String, String> {
   private Scheduler executor;
   private ScheduledFuture<?> scheduledFuture;
 
-  @Connection
+  @org.mule.sdk.api.annotation.param.Connection
   private ConnectionProvider<TestOAuthConnection> connectionProvider;
   private TestOAuthConnection connection;
 

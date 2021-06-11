@@ -28,7 +28,7 @@ public class DifferedKnockableDoor {
 
   @Parameter
   @Optional
-  private Literal<String> encodedPasssword;
+  private org.mule.sdk.api.runtime.parameter.Literal<String> encodedPasssword;
 
   public ParameterResolver<String> getVictim() {
     return victim;
@@ -38,7 +38,7 @@ public class DifferedKnockableDoor {
     return address;
   }
 
-  public Literal<String> getEncodedPasssword() {
+  public org.mule.sdk.api.runtime.parameter.Literal<String> getEncodedPasssword() {
     return encodedPasssword;
   }
 

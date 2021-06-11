@@ -22,7 +22,7 @@ public class PhoneNumber {
   @Parameter
   private String home;
 
-  @DefaultEncoding
+  @org.mule.sdk.api.annotation.param.DefaultEncoding
   private String countryEncoding;
 
   @Parameter

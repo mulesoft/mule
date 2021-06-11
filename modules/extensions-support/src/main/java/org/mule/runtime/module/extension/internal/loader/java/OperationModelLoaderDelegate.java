@@ -197,7 +197,8 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   static void processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod, boolean allowStreaming) {
     List<ExtensionParameter> callbackParameters = operationMethod.getParameters().stream()
-        .filter(p -> p.getType().isSameType(CompletionCallback.class))
+        .filter(p -> p.getType().isSameType(CompletionCallback.class)
+            || p.getType().isSameType(org.mule.sdk.api.runtime.process.CompletionCallback.class))
         .collect(toList());
 
     checkDefinition(!callbackParameters.isEmpty(),

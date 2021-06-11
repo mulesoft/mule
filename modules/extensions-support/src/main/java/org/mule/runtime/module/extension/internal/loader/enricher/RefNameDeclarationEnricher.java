@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static org.reflections.ReflectionUtils.withAnnotation;
+
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -17,6 +19,8 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
 import java.lang.reflect.Field;
+
+import com.google.common.base.Predicate;
 
 /**
  * A {@link DeclarationEnricher} which looks for configurations with fields annotated with {@link RefName}.
@@ -33,16 +37,17 @@ public final class RefNameDeclarationEnricher extends AbstractAnnotatedFieldDecl
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+    Predicate<Field> fieldHasAnnotationPredicate = getFieldHasAnnotationPredicate();
     new IdempotentDeclarationWalker() {
 
       @Override
       public void onConfiguration(ConfigurationDeclaration declaration) {
-        doEnrich(declaration);
+        doEnrich(declaration, fieldHasAnnotationPredicate);
       }
 
       @Override
       protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-        doEnrich(declaration);
+        doEnrich(declaration, fieldHasAnnotationPredicate);
       }
 
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
@@ -54,8 +59,13 @@ public final class RefNameDeclarationEnricher extends AbstractAnnotatedFieldDecl
   }
 
   @Override
-  protected Class getAnnotation() {
-    return RefName.class;
+  protected Predicate<Field> getFieldHasAnnotationPredicate() {
+    return withAnnotation(RefName.class);
+  }
+
+  @Override
+  protected String getAnnotationName() {
+    return "RefName";
   }
 
   @Override

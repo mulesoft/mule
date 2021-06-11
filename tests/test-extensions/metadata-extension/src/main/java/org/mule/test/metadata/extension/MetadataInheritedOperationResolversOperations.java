@@ -17,7 +17,8 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 public class MetadataInheritedOperationResolversOperations extends MetadataOperationsParent {
 
   @MediaType(value = ANY, strict = false)
-  public Object shouldInheritOperationParentResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type,
+  public Object shouldInheritOperationParentResolvers(@org.mule.sdk.api.annotation.param.Connection MetadataConnection connection,
+                                                      @MetadataKeyId String type,
                                                       @Optional @Content Object content) {
     return null;
   }

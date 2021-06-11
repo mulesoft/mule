@@ -66,7 +66,8 @@ public class DrStrangeOperations {
 
   @Throws(CustomErrorProvider.class)
   @MediaType(TEXT_PLAIN)
-  public String readStream(@Connection MysticConnection connection, @Optional(defaultValue = PAYLOAD) InputStream stream)
+  public String readStream(@org.mule.sdk.api.annotation.param.Connection MysticConnection connection,
+                           @Optional(defaultValue = PAYLOAD) InputStream stream)
       throws IOException {
     try {
       return IOUtils.toString(stream);
@@ -91,7 +92,8 @@ public class DrStrangeOperations {
   }
 
   @Stereotype(ReferableOperationStereotypeDefinition.class)
-  public void withFlowReference(@Config DrStrange dr, @Optional @FlowReference String flowRef, @ComponentId String name) {
+  public void withFlowReference(@org.mule.sdk.api.annotation.param.Config DrStrange dr, @Optional @FlowReference String flowRef,
+                                @ComponentId String name) {
 
     if (!StringUtils.isBlank(flowRef)) {
       if (!locator.find(Location.builder().globalName(flowRef).build()).isPresent()) {

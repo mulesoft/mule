@@ -102,7 +102,9 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
    */
   @Override
   public List<ExtensionParameter> getParameterGroups() {
-    return getParametersAnnotatedWith(ParameterGroup.class);
+    List<ExtensionParameter> extensionParametersGroups = new LinkedList<>(getParametersAnnotatedWith(ParameterGroup.class));
+    extensionParametersGroups.addAll(getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.ParameterGroup.class));
+    return extensionParametersGroups;
   }
 
   /**

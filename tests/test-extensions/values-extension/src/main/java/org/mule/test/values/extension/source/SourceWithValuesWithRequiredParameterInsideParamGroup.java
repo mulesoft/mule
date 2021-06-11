@@ -14,6 +14,6 @@ import org.mule.test.values.extension.GroupWithValuesParameter;
 @MediaType(TEXT_PLAIN)
 public class SourceWithValuesWithRequiredParameterInsideParamGroup extends AbstractSource {
 
-  @ParameterGroup(name = "ValuesGroup")
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "ValuesGroup")
   GroupWithValuesParameter optionsParameter;
 }

@@ -29,7 +29,8 @@ public interface OperationElement extends MethodElement<OperationContainerElemen
     Type returnType;
     if (isNonBlocking(this)) {
       returnType = getParameters().stream()
-          .filter(p -> p.getType().isAssignableTo(CompletionCallback.class))
+          .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)
+              || p.getType().isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class))
           .findAny()
           .get()
           .getType();

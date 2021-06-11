@@ -86,7 +86,8 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
   private void validateNonBlockingCallback(MethodElement<? extends Type> operationMethod, ProblemsReporter problemsReporter,
                                            OperationModel operationModel, ExtensionModel extensionModel) {
     operationMethod.getParameters().stream()
-        .filter(p -> p.getType().isSameType(CompletionCallback.class))
+        .filter(p -> p.getType().isSameType(CompletionCallback.class)
+            || p.getType().isSameType(org.mule.sdk.api.runtime.process.CompletionCallback.class))
         .findFirst().ifPresent(p -> {
           if (p.getType().getGenerics().isEmpty()) {
             problemsReporter.addError(new Problem(p, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),

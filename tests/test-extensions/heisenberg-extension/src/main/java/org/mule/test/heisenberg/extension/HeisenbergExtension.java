@@ -12,6 +12,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
 
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -37,7 +38,9 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
@@ -201,6 +204,7 @@ public class HeisenbergExtension implements Lifecycle {
   private HankSchrader brotherInLaw;
 
   private final List<BackPressureContext> backPressureContexts = new LinkedList<>();
+  private final List<org.mule.sdk.api.runtime.source.BackPressureContext> sdkBackPressureContexts = new LinkedList<>();
 
   public void onBackPressure(BackPressureContext ctx) {
     synchronized (backPressureContexts) {
@@ -208,9 +212,21 @@ public class HeisenbergExtension implements Lifecycle {
     }
   }
 
+  public void onBackPressure(org.mule.sdk.api.runtime.source.BackPressureContext ctx) {
+    synchronized (sdkBackPressureContexts) {
+      sdkBackPressureContexts.add(ctx);
+    }
+  }
+
   public List<BackPressureContext> getBackPressureContexts() {
     synchronized (backPressureContexts) {
       return copyOf(backPressureContexts);
+    }
+  }
+
+  public List<org.mule.sdk.api.runtime.source.BackPressureContext> getSdkBackPressureContexts() {
+    synchronized (sdkBackPressureContexts) {
+      return copyOf(sdkBackPressureContexts);
     }
   }
 

@@ -6,16 +6,22 @@
  */
 package org.mule.test.module.extension.client;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
+
+import java.util.Collection;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
+@RunnerDelegateTo(Parameterized.class)
 @Feature("EXTENSIONS_CLIENT")
 public abstract class AbstractExtensionsClientFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -33,9 +39,24 @@ public abstract class AbstractExtensionsClientFunctionalTestCase extends Abstrac
   private static String MESSAGELESS_ECHO = " echoed by Heisenberg";
   private static int NUMBER_OF_CALLS = 1000;
 
+
+  @Parameterized.Parameter(0)
+  public String parameterizationName;
+
+  @Parameterized.Parameter(1)
+  public String configName;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        {"Using Extensions API", "extensions-client-config.xml"},
+        {"Using SDK API", "sdk-extensions-client-config.xml"},
+    });
+  }
+
   @Override
   protected String getConfigFile() {
-    return "extensions-client-config.xml";
+    return configName;
   }
 
   @Test

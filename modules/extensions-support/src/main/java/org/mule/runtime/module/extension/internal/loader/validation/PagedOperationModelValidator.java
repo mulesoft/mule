@@ -32,8 +32,10 @@ public class PagedOperationModelValidator implements ExtensionModelValidator {
       @Override
       protected void onOperation(OperationModel operationModel) {
         boolean hasConnectionParameter = operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-            .map(property -> property.getOperationElement()
-                .getParametersAnnotatedWith(Connection.class).size() > 0)
+            .map(property -> (property.getOperationElement()
+                .getParametersAnnotatedWith(Connection.class).size()
+                + property.getOperationElement()
+                    .getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Connection.class).size()) > 0)
             .orElse(false);
         if (hasConnectionParameter && operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           problemsReporter.addError(new Problem(operationModel, format(

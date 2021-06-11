@@ -31,11 +31,11 @@ public class NestedWrapperTypesConfig extends ParameterResolverExtension {
 
   @Parameter
   @Optional
-  private ParameterResolver<ParameterResolver<ParameterResolver<ParameterResolver<TypedValue<InputStream>>>>> nestedParameter;
+  private ParameterResolver<ParameterResolver<org.mule.sdk.api.runtime.parameter.ParameterResolver<ParameterResolver<TypedValue<InputStream>>>>> nestedParameter;
 
   @Parameter
   @Optional
-  private ParameterResolver<Literal<String>> resolverOfLiteral;
+  private ParameterResolver<org.mule.sdk.api.runtime.parameter.Literal<String>> resolverOfLiteral;
 
   @Parameter
   @Optional
@@ -49,11 +49,11 @@ public class NestedWrapperTypesConfig extends ParameterResolverExtension {
     return lazyParameter;
   }
 
-  public ParameterResolver<ParameterResolver<ParameterResolver<ParameterResolver<TypedValue<InputStream>>>>> getNestedParameter() {
+  public ParameterResolver<ParameterResolver<org.mule.sdk.api.runtime.parameter.ParameterResolver<ParameterResolver<TypedValue<InputStream>>>>> getNestedParameter() {
     return nestedParameter;
   }
 
-  public ParameterResolver<Literal<String>> getResolverOfLiteral() {
+  public ParameterResolver<org.mule.sdk.api.runtime.parameter.Literal<String>> getResolverOfLiteral() {
     return resolverOfLiteral;
   }
 

@@ -29,8 +29,11 @@ class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElem
 
   ConfigurationWrapper(Class aClass, ClassTypeLoader typeLoader) {
     super(aClass, typeLoader);
-    this.parameters = Stream.concat(getAnnotatedFields(Parameter.class).stream(),
-                                    getAnnotatedFields(ParameterGroup.class).stream())
+    this.parameters = Stream.concat(Stream.concat(Stream.concat(getAnnotatedFields(Parameter.class).stream(),
+                                                                getAnnotatedFields(ParameterGroup.class).stream()),
+                                                  getAnnotatedFields(org.mule.sdk.api.annotation.param.ParameterGroup.class)
+                                                      .stream()),
+                                    getAnnotatedFields(org.mule.sdk.api.annotation.param.Parameter.class).stream())
         .distinct()
         .collect(toImmutableList());
   }

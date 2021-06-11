@@ -49,7 +49,7 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
    * {@inheritDoc}
    */
   default List<ExtensionParameter> getParameterGroups() {
-    return getAnnotatedFields(ParameterGroup.class)
+    return getAnnotatedFields(ParameterGroup.class, org.mule.sdk.api.annotation.param.ParameterGroup.class)
         .stream()
         .distinct()
         .collect(toList());

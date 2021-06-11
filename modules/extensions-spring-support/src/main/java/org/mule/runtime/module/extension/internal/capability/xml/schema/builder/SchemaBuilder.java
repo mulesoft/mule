@@ -410,7 +410,8 @@ public final class SchemaBuilder {
         attribute.setName(name);
 
         String typeName = getOrCreateEnumTypeId(enumType).get();
-        if (OperationTransactionalAction.class.getName().equals(typeName)) {
+        if (OperationTransactionalAction.class.getName().equals(typeName)
+            || org.mule.sdk.api.tx.OperationTransactionalAction.class.getName().equals(typeName)) {
           attribute.setType(MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE);
         } else if (TransactionType.class.getName().equals(typeName)) {
           attribute.setType(MULE_TRANSACTION_TYPE);
