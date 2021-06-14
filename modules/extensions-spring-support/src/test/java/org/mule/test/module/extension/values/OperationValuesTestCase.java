@@ -411,6 +411,27 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
+  public void parameterWithTwoFieldWithSameValues() throws Exception {
+    ValueResult targetResult = getValueResult("parameterWithTwoFieldWithSameValues", "body", "target.channelId");
+    ValueResult sourceResult = getValueResult("parameterWithTwoFieldWithSameValues", "body", "source.channelId");
+
+    String targetPartName = "body.target.channelId";
+    assertThat(targetResult.getValues(), hasSize(3));
+    assertThat(targetResult.getValues(), hasValues(valueWithId("channel1")
+        .withPartName(targetPartName), valueWithId("channel2")
+            .withPartName(targetPartName), valueWithId("channel3")
+                .withPartName(targetPartName)));
+
+
+    String sourcePartName = "body.source.channelId";
+    assertThat(sourceResult.getValues(), hasSize(3));
+    assertThat(sourceResult.getValues(), hasValues(valueWithId("channel1")
+        .withPartName(sourcePartName), valueWithId("channel2")
+            .withPartName(sourcePartName), valueWithId("channel3")
+                .withPartName(sourcePartName)));
+  }
+
+  @Test
   public void parameterWithMultiLevelFieldValues() throws Exception {
     Set<Value> values = getValues("parameterWithMultilevelFieldValue", "body", "location.continent");
 

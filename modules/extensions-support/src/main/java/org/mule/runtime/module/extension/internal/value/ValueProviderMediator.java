@@ -206,7 +206,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
     try {
       return withRefreshToken(connectionProvider,
                               () -> resolveValues(parameters, factoryModelProperty, parameterValueResolver,
-                                                  connectionSupplier, configurationSupplier));
+                                                  connectionSupplier, configurationSupplier, targetSelector));
     } catch (ValueResolvingException e) {
       throw e;
     } catch (Exception e) {
@@ -221,6 +221,14 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
                                    ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                    Supplier<Object> configurationSupplier)
       throws ValueResolvingException {
+    return resolveValues(parameters, factoryModelProperty, parameterValueResolver, connectionSupplier, configurationSupplier,
+                         null);
+  }
+
+  private Set<Value> resolveValues(List<ParameterModel> parameters, ValueProviderFactoryModelProperty factoryModelProperty,
+                                   ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
+                                   Supplier<Object> configurationSupplier, String targerSelector)
+      throws ValueResolvingException {
     try {
       ValueProvider valueProvider =
           factoryModelProperty
@@ -231,7 +239,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
       Set<org.mule.sdk.api.values.Value> valueSet = valueProvider.resolve();
 
       return valueSet.stream()
-          .map(option -> cloneAndEnrichValue(option, parameters, valueProvider.getId()))
+          .map(option -> cloneAndEnrichValue(option, parameters, valueProvider.getId(), targerSelector))
           .map(ValueBuilder::build)
           .map(MuleValueAdapter::new)
           .collect(toCollection(LinkedHashSet::new));

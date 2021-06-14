@@ -74,6 +74,11 @@ public class ValueProviderUtils {
     return cloneAndEnrichValue(value, orderParts(parameters, providerId), 1);
   }
 
+  public static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters, String providerId,
+                                                 String targetSelector) {
+    return cloneAndEnrichValue(value, orderParts(parameters, providerId, targetSelector), 1);
+  }
+
   /**
    * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
    * {@link ValueBuilder} and adding the partName of each {@link Value} found.
@@ -101,11 +106,19 @@ public class ValueProviderUtils {
   }
 
   private static Map<Integer, String> orderParts(List<ParameterModel> parameters, String providerId) {
+    return orderParts(parameters, providerId, null);
+  }
+
+  private static Map<Integer, String> orderParts(List<ParameterModel> parameters, String providerId, String targetSelector) {
     if (parameters.size() == 1 && !parameters.get(0).getFieldValueProviderModels().isEmpty()) {
       return parameters.get(0).getFieldValueProviderModels().stream()
           .filter(fieldValueProviderModel -> fieldValueProviderModel.getProviderId().equals(providerId))
           .collect(toMap(ValueProviderModel::getPartOrder,
-                         fieldModel -> parameters.get(0).getName() + "." + fieldModel.getTargetSelector()));
+                         fieldModel -> parameters.get(0).getName() + "." + fieldModel.getTargetSelector(),
+                         // TODO: MULE-19484 Take into account merge for multilevel.
+                         (partName, anotherPartName) -> partName.substring(partName.indexOf(".") + 1).equals(targetSelector)
+                             ? partName
+                             : anotherPartName));
     }
 
     return parameters.stream()

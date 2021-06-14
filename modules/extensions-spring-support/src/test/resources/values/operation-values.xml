@@ -269,4 +269,7 @@
         </values:with-bound-acting-parameter-from-xml-content-field>
     </flow>
 
+    <flow name="parameterWithTwoFieldWithSameValues">
+        <values:parameter-with-two-field-with-same-values/>
+    </flow>
 </mule>

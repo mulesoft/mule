@@ -251,4 +251,10 @@ public class ValuesOperations {
       value = SimpleValueProvider.class) @FieldValues(
           targetSelectors = {"location.continent", "location.country", "location.city"},
           value = SdkMultiLevelValueProvider.class) InputStream body) {}
+
+  public void parameterWithTwoFieldWithSameValues(@TypeResolver(JsonTypeResolver.class) @Content @FieldValues(
+      targetSelectors = "source.channelId",
+      value = SimpleValueProvider.class) @FieldValues(
+          targetSelectors = "target.channelId",
+          value = SimpleValueProvider.class) InputStream body) {}
 }
