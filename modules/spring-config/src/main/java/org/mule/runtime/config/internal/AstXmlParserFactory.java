@@ -40,13 +40,16 @@ public class AstXmlParserFactory {
                                    ArtifactType artifactType, ArtifactAst parentArtifactAst, boolean errorTypeRepository,
                                    FeatureFlaggingService featureFlaggingService) {
     ConfigurationPropertiesResolver propertyResolver =
-            new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
-    return createMuleXmlParser(extensions, disableXmlValidations, featureFlaggingService, AstXmlParser.builder(), propertyKey -> (String) propertyResolver.resolveValue(propertyKey), this.resolveParentArtifact(artifactType, parentArtifactAst, errorTypeRepository));
+        new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
+    return createMuleXmlParser(extensions, disableXmlValidations, featureFlaggingService, AstXmlParser.builder(),
+                               propertyKey -> (String) propertyResolver.resolveValue(propertyKey),
+                               this.resolveParentArtifact(artifactType, parentArtifactAst, errorTypeRepository));
   }
 
   AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
                                    boolean disableXmlValidations,
-                                   FeatureFlaggingService featureFlaggingService, Builder builder, ParsingPropertyResolver parsingPropertyResolver, ArtifactAst parentArtifact) {
+                                   FeatureFlaggingService featureFlaggingService, Builder builder,
+                                   ParsingPropertyResolver parsingPropertyResolver, ArtifactAst parentArtifact) {
     builder.withPropertyResolver(parsingPropertyResolver)
         // TODO MULE-19203 for policies this includes all extensions from the app as well. It should be just the ones
         // declared in the policy, with a feature flag for getting the ones from the app as well (ref:
