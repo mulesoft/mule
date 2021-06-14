@@ -12,10 +12,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
-import org.mule.runtime.ast.internal.xml.DefaultAstXmlParser;
-import org.mule.runtime.ast.internal.xml.resolver.ModuleDelegatingEntityResolver;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -35,7 +32,7 @@ public class AstXmlParserFactoryTestCase {
     when(builder.withPropertyResolver(any())).thenReturn(builder);
     when(builder.withExtensionModels(any())).thenReturn(builder);
     when(builder.withParentArtifact(any())).thenReturn(builder);
-    astXmlParserFactory = new AstXmlParserFactory(builder);
+    astXmlParserFactory = new AstXmlParserFactory();
     featureFlaggingService = mock(FeatureFlaggingService.class);
   }
 
@@ -44,7 +41,7 @@ public class AstXmlParserFactoryTestCase {
   public void createParserWithLegacyBehaviourWhenFeatureFlagDisabled() {
     Mockito.when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-    astXmlParserFactory.createMuleXmlParser(null, null, false, null, null, false, featureFlaggingService);
+    astXmlParserFactory.createMuleXmlParser(null, false, featureFlaggingService, builder, null, null);
 
     verify(builder).withLegacyFailStrategy();
   }
@@ -54,7 +51,7 @@ public class AstXmlParserFactoryTestCase {
   public void createParserWithNewBehaviourWhenFeatureFlagEnabled() {
     Mockito.when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
 
-    astXmlParserFactory.createMuleXmlParser(null, null, false, null, null, false, featureFlaggingService);
+    astXmlParserFactory.createMuleXmlParser(null, false, featureFlaggingService, builder, null, null);
 
     verify(builder, never()).withLegacyFailStrategy();
   }

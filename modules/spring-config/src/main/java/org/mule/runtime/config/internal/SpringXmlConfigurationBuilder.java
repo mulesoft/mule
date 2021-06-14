@@ -231,7 +231,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         if (artifactConfigResources.length == 0) {
           artifactAst = emptyArtifact();
         } else {
-          AstXmlParserFactory astXmlParserFactory = new AstXmlParserFactory(AstXmlParser.builder());
+          AstXmlParserFactory astXmlParserFactory = new AstXmlParserFactory();
           final AstXmlParser parser =
               astXmlParserFactory.createMuleXmlParser(extensions, artifactProperties, disableXmlValidations, artifactType,
                                                       parentArtifactAst, shareErrorTypeRepository(), featureFlaggingService);

@@ -18,6 +18,7 @@ import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPro
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.exception.FilteredErrorTypeRepository;
+import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
 
 import java.util.Map;
 import java.util.Optional;
@@ -34,25 +35,24 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
 public class AstXmlParserFactory {
 
-  private final Builder builder;
-
-  public AstXmlParserFactory(Builder builder) {
-    this.builder = builder;
-  }
-
   AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
                                    Map<String, String> artifactProperties, boolean disableXmlValidations,
                                    ArtifactType artifactType, ArtifactAst parentArtifactAst, boolean errorTypeRepository,
                                    FeatureFlaggingService featureFlaggingService) {
     ConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
+            new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
+    return createMuleXmlParser(extensions, disableXmlValidations, featureFlaggingService, AstXmlParser.builder(), propertyKey -> (String) propertyResolver.resolveValue(propertyKey), this.resolveParentArtifact(artifactType, parentArtifactAst, errorTypeRepository));
+  }
 
-    builder.withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
+  AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
+                                   boolean disableXmlValidations,
+                                   FeatureFlaggingService featureFlaggingService, Builder builder, ParsingPropertyResolver parsingPropertyResolver, ArtifactAst parentArtifact) {
+    builder.withPropertyResolver(parsingPropertyResolver)
         // TODO MULE-19203 for policies this includes all extensions from the app as well. It should be just the ones
         // declared in the policy, with a feature flag for getting the ones from the app as well (ref:
         // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
         .withExtensionModels(extensions)
-        .withParentArtifact(this.resolveParentArtifact(artifactType, parentArtifactAst, errorTypeRepository));
+        .withParentArtifact(parentArtifact);
     if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)) {
       builder.withLegacyFailStrategy();
     }
