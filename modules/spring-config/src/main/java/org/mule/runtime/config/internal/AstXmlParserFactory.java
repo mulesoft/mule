@@ -65,7 +65,7 @@ public class AstXmlParserFactory {
     return builder.build();
   }
 
-  protected ArtifactAst resolveParentArtifact(ArtifactType artifactType, final ArtifactAst parentArtifactAst,
+  private ArtifactAst resolveParentArtifact(ArtifactType artifactType, final ArtifactAst parentArtifactAst,
                                               boolean errorTypeRepository) {
     if (POLICY.equals(artifactType)) {
       if (errorTypeRepository) {

@@ -77,6 +77,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private boolean disableXmlValidations = false;
 
   private SpringRegistry registry;
+  private AstXmlParser parser;
 
   private ArtifactAst parentArtifactAst;
   private ApplicationContext parentContext;
@@ -232,7 +233,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           artifactAst = emptyArtifact();
         } else {
           AstXmlParserFactory astXmlParserFactory = new AstXmlParserFactory();
-          final AstXmlParser parser =
+          parser =
               astXmlParserFactory.createMuleXmlParser(extensions, artifactProperties, disableXmlValidations, artifactType,
                                                       parentArtifactAst, shareErrorTypeRepository(), featureFlaggingService);
 
@@ -345,5 +346,13 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   public void setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
     this.componentBuildingDefinitionRegistryFactory = ofNullable(componentBuildingDefinitionRegistryFactory);
+  }
+
+  AstXmlParser getParser() {
+    return parser;
+  }
+
+  public void setFeatureFlaggingService(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
   }
 }
