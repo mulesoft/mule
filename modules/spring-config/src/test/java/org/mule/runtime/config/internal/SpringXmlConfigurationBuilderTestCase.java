@@ -20,45 +20,47 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAI
 
 public class SpringXmlConfigurationBuilderTestCase {
 
-    private FeatureFlaggingService featureFlaggingService;
-    private SpringXmlConfigurationBuilder configurationBuilder;
-    private MuleContext muleContext;
+  private FeatureFlaggingService featureFlaggingService;
+  private SpringXmlConfigurationBuilder configurationBuilder;
+  private MuleContext muleContext;
 
-    @Before
-    public void setUp() throws Exception {
-        configurationBuilder = new SpringXmlConfigurationBuilder(new String[] {"dummy.xml"}, null, null, false, false);
-        featureFlaggingService = mock(FeatureFlaggingService.class);
-        configurationBuilder.setFeatureFlaggingService(featureFlaggingService);
-        muleContext = mock(MuleContext.class);
-        Injector injector = mock(Injector.class);
-        when(muleContext.getInjector()).thenReturn(injector);
+  @Before
+  public void setUp() throws Exception {
+    configurationBuilder = new SpringXmlConfigurationBuilder(new String[] {"dummy.xml"}, null, null, false, false);
+    featureFlaggingService = mock(FeatureFlaggingService.class);
+    configurationBuilder.setFeatureFlaggingService(featureFlaggingService);
+    muleContext = mock(MuleContext.class);
+    Injector injector = mock(Injector.class);
+    when(muleContext.getInjector()).thenReturn(injector);
+  }
+
+  @Test
+  @Issue("EE-7827")
+  public void configureWithFailOnFirstError() throws ConfigurationException {
+    when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
+
+    try {
+      configurationBuilder.configure(muleContext);
+    } catch (Exception ignored) {
     }
 
-    @Test
-    @Issue("EE-7827")
-    public void configureWithFailOnFirstError() throws ConfigurationException {
-        when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
+    verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
+    assertThat(((DefaultAstXmlParser) configurationBuilder.getParser()).getFailStrategy(),
+               instanceOf(FailOnFirstErrorResolveEntityFailStrategy.class));
+  }
 
-        try {
-            configurationBuilder.configure(muleContext);
-        } catch (Exception ignored) {
-        }
+  @Test
+  @Issue("EE-7827")
+  public void configureWithFailAfterTenErrors() throws ConfigurationException {
+    when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-        verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
-        assertThat(((DefaultAstXmlParser) configurationBuilder.getParser()).getFailStrategy(), instanceOf(FailOnFirstErrorResolveEntityFailStrategy.class));
+    try {
+      configurationBuilder.configure(muleContext);
+    } catch (Exception ignored) {
     }
 
-    @Test
-    @Issue("EE-7827")
-    public void configureWithFailAfterTenErrors() throws ConfigurationException {
-        when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
-
-        try {
-            configurationBuilder.configure(muleContext);
-        } catch (Exception ignored) {
-        }
-
-        verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
-        assertThat(((DefaultAstXmlParser) configurationBuilder.getParser()).getFailStrategy(), instanceOf(FailAfterTenErrorsResolveEntityFailStrategy.class));
-    }
+    verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
+    assertThat(((DefaultAstXmlParser) configurationBuilder.getParser()).getFailStrategy(),
+               instanceOf(FailAfterTenErrorsResolveEntityFailStrategy.class));
+  }
 }

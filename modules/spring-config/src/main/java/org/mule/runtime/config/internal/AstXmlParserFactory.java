@@ -66,7 +66,7 @@ public class AstXmlParserFactory {
   }
 
   private ArtifactAst resolveParentArtifact(ArtifactType artifactType, final ArtifactAst parentArtifactAst,
-                                              boolean errorTypeRepository) {
+                                            boolean errorTypeRepository) {
     if (POLICY.equals(artifactType)) {
       if (errorTypeRepository) {
         // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
