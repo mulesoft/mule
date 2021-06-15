@@ -7,8 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isCompileTime;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
@@ -43,6 +45,10 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
       "Operation [%s] in extension [%s] has a '%s' as return type but their generics "
           +
           "were not provided. Please provide the Payload and Attributes generics.";
+
+  private static final String INVALID_GENERICS_ERROR_MESSAGE =
+      "Operation [%s] in extension [%s] has a '%s' as return type with Void type for output but non Void type for attributes";
+
   private final List<Class<?>> illegalReturnTypes = ImmutableList.of(CoreEvent.class, Message.class);
 
   @Override
@@ -86,11 +92,16 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
   private void validateNonBlockingCallback(MethodElement<? extends Type> operationMethod, ProblemsReporter problemsReporter,
                                            OperationModel operationModel, ExtensionModel extensionModel) {
     operationMethod.getParameters().stream()
-        .filter(p -> p.getType().isSameType(CompletionCallback.class))
-        .findFirst().ifPresent(p -> {
-          if (p.getType().getGenerics().isEmpty()) {
-            problemsReporter.addError(new Problem(p, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
-                                                            extensionModel.getName(), CompletionCallback.class.getName())));
+        .filter(extensionParameter -> extensionParameter.getType().isSameType(CompletionCallback.class))
+        .findFirst().ifPresent(extensionParameter -> {
+          List<TypeGeneric> generics = extensionParameter.getType().getGenerics();
+          if (generics.isEmpty()) {
+            problemsReporter
+                .addError(new Problem(extensionParameter, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                 extensionModel.getName(), CompletionCallback.class.getName())));
+          } else {
+            validateGenerics(extensionModel, extensionParameter, operationModel, generics, CompletionCallback.class,
+                             problemsReporter);
           }
         });
   }
@@ -98,9 +109,12 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
   private void validateResultReturnType(Type returnType, ProblemsReporter problemsReporter, OperationModel operationModel,
                                         ExtensionModel extensionModel) {
     if (returnType.isAssignableTo(Result.class)) {
-      if (returnType.getGenerics().isEmpty()) {
+      List<TypeGeneric> generics = returnType.getGenerics();
+      if (generics.isEmpty()) {
         problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
                                                                      extensionModel.getName(), Result.class)));
+      } else {
+        validateGenerics(extensionModel, operationModel, operationModel, generics, Result.class, problemsReporter);
       }
     }
   }
@@ -111,9 +125,15 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
       List<TypeGeneric> generics = returnType.getGenerics();
       if (!generics.isEmpty()) {
         Type concreteType = generics.get(0).getConcreteType();
-        if (concreteType.isAssignableTo(Result.class) && concreteType.getGenerics().isEmpty()) {
-          problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
-                                                                       extensionModel.getName(), Result.class)));
+        if (concreteType.isAssignableTo(Result.class)) {
+          List<TypeGeneric> concreteTypeGenerics = concreteType.getGenerics();
+          if (concreteTypeGenerics.isEmpty()) {
+            problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                         extensionModel.getName(), Result.class)));
+          } else {
+            validateGenerics(extensionModel, operationModel, operationModel, concreteTypeGenerics, Result.class,
+                             problemsReporter);
+          }
         }
       }
     }
@@ -122,5 +142,14 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
   private IllegalModelDefinitionException missingReturnTypeException(ExtensionModel model, OperationModel operationModel) {
     throw new IllegalOperationModelDefinitionException(format("Operation '%s' in Extension '%s' is missing a return type",
                                                               operationModel.getName(), model.getName()));
+  }
+
+  private void validateGenerics(ExtensionModel extensionModel, NamedObject namedObject, OperationModel operationModel,
+                                List<TypeGeneric> generics, Class returnType, ProblemsReporter problemsReporter) {
+    if (generics.get(0).getConcreteType().isSameType(Void.class) &&
+        !generics.get(1).getConcreteType().isSameType(Void.class)) {
+      problemsReporter.addWarning(new Problem(namedObject, format(INVALID_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                  extensionModel.getName(), returnType.getName())));
+    }
   }
 }
