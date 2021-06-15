@@ -22,6 +22,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.data.sample.SampleDataProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.sampledata.SampleDataFailure;
 import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
@@ -122,19 +123,19 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
   private Map<String, Object> parameterMapWithDefaults(ParameterizedElementDeclaration componentElementDeclaration,
                                                        ComponentModel componentModel) {
-    Map<String, Object> explicitParameterMaps = parametersMap(componentElementDeclaration, componentModel, true);
+    Map<String, Object> explicitParameterMaps = parametersMap(componentElementDeclaration, componentModel);
     if (componentModel instanceof HasOutputModel) {
       ((HasOutputModel) componentModel).getSampleDataProviderModel().ifPresent(model -> {
         // No need to identify the acting parameter is required or not, maybe be required but DSL on component
         // is optional with default so we need to include its default value.
         List<String> actingParameters = model.getParameters().stream()
-            .map(actingParameterModel -> actingParameterModel.getName())
+            .map(ActingParameterModel::getName)
             .collect(toList());
 
         // Now we get the default values for those optional parameters from model that are marked as acting
         // parameters
         ParameterValueResolver parameterValueResolver =
-            parameterValueResolver(componentElementDeclaration, componentModel, true);
+            parameterValueResolver(componentElementDeclaration, componentModel);
 
         componentModel.getAllParameterModels().stream()
             .filter(p -> actingParameters.contains(p.getName()))

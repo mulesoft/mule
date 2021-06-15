@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -25,7 +23,6 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,14 +39,13 @@ public class InjectableParameterResolver {
 
   private static final Logger LOGGER = getLogger(InjectableParameterResolver.class);
 
-  private static final String BINDING_IDENTIFIER = "componentParameters";
-  private static final String BINDING_IDENTIFIER_ACCESS = BINDING_IDENTIFIER + ".";
-
+  private static final DataType DW_DATA_TYPE = DataType.builder().mediaType("application/dw").build();
+  private static final String PAYLOAD_BINDING = "payload";
   private static final String EXPRESSION_PREFIX = "#[{";
   private static final String EXPRESSION_SUFFIX = "}]";
   private static final String EMPTY_EXPRESSION = EXPRESSION_PREFIX + EXPRESSION_SUFFIX;
 
-  private final Map<String, Object> resolvedParameterValues;
+  private final BindingContext expressionResolvingContext;
   private final ExpressionManager expressionManager;
   private final Map<String, InjectableParameterInfo> injectableParametersMap;
 
@@ -59,7 +55,7 @@ public class InjectableParameterResolver {
                                      List<InjectableParameterInfo> injectableParameters) {
     this.expressionManager = expressionManager;
     this.injectableParametersMap = getInjectableParametersMap(injectableParameters);
-    this.resolvedParameterValues = getResolvedValues(parameterValueResolver, parameterizedModel);
+    this.expressionResolvingContext = expressionResolvingContext(parameterValueResolver, parameterizedModel);
   }
 
   /**
@@ -69,25 +65,18 @@ public class InjectableParameterResolver {
    * @return the value of the injectable parameter.
    */
   public Object getInjectableParameterValue(String parameterName) {
-    Object parameterValue;
-    parameterValue = resolvedParameterValues.get(parameterName);
+    Object parameterValue = null;
     InjectableParameterInfo injectableParameterInfo = injectableParametersMap.get(parameterName);
-
-    if (parameterValue != null) {
-      try {
-        parameterValue = expressionManager
-            .evaluate("#[payload]",
-                      DataType.fromType(getClassFromType(injectableParameterInfo.getType())),
-                      BindingContext.builder()
-                          .addBinding("payload", new TypedValue(parameterValue, DataType.fromObject(parameterValue))).build())
-            .getValue();
-      } catch (ClassNotFoundException e) {
-        LOGGER.debug("Transformation of injectable parameter '{}' failed, the same value of the resolution will be used.",
-                     parameterName);
-      }
-
+    try {
+      parameterValue = expressionManager
+          .evaluate("#[ payload." + parameterName + "]",
+                    DataType.fromType(getType(injectableParameterInfo.getType())),
+                    expressionResolvingContext)
+          .getValue();
+    } catch (IllegalArgumentException e) {
+      LOGGER.debug("Transformation of injectable parameter '{}' failed, the same value of the resolution will be used.",
+                   parameterName);
     }
-
     return parameterValue;
   }
 
@@ -96,23 +85,22 @@ public class InjectableParameterResolver {
                                                        injectableParameter -> injectableParameter));
   }
 
-  private Map<String, Object> getResolvedValues(ParameterValueResolver parameterValueResolver,
-                                                ParameterizedModel parameterizedModel) {
+  private BindingContext expressionResolvingContext(ParameterValueResolver parameterValueResolver,
+                                                    ParameterizedModel parameterizedModel) {
     BindingContext bindingContext = createBindingContext(parameterValueResolver, parameterizedModel);
-    String expression = getResolvedParameterValuesExpression(componentParameterIdentifiers(bindingContext));
-
+    String expression = getResolvedParameterValuesExpression(bindingContext.identifiers());
+    BindingContext.Builder expressionResolvingContextBuilder = BindingContext.builder();
     if (!expression.equals(EMPTY_EXPRESSION)) {
-      return (Map<String, Object>) expressionManager
-          .evaluate(expression, DataType.builder().mapType(Map.class).build(), bindingContext)
-          .getValue();
+      expressionResolvingContextBuilder
+          .addBinding(PAYLOAD_BINDING, expressionManager.evaluate(expression, DW_DATA_TYPE, bindingContext));
     } else {
-      return emptyMap();
+      expressionResolvingContextBuilder.addBinding(PAYLOAD_BINDING, new TypedValue<>("{}", DW_DATA_TYPE));
     }
+    return expressionResolvingContextBuilder.build();
   }
 
   private BindingContext createBindingContext(ParameterValueResolver parameterValueResolver,
                                               ParameterizedModel parameterizedModel) {
-    Map<String, TypedValue> componentParameters = new HashMap();
     BindingContext.Builder bindingContextBuilder = BindingContext.builder();
 
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
@@ -121,24 +109,16 @@ public class InjectableParameterResolver {
       if (value == null) {
         value = getParameterValueSafely(parameterValueResolver, parameterModel.getName());
       }
-
       if (value != null) {
         if (!(value instanceof TypedValue)) {
           String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
         }
-        componentParameters.put(parameterModel.getName(), (TypedValue) value);
+        bindingContextBuilder.addBinding(parameterModel.getName(), (TypedValue) value);
       }
     }
-
-    bindingContextBuilder.addBinding(BINDING_IDENTIFIER,
-                                     new TypedValue(componentParameters, DataType.builder().mapType(Map.class).build()));
     return bindingContextBuilder.build();
-  }
-
-  private Collection<String> componentParameterIdentifiers(BindingContext bindingContext) {
-    return ((Map) bindingContext.lookup(BINDING_IDENTIFIER).get().getValue()).keySet();
   }
 
   private String getResolvedParameterValuesExpression(Collection<String> identifiers) {
@@ -151,37 +131,13 @@ public class InjectableParameterResolver {
                                   .getExtractionExpression())))
                           .map(injectableParameterInfo -> "\""
                               + injectableParameterInfo.getParameterName() + "\"  : "
-                              + BINDING_IDENTIFIER_ACCESS
-                              + sanitizeExpression(injectableParameterInfo.getExtractionExpression()))
+                              + injectableParameterInfo.getExtractionExpression())
                           .collect(Collectors.joining(", ")));
     expression.append(EXPRESSION_SUFFIX);
 
     return expression.toString();
   }
 
-  private String sanitizeExpression(String extractionExpression) {
-    StringBuilder sanitazedExpression = new StringBuilder();
-    sanitazedExpression.append("\"");
-    int extractionExpressionLength = extractionExpression.length();
-    int firstDotIndex = extractionExpression.indexOf(".");
-
-    if (firstDotIndex == -1) {
-      sanitazedExpression.append(extractionExpression);
-      sanitazedExpression.append("\"");
-    } else {
-      sanitazedExpression.append(extractionExpression.substring(0, firstDotIndex));
-      sanitazedExpression.append("\"");
-      sanitazedExpression.append(extractionExpression.substring(firstDotIndex, extractionExpressionLength));
-    }
-    return sanitazedExpression.toString();
-  }
-
-  private Class getClassFromType(MetadataType parameterMetadataType) throws ClassNotFoundException {
-    return Thread.currentThread().getContextClassLoader()
-        .loadClass(parameterMetadataType.getAnnotation(ClassInformationAnnotation.class)
-            .map(classInformationAnnotation -> classInformationAnnotation.getClassname())
-            .orElse(Object.class.getName()));
-  }
 
   private Object getParameterValueSafely(ParameterValueResolver parameterValueResolver, String parameterName) {
     try {
