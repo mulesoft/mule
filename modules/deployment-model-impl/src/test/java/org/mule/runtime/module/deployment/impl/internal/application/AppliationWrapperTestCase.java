@@ -26,7 +26,7 @@ public class AppliationWrapperTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-19487")
   public void regsitryNullSafe() throws IOException {
-    final Application app = mock(org.mule.runtime.deployment.model.api.application.Application.class);
+    final Application app = mock(Application.class);
     when(app.getArtifactContext()).thenReturn(null);
 
     assertThat(new ApplicationWrapper(app).getRegistry(), is(nullValue()));
