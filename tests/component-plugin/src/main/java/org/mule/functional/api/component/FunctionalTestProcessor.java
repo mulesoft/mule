@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.functional.api.notification.FunctionalTestNotification;
 import org.mule.functional.api.notification.FunctionalTestNotificationListener;
@@ -42,6 +41,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -172,11 +172,15 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    Publisher<CoreEvent> pub = Processor.super.apply(publisher);
-    if (processor != null) {
-      return from(pub).transform(processor::apply);
-    } else {
-      return pub;
+    if (processor == null) {
+      return Processor.super.apply(publisher);
+    }
+
+    try {
+      Method applyMethod = processor.getClass().getDeclaredMethod("apply", Publisher.class);
+      return (Publisher<CoreEvent>) applyMethod.invoke(processor, publisher);
+    } catch (Exception e) {
+      return Processor.super.apply(publisher);
     }
   }
 
