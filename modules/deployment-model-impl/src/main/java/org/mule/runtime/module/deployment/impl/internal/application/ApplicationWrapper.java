@@ -39,7 +39,7 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
 
   @Override
   public Registry getRegistry() {
-    return getDelegate().getArtifactContext().getRegistry();
+    return getDelegate().getArtifactContext() != null ? getDelegate().getArtifactContext().getRegistry() : null;
   }
 
   @Override
