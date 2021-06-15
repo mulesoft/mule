@@ -92,7 +92,7 @@ class ComponentAstBasedElementModelFactory {
               && configuration.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(type)).orElse(false)) {
             DslElementModel.Builder<ObjectType> typeBuilder = DslElementModel.<ObjectType>builder()
                 .withModel(type)
-                .withDsl(configuration.getGenerationInformation().getSyntax().get())
+                .withDsl(typeDsl)
                 .withConfig(configuration);
 
             enrichElementModel(configuration.getModel(ParameterizedModel.class).get(), typeDsl, configuration, typeBuilder);
@@ -178,11 +178,12 @@ class ComponentAstBasedElementModelFactory {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}'", identifier.get());
         }
 
-        ComponentAst fieldComponent = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
+        final ComponentAst fieldComponent = (ComponentAst) configuration.getParameter("value").getValue().getRight();
 
         if (isMap(objectType)) {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.orElse(null));
-          typeBuilder.containing(createMapElement(objectType, modelDsl, fieldComponent));
+          typeBuilder.containing(createMapElement(objectType, modelDsl,
+                                                  fieldComponent));
           return;
         }
 
