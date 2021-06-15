@@ -13,7 +13,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
@@ -47,7 +46,6 @@ import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModel.Builder;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 
@@ -103,34 +101,6 @@ class ComponentAstBasedElementModelFactory {
             return empty();
           }
         });
-  }
-
-  private void populateObjectFields(ObjectType type, ComponentAst configuration, DslElementSyntax typeDsl,
-                                    DslElementModel.Builder typeBuilder) {
-    LOGGER.trace("populateObjectFields: type: '{}'", type);
-
-    type.getFields().forEach(field -> {
-
-      if (field.getValue() instanceof ObjectType && field.getAnnotation(FlattenedTypeAnnotation.class).isPresent()) {
-        ((ObjectType) field.getValue()).getFields().forEach(nested -> {
-          final String name = getLocalPart(nested);
-          LOGGER.trace("populateObjectFields: type: '{}', flattened: {}, field: {}", type, field.getValue(), name);
-          typeDsl.getContainedElement(name)
-              .ifPresent(fieldDsl -> nested.getValue()
-                  .accept(getComponentChildVisitor(typeBuilder, configuration, nested, name, fieldDsl,
-                                                   getDefaultValue(name, field.getValue()))));
-
-        });
-
-      } else {
-        final String name = getLocalPart(field);
-        LOGGER.trace("populateObjectFields: type: '{}', field: {}", type, name);
-        typeDsl.getContainedElement(name)
-            .ifPresent(fieldDsl -> field.getValue()
-                .accept(getComponentChildVisitor(typeBuilder, configuration, field, name, fieldDsl,
-                                                 getDefaultValue(name, type))));
-      }
-    });
   }
 
   private Multimap<ComponentIdentifier, ComponentAst> getNestedComponents(ComponentAst configuration) {
@@ -350,18 +320,6 @@ class ComponentAstBasedElementModelFactory {
             }
           });
         });
-
-
-
-    // List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
-    // .filter(ParameterGroupModel::isShowInDsl)
-    // .flatMap(g -> g.getParameterModels().stream())
-    // .collect(toList());
-    //
-    // model.getAllParameterModels().stream()
-    // .filter(p -> !inlineGroupedParameters.contains(p))
-    // .forEach(p -> addElementParameter(configuration, innerComponents, parameters, elementDsl, builder, p,
-    // paramModel -> configuration.getParameter(paramModel.getName())));
   }
 
   private void populateConnectionProviderElements(DslElementModel.Builder builder, ComponentAst configuration) {
@@ -498,14 +456,14 @@ class ComponentAstBasedElementModelFactory {
     final ComponentParameterAst parameter = configuration.getParameter(paramModel.getName());
     if (parameter != null && parameter.getValue().getRight() instanceof ComponentAst) {
       paramComponent = (ComponentAst) parameter.getValue().getRight();
+
+      if (paramSyntax.isWrapped()) {
+        resolveWrappedElement(groupElementBuilder, paramModel, paramComponent, paramSyntax);
+        return;
+      }
     } else {
       // TODO MULE-17711 remove this
       paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramSyntax));
-    }
-
-    if (paramSyntax.isWrapped()) {
-      resolveWrappedElement(groupElementBuilder, paramModel, paramComponent, paramSyntax);
-      return;
     }
 
     String value = paramSyntax.supportsAttributeDeclaration()
@@ -520,8 +478,7 @@ class ComponentAstBasedElementModelFactory {
 
         DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
             .withModel(paramModel)
-            .withDsl(paramComponent.getGenerationInformation().getSyntax().get());
-        // paramElementBuilder.withConfig(paramComponent);
+            .withDsl(parameter.getGenerationInformation().getSyntax().get());
 
         final Optional<ParameterizedModel> parameterized = paramComponent.getModel(ParameterizedModel.class);
         if (parameterized.isPresent()) {
@@ -554,9 +511,6 @@ class ComponentAstBasedElementModelFactory {
                 populateMapEntries(objectType, paramSyntax, paramElementBuilder, paramComponent);
                 return;
               }
-
-              paramElementBuilder.withConfig(paramComponent);
-              populateObjectFields(objectType, paramComponent, paramSyntax, paramElementBuilder);
             }
           });
         }
