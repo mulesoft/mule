@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
@@ -74,8 +75,9 @@ public class InjectableParameterResolver {
                     expressionResolvingContext)
           .getValue();
     } catch (IllegalArgumentException e) {
-      LOGGER.debug("Transformation of injectable parameter '{}' failed, the same value of the resolution will be used.",
-                   parameterName);
+      LOGGER.debug(format("Transformation of injectable parameter '%s' failed, the same value of the resolution will be used.",
+                          parameterName),
+                   e);
     }
     return parameterValue;
   }
