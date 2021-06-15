@@ -166,6 +166,21 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   }
 
   @Override
+  public void disposeMetadataCache(ComponentElementDeclaration component) {
+    try {
+      withInternalDeclarationSession("disposeMetadataCache()", session -> {
+        session.disposeMetadataCache(component);
+        return null;
+      });
+    } catch (Throwable t) {
+      LOGGER.error(format("Error while disposing metadata on component: '%s:%s'", component.getDeclaringExtension(),
+                          component.getName()),
+                   t);
+      throw t;
+    }
+  }
+
+  @Override
   public SampleDataResult getSampleData(ComponentElementDeclaration component) {
     try {
       return withInternalDeclarationSession("getSampleData()", session -> session.getSampleData(component));

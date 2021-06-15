@@ -95,6 +95,14 @@ public interface DeclarationSession {
   MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component);
 
   /**
+   * Disposes the {@link org.mule.runtime.api.metadata.MetadataCache} associated to the component metadata resolution which is
+   * provided in order to store resources cross resolution by resolvers.
+   *
+   * @param component the component whose has a dynamic metadata types.
+   */
+  void disposeMetadataCache(ComponentElementDeclaration component);
+
+  /**
    * Retrieves any sample data available for the component.
    *
    * @param component the component whose sample data is required

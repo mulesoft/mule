@@ -28,7 +28,9 @@ import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.GlobalElementDeclarationVisitor;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
@@ -107,7 +109,16 @@ public class ArtifactHelper {
   }
 
   public Optional<ConfigurationInstance> getConfigurationInstance(String configName) {
-    return findConfigurationProvider(configName).map(cp -> cp.get(getNullEvent()));
+    return findConfigurationProvider(configName).map(cp -> {
+      CoreEvent fakeEvent = getNullEvent();
+      try {
+        return cp.get(fakeEvent);
+      } finally {
+        if (fakeEvent != null) {
+          ((BaseEventContext) fakeEvent.getContext()).success();
+        }
+      }
+    });
   }
 
   public List<String> getExtensions() {
