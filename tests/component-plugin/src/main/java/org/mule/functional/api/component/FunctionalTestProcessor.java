@@ -51,7 +51,6 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.core.publisher.Flux;
 
 /**
  * <code>FunctionalTestProcessor</code> is a service that can be used by functional tests. This service accepts an EventCallback
@@ -173,11 +172,12 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    Flux<CoreEvent> flux = from(publisher);
+    Publisher<CoreEvent> pub = Processor.super.apply(publisher);
     if (processor != null) {
-      flux = flux.transform(processor);
+      return from(pub).transform(processor::apply);
+    } else {
+      return pub;
     }
-    return Processor.super.apply(flux);
   }
 
   /**
