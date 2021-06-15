@@ -41,7 +41,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -174,13 +173,8 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     if (processor == null) {
       return Processor.super.apply(publisher);
-    }
-
-    try {
-      Method applyMethod = processor.getClass().getDeclaredMethod("apply", Publisher.class);
-      return (Publisher<CoreEvent>) applyMethod.invoke(processor, publisher);
-    } catch (Exception e) {
-      return Processor.super.apply(publisher);
+    } else {
+      return processor.apply(publisher);
     }
   }
 
