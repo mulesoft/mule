@@ -49,6 +49,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -229,7 +230,12 @@ class ComponentAstBasedElementModelFactory {
 
   private void populateMapEntries(ObjectType objectType, DslElementSyntax modelDsl, DslElementModel.Builder mapBuilder,
                                   ComponentAst mapConfig) {
-    mapConfig.directChildrenStream().forEach(entryConfig -> {
+    populateMapEntries(objectType, modelDsl, mapBuilder, mapConfig.directChildrenStream().collect(toList()));
+  }
+
+  private void populateMapEntries(ObjectType objectType, DslElementSyntax modelDsl, DslElementModel.Builder mapBuilder,
+                                  Collection<ComponentAst> mapEntriesConfigs) {
+    mapEntriesConfigs.forEach(entryConfig -> {
       MetadataType entryType = objectType.getOpenRestriction().get();
       modelDsl.getGeneric(entryType).ifPresent(entryDsl -> {
         DslElementModel.Builder<Object> entry = DslElementModel.builder()
@@ -452,13 +458,19 @@ class ComponentAstBasedElementModelFactory {
       return;
     }
 
-    ComponentAst paramComponent;
+    Object paramComponent;
     final ComponentParameterAst parameter = configuration.getParameter(paramModel.getName());
-    if (parameter != null && parameter.getValue().getRight() instanceof ComponentAst) {
-      paramComponent = (ComponentAst) parameter.getValue().getRight();
+    if (parameter != null
+        && (parameter.getValue().getRight() instanceof ComponentAst || parameter.getValue().getRight() instanceof Collection)) {
 
-      if (paramSyntax.isWrapped()) {
-        resolveWrappedElement(groupElementBuilder, paramModel, paramComponent, paramSyntax);
+      if (parameter.getValue().getRight() instanceof Collection && ((Collection) parameter.getValue().getRight()).isEmpty()) {
+        paramComponent = null;
+      } else {
+        paramComponent = parameter.getValue().getRight();
+      }
+
+      if (paramSyntax.isWrapped() && paramComponent instanceof ComponentAst) {
+        resolveWrappedElement(groupElementBuilder, paramModel, (ComponentAst) paramComponent, paramSyntax);
         return;
       }
     } else {
@@ -474,53 +486,54 @@ class ComponentAstBasedElementModelFactory {
 
     Optional<String> defaultValue = getDefaultValue(paramModel);
     if (paramComponent != null || !isBlank(value) || defaultValue.isPresent()) {
+      DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
+          .withModel(paramModel)
+          .withDsl(paramSyntax);
+
       if (paramComponent != null && !isContent(paramModel) && !isText(paramModel)) {
+        paramModel.getType().accept(new MetadataTypeVisitor() {
 
-        DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
-            .withModel(paramModel)
-            .withDsl(parameter.getGenerationInformation().getSyntax().get());
+          @Override
+          protected void defaultVisit(MetadataType metadataType) {
+            if (paramComponent instanceof ComponentAst) {
+              final ComponentAst paramComponentValue = (ComponentAst) paramComponent;
+              paramElementBuilder.withConfig(paramComponentValue);
+              enrichElementModel(paramComponentValue.getModel(ParameterizedModel.class).get(),
+                                 groupDsl, paramComponentValue, paramElementBuilder);
+            }
+          }
 
-        final Optional<ParameterizedModel> parameterized = paramComponent.getModel(ParameterizedModel.class);
-        if (parameterized.isPresent()) {
-          paramElementBuilder.withConfig(paramComponent);
-          enrichElementModel(parameterized.get(), groupDsl, paramComponent, paramElementBuilder);
-        } else {
-          paramModel.getType().accept(new MetadataTypeVisitor() {
+          @Override
+          public void visitArrayType(ArrayType arrayType) {
+            MetadataType itemType = arrayType.getType();
+            paramSyntax.getGeneric(itemType)
+                .ifPresent(itemdsl -> ((Collection<ComponentAst>) parameter.getValue().getRight())
+                    .stream()
+                    .filter(c -> c.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(itemType))
+                        .orElse(false))
+                    .forEach(c -> {
+                      final Builder<Object> arrayModelBuilder = DslElementModel.builder()
+                          .withModel(itemType)
+                          .withDsl(c.getGenerationInformation().getSyntax().get())
+                          .withConfig(c);
+                      enrichElementModel(c.getModel(ParameterizedModel.class).get(), itemdsl, c,
+                                         arrayModelBuilder);
+                      paramElementBuilder.containing(arrayModelBuilder.build());
+                    }));
+          }
 
-            @Override
-            public void visitArrayType(ArrayType arrayType) {
-              MetadataType itemType = arrayType.getType();
-              paramSyntax.getGeneric(itemType)
-                  .ifPresent(itemdsl -> paramComponent.directChildrenStream()
-                      .filter(c -> c.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(itemType))
-                          .orElse(false))
-                      .forEach(c -> {
-                        final Builder<Object> arrayModelBuilder = DslElementModel.builder()
-                            .withModel(itemType)
-                            .withDsl(c.getGenerationInformation().getSyntax().get())
-                            .withConfig(c);
-                        enrichElementModel(c.getModel(ParameterizedModel.class).get(), itemdsl, c,
-                                           arrayModelBuilder);
-                        paramElementBuilder.containing(arrayModelBuilder.build());
-                      }));
+          @Override
+          public void visitObject(ObjectType objectType) {
+            if (isMap(objectType)) {
+              populateMapEntries(objectType, paramSyntax, paramElementBuilder,
+                                 ((Collection<ComponentAst>) parameter.getValue().getRight()));
+              return;
             }
 
-            @Override
-            public void visitObject(ObjectType objectType) {
-              if (isMap(objectType)) {
-                populateMapEntries(objectType, paramSyntax, paramElementBuilder, paramComponent);
-                return;
-              }
-            }
-          });
-        }
-
-        groupElementBuilder.containing(paramElementBuilder.build());
+            defaultVisit(objectType);
+          }
+        });
       } else if (isBlank(value)) {
-        DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
-            .withModel(paramModel)
-            .withDsl(paramSyntax);
-
         final Optional<String> body = paramComponent != null
             ? of(paramFetcher.apply(paramModel).getRawValue())
             : empty();
@@ -531,15 +544,11 @@ class ComponentAstBasedElementModelFactory {
               paramElementBuilder.isExplicitInDsl(false);
               return defaultValue.get();
             }));
-        groupElementBuilder.containing(paramElementBuilder.build());
       } else {
-        DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
-            .withModel(paramModel)
-            .withDsl(paramSyntax);
-
         paramElementBuilder.withValue(value);
-        groupElementBuilder.containing(paramElementBuilder.build());
       }
+
+      groupElementBuilder.containing(paramElementBuilder.build());
     }
   }
 
