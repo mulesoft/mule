@@ -436,7 +436,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this.componentBuildingDefinitionRegistryFactory = ofNullable(componentBuildingDefinitionRegistryFactory);
   }
 
-  AstXmlParser getParser() {
+  protected AstXmlParser getParser() {
     return parser;
   }
 

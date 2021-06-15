@@ -15,7 +15,6 @@ import org.mule.runtime.ast.internal.xml.resolver.FailAfterTenErrorsResolveEntit
 import org.mule.runtime.ast.internal.xml.resolver.FailOnFirstErrorResolveEntityFailStrategy;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
@@ -32,7 +31,8 @@ public class SpringXmlConfigurationBuilderTestCase {
 
   @Before
   public void setUp() throws Exception {
-    configurationBuilder = new SpringXmlConfigurationBuilder(new String[] {"dummy.xml"}, null, null, false, false);
+    configurationBuilder =
+        new SpringXmlConfigurationBuilder(new String[] {"dummy.xml"}, null, null, false, false);
     featureFlaggingService = mock(FeatureFlaggingService.class);
     configurationBuilder.setFeatureFlaggingService(featureFlaggingService);
     muleContext = mock(MuleContext.class);
@@ -42,7 +42,7 @@ public class SpringXmlConfigurationBuilderTestCase {
 
   @Test
   @Issue("EE-7827")
-  public void configureWithFailOnFirstError() throws ConfigurationException {
+  public void configureWithFailOnFirstError() {
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
 
     try {
@@ -57,7 +57,7 @@ public class SpringXmlConfigurationBuilderTestCase {
 
   @Test
   @Issue("EE-7827")
-  public void configureWithFailAfterTenErrors() throws ConfigurationException {
+  public void configureWithFailAfterTenErrors() {
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
     try {
