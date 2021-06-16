@@ -354,7 +354,7 @@ class ComponentConfigurationBuilder<T> {
                                                              ownerComponentModel.getParameterGroupModels());
               ComponentParameterAst p;
               if (groupModelOptional.isPresent()) {
-                p = ownerComponent.getParameter(parameterName, groupModelOptional.get());
+                p = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
               } else {
                 p = ownerComponent.getParameter(parameterName);
               }

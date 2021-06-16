@@ -235,11 +235,6 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public ComponentParameterAst getParameter(String paramName, ParameterGroupModel parameterGroupModel) {
-              throw new NoSuchElementException(DEFAULT_GLOBAL_ELEMENTS + " does not have parameters");
-            }
-
-            @Override
             public ComponentParameterAst getParameter(String groupName, String paramName) {
               throw new NoSuchElementException(DEFAULT_GLOBAL_ELEMENTS + " does not have parameters");
             }
