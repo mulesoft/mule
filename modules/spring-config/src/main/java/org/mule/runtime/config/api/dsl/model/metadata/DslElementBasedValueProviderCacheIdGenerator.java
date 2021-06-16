@@ -38,10 +38,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-
 public class DslElementBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<DslElementModel<?>> {
 
-  private ComponentLocator<DslElementModel<?>> locator;
+  private final ComponentLocator<DslElementModel<?>> locator;
 
   private static final String VALUE_PROVIDER = "ValueProvider";
 
@@ -218,7 +217,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
                                          l -> resolveIdRecursively(l).orElse(null),
                                          r -> aValueProviderCacheId(fromElementWithName(sourceElementNameFromSimpleValue(parameterModel))
                                              .withHashValueFrom(v)))))
-        .orElse(resolveIdRecursively(parameterModel));
+        .orElseGet(() -> resolveIdRecursively(parameterModel));
   }
 
   private Optional<ValueProviderCacheId> resolveIdRecursively(DslElementModel<?> element) {
@@ -235,8 +234,8 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
 
   private class ParameterModelInformation {
 
-    private ParameterModel parameterModel;
-    private DslElementModel<?> parameterDslElementModel;
+    private final ParameterModel parameterModel;
+    private final DslElementModel<?> parameterDslElementModel;
 
     private ParameterModelInformation(DslElementModel<?> dslElementModel) {
       checkArgument(dslElementModel.getModel() instanceof ParameterModel, "A ParameterModel is expected");
