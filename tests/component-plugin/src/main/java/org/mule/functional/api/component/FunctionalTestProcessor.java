@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.functional.api.notification.FunctionalTestNotification;
 import org.mule.functional.api.notification.FunctionalTestNotificationListener;
@@ -42,14 +41,15 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * <code>FunctionalTestProcessor</code> is a service that can be used by functional tests. This service accepts an EventCallback
@@ -166,6 +166,15 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
       } else {
         throw new DefaultMuleException(t);
       }
+    }
+  }
+
+  @Override
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    if (processor == null) {
+      return Processor.super.apply(publisher);
+    } else {
+      return processor.apply(publisher);
     }
   }
 
