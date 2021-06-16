@@ -11,13 +11,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.internal.xml.DefaultAstXmlParser;
-import org.mule.runtime.ast.internal.xml.resolver.FailAfterTenErrorsResolveEntityFailStrategy;
-import org.mule.runtime.ast.internal.xml.resolver.FailOnFirstErrorResolveEntityFailStrategy;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,8 +49,7 @@ public class SpringXmlConfigurationBuilderTestCase {
     }
 
     verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
-    assertThat(((DefaultAstXmlParser) configurationBuilder.getParser()).getFailStrategy(),
-               instanceOf(FailOnFirstErrorResolveEntityFailStrategy.class));
+    assertTrue(((DefaultAstXmlParser) configurationBuilder.getParser()).isFailOnFirstErrorStrategy());
   }
 
   @Test
@@ -66,7 +63,6 @@ public class SpringXmlConfigurationBuilderTestCase {
     }
 
     verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
-    assertThat(((DefaultAstXmlParser) configurationBuilder.getParser()).getFailStrategy(),
-               instanceOf(FailAfterTenErrorsResolveEntityFailStrategy.class));
+    assertFalse(((DefaultAstXmlParser) configurationBuilder.getParser()).isFailOnFirstErrorStrategy());
   }
 }
