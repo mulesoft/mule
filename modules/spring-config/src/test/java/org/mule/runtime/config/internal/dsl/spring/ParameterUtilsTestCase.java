@@ -20,8 +20,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
@@ -53,7 +55,7 @@ public class ParameterUtilsTestCase extends AbstractMuleTestCase {
     parameterUtils = new ParameterUtils();
 
     List<ComponentAst> builtChildren = null;
-    Map<ParameterModel, ComponentParameterAst> parameterAsts = null;
+    Map<Pair<ParameterModel, ParameterGroupModel>, ComponentParameterAst> parameterAsts = null;
     Map<String, String> extraParams = null;
     PropertiesResolver propertiesResolver = mock(PropertiesResolver.class);
     Supplier<Optional<String>> componentId = null;
@@ -70,7 +72,7 @@ public class ParameterUtilsTestCase extends AbstractMuleTestCase {
     ComponentMetadataAst metadata = null;
 
     componentAst =
-        new DefaultComponentAst(builtChildren, parameterAsts, extraParams, propertiesResolver, componentId, extensionModel,
+        new DefaultComponentAst(builtChildren, parameterAsts,  extraParams, propertiesResolver, componentId, extensionModel,
                                 componentModel, nestableElementModel, configurationModel, connectionProviderModel,
                                 parameterizedModel, null, generationInformation, metadata, location, identifier, componentType);
   }

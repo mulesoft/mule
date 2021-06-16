@@ -63,6 +63,18 @@ public final class ParameterGroupUtils {
 
   }
 
+  public Optional<ParameterGroupModel> getParameterGroupModel(ComponentAst ownerComponent, String parameterName,
+                                                              ComponentAst possibleGroup,
+                                                              List<ParameterGroupModel> groupModels) {
+    return groupModels.stream()
+            .filter(parameterGroupModel -> parameterGroupModel.getParameter(parameterName).isPresent() &&
+                    parameterGroupModel.isShowInDsl() &&
+                    getChildElementName(ownerComponent, parameterGroupModel)
+                            .map(en -> possibleGroup.getIdentifier().getName().equals(en))
+                            .orElse(false))
+            .findFirst();
+  }
+
   public ComponentParameterAst getComponentParameterAstFromSourceModel(CreateBeanDefinitionRequest createBeanDefinitionRequest,
                                                                        ComponentAst ownerComponent, String paramName,
                                                                        SourceModel ownerComponentModel) {

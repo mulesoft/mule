@@ -19,6 +19,8 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQ
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -40,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -334,20 +337,27 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
+            // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
+            // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
+            // previous implementations.
+            int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
+            final ComponentAst possibleGroup =
+                    ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
+                            ? componentModel
+                            : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
             if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-              // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
-              // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
-              // previous implementations.
-              int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
-              final ComponentAst possibleGroup =
-                  ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
-                      ? componentModel
-                      : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
-
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName, possibleGroup,
                                                                          (SourceModel) ownerComponentModel);
             } else {
-              ComponentParameterAst p = ownerComponent.getParameter(parameterName);
+              Optional<ParameterGroupModel> groupModelOptional =
+                      parameterGroupUtils.
+                              getParameterGroupModel(ownerComponent,parameterName,possibleGroup, ownerComponentModel.getParameterGroupModels());
+              ComponentParameterAst p;
+              if (groupModelOptional.isPresent()) {
+                p = ownerComponent.getParameter(parameterName, groupModelOptional.get());
+              } else {
+                p = ownerComponent.getParameter(parameterName);
+              }
 
               if (p == null) {
                 // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
