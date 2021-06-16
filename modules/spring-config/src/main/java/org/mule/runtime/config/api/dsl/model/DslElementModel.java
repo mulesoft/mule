@@ -384,17 +384,19 @@ public class DslElementModel<T> {
                     .namespace(dslElementSyntax.getPrefix())
                     .name(dslElementSyntax.getElementName()).build();
 
-                InternalComponentConfiguration.Builder listWrapperBuilder = InternalComponentConfiguration.builder()
-                    .withIdentifier(listWrapperIdentifier);
+                if (param.getValue().getRight() instanceof Collection) {
+                  InternalComponentConfiguration.Builder listWrapperBuilder = InternalComponentConfiguration.builder()
+                      .withIdentifier(listWrapperIdentifier);
 
-                Collection<ComponentAst> arrayValues = (Collection<ComponentAst>) param.getValue().getRight();
-                if (arrayValues != null) {
-                  for (ComponentAst child : arrayValues) {
-                    listWrapperBuilder.withNestedComponent(from(child));
+                  Collection<ComponentAst> arrayValues = (Collection<ComponentAst>) param.getValue().getRight();
+                  if (arrayValues != null) {
+                    for (ComponentAst child : arrayValues) {
+                      listWrapperBuilder.withNestedComponent(from(child));
+                    }
                   }
-                }
 
-                builder.withNestedComponent(listWrapperBuilder.build());
+                  builder.withNestedComponent(listWrapperBuilder.build());
+                }
               });
         }
 

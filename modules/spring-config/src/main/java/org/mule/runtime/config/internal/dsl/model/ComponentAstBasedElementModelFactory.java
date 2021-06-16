@@ -459,15 +459,19 @@ class ComponentAstBasedElementModelFactory {
       return;
     }
 
-    Object paramComponent;
     final ComponentParameterAst parameter = configuration.getParameter(paramModel.getName());
-    if (parameter != null
-        && (parameter.getValue().getRight() instanceof ComponentAst || parameter.getValue().getRight() instanceof Collection)) {
+    final Object paramValue = parameter.getValue().getRight();
 
-      if (parameter.getValue().getRight() instanceof Collection && ((Collection) parameter.getValue().getRight()).isEmpty()) {
+    Object paramComponent;
+    if (parameter != null
+        // handle nested parameters
+        && (paramValue instanceof ComponentAst || paramValue instanceof Collection)) {
+
+      if (paramValue instanceof Collection && ((Collection) paramValue).isEmpty()) {
+        // assume an empty collection parameter as the parameter is not present
         paramComponent = null;
       } else {
-        paramComponent = parameter.getValue().getRight();
+        paramComponent = paramValue;
       }
 
       if (paramSyntax.isWrapped() && paramComponent instanceof ComponentAst) {
@@ -475,8 +479,7 @@ class ComponentAstBasedElementModelFactory {
         return;
       }
     } else {
-      // TODO MULE-17711 remove this
-      paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramSyntax));
+      paramComponent = null;
     }
 
     String value = paramSyntax.supportsAttributeDeclaration()
@@ -508,7 +511,7 @@ class ComponentAstBasedElementModelFactory {
           public void visitArrayType(ArrayType arrayType) {
             MetadataType itemType = arrayType.getType();
             paramSyntax.getGeneric(itemType)
-                .ifPresent(itemdsl -> ((Collection<ComponentAst>) parameter.getValue().getRight())
+                .ifPresent(itemdsl -> ((Collection<ComponentAst>) paramValue)
                     .stream()
                     .filter(c -> c.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(itemType))
                         .orElse(false))
@@ -527,7 +530,7 @@ class ComponentAstBasedElementModelFactory {
           public void visitObject(ObjectType objectType) {
             if (isMap(objectType)) {
               populateMapEntries(objectType, paramSyntax, paramElementBuilder,
-                                 ((Collection<ComponentAst>) parameter.getValue().getRight()));
+                                 ((Collection<ComponentAst>) paramValue));
               return;
             }
 
@@ -551,6 +554,10 @@ class ComponentAstBasedElementModelFactory {
 
       groupElementBuilder.containing(paramElementBuilder.build());
     }
+  }
+
+  protected boolean paramIsEmptyCollection(final ComponentParameterAst parameter) {
+    return parameter.getValue().getRight() instanceof Collection && ((Collection) parameter.getValue().getRight()).isEmpty();
   }
 
   private void resolveWrappedElement(DslElementModel.Builder<ParameterGroupModel> groupElementBuilder, ParameterModel p,
