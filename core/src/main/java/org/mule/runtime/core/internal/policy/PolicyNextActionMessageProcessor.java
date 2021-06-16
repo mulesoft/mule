@@ -19,9 +19,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -65,9 +63,6 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   @Inject
   private ServerNotificationHandler notificationManager;
-
-  @Inject
-  private ConfigurationComponentLocator componentLocator;
 
   private PolicyNotificationHelper notificationHelper;
   private PolicyEventMapper policyEventMapper;
