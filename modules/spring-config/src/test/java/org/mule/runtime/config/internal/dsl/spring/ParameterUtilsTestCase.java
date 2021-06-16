@@ -72,7 +72,7 @@ public class ParameterUtilsTestCase extends AbstractMuleTestCase {
     ComponentMetadataAst metadata = null;
 
     componentAst =
-        new DefaultComponentAst(builtChildren, parameterAsts,  extraParams, propertiesResolver, componentId, extensionModel,
+        new DefaultComponentAst(builtChildren, parameterAsts, extraParams, propertiesResolver, componentId, extensionModel,
                                 componentModel, nestableElementModel, configurationModel, connectionProviderModel,
                                 parameterizedModel, null, generationInformation, metadata, location, identifier, componentType);
   }
