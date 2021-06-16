@@ -25,6 +25,7 @@ import static org.mule.tck.processor.ContextPropagationChecker.assertContextProp
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -130,8 +131,9 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.addRoute("wat", mp);
     initialise();
 
-    thrown.expectCause(instanceOf(ExpressionRuntimeException.class));
-    thrown.expectCause(hasMessage(containsString("evaluating expression: \"wat\"")));
+    thrown.expect(instanceOf(ExpressionRuntimeException.class));
+    thrown.expect(hasMessage(containsString("evaluating expression: \"wat\"")));
+    thrown.expectCause(instanceOf(ExpressionExecutionException.class));
     process(choiceRouter, zapEvent());
   }
 
