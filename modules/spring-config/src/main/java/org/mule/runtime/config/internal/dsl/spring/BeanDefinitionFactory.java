@@ -342,6 +342,23 @@ public class BeanDefinitionFactory {
     }
   }
 
+  private Optional<SpringComponentModel> resolveComponentBeanDefinitionParam(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                                                             List<ComponentAst> componentModelHierarchy,
+                                                                             ComponentAst componentModel,
+                                                                             String parameterName) {
+    Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
+        componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
+    if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
+      final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, componentModel,
+                                                                                  buildingDefinitionOptional.orElse(null));
+      request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
+      this.componentModelProcessor.processRequest(springComponentModels, request);
+      return of(request.getSpringComponentModel());
+    } else {
+      return processComponentWrapper(springComponentModels, componentModel);
+    }
+  }
+
   private Optional<SpringComponentModel> processComponentWrapper(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                                                  ComponentAst componentModel) {
     return componentBuildingDefinitionRegistry.getWrappedComponent(componentModel.getIdentifier())
