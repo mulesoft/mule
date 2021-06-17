@@ -91,7 +91,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private boolean disableXmlValidations = false;
 
   private SpringRegistry registry;
-  private AstXmlParser parser;
 
   private ArtifactAst parentArtifactAst;
   private ApplicationContext parentContext;
@@ -246,8 +245,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         if (artifactConfigResources.length == 0) {
           artifactAst = emptyArtifact();
         } else {
-          parser =
-              createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
+          final AstXmlParser parser = createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
 
           artifactAst = parser.parse(stream(artifactConfigResources)
               .map((CheckedFunction<ConfigResource, Pair<String, InputStream>>) (configFile -> new Pair<>(configFile
