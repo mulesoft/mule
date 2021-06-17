@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -59,9 +58,6 @@ public class SpringXmlConfigurationBuilderTestCase {
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
 
     configurationBuilder.configure(muleContext);
-
-    verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
-
   }
 
   @Test
@@ -73,9 +69,6 @@ public class SpringXmlConfigurationBuilderTestCase {
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
     configurationBuilder.configure(muleContext);
-
-    verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
-
   }
 
   public static final class TestExtensionSchemagenerator implements ExtensionSchemaGenerator {
