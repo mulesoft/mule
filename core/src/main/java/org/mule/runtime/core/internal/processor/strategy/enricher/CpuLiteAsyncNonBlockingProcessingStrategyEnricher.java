@@ -7,13 +7,13 @@
 
 package org.mule.runtime.core.internal.processor.strategy.enricher;
 
+import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
-
-import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 
 /**
  * A {@link ReactiveProcessorEnricher} for CPU_LITE processing type.

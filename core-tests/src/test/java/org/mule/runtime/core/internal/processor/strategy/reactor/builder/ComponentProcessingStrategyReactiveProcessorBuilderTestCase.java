@@ -33,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import reactor.test.publisher.TestPublisher;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -66,7 +65,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
     this.parallelism = parallelism;
   }
 
-  @Parameters(name = "{0}")
+  @Parameters(name = "parallelism: {0}")
   public static Collection<Integer> paralellism() {
     return asList(1, 4);
   }

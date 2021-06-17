@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
-import static java.util.function.Function.identity;
+import static java.util.function.UnaryOperator.identity;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;

@@ -57,7 +57,7 @@ public class ProactorProcessingStrategyEnricherTestCase extends AbstractEnriched
     this.parallelism = parallelism;
   }
 
-  @Parameters(name = "{0}")
+  @Parameters(name = "parallelism: {0}")
   public static Collection<Integer> paralellism() {
     return asList(1, 4);
   }

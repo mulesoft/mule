@@ -28,7 +28,6 @@ import java.util.concurrent.ScheduledExecutorService;
  * <p>
  * If the response should be submitted using a {@link Scheduler} for returning to the flow or further processing can be done in
  * the same thread.
- * <p>
  *
  * @since 4.4.0
  */

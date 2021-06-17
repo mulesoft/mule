@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
@@ -18,8 +20,6 @@ import reactor.util.context.Context;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 /**
  * Builder of a {@link Publisher} with common operations in {@link Mono} and {@link Flux}.

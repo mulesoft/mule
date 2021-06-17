@@ -21,13 +21,13 @@ import org.reactivestreams.Publisher;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Builder for a {@link ReactiveProcessor} that enriches a pipeline {@link ReactiveProcessor} with processing strategy logic. The
  * processing strategy involves a decision regarding
  * <p>
  * the {@link Scheduler} to use for dispatching the a {@link CoreEvent} to a flow.
- * <p>
  *
  * @since 4.4.0
  */
@@ -36,7 +36,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
   private final ReactiveProcessor pipeline;
   private final ClassLoader executionClassloader;
   private Optional<ScheduledExecutorService> scheduler = empty();
-  private Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator = identity();
+  private UnaryOperator<ScheduledExecutorService> schedulerDecorator = UnaryOperator.identity();
 
   private PipelineProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor pipeline, ClassLoader executionClassloader) {
     this.pipeline = pipeline;
@@ -68,7 +68,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
    *
    * @return the builder with decorator set.
    */
-  public PipelineProcessingStrategyReactiveProcessorBuilder withSchedulerDecorator(Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator) {
+  public PipelineProcessingStrategyReactiveProcessorBuilder withSchedulerDecorator(UnaryOperator<ScheduledExecutorService> schedulerDecorator) {
     this.schedulerDecorator = schedulerDecorator;
     return this;
   }

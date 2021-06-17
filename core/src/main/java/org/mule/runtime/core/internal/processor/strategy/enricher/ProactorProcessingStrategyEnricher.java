@@ -53,6 +53,7 @@ public class ProactorProcessingStrategyEnricher implements ReactiveProcessorEnri
   }
 
   private int getChainParallelism(ReactiveProcessor processor) {
+    // TODO MULE-19526: Technical debt: the resolution of the level of parallelism in proactor should be refactored
     if (maxConcurrency == 1) {
       return 1;
     } else if (maxConcurrency == MAX_VALUE) {

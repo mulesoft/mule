@@ -8,12 +8,15 @@
 package org.mule.runtime.core.internal.processor.strategy.processor;
 
 import static java.util.Arrays.asList;
-import static java.util.function.Function.identity;
+import static java.util.function.UnaryOperator.identity;
+import static org.junit.runners.Parameterized.Parameters;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.*;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
@@ -66,7 +69,7 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
     this.parallelism = parallelism;
   }
 
-  @Parameterized.Parameters(name = "{0}")
+  @Parameters(name = "parallelism: {0}")
   public static Collection<Integer> paralellism() {
     return asList(1, 4);
   }
