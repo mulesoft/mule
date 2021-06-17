@@ -89,16 +89,16 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
 
   public ReactiveProcessor build() {
     if (parallelism == 1) {
-      return publisher -> baseProcessingStrategyBuilder(buildFlux(publisher)).build();
+      return publisher -> baseProcessingStrategyPublisherBuilder(buildFlux(publisher)).build();
     } else {
       // FlatMap is the way reactor has to do parallel processing.
       return publisher -> Flux.from(publisher)
-          .flatMap(e -> baseProcessingStrategyBuilder(ReactorPublisherBuilder.buildMono(e)).build(),
+          .flatMap(e -> baseProcessingStrategyPublisherBuilder(ReactorPublisherBuilder.buildMono(e)).build(),
                    parallelism);
     }
   }
 
-  private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyBuilder(ReactorPublisherBuilder<T> builder) {
+  private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyPublisherBuilder(ReactorPublisherBuilder<T> builder) {
     ReactorPublisherBuilder<T> beforeProcssor = dispatcherScheduler
         .map(sch -> builder.publishOn(sch))
         .orElse(builder)

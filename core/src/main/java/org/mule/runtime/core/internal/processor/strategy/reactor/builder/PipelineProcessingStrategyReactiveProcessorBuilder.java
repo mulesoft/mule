@@ -10,7 +10,6 @@ package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static java.util.function.Function.identity;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -20,7 +19,6 @@ import org.reactivestreams.Publisher;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 /**
@@ -74,10 +72,10 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
   }
 
   public ReactiveProcessor build() {
-    return publisher -> basePipelinePublisher(buildFlux(publisher)).build();
+    return publisher -> baseProcessingStrategyPublisherBuilder(buildFlux(publisher)).build();
   }
 
-  private <T extends Publisher> ReactorPublisherBuilder<T> basePipelinePublisher(ReactorPublisherBuilder<T> publisher) {
+  private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyPublisherBuilder(ReactorPublisherBuilder<T> publisher) {
     return scheduler
         .map(sch -> publisher.publishOn(schedulerDecorator.apply(sch)))
         .orElse(publisher)
