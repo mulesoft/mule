@@ -448,4 +448,11 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasValues(americaValue));
   }
 
+  @Test
+  public void actingParameterWithReservedName() throws Exception {
+    Set<Value> channels = getValues("actingParameterWithReservedName", "parameterWithValues");
+    assertThat(channels, hasSize(1));
+    assertThat(channels, hasValues("typeValue"));
+  }
+
 }

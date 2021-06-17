@@ -41,6 +41,9 @@ public class InjectableParameterResolver {
 
   private static final Logger LOGGER = getLogger(InjectableParameterResolver.class);
 
+  // Use this as a prefix for binding context identifiers so that no identifier clash with a DW reserved word or function
+  private static final String IDENTIFIER_PREFIX = "muleprefixforidentifiers";
+
   private static final String EXPRESSION_PREFIX = "#[{";
   private static final String EXPRESSION_SUFFIX = "}]";
   private static final String EMPTY_EXPRESSION = EXPRESSION_PREFIX + EXPRESSION_SUFFIX;
@@ -106,6 +109,10 @@ public class InjectableParameterResolver {
     }
   }
 
+  private String getWithBindingPrefix(String bindingName) {
+    return IDENTIFIER_PREFIX + bindingName;
+  }
+
   private BindingContext createBindingContext(ParameterValueResolver parameterValueResolver,
                                               ParameterizedModel parameterizedModel) {
     BindingContext.Builder bindingContextBuilder = BindingContext.builder();
@@ -123,7 +130,7 @@ public class InjectableParameterResolver {
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
         }
-        bindingContextBuilder.addBinding(parameterModel.getName(), (TypedValue) value);
+        bindingContextBuilder.addBinding(getWithBindingPrefix(parameterModel.getName()), (TypedValue) value);
       }
     }
     return bindingContextBuilder.build();
@@ -135,11 +142,11 @@ public class InjectableParameterResolver {
     expression.append(
                       injectableParametersMap.values().stream()
                           .filter(injectableParameterInfo -> identifiers
-                              .contains(getParameterNameFromExtractionExpression(injectableParameterInfo
-                                  .getExtractionExpression())))
+                              .contains(getWithBindingPrefix(getParameterNameFromExtractionExpression(injectableParameterInfo
+                                  .getExtractionExpression()))))
                           .map(injectableParameterInfo -> "\""
                               + injectableParameterInfo.getParameterName() + "\"  : "
-                              + injectableParameterInfo.getExtractionExpression())
+                              + getWithBindingPrefix(injectableParameterInfo.getExtractionExpression()))
                           .collect(Collectors.joining(", ")));
     expression.append(EXPRESSION_SUFFIX);
 

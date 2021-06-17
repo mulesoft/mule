@@ -272,4 +272,8 @@
     <flow name="parameterWithTwoFieldWithSameValues">
         <values:parameter-with-two-field-with-same-values/>
     </flow>
+
+    <flow name="actingParameterWithReservedName">
+        <values:acting-parameter-with-reserved-name type="typeValue"/>
+    </flow>
 </mule>
