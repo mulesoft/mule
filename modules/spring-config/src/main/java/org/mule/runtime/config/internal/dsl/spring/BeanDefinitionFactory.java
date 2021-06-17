@@ -30,6 +30,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.dsl.api.component.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -44,6 +45,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -51,6 +53,7 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -174,7 +177,11 @@ public class BeanDefinitionFactory {
               if (values != null) {
 
                 for (ComponentAst child : values) {
-                  resolveComponent(springComponentModels, updatedHierarchy, child, registry, componentLocator);
+                  resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, componentModel, child, param
+                      .getModel().getName())
+                          .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel, child,
+                                                                                        springComponentModels,
+                                                                                        registry, componentLocator));
                 }
               }
             }
@@ -185,17 +192,45 @@ public class BeanDefinitionFactory {
               updatedHierarchy.add(componentModel);
 
               if (isMap(objectType)) {
-                List<ComponentAst> values = (List<ComponentAst>) param.getValue().getRight();
-                for (ComponentAst child : values) {
-                  resolveComponent(springComponentModels, updatedHierarchy, child, registry, componentLocator);
+                List<ComponentAst> entries = (List<ComponentAst>) param.getValue().getRight();
+                for (ComponentAst entry : entries) {
+                  final ComponentParameterAst entryValue = entry.getParameter(SIMPLE_TYPE_VALUE_PARAMETER_NAME);
+                  if (entryValue != null) {
+                    final List<ComponentAst> entryValueHierarchy = new ArrayList<>(componentModelHierarchy);
+                    entryValueHierarchy.add(entry);
+
+                    if (entryValue.getValue().getRight() instanceof ComponentAst) {
+                      resolveComponent(springComponentModels, updatedHierarchy,
+                                       (ComponentAst) entryValue.getValue().getRight(),
+                                       registry, componentLocator);
+                    } else if (entryValue.getValue().getRight() instanceof Collection) {
+                      ((Collection<ComponentAst>) (entryValue.getValue().getRight()))
+                          .forEach(entryItem -> {
+                            resolveComponent(springComponentModels, updatedHierarchy,
+                                             entryItem, registry, componentLocator);
+                          });
+                    }
+                  }
+
+                  resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, componentModel, entry, param
+                      .getModel().getName())
+                          .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel, entry,
+                                                                                        springComponentModels,
+                                                                                        registry, componentLocator));
                 }
 
                 return;
               }
 
               if (param.getValue().getRight() instanceof ComponentAst) {
-                resolveComponent(springComponentModels, updatedHierarchy, (ComponentAst) param.getValue().getRight(), registry,
-                                 componentLocator);
+                final ComponentAst child = (ComponentAst) param.getValue().getRight();
+                resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, componentModel,
+                                                    child, param.getModel().getName())
+                                                        .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel,
+                                                                                                                      child,
+                                                                                                                      springComponentModels,
+                                                                                                                      registry,
+                                                                                                                      componentLocator));
               }
             }
 
@@ -203,55 +238,61 @@ public class BeanDefinitionFactory {
         });
 
     resolveComponentBeanDefinition(springComponentModels, componentModelHierarchy, componentModel)
-        .ifPresent(springComponentModel -> {
-          springComponentModels.put(componentModel, springComponentModel);
+        .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel, componentModel, springComponentModels,
+                                                                      registry, componentLocator));
+  }
 
-          // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
-          // how core constructs are processed.
-          processMuleConfiguration(springComponentModels, componentModel, registry);
-          processMuleSecurityManager(springComponentModels, componentModel, registry);
+  protected void handleSpringComponentModel(SpringComponentModel springComponentModel, ComponentAst componentModel,
+                                            Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                            BeanDefinitionRegistry registry,
+                                            SpringConfigurationComponentLocator componentLocator) {
+    springComponentModels.put(componentModel, springComponentModel);
 
-          componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-              .ifPresent(componentBuildingDefinition -> {
-                if ((springComponentModel.getType() != null)
-                    && Component.class.isAssignableFrom(springComponentModel.getType())) {
-                  addAnnotation(ANNOTATION_NAME, componentModel.getIdentifier(), springComponentModel);
-                  // We need to use a mutable map since spring will resolve the properties placeholder present in the value if
-                  // needed and it will be done by mutating the same map.
+    // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
+    // how core constructs are processed.
+    processMuleConfiguration(springComponentModels, componentModel, registry);
+    processMuleSecurityManager(springComponentModels, componentModel, registry);
 
-                  final Map<String, String> rawParams = new HashMap<>();
-                  componentModel.getMetadata().getDocAttributes().entrySet().stream()
-                      .forEach(docAttr -> buildRawParamKeyForDocAttribute(docAttr)
-                          .ifPresent(key -> rawParams.put(key, docAttr.getValue())));
+    componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
+        .ifPresent(componentBuildingDefinition -> {
+          if ((springComponentModel.getType() != null)
+              && Component.class.isAssignableFrom(springComponentModel.getType())) {
+            addAnnotation(ANNOTATION_NAME, componentModel.getIdentifier(), springComponentModel);
+            // We need to use a mutable map since spring will resolve the properties placeholder present in the value if
+            // needed and it will be done by mutating the same map.
 
-                  addAnnotation(ANNOTATION_PARAMETERS,
-                                componentModel.getModel(ParameterizedModel.class)
-                                    .map(pm -> {
-                                      componentModel.getParameters().stream()
-                                          .filter(param -> param.getValue().getValue().isPresent())
-                                          .forEach(param -> rawParams.put(param.getModel().getName(),
-                                                                          param.getValue()
-                                                                              .mapLeft(expr -> "#[" + expr + "]")
-                                                                              .getValue().get().toString()));
+            final Map<String, String> rawParams = new HashMap<>();
+            componentModel.getMetadata().getDocAttributes().entrySet().stream()
+                .forEach(docAttr -> buildRawParamKeyForDocAttribute(docAttr)
+                    .ifPresent(key -> rawParams.put(key, docAttr.getValue())));
 
-                                      return rawParams;
-                                    })
-                                    .orElse(rawParams),
-                                springComponentModel);
+            addAnnotation(ANNOTATION_PARAMETERS,
+                          componentModel.getModel(ParameterizedModel.class)
+                              .map(pm -> {
+                                componentModel.getParameters().stream()
+                                    .filter(param -> param.getValue().getValue().isPresent())
+                                    .forEach(param -> rawParams.put(param.getModel().getName(),
+                                                                    param.getValue()
+                                                                        .mapLeft(expr -> "#[" + expr + "]")
+                                                                        .getValue().get().toString()));
 
-                  componentLocator.addComponentLocation(componentModel.getLocation());
-                  addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, springComponentModel);
-                }
-              });
+                                return rawParams;
+                              })
+                              .orElse(rawParams),
+                          springComponentModel);
 
-          addAnnotation(LOCATION_KEY, componentModel.getLocation(), springComponentModel);
-          addAnnotation(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId,
-                                                                                      componentModel
-                                                                                          .getLocation(),
-                                                                                      componentModel
-                                                                                          .getMetadata()),
-                        springComponentModel);
+            componentLocator.addComponentLocation(componentModel.getLocation());
+            addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, springComponentModel);
+          }
         });
+
+    addAnnotation(LOCATION_KEY, componentModel.getLocation(), springComponentModel);
+    addAnnotation(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId,
+                                                                                componentModel
+                                                                                    .getLocation(),
+                                                                                componentModel
+                                                                                    .getMetadata()),
+                  springComponentModel);
   }
 
   /**
@@ -344,6 +385,7 @@ public class BeanDefinitionFactory {
 
   private Optional<SpringComponentModel> resolveComponentBeanDefinitionParam(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                                                              List<ComponentAst> componentModelHierarchy,
+                                                                             ComponentAst ownerComponentModel,
                                                                              ComponentAst componentModel,
                                                                              String parameterName) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
