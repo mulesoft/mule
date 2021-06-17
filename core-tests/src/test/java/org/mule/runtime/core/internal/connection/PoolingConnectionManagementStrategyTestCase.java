@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static java.lang.Integer.min;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -39,8 +38,6 @@ import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -235,29 +232,9 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext);
   }
 
-  private <T> void verifyThat(Assertion<T> assertion) throws Exception {
-    verifyThat(assertion, (T) connection1.getConnection(), (T) connection2.getConnection());
-  }
-
-  private <T> void verifyThat(Assertion<T> assertion, T... subjects) {
-    Arrays.stream(subjects).forEach(subject -> {
-      try {
-        assertion.test(verify(subject));
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    });
-  }
-
   private void verifyConnections(int numToCreate) throws ConnectionException {
     verify(this.connectionProvider, times(numToCreate)).connect();
     verify(this.connectionProvider, times(0)).disconnect(any());
-  }
-
-  @FunctionalInterface
-  private interface Assertion<T> {
-
-    void test(T subject) throws Exception;
   }
 
 }
