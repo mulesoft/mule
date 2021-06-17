@@ -460,7 +460,7 @@ class ComponentAstBasedElementModelFactory {
     }
 
     final ComponentParameterAst parameter = configuration.getParameter(paramModel.getName());
-    final Object paramValue = parameter.getValue().getRight();
+    final Object paramValue = parameter != null ? parameter.getValue().getRight() : null;
 
     Object paramComponent;
     if (parameter != null

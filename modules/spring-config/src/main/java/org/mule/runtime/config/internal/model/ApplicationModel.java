@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.config.internal.model;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
@@ -37,10 +41,12 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -172,11 +178,16 @@ public abstract class ApplicationModel {
       if (FLOW_IDENTIFIER.equals(flow.getIdentifier())) {
         return flow.directChildrenStream().findFirst()
             .filter(comp -> comp.getModel(SourceModel.class).isPresent())
-            .map(source -> source.directChildrenStream()
-                .filter(childComponent -> REDELIVERY_POLICY_IDENTIFIER.equals(childComponent.getIdentifier()))
-                .findAny()
-                .map(redeliveryPolicy -> transformFlowWithRedeliveryPolicy(flow, source, redeliveryPolicy))
-                .orElse(flow))
+            .flatMap(source -> {
+              final ComponentParameterAst redeliveryPolicyParam = source.getParameter(REDELIVERY_POLICY_PARAMETER_NAME);
+              if (redeliveryPolicyParam != null) {
+                final ComponentAst redeliveryPolicy = (ComponentAst) redeliveryPolicyParam.getValue().getRight();
+                if (redeliveryPolicy != null) {
+                  return of(transformFlowWithRedeliveryPolicy(flow, source, redeliveryPolicy));
+                }
+              }
+              return empty();
+            })
             .orElse(flow);
       }
 
@@ -189,15 +200,40 @@ public abstract class ApplicationModel {
                                                                 ComponentAst redeliveryPolicy) {
     final List<ComponentAst> newFlowChildren = new ArrayList<>();
 
+    // The transformed source is the same with the redelivery-policy removed...
     newFlowChildren.add(new BaseComponentAstDecorator(source) {
 
       @Override
       public Stream<ComponentAst> directChildrenStream() {
-        // The transformed source is the same with the redelivery-policy removed...
         return super.directChildrenStream()
             .filter(sourceChild -> sourceChild != redeliveryPolicy);
-
       }
+
+      @Override
+      public ComponentParameterAst getParameter(String groupName, String paramName) {
+        if (REDELIVERY_POLICY_PARAMETER_NAME.equals(paramName)) {
+          return null;
+        } else {
+          return getDecorated().getParameter(groupName, paramName);
+        }
+      };
+
+      @Override
+      public ComponentParameterAst getParameter(String paramName) {
+        if (REDELIVERY_POLICY_PARAMETER_NAME.equals(paramName)) {
+          return null;
+        } else {
+          return getDecorated().getParameter(paramName);
+        }
+      };
+
+      @Override
+      public Collection<ComponentParameterAst> getParameters() {
+        return getDecorated().getParameters().stream()
+            .filter(p -> !p.getModel().getName().equals(REDELIVERY_POLICY_PARAMETER_NAME))
+            .collect(toList());
+      };
+
     });
     newFlowChildren.add(new BaseComponentAstDecorator(redeliveryPolicy) {
 
@@ -222,7 +258,6 @@ public abstract class ApplicationModel {
       public Stream<ComponentAst> directChildrenStream() {
         return newFlowChildren.stream();
       }
-
     };
   }
 
