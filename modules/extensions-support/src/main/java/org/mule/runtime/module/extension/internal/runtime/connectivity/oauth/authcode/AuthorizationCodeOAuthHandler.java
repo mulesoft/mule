@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.NO_OAUTH_REDIRECT_URI;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -21,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.runtime.connectivity.oa
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -51,7 +53,9 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -68,9 +72,13 @@ import org.reactivestreams.Publisher;
 public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCodeOAuthDancer> {
 
   private static final String DANCE_CALLBACK_EVENT_KEY = "event";
+  public static final String REDIRECT_URI_PARAMETER = "redirect_uri";
 
   @Inject
   private Registry registry;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   // TODO: MULE-10837 this should be a plain old @Inject
   private LazyValue<HttpService> httpService;
@@ -197,6 +205,11 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
         .customParameters(config.getCustomParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
+    if (!featureFlaggingService.isEnabled(NO_OAUTH_REDIRECT_URI)) {
+      Map<String, String> additionalRefreshTokenParameters = new HashMap<>();
+      additionalRefreshTokenParameters.put(REDIRECT_URI_PARAMETER, getExternalCallback(httpServer, callbackConfig));
+      dancerBuilder.addAdditionalRefreshTokenParameters(additionalRefreshTokenParameters);
+    }
     Pair<Optional<Flow>, Optional<Flow>> listenerFlows = getListenerFlows(config);
     listenerFlows.getFirst().ifPresent(flow -> dancerBuilder.beforeDanceCallback(beforeCallback(config, flow)));
     listenerFlows.getSecond().ifPresent(flow -> dancerBuilder.afterDanceCallback(afterCallback(config, flow)));

@@ -14,6 +14,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.NO_OAUTH_REDIRECT_URI;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -292,6 +293,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureToStringTransformerTransformIteratorElements();
       configureEnablePolicyIsolation();
       configureEntityResolverFailOnFirstErrorFeature();
+      configureNoOauthRedirectUriFeature();
     }
   }
 
@@ -1231,6 +1233,18 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEntityResolverFailOnFirstErrorFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR, featureContext -> featureContext
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+  }
+
+  /**
+   * Configures {@link FeatureFlaggingService} to apply EE-7789 for applications with <code>minMuleVersion</code> lesser than or
+   * equal to 4.4.0, or if system property {@link MuleRuntimeFeature#NO_OAUTH_REDIRECT_URI} is set.
+   *
+   * @since 4.4.0
+   */
+  private static void configureNoOauthRedirectUriFeature() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(NO_OAUTH_REDIRECT_URI, featureContext -> featureContext
         .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }
