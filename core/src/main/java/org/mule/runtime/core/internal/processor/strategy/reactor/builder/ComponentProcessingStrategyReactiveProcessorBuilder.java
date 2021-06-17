@@ -99,14 +99,14 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   }
 
   private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyPublisherBuilder(ReactorPublisherBuilder<T> builder) {
-    ReactorPublisherBuilder<T> beforeProcssor = dispatcherScheduler
+    ReactorPublisherBuilder<T> beforeProcessor = dispatcherScheduler
         .map(sch -> builder.publishOn(sch))
         .orElse(builder)
         .transform(processor);
 
     return callbackScheduler
-        .map(sch -> beforeProcssor.publishOn(sch))
-        .orElse(beforeProcssor)
+        .map(sch -> beforeProcessor.publishOn(sch))
+        .orElse(beforeProcessor)
         .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, contextScheduler));
   }
 
