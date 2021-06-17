@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal;
 
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.stream;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
@@ -20,7 +19,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
@@ -63,6 +61,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -93,6 +92,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
   private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
+  private Optional<AstXmlParser> astXmlParser = empty();
 
   private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                         ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
@@ -110,33 +110,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       throws ConfigurationException {
     this(configResources, artifactProperties, artifactType, enableLazyInit, disableXmlValidations,
          getRuntimeLockFactory());
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String configResources, Map<String, String> artifactProperties, ArtifactType artifactType)
-      throws ConfigurationException {
-    this(new String[] {configResources}, artifactProperties, artifactType, false, false);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String configResource) throws ConfigurationException {
-    this(configResource, emptyMap(), APP);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String[] configFiles, Map<String, String> artifactProperties)
-      throws ConfigurationException {
-    this(configFiles, artifactProperties, APP, false, false);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String[] configFiles, boolean enableLazyInit, boolean disableXmlValidations)
-      throws ConfigurationException {
-    this(configFiles, emptyMap(), APP, enableLazyInit, disableXmlValidations, getRuntimeLockFactory());
   }
 
   public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
@@ -236,7 +209,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           artifactAst = emptyArtifact();
         } else {
           final AstXmlParser parser =
-              createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
+              astXmlParser.orElseGet(() -> createMuleXmlParser(extensions, resolveParentArtifact(), artifactProperties,
+                                                               disableXmlValidations));
 
           artifactAst = parser.parse(stream(artifactConfigResources)
               .map((CheckedFunction<ConfigResource, Pair<String, InputStream>>) (configFile -> new Pair<>(configFile
@@ -255,8 +229,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
   }
 
-  private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
-                                           Map<String, String> artifactProperties, boolean disableXmlValidations) {
+  public static AstXmlParser createMuleXmlParser(Collection<ExtensionModel> extensions, ArtifactAst parent,
+                                                 Map<String, String> artifactProperties, boolean disableXmlValidations) {
     ConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
 
@@ -266,7 +240,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // declared in the policy, with a feature flag for getting the ones from the app as well (ref:
         // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
         .withExtensionModels(extensions)
-        .withParentArtifact(resolveParentArtifact());
+        .withParentArtifact(parent);
     if (disableXmlValidations) {
       builder = builder.withSchemaValidationsDisabled();
     }
@@ -420,5 +394,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   public void setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
     this.componentBuildingDefinitionRegistryFactory = ofNullable(componentBuildingDefinitionRegistryFactory);
+  }
+
+  public void setAstXmlParser(AstXmlParser parser) {
+    this.astXmlParser = of(parser);
   }
 }

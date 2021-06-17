@@ -28,34 +28,6 @@ public final class SpringXmlConfigurationBuilderFactory {
     // Nothing to do
   }
 
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public static ConfigurationBuilder createConfigurationBuilder(String configResource) throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(configResource);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public static ConfigurationBuilder createConfigurationBuilder(String configResource, boolean lazyInit)
-      throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit, true);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public static ConfigurationBuilder createConfigurationBuilder(String configResource, boolean lazyInit,
-                                                                boolean disableXmlValidations)
-      throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit, disableXmlValidations);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, boolean lazyInit)
-      throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(configResources, lazyInit, true);
-  }
-
   // TODO: MULE-19422 Remove testing infrastructure usages
   @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(ArtifactDeclaration artifactDeclaration)
@@ -64,8 +36,6 @@ public final class SpringXmlConfigurationBuilderFactory {
                                              getRuntimeLockFactory());
   }
 
-  // TODO: MULE-19422 Remove testing infrastructure usages
-  @Deprecated
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, ArtifactContext domainArtifactContext)
       throws ConfigurationException {
     final SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
@@ -75,13 +45,6 @@ public final class SpringXmlConfigurationBuilderFactory {
                                                      domainArtifactContext.getArtifactAst());
     }
     return springXmlConfigurationBuilder;
-  }
-
-  @Deprecated
-  public static ConfigurationBuilder createConfigurationBuilder(String configResource, Map<String, String> artifactProperties,
-                                                                ArtifactType artifactType)
-      throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(configResource, artifactProperties, artifactType);
   }
 
   // Prod code usage

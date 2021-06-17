@@ -99,8 +99,16 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
   }
 
   /**
+   * XML SDK tests add their own test extensions done with the XML SDK.
+   */
+  @Override
+  protected boolean mustRegenerateAstXmlParser() {
+    return true;
+  }
+
+  /**
    * Parameter to re-type operations' output if exists. It should map to
-   * 
+   *
    * @return the string of the parameter that represents the declaration file.
    */
   protected Optional<String> operationsOutputPath() {
@@ -109,7 +117,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
 
   /**
    * Parameter to add resources to the {@link ExtensionModel} generation.
-   * 
+   *
    * @return the collection of resources that must be exported
    */
   protected Optional<List<String>> resourcesPaths() {
