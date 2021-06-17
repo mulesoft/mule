@@ -30,9 +30,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -45,6 +50,7 @@ import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -147,6 +153,51 @@ public class BeanDefinitionFactory {
     if (isComponentIgnored(componentModel.getIdentifier())) {
       return;
     }
+
+    componentModel.getParameters()
+        .stream()
+        .filter(param -> param.getValue() != null)
+        .forEach(param -> {
+          param.getModel().getType().accept(new MetadataTypeVisitor() {
+
+            @Override
+            protected void defaultVisit(MetadataType metadataType) {
+
+            }
+
+            @Override
+            public void visitArrayType(ArrayType arrayType) {
+              final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
+              updatedHierarchy.add(componentModel);
+
+              List<ComponentAst> values = (List<ComponentAst>) param.getValue().getRight();
+              for (ComponentAst child : values) {
+                resolveComponent(springComponentModels, updatedHierarchy, child, registry, componentLocator);
+              }
+            }
+
+            @Override
+            public void visitObject(ObjectType objectType) {
+              final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
+              updatedHierarchy.add(componentModel);
+
+              if (isMap(objectType)) {
+                List<ComponentAst> values = (List<ComponentAst>) param.getValue().getRight();
+                for (ComponentAst child : values) {
+                  resolveComponent(springComponentModels, updatedHierarchy, child, registry, componentLocator);
+                }
+
+                return;
+              }
+
+              if (param.getValue().getRight() instanceof ComponentAst) {
+                resolveComponent(springComponentModels, updatedHierarchy, (ComponentAst) param.getValue().getRight(), registry,
+                                 componentLocator);
+              }
+            }
+
+          });
+        });
 
     resolveComponentBeanDefinition(springComponentModels, componentModelHierarchy, componentModel)
         .ifPresent(springComponentModel -> {
