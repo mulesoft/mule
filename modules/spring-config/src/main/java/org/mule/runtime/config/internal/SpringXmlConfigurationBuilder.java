@@ -74,10 +74,10 @@ import java.util.Spliterator;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import javax.inject.Inject;
 
 /**
  * <code>SpringXmlConfigurationBuilder</code> enables Mule to be configured from a Spring XML Configuration file used with Mule
