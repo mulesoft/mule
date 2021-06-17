@@ -33,6 +33,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -233,6 +234,8 @@ public class MuleContextUtils {
     ConfigurationProperties configProps = mock(ConfigurationProperties.class, withSettings().lenient());
     when(configProps.resolveBooleanProperty(any())).thenReturn(empty());
 
+    FeatureFlaggingService featureFlaggingService = mock(FeatureFlaggingService.class);
+
     ConfigurationComponentLocator configurationComponentLocator =
         mock(ConfigurationComponentLocator.class, withSettings().lenient());
     when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
@@ -254,6 +257,7 @@ public class MuleContextUtils {
       injectableObjects.put(NotificationListenerRegistry.class, notificationListenerRegistry);
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);
+      injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));

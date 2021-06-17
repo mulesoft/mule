@@ -8,65 +8,80 @@ package org.mule.runtime.config.internal;
 
 import io.qameta.allure.Issue;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.ast.internal.xml.DefaultAstXmlParser;
-import org.mule.runtime.ast.internal.xml.resolver.FailAfterTenErrorsResolveEntityFailStrategy;
-import org.mule.runtime.ast.internal.xml.resolver.FailOnFirstErrorResolveEntityFailStrategy;
-import org.mule.runtime.core.api.Injector;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.mockito.Mockito.mock;
+import javax.inject.Inject;
+import java.util.HashMap;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 public class SpringXmlConfigurationBuilderTestCase {
 
+  @Inject
   private FeatureFlaggingService featureFlaggingService;
+
   private SpringXmlConfigurationBuilder configurationBuilder;
-  private MuleContext muleContext;
+  private MuleContextWithRegistry muleContext;
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Before
   public void setUp() throws Exception {
+    muleContext = mockContextWithServices();
+    muleContext.getInjector().inject(this);
     configurationBuilder =
-        new SpringXmlConfigurationBuilder(new String[] {"dummy.xml"}, null, null, false, false);
-    featureFlaggingService = mock(FeatureFlaggingService.class);
-    configurationBuilder.setFeatureFlaggingService(featureFlaggingService);
-    muleContext = mock(MuleContext.class);
-    Injector injector = mock(Injector.class);
-    when(muleContext.getInjector()).thenReturn(injector);
+        new SpringXmlConfigurationBuilder(new String[] {"invalid-schema.xml"}, new HashMap<>(), ArtifactType.APP, false, false);
   }
 
   @Test
   @Issue("EE-7827")
-  public void configureWithFailOnFirstError() {
+  public void configureWithFailOnFirstError() throws ConfigurationException {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage(containsString("Can't resolve http://www.mulesoft.org/schema/mule/invalid-namespace/current/invalid-schema.xsd, A dependency or plugin might be missing"));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
 
-    try {
-      configurationBuilder.configure(muleContext);
-    } catch (Exception ignored) {
-    }
+    configurationBuilder.configure(muleContext);
 
     verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
-    assertThat(((DefaultAstXmlParser) configurationBuilder.getParser()).getFailStrategy(),
-               instanceOf(FailOnFirstErrorResolveEntityFailStrategy.class));
+
   }
 
   @Test
   @Issue("EE-7827")
-  public void configureWithFailAfterTenErrors() {
+  public void configureWithFailAfterTenErrors() throws ConfigurationException {
+    expectedException.expect(ConfigurationException.class);
+    expectedException
+        .expectMessage(containsString("Invalid content was found starting with element 'invalid-namespace:config'."));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-    try {
-      configurationBuilder.configure(muleContext);
-    } catch (Exception ignored) {
-    }
+    configurationBuilder.configure(muleContext);
 
     verify(featureFlaggingService).isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR);
-    assertThat(((DefaultAstXmlParser) configurationBuilder.getParser()).getFailStrategy(),
-               instanceOf(FailAfterTenErrorsResolveEntityFailStrategy.class));
+
   }
+
+  public static final class TestExtensionSchemagenerator implements ExtensionSchemaGenerator {
+
+    @Override
+    public String generate(ExtensionModel extensionModel, DslResolvingContext context) {
+      return "";
+    }
+  }
+
 }

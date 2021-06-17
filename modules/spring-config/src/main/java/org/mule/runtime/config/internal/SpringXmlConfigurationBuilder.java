@@ -436,10 +436,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this.componentBuildingDefinitionRegistryFactory = ofNullable(componentBuildingDefinitionRegistryFactory);
   }
 
-  protected AstXmlParser getParser() {
-    return parser;
-  }
-
   public void setFeatureFlaggingService(FeatureFlaggingService featureFlaggingService) {
     this.featureFlaggingService = featureFlaggingService;
   }
