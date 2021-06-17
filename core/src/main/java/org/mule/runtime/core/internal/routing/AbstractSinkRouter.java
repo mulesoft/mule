@@ -42,7 +42,7 @@ abstract class AbstractSinkRouter {
         .doOnComplete(() -> {
           this.routes.stream().forEach(ExecutableRoute::complete);
           phantomRoute.complete();
-        });
+        }).doOnError(this.phantomRoute::error);
   }
 
   /**
