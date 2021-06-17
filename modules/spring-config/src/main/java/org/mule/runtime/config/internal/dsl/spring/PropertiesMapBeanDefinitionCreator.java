@@ -22,6 +22,7 @@ import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -32,7 +33,8 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     if (componentModel.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
         || componentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER)) {
@@ -51,6 +53,9 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder
           .addConstructorArgValue(managedMap)
           .getBeanDefinition());
+
+      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+
       return true;
     }
     return false;

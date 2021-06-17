@@ -15,6 +15,7 @@ import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -36,7 +37,8 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     if (createBeanDefinitionRequest.getComponentModelHierarchy().isEmpty()) {
       return false;
     }
@@ -63,6 +65,9 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
       createBeanDefinitionRequest.getSpringComponentModel()
           .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(objectTypeVisitor.getType())
               .addConstructorArgValue(managedList).getBeanDefinition());
+
+      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+
       return true;
     }
     return false;

@@ -23,6 +23,7 @@ import org.mule.runtime.dsl.api.component.TypeDefinition.MapEntryType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -60,7 +61,8 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     ObjectTypeVisitor objectTypeVisitor = createBeanDefinitionRequest.retrieveTypeVisitor();
     Class<?> type = objectTypeVisitor.getType();
@@ -86,6 +88,9 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
         .addConstructorArgValue(value).getBeanDefinition();
 
     createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinition);
+
+    componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+
     return true;
   }
 

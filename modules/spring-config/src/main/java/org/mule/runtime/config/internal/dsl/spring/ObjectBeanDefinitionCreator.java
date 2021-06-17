@@ -20,6 +20,7 @@ import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -38,7 +39,8 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     if (!componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
       return false;
@@ -72,6 +74,9 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
       processMuleProperties(componentModel, beanDefinitionBuilder, null);
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
     }
+
+    componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+
     return true;
   }
 }

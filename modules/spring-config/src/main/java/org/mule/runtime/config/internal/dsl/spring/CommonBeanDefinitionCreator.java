@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
+import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
@@ -84,7 +85,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   public boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                               CreateBeanDefinitionRequest request) {
+                               CreateBeanDefinitionRequest request,
+                               Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ObjectTypeVisitor objectTypeVisitor = request.retrieveTypeVisitor();
     ComponentBuildingDefinition buildingDefinition = request.getComponentBuildingDefinition();
     request.getSpringComponentModel().setType(objectTypeVisitor.getType());
@@ -92,6 +94,9 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         createBeanDefinitionBuilder(objectTypeVisitor, request.getSpringComponentModel(), buildingDefinition);
     processAnnotations(request.getSpringComponentModel(), beanDefinitionBuilder);
     processComponentDefinitionModel(springComponentModels, request, buildingDefinition, beanDefinitionBuilder);
+
+    componentBeanDefinitionHandler.accept(request.getSpringComponentModel());
+
     return true;
   }
 

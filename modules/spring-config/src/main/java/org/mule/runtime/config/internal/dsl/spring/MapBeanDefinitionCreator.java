@@ -15,6 +15,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -41,7 +42,8 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
 
     if (createBeanDefinitionRequest.getComponentModelHierarchy().isEmpty()) {
       return false;
@@ -66,6 +68,9 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator {
       createBeanDefinitionRequest.getSpringComponentModel()
           .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(MapFactoryBean.class)
               .addConstructorArgValue(managedList).addConstructorArgValue(type).getBeanDefinition());
+
+      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+
       return true;
     }
     return false;

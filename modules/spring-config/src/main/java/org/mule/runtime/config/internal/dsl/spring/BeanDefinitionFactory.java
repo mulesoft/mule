@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.lang.String.format;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
@@ -61,6 +60,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -178,10 +178,15 @@ public class BeanDefinitionFactory {
 
                 for (ComponentAst child : values) {
                   resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, componentModel, child, param
-                      .getModel().getName())
-                          .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel, child,
-                                                                                        springComponentModels,
-                                                                                        registry, componentLocator));
+                      .getModel().getName(),
+                                                      nestedComp -> resolveComponent(springComponentModels, updatedHierarchy,
+                                                                                     nestedComp,
+                                                                                     registry, componentLocator),
+                                                      springComponentModel -> handleSpringComponentModel(springComponentModel,
+                                                                                                         componentModel,
+                                                                                                         springComponentModels,
+                                                                                                         registry,
+                                                                                                         componentLocator));
                 }
               }
             }
@@ -213,10 +218,15 @@ public class BeanDefinitionFactory {
                   }
 
                   resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, componentModel, entry, param
-                      .getModel().getName())
-                          .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel, entry,
-                                                                                        springComponentModels,
-                                                                                        registry, componentLocator));
+                      .getModel().getName(),
+                                                      nestedComp -> resolveComponent(springComponentModels, updatedHierarchy,
+                                                                                     nestedComp,
+                                                                                     registry, componentLocator),
+                                                      springComponentModel -> handleSpringComponentModel(springComponentModel,
+                                                                                                         componentModel,
+                                                                                                         springComponentModels,
+                                                                                                         registry,
+                                                                                                         componentLocator));
                 }
 
                 return;
@@ -225,21 +235,32 @@ public class BeanDefinitionFactory {
               if (param.getValue().getRight() instanceof ComponentAst) {
                 final ComponentAst child = (ComponentAst) param.getValue().getRight();
                 resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, componentModel,
-                                                    child, param.getModel().getName())
-                                                        .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel,
-                                                                                                                      child,
-                                                                                                                      springComponentModels,
-                                                                                                                      registry,
-                                                                                                                      componentLocator));
+                                                    child, param.getModel().getName(),
+                                                    nestedComp -> resolveComponent(springComponentModels, updatedHierarchy,
+                                                                                   nestedComp,
+                                                                                   registry, componentLocator),
+                                                    springComponentModel -> handleSpringComponentModel(springComponentModel,
+                                                                                                       componentModel,
+                                                                                                       springComponentModels,
+                                                                                                       registry,
+                                                                                                       componentLocator));
               }
             }
 
           });
         });
 
-    resolveComponentBeanDefinition(springComponentModels, componentModelHierarchy, componentModel)
-        .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel, componentModel, springComponentModels,
-                                                                      registry, componentLocator));
+    final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentModelHierarchy);
+    nestedHierarchy.add(componentModel);
+
+    resolveComponentBeanDefinition(springComponentModels, componentModelHierarchy, componentModel,
+                                   nestedComp -> resolveComponent(springComponentModels, nestedHierarchy, nestedComp,
+                                                                  registry, componentLocator),
+                                   springComponentModel -> handleSpringComponentModel(springComponentModel,
+                                                                                      componentModel,
+                                                                                      springComponentModels,
+                                                                                      registry,
+                                                                                      componentLocator));
   }
 
   protected void handleSpringComponentModel(SpringComponentModel springComponentModel, ComponentAst componentModel,
@@ -288,10 +309,8 @@ public class BeanDefinitionFactory {
 
     addAnnotation(LOCATION_KEY, componentModel.getLocation(), springComponentModel);
     addAnnotation(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId,
-                                                                                componentModel
-                                                                                    .getLocation(),
-                                                                                componentModel
-                                                                                    .getMetadata()),
+                                                                                componentModel.getLocation(),
+                                                                                componentModel.getMetadata()),
                   springComponentModel);
   }
 
@@ -367,43 +386,51 @@ public class BeanDefinitionFactory {
   }
 
 
-  private Optional<SpringComponentModel> resolveComponentBeanDefinition(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                                        List<ComponentAst> componentModelHierarchy,
-                                                                        ComponentAst componentModel) {
+  private void resolveComponentBeanDefinition(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                              List<ComponentAst> componentModelHierarchy,
+                                              ComponentAst componentModel,
+                                              Consumer<ComponentAst> nestedComponentParamProcessor,
+                                              Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
         componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
       final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, componentModel,
                                                                                   buildingDefinitionOptional.orElse(null));
       request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
-      this.componentModelProcessor.processRequest(springComponentModels, request);
-      return of(request.getSpringComponentModel());
+      this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
+                                                  componentBeanDefinitionHandler);
     } else {
-      return processComponentWrapper(springComponentModels, componentModel);
+      processComponentWrapper(springComponentModels, componentModel, nestedComponentParamProcessor,
+                              componentBeanDefinitionHandler);
     }
   }
 
-  private Optional<SpringComponentModel> resolveComponentBeanDefinitionParam(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                                             List<ComponentAst> componentModelHierarchy,
-                                                                             ComponentAst ownerComponentModel,
-                                                                             ComponentAst componentModel,
-                                                                             String parameterName) {
+  private void resolveComponentBeanDefinitionParam(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                                   List<ComponentAst> componentModelHierarchy,
+                                                   ComponentAst ownerComponentModel,
+                                                   ComponentAst componentModel,
+                                                   String parameterName,
+                                                   Consumer<ComponentAst> nestedComponentParamProcessor,
+                                                   Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
         componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
       final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, componentModel,
                                                                                   buildingDefinitionOptional.orElse(null));
       request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
-      this.componentModelProcessor.processRequest(springComponentModels, request);
-      return of(request.getSpringComponentModel());
+      this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
+                                                  componentBeanDefinitionHandler);
     } else {
-      return processComponentWrapper(springComponentModels, componentModel);
+      processComponentWrapper(springComponentModels, componentModel, nestedComponentParamProcessor,
+                              componentBeanDefinitionHandler);
     }
   }
 
-  private Optional<SpringComponentModel> processComponentWrapper(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                                 ComponentAst componentModel) {
-    return componentBuildingDefinitionRegistry.getWrappedComponent(componentModel.getIdentifier())
+  private void processComponentWrapper(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                       ComponentAst componentModel,
+                                       Consumer<ComponentAst> nestedComponentParamProcessor,
+                                       Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+    componentBuildingDefinitionRegistry.getWrappedComponent(componentModel.getIdentifier())
         .map(wrapperElementType -> {
           if (wrapperElementType.equals(SINGLE)) {
             if (componentModel.directChildrenStream().count() == 0) {
@@ -412,8 +439,10 @@ public class BeanDefinitionFactory {
               throw new IllegalStateException(format("Element [%s] located at [%s] does not have any child element declared, but one is required.",
                                                      componentModel.getIdentifier(), location));
             }
-            final SpringComponentModel firstSpringComponentModel =
-                springComponentModels.get(componentModel.directChildrenStream().findFirst().get());
+
+            final ComponentAst nested = componentModel.directChildrenStream().findFirst().get();
+            nestedComponentParamProcessor.accept(nested);
+            final SpringComponentModel firstSpringComponentModel = springComponentModels.get(nested);
 
             final SpringComponentModel springComponentModel = new SpringComponentModel();
             springComponentModel.setComponent(componentModel);
@@ -426,7 +455,8 @@ public class BeanDefinitionFactory {
             throw new IllegalStateException(format("Element %s does not have a building definition and it should since it's of type %s",
                                                    componentModel.getIdentifier(), wrapperElementType));
           }
-        });
+        })
+        .ifPresent(componentBeanDefinitionHandler);
   }
 
   private BeanDefinitionCreator buildComponentModelProcessorChainOfResponsability() {

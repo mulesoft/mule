@@ -26,6 +26,7 @@ import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -48,7 +49,8 @@ class EagerObjectCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     Class<ConfigurableObjectProvider> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (type == null) {
@@ -94,6 +96,9 @@ class EagerObjectCreator extends BeanDefinitionCreator {
       createBeanDefinitionRequest.getSpringComponentModel().setObjectInstance(instance);
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(rootBeanDefinition(ConstantFactoryBean.class)
           .addConstructorArgValue(instance).getBeanDefinition());
+
+      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+
       return true;
     }).orElse(false);
   }

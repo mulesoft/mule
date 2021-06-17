@@ -15,6 +15,7 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 
@@ -41,12 +42,14 @@ abstract class BeanDefinitionCreator {
    * @param request
    */
   public final void processRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                   CreateBeanDefinitionRequest request) {
-    if (handleRequest(springComponentModels, request)) {
+                                   CreateBeanDefinitionRequest request,
+                                   Consumer<ComponentAst> nestedComponentParamProcessor,
+                                   Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+    if (handleRequest(springComponentModels, request, componentBeanDefinitionHandler)) {
       return;
     }
     if (next != null) {
-      next.processRequest(springComponentModels, request);
+      next.processRequest(springComponentModels, request, nestedComponentParamProcessor, componentBeanDefinitionHandler);
     }
   }
 
@@ -58,7 +61,8 @@ abstract class BeanDefinitionCreator {
    * @return true if it created the {@code BeanDefinition}, false otherwise.
    */
   abstract boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                 CreateBeanDefinitionRequest createBeanDefinitionRequest);
+                                 CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                 Consumer<SpringComponentModel> componentBeanDefinitionHandler);
 
   protected BeanDefinition getConvertibleBeanDefinition(Class<?> type, Object value, Optional<TypeConverter> converter) {
     return converter.map(
