@@ -25,6 +25,8 @@ import static org.mule.tck.processor.ContextPropagationChecker.assertContextProp
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import io.qameta.allure.Issue;
+import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -125,13 +127,15 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   @Test
+  @Issue("MULE-19512")
   public void failingExpression() throws Exception {
     MessageProcessorChain mp = newChain(empty(), new TestMessageProcessor("bar"));
     choiceRouter.addRoute("wat", mp);
     initialise();
 
-    thrown.expectCause(instanceOf(ExpressionRuntimeException.class));
-    thrown.expectCause(hasMessage(containsString("evaluating expression: \"wat\"")));
+    thrown.expect(instanceOf(ExpressionRuntimeException.class));
+    thrown.expect(hasMessage(containsString("evaluating expression: \"wat\"")));
+    thrown.expectCause(instanceOf(ExpressionExecutionException.class));
     process(choiceRouter, zapEvent());
   }
 
