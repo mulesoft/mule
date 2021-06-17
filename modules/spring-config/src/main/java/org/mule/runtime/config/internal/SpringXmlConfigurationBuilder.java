@@ -16,6 +16,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
@@ -23,9 +24,11 @@ import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifac
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -71,6 +74,8 @@ import java.util.Spliterator;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -93,6 +98,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
   private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                         ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
@@ -155,6 +163,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       ((DefaultMuleContext) muleContext).setLifecycleStrategy(new NullDomainMuleContextLifecycleStrategy());
       return;
     }
+
+    initialiseIfNeeded(this, muleContext);
 
     muleArtifactContext = createApplicationContext(muleContext);
     createSpringRegistry(muleContext, muleArtifactContext);
@@ -235,8 +245,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         if (artifactConfigResources.length == 0) {
           artifactAst = emptyArtifact();
         } else {
-          final AstXmlParser parser =
-              createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
+          final AstXmlParser parser = createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
 
           artifactAst = parser.parse(stream(artifactConfigResources)
               .map((CheckedFunction<ConfigResource, Pair<String, InputStream>>) (configFile -> new Pair<>(configFile
@@ -267,8 +276,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
         .withExtensionModels(extensions)
         .withParentArtifact(resolveParentArtifact());
+    if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)) {
+      builder.withLegacyFailStrategy();
+    }
     if (disableXmlValidations) {
-      builder = builder.withSchemaValidationsDisabled();
+      builder.withSchemaValidationsDisabled();
     }
     return builder.build();
   }
