@@ -171,8 +171,11 @@ public class BeanDefinitionFactory {
               updatedHierarchy.add(componentModel);
 
               List<ComponentAst> values = (List<ComponentAst>) param.getValue().getRight();
-              for (ComponentAst child : values) {
-                resolveComponent(springComponentModels, updatedHierarchy, child, registry, componentLocator);
+              if (values != null) {
+
+                for (ComponentAst child : values) {
+                  resolveComponent(springComponentModels, updatedHierarchy, child, registry, componentLocator);
+                }
               }
             }
 
