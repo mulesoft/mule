@@ -145,11 +145,13 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
       return false;
     }
 
-    Location completeLocation = builderFromStringRepresentation(elements.get(0).getProcessorPath().split(" ")[0]).build();
-    List<String> parts = completeLocation.getParts();
-    boolean isSubflowWithinASource = completeLocation.getGlobalName().equals(getRootContainerLocation().toString())
-        && parts.size() >= 1 && parts.get(0).equals(SOURCE_POLICY_PART_IDENTIFIER);
-    return isSubflowWithinASource;
+    return isSubflowWithinASoucePolicy(builderFromStringRepresentation(elements.get(0).getProcessorPath().split(" ")[0]).build());
+  }
+
+  private boolean isSubflowWithinASoucePolicy(Location loc) {
+    List<String> parts = loc.getParts();
+    return loc.getGlobalName().equals(getRootContainerLocation().toString()) && parts.size() >= 1
+        && parts.get(0).equals(SOURCE_POLICY_PART_IDENTIFIER);
   }
 
   @Override
