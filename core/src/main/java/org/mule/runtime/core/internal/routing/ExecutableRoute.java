@@ -51,6 +51,15 @@ class ExecutableRoute {
   }
 
   /**
+   * Signals the given throwable on the route's sink.
+   *
+   * @param throwable The {@link Throwable} to signal.
+   */
+  void error(Throwable throwable) {
+    sinkRecorder.error(throwable);
+  }
+
+  /**
    * Triggers the underlying {@link Flux} completion signal.
    */
   public void complete() {
