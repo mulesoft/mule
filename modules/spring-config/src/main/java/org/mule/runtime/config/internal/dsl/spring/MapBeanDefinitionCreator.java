@@ -43,13 +43,13 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator {
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
 
     if (createBeanDefinitionRequest.getComponentModelHierarchy().isEmpty()) {
       return false;
     }
 
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
     Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
     if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null) {
@@ -57,8 +57,10 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator {
       final ComponentAst paramOwnerComponentModel = createBeanDefinitionRequest.getComponentModelHierarchy()
           .get(createBeanDefinitionRequest.getComponentModelHierarchy().size() - 1);
       final ComponentParameterAst param =
-          paramOwnerComponentModel.getParameter(componentModel.getGenerationInformation().getSyntax().get().getAttributeName());
+          paramOwnerComponentModel.getParameter(createBeanDefinitionRequest.getParamName());
       Collection<ComponentAst> items = (Collection<ComponentAst>) param.getValue().getRight();
+
+      items.forEach(nestedComponentParamProcessor);
 
       ManagedList managedList = items.stream()
           .map(springComponentModels::get)

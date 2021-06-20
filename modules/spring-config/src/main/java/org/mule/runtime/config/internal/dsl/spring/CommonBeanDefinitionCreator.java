@@ -86,6 +86,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   @Override
   public boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                CreateBeanDefinitionRequest request,
+                               Consumer<ComponentAst> nestedComponentParamProcessor,
                                Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ObjectTypeVisitor objectTypeVisitor = request.retrieveTypeVisitor();
     ComponentBuildingDefinition buildingDefinition = request.getComponentBuildingDefinition();

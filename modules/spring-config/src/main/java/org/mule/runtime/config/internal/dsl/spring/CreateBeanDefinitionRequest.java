@@ -26,6 +26,7 @@ public class CreateBeanDefinitionRequest {
 
   private final List<ComponentAst> componentModelHierarchy;
   private final ComponentAst componentModel;
+  private final String paramName;
   private final ComponentBuildingDefinition componentBuildingDefinition;
   private final SpringComponentModel springComponentModel;
   private final Supplier<ObjectTypeVisitor> typeVisitorRetriever;
@@ -38,8 +39,21 @@ public class CreateBeanDefinitionRequest {
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
                                      ComponentAst componentModel,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
+    this(componentModelHierarchy, componentModel, null, componentBuildingDefinition);
+  }
+
+  /**
+   * @param parentComponentModel        the container element of the holder for the configuration attributes defined by the user
+   * @param componentModel              the holder for the configuration attributes defined by the user
+   * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
+   */
+  public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
+                                     ComponentAst componentModel,
+                                     String paramName,
+                                     ComponentBuildingDefinition componentBuildingDefinition) {
     this.componentModelHierarchy = componentModelHierarchy;
     this.componentModel = componentModel;
+    this.paramName = paramName;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
     springComponentModel.setComponent(componentModel);
@@ -63,6 +77,10 @@ public class CreateBeanDefinitionRequest {
 
   public ComponentAst getComponentModel() {
     return componentModel;
+  }
+
+  public String getParamName() {
+    return paramName;
   }
 
   public ComponentBuildingDefinition getComponentBuildingDefinition() {

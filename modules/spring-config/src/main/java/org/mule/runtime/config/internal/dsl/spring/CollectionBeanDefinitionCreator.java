@@ -38,13 +38,12 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     if (createBeanDefinitionRequest.getComponentModelHierarchy().isEmpty()) {
       return false;
     }
 
-
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     ObjectTypeVisitor objectTypeVisitor = createBeanDefinitionRequest.retrieveTypeVisitor();
     if (Collection.class.isAssignableFrom(objectTypeVisitor.getType())) {
       createBeanDefinitionRequest.getSpringComponentModel().setType(objectTypeVisitor.getType());
@@ -52,8 +51,10 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
       final ComponentAst paramOwnerComponentModel = createBeanDefinitionRequest.getComponentModelHierarchy()
           .get(createBeanDefinitionRequest.getComponentModelHierarchy().size() - 1);
       final ComponentParameterAst param =
-          paramOwnerComponentModel.getParameter(componentModel.getGenerationInformation().getSyntax().get().getAttributeName());
+          paramOwnerComponentModel.getParameter(createBeanDefinitionRequest.getParamName());
       Collection<ComponentAst> items = (Collection<ComponentAst>) param.getValue().getRight();
+
+      items.forEach(nestedComponentParamProcessor);
 
       ManagedList<Object> managedList = items.stream()
           .map(springComponentModels::get)

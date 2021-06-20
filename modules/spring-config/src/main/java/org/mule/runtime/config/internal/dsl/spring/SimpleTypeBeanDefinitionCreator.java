@@ -39,6 +39,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
 

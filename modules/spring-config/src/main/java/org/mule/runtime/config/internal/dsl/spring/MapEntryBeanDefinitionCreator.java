@@ -62,6 +62,7 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     ObjectTypeVisitor objectTypeVisitor = createBeanDefinitionRequest.retrieveTypeVisitor();
@@ -81,7 +82,8 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
     if (valueRefParam != null) {
       value = new RuntimeBeanReference(valueRefParam.getResolvedRawValue());
     } else {
-      value = getValue(springComponentModels, objectTypeVisitor, componentModel, componentBuildingDefinition);
+      value = getValue(springComponentModels, objectTypeVisitor, componentModel, componentBuildingDefinition,
+                       nestedComponentParamProcessor);
     }
 
     AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
@@ -96,7 +98,8 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private Object getValue(Map<ComponentAst, SpringComponentModel> springComponentModels,
                           ObjectTypeVisitor objectTypeVisitor, ComponentAst componentModel,
-                          ComponentBuildingDefinition componentBuildingDefinition) {
+                          ComponentBuildingDefinition componentBuildingDefinition,
+                          Consumer<ComponentAst> nestedComponentParamProcessor) {
     Class valueType = objectTypeVisitor.getMapEntryType().get().getValueType();
 
     return componentModel.getParameter(SIMPLE_TYPE_VALUE_PARAMETER_NAME).getValue()
@@ -106,6 +109,7 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
             return getConvertibleBeanDefinition(valueType, v, componentBuildingDefinition.getTypeConverter());
           } else if (List.class.isAssignableFrom(objectTypeVisitor.getMapEntryType().get().getValueType())) {
             final Collection<ComponentAst> values = (Collection<ComponentAst>) v;
+            values.forEach(nestedComponentParamProcessor);
             ManagedList<Object> managedList = values.stream()
                 .map(springComponentModels::get)
                 .map(childSpringComponent -> childSpringComponent.getBeanDefinition() != null
@@ -117,6 +121,7 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
                 .addConstructorArgValue(managedList)
                 .getBeanDefinition();
           } else {
+            nestedComponentParamProcessor.accept((ComponentAst) v);
             final SpringComponentModel childSpringComponent = springComponentModels.get(v);
             BeanDefinition beanDefinition = childSpringComponent.getBeanDefinition();
             return beanDefinition != null ? beanDefinition : childSpringComponent.getBeanReference();

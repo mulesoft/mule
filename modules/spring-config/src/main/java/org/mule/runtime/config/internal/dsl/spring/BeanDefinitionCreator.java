@@ -45,7 +45,7 @@ abstract class BeanDefinitionCreator {
                                    CreateBeanDefinitionRequest request,
                                    Consumer<ComponentAst> nestedComponentParamProcessor,
                                    Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    if (handleRequest(springComponentModels, request, componentBeanDefinitionHandler)) {
+    if (handleRequest(springComponentModels, request, nestedComponentParamProcessor, componentBeanDefinitionHandler)) {
       return;
     }
     if (next != null) {
@@ -62,6 +62,7 @@ abstract class BeanDefinitionCreator {
    */
   abstract boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                  CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                 Consumer<ComponentAst> nestedComponentParamProcessor,
                                  Consumer<SpringComponentModel> componentBeanDefinitionHandler);
 
   protected BeanDefinition getConvertibleBeanDefinition(Class<?> type, Object value, Optional<TypeConverter> converter) {
