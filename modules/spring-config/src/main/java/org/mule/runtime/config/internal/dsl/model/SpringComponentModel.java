@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.ast.api.ComponentAst;
 
@@ -19,11 +20,20 @@ import org.springframework.beans.factory.config.BeanReference;
  */
 public class SpringComponentModel {
 
+  private ComponentIdentifier componentIdentifier;
   private ComponentAst component;
   private ConfigurableObjectProvider objectInstance;
   private Class<?> type;
   private BeanReference beanReference;
   private BeanDefinition beanDefinition;
+
+  public void setComponentIdentifier(ComponentIdentifier componentIdentifier) {
+    this.componentIdentifier = componentIdentifier;
+  }
+
+  public ComponentIdentifier getComponentIdentifier() {
+    return componentIdentifier;
+  }
 
   public void setComponent(ComponentAst component) {
     this.component = component;

@@ -43,7 +43,7 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
-    if (!componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
+    if (componentModel == null || !componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
       return false;
     }
     String refParameterValue = componentModel.getParameter(REF_PARAMETER).getResolvedRawValue();

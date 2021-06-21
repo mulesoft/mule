@@ -37,8 +37,9 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
-    if (componentModel.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
-        || componentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER)) {
+    if (componentModel != null
+        && (componentModel.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
+            || componentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))) {
       ManagedMap<Object, Object> managedMap;
       if (componentModel.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)) {
         managedMap = createManagedMapFromEntries(componentModel);

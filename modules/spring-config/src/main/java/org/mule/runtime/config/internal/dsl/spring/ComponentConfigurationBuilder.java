@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
@@ -97,18 +98,20 @@ class ComponentConfigurationBuilder<T> {
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
-    return componentModel.directChildrenStream()
-        .map(springComponentModels::get)
-        .filter(Objects::nonNull)
-        .map(springModel -> {
-          Class<?> beanDefinitionType = resolveBeanDefinitionType(springModel);
-          Object bean = springModel.getBeanDefinition() != null
-              ? springModel.getBeanDefinition()
-              : springModel.getBeanReference();
-          return new ComponentValue(springModel.getComponent(), beanDefinitionType, bean);
-        })
-        .filter(Objects::nonNull)
-        .collect(toList());
+    return concat(createBeanDefinitionRequest.getParamsModels().stream(),
+                  // TODO MULE 17711 remove this second concat term
+                  componentModel.directChildrenStream()
+                      .map(springComponentModels::get)
+                      .filter(Objects::nonNull))
+                          .map(springModel -> {
+                            Class<?> beanDefinitionType = resolveBeanDefinitionType(springModel);
+                            Object bean = springModel.getBeanDefinition() != null
+                                ? springModel.getBeanDefinition()
+                                : springModel.getBeanReference();
+                            return new ComponentValue(springModel.getComponentIdentifier(), beanDefinitionType, bean);
+                          })
+                          .filter(Objects::nonNull)
+                          .collect(toList());
   }
 
   private Class<?> resolveBeanDefinitionType(SpringComponentModel springModel) {
@@ -473,7 +476,7 @@ class ComponentConfigurationBuilder<T> {
       return componentValue -> {
         AtomicReference<Boolean> matchesIdentifier = new AtomicReference<>(true);
         identifierOptional.ifPresent(wrapperIdentifier -> matchesIdentifier
-            .set(wrapperIdentifier.equals(componentValue.getComponentModel().getIdentifier().getName())));
+            .set(wrapperIdentifier.equals(componentValue.getComponentIdentifier().getName())));
         return matchesIdentifier.get() && (areMatchingTypes(type, componentValue.getType())
             || ((areMatchingTypes(Map.class, componentValue.getType()) && areMatchingTypes(MapFactoryBean.class, type))));
       };

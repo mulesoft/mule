@@ -26,6 +26,7 @@ public class CreateBeanDefinitionRequest {
 
   private final List<ComponentAst> componentModelHierarchy;
   private final ComponentAst componentModel;
+  private final List<SpringComponentModel> paramsModels;
   private final String paramName;
   private final ComponentBuildingDefinition componentBuildingDefinition;
   private final SpringComponentModel springComponentModel;
@@ -37,9 +38,9 @@ public class CreateBeanDefinitionRequest {
    * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
    */
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
-                                     ComponentAst componentModel,
+                                     ComponentAst componentModel, List<SpringComponentModel> paramsModels,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
-    this(componentModelHierarchy, componentModel, null, componentBuildingDefinition);
+    this(componentModelHierarchy, componentModel, paramsModels, null, componentBuildingDefinition);
   }
 
   /**
@@ -49,13 +50,16 @@ public class CreateBeanDefinitionRequest {
    */
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
                                      ComponentAst componentModel,
+                                     List<SpringComponentModel> paramsModels,
                                      String paramName,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
     this.componentModelHierarchy = componentModelHierarchy;
     this.componentModel = componentModel;
+    this.paramsModels = paramsModels;
     this.paramName = paramName;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
+    springComponentModel.setComponentIdentifier(componentBuildingDefinition.getComponentIdentifier());
     springComponentModel.setComponent(componentModel);
 
     this.typeVisitorRetriever = new LazyValue<>(() -> {
@@ -77,6 +81,10 @@ public class CreateBeanDefinitionRequest {
 
   public ComponentAst getComponentModel() {
     return componentModel;
+  }
+
+  public List<SpringComponentModel> getParamsModels() {
+    return paramsModels;
   }
 
   public String getParamName() {
