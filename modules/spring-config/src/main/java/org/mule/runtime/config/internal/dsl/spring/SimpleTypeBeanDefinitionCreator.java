@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -27,7 +29,12 @@ import java.util.function.Consumer;
  */
 class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
-  public SimpleTypeBeanDefinitionCreator() {}
+  private final ParameterUtils parameterUtils;
+
+  public SimpleTypeBeanDefinitionCreator(ParameterUtils parameterUtils) {
+    super();
+    this.parameterUtils = parameterUtils;
+  }
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
@@ -42,14 +49,10 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
     createBeanDefinitionRequest.getSpringComponentModel().setType(type);
 
-    final ComponentAst paramOwner = createBeanDefinitionRequest.getParamOwnerComponentModel();
-    final ComponentParameterAst param = paramOwner != null
-        ? paramOwner.getParameter(createBeanDefinitionRequest.getParamName())
-        : null;
+    ComponentParameterAst paramInOwnerComponent = parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest);
 
-    if (param != null) {
-      this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, param.getResolvedRawValue());
-      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+    if (paramInOwnerComponent != null) {
+      this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, paramInOwnerComponent.getResolvedRawValue());
       return true;
     }
 
@@ -57,10 +60,9 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
     final ComponentParameterAst valueParam = componentModel.getParameter("value");
 
     if (valueParam == null || valueParam.getResolvedRawValue() == null) {
-      return false;
-      // throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
-      // componentModel.getMetadata().getFileName().orElse("unknown"),
-      // componentModel.getMetadata().getStartLine().orElse(-1)));
+      throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
+                                                         componentModel.getMetadata().getFileName().orElse("unknown"),
+                                                         componentModel.getMetadata().getStartLine().orElse(-1)));
     }
 
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());
