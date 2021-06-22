@@ -7,10 +7,9 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -22,6 +21,10 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteAsyncNonBlockingProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBlockingProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.concurrent.RejectedExecutionException;
@@ -39,6 +42,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
   private final BiConsumer<CoreEvent, Throwable> inFlightDecrementCallback = (e, t) -> inFlightEvents.decrementAndGet();
 
   private Scheduler cpuLightScheduler;
+  private ReactiveProcessorEnricher processorEnricher = null;
 
   AbstractReactorStreamProcessingStrategy(int subscribers,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier,
@@ -52,17 +56,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
 
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-      reactor.core.scheduler.Scheduler cpuLiteScheduler = fromExecutorService(getNonBlockingTaskScheduler());
-      return publisher -> from(publisher)
-          .transform(processor)
-          .publishOn(cpuLiteScheduler)
-          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-    } else {
-      return publisher -> from(publisher)
-          .transform(processor)
-          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-    }
+    return processorEnricher.enrich(processor);
   }
 
   protected ScheduledExecutorService getNonBlockingTaskScheduler() {
@@ -110,6 +104,18 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
   @Override
   public void start() throws MuleException {
     this.cpuLightScheduler = createCpuLightScheduler(cpuLightSchedulerSupplier);
+    processorEnricher = getProcessingStrategyEnricher();
+  }
+
+  protected ProcessingTypeBasedReactiveProcessorEnricher getProcessingStrategyEnricher() {
+    CpuLiteNonBlockingProcessingStrategyEnricher cpuLiteEnricher =
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLightScheduler);
+    CpuLiteAsyncNonBlockingProcessingStrategyEnricher cpuLiteAsyncEnricher =
+        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> cpuLightScheduler, this::getNonBlockingTaskScheduler);
+
+    return new ProcessingTypeBasedReactiveProcessorEnricher(cpuLiteEnricher)
+        .register(CPU_LITE, cpuLiteEnricher)
+        .register(CPU_LITE_ASYNC, cpuLiteAsyncEnricher);
   }
 
   @Override

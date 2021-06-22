@@ -364,6 +364,7 @@ public interface AllureConstants {
       String REACTOR = "Reactor";
       String DIRECT = "Direct";
       String WORK_QUEUE = "Work Queue";
+      String ENRICHER = "Enricher";
     }
 
   }
