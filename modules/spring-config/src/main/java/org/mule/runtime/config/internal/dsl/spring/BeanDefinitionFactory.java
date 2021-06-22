@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
@@ -31,12 +32,15 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -53,6 +57,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -171,6 +176,25 @@ public class BeanDefinitionFactory {
             }
 
             @Override
+            public void visitSimpleType(SimpleType simpleType) {
+              if (isContent(param.getModel()) || isText(param.getModel())) {
+                final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
+                updatedHierarchy.add(componentModel);
+                resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, emptySet(), param,
+                                                    nestedComp -> resolveComponent(springComponentModels, componentModelHierarchy,
+                                                                                   nestedComp, registry, componentLocator),
+                                                    springComponentModel -> {
+                                                      paramsModels.add(springComponentModel);
+                                                      handleSpringComponentModel(springComponentModel,
+                                                                                 springComponentModel.getComponent(),
+                                                                                 springComponentModels,
+                                                                                 registry,
+                                                                                 componentLocator);
+                                                    });
+              }
+            }
+
+            @Override
             public void visitArrayType(ArrayType arrayType) {
               final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
               updatedHierarchy.add(componentModel);
@@ -191,7 +215,7 @@ public class BeanDefinitionFactory {
                 }
               }
 
-              resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, componentModel, param,
+              resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, emptySet(), param,
                                                   nestedComp -> resolveComponent(springComponentModels, componentModelHierarchy,
                                                                                  nestedComp, registry, componentLocator),
                                                   springComponentModel -> {
@@ -229,7 +253,7 @@ public class BeanDefinitionFactory {
                   }
                 }
 
-                resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, componentModel, param,
+                resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, emptySet(), param,
                                                     nestedComp -> resolveComponent(springComponentModels, componentModelHierarchy,
                                                                                    nestedComp, registry, componentLocator),
                                                     springComponentModel -> {
@@ -428,7 +452,7 @@ public class BeanDefinitionFactory {
 
   private void resolveComponentBeanDefinitionParam(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                                    List<ComponentAst> componentModelHierarchy,
-                                                   ComponentAst componentModel,
+                                                   Collection<SpringComponentModel> paramsModels,
                                                    ComponentParameterAst param,
                                                    Consumer<ComponentAst> nestedComponentParamProcessor,
                                                    Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
@@ -447,7 +471,10 @@ public class BeanDefinitionFactory {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
         componentBuildingDefinitionRegistry.getBuildingDefinition(paramComponentIdentifier);
     // if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(paramComponentIdentifier)) {
-    final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, null, emptyList(),
+    final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, null, paramsModels,
+                                                                                componentModelHierarchy
+                                                                                    .get(componentModelHierarchy.size()
+                                                                                        - 1),
                                                                                 param.getModel().getName(),
                                                                                 buildingDefinitionOptional.orElse(null));
     request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
@@ -497,7 +524,7 @@ public class BeanDefinitionFactory {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
     PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
-    SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator(parameterUtils);
+    SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();

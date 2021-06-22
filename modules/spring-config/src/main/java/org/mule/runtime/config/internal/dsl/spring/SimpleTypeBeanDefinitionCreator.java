@@ -29,13 +29,6 @@ import java.util.function.Consumer;
  */
 class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
-  private final ParameterUtils parameterUtils;
-
-  public SimpleTypeBeanDefinitionCreator(ParameterUtils parameterUtils) {
-    super();
-    this.parameterUtils = parameterUtils;
-  }
-
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateBeanDefinitionRequest createBeanDefinitionRequest,
@@ -49,10 +42,14 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
     createBeanDefinitionRequest.getSpringComponentModel().setType(type);
 
-    ComponentParameterAst paramInOwnerComponent = parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest);
+    final ComponentAst paramOwner = createBeanDefinitionRequest.getParamOwnerComponentModel();
+    final ComponentParameterAst param = paramOwner != null
+        ? paramOwner.getParameter(createBeanDefinitionRequest.getParamName())
+        : null;
 
-    if (paramInOwnerComponent != null) {
-      this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, paramInOwnerComponent.getResolvedRawValue());
+    if (param != null) {
+      this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, param.getResolvedRawValue());
+      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
       return true;
     }
 
