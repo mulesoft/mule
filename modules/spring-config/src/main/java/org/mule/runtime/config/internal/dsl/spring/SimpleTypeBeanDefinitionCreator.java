@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -57,9 +55,10 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
     final ComponentParameterAst valueParam = componentModel.getParameter("value");
 
     if (valueParam == null || valueParam.getResolvedRawValue() == null) {
-      throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
-                                                         componentModel.getMetadata().getFileName().orElse("unknown"),
-                                                         componentModel.getMetadata().getStartLine().orElse(-1)));
+      return false;
+      // throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
+      // componentModel.getMetadata().getFileName().orElse("unknown"),
+      // componentModel.getMetadata().getStartLine().orElse(-1)));
     }
 
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());

@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
@@ -54,7 +55,6 @@ import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,7 +67,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -457,29 +456,30 @@ public class BeanDefinitionFactory {
                                                    ComponentParameterAst param,
                                                    Consumer<ComponentAst> nestedComponentParamProcessor,
                                                    Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    final DslElementSyntax paramSyntax = param.getGenerationInformation().getSyntax().get();
+    param.getGenerationInformation().getSyntax()
+        .ifPresent(paramSyntax -> {
+          if (isEmpty(paramSyntax.getElementName())) {
+            return;
+          }
 
-    if (StringUtils.isEmpty(paramSyntax.getElementName())) {
-      return;
-    }
+          ComponentIdentifier paramComponentIdentifier = ComponentIdentifier.builder()
+              .namespaceUri(paramSyntax.getNamespace())
+              .namespace(paramSyntax.getPrefix())
+              .name(paramSyntax.getElementName())
+              .build();
 
-    ComponentIdentifier paramComponentIdentifier = ComponentIdentifier.builder()
-        .namespaceUri(paramSyntax.getNamespace())
-        .namespace(paramSyntax.getPrefix())
-        .name(paramSyntax.getElementName())
-        .build();
-
-    Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-        componentBuildingDefinitionRegistry.getBuildingDefinition(paramComponentIdentifier);
-    final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, null, paramsModels,
-                                                                                componentModelHierarchy
-                                                                                    .get(componentModelHierarchy.size()
-                                                                                        - 1),
-                                                                                param.getModel().getName(),
-                                                                                buildingDefinitionOptional.orElse(null));
-    request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
-    this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
-                                                componentBeanDefinitionHandler);
+          Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
+              componentBuildingDefinitionRegistry.getBuildingDefinition(paramComponentIdentifier);
+          final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, null, paramsModels,
+                                                                                      componentModelHierarchy
+                                                                                          .get(componentModelHierarchy.size()
+                                                                                              - 1),
+                                                                                      param.getModel().getName(),
+                                                                                      buildingDefinitionOptional.orElse(null));
+          request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
+          this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
+                                                      componentBeanDefinitionHandler);
+        });
   }
 
   private void processComponentWrapper(Map<ComponentAst, SpringComponentModel> springComponentModels,
