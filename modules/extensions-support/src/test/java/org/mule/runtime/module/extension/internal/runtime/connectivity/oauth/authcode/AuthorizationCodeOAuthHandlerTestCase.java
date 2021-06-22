@@ -46,7 +46,7 @@ public class AuthorizationCodeOAuthHandlerTestCase extends AbstractMuleTestCase 
   @Mock
   LazyValue<OAuthService> oauthService;
   @Mock
-  LazyValue<HttpService> httpService ;
+  LazyValue<HttpService> httpService;
 
   @InjectMocks
   AuthorizationCodeOAuthHandler authorizationCodeOAuthHandler = new AuthorizationCodeOAuthHandler();
@@ -64,6 +64,7 @@ public class AuthorizationCodeOAuthHandlerTestCase extends AbstractMuleTestCase 
     when(oauthService.get()).thenReturn(oAuthService);
 
     dancerBuilder = mock(OAuthAuthorizationCodeDancerBuilder.class, new Answer() {
+
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
         if (Object.class.equals(invocation.getMethod().getReturnType())) {
@@ -77,13 +78,13 @@ public class AuthorizationCodeOAuthHandlerTestCase extends AbstractMuleTestCase 
 
     OAuthCallbackConfig oAuthCallbackConfig = mock(OAuthCallbackConfig.class);
     oAuthConfig = new AuthorizationCodeConfig("configName",
-        empty(),
-        emptyMultiMap(),
-        emptyMultiMap(),
-        emptyMap(),
-        new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
-        oAuthCallbackConfig,
-        "key", "secret", "url", "url", "scope", "id", null, null);
+                                              empty(),
+                                              emptyMultiMap(),
+                                              emptyMultiMap(),
+                                              emptyMap(),
+                                              new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
+                                              oAuthCallbackConfig,
+                                              "key", "secret", "url", "url", "scope", "id", null, null);
     when(oAuthCallbackConfig.getExternalCallbackUrl()).thenReturn(of("http://localhost:8081/callback"));
 
     HttpService httpServiceMock = mock(HttpService.class);
@@ -95,14 +96,14 @@ public class AuthorizationCodeOAuthHandlerTestCase extends AbstractMuleTestCase 
   }
 
   @Test
-  public void createDancerWithoutAdditionalRefreshTokenParamsWhenFeatureFlagEnabled(){
+  public void createDancerWithoutAdditionalRefreshTokenParamsWhenFeatureFlagEnabled() {
     when(featureFlaggingService.isEnabled(NO_OAUTH_REDIRECT_URI)).thenReturn(true);
     authorizationCodeOAuthHandler.register(oAuthConfig);
     verify(dancerBuilder, never()).addAdditionalRefreshTokenParameters(any());
   }
 
   @Test
-  public void createDancerWithAdditionalRefreshTokenParamsWhenFeatureFlagNotEnabled(){
+  public void createDancerWithAdditionalRefreshTokenParamsWhenFeatureFlagNotEnabled() {
     when(featureFlaggingService.isEnabled(NO_OAUTH_REDIRECT_URI)).thenReturn(false);
     authorizationCodeOAuthHandler.register(oAuthConfig);
     verify(dancerBuilder, times(1)).addAdditionalRefreshTokenParameters(any());
