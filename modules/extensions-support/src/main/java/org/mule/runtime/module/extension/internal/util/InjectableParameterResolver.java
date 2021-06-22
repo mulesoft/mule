@@ -25,6 +25,7 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,8 +42,8 @@ public class InjectableParameterResolver {
 
   private static final Logger LOGGER = getLogger(InjectableParameterResolver.class);
 
-  // Use this as a prefix for binding context identifiers so that no identifier clash with a DW reserved word or function
-  private static final String IDENTIFIER_PREFIX = "muleprefixforidentifiers";
+  private static final String BINDING_IDENTIFIER = "componentParameters";
+  private static final String BINDING_IDENTIFIER_ACCESS = BINDING_IDENTIFIER + ".";
 
   private static final String EXPRESSION_PREFIX = "#[{";
   private static final String EXPRESSION_SUFFIX = "}]";
@@ -98,7 +99,7 @@ public class InjectableParameterResolver {
   private Map<String, Object> getResolvedValues(ParameterValueResolver parameterValueResolver,
                                                 ParameterizedModel parameterizedModel) {
     BindingContext bindingContext = createBindingContext(parameterValueResolver, parameterizedModel);
-    String expression = getResolvedParameterValuesExpression(bindingContext.identifiers());
+    String expression = getResolvedParameterValuesExpression(componentParameterIdentifiers(bindingContext));
 
     if (!expression.equals(EMPTY_EXPRESSION)) {
       return (Map<String, Object>) expressionManager
@@ -109,12 +110,9 @@ public class InjectableParameterResolver {
     }
   }
 
-  private String getWithBindingPrefix(String bindingName) {
-    return IDENTIFIER_PREFIX + bindingName;
-  }
-
   private BindingContext createBindingContext(ParameterValueResolver parameterValueResolver,
                                               ParameterizedModel parameterizedModel) {
+    Map<String, TypedValue> componentParameters = new HashMap();
     BindingContext.Builder bindingContextBuilder = BindingContext.builder();
 
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
@@ -130,10 +128,17 @@ public class InjectableParameterResolver {
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
         }
-        bindingContextBuilder.addBinding(getWithBindingPrefix(parameterModel.getName()), (TypedValue) value);
+        componentParameters.put(parameterModel.getName(), (TypedValue) value);
       }
     }
+
+    bindingContextBuilder.addBinding(BINDING_IDENTIFIER,
+                                     new TypedValue(componentParameters, DataType.builder().mapType(Map.class).build()));
     return bindingContextBuilder.build();
+  }
+
+  private Collection<String> componentParameterIdentifiers(BindingContext bindingContext) {
+    return ((Map) bindingContext.lookup(BINDING_IDENTIFIER).get().getValue()).keySet();
   }
 
   private String getResolvedParameterValuesExpression(Collection<String> identifiers) {
@@ -142,15 +147,33 @@ public class InjectableParameterResolver {
     expression.append(
                       injectableParametersMap.values().stream()
                           .filter(injectableParameterInfo -> identifiers
-                              .contains(getWithBindingPrefix(getParameterNameFromExtractionExpression(injectableParameterInfo
-                                  .getExtractionExpression()))))
+                              .contains(getParameterNameFromExtractionExpression(injectableParameterInfo
+                                  .getExtractionExpression())))
                           .map(injectableParameterInfo -> "\""
                               + injectableParameterInfo.getParameterName() + "\"  : "
-                              + getWithBindingPrefix(injectableParameterInfo.getExtractionExpression()))
+                              + BINDING_IDENTIFIER_ACCESS
+                              + sanitizeExpression(injectableParameterInfo.getExtractionExpression()))
                           .collect(Collectors.joining(", ")));
     expression.append(EXPRESSION_SUFFIX);
 
     return expression.toString();
+  }
+
+  private String sanitizeExpression(String extractionExpression) {
+    StringBuilder sanitazedExpression = new StringBuilder();
+    sanitazedExpression.append("\"");
+    int extractionExpressionLength = extractionExpression.length();
+    int firstDotIndex = extractionExpression.indexOf(".");
+
+    if (firstDotIndex == -1) {
+      sanitazedExpression.append(extractionExpression);
+      sanitazedExpression.append("\"");
+    } else {
+      sanitazedExpression.append(extractionExpression.substring(0, firstDotIndex));
+      sanitazedExpression.append("\"");
+      sanitazedExpression.append(extractionExpression.substring(firstDotIndex, extractionExpressionLength));
+    }
+    return sanitazedExpression.toString();
   }
 
   private Class getClassFromType(MetadataType parameterMetadataType) throws ClassNotFoundException {
