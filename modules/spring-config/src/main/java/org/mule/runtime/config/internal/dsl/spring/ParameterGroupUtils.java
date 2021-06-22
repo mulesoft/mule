@@ -41,13 +41,8 @@ public final class ParameterGroupUtils {
                                                                ComponentAst possibleGroup,
                                                                SourceModel ownerComponentModel) {
 
-    Optional<ParameterGroupModel> groupModelOptional = getSourceParamGroups(ownerComponentModel).stream()
-        .filter(parameterGroupModel -> parameterGroupModel.getParameter(parameterName).isPresent() &&
-            parameterGroupModel.isShowInDsl() &&
-            getChildElementName(ownerComponent, parameterGroupModel)
-                .map(en -> possibleGroup.getIdentifier().getName().equals(en))
-                .orElse(false))
-        .findFirst();
+    Optional<ParameterGroupModel> groupModelOptional =
+        getParameterGroupModel(ownerComponent, parameterName, possibleGroup, getSourceParamGroups(ownerComponentModel));
 
     if (!groupModelOptional.isPresent()) {
       return null;
