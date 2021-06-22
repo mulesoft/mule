@@ -9,6 +9,8 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
@@ -60,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -180,10 +183,15 @@ public class BeanDefinitionFactory {
                                                                                       componentLocator));
   }
 
-  protected void resolveParamBeanDefinition(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                            List<ComponentAst> componentModelHierarchy, ComponentAst paramOwnerComponentModel,
-                                            BeanDefinitionRegistry registry, SpringConfigurationComponentLocator componentLocator,
-                                            List<SpringComponentModel> paramsModels, ComponentParameterAst param) {
+  protected Optional<SpringComponentModel> resolveParamBeanDefinition(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                                                      List<ComponentAst> componentModelHierarchy,
+                                                                      ComponentAst paramOwnerComponentModel,
+                                                                      BeanDefinitionRegistry registry,
+                                                                      SpringConfigurationComponentLocator componentLocator,
+                                                                      List<SpringComponentModel> paramsModels,
+                                                                      ComponentParameterAst param) {
+    AtomicReference<SpringComponentModel> model = new AtomicReference<>();
+
     param.getModel().getType().accept(new MetadataTypeVisitor() {
 
       @Override
@@ -191,33 +199,15 @@ public class BeanDefinitionFactory {
 
       }
 
-      @Override
-      public void visitSimpleType(SimpleType simpleType) {
-        if (isContent(param.getModel()) || isText(param.getModel())) {
-          final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
-          updatedHierarchy.add(paramOwnerComponentModel);
-          resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, emptySet(), param,
-                                              nestedComp -> resolveComponent(springComponentModels, componentModelHierarchy,
-                                                                             nestedComp, registry, componentLocator),
-                                              springComponentModel -> {
-                                                paramsModels.add(springComponentModel);
-                                                handleSpringComponentModel(springComponentModel,
-                                                                           springComponentModel.getComponent(),
-                                                                           springComponentModels,
-                                                                           registry,
-                                                                           componentLocator);
-                                              });
-        }
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
+      protected void visitMultipleChildren(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                           List<ComponentAst> componentModelHierarchy, ComponentAst paramOwnerComponentModel,
+                                           BeanDefinitionRegistry registry, SpringConfigurationComponentLocator componentLocator,
+                                           List<SpringComponentModel> paramsModels, ComponentParameterAst param,
+                                           List<ComponentAst> values) {
         final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
         updatedHierarchy.add(paramOwnerComponentModel);
 
-        List<ComponentAst> values = (List<ComponentAst>) param.getValue().getRight();
         if (values != null) {
-
           for (ComponentAst child : values) {
             resolveComponentBeanDefinition(springComponentModels, emptyList(), updatedHierarchy, child,
                                            nestedComp -> resolveComponent(springComponentModels, updatedHierarchy,
@@ -240,33 +230,63 @@ public class BeanDefinitionFactory {
                                                                          springComponentModels,
                                                                          registry,
                                                                          componentLocator);
-                                            });
+                                            })
+                                                .ifPresent(model::set);
+      }
 
-
-
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
+                              componentLocator, paramsModels, param,
+                              (List<ComponentAst>) param.getValue().getRight());
       }
 
       @Override
       public void visitObject(ObjectType objectType) {
+        if (isMap(objectType)) {
+          visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
+                                componentLocator, paramsModels, param,
+                                (List<ComponentAst>) param.getValue().getRight());
+          return;
+        }
+
         final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
         updatedHierarchy.add(paramOwnerComponentModel);
 
-        if (isMap(objectType)) {
-          List<ComponentAst> entries = (List<ComponentAst>) param.getValue().getRight();
-          if (entries != null) {
-            for (ComponentAst entry : entries) {
-              resolveComponentBeanDefinition(springComponentModels, emptyList(), updatedHierarchy, entry,
-                                             nestedComp -> resolveComponent(springComponentModels, updatedHierarchy,
-                                                                            nestedComp, registry, componentLocator),
-                                             springComponentModel -> handleSpringComponentModel(springComponentModel,
-                                                                                                springComponentModel
-                                                                                                    .getComponent(),
-                                                                                                springComponentModels,
-                                                                                                registry,
-                                                                                                componentLocator));
-            }
-          }
+        if (param.getValue().getRight() instanceof ComponentAst) {
+          final ComponentAst child = (ComponentAst) param.getValue().getRight();
 
+          final LinkedHashMap<ComponentAst, SpringComponentModel> childParams = new LinkedHashMap<>();
+          List<SpringComponentModel> childParamsModels = child.getParameters()
+              .stream()
+              .filter(paramIn -> paramIn.getValue() != null)
+              .map(paramIn -> resolveParamBeanDefinition(childParams, updatedHierarchy, child, registry,
+                                                         componentLocator, new ArrayList<>(), paramIn))
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(toList());
+
+          updatedHierarchy.add(child);
+          resolveComponentBeanDefinitionParam(childParams, updatedHierarchy, childParamsModels, param,
+                                              nestedComp -> resolveComponent(springComponentModels, componentModelHierarchy,
+                                                                             nestedComp, registry, componentLocator),
+                                              springComponentModel -> {
+                                                paramsModels.add(springComponentModel);
+                                                handleSpringComponentModel(springComponentModel,
+                                                                           springComponentModel.getComponent(),
+                                                                           springComponentModels,
+                                                                           registry,
+                                                                           componentLocator);
+                                              })
+                                                  .ifPresent(model::set);
+        }
+      }
+
+      @Override
+      public void visitSimpleType(SimpleType simpleType) {
+        if (isContent(param.getModel()) || isText(param.getModel())) {
+          final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
+          updatedHierarchy.add(paramOwnerComponentModel);
           resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, emptySet(), param,
                                               nestedComp -> resolveComponent(springComponentModels, componentModelHierarchy,
                                                                              nestedComp, registry, componentLocator),
@@ -277,29 +297,13 @@ public class BeanDefinitionFactory {
                                                                            springComponentModels,
                                                                            registry,
                                                                            componentLocator);
-                                              });
-
-
-          return;
-        }
-
-        if (param.getValue().getRight() instanceof ComponentAst) {
-          final ComponentAst child = (ComponentAst) param.getValue().getRight();
-          resolveComponentBeanDefinition(springComponentModels, emptyList(), updatedHierarchy, child,
-                                         nestedComp -> resolveComponent(springComponentModels, updatedHierarchy,
-                                                                        nestedComp, registry, componentLocator),
-                                         springComponentModel -> {
-                                           paramsModels.add(springComponentModel);
-                                           handleSpringComponentModel(springComponentModel,
-                                                                      paramOwnerComponentModel,
-                                                                      springComponentModels,
-                                                                      registry,
-                                                                      componentLocator);
-                                         });
+                                              })
+                                                  .ifPresent(model::set);
         }
       }
-
     });
+
+    return ofNullable(model.get());
   }
 
   protected void handleSpringComponentModel(SpringComponentModel springComponentModel, ComponentAst componentModel,
@@ -450,18 +454,15 @@ public class BeanDefinitionFactory {
     }
   }
 
-  private void resolveComponentBeanDefinitionParam(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                   List<ComponentAst> componentModelHierarchy,
-                                                   Collection<SpringComponentModel> paramsModels,
-                                                   ComponentParameterAst param,
-                                                   Consumer<ComponentAst> nestedComponentParamProcessor,
-                                                   Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    param.getGenerationInformation().getSyntax()
-        .ifPresent(paramSyntax -> {
-          if (isEmpty(paramSyntax.getElementName())) {
-            return;
-          }
-
+  private Optional<SpringComponentModel> resolveComponentBeanDefinitionParam(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                                                             List<ComponentAst> componentModelHierarchy,
+                                                                             Collection<SpringComponentModel> paramsModels,
+                                                                             ComponentParameterAst param,
+                                                                             Consumer<ComponentAst> nestedComponentParamProcessor,
+                                                                             Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+    return param.getGenerationInformation().getSyntax()
+        .filter(paramSyntax -> !isEmpty(paramSyntax.getElementName()))
+        .map(paramSyntax -> {
           ComponentIdentifier paramComponentIdentifier = ComponentIdentifier.builder()
               .namespaceUri(paramSyntax.getNamespace())
               .namespace(paramSyntax.getPrefix())
@@ -479,6 +480,8 @@ public class BeanDefinitionFactory {
           request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
           this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
                                                       componentBeanDefinitionHandler);
+
+          return request.getSpringComponentModel();
         });
   }
 
