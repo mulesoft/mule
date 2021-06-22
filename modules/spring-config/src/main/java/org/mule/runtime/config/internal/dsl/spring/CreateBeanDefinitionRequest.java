@@ -13,6 +13,7 @@ import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -26,7 +27,8 @@ public class CreateBeanDefinitionRequest {
 
   private final List<ComponentAst> componentModelHierarchy;
   private final ComponentAst componentModel;
-  private final List<SpringComponentModel> paramsModels;
+  private final Collection<SpringComponentModel> paramsModels;
+  private final ComponentAst paramOwnerComponentModel;
   private final String paramName;
   private final ComponentBuildingDefinition componentBuildingDefinition;
   private final SpringComponentModel springComponentModel;
@@ -40,7 +42,7 @@ public class CreateBeanDefinitionRequest {
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
                                      ComponentAst componentModel, List<SpringComponentModel> paramsModels,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
-    this(componentModelHierarchy, componentModel, paramsModels, null, componentBuildingDefinition);
+    this(componentModelHierarchy, componentModel, paramsModels, null, null, componentBuildingDefinition);
   }
 
   /**
@@ -50,12 +52,14 @@ public class CreateBeanDefinitionRequest {
    */
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
                                      ComponentAst componentModel,
-                                     List<SpringComponentModel> paramsModels,
+                                     Collection<SpringComponentModel> paramsModels,
+                                     ComponentAst paramOwnerComponentModel,
                                      String paramName,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
     this.componentModelHierarchy = componentModelHierarchy;
     this.componentModel = componentModel;
     this.paramsModels = paramsModels;
+    this.paramOwnerComponentModel = paramOwnerComponentModel;
     this.paramName = paramName;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
@@ -83,8 +87,12 @@ public class CreateBeanDefinitionRequest {
     return componentModel;
   }
 
-  public List<SpringComponentModel> getParamsModels() {
+  public Collection<SpringComponentModel> getParamsModels() {
     return paramsModels;
+  }
+
+  public ComponentAst getParamOwnerComponentModel() {
+    return paramOwnerComponentModel;
   }
 
   public String getParamName() {

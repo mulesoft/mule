@@ -114,6 +114,9 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   private void processNestedAnnotations(ComponentAst componentModel, Map<QName, Object> previousAnnotations) {
+    if (componentModel == null) {
+      return;
+    }
     componentModel.directChildrenStream()
         .filter(cdm -> cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER))
         .findFirst()
@@ -186,7 +189,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
     final ComponentAst componentModel = request.getComponentModel();
     ComponentAst ownerComponent;
-    if (componentModel.getModel(ParameterizedModel.class).isPresent()) {
+    if (componentModel != null && componentModel.getModel(ParameterizedModel.class).isPresent()) {
       ownerComponent = componentModel;
     } else {
       ownerComponent = request.resolveOwnerComponent();
@@ -212,6 +215,10 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   static void processMuleProperties(ComponentAst componentModel, BeanDefinitionBuilder beanDefinitionBuilder,
                                     BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
+    if (componentModel == null) {
+      return;
+    }
+
     // for now we skip custom-transformer since requires injection by the object factory.
     if (beanDefinitionPostProcessor != null && beanDefinitionPostProcessor.getGenericPropertiesCustomProcessingIdentifiers()
         .contains(componentModel.getIdentifier())) {

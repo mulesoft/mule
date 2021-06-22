@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,13 +43,11 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   public static final String TEST_STRING_RAW_VALUE = "Test Raw Value";
   private SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator;
   private Map<ComponentAst, SpringComponentModel> springComponentModels;
-  private ParameterUtils parameterUtils;
   private CreateBeanDefinitionRequest createBeanDefinitionRequest;
 
   @Before
   public void setUp() {
-    parameterUtils = mock(ParameterUtils.class);
-    simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator(parameterUtils);
+    simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
     createBeanDefinitionRequest = mock(CreateBeanDefinitionRequest.class);
     SpringComponentModel springComponentModel = new SpringComponentModel();
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
@@ -73,9 +74,11 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
 
-    when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(paramInOwnerComponent);
+    ComponentAst componentModel = mock(ComponentAst.class);
+    when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
+    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
 
-    mockComponentBuildingDefinition(createBeanDefinitionRequest, Optional.empty());
+    mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
     // When
     boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
@@ -96,9 +99,11 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
 
-    when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(paramInOwnerComponent);
+    ComponentAst componentModel = mock(ComponentAst.class);
+    when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
+    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
 
-    mockComponentBuildingDefinition(createBeanDefinitionRequest, Optional.empty());
+    mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
     // When
     simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
@@ -106,7 +111,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     });
 
     // Then
-    ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = ArgumentCaptor.forClass(BeanDefinition.class);
+    ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = forClass(BeanDefinition.class);
     verify(springComponentModel, times(1)).setBeanDefinition(beanDefinitionArgumentCaptor.capture());
     BeanDefinition value = beanDefinitionArgumentCaptor.getValue();
     assertThat(value.getBeanClassName(), is(String.class.getName()));
@@ -123,9 +128,11 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
 
-    when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(paramInOwnerComponent);
+    ComponentAst componentModel = mock(ComponentAst.class);
+    when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
+    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
 
-    mockComponentBuildingDefinition(createBeanDefinitionRequest, Optional.of(o -> TEST_STRING_RAW_VALUE));
+    mockComponentBuildingDefinition(createBeanDefinitionRequest, of(o -> TEST_STRING_RAW_VALUE));
 
     // When
     simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
@@ -133,7 +140,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     });
 
     // Then
-    ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = ArgumentCaptor.forClass(BeanDefinition.class);
+    ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = forClass(BeanDefinition.class);
     verify(springComponentModel, times(1)).setBeanDefinition(beanDefinitionArgumentCaptor.capture());
     BeanDefinition value = beanDefinitionArgumentCaptor.getValue();
     assertThat(value.getBeanClassName(), is("org.mule.runtime.config.internal.factories.ConstantFactoryBean"));
@@ -145,8 +152,6 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     // Given
     mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
-    when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(null);
-
     ComponentAst componentModel = mock(ComponentAst.class);
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
@@ -154,7 +159,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
     when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
 
-    mockComponentBuildingDefinition(createBeanDefinitionRequest, Optional.empty());
+    mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
     // When
     boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
@@ -173,8 +178,6 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     SpringComponentModel springComponentModel = mock(SpringComponentModel.class);
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
 
-    when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(null);
-
     ComponentAst componentModel = mock(ComponentAst.class);
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
@@ -182,7 +185,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
     when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
 
-    mockComponentBuildingDefinition(createBeanDefinitionRequest, Optional.empty());
+    mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
     // When
     simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
@@ -190,7 +193,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     });
 
     // Then
-    ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = ArgumentCaptor.forClass(BeanDefinition.class);
+    ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = forClass(BeanDefinition.class);
     verify(springComponentModel, times(1)).setBeanDefinition(beanDefinitionArgumentCaptor.capture());
     BeanDefinition value = beanDefinitionArgumentCaptor.getValue();
     assertThat(value.getBeanClassName(), is(String.class.getName()));
@@ -205,8 +208,6 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     SpringComponentModel springComponentModel = mock(SpringComponentModel.class);
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
 
-    when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(null);
-
     ComponentAst componentModel = mock(ComponentAst.class);
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
@@ -214,7 +215,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
     when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
 
-    mockComponentBuildingDefinition(createBeanDefinitionRequest, Optional.of(o -> TEST_STRING_RAW_VALUE));
+    mockComponentBuildingDefinition(createBeanDefinitionRequest, of(o -> TEST_STRING_RAW_VALUE));
 
     // When
     simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
@@ -222,7 +223,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     });
 
     // Then
-    ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = ArgumentCaptor.forClass(BeanDefinition.class);
+    ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = forClass(BeanDefinition.class);
     verify(springComponentModel, times(1)).setBeanDefinition(beanDefinitionArgumentCaptor.capture());
     BeanDefinition value = beanDefinitionArgumentCaptor.getValue();
     assertThat(value.getBeanClassName(), is("org.mule.runtime.config.internal.factories.ConstantFactoryBean"));
@@ -271,7 +272,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     @Override
     public Optional<ComponentMetadataAst> getMetadata() {
-      return Optional.empty();
+      return empty();
     }
 
     @Override
