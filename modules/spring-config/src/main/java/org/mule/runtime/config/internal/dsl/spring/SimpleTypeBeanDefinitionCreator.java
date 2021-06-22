@@ -27,6 +27,8 @@ import java.util.function.Consumer;
  */
 class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
+  public SimpleTypeBeanDefinitionCreator() {}
+
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateBeanDefinitionRequest createBeanDefinitionRequest,

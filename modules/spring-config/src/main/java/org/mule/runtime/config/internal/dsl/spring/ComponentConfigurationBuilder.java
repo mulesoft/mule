@@ -41,6 +41,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,20 +99,23 @@ class ComponentConfigurationBuilder<T> {
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
-    return concat(createBeanDefinitionRequest.getParamsModels().stream(),
-                  // TODO MULE 17711 remove this second concat term
-                  componentModel.directChildrenStream()
-                      .map(springComponentModels::get)
-                      .filter(Objects::nonNull))
-                          .map(springModel -> {
-                            Class<?> beanDefinitionType = resolveBeanDefinitionType(springModel);
-                            Object bean = springModel.getBeanDefinition() != null
-                                ? springModel.getBeanDefinition()
-                                : springModel.getBeanReference();
-                            return new ComponentValue(springModel.getComponentIdentifier(), beanDefinitionType, bean);
-                          })
-                          .filter(Objects::nonNull)
-                          .collect(toList());
+    final Stream<SpringComponentModel> baseStream = componentModel != null
+        ? concat(createBeanDefinitionRequest.getParamsModels().stream(),
+                 // TODO MULE 17711 remove this second concat term
+                 componentModel.directChildrenStream()
+                     .map(springComponentModels::get)
+                     .filter(Objects::nonNull))
+        : createBeanDefinitionRequest.getParamsModels().stream();
+    return baseStream
+        .map(springModel -> {
+          Class<?> beanDefinitionType = resolveBeanDefinitionType(springModel);
+          Object bean = springModel.getBeanDefinition() != null
+              ? springModel.getBeanDefinition()
+              : springModel.getBeanReference();
+          return new ComponentValue(springModel.getComponentIdentifier(), beanDefinitionType, bean);
+        })
+        .filter(Objects::nonNull)
+        .collect(toList());
   }
 
   private Class<?> resolveBeanDefinitionType(SpringComponentModel springModel) {
@@ -357,7 +361,7 @@ class ComponentConfigurationBuilder<T> {
                 p = ownerComponent.getParameter(parameterName);
               }
 
-              if (p == null) {
+              if (p == null && componentModel != null) {
                 // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
                 return ownerComponent.getParameter(componentModel.getIdentifier().getName());
               }
@@ -370,9 +374,11 @@ class ComponentConfigurationBuilder<T> {
       Object parameterValue;
       if (parameter == null) {
         // Fallback for test components that do not have an extension model.
-        parameterValue = componentModel.getRawParameterValue(parameterName)
-            .map(v -> (Object) v)
-            .orElse(defaultValue);
+        parameterValue = componentModel == null
+            ? null
+            : componentModel.getRawParameterValue(parameterName)
+                .map(v -> (Object) v)
+                .orElse(defaultValue);
       } else if ("frequency".equals(parameterName)
           && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
           && parameter.isDefaultValue()) {
