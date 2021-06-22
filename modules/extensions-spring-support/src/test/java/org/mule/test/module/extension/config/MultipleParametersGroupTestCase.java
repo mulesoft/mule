@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+import io.qameta.allure.Issue;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -19,25 +20,15 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 public class MultipleParametersGroupTestCase extends AbstractExtensionFunctionalTestCase {
 
-  public static final String HEISENBERG = "heisenberg";
-  private static final String EMPTY_STRING = "";
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
-
   @Override
-  protected String[] getConfigFiles() {
-    return new String[] {"heisenberg-multiple-parameters-group-config.xml"};
-  }
-
-  @Override
-  protected boolean isDisposeContextPerClass() {
-    return true;
+  protected String getConfigFile() {
+    return "heisenberg-multiple-parameters-group-config.xml";
   }
 
   @Test
+  @Issue("EE-7705")
   public void getInlineGroupDefinition() throws Exception {
-    Message message = flowRunner("getBarberPreferences").withPayload(EMPTY_STRING).run().getMessage();
+    Message message = flowRunner("getBarberPreferences").run().getMessage();
 
     assertThat(message.getPayload().getValue(), is(notNullValue()));
     assertThat(message.getPayload().getDataType().getMediaType().matches(APPLICATION_JAVA), is(true));
@@ -46,7 +37,7 @@ public class MultipleParametersGroupTestCase extends AbstractExtensionFunctional
     assertThat(preferences.getBeardTrimming(), is(BarberPreferences.BEARD_KIND.MUSTACHE));
     assertThat(preferences.isFullyBald(), is(false));
 
-    message = flowRunner("getSecondBarberPreferences").withPayload(EMPTY_STRING).run().getMessage();
+    message = flowRunner("getSecondBarberPreferences").run().getMessage();
 
     assertThat(message.getPayload().getValue(), is(notNullValue()));
     assertThat(message.getPayload().getDataType().getMediaType().matches(APPLICATION_JAVA), is(true));
@@ -54,7 +45,5 @@ public class MultipleParametersGroupTestCase extends AbstractExtensionFunctional
     preferences = (BarberPreferences) message.getPayload().getValue();
     assertThat(preferences.getBeardTrimming(), is(BarberPreferences.BEARD_KIND.GOATIE));
     assertThat(preferences.isFullyBald(), is(true));
-
-
   }
 }
