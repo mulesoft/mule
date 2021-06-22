@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
@@ -229,6 +230,11 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     @Override
     public ParameterModel getModel() {
+      return null;
+    }
+
+    @Override
+    public ParameterGroupModel getGroupModel() {
       return null;
     }
 

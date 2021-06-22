@@ -19,6 +19,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQ
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -334,20 +335,24 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
+            int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
+            final ComponentAst possibleGroup =
+                ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
+                    ? componentModel
+                    : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
             if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-              // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
-              // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
-              // previous implementations.
-              int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
-              final ComponentAst possibleGroup =
-                  ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
-                      ? componentModel
-                      : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
-
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName, possibleGroup,
                                                                          (SourceModel) ownerComponentModel);
             } else {
-              ComponentParameterAst p = ownerComponent.getParameter(parameterName);
+              Optional<ParameterGroupModel> groupModelOptional =
+                  parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName, possibleGroup,
+                                                             ownerComponentModel.getParameterGroupModels());
+              ComponentParameterAst p;
+              if (groupModelOptional.isPresent()) {
+                p = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
+              } else {
+                p = ownerComponent.getParameter(parameterName);
+              }
 
               if (p == null) {
                 // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.

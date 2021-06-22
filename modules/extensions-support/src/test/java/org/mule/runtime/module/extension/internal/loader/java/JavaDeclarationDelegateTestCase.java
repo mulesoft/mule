@@ -182,6 +182,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String FAIL_TO_EXECUTE = "failToExecute";
   private static final String THROW_ERROR = "throwError";
   public static final String ECHO_AN_OPERATION_WITH_ALIAS = "echo";
+  public static final String GET_SECOND_BARBER_PREFERENCE = "getSecondBarberPreferences";
+
   public static final String BY_PASS_WEAPON = "byPassWeapon";
   public static final MetadataType WEAPON_TYPE = TYPE_LOADER.load(Weapon.class);
   public static final MetadataType STRING_TYPE = TYPE_LOADER.load(String.class);
@@ -232,7 +234,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
     assertThat(configuration, is(notNullValue()));
     assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-    assertThat(configuration.getAllParameters(), hasSize(33));
+    assertThat(configuration.getAllParameters(), hasSize(35));
     assertParameter(configuration.getAllParameters(), "extendedProperty", "", STRING_TYPE, true, SUPPORTED,
                     null);
   }
@@ -429,7 +431,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
     List<ParameterDeclaration> parameters = conf.getAllParameters();
-    assertThat(parameters, hasSize(32));
+    assertThat(parameters, hasSize(34));
 
     assertParameter(parameters, "myName", "", STRING_TYPE, false, SUPPORTED, HEISENBERG);
     assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
@@ -512,7 +514,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(60));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(25));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(26));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
@@ -553,6 +555,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(withOperationsDeclaration, "failAtClosePagedOperation", "");
     assertOperation(withOperationsDeclaration, "failingConnectivityPagedOperation", "");
     assertOperation(withOperationsDeclaration, "nameAsStreamConnected", "");
+    assertOperation(withOperationsDeclaration, "getSecondBarberPreferences", "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));

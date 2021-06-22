@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenberg"
+                       myName="heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="1000000"
+                       finalHealth="CANCER">
+        <heisenberg:enemies/>
+        <heisenberg:monthly-incomes/>
+        <heisenberg:known-addresses/>
+        <heisenberg:inline-barber-preferences beardTrimming="MUSTACHE" fullyBald="false"/>
+        <heisenberg:inline-second-barber-preferences beardTrimming="GOATIE" fullyBald="true"/>
+    </heisenberg:config>
+
+    <flow name="getBarberPreferences">
+        <heisenberg:get-barber-preferences config-ref="heisenberg"/>
+    </flow>
+
+    <flow name="getSecondBarberPreferences">
+        <heisenberg:get-second-barber-preferences config-ref="heisenberg"/>
+    </flow>
+
+</mule>

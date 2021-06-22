@@ -1836,7 +1836,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
-              "defaultValue": "true",
+              "defaultValue": "false",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -1848,6 +1848,108 @@
                 "text": false,
                 "query": false,
                 "order": 31
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [
+                "hairy"
+              ],
+              "name": "fullyBald",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "GOATIE",
+                      "MUSTACHE"
+                    ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences$BEARD_KIND",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "GOATIE",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 32
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "beardTrimming",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 5
+          },
+          "showInDsl": true,
+          "name": "Inline Second Barber Preferences",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "true",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 33
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -1880,7 +1982,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 32
+                "order": 34
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -1894,7 +1996,7 @@
             "password": false,
             "text": false,
             "query": false,
-            "order": 5
+            "order": 6
           },
           "showInDsl": true,
           "name": "Brother in law",
@@ -11831,6 +11933,329 @@
             }
           ],
           "name": "getSaulPhone",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "CPU_LITE",
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.test.heisenberg.extension.model.BarberPreferences"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": false,
+          "supportsStreaming": false,
+          "notifications": [],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "stereotype": {
+            "type": "HEISENBERG-EMPIRE",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "REQUIRED",
+                  "defaultValue": "#[payload]",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "targetValue",
+                  "displayModel": {
+                    "displayName": "Target Value"
+                  },
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "description": {
+                        "value": "Determines that an error thrown by this operation should be mapped to another"
+                      },
+                      "typeDsl": {
+                        "allowInlineDefinition": true,
+                        "allowTopLevelDefinition": false
+                      }
+                    },
+                    "item": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "errorMapping"
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "source"
+                          },
+                          "model": {
+                            "format": {
+                              "id": "text",
+                              "label": "Text",
+                              "validMimeTypes": [
+                                "text/plain"
+                              ]
+                            },
+                            "type": "String",
+                            "annotations": {
+                              "typeId": "errorTypeMatcher",
+                              "enum": {
+                                "type": "[Ljava.lang.String;",
+                                "values": [
+                                  "ANY",
+                                  "REDELIVERY_EXHAUSTED",
+                                  "TRANSFORMATION",
+                                  "EXPRESSION",
+                                  "SECURITY",
+                                  "CLIENT_SECURITY",
+                                  "SERVER_SECURITY",
+                                  "ROUTING",
+                                  "CONNECTIVITY",
+                                  "RETRY_EXHAUSTED",
+                                  "TIMEOUT"
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "target",
+                            "required": "true"
+                          },
+                          "model": {
+                            "format": {
+                              "id": "text",
+                              "label": "Text",
+                              "validMimeTypes": [
+                                "text/plain"
+                              ]
+                            },
+                            "type": "String",
+                            "annotations": {
+                              "typeId": "errorTypeDefinition"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3,
+                    "tabName": "Error Mapping"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "errorMappings",
+                  "description": "Set of error mappings",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "error-mapping",
+                        "prefix": "mule"
+                      }
+                    },
+                    "sinceMuleVersion": {
+                      "version": "4.4.0"
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 12
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "showInDsl": false,
+              "name": "Error Mappings",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "getSecondBarberPreferences",
           "description": "",
           "modelProperties": {},
           "kind": "operation"
@@ -27627,6 +28052,8 @@
             "dateOfGraduation",
             "knownAddresses",
             "description",
+            "fullyBald",
+            "beardTrimming",
             "fullyBald",
             "beardTrimming",
             "worksAtDEA",
@@ -53523,6 +53950,94 @@
         {
           "key": {
             "name": "barberPreferences",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.heisenberg.extension.model.BarberPreferences",
+              "classInformation": {
+                "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "typeAlias": {
+                "value": "BarberPreferences"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "fullyBald"
+                },
+                "model": {
+                  "type": "Boolean",
+                  "annotations": {
+                    "typeId": "boolean"
+                  }
+                },
+                "annotations": {
+                  "default": "false",
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "beardTrimming"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                    "enum": {
+                      "type": "[Ljava.lang.String;",
+                      "values": [
+                        "GOATIE",
+                        "MUSTACHE"
+                      ]
+                    },
+                    "classInformation": {
+                      "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences$BEARD_KIND",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [],
+                      "parent": "java.lang.Enum",
+                      "genericTypes": [],
+                      "isMap": false
+                    }
+                  }
+                },
+                "annotations": {
+                  "default": "GOATIE",
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "flattened": {},
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "secondBarberPreferences",
             "required": "true"
           },
           "model": {
