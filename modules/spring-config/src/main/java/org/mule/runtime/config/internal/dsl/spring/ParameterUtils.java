@@ -6,17 +6,15 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.util.stream.Collectors.toList;
+
+import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-
-import static java.util.stream.Collectors.toList;
 
 public class ParameterUtils {
 
@@ -24,37 +22,6 @@ public class ParameterUtils {
 
   public ParameterUtils() {
     parameterGroupUtils = new ParameterGroupUtils();
-  }
-
-  public ComponentParameterAst getParamInOwnerComponent(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    ComponentAst ownerComponent = createBeanDefinitionRequest.resolveOwnerComponent();
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
-
-    if (ownerComponent == null) {
-      return null;
-    }
-
-    final String paramName = getParamName(ownerComponent, componentModel.getIdentifier().getName());
-
-    ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
-
-    if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-      return parameterGroupUtils.getComponentParameterAstFromSourceModel(createBeanDefinitionRequest, ownerComponent, paramName,
-                                                                         (SourceModel) ownerComponentModel);
-    }
-
-    if (paramName == null) {
-      return ownerComponent.getParameter(componentModel.getIdentifier().getName());
-    }
-
-    ComponentParameterAst paramInOwner = ownerComponent.getParameter(paramName);
-
-    if (paramInOwner == null) {
-      // XML SDK 1 allows for hyphenated names in parameters, so need to account for those.
-      return ownerComponent.getParameter(componentModel.getIdentifier().getName());
-    }
-
-    return paramInOwner;
   }
 
   /**
