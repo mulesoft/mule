@@ -48,13 +48,9 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
     if (Collection.class.isAssignableFrom(objectTypeVisitor.getType())) {
       createBeanDefinitionRequest.getSpringComponentModel().setType(objectTypeVisitor.getType());
 
-      final ComponentAst paramOwnerComponentModel = createBeanDefinitionRequest.getComponentModelHierarchy()
-          .get(createBeanDefinitionRequest.getComponentModelHierarchy().size() - 1);
       final ComponentParameterAst param =
-          paramOwnerComponentModel.getParameter(createBeanDefinitionRequest.getParamName());
+          createBeanDefinitionRequest.getParamOwnerComponentModel().getParameter(createBeanDefinitionRequest.getParamName());
       Collection<ComponentAst> items = (Collection<ComponentAst>) param.getValue().getRight();
-
-      // items.forEach(nestedComponentParamProcessor);
 
       ManagedList<Object> managedList = items.stream()
           .map(springComponentModels::get)
