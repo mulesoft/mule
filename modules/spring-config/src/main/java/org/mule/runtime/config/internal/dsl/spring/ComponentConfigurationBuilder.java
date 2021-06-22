@@ -335,9 +335,6 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
-            // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
-            // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
-            // previous implementations.
             int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
             final ComponentAst possibleGroup =
                 ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
