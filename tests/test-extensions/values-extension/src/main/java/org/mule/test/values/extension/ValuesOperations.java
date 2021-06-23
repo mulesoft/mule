@@ -39,6 +39,7 @@ import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupVal
 import org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
+import org.mule.test.values.extension.resolver.WithReservedNameActingParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithTwoActingParametersValueProvider;
 
 import java.io.InputStream;
@@ -257,4 +258,7 @@ public class ValuesOperations {
       value = SimpleValueProvider.class) @FieldValues(
           targetSelectors = "target.channelId",
           value = SimpleValueProvider.class) InputStream body) {}
+
+  public void actingParameterWithReservedName(String type,
+                                              @OfValues(WithReservedNameActingParameterValueProvider.class) String parameterWithValues) {}
 }

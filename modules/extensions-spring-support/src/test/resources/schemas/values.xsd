@@ -632,6 +632,16 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ActingParameterWithReservedNameType" substitutionGroup="mule:abstract-operator" name="acting-parameter-with-reserved-name"></xs:element>
+  <xs:complexType name="ActingParameterWithReservedNameType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AttributeAsActingForTagContentValueType" substitutionGroup="mule:abstract-operator" name="attribute-as-acting-for-tag-content-value"></xs:element>
   <xs:complexType name="AttributeAsActingForTagContentValueType">
     <xs:complexContent>
