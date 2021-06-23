@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.lang.System.getProperty;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assume.assumeThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
@@ -50,7 +53,7 @@ public class SpringXmlConfigurationBuilderTestCase {
   }
 
   @Test
-  @Issue("EE-7827")
+  @Issue("MULE-19534")
   public void configureWithFailOnFirstError() throws ConfigurationException {
     expectedException.expect(ConfigurationException.class);
     expectedException
@@ -61,8 +64,9 @@ public class SpringXmlConfigurationBuilderTestCase {
   }
 
   @Test
-  @Issue("EE-7827")
+  @Issue("MULE-19534")
   public void configureWithFailAfterTenErrors() throws ConfigurationException {
+    assumeThat(getProperty("java.version"), startsWith("1.8"));
     expectedException.expect(ConfigurationException.class);
     expectedException
         .expectMessage(containsString("Invalid content was found starting with element 'invalid-namespace:config'."));
