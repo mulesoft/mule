@@ -68,6 +68,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -120,6 +121,7 @@ public class BeanDefinitionFactory {
   private final String artifactId;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private final BeanDefinitionCreator componentModelProcessor;
+  private final BeanDefinitionCreator componentModelProcessorParam;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
   /**
@@ -131,6 +133,7 @@ public class BeanDefinitionFactory {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
+    this.componentModelProcessorParam = buildParamComponentModelProcessorChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
 
     registerConfigurationPropertyProviders();
@@ -171,6 +174,7 @@ public class BeanDefinitionFactory {
         .ifPresent(pmzd -> {
           pmzd.getParameterGroupModels().forEach(pmg -> {
             List<SpringComponentModel> groupParamsModels = new ArrayList<>();
+            AtomicBoolean anyParamPresent = new AtomicBoolean();
             pmg.getParameterModels().forEach(pm -> {
               final ComponentParameterAst param;
               if (pmg.isShowInDsl()) {
@@ -182,27 +186,30 @@ public class BeanDefinitionFactory {
               if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
                 resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
                                            componentLocator, groupParamsModels, param);
+                anyParamPresent.set(true);
               }
             });
 
-            if (pmg.isShowInDsl()) {
-              final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentModelHierarchy);
-              nestedHierarchy.add(componentModel);
+            if (anyParamPresent.get()) {
+              if (pmg.isShowInDsl()) {
+                final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentModelHierarchy);
+                nestedHierarchy.add(componentModel);
 
-              resolveComponentBeanDefinitionParamGroup(springComponentModels, nestedHierarchy, groupParamsModels, pmg,
-                                                       nestedComp -> resolveComponent(springComponentModels,
-                                                                                      componentModelHierarchy, nestedComp,
-                                                                                      registry, componentLocator),
-                                                       springComponentModel -> {
-                                                         paramsModels.add(springComponentModel);
-                                                         handleSpringComponentModel(springComponentModel,
-                                                                                    springComponentModel.getComponent(),
-                                                                                    springComponentModels,
-                                                                                    registry,
-                                                                                    componentLocator);
-                                                       });
-            } else {
-              paramsModels.addAll(groupParamsModels);
+                resolveComponentBeanDefinitionParamGroup(springComponentModels, nestedHierarchy, groupParamsModels, pmg,
+                                                         nestedComp -> resolveComponent(springComponentModels,
+                                                                                        componentModelHierarchy, nestedComp,
+                                                                                        registry, componentLocator),
+                                                         springComponentModel -> {
+                                                           paramsModels.add(springComponentModel);
+                                                           handleSpringComponentModel(springComponentModel,
+                                                                                      springComponentModel.getComponent(),
+                                                                                      springComponentModels,
+                                                                                      registry,
+                                                                                      componentLocator);
+                                                         });
+              } else {
+                paramsModels.addAll(groupParamsModels);
+              }
             }
           });
         });
@@ -515,8 +522,8 @@ public class BeanDefinitionFactory {
                                                                                       param,
                                                                                       buildingDefinitionOptional.orElse(null));
           request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
-          this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
-                                                      componentBeanDefinitionHandler);
+          this.componentModelProcessorParam.processRequest(springComponentModels, request, nestedComponentParamProcessor,
+                                                           componentBeanDefinitionHandler);
 
           return request.getSpringComponentModel();
         });
@@ -591,6 +598,22 @@ public class BeanDefinitionFactory {
   }
 
   private BeanDefinitionCreator buildComponentModelProcessorChainOfResponsability() {
+    EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
+    ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
+    PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
+    SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
+    MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
+    CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
+
+    eagerObjectCreator.setNext(objectBeanDefinitionCreator);
+    objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);
+    propertiesMapBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
+    simpleTypeBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);
+    mapEntryBeanDefinitionCreator.setNext(commonComponentModelProcessor);
+    return eagerObjectCreator;
+  }
+
+  private BeanDefinitionCreator buildParamComponentModelProcessorChainOfResponsability() {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
     PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
