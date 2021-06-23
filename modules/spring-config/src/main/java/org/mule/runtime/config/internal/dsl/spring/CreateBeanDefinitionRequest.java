@@ -64,7 +64,9 @@ public class CreateBeanDefinitionRequest {
     this.param = param;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
-    springComponentModel.setComponentIdentifier(componentBuildingDefinition.getComponentIdentifier());
+    springComponentModel.setComponentIdentifier(componentModel != null
+        ? componentModel.getIdentifier()
+        : componentBuildingDefinition.getComponentIdentifier());
     springComponentModel.setComponent(componentModel);
 
     this.typeVisitorRetriever = new LazyValue<>(() -> {
