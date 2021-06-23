@@ -13,12 +13,12 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 public final class ParameterGroupUtils {
 
@@ -65,7 +65,7 @@ public final class ParameterGroupUtils {
         .filter(parameterGroupModel -> parameterGroupModel.getParameter(parameterName).isPresent() &&
             parameterGroupModel.isShowInDsl() &&
             getChildElementName(ownerComponent, parameterGroupModel)
-                .map(en -> possibleGroup.getIdentifier().getName().equals(en))
+                .map(en -> possibleGroup != null && possibleGroup.getIdentifier().getName().equals(en))
                 .orElse(false))
         .findFirst();
   }
