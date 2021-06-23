@@ -23,6 +23,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExportedPackagesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @since 4.0
  */
-final public class ExportedArtifactsCollector {
+final public class ExportedPackagesCollector {
 
   private final Set<String> filteredPackages =
       ImmutableSet.<String>builder().add("java.", "javax.", "org.mule.runtime.", "com.mulesoft.mule.runtime").build();
@@ -57,7 +58,7 @@ final public class ExportedArtifactsCollector {
    *
    * @param extensionModel the {@link ExtensionModel model} for the analyzed extension
    */
-  public ExportedArtifactsCollector(ExtensionModel extensionModel) {
+  public ExportedPackagesCollector(ExtensionModel extensionModel) {
     this(extensionModel, new DefaultClassPackageFinder());
   }
 
@@ -66,7 +67,7 @@ final public class ExportedArtifactsCollector {
    *
    * @param extensionModel the {@link ExtensionModel model} for the analyzed extension
    */
-  public ExportedArtifactsCollector(ExtensionModel extensionModel, ClassPackageFinder packageFinder) {
+  public ExportedPackagesCollector(ExtensionModel extensionModel, ClassPackageFinder packageFinder) {
     this.extensionModel = extensionModel;
     this.packageFinder = packageFinder;
   }
@@ -138,6 +139,8 @@ final public class ExportedArtifactsCollector {
 
   private void collectManuallyExportedPackages() {
     extensionModel.getTypes().forEach(t -> getId(t).ifPresent(exportedClasses::add));
+    extensionModel.getModelProperty(ExportedPackagesModelProperty.class)
+            .ifPresent(p -> exportedClasses.addAll(p.getExportedPackages()));
   }
 
   private void collectDefault() {

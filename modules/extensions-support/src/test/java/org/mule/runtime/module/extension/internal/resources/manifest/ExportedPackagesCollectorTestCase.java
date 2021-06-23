@@ -51,7 +51,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.google.common.reflect.TypeToken;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExportedArtifactsCollectorTestCase extends AbstractMuleTestCase {
+public class ExportedPackagesCollectorTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
@@ -65,7 +65,7 @@ public class ExportedArtifactsCollectorTestCase extends AbstractMuleTestCase {
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
-  private ExportedArtifactsCollector collector;
+  private ExportedPackagesCollector collector;
 
   @Before
   public void setup() {
@@ -84,7 +84,7 @@ public class ExportedArtifactsCollectorTestCase extends AbstractMuleTestCase {
     withMethod(secondOperation, empty());
     when(extensionModel.getOperationModels()).thenReturn(asList(firstOperation, secondOperation));
     visitableMock(firstOperation, secondOperation);
-    collector = new ExportedArtifactsCollector(extensionModel);
+    collector = new ExportedPackagesCollector(extensionModel);
   }
 
   private void withMethod(OperationModel operationModel, Optional<Method> optionalMethod) {
