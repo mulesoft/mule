@@ -25,6 +25,8 @@ import java.util.HashMap;
 import javax.inject.Inject;
 
 import io.qameta.allure.Issue;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,6 +65,7 @@ public class SpringXmlConfigurationBuilderTestCase {
   @Test
   @Issue("EE-7827")
   public void configureWithFailAfterTenErrors() throws ConfigurationException {
+    Assume.assumeThat(System.getProperty("java.version"), CoreMatchers.startsWith("1.8"));
     expectedException.expect(ConfigurationException.class);
     expectedException
         .expectMessage(containsString("Invalid content was found starting with element 'invalid-namespace:config'."));
