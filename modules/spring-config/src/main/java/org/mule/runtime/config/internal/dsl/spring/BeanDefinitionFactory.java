@@ -166,30 +166,24 @@ public class BeanDefinitionFactory {
     List<SpringComponentModel> paramsModels = new ArrayList<>();
 
 
-    // componentModel.getModel(ParameterizedModel.class)
-    // .ifPresent(pmzd -> {
-    // pmzd.getParameterGroupModels().forEach(pmg -> {
-    // pmg.getParameterModels().forEach(pm -> {
-    // final ComponentParameterAst param;
-    // if (pmg.isShowInDsl()) {
-    // param = componentModel.getParameter(pmg.getName(), pm.getName());
-    // } else {
-    // param = componentModel.getParameter(pm.getName());
-    // }
-    //
-    // if (param != null && param.getValue() != null) {
-    // resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
-    // componentLocator, paramsModels, param);
-    // }
-    // });
-    // });
-    // });
+    componentModel.getModel(ParameterizedModel.class)
+        .ifPresent(pmzd -> {
+          pmzd.getParameterGroupModels().forEach(pmg -> {
+            pmg.getParameterModels().forEach(pm -> {
+              final ComponentParameterAst param;
+              if (pmg.isShowInDsl()) {
+                param = componentModel.getParameter(pmg.getName(), pm.getName());
+              } else {
+                param = componentModel.getParameter(pm.getName());
+              }
 
-    componentModel.getParameters()
-        .stream()
-        .filter(param -> param.getValue() != null)
-        .forEach(param -> resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
-                                                     componentLocator, paramsModels, param));
+              if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
+                resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
+                                           componentLocator, paramsModels, param);
+              }
+            });
+          });
+        });
 
     final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentModelHierarchy);
     nestedHierarchy.add(componentModel);
