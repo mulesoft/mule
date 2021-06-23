@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.util.stream.Collectors.toCollection;
 
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 
@@ -48,9 +47,7 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
     if (Collection.class.isAssignableFrom(objectTypeVisitor.getType())) {
       createBeanDefinitionRequest.getSpringComponentModel().setType(objectTypeVisitor.getType());
 
-      final ComponentParameterAst param =
-          createBeanDefinitionRequest.getParamOwnerComponentModel().getParameter(createBeanDefinitionRequest.getParamName());
-      Collection<ComponentAst> items = (Collection<ComponentAst>) param.getValue().getRight();
+      Collection<ComponentAst> items = (Collection<ComponentAst>) createBeanDefinitionRequest.getParam().getValue().getRight();
 
       ManagedList<Object> managedList = items.stream()
           .map(springComponentModels::get)

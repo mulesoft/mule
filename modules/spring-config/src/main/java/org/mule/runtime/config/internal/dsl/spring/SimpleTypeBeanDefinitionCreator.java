@@ -40,10 +40,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
     createBeanDefinitionRequest.getSpringComponentModel().setType(type);
 
-    final ComponentAst paramOwner = createBeanDefinitionRequest.getParamOwnerComponentModel();
-    final ComponentParameterAst param = paramOwner != null
-        ? paramOwner.getParameter(createBeanDefinitionRequest.getParamName())
-        : null;
+    final ComponentParameterAst param = createBeanDefinitionRequest.getParam();
 
     if (param != null) {
       this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, param.getResolvedRawValue());

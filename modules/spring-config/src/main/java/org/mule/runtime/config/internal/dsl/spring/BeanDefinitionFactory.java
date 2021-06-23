@@ -164,6 +164,27 @@ public class BeanDefinitionFactory {
     }
 
     List<SpringComponentModel> paramsModels = new ArrayList<>();
+
+
+    // componentModel.getModel(ParameterizedModel.class)
+    // .ifPresent(pmzd -> {
+    // pmzd.getParameterGroupModels().forEach(pmg -> {
+    // pmg.getParameterModels().forEach(pm -> {
+    // final ComponentParameterAst param;
+    // if (pmg.isShowInDsl()) {
+    // param = componentModel.getParameter(pmg.getName(), pm.getName());
+    // } else {
+    // param = componentModel.getParameter(pm.getName());
+    // }
+    //
+    // if (param != null && param.getValue() != null) {
+    // resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
+    // componentLocator, paramsModels, param);
+    // }
+    // });
+    // });
+    // });
+
     componentModel.getParameters()
         .stream()
         .filter(param -> param.getValue() != null)
@@ -475,7 +496,7 @@ public class BeanDefinitionFactory {
                                                                                       componentModelHierarchy
                                                                                           .get(componentModelHierarchy.size()
                                                                                               - 1),
-                                                                                      param.getModel().getName(),
+                                                                                      param,
                                                                                       buildingDefinitionOptional.orElse(null));
           request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
           this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,

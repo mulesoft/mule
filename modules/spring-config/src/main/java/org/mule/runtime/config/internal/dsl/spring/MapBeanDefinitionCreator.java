@@ -54,9 +54,7 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator {
     Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
     if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null) {
 
-      final ComponentParameterAst param =
-          createBeanDefinitionRequest.getParamOwnerComponentModel().getParameter(createBeanDefinitionRequest.getParamName());
-      Collection<ComponentAst> items = (Collection<ComponentAst>) param.getValue().getRight();
+      Collection<ComponentAst> items = (Collection<ComponentAst>) createBeanDefinitionRequest.getParam().getValue().getRight();
 
       items.forEach(nestedComponentParamProcessor);
 

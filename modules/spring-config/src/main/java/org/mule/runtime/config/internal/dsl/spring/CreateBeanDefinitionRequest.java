@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -29,7 +30,7 @@ public class CreateBeanDefinitionRequest {
   private final ComponentAst componentModel;
   private final Collection<SpringComponentModel> paramsModels;
   private final ComponentAst paramOwnerComponentModel;
-  private final String paramName;
+  private final ComponentParameterAst param;
   private final ComponentBuildingDefinition componentBuildingDefinition;
   private final SpringComponentModel springComponentModel;
   private final Supplier<ObjectTypeVisitor> typeVisitorRetriever;
@@ -54,13 +55,13 @@ public class CreateBeanDefinitionRequest {
                                      ComponentAst componentModel,
                                      Collection<SpringComponentModel> paramsModels,
                                      ComponentAst paramOwnerComponentModel,
-                                     String paramName,
+                                     ComponentParameterAst param,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
     this.componentModelHierarchy = componentModelHierarchy;
     this.componentModel = componentModel;
     this.paramsModels = paramsModels;
     this.paramOwnerComponentModel = paramOwnerComponentModel;
-    this.paramName = paramName;
+    this.param = param;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
     springComponentModel.setComponentIdentifier(componentBuildingDefinition.getComponentIdentifier());
@@ -95,8 +96,8 @@ public class CreateBeanDefinitionRequest {
     return paramOwnerComponentModel;
   }
 
-  public String getParamName() {
-    return paramName;
+  public ComponentParameterAst getParam() {
+    return param;
   }
 
   public ComponentBuildingDefinition getComponentBuildingDefinition() {
