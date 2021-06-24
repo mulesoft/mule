@@ -26,6 +26,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -130,14 +131,15 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
   }
 
   /**
-   * This method is just loading the SchedulingStrategy type from the core extension model, so it doesn't need to declare the
-   * subtypes (cron and fixed-frequency).
+   * This method is just loading the {@link SchedulingStrategy} type from the core extension model, so it doesn't need to declare
+   * the subtypes ({@code cron} and {@code fixed-frequency}).
    *
-   * It isn't implemented as an UnionType because of backwards compatibility (see MULE-19167 and
+   * <p>
+   * It isn't implemented as an {@link UnionType} because of backwards compatibility (see MULE-19167 and
    * {@link MuleExtensionModelDeclarer}).
    *
    * @param loader The type loader.
-   * @return The scheduling-strategy parameter type.
+   * @return The {@code scheduling-strategy} parameter type.
    */
   private MetadataType loadSchedulingStrategyType(ClassTypeLoader loader) {
     return loader.load(SchedulingStrategy.class);

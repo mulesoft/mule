@@ -76,6 +76,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -254,7 +255,7 @@ class MuleExtensionModelDeclarer {
   }
 
   /**
-   * The scheduling-strategy type may be {@code cron} or {@code fixed-frequency}, and this hierarchy is implemented by
+   * The {@code scheduling-strategy} type may be {@code cron} or {@code fixed-frequency}, and this hierarchy is implemented by
    * using subtypes. It makes the resulting XML look like this:
    *
    * <pre>
@@ -268,7 +269,7 @@ class MuleExtensionModelDeclarer {
    * }
    * </pre>
    *
-   * If it were implemented as an UnionType (see MULE-19167) it would look like this, and it would break backwards:
+   * If it were implemented as an {@link UnionType} (see MULE-19167) it would look like this, and it would break backwards:
    *
    * <pre>
    * {
@@ -279,7 +280,7 @@ class MuleExtensionModelDeclarer {
    * }
    * </pre>
    *
-   * This type is imported by the SDK in order to support polling sources.
+   * NOTE: This type is imported by the SDK in order to support polling sources at {@link PollingSourceDeclarationEnricher}.
    */
   private MetadataType buildSchedulingStrategyType(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     MetadataType baseSchedulingStrategy = typeLoader.load(SchedulingStrategy.class);
