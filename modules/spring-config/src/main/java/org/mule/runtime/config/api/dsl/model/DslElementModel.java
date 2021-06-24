@@ -18,6 +18,8 @@ import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -237,6 +239,11 @@ public class DslElementModel<T> {
       return this;
     }
 
+    public Builder<M> withGroupConfig(ComponentAst paramsOwner, ParameterGroupModel dslGroup) {
+      this.configuration = paramsOwner != null ? from(paramsOwner, dslGroup) : null;
+      return this;
+    }
+
     private ComponentConfiguration from(ComponentAst element) {
       InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
           .withIdentifier(element.getIdentifier())
@@ -247,24 +254,16 @@ public class DslElementModel<T> {
       element.getModel(ParameterizedModel.class)
           .ifPresent(pmzd -> {
             if (pmzd instanceof SourceModel) {
-              ((SourceModel) pmzd).getSuccessCallback().ifPresent(cbk -> {
-                cbk.getParameterGroupModels()
-                    .forEach(pmg -> {
-                      fromSourceCallbackGroup(pmg, element, dslGroupsAsChildrenNames, builder);
-                    });
-              });
-              ((SourceModel) pmzd).getErrorCallback().ifPresent(cbk -> {
-                cbk.getParameterGroupModels()
-                    .forEach(pmg -> {
-                      fromSourceCallbackGroup(pmg, element, dslGroupsAsChildrenNames, builder);
-                    });
-              });
+              ((SourceModel) pmzd).getSuccessCallback()
+                  .ifPresent(cbk -> cbk.getParameterGroupModels()
+                      .forEach(pmg -> fromSourceCallbackGroup(pmg, element, dslGroupsAsChildrenNames, builder)));
+              ((SourceModel) pmzd).getErrorCallback()
+                  .ifPresent(cbk -> cbk.getParameterGroupModels()
+                      .forEach(pmg -> fromSourceCallbackGroup(pmg, element, dslGroupsAsChildrenNames, builder)));
             }
 
             pmzd.getParameterGroupModels()
-                .forEach(pmg -> {
-                  fromGroup(pmg, element, dslGroupsAsChildrenNames, builder);
-                });
+                .forEach(pmg -> fromGroup(pmg, element, dslGroupsAsChildrenNames, builder));
           });
 
       final List<String> paramsAsChildrenNames = element.getModel(ParameterizedModel.class)
@@ -305,6 +304,30 @@ public class DslElementModel<T> {
       builder.withProperty(COMPONENT_AST_KEY, element);
 
       return builder.build();
+    }
+
+    private ComponentConfiguration from(ComponentAst paramsOwner, ParameterGroupModel dslGroup) {
+      return paramsOwner.getGenerationInformation().getSyntax()
+          .flatMap(ownerSyntax -> ownerSyntax.getChild(dslGroup.getName()))
+          .map(groupSyntax -> {
+            final ComponentIdentifier groupIdentifier = ComponentIdentifier.builder()
+                .name(groupSyntax.getElementName())
+                .namespace(groupSyntax.getPrefix())
+                .namespaceUri(groupSyntax.getNamespace())
+                .build();
+
+            InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
+                .withIdentifier(groupIdentifier);
+
+            dslGroup.getParameterModels().forEach(pm -> {
+              final ComponentParameterAst param = paramsOwner.getParameter(dslGroup.getName(), pm.getName());
+
+              handleParam(param, param.getModel().getType(), builder);
+            });
+
+            return builder.build();
+          })
+          .get();
     }
 
     protected void fromSourceCallbackGroup(ParameterGroupModel pmg, ComponentAst element,
@@ -366,6 +389,34 @@ public class DslElementModel<T> {
     }
 
     protected void handleParam(ComponentParameterAst param, MetadataType type, InternalComponentConfiguration.Builder builder) {
+      param.getValue().apply(expr -> handleExpressionParam(param, expr, builder),
+                             v -> handleFixedValueParam(param, type, builder));
+
+    }
+
+    protected void handleExpressionParam(ComponentParameterAst param, String expr,
+                                         InternalComponentConfiguration.Builder builder) {
+      if (isContent(param.getModel()) || isText(param.getModel())) {
+        param.getGenerationInformation().getSyntax().ifPresent(contentParamSyntax -> {
+          final ComponentIdentifier contentParamIdentifier = ComponentIdentifier.builder()
+              .namespaceUri(contentParamSyntax.getNamespace())
+              .namespace(contentParamSyntax.getPrefix())
+              .name(contentParamSyntax.getElementName()).build();
+
+          InternalComponentConfiguration.Builder dslElementBuilder = InternalComponentConfiguration.builder()
+              .withIdentifier(contentParamIdentifier);
+
+          dslElementBuilder.withValue("#[" + expr + "]");
+
+          builder.withNestedComponent(dslElementBuilder.build());
+        });
+      } else {
+        builder.withParameter(param.getModel().getName(), expr);
+      }
+    }
+
+    protected void handleFixedValueParam(ComponentParameterAst param, MetadataType type,
+                                         InternalComponentConfiguration.Builder builder) {
       type.accept(new MetadataTypeVisitor() {
 
         @Override
@@ -385,10 +436,12 @@ public class DslElementModel<T> {
                     .name(dslElementSyntax.getElementName()).build();
 
                 if (param.getValue().getRight() instanceof Collection) {
-                  InternalComponentConfiguration.Builder listWrapperBuilder = InternalComponentConfiguration.builder()
-                      .withIdentifier(listWrapperIdentifier);
+                  InternalComponentConfiguration.Builder listWrapperBuilder =
+                      InternalComponentConfiguration.builder()
+                          .withIdentifier(listWrapperIdentifier);
 
-                  Collection<ComponentAst> arrayValues = (Collection<ComponentAst>) param.getValue().getRight();
+                  Collection<ComponentAst> arrayValues =
+                      (Collection<ComponentAst>) param.getValue().getRight();
                   if (arrayValues != null) {
                     for (ComponentAst child : arrayValues) {
                       listWrapperBuilder.withNestedComponent(from(child));
@@ -414,11 +467,13 @@ public class DslElementModel<T> {
                       .namespace(dslElementSyntax.getPrefix())
                       .name(dslElementSyntax.getElementName()).build();
 
-                  InternalComponentConfiguration.Builder listWrapperBuilder = InternalComponentConfiguration.builder()
-                      .withIdentifier(listWrapperIdentifier);
+                  InternalComponentConfiguration.Builder listWrapperBuilder =
+                      InternalComponentConfiguration.builder()
+                          .withIdentifier(listWrapperIdentifier);
 
                   // Collection mapValues = (Collection) param.getValue().getRight();
-                  Collection<ComponentAst> mapValues = (Collection<ComponentAst>) param.getValue().getRight();
+                  Collection<ComponentAst> mapValues =
+                      (Collection<ComponentAst>) param.getValue().getRight();
                   if (mapValues != null) {
                     for (ComponentAst child : mapValues) {
                       listWrapperBuilder.withNestedComponent(from(child));
@@ -440,7 +495,8 @@ public class DslElementModel<T> {
               .ifPresent(dslElementSyntax -> {
                 unionType.getTypes()
                     .stream()
-                    .filter(type -> type.equals(((ComponentAst) (param.getValue().getRight())).getType()))
+                    .filter(type -> type
+                        .equals(((ComponentAst) (param.getValue().getRight())).getType()))
                     .findAny()
                     .ifPresent(type -> {
                       final ComponentIdentifier unionWrapperIdentifier = ComponentIdentifier.builder()
@@ -448,8 +504,9 @@ public class DslElementModel<T> {
                           .namespace(dslElementSyntax.getPrefix())
                           .name(dslElementSyntax.getElementName()).build();
 
-                      InternalComponentConfiguration.Builder unionWrapperBuilder = InternalComponentConfiguration.builder()
-                          .withIdentifier(unionWrapperIdentifier);
+                      InternalComponentConfiguration.Builder unionWrapperBuilder =
+                          InternalComponentConfiguration.builder()
+                              .withIdentifier(unionWrapperIdentifier);
 
                       handleParam(param, type, unionWrapperBuilder);
 

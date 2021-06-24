@@ -306,7 +306,6 @@ class ComponentAstBasedElementModelFactory {
                                              DslElementModel.Builder builder, ComponentAst configuration,
                                              Function<ParameterGroupModel, Function<ParameterModel, ComponentParameterAst>> paramFetcher) {
 
-    Multimap<ComponentIdentifier, ComponentAst> innerComponents = getNestedComponents(configuration);
     Map<String, String> parameters = configuration.getParameters()
         .stream()
         .filter(p -> p.getResolvedRawValue() != null)
@@ -314,17 +313,15 @@ class ComponentAstBasedElementModelFactory {
 
     model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
-        .forEach(group -> addInlineGroup(configuration, innerComponents, parameters, builder, group,
+        .forEach(group -> addInlineGroup(configuration, parameters, builder, group,
                                          paramFetcher.apply(group)));
 
-
-    model.getParameterGroupModels()
+    model.getParameterGroupModels().stream()
+        .filter(g -> !g.isShowInDsl())
         .forEach(g -> {
           g.getParameterModels().forEach(p -> {
-            if (!g.isShowInDsl()) {
-              addElementParameter(configuration, innerComponents, parameters, elementDsl, builder, p,
-                                  paramModel -> configuration.getParameter(paramModel.getName()));
-            }
+            addElementParameter(configuration, parameters, elementDsl, builder, p,
+                                paramModel -> configuration.getParameter(paramModel.getName()));
           });
         });
   }
@@ -369,8 +366,7 @@ class ComponentAstBasedElementModelFactory {
         .forEach(nestedComponentConfig -> create(nestedComponentConfig).ifPresent(builder::containing));
   }
 
-  private void addInlineGroup(ComponentAst configuration, Multimap<ComponentIdentifier, ComponentAst> innerComponents,
-                              Map<String, String> parameters,
+  private void addInlineGroup(ComponentAst configuration, Map<String, String> parameters,
                               DslElementModel.Builder parent, ParameterGroupModel group,
                               Function<ParameterModel, ComponentParameterAst> paramFetcher) {
     final DslElementSyntax groupSyntax =
@@ -383,17 +379,14 @@ class ComponentAstBasedElementModelFactory {
         .withModel(group)
         .withDsl(groupSyntax);
 
-    ComponentAst groupComponent = getSingleComponentConfiguration(innerComponents, identifier);
-    if (groupComponent != null) {
-      groupElementBuilder.withConfig(groupComponent);
+    if (configuration.getParameters().stream().anyMatch(param -> param.getGroupModel().equals(group))) {
+      groupElementBuilder.withGroupConfig(configuration, group);
 
-      Multimap<ComponentIdentifier, ComponentAst> groupInnerComponents = getNestedComponents(groupComponent);
       group.getParameterModels()
-          .forEach(p -> addElementParameter(configuration, groupInnerComponents, parameters, groupSyntax, groupElementBuilder,
+          .forEach(p -> addElementParameter(configuration, parameters, groupSyntax, groupElementBuilder,
                                             p, paramFetcher));
 
       parent.containing(groupElementBuilder.build());
-
     } else if (shouldBuildDefaultGroup(group)) {
       buildDefaultInlineGroupElement(parent, groupElementBuilder.isExplicitInDsl(false), group, groupSyntax,
                                      identifier.get());
@@ -448,8 +441,7 @@ class ComponentAstBasedElementModelFactory {
     return !isRequired(group) && group.getParameterModels().stream().anyMatch(p -> getDefaultValue(p).isPresent());
   }
 
-  private void addElementParameter(ComponentAst configuration, Multimap<ComponentIdentifier, ComponentAst> innerComponents,
-                                   Map<String, String> parameters,
+  private void addElementParameter(ComponentAst configuration, Map<String, String> parameters,
                                    DslElementSyntax groupDsl, DslElementModel.Builder<ParameterGroupModel> groupElementBuilder,
                                    ParameterModel paramModel, Function<ParameterModel, ComponentParameterAst> paramFetcher) {
     final DslElementSyntax paramSyntax = groupDsl.getContainedElement(paramModel.getName())
