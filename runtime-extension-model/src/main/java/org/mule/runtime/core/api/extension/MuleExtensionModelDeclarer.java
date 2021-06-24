@@ -76,6 +76,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -241,10 +242,9 @@ class MuleExtensionModelDeclarer {
     scheduler.withOutput().ofType(typeLoader.load(Object.class));
     scheduler.withOutputAttributes().ofType(typeLoader.load(Object.class));
 
-    MetadataType baseSchedulingStrategy = typeLoader.load(SchedulingStrategy.class);
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
-        .ofType(baseSchedulingStrategy)
+        .ofType(buildSchedulingStrategyType(extensionDeclarer, typeLoader))
         .withExpressionSupport(NOT_SUPPORTED);
 
     scheduler.onDefaultParameterGroup()
@@ -252,6 +252,38 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(Boolean.class))
         .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED);
+  }
+
+  /**
+   * The {@code scheduling-strategy} type may be {@code cron} or {@code fixed-frequency}, and this hierarchy is implemented by
+   * using subtypes. It makes the resulting XML look like this:
+   *
+   * <pre>
+   * {
+   *   &#64;code
+   *   <scheduler>
+   *     <scheduling-strategy>
+   *       <fixed-frequency params... />
+   *     </scheduling-strategy>
+   *   </scheduler>
+   * }
+   * </pre>
+   *
+   * If it were implemented as an {@link UnionType} (see MULE-19167) it would look like this, and it would break backwards:
+   *
+   * <pre>
+   * {
+   *   &#64;code
+   *   <scheduler>
+   *     <fixed-frequency params... />
+   *   </scheduler>
+   * }
+   * </pre>
+   *
+   * NOTE: This type is imported by the SDK in order to support polling sources at {@link PollingSourceDeclarationEnricher}.
+   */
+  private MetadataType buildSchedulingStrategyType(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    MetadataType baseSchedulingStrategy = typeLoader.load(SchedulingStrategy.class);
 
     MetadataType fixedFrequencyScheduler = typeLoader.load(FixedFrequencyScheduler.class);
     MetadataType cronScheduler = typeLoader.load(CronScheduler.class);
@@ -263,6 +295,7 @@ class MuleExtensionModelDeclarer {
     extensionDeclarer.getDeclaration().addType((ObjectType) fixedFrequencyScheduler);
     extensionDeclarer.getDeclaration().addType((ObjectType) cronScheduler);
 
+    return baseSchedulingStrategy;
   }
 
   private void declareIdempotentValidator(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
