@@ -133,7 +133,8 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
    * This method is just loading the SchedulingStrategy type from the core extension model, so it doesn't need to declare the
    * subtypes (cron and fixed-frequency).
    *
-   * It isn't implemented as an UnionType because of backwards compatibility (see MULE-19167 and MuleExtensionModelDeclarer).
+   * It isn't implemented as an UnionType because of backwards compatibility (see MULE-19167 and
+   * {@link MuleExtensionModelDeclarer}).
    *
    * @param loader The type loader.
    * @return The scheduling-strategy parameter type.

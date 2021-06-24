@@ -254,8 +254,8 @@ class MuleExtensionModelDeclarer {
   }
 
   /**
-   * The scheduling-strategy type may be cron or fixed-frequency, and this hierarchy is implemented by using subtypes. It makes
-   * the resulting XML look like this:
+   * The scheduling-strategy type may be {@code cron} or {@code fixed-frequency}, and this hierarchy is implemented by
+   * using subtypes. It makes the resulting XML look like this:
    *
    * <pre>
    * {
