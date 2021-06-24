@@ -185,7 +185,8 @@ public class BeanDefinitionFactory {
                 param = componentModel.getParameter(pm.getName());
               }
 
-              if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
+              if (param != null && param.getValue() != null && !param.isDefaultValue()
+                  && param.getValue().getValue().isPresent()) {
                 resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
                                            componentLocator, groupParamsModels, param);
                 anyParamPresent.set(true);
@@ -548,11 +549,10 @@ public class BeanDefinitionFactory {
           Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
               componentBuildingDefinitionRegistry.getBuildingDefinition(paramComponentIdentifier);
           if (buildingDefinitionOptional.isPresent()) {
+            final ComponentAst paramOwnerComponentModel = componentModelHierarchy.get(componentModelHierarchy.size() - 1);
             final CreateBeanDefinitionRequest request =
                 new CreateBeanDefinitionRequest(componentModelHierarchy, null, paramsModels,
-                                                componentModelHierarchy
-                                                    .get(componentModelHierarchy.size()
-                                                        - 1),
+                                                paramOwnerComponentModel,
                                                 param,
                                                 buildingDefinitionOptional.orElse(null));
             request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
@@ -571,13 +571,11 @@ public class BeanDefinitionFactory {
                                                                                   ParameterGroupModel paramGroupModel,
                                                                                   Consumer<ComponentAst> nestedComponentParamProcessor,
                                                                                   Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    final ComponentAst paramOwnerComponentModel = componentModelHierarchy
-        .get(componentModelHierarchy.size()
-            - 1);
+    final ComponentAst paramOwnerComponentModel = componentModelHierarchy.get(componentModelHierarchy.size() - 1);
 
     return paramOwnerComponentModel.getGenerationInformation().getSyntax()
         .flatMap(ownerSyntax -> ownerSyntax.getChild(paramGroupModel.getName()))
-        .map(groupSyntax -> {
+        .flatMap(groupSyntax -> {
 
           ComponentIdentifier paramComponentIdentifier = ComponentIdentifier.builder()
               .namespaceUri(groupSyntax.getNamespace())
@@ -587,15 +585,20 @@ public class BeanDefinitionFactory {
 
           Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
               componentBuildingDefinitionRegistry.getBuildingDefinition(paramComponentIdentifier);
-          final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, null, paramsModels,
-                                                                                      paramOwnerComponentModel,
-                                                                                      null,
-                                                                                      buildingDefinitionOptional.orElse(null));
-          request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
-          this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
-                                                      componentBeanDefinitionHandler);
+          if (buildingDefinitionOptional.isPresent()) {
+            final CreateBeanDefinitionRequest request =
+                new CreateBeanDefinitionRequest(componentModelHierarchy, null, paramsModels,
+                                                paramOwnerComponentModel,
+                                                null,
+                                                buildingDefinitionOptional.orElse(null));
+            request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
+            this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
+                                                        componentBeanDefinitionHandler);
 
-          return request.getSpringComponentModel();
+            return of(request.getSpringComponentModel());
+          } else {
+            return empty();
+          }
         });
   }
 
