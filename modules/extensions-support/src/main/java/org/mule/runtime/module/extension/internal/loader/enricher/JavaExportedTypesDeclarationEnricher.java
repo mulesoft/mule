@@ -40,22 +40,22 @@ public final class JavaExportedTypesDeclarationEnricher extends AbstractAnnotate
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     extensionLoadingContext.getExtensionDeclarer().getDeclaration()
-            .getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-            .map(ExtensionTypeDescriptorModelProperty::getType)
-            .flatMap(type -> type.getValueFromAnnotation(Export.class))
-            .ifPresent(exportAnnotation -> {
-              Set<String> exportedClassNames = new LinkedHashSet<>();
-              ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
-              exportAnnotation.getClassArrayValue(Export::classes).forEach(type -> {
-                exportedClassNames.add(type.getClassInformation().getClassname());
-                registerType(declarer, type.asMetadataType());
-              });
-              exportAnnotation.getArrayValue(Export::resources).forEach(declarer::withResource);
+        .getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+        .map(ExtensionTypeDescriptorModelProperty::getType)
+        .flatMap(type -> type.getValueFromAnnotation(Export.class))
+        .ifPresent(exportAnnotation -> {
+          Set<String> exportedClassNames = new LinkedHashSet<>();
+          ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
+          exportAnnotation.getClassArrayValue(Export::classes).forEach(type -> {
+            exportedClassNames.add(type.getClassInformation().getClassname());
+            registerType(declarer, type.asMetadataType());
+          });
+          exportAnnotation.getArrayValue(Export::resources).forEach(declarer::withResource);
 
-              if (!exportedClassNames.isEmpty()) {
-                declarer.withModelProperty(new ExportedClassNamesModelProperty(exportedClassNames));
-              }
-            });
+          if (!exportedClassNames.isEmpty()) {
+            declarer.withModelProperty(new ExportedClassNamesModelProperty(exportedClassNames));
+          }
+        });
   }
 
   private void registerType(ExtensionDeclarer declarer, MetadataType type) {

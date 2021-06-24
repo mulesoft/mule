@@ -140,7 +140,7 @@ final public class ExportedPackagesCollector {
   private void collectManuallyExportedPackages() {
     extensionModel.getTypes().forEach(t -> getId(t).ifPresent(exportedClasses::add));
     extensionModel.getModelProperty(ExportedClassNamesModelProperty.class)
-            .ifPresent(p -> exportedClasses.addAll(p.getExportedClassNames()));
+        .ifPresent(p -> exportedClasses.addAll(p.getExportedClassNames()));
   }
 
   private void collectDefault() {

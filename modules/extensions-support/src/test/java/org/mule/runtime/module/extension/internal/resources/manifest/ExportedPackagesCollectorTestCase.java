@@ -108,13 +108,13 @@ public class ExportedPackagesCollectorTestCase extends AbstractMuleTestCase {
   @Test
   public void collectFromModelProperty() {
     when(extensionModel.getModelProperty(ExportedClassNamesModelProperty.class))
-            .thenReturn(of(new ExportedClassNamesModelProperty(singleton(FruitConsistency.class.getName()))));
+        .thenReturn(of(new ExportedClassNamesModelProperty(singleton(FruitConsistency.class.getName()))));
 
     Set<String> exportedPackages = collector.getExportedPackages();
     assertThat(exportedPackages, hasSize(7));
     assertThat(exportedPackages,
-            containsInAnyOrder(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE, SEED_PACKAGE, EXCEPTION_PACKAGE,
-                    FruitConsistency.class.getPackage().getName()));
+               containsInAnyOrder(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE, SEED_PACKAGE, EXCEPTION_PACKAGE,
+                                  FruitConsistency.class.getPackage().getName()));
   }
 
   private OutputModel mockOutputModel(Type type) {
