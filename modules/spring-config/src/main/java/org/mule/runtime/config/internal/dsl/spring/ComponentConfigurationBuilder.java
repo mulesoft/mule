@@ -76,7 +76,16 @@ class ComponentConfigurationBuilder<T> {
                                        ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     this.ownerComponent = ownerComponent;
-    this.componentModel = componentModel;
+
+    if (componentModel != null) {
+      this.componentModel = componentModel;
+    } else if (createBeanDefinitionRequest.getParam() != null
+        && createBeanDefinitionRequest.getParam().getValue().getRight() instanceof ComponentAst) {
+      this.componentModel = ((ComponentAst) createBeanDefinitionRequest.getParam().getValue().getRight());
+    } else {
+      this.componentModel = null;
+    }
+
     this.createBeanDefinitionRequest = createBeanDefinitionRequest;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
