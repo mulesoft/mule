@@ -108,7 +108,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
         ParameterDeclaration parameter = new ParameterDeclaration(SCHEDULING_STRATEGY_PARAMETER_NAME);
         parameter.setDescription(SCHEDULING_STRATEGY_PARAMETER_DESCRIPTION);
         parameter.setRequired(true);
-        parameter.setType(loader.load(SchedulingStrategy.class), false);
+        parameter.setType(loadSchedulingStrategyType(loader), false);
         parameter.setExpressionSupport(NOT_SUPPORTED);
         parameter.addModelProperty(new InfrastructureParameterModelProperty(schedulingStrategyParameterSequence));
         parameter.addModelProperty(new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER,
@@ -125,8 +125,21 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
 
     if (thereArePollingSources.get() && !isSchedulerAlreadyImported(extensionDeclarer.getDeclaration())) {
       ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-      extensionDeclarer.withImportedType(new ImportedTypeModel((ObjectType) typeLoader.load(SchedulingStrategy.class)));
+      extensionDeclarer.withImportedType(new ImportedTypeModel((ObjectType) loadSchedulingStrategyType(typeLoader)));
     }
+  }
+
+  /**
+   * This method is just loading the SchedulingStrategy type from the core extension model, so it doesn't need to
+   * declare the subtypes (cron and fixed-frequency).
+   *
+   * It isn't implemented as an UnionType because of backwards compatibility (see MULE-19167 and MuleExtensionModelDeclarer).
+   *
+   * @param loader The type loader.
+   * @return The scheduling-strategy parameter type.
+   */
+  private MetadataType loadSchedulingStrategyType(ClassTypeLoader loader) {
+    return loader.load(SchedulingStrategy.class);
   }
 
   private boolean isSchedulerAlreadyImported(ExtensionDeclaration extension) {
