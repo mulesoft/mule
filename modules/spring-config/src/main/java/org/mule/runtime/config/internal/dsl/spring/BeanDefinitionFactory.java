@@ -283,7 +283,8 @@ public class BeanDefinitionFactory {
       this.componentModelProcessor.processRequest(springComponentModels, request);
       return of(request.getSpringComponentModel());
     } else {
-      return processComponentWrapper(springComponentModels, componentModel);
+      return Optional.empty();
+      // return processComponentWrapper(springComponentModels, componentModel);
     }
   }
 
