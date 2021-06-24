@@ -150,8 +150,8 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        if (e.getCause() instanceof MessagingException) {
-          throw propagate(e.getCause());
+        if (e.getCause().getCause() instanceof MessagingException) {
+          throw propagate(e.getCause().getCause());
         } else {
           throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
         }
