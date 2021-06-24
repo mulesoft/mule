@@ -19,10 +19,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExportedClassNamesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
-import java.util.Optional;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Enriches the declaration with the types which are manually exported through {@link Export}
@@ -38,19 +39,22 @@ public final class JavaExportedTypesDeclarationEnricher extends AbstractAnnotate
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    Optional<ExtensionTypeDescriptorModelProperty> modelProperty = extensionLoadingContext.getExtensionDeclarer().getDeclaration()
-        .getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-    modelProperty
+    extensionLoadingContext.getExtensionDeclarer().getDeclaration()
+        .getModelProperty(ExtensionTypeDescriptorModelProperty.class)
         .map(ExtensionTypeDescriptorModelProperty::getType)
         .flatMap(type -> type.getValueFromAnnotation(Export.class))
         .ifPresent(exportAnnotation -> {
+          Set<String> exportedClassNames = new LinkedHashSet<>();
           ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
-          exportAnnotation.getClassArrayValue(Export::classes)
-              .stream()
-              .map(Type::asMetadataType)
-              .forEach(type -> registerType(declarer, type));
-
+          exportAnnotation.getClassArrayValue(Export::classes).forEach(type -> {
+            exportedClassNames.add(type.getClassInformation().getClassname());
+            registerType(declarer, type.asMetadataType());
+          });
           exportAnnotation.getArrayValue(Export::resources).forEach(declarer::withResource);
+
+          if (!exportedClassNames.isEmpty()) {
+            declarer.withModelProperty(new ExportedClassNamesModelProperty(exportedClassNames));
+          }
         });
   }
 
