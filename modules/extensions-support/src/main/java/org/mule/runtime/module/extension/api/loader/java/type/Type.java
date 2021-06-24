@@ -159,6 +159,4 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
    * @since 4.2
    */
   Optional<MethodElement> getMethod(String name, Class<?>... parameterTypes);
-
-  String getPackageName();
 }

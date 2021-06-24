@@ -23,7 +23,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExportedPackagesModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExportedClassNamesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 
 import java.util.Collection;
@@ -139,8 +139,8 @@ final public class ExportedPackagesCollector {
 
   private void collectManuallyExportedPackages() {
     extensionModel.getTypes().forEach(t -> getId(t).ifPresent(exportedClasses::add));
-    extensionModel.getModelProperty(ExportedPackagesModelProperty.class)
-            .ifPresent(p -> exportedClasses.addAll(p.getExportedPackages()));
+    extensionModel.getModelProperty(ExportedClassNamesModelProperty.class)
+            .ifPresent(p -> exportedClasses.addAll(p.getExportedClassNames()));
   }
 
   private void collectDefault() {

@@ -102,14 +102,6 @@ public class TypeWrapper implements Type {
    * {@inheritDoc}
    */
   @Override
-  public String getPackageName() {
-    return aClass.getPackage().getName();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
     return ofNullable(aClass.getAnnotation(annotationClass));
   }

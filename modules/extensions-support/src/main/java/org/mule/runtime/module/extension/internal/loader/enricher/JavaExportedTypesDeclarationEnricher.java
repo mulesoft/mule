@@ -19,7 +19,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExportedPackagesModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExportedClassNamesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.util.LinkedHashSet;
@@ -44,16 +44,16 @@ public final class JavaExportedTypesDeclarationEnricher extends AbstractAnnotate
             .map(ExtensionTypeDescriptorModelProperty::getType)
             .flatMap(type -> type.getValueFromAnnotation(Export.class))
             .ifPresent(exportAnnotation -> {
-              Set<String> exportedPackages = new LinkedHashSet<>();
+              Set<String> exportedClassNames = new LinkedHashSet<>();
               ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
               exportAnnotation.getClassArrayValue(Export::classes).forEach(type -> {
-                exportedPackages.add(type.getPackageName());
+                exportedClassNames.add(type.getClassInformation().getClassname());
                 registerType(declarer, type.asMetadataType());
               });
               exportAnnotation.getArrayValue(Export::resources).forEach(declarer::withResource);
 
-              if (!exportedPackages.isEmpty()) {
-                declarer.withModelProperty(new ExportedPackagesModelProperty(exportedPackages));
+              if (!exportedClassNames.isEmpty()) {
+                declarer.withModelProperty(new ExportedClassNamesModelProperty(exportedClassNames));
               }
             });
   }

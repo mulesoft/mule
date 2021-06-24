@@ -12,21 +12,21 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 
 import java.util.Set;
 
-public class ExportedPackagesModelProperty implements ModelProperty {
+public class ExportedClassNamesModelProperty implements ModelProperty {
 
-  private final Set<String> exportedPackages;
+  private final Set<String> exportedClassNames;
 
-  public ExportedPackagesModelProperty(Set<String> exportedPackages) {
-    this.exportedPackages = unmodifiableSet(exportedPackages);
+  public ExportedClassNamesModelProperty(Set<String> exportedClassNames) {
+    this.exportedClassNames = unmodifiableSet(exportedClassNames);
   }
 
-  public Set<String> getExportedPackages() {
-    return exportedPackages;
+  public Set<String> getExportedClassNames() {
+    return exportedClassNames;
   }
 
   @Override
   public String getName() {
-    return "exportedPackaged";
+    return "exportedClassNames";
   }
 
   @Override
