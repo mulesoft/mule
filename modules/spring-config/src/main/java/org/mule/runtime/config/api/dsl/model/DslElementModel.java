@@ -411,7 +411,7 @@ public class DslElementModel<T> {
           builder.withNestedComponent(dslElementBuilder.build());
         });
       } else {
-        builder.withParameter(param.getModel().getName(), expr);
+        builder.withParameter(param.getModel().getName(), "#[" + expr + "]");
       }
     }
 

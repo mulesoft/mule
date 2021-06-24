@@ -305,7 +305,6 @@ class ComponentAstBasedElementModelFactory {
   private void populateParameterizedElements(ParameterizedModel model, DslElementSyntax elementDsl,
                                              DslElementModel.Builder builder, ComponentAst configuration,
                                              Function<ParameterGroupModel, Function<ParameterModel, ComponentParameterAst>> paramFetcher) {
-
     Map<String, String> parameters = configuration.getParameters()
         .stream()
         .filter(p -> p.getResolvedRawValue() != null)
@@ -315,6 +314,7 @@ class ComponentAstBasedElementModelFactory {
         .filter(ParameterGroupModel::isShowInDsl)
         .forEach(group -> addInlineGroup(configuration, parameters, builder, group,
                                          paramFetcher.apply(group)));
+
 
     model.getParameterGroupModels().stream()
         .filter(g -> !g.isShowInDsl())
@@ -379,7 +379,9 @@ class ComponentAstBasedElementModelFactory {
         .withModel(group)
         .withDsl(groupSyntax);
 
-    if (configuration.getParameters().stream().anyMatch(param -> param.getGroupModel().equals(group))) {
+    if (configuration.getParameters().stream()
+        .filter(param -> !param.isDefaultValue())
+        .anyMatch(param -> param.getGroupModel().equals(group))) {
       groupElementBuilder.withGroupConfig(configuration, group);
 
       group.getParameterModels()
@@ -387,6 +389,7 @@ class ComponentAstBasedElementModelFactory {
                                             p, paramFetcher));
 
       parent.containing(groupElementBuilder.build());
+
     } else if (shouldBuildDefaultGroup(group)) {
       buildDefaultInlineGroupElement(parent, groupElementBuilder.isExplicitInDsl(false), group, groupSyntax,
                                      identifier.get());
