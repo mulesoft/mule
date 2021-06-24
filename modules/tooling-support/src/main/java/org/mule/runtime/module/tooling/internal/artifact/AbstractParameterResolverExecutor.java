@@ -11,8 +11,10 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.withExtensionClassLoader;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
