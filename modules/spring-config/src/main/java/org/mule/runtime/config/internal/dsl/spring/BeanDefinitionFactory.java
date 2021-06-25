@@ -185,8 +185,7 @@ public class BeanDefinitionFactory {
                 param = componentModel.getParameter(pm.getName());
               }
 
-              if (param != null && param.getValue() != null && !param.isDefaultValue()
-                  && param.getValue().getValue().isPresent()) {
+              if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
                 resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
                                            componentLocator, groupParamsModels, param);
                 anyParamPresent.set(true);
@@ -239,6 +238,7 @@ public class BeanDefinitionFactory {
                                                                       ComponentParameterAst param) {
 
     return param.getValue()
+        // .reduce(expr -> empty(),
         .reduce(expr -> resolveParamBeanDefinitionSimpleType(springComponentModels, componentModelHierarchy,
                                                              paramOwnerComponentModel,
                                                              registry, componentLocator, paramsModels, param),
