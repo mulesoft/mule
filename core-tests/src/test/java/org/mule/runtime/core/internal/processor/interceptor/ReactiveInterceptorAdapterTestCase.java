@@ -26,7 +26,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -206,7 +205,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
-      verify(interceptor, atLeastOnce()).getClass().getClassLoader();
     }
   }
 
@@ -237,7 +235,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(2));
-      verify(interceptor, atLeastOnce()).getClass().getClassLoader();
     }
   }
 
@@ -266,7 +263,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
-      verify(interceptor, atLeastOnce()).getClass().getClassLoader();
     }
   }
 
@@ -298,7 +294,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
-      verify(interceptor, atLeastOnce()).getClass().getClassLoader();
     }
   }
 
