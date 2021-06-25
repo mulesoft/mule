@@ -43,9 +43,9 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.SimpleType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -55,6 +55,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -238,7 +239,6 @@ public class BeanDefinitionFactory {
                                                                       ComponentParameterAst param) {
 
     return param.getValue()
-        // .reduce(expr -> empty(),
         .reduce(expr -> resolveParamBeanDefinitionSimpleType(springComponentModels, componentModelHierarchy,
                                                              paramOwnerComponentModel,
                                                              registry, componentLocator, paramsModels, param),
@@ -257,11 +257,6 @@ public class BeanDefinitionFactory {
                                                                                 ComponentParameterAst param) {
     AtomicReference<SpringComponentModel> model = new AtomicReference<>();
     param.getModel().getType().accept(new MetadataTypeVisitor() {
-
-      @Override
-      protected void defaultVisit(MetadataType metadataType) {
-
-      }
 
       protected void visitMultipleChildren(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                            List<ComponentAst> componentModelHierarchy, ComponentAst paramOwnerComponentModel,
@@ -307,18 +302,20 @@ public class BeanDefinitionFactory {
 
       @Override
       public void visitObject(ObjectType objectType) {
+        final Object complexValue = param.getValue().getRight();
+
         if (isMap(objectType)) {
           visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
                                 componentLocator, paramsModels, param,
-                                (List<ComponentAst>) param.getValue().getRight());
+                                (List<ComponentAst>) complexValue);
           return;
         }
 
         final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
         updatedHierarchy.add(paramOwnerComponentModel);
 
-        if (param.getValue().getRight() instanceof ComponentAst) {
-          final ComponentAst child = (ComponentAst) param.getValue().getRight();
+        if (complexValue instanceof ComponentAst) {
+          final ComponentAst child = (ComponentAst) complexValue;
 
           final LinkedHashMap<ComponentAst, SpringComponentModel> childParams = new LinkedHashMap<>();
           List<SpringComponentModel> childParamsModels = child.getParameters()
@@ -344,6 +341,20 @@ public class BeanDefinitionFactory {
                                               })
                                                   .ifPresent(model::set);
         }
+      }
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        final Object complexValue = param.getValue().getRight();
+        if (complexValue instanceof ComponentAst) {
+          unionType.getTypes()
+              .stream()
+              .filter(t -> ((ComponentAst) complexValue).getModel(MetadataTypeAdapter.class)
+                  .map(a -> a.getType().equals(t))
+                  .orElse(false))
+              .forEach(t -> visitObject((ObjectType) t));
+        }
+
       }
 
       @Override
