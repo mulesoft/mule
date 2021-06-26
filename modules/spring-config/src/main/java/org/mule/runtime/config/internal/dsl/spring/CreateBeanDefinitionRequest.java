@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -43,7 +44,10 @@ public class CreateBeanDefinitionRequest {
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
                                      ComponentAst componentModel, List<SpringComponentModel> paramsModels,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
-    this(componentModelHierarchy, componentModel, paramsModels, null, null, componentBuildingDefinition);
+    this(componentModelHierarchy, componentModel, paramsModels, null, null, componentBuildingDefinition,
+         componentModel != null
+             ? componentModel.getIdentifier()
+             : componentBuildingDefinition.getComponentIdentifier());
   }
 
   /**
@@ -56,7 +60,8 @@ public class CreateBeanDefinitionRequest {
                                      Collection<SpringComponentModel> paramsModels,
                                      ComponentAst paramOwnerComponentModel,
                                      ComponentParameterAst param,
-                                     ComponentBuildingDefinition componentBuildingDefinition) {
+                                     ComponentBuildingDefinition componentBuildingDefinition,
+                                     ComponentIdentifier componentIdentifier) {
     this.componentModelHierarchy = componentModelHierarchy;
     this.componentModel = componentModel;
     this.paramsModels = paramsModels;
@@ -64,9 +69,7 @@ public class CreateBeanDefinitionRequest {
     this.param = param;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
-    springComponentModel.setComponentIdentifier(componentModel != null
-        ? componentModel.getIdentifier()
-        : componentBuildingDefinition.getComponentIdentifier());
+    springComponentModel.setComponentIdentifier(componentIdentifier);
     springComponentModel.setComponent(componentModel);
 
     this.typeVisitorRetriever = new LazyValue<>(() -> {
