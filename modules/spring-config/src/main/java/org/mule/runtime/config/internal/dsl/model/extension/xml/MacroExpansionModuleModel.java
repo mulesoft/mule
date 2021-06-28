@@ -424,8 +424,9 @@ public class MacroExpansionModuleModel {
    * @return the suffix needed to be used when macro expanding elements, or {@link Optional#empty()} otherwise.
    */
   private Optional<String> getConfigRefName(ComponentAst operationRefModel) {
-    return Optional.ofNullable(operationRefModel.getRawParameterValue(MODULE_OPERATION_CONFIG_REF)
-        .orElseGet(() -> defaultGlobalElementName().orElse(null)));
+    return Optional.ofNullable(operationRefModel.getParameter(MODULE_OPERATION_CONFIG_REF) != null
+        ? operationRefModel.getParameter(MODULE_OPERATION_CONFIG_REF).getRawValue()
+        : defaultGlobalElementName().orElse(null));
   }
 
   /**
