@@ -17,7 +17,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.a
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -66,13 +65,6 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   protected OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
     return (OperationDeclaration) find(declaration.getOperations(),
                                        object -> ((OperationDeclaration) object).getName().equals(operationName));
-  }
-
-  protected ConnectionProviderDeclaration getConnectionProvider(ConfigurationDeclaration configurationDeclaration,
-                                                                final String connectionProviderName) {
-    return (ConnectionProviderDeclaration) find(configurationDeclaration.getConnectionProviders(),
-                                                connectionProvider -> ((ConnectionProviderDeclaration) connectionProvider)
-                                                    .getName().equals(connectionProviderName));
   }
 
   protected Pair<ParameterGroupDeclaration, ParameterDeclaration> findParameterInGroup(ParameterizedDeclaration<?> declaration,

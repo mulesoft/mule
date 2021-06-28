@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BASIC_AUTH_HEADER;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.findConnectionProvider;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -42,7 +43,7 @@ public class OAuthConnectionProviderModelLoaderTestCase extends AbstractJavaExte
   public void credentialsPlacementSettingForAuthorizationCodeIsLoaded() {
     ConfigurationDeclaration configuration = getConfiguration(extensionDeclaration, "auth-code");
     ConnectionProviderDeclaration connectionProviderDeclaration =
-        getConnectionProvider(configuration, "with-credentials-placement");
+        findConnectionProvider(configuration, "with-credentials-placement");
     AuthorizationCodeGrantType authorizationCodeGrantType = getAuthorizationCodeGrantType(connectionProviderDeclaration);
     assertThat(authorizationCodeGrantType.getCredentialsPlacement(), is(BASIC_AUTH_HEADER));
   }
@@ -51,7 +52,7 @@ public class OAuthConnectionProviderModelLoaderTestCase extends AbstractJavaExte
   public void credentialsPlacementDefaultForAuthorizationCodeIsLoaded() {
     ConfigurationDeclaration configuration = getConfiguration(extensionDeclaration, "auth-code");
     ConnectionProviderDeclaration connectionProviderDeclaration =
-        getConnectionProvider(configuration, "scopeless");
+        findConnectionProvider(configuration, "scopeless");
     AuthorizationCodeGrantType authorizationCodeGrantType = getAuthorizationCodeGrantType(connectionProviderDeclaration);
     assertThat(authorizationCodeGrantType.getCredentialsPlacement(), is(BODY));
   }
