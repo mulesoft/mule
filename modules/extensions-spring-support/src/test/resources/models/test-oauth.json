@@ -7563,36 +7563,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "BODY",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 11
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -7604,7 +7574,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 11
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -7635,7 +7605,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7669,7 +7639,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7721,7 +7691,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7759,7 +7729,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 15
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -7790,7 +7760,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -7821,7 +7791,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -7870,7 +7840,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 18
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7912,7 +7882,8 @@
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
                   "refreshTokenExpr": "#[payload.refresh_token]",
-                  "defaultScope": "defaultScope"
+                  "defaultScope": "defaultScope",
+                  "credentialsPlacement": "BODY"
                 }
               ]
             },
@@ -7927,7 +7898,6 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -8501,36 +8471,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "BODY",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 11
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -8542,7 +8482,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 11
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8573,7 +8513,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [
                     {
@@ -8607,7 +8547,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -8659,7 +8599,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -8697,7 +8637,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 15
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8728,7 +8668,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8759,7 +8699,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8808,7 +8748,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 18
                   },
                   "allowedStereotypeModels": [
                     {
@@ -8849,7 +8789,8 @@
                   "authorizationUrl": "authUrl",
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
-                  "refreshTokenExpr": "#[payload.refresh_token]"
+                  "refreshTokenExpr": "#[payload.refresh_token]",
+                  "credentialsPlacement": "BODY"
                 }
               ]
             },
@@ -8864,7 +8805,6 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -9439,36 +9379,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "BODY",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 11
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -9480,7 +9390,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 11
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9511,7 +9421,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9545,7 +9455,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9597,7 +9507,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9635,7 +9545,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 15
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9666,7 +9576,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9697,7 +9607,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9746,7 +9656,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 18
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9788,7 +9698,8 @@
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
                   "refreshTokenExpr": "#[payload.refresh_token]",
-                  "defaultScope": "defaultScope"
+                  "defaultScope": "defaultScope",
+                  "credentialsPlacement": "BODY"
                 }
               ]
             },
@@ -9803,7 +9714,6 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -10377,36 +10287,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "BASIC_AUTH_HEADER",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 11
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -10418,7 +10298,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 11
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10449,7 +10329,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10483,7 +10363,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10535,7 +10415,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10573,7 +10453,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 15
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10604,7 +10484,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10635,7 +10515,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10684,7 +10564,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 18
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10725,7 +10605,8 @@
                   "authorizationUrl": "authUrl",
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
-                  "refreshTokenExpr": "#[payload.refresh_token]"
+                  "refreshTokenExpr": "#[payload.refresh_token]",
+                  "credentialsPlacement": "BASIC_AUTH_HEADER"
                 }
               ]
             },
@@ -10740,7 +10621,6 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -11431,36 +11311,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "BODY",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 15
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -11472,7 +11322,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 15
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11503,7 +11353,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 16
                   },
                   "allowedStereotypeModels": [
                     {
@@ -11537,7 +11387,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 17
                   },
                   "allowedStereotypeModels": [
                     {
@@ -11589,7 +11439,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 18
                   },
                   "allowedStereotypeModels": [
                     {
@@ -11627,7 +11477,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11658,7 +11508,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11689,7 +11539,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11738,7 +11588,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 22
                   },
                   "allowedStereotypeModels": [
                     {
@@ -11780,7 +11630,8 @@
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
                   "refreshTokenExpr": "#[payload.refresh_token]",
-                  "defaultScope": "defaultScope"
+                  "defaultScope": "defaultScope",
+                  "credentialsPlacement": "BODY"
                 }
               ]
             },
@@ -11799,7 +11650,6 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -20038,36 +19888,6 @@
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "QUERY_PARAMS",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 12
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -20108,7 +19928,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [
                     {
@@ -20165,7 +19985,6 @@
                 "clientSecret",
                 "tokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "objectStore"
               ]
             }
@@ -27370,36 +27189,6 @@
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "QUERY_PARAMS",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 12
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -27440,7 +27229,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [
                     {
@@ -27497,7 +27286,6 @@
                 "clientSecret",
                 "tokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "objectStore"
               ]
             }
@@ -28065,36 +27853,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "BODY",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 11
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -28106,7 +27864,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 11
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -28137,7 +27895,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [
                     {
@@ -28171,7 +27929,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -28223,7 +27981,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -28261,7 +28019,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 15
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -28292,7 +28050,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -28323,7 +28081,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -28372,7 +28130,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 18
                   },
                   "allowedStereotypeModels": [
                     {
@@ -28414,7 +28172,8 @@
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
                   "refreshTokenExpr": "#[payload.refresh_token]",
-                  "defaultScope": "defaultScope"
+                  "defaultScope": "defaultScope",
+                  "credentialsPlacement": "BODY"
                 }
               ]
             },
@@ -28429,7 +28188,6 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -35819,36 +35577,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "BODY",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 12
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -35860,7 +35588,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -35891,7 +35619,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -35925,7 +35653,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -35977,7 +35705,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 15
                   },
                   "allowedStereotypeModels": [
                     {
@@ -36015,7 +35743,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -36046,7 +35774,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -36077,7 +35805,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 18
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -36126,7 +35854,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 19
                   },
                   "allowedStereotypeModels": [
                     {
@@ -36167,7 +35895,8 @@
                   "authorizationUrl": "authUrl",
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
-                  "refreshTokenExpr": "#[payload.refresh_token]"
+                  "refreshTokenExpr": "#[payload.refresh_token]",
+                  "credentialsPlacement": "BODY"
                 }
               ]
             },
@@ -36182,7 +35911,6 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -43357,36 +43085,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "BODY",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 11
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "credentialsPlacement",
-                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -43398,7 +43096,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 11
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -43429,7 +43127,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 12
                   },
                   "allowedStereotypeModels": [
                     {
@@ -43463,7 +43161,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -43515,7 +43213,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -43553,7 +43251,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 15
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -43584,7 +43282,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -43615,7 +43313,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -43664,7 +43362,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 18
                   },
                   "allowedStereotypeModels": [
                     {
@@ -43705,7 +43403,8 @@
                   "authorizationUrl": "authUrl",
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
-                  "refreshTokenExpr": "#[payload.refresh_token]"
+                  "refreshTokenExpr": "#[payload.refresh_token]",
+                  "credentialsPlacement": "BODY"
                 }
               ]
             },
@@ -43720,7 +43419,6 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
-                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
