@@ -369,7 +369,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                                                       pm -> component.getParameter(group.getName(), pm.getName()))));
     }
 
-    declareComposableModel(model, elementDsl, component.directChildrenStream(), declarer);
+    declareComposableModel(model, elementDsl, component, declarer);
   }
 
   private void declareParameterGroup(ComponentAst component, ComponentModel model, ComponentElementDeclarer declarer,
@@ -468,8 +468,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   }
 
   private void declareComposableModel(ComposableModel model, DslElementSyntax elementDsl,
-                                      Stream<ComponentAst> children, HasNestedComponentDeclarer declarer) {
-    children.forEach(child -> {
+                                      ComponentAst composableComponent, HasNestedComponentDeclarer declarer) {
+    composableComponent.directChildrenStream().forEach(child -> {
       ElementDeclarer extensionElementsDeclarer = forExtension(child.getExtension().getName());
 
       Reference<Boolean> componentFound = new Reference<>(false);
@@ -502,7 +502,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
           declareParameterizedComponent((ParameterizedModel) nestedModel,
                                         routeDsl, routeDeclarer, attributes, child);
-          declareComposableModel((ComposableModel) nestedModel, elementDsl, child.directChildrenStream(), routeDeclarer);
+          declareComposableModel((ComposableModel) nestedModel, elementDsl, child, routeDeclarer);
           return routeDeclarer.getDeclaration();
         });
   }
