@@ -332,18 +332,68 @@ public class BeanDefinitionFactory {
         if (complexValue instanceof ComponentAst) {
           final ComponentAst child = (ComponentAst) complexValue;
 
-          final LinkedHashMap<ComponentAst, SpringComponentModel> childParams = new LinkedHashMap<>();
-          List<SpringComponentModel> childParamsModels = child.getParameters()
-              .stream()
-              .filter(paramIn -> paramIn.getValue() != null)
-              .map(paramIn -> resolveParamBeanDefinition(childParams, updatedHierarchy, child, registry,
-                                                         componentLocator, new ArrayList<>(), paramIn))
-              .filter(Optional::isPresent)
-              .map(Optional::get)
-              .collect(toList());
+          List<SpringComponentModel> childParamsModels = new ArrayList<>();
+          // final LinkedHashMap<ComponentAst, SpringComponentModel> childParams = new LinkedHashMap<>();
+          // final LinkedHashMap<ComponentAst, SpringComponentModel> childParams = new LinkedHashMap<>();
+          // List<SpringComponentModel> childParamsModels = child.getParameters()
+          // .stream()
+          // .filter(paramIn -> paramIn.getValue() != null)
+          // .map(paramIn -> resolveParamBeanDefinition(childParams, updatedHierarchy, child, registry,
+          // componentLocator, new ArrayList<>(), paramIn))
+          // .filter(Optional::isPresent)
+          // .map(Optional::get)
+          // .collect(toList());
+
+
+          child.getModel(ParameterizedModel.class).ifPresent(pmzd -> {
+            pmzd.getParameterGroupModels().forEach(pmg -> {
+              List<SpringComponentModel> groupParamsModels = new ArrayList<>();
+              AtomicBoolean anyParamPresent = new AtomicBoolean();
+              pmg.getParameterModels().forEach(pm -> {
+                final ComponentParameterAst param;
+                if (pmg.isShowInDsl()) {
+                  param = child.getParameter(pmg.getName(), pm.getName());
+                } else {
+                  param = child.getParameter(pm.getName());
+                }
+
+                if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
+                  resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, child, registry,
+                                             componentLocator, groupParamsModels, param);
+                  anyParamPresent.set(true);
+                }
+              });
+
+              if (anyParamPresent.get()) {
+                if (pmg.isShowInDsl()) {
+                  final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentModelHierarchy);
+                  nestedHierarchy.add(child);
+
+                  resolveComponentBeanDefinitionParamGroup(springComponentModels, nestedHierarchy, groupParamsModels, pmg,
+                                                           nestedComp -> resolveComponent(springComponentModels,
+                                                                                          componentModelHierarchy, nestedComp,
+                                                                                          registry, componentLocator),
+                                                           springComponentModel -> {
+                                                             childParamsModels.add(springComponentModel);
+                                                             handleSpringComponentModel(springComponentModel,
+                                                                                        springComponentModel.getComponent(),
+                                                                                        springComponentModels,
+                                                                                        registry,
+                                                                                        componentLocator);
+                                                           });
+                } else {
+                  childParamsModels.addAll(groupParamsModels);
+                }
+              }
+            });
+          });
+
+          //////////////////
+
 
           updatedHierarchy.add(child);
-          resolveComponentBeanDefinitionParam(childParams, updatedHierarchy, childParamsModels, paramOwnerComponentModel, param,
+          resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, childParamsModels,
+                                              paramOwnerComponentModel, param,
                                               nestedComp -> resolveComponent(springComponentModels, componentModelHierarchy,
                                                                              nestedComp, registry, componentLocator),
                                               springComponentModel -> {
@@ -566,7 +616,14 @@ public class BeanDefinitionFactory {
                                                                              Consumer<ComponentAst> nestedComponentParamProcessor,
                                                                              Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     return paramOwnerComponentModel.getGenerationInformation().getSyntax()
-        .flatMap(ownerSyntax -> ownerSyntax.getChild(param.getModel().getName()))
+        .flatMap(ownerSyntax -> {
+          if (param.getGroupModel().isShowInDsl()) {
+            return ownerSyntax.getChild(param.getGroupModel().getName())
+                .flatMap(dslGroupSyntax -> dslGroupSyntax.getChild(param.getModel().getName()));
+          } else {
+            return ownerSyntax.getChild(param.getModel().getName());
+          }
+        })
         .filter(paramSyntax -> !isEmpty(paramSyntax.getElementName()))
         // return param.getGenerationInformation().getSyntax()
         // .filter(paramSyntax -> !isEmpty(paramSyntax.getElementName()))
@@ -618,21 +675,21 @@ public class BeanDefinitionFactory {
         .flatMap(ownerSyntax -> ownerSyntax.getChild(paramGroupModel.getName()))
         .flatMap(groupSyntax -> {
 
-          ComponentIdentifier paramComponentIdentifier = ComponentIdentifier.builder()
+          ComponentIdentifier paramGroupComponentIdentifier = ComponentIdentifier.builder()
               .namespaceUri(groupSyntax.getNamespace())
               .namespace(groupSyntax.getPrefix())
               .name(groupSyntax.getElementName())
               .build();
 
           Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-              componentBuildingDefinitionRegistry.getBuildingDefinition(paramComponentIdentifier);
+              componentBuildingDefinitionRegistry.getBuildingDefinition(paramGroupComponentIdentifier);
           if (buildingDefinitionOptional.isPresent()) {
             final CreateBeanDefinitionRequest request =
                 new CreateBeanDefinitionRequest(componentModelHierarchy, null, paramsModels,
                                                 paramOwnerComponentModel,
                                                 null,
                                                 buildingDefinitionOptional.orElse(null),
-                                                paramOwnerComponentModel.getIdentifier());
+                                                paramGroupComponentIdentifier);
             request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
             this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
                                                         componentBeanDefinitionHandler);
