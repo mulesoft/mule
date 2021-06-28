@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.util.regex.Pattern.compile;
-
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -18,11 +17,8 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 public final class ParameterGroupUtils {
-
-  private final static Pattern SANITIZE_PATTERN = compile("\\s+");
 
   /**
    * Resolves a parameter from a source component, taking into account that the success/error callbacks on the source may have
@@ -38,7 +34,7 @@ public final class ParameterGroupUtils {
    * @return the resolved parameter
    */
   public ComponentParameterAst getSourceCallbackAwareParameter(ComponentAst ownerComponent, String parameterName,
-                                                               ComponentAst possibleGroup,
+                                                               ComponentIdentifier possibleGroup,
                                                                SourceModel ownerComponentModel) {
 
     Optional<ParameterGroupModel> groupModelOptional =
@@ -59,27 +55,15 @@ public final class ParameterGroupUtils {
   }
 
   public Optional<ParameterGroupModel> getParameterGroupModel(ComponentAst ownerComponent, String parameterName,
-                                                              ComponentAst possibleGroup,
+                                                              ComponentIdentifier possibleGroup,
                                                               List<ParameterGroupModel> groupModels) {
     return groupModels.stream()
         .filter(parameterGroupModel -> parameterGroupModel.getParameter(parameterName).isPresent() &&
             parameterGroupModel.isShowInDsl() &&
             getChildElementName(ownerComponent, parameterGroupModel)
-                .map(en -> possibleGroup != null && possibleGroup.getIdentifier().getName().equals(en))
+                .map(en -> possibleGroup != null && possibleGroup.getName().equals(en))
                 .orElse(false))
         .findFirst();
-  }
-
-  public ComponentParameterAst getComponentParameterAstFromSourceModel(CreateBeanDefinitionRequest createBeanDefinitionRequest,
-                                                                       ComponentAst ownerComponent, String paramName,
-                                                                       SourceModel ownerComponentModel) {
-    // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
-    // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
-    // previous implementations.
-    int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
-    final ComponentAst possibleGroup = createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
-
-    return getSourceCallbackAwareParameter(ownerComponent, paramName, possibleGroup, ownerComponentModel);
   }
 
   private List<ParameterGroupModel> getSourceParamGroups(SourceModel ownerComponentModel) {

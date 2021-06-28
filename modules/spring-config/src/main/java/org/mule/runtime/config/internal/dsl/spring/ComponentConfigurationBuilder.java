@@ -359,11 +359,14 @@ class ComponentConfigurationBuilder<T> {
                     ? componentModel
                     : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
             if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-              return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName, possibleGroup,
+              return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
+                                                                         possibleGroup.getIdentifier(),
                                                                          (SourceModel) ownerComponentModel);
             } else {
               Optional<ParameterGroupModel> groupModelOptional =
-                  parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName, possibleGroup,
+                  parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
+                                                             createBeanDefinitionRequest.getSpringComponentModel()
+                                                                 .getComponentIdentifier(),
                                                              ownerComponentModel.getParameterGroupModels());
               ComponentParameterAst p;
               if (groupModelOptional.isPresent()) {
