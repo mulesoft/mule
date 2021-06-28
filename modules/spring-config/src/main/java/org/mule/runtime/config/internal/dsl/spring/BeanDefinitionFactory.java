@@ -246,7 +246,7 @@ public class BeanDefinitionFactory {
           .forEach(childSpringComponentModel -> expressionLanguage.set(childSpringComponentModel.getBeanDefinition()));
       if (componentModel.getParameter(OBJECT_SERIALIZER_REF) != null) {
         String defaultObjectSerializer = componentModel.getParameter(OBJECT_SERIALIZER_REF).getRawValue();
-        if (defaultObjectSerializer != DEFAULT_OBJECT_SERIALIZER_NAME) {
+        if (defaultObjectSerializer != null && defaultObjectSerializer != DEFAULT_OBJECT_SERIALIZER_NAME) {
           registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
           registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
         }
