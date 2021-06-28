@@ -295,9 +295,17 @@ public class BeanDefinitionFactory {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
-                              componentLocator, paramsModels, param,
-                              (List<ComponentAst>) param.getValue().getRight());
+        final Object complexValue = param.getValue().getRight();
+        if (complexValue instanceof List) {
+          visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
+                                componentLocator, paramsModels, param,
+                                (List<ComponentAst>) complexValue);
+        } else {
+          resolveParamBeanDefinitionSimpleType(springComponentModels, componentModelHierarchy, paramOwnerComponentModel,
+                                               registry,
+                                               componentLocator, paramsModels, param)
+                                                   .ifPresent(model::set);
+        }
       }
 
       @Override
@@ -305,9 +313,16 @@ public class BeanDefinitionFactory {
         final Object complexValue = param.getValue().getRight();
 
         if (isMap(objectType)) {
-          visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
-                                componentLocator, paramsModels, param,
-                                (List<ComponentAst>) complexValue);
+          if (complexValue instanceof List) {
+            visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
+                                  componentLocator, paramsModels, param,
+                                  (List<ComponentAst>) complexValue);
+          } else {
+            resolveParamBeanDefinitionSimpleType(springComponentModels, componentModelHierarchy, paramOwnerComponentModel,
+                                                 registry,
+                                                 componentLocator, paramsModels, param)
+                                                     .ifPresent(model::set);
+          }
           return;
         }
 
