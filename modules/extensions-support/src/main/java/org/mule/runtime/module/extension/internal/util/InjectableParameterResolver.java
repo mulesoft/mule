@@ -19,14 +19,18 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.NotAnInputStreamException;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
-import java.util.Collection;
+import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.slf4j.Logger;
 
@@ -40,15 +44,10 @@ public class InjectableParameterResolver {
 
   private static final Logger LOGGER = getLogger(InjectableParameterResolver.class);
 
-  private static final DataType DW_DATA_TYPE = DataType.builder().mediaType("application/dw").build();
-  private static final String PAYLOAD_BINDING = "payload";
-  private static final String EXPRESSION_PREFIX = "#[{";
-  private static final String EXPRESSION_SUFFIX = "}]";
-  private static final String EMPTY_EXPRESSION = EXPRESSION_PREFIX + EXPRESSION_SUFFIX;
-
   private final BindingContext expressionResolvingContext;
   private final ExpressionManager expressionManager;
   private final Map<String, InjectableParameterInfo> injectableParametersMap;
+  private final Set<String> availableParams = new HashSet<>();
 
   public InjectableParameterResolver(ParameterizedModel parameterizedModel,
                                      ParameterValueResolver parameterValueResolver,
@@ -56,7 +55,7 @@ public class InjectableParameterResolver {
                                      List<InjectableParameterInfo> injectableParameters) {
     this.expressionManager = expressionManager;
     this.injectableParametersMap = getInjectableParametersMap(injectableParameters);
-    this.expressionResolvingContext = expressionResolvingContext(parameterValueResolver, parameterizedModel);
+    this.expressionResolvingContext = createBindingContextAndPopulateAvailableParams(parameterValueResolver, parameterizedModel);
   }
 
   /**
@@ -68,43 +67,40 @@ public class InjectableParameterResolver {
   public Object getInjectableParameterValue(String parameterName) {
     Object parameterValue = null;
     InjectableParameterInfo injectableParameterInfo = injectableParametersMap.get(parameterName);
-    try {
-      parameterValue = expressionManager
-          .evaluate("#[ payload." + parameterName + "]",
-                    DataType.fromType(getType(injectableParameterInfo.getType())),
-                    expressionResolvingContext)
-          .getValue();
-    } catch (IllegalArgumentException e) {
-      LOGGER.debug(format("Transformation of injectable parameter '%s' failed, the same value of the resolution will be used.",
-                          parameterName),
-                   e);
+
+    if (injectableParameterInfo == null) {
+      throw new IllegalArgumentException("'" + parameterName + "' is not present in the resolver");
+    }
+
+    String extractionExpression = injectableParameterInfo.getExtractionExpression();
+    String topLevelRequiredParameter = getParameterNameFromExtractionExpression(extractionExpression);
+    if (availableParams.contains(topLevelRequiredParameter)) {
+      try {
+        parameterValue = expressionManager
+            .evaluate("#[" + injectableParameterInfo.getExtractionExpression() + "]",
+                      DataType.fromType(getType(injectableParameterInfo.getType())),
+                      expressionResolvingContext)
+            .getValue();
+      } catch (IllegalArgumentException e) {
+        LOGGER.debug(format("Transformation of injectable parameter '%s' failed, the same value of the resolution will be used.",
+                            parameterName),
+                     e);
+      }
+    } else {
+      LOGGER.debug("The parameter: '" + topLevelRequiredParameter
+          + "' on which the extraction expression was to be executed is not present in the context, returning null");
     }
     return parameterValue;
   }
 
   private Map<String, InjectableParameterInfo> getInjectableParametersMap(List<InjectableParameterInfo> injectableParameters) {
-    return injectableParameters.stream().collect(toMap(injectableParameter -> injectableParameter.getParameterName(),
+    return injectableParameters.stream().collect(toMap(InjectableParameterInfo::getParameterName,
                                                        injectableParameter -> injectableParameter));
   }
 
-  private BindingContext expressionResolvingContext(ParameterValueResolver parameterValueResolver,
-                                                    ParameterizedModel parameterizedModel) {
-    BindingContext bindingContext = createBindingContext(parameterValueResolver, parameterizedModel);
-    String expression = getResolvedParameterValuesExpression(bindingContext.identifiers());
-    BindingContext.Builder expressionResolvingContextBuilder = BindingContext.builder();
-    if (!expression.equals(EMPTY_EXPRESSION)) {
-      expressionResolvingContextBuilder
-          .addBinding(PAYLOAD_BINDING, expressionManager.evaluate(expression, DW_DATA_TYPE, bindingContext));
-    } else {
-      expressionResolvingContextBuilder.addBinding(PAYLOAD_BINDING, new TypedValue<>("{}", DW_DATA_TYPE));
-    }
-    return expressionResolvingContextBuilder.build();
-  }
-
-  private BindingContext createBindingContext(ParameterValueResolver parameterValueResolver,
-                                              ParameterizedModel parameterizedModel) {
+  private BindingContext createBindingContextAndPopulateAvailableParams(ParameterValueResolver parameterValueResolver,
+                                                                        ParameterizedModel parameterizedModel) {
     BindingContext.Builder bindingContextBuilder = BindingContext.builder();
-
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       String unaliasedName = getImplementingName(parameterModel);
       Object value = getParameterValueSafely(parameterValueResolver, unaliasedName);
@@ -114,32 +110,20 @@ public class InjectableParameterResolver {
       if (value != null) {
         if (!(value instanceof TypedValue)) {
           String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
+          try {
+            value = IOUtils.ifInputStream(value, (CheckedFunction<InputStream, ?>) IOUtils::toByteArray);
+          } catch (NotAnInputStreamException e) {
+            // do nothing
+          }
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
         }
         bindingContextBuilder.addBinding(parameterModel.getName(), (TypedValue) value);
+        availableParams.add(parameterModel.getName());
       }
     }
     return bindingContextBuilder.build();
   }
-
-  private String getResolvedParameterValuesExpression(Collection<String> identifiers) {
-    StringBuilder expression = new StringBuilder();
-    expression.append(EXPRESSION_PREFIX);
-    expression.append(
-                      injectableParametersMap.values().stream()
-                          .filter(injectableParameterInfo -> identifiers
-                              .contains(getParameterNameFromExtractionExpression(injectableParameterInfo
-                                  .getExtractionExpression())))
-                          .map(injectableParameterInfo -> "\""
-                              + injectableParameterInfo.getParameterName() + "\"  : "
-                              + injectableParameterInfo.getExtractionExpression())
-                          .collect(Collectors.joining(", ")));
-    expression.append(EXPRESSION_SUFFIX);
-
-    return expression.toString();
-  }
-
 
   private Object getParameterValueSafely(ParameterValueResolver parameterValueResolver, String parameterName) {
     try {

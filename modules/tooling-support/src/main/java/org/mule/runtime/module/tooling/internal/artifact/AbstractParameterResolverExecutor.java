@@ -13,7 +13,6 @@ import static org.mule.runtime.module.tooling.internal.artifact.params.Parameter
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -74,7 +73,6 @@ public class AbstractParameterResolverExecutor {
   protected Map<String, Object> parametersMap(ParameterizedElementDeclaration parameterizedElementDeclaration,
                                               ParameterizedModel parameterizedModel)
       throws ExpressionNotSupportedException {
-    ExtensionModel extensionModel = artifactHelper.getExtensionModel(parameterizedElementDeclaration);
     Map<String, Object> parametersMap = new HashMap<>();
 
     Map<String, ParameterGroupModel> parameterGroups =
