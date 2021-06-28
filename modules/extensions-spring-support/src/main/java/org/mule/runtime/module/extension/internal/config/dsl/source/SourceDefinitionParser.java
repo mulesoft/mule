@@ -40,15 +40,13 @@ import java.util.List;
  */
 public class SourceDefinitionParser extends ExtensionDefinitionParser {
 
-  private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
   private final DslElementSyntax sourceDsl;
 
   public SourceDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                 SourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver,
                                 ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
-    this.extensionModel = extensionModel;
+    super(definition, dslSyntaxResolver, parsingContext, extensionModel);
     this.sourceModel = sourceModel;
     this.sourceDsl = dslSyntaxResolver.resolve(sourceModel);
   }

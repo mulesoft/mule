@@ -17,6 +17,7 @@ import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoad
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
@@ -47,8 +48,9 @@ public class TypedInlineParameterGroupParser extends ParameterGroupParser {
                                          ParameterGroupDescriptor groupDescriptor,
                                          ClassLoader classLoader, DslElementSyntax groupDsl,
                                          DslSyntaxResolver dslResolver,
-                                         ExtensionParsingContext context) {
-    super(definition, group, classLoader, groupDsl, dslResolver, context);
+                                         ExtensionParsingContext context,
+                                         ExtensionModel extensionModel) {
+    super(definition, group, classLoader, groupDsl, dslResolver, context, extensionModel);
     MetadataType type = getDefault().createTypeLoader(classLoader).load(groupDescriptor.getType().getDeclaringClass().get());
 
     checkArgument(isObjectType(type), format("Only an ObjectType can be parsed as a TypedParameterGroup, found [%s] instead",

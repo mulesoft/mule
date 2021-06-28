@@ -15,6 +15,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -46,8 +47,9 @@ public class RouteComponentParser extends ExtensionDefinitionParser {
                               ClassLoader classLoader,
                               DslElementSyntax routeDsl,
                               DslSyntaxResolver dslResolver,
-                              ExtensionParsingContext context) {
-    super(definition, dslResolver, context);
+                              ExtensionParsingContext context,
+                              ExtensionModel extensionModel) {
+    super(definition, dslResolver, context, extensionModel);
 
     checkArgument(isObjectType(metadataType),
                   format("Only an ObjectType can be parsed as a TypedParameterGroup, found [%s] instead",

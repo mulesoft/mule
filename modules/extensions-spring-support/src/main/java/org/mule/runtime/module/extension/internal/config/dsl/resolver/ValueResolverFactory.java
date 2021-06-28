@@ -9,18 +9,23 @@ package org.mule.runtime.module.extension.internal.config.dsl.resolver;
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLiteral;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
@@ -51,21 +56,26 @@ public class ValueResolverFactory {
     this.dslResolver = dslResolver;
   }
 
-  public <T> ValueResolver<T> of(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
+  public <T> ValueResolver<T> of(ExtensionModel extensionModel, String parameterName, MetadataType expectedType, Object value,
+                                 Object defaultValue,
                                  ExpressionSupport expressionSupport, boolean required,
                                  Set<ModelProperty> modelProperties) {
-    return of(parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties, true, false);
+    return of(extensionModel, parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties,
+              true, false);
   }
 
-  public <T> ValueResolver<T> of(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
+  public <T> ValueResolver<T> of(ExtensionModel extensionModel, String parameterName, MetadataType expectedType, Object value,
+                                 Object defaultValue,
                                  ExpressionSupport expressionSupport, boolean required,
                                  Set<ModelProperty> modelProperties,
                                  boolean acceptsReferences) {
-    return of(parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties, acceptsReferences,
+    return of(extensionModel, parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties,
+              acceptsReferences,
               false);
   }
 
-  public <T> ValueResolver<T> of(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
+  public <T> ValueResolver<T> of(ExtensionModel extensionModel, String parameterName, MetadataType expectedType, Object value,
+                                 Object defaultValue,
                                  ExpressionSupport expressionSupport, boolean required,
                                  Set<ModelProperty> modelProperties,
                                  boolean acceptsReferences, boolean content) {
@@ -73,9 +83,11 @@ public class ValueResolverFactory {
       return (ValueResolver<T>) value;
     }
 
-    ValueResolver<T> resolver;
+    ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    CompositeClassLoader compositeClassLoader = from(extensionClassLoader, Thread.currentThread().getContextClassLoader());
+    final Class<?> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType, compositeClassLoader).orElse(Object.class);
 
-    final Class<?> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType).orElse(Object.class);
+    ValueResolver<T> resolver;
 
     if (isExpression(value)) {
       final String expression = (String) value;

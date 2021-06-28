@@ -35,15 +35,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 public final class ConnectionProviderDefinitionParser extends ExtensionDefinitionParser {
 
   private final ConnectionProviderModel providerModel;
-  private final ExtensionModel extensionModel;
   private final DslElementSyntax connectionDsl;
 
   public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel,
                                             ExtensionModel extensionModel, DslSyntaxResolver dslSyntaxResolver,
                                             ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
+    super(definition, dslSyntaxResolver, parsingContext, extensionModel);
     this.providerModel = providerModel;
-    this.extensionModel = extensionModel;
     this.connectionDsl = dslSyntaxResolver.resolve(providerModel);
   }
 
