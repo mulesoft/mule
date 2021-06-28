@@ -7563,7 +7563,8 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "BODY",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -7575,6 +7576,35 @@
                     "text": false,
                     "query": false,
                     "order": 11
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -7605,7 +7635,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7639,7 +7669,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7691,7 +7721,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 15
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7729,7 +7759,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -7760,7 +7790,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -7791,7 +7821,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 18
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -7840,7 +7870,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 19
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7897,6 +7927,7 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
+                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -8470,7 +8501,8 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "BODY",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -8482,6 +8514,35 @@
                     "text": false,
                     "query": false,
                     "order": 11
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8512,7 +8573,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -8546,7 +8607,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -8598,7 +8659,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 15
                   },
                   "allowedStereotypeModels": [
                     {
@@ -8636,7 +8697,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8667,7 +8728,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8698,7 +8759,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 18
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8747,7 +8808,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 19
                   },
                   "allowedStereotypeModels": [
                     {
@@ -8803,6 +8864,7 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
+                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -9377,7 +9439,8 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "BODY",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -9389,6 +9452,35 @@
                     "text": false,
                     "query": false,
                     "order": 11
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9419,7 +9511,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9453,7 +9545,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9505,7 +9597,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 15
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9543,7 +9635,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9574,7 +9666,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9605,7 +9697,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 18
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9654,7 +9746,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 19
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9711,6 +9803,944 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
+                "credentialsPlacement",
+                "resourceOwnerId",
+                "before",
+                "after",
+                "listenerConfig",
+                "callbackPath",
+                "authorizePath",
+                "externalCallbackUrl",
+                "objectStore"
+              ]
+            }
+          }
+        },
+        {
+          "connectionManagementType": "NONE",
+          "externalLibraryModels": [],
+          "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
+          "stereotype": {
+            "type": "WITH-CREDENTIALS-PLACEMENT",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.lang.Double",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [
+                          "java.lang.Comparable"
+                        ],
+                        "parent": "java.lang.Number",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "34.0",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "apiVersion",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "display",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "false",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "immediate",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "true",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "prompt",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "Reconnection"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "failsDeployment"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "default": "false"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "reconnectionStrategy"
+                        },
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "ReconnectionStrategy"
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "reconnect"
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "classInformation": {
+                                        "classname": "java.lang.Long",
+                                        "hasDefaultConstructor": false,
+                                        "isInterface": false,
+                                        "isInstantiable": false,
+                                        "isAbstract": false,
+                                        "isFinal": true,
+                                        "implementedInterfaces": [
+                                          "java.lang.Comparable"
+                                        ],
+                                        "parent": "java.lang.Number",
+                                        "genericTypes": [],
+                                        "isMap": false
+                                      },
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "blocking"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "true"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "count"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "default": "2"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How many reconnection attempts to make"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "reconnect-forever"
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "classInformation": {
+                                        "classname": "java.lang.Long",
+                                        "hasDefaultConstructor": false,
+                                        "isInterface": false,
+                                        "isInstantiable": false,
+                                        "isAbstract": false,
+                                        "isFinal": true,
+                                        "implementedInterfaces": [
+                                          "java.lang.Comparable"
+                                        ],
+                                        "parent": "java.lang.Number",
+                                        "genericTypes": [],
+                                        "isMap": false
+                                      },
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "blocking"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "true"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The reconnection strategy to use"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 5,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "reconnection",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "reconnection",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 6
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
+                  "name": "consumerKey",
+                  "description": "The OAuth consumerKey as registered with the service provider",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 7
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
+                  "name": "consumerSecret",
+                  "description": "The OAuth consumerSecret as registered with the service provider",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "authUrl",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 8
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
+                  "name": "authorizationUrl",
+                  "description": "The service provider\u0027s authorization endpoint URL",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "accessTokenUrl",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 9
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
+                  "name": "accessTokenUrl",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 10
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "scopes",
+                  "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "BASIC_AUTH_HEADER",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 11
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
+                  "name": "resourceOwnerId",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 13
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "before",
+                  "description": "The name of a flow to be executed right before starting the OAuth dance",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 14
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "after",
+                  "description": "The name of a flow to be executed right after an accessToken has been received",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "showInDsl": true,
+              "name": "oauthAuthorizationCode",
+              "displayModel": {
+                "displayName": "OAuth Authorization Code"
+              },
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 15
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "LISTENER_CONFIG",
+                      "namespace": "HTTP",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "listenerConfig",
+                  "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
+                  "name": "callbackPath",
+                  "description": "The path of the access token callback endpoint",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
+                  "name": "authorizePath",
+                  "description": "The path of the local http endpoint which triggers the OAuth dance",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
+                  "name": "externalCallbackUrl",
+                  "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "showInDsl": true,
+              "name": "oauthCallbackConfig",
+              "displayModel": {
+                "displayName": "OAuth Callback Config"
+              },
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "OBJECT_STORE",
+                      "namespace": "OS"
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "objectStore",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "showInDsl": true,
+              "name": "oauthStoreConfig",
+              "displayModel": {
+                "displayName": "OAuth Store Config"
+              },
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "with-credentials-placement",
+          "description": "",
+          "modelProperties": {
+            "OAuth": {
+              "grantTypes": [
+                {
+                  "grantType": "Authorization Code",
+                  "accessTokenUrl": "accessTokenUrl",
+                  "authorizationUrl": "authUrl",
+                  "accessTokenExpr": "#[payload.access_token]",
+                  "expirationRegex": "#[payload.expires_in]",
+                  "refreshTokenExpr": "#[payload.refresh_token]"
+                }
+              ]
+            },
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "apiVersion",
+                "display",
+                "immediate",
+                "prompt",
+                "consumerKey",
+                "consumerSecret",
+                "authorizationUrl",
+                "accessTokenUrl",
+                "scopes",
+                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -10401,7 +11431,8 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "BODY",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -10413,6 +11444,35 @@
                     "text": false,
                     "query": false,
                     "order": 15
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10443,7 +11503,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 17
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10477,7 +11537,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 18
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10529,7 +11589,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 19
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10567,7 +11627,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10598,7 +11658,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10629,7 +11689,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10678,7 +11738,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 23
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10739,6 +11799,7 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
+                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -18977,6 +20038,36 @@
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "QUERY_PARAMS",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -19017,7 +20108,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -19074,6 +20165,7 @@
                 "clientSecret",
                 "tokenUrl",
                 "scopes",
+                "credentialsPlacement",
                 "objectStore"
               ]
             }
@@ -26278,6 +27370,36 @@
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "QUERY_PARAMS",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -26318,7 +27440,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -26375,6 +27497,7 @@
                 "clientSecret",
                 "tokenUrl",
                 "scopes",
+                "credentialsPlacement",
                 "objectStore"
               ]
             }
@@ -26942,7 +28065,8 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "BODY",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -26954,6 +28078,35 @@
                     "text": false,
                     "query": false,
                     "order": 11
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -26984,7 +28137,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -27018,7 +28171,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -27070,7 +28223,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 15
                   },
                   "allowedStereotypeModels": [
                     {
@@ -27108,7 +28261,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -27139,7 +28292,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -27170,7 +28323,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 18
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -27219,7 +28372,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 19
                   },
                   "allowedStereotypeModels": [
                     {
@@ -27276,6 +28429,7 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
+                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -34665,7 +35819,8 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "BODY",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -34677,6 +35832,35 @@
                     "text": false,
                     "query": false,
                     "order": 12
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 13
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -34707,7 +35891,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -34741,7 +35925,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 15
                   },
                   "allowedStereotypeModels": [
                     {
@@ -34793,7 +35977,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 16
                   },
                   "allowedStereotypeModels": [
                     {
@@ -34831,7 +36015,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -34862,7 +36046,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 18
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -34893,7 +36077,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -34942,7 +36126,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 20
                   },
                   "allowedStereotypeModels": [
                     {
@@ -34998,6 +36182,7 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
+                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
@@ -42172,7 +43357,8 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "BODY",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -42184,6 +43370,35 @@
                     "text": false,
                     "query": false,
                     "order": 11
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "credentialsPlacement",
+                  "description": "The place where credentials will be sent on the token\u0027s request. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -42214,7 +43429,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12
+                    "order": 13
                   },
                   "allowedStereotypeModels": [
                     {
@@ -42248,7 +43463,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 13
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -42300,7 +43515,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 14
+                    "order": 15
                   },
                   "allowedStereotypeModels": [
                     {
@@ -42338,7 +43553,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -42369,7 +43584,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 17
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -42400,7 +43615,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 18
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -42449,7 +43664,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 19
                   },
                   "allowedStereotypeModels": [
                     {
@@ -42505,6 +43720,7 @@
                 "authorizationUrl",
                 "accessTokenUrl",
                 "scopes",
+                "credentialsPlacement",
                 "resourceOwnerId",
                 "before",
                 "after",
