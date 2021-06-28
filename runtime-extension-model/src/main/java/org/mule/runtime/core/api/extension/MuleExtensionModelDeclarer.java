@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.extension;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -17,6 +16,7 @@ import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDE
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
@@ -45,9 +45,17 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BASE_TYPE_BUILDER;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.OBJECT_STORE_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.TYPE_LOADER;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.VOID_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -73,7 +81,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
@@ -91,15 +98,12 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
@@ -138,9 +142,6 @@ class MuleExtensionModelDeclarer {
 
   ExtensionDeclarer createExtensionModel() {
 
-    final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault()
-        .createTypeLoader(MuleExtensionModelDeclarer.class.getClassLoader());
-
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named(MULE_NAME)
         .describedAs("Mule Runtime and Integration Platform: Core components")
@@ -156,49 +157,49 @@ class MuleExtensionModelDeclarer {
             .setSchemaLocation(CORE_SCHEMA_LOCATION)
             .build());
 
-    declareExportedTypes(typeLoader, extensionDeclarer);
+    declareExportedTypes(extensionDeclarer);
 
     // constructs
-    declareObject(extensionDeclarer, typeLoader);
-    declareFlow(extensionDeclarer, typeLoader);
-    declareSubflow(extensionDeclarer, typeLoader);
-    declareChoice(extensionDeclarer, typeLoader);
-    declareErrorHandler(extensionDeclarer, typeLoader);
-    declareTry(extensionDeclarer, typeLoader);
-    declareScatterGather(extensionDeclarer, typeLoader);
-    declareParallelForEach(extensionDeclarer, typeLoader);
+    declareObject(extensionDeclarer);
+    declareFlow(extensionDeclarer);
+    declareSubflow(extensionDeclarer);
+    declareChoice(extensionDeclarer);
+    declareErrorHandler(extensionDeclarer);
+    declareTry(extensionDeclarer);
+    declareScatterGather(extensionDeclarer, TYPE_LOADER);
+    declareParallelForEach(extensionDeclarer, TYPE_LOADER);
     declareFirstSuccessful(extensionDeclarer);
     declareRoundRobin(extensionDeclarer);
-    declareConfiguration(extensionDeclarer, typeLoader);
-    declareConfigurationProperties(extensionDeclarer, typeLoader);
-    declareAsync(extensionDeclarer, typeLoader);
-    declareForEach(extensionDeclarer, typeLoader);
-    declareUntilSuccessful(extensionDeclarer, typeLoader);
+    declareConfiguration(extensionDeclarer);
+    declareConfigurationProperties(extensionDeclarer);
+    declareAsync(extensionDeclarer);
+    declareForEach(extensionDeclarer, TYPE_LOADER);
+    declareUntilSuccessful(extensionDeclarer);
 
     // operations
-    declareFlowRef(extensionDeclarer, typeLoader);
-    declareIdempotentValidator(extensionDeclarer, typeLoader);
-    declareLogger(extensionDeclarer, typeLoader);
-    declareSetPayload(extensionDeclarer, typeLoader);
-    declareSetVariable(extensionDeclarer, typeLoader);
-    declareRemoveVariable(extensionDeclarer, typeLoader);
-    declareParseTemplate(extensionDeclarer, typeLoader);
-    declareRaiseError(extensionDeclarer, typeLoader);
+    declareFlowRef(extensionDeclarer);
+    declareIdempotentValidator(extensionDeclarer);
+    declareLogger(extensionDeclarer);
+    declareSetPayload(extensionDeclarer);
+    declareSetVariable(extensionDeclarer);
+    declareRemoveVariable(extensionDeclarer);
+    declareParseTemplate(extensionDeclarer);
+    declareRaiseError(extensionDeclarer);
 
     // sources
-    declareScheduler(extensionDeclarer, typeLoader);
+    declareScheduler(extensionDeclarer, TYPE_LOADER);
 
     // errors
     declareErrors(extensionDeclarer);
 
     // misc
     declareNotifications(extensionDeclarer);
-    declareGlobalProperties(extensionDeclarer, typeLoader);
+    declareGlobalProperties(extensionDeclarer);
 
     return extensionDeclarer;
   }
 
-  private void declareObject(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareObject(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer object = extensionDeclarer.withConstruct("object")
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("OBJECT", "MULE").withParent(APP_CONFIG).build())
@@ -209,20 +210,20 @@ class MuleExtensionModelDeclarer {
     object.onDefaultParameterGroup()
         .withRequiredParameter("name")
         .asComponentId()
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Name to use to reference this object.");
 
     object.onDefaultParameterGroup()
         .withOptionalParameter("ref")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("@Deprecated since 4.0. Only meant to be used for backwards compatibility. " +
             "Reference to another object defined in the mule configuration or any other provider of objects.");
 
     object.onDefaultParameterGroup()
         .withOptionalParameter("class")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Creates an instance of the class provided as argument.");
 
@@ -230,8 +231,8 @@ class MuleExtensionModelDeclarer {
         .withExclusiveOptionals(ImmutableSet.of("ref", "class"), true);
   }
 
-  private void declareExportedTypes(ClassTypeLoader typeLoader, ExtensionDeclarer extensionDeclarer) {
-    extensionDeclarer.getDeclaration().addType((ObjectType) typeLoader.load(ObjectStore.class));
+  private void declareExportedTypes(ExtensionDeclarer extensionDeclarer) {
+    extensionDeclarer.getDeclaration().addType((ObjectType) OBJECT_STORE_TYPE);
   }
 
   private void declareScheduler(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -244,12 +245,12 @@ class MuleExtensionModelDeclarer {
 
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
-        .ofType(buildSchedulingStrategyType(extensionDeclarer, typeLoader))
+        .ofType(buildSchedulingStrategyType(extensionDeclarer, TYPE_LOADER))
         .withExpressionSupport(NOT_SUPPORTED);
 
     scheduler.onDefaultParameterGroup()
         .withOptionalParameter("disallowConcurrentExecution")
-        .ofType(typeLoader.load(Boolean.class))
+        .ofType(BOOLEAN_TYPE)
         .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED);
   }
@@ -280,7 +281,7 @@ class MuleExtensionModelDeclarer {
    * }
    * </pre>
    *
-   * NOTE: This type is imported by the SDK in order to support polling sources at {@link PollingSourceDeclarationEnricher}.
+   * NOTE: This type is imported by the SDK in order to support polling sources at {@code PollingSourceDeclarationEnricher}.
    */
   private MetadataType buildSchedulingStrategyType(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     MetadataType baseSchedulingStrategy = typeLoader.load(SchedulingStrategy.class);
@@ -298,7 +299,7 @@ class MuleExtensionModelDeclarer {
     return baseSchedulingStrategy;
   }
 
-  private void declareIdempotentValidator(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareIdempotentValidator(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer validator = extensionDeclarer
         .withOperation("idempotentMessageValidator")
         .describedAs("Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. "
@@ -306,12 +307,12 @@ class MuleExtensionModelDeclarer {
             + "attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.")
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    validator.withOutput().ofType(typeLoader.load(void.class));
-    validator.withOutputAttributes().ofType(typeLoader.load(void.class));
+    validator.withOutput().ofType(VOID_TYPE);
+    validator.withOutputAttributes().ofType(VOID_TYPE);
 
     validator.onDefaultParameterGroup()
         .withOptionalParameter("idExpression")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .defaultingTo("#[correlationId]")
         .withDsl(ParameterDslConfiguration.builder().allowsReferences(false).build())
         .describedAs("The expression to use when extracting the ID from the message. "
@@ -319,13 +320,13 @@ class MuleExtensionModelDeclarer {
 
     validator.onDefaultParameterGroup()
         .withOptionalParameter("valueExpression")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .defaultingTo("#[correlationId]")
         .describedAs("The expression to use when extracting the value from the message.");
 
     validator.onDefaultParameterGroup()
         .withOptionalParameter("storePrefix")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Defines the prefix of the object store names. This will only be used for the internally built object store.");
 
@@ -333,7 +334,7 @@ class MuleExtensionModelDeclarer {
                                                                                      ParameterDslConfiguration.builder()
                                                                                          .allowsInlineDefinition(true)
                                                                                          .allowsReferences(true).build())
-        .ofType(typeLoader.load(ObjectStore.class)).withExpressionSupport(NOT_SUPPORTED)
+        .ofType(OBJECT_STORE_TYPE).withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(OBJECT_STORE))
         .describedAs("The object store where the IDs of the processed events are going to be stored. " +
             "If defined as an argument, it should reference a globally created object store. Otherwise, " +
@@ -342,7 +343,7 @@ class MuleExtensionModelDeclarer {
     validator.withErrorModel(duplicateMessageError);
   }
 
-  private void declareAsync(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareAsync(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer async = extensionDeclarer.withConstruct("async")
         .describedAs("Processes the nested list of message processors asynchronously.");
 
@@ -350,16 +351,16 @@ class MuleExtensionModelDeclarer {
     async.onDefaultParameterGroup()
         .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .describedAs("Name that will be used to identify the async scheduling tasks.");
 
     async.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
         .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that this async router can use to optimize its performance when processing messages.")
-        .ofType(typeLoader.load(Integer.class));
+        .ofType(INTEGER_TYPE);
   }
 
-  private void declareFlowRef(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareFlowRef(ExtensionDeclarer extensionDeclarer) {
 
     OperationDeclarer flowRef = extensionDeclarer.withOperation("flowRef")
         .describedAs("Allows a \u0027flow\u0027 to be referenced so that message processing will continue in the referenced flow "
@@ -368,18 +369,18 @@ class MuleExtensionModelDeclarer {
         .withErrorModel(routingError)
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    flowRef.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
-    flowRef.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
+    flowRef.withOutput().ofType(ANY_TYPE);
+    flowRef.withOutputAttributes().ofType(ANY_TYPE);
 
     flowRef.onDefaultParameterGroup()
         .withRequiredParameter("name")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withAllowedStereotypes(asList(FLOW, SUB_FLOW))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the flow to call");
   }
 
-  private void declareLogger(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareLogger(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer logger = extensionDeclarer.withOperation("logger")
         .describedAs("Performs logging using an expression to determine the message to be logged. By default, if a message is not specified, the current Mule Message is logged "
             + "using the " + DEFAULT_LOG_LEVEL
@@ -387,149 +388,149 @@ class MuleExtensionModelDeclarer {
             + "the level and category can both be configured to suit your needs.")
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    logger.withOutput().ofType(typeLoader.load(void.class));
-    logger.withOutputAttributes().ofType(typeLoader.load(void.class));
+    logger.withOutput().ofType(VOID_TYPE);
+    logger.withOutputAttributes().ofType(VOID_TYPE);
 
     logger.onDefaultParameterGroup()
         .withOptionalParameter("message")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .describedAs("The message that will be logged. Embedded expressions can be used to extract values from the current message. "
             + "If no message is specified, then the current message is used.");
 
     logger.onDefaultParameterGroup()
         .withOptionalParameter("level")
         .defaultingTo(DEFAULT_LOG_LEVEL)
-        .ofType(BaseTypeBuilder.create(JAVA).stringType()
+        .ofType(BASE_TYPE_BUILDER.stringType()
             .enumOf("ERROR", "WARN", "INFO", "DEBUG", "TRACE").build())
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets the log level. Default is " + DEFAULT_LOG_LEVEL + ".");
 
     logger.onDefaultParameterGroup()
         .withOptionalParameter("category")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets the log category.");
 
   }
 
-  private void declareSetPayload(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareSetPayload(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer setPayload = extensionDeclarer.withOperation("setPayload")
         .describedAs("A processor that sets the payload with the provided value.")
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    setPayload.withOutput().ofType(typeLoader.load(void.class));
-    setPayload.withOutputAttributes().ofType(typeLoader.load(void.class));
+    setPayload.withOutput().ofType(VOID_TYPE);
+    setPayload.withOutputAttributes().ofType(VOID_TYPE);
 
     setPayload.onDefaultParameterGroup()
         .withRequiredParameter("value")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(SUPPORTED)
         .describedAs("The value to be set on the payload. Supports expressions.");
 
     setPayload.onDefaultParameterGroup()
         .withOptionalParameter("encoding")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The encoding of the value assigned to the payload.");
 
     setPayload.onDefaultParameterGroup()
         .withOptionalParameter("mimeType")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type, e.g. text/plain or application/json");
 
   }
 
-  private void declareSetVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareSetVariable(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer setVariable = extensionDeclarer.withOperation("setVariable")
         .describedAs("A processor that adds variables.")
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    setVariable.withOutput().ofType(typeLoader.load(void.class));
-    setVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
+    setVariable.withOutput().ofType(VOID_TYPE);
+    setVariable.withOutputAttributes().ofType(VOID_TYPE);
 
     setVariable.onDefaultParameterGroup()
         .withOptionalParameter("variableName")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the variable.");
 
     setVariable.onDefaultParameterGroup()
         .withRequiredParameter("value")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(SUPPORTED)
         .describedAs("The value assigned to the variable. Supports expressions.");
 
     setVariable.onDefaultParameterGroup()
         .withOptionalParameter("encoding")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The encoding of the value assigned to the variable.");
 
     setVariable.onDefaultParameterGroup()
         .withOptionalParameter("mimeType")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type of the value assigned to the variable, e.g. text/plain or application/json");
   }
 
-  private void declareParseTemplate(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareParseTemplate(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer parseTemplate = extensionDeclarer.withOperation("parseTemplate")
         .describedAs("Parses a template defined inline.")
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    parseTemplate.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
-    parseTemplate.withOutputAttributes().ofType(typeLoader.load(void.class));
+    parseTemplate.withOutput().ofType(ANY_TYPE);
+    parseTemplate.withOutputAttributes().ofType(VOID_TYPE);
 
     parseTemplate.onDefaultParameterGroup()
         .withOptionalParameter("content")
-        .ofType(typeLoader.load(String.class))
-        .withRole(ParameterRole.PRIMARY_CONTENT)
+        .ofType(STRING_TYPE)
+        .withRole(PRIMARY_CONTENT)
         .withExpressionSupport(SUPPORTED)
         .describedAs("Template to be processed.");
 
     parseTemplate.onDefaultParameterGroup()
         .withOptionalParameter("location")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The location of the template. The order in which the processor will attempt to load the file is: from the file system, from a URL, then from the classpath.");
 
     parseTemplate.onDefaultParameterGroup()
         .withOptionalParameter("outputEncoding")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The encoding to be assigned to the result generated when parsing the template.");
 
     parseTemplate.onDefaultParameterGroup()
         .withOptionalParameter("outputMimeType")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
   }
 
-  private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer removeVariable = extensionDeclarer.withOperation("removeVariable")
         .describedAs("A processor that removes variables by name or a wildcard expression.")
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    removeVariable.withOutput().ofType(typeLoader.load(void.class));
-    removeVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
+    removeVariable.withOutput().ofType(VOID_TYPE);
+    removeVariable.withOutputAttributes().ofType(VOID_TYPE);
 
     removeVariable.onDefaultParameterGroup()
         .withOptionalParameter("variableName")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The variable name.");
 
   }
 
-  private void declareRaiseError(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareRaiseError(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
         .describedAs("Throws an error with the specified type and description.")
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    raiseError.withOutput().ofType(typeLoader.load(void.class));
-    raiseError.withOutputAttributes().ofType(typeLoader.load(void.class));
+    raiseError.withOutput().ofType(VOID_TYPE);
+    raiseError.withOutputAttributes().ofType(VOID_TYPE);
 
     raiseError.onDefaultParameterGroup()
         .withRequiredParameter("type")
@@ -539,7 +540,7 @@ class MuleExtensionModelDeclarer {
 
     raiseError.onDefaultParameterGroup()
         .withOptionalParameter("description")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .describedAs("The description of this error.");
   }
 
@@ -570,27 +571,27 @@ class MuleExtensionModelDeclarer {
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
-        .ofType(typeLoader.load(Integer.class))
+        .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Partitions the collection in sub-collections of the specified size.");
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("rootMessageVariableName")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .defaultingTo("rootMessage")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Variable name for the original message.");
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("counterVariableName")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .defaultingTo("counter")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Variable name for the item number being processed.");
 
   }
 
-  private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer untilSuccessful = extensionDeclarer.withConstruct("untilSuccessful")
         .describedAs("Attempts to route a message to its inner chain in a synchronous manner. " +
             "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.");
@@ -599,14 +600,14 @@ class MuleExtensionModelDeclarer {
 
     untilSuccessful.onDefaultParameterGroup()
         .withOptionalParameter("maxRetries")
-        .ofType(typeLoader.load(Integer.class))
+        .ofType(INTEGER_TYPE)
         .defaultingTo(5)
         .withExpressionSupport(SUPPORTED)
         .describedAs("Specifies the maximum number of processing retries that will be performed.");
 
     untilSuccessful.onDefaultParameterGroup()
         .withOptionalParameter("millisBetweenRetries")
-        .ofType(typeLoader.load(Integer.class))
+        .ofType(INTEGER_TYPE)
         .defaultingTo(60000)
         .withExpressionSupport(SUPPORTED)
         .describedAs("Specifies the minimum time interval between two process retries in milliseconds.\n" +
@@ -614,7 +615,7 @@ class MuleExtensionModelDeclarer {
             " Default value is 60000 (one minute)");
   }
 
-  private void declareChoice(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareChoice(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer choice = extensionDeclarer.withConstruct("choice")
         .describedAs("Sends the message to the first message processor whose condition is satisfied. "
             + "If none of the conditions are satisfied, it sends the message to the configured default message processor "
@@ -625,7 +626,7 @@ class MuleExtensionModelDeclarer {
     when.withChain();
     ParameterDeclarer expressionParam = when.onDefaultParameterGroup()
         .withRequiredParameter("expression")
-        .ofType(typeLoader.load(boolean.class));
+        .ofType(BOOLEAN_TYPE);
 
     if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
       try {
@@ -642,7 +643,7 @@ class MuleExtensionModelDeclarer {
     choice.withRoute("otherwise").withMaxOccurs(1).withChain();
   }
 
-  private void declareFlow(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareFlow(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer flow = extensionDeclarer.withConstruct(FLOW_ELEMENT_IDENTIFIER)
         .allowingTopLevelDefinition()
         .withStereotype(FLOW);
@@ -650,12 +651,12 @@ class MuleExtensionModelDeclarer {
     flow.onDefaultParameterGroup()
         .withRequiredParameter("name")
         .asComponentId()
-        .ofType(typeLoader.load(String.class));
+        .ofType(STRING_TYPE);
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("started", "stopped").build());
+        .ofType(BASE_TYPE_BUILDER.stringType().enumOf("started", "stopped").build());
     flow.onDefaultParameterGroup().withOptionalParameter("maxConcurrency")
         .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize its performance when processing messages.")
-        .ofType(typeLoader.load(Integer.class));
+        .ofType(INTEGER_TYPE);
 
     flow.withComponent("source")
         .withAllowedStereotypes(MuleStereotypes.SOURCE);
@@ -665,7 +666,7 @@ class MuleExtensionModelDeclarer {
 
   }
 
-  private void declareSubflow(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareSubflow(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer subFlow = extensionDeclarer.withConstruct("subFlow")
         .allowingTopLevelDefinition()
         .withStereotype(SUB_FLOW);
@@ -673,7 +674,7 @@ class MuleExtensionModelDeclarer {
     subFlow.onDefaultParameterGroup()
         .withRequiredParameter("name")
         .asComponentId()
-        .ofType(typeLoader.load(String.class));
+        .ofType(STRING_TYPE);
     subFlow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
   }
 
@@ -706,20 +707,20 @@ class MuleExtensionModelDeclarer {
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
-        .ofType(typeLoader.load(Integer.class))
+        .ofType(INTEGER_TYPE)
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_PARAMETER_NAME)
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
 
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .defaultingTo(PAYLOAD)
         .withExpressionSupport(REQUIRED)
         .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
@@ -750,8 +751,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
     if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
       try {
-        collectionParam = collectionParam
-            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+        collectionParam.withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
       } catch (InstantiationException | IllegalAccessException e) {
         // ignore
       }
@@ -765,20 +765,20 @@ class MuleExtensionModelDeclarer {
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
-        .ofType(typeLoader.load(Integer.class))
+        .ofType(INTEGER_TYPE)
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_PARAMETER_NAME)
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
 
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .defaultingTo(PAYLOAD)
         .withExpressionSupport(REQUIRED)
         .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
@@ -788,15 +788,14 @@ class MuleExtensionModelDeclarer {
         .withModelProperty(new TargetModelProperty());
   }
 
-  private void declareTry(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareTry(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer tryScope = extensionDeclarer.withConstruct("try")
         .describedAs("Processes the nested list of message processors, "
             + "within a transaction and with it's own error handler if required.");
 
     tryScope.onDefaultParameterGroup()
         .withOptionalParameter("transactionalAction")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType()
-            .enumOf("INDIFFERENT", "ALWAYS_BEGIN", "BEGIN_OR_JOIN").build())
+        .ofType(BASE_TYPE_BUILDER.stringType().enumOf("INDIFFERENT", "ALWAYS_BEGIN", "BEGIN_OR_JOIN").build())
         .defaultingTo("INDIFFERENT")
         .withExpressionSupport(NOT_SUPPORTED)
         .withLayout(LayoutModel.builder().tabName("Transactions").build())
@@ -804,7 +803,7 @@ class MuleExtensionModelDeclarer {
 
     tryScope.onDefaultParameterGroup()
         .withOptionalParameter("transactionType")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("LOCAL", "XA").build())
+        .ofType(BASE_TYPE_BUILDER.stringType().enumOf("LOCAL", "XA").build())
         .defaultingTo("LOCAL")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Transaction type supported. Availability will depend on the runtime version, "
@@ -815,7 +814,7 @@ class MuleExtensionModelDeclarer {
         .withAllowedStereotypes(ERROR_HANDLER);
   }
 
-  private void declareErrorHandler(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareErrorHandler(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer errorHandler = extensionDeclarer.withConstruct("errorHandler")
         .withStereotype(ERROR_HANDLER)
         .allowingTopLevelDefinition()
@@ -825,22 +824,22 @@ class MuleExtensionModelDeclarer {
     errorHandler.onDefaultParameterGroup()
         .withRequiredParameter("name")
         .asComponentId()
-        .ofType(typeLoader.load(String.class));
+        .ofType(STRING_TYPE);
 
     errorHandler.onDefaultParameterGroup()
         .withOptionalParameter("ref")
         .withAllowedStereotypes(singletonList(ERROR_HANDLER))
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the error handler to reuse.");
 
     NestedRouteDeclarer onErrorContinue = errorHandler.withRoute("onErrorContinue")
         .describedAs("Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully.");
-    declareOnErrorRoute(typeLoader, onErrorContinue);
+    declareOnErrorRoute(onErrorContinue);
 
     NestedRouteDeclarer onErrorPropagate = errorHandler.withRoute("onErrorPropagate")
         .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages.");
-    declareOnErrorRoute(typeLoader, onErrorPropagate);
+    declareOnErrorRoute(onErrorPropagate);
 
     errorHandler.withOptionalComponent("onError")
         .withAllowedStereotypes(ON_ERROR)
@@ -853,26 +852,25 @@ class MuleExtensionModelDeclarer {
     onError.onDefaultParameterGroup()
         .withRequiredParameter("ref")
         .withAllowedStereotypes(asList(ON_ERROR))
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the error handler to reuse.");
 
     // TODO MULE-13277 errorHandler.isOneRouteRequired(true);
 
     // global onError's that may be referenced from an error handler
-    declareGlobalOnErrorRoute(typeLoader, extensionDeclarer.withConstruct("onErrorContinue")
+    declareGlobalOnErrorRoute(extensionDeclarer.withConstruct("onErrorContinue")
         .describedAs("Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully."));
-    declareGlobalOnErrorRoute(typeLoader, extensionDeclarer.withConstruct("onErrorPropagate")
+    declareGlobalOnErrorRoute(extensionDeclarer.withConstruct("onErrorPropagate")
         .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages."));
   }
 
-  private void declareOnErrorRoute(ClassTypeLoader typeLoader, NestedRouteDeclarer onError) {
+  private void declareOnErrorRoute(NestedRouteDeclarer onError) {
     onError.withChain();
-
-    declareOnErrorRouteParams(typeLoader, onError);
+    declareOnErrorRouteParams(onError);
   }
 
-  private void declareGlobalOnErrorRoute(ClassTypeLoader typeLoader, ConstructDeclarer onError) {
+  private void declareGlobalOnErrorRoute(ConstructDeclarer onError) {
     onError.withStereotype(ON_ERROR)
         .allowingTopLevelDefinition()
         .withChain();
@@ -880,15 +878,15 @@ class MuleExtensionModelDeclarer {
     onError.onDefaultParameterGroup()
         .withRequiredParameter("name")
         .asComponentId()
-        .ofType(typeLoader.load(String.class));
+        .ofType(STRING_TYPE);
 
-    declareOnErrorRouteParams(typeLoader, onError);
+    declareOnErrorRouteParams(onError);
   }
 
-  private void declareOnErrorRouteParams(ClassTypeLoader typeLoader, HasParametersDeclarer onError) {
+  private void declareOnErrorRouteParams(HasParametersDeclarer onError) {
     onError.onDefaultParameterGroup()
         .withOptionalParameter("when")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .describedAs("The expression that will be evaluated to determine if this exception strategy should be executed. "
             + "This should always be a boolean expression.");
 
@@ -901,14 +899,14 @@ class MuleExtensionModelDeclarer {
 
     onError.onDefaultParameterGroup()
         .withOptionalParameter("logException")
-        .ofType(typeLoader.load(boolean.class))
+        .ofType(BOOLEAN_TYPE)
         .defaultingTo(true)
         .describedAs("Determines whether the handled exception will be logged to its standard logger in the ERROR "
             + "level before being handled. Default is true.");
 
     onError.onDefaultParameterGroup()
         .withOptionalParameter("enableNotifications")
-        .ofType(typeLoader.load(boolean.class))
+        .ofType(BOOLEAN_TYPE)
         .defaultingTo(true)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs."
@@ -959,7 +957,7 @@ class MuleExtensionModelDeclarer {
     extensionDeclarer.withErrorModel(newError(FATAL).handleable(false).withParent(criticalError).build());
   }
 
-  private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareConfiguration(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configuration")
         .allowingTopLevelDefinition()
         .withStereotype(APP_CONFIG)
@@ -970,14 +968,14 @@ class MuleExtensionModelDeclarer {
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultResponseTimeout")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("10000")
         .describedAs("The default period (ms) to wait for a synchronous response.");
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultTransactionTimeout")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("30000")
         .describedAs("The default timeout (ms) for transactions. This can also be configured on transactions, "
@@ -985,7 +983,7 @@ class MuleExtensionModelDeclarer {
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultErrorHandler-ref")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(ERROR_HANDLER))
         .describedAs("The default error handler for every flow. This must be a reference to a global error handler.")
@@ -997,7 +995,7 @@ class MuleExtensionModelDeclarer {
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("inheritIterableRepeatability")
-        .ofType(typeLoader.load(boolean.class))
+        .ofType(BOOLEAN_TYPE)
         .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.")
@@ -1005,7 +1003,7 @@ class MuleExtensionModelDeclarer {
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("shutdownTimeout")
-        .ofType(typeLoader.load(Integer.class))
+        .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("5000")
         .describedAs("The time in milliseconds to wait for any in-progress work to finish running before Mule shuts down. "
@@ -1019,7 +1017,7 @@ class MuleExtensionModelDeclarer {
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("maxQueueTransactionFilesSize")
-        .ofType(typeLoader.load(Integer.class))
+        .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("500")
         .describedAs("Sets the approximate maximum space in megabytes allowed for the transaction log files for transactional persistent queues."
@@ -1028,7 +1026,7 @@ class MuleExtensionModelDeclarer {
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultObjectSerializer-ref")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(SERIALIZER))
         .describedAs("An optional reference to an ObjectSerializer to be used as the application's default")
@@ -1051,12 +1049,12 @@ class MuleExtensionModelDeclarer {
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("correlationIdGeneratorExpression")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(REQUIRED)
         .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
   }
 
-  private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configurationProperties")
         .allowingTopLevelDefinition()
         .withStereotype(APP_CONFIG)
@@ -1072,7 +1070,7 @@ class MuleExtensionModelDeclarer {
 
     configuration.onDefaultParameterGroup()
         .withRequiredParameter("file")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, EMBEDDED, new String[] {"yaml", "properties"}))
             .build())
@@ -1091,7 +1089,7 @@ class MuleExtensionModelDeclarer {
         .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
   }
 
-  private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer) {
     final ConstructDeclarer globalPropDeclarer = extensionDeclarer.withConstruct("globalProperty")
         .allowingTopLevelDefinition()
         .describedAs("A global property is a named string. It can be inserted in most attribute values using standard (${key}) property placeholders.");
@@ -1099,14 +1097,14 @@ class MuleExtensionModelDeclarer {
     globalPropDeclarer
         .onDefaultParameterGroup()
         .withRequiredParameter("name")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the property. This is used inside property placeholders.");
 
     globalPropDeclarer
         .onDefaultParameterGroup()
         .withRequiredParameter("value")
-        .ofType(typeLoader.load(String.class))
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The value of the property. This replaces each occurence of a property placeholder.");
   }
