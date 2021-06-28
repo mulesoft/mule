@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.extension;
 
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 
 /**
- * {@link ModelProperty} to be used when an {@link org.mule.runtime.api.meta.model.ExtensionModel} should not generate parsers for
+ * {@link ModelProperty} to be used when an {@link ExtensionModel} should not generate parsers for
  * the extension operations.
  * 
  * @since 4.0

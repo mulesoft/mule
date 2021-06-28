@@ -83,6 +83,9 @@ public final class MuleExtensionModelProvider {
   private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(new DefaultExtensionLoadingContext(new TlsExtensionModelDeclarer().createExtensionModel(), loadingRequest())));
 
+  private static final LazyValue<ExtensionModel> OPERATION_DSL_EXTENSION_MODEL = new LazyValue<>(() ->
+      new ExtensionModelFactory().create(new DefaultExtensionLoadingContext(new OperationDslExtensionModelDeclarer().declareExtensionModel(), loadingRequest())));
+
   private static ExtensionModelLoadingRequest loadingRequest() {
     return ExtensionModelLoadingRequest.builder(MuleExtensionModelProvider.class.getClassLoader(), new NullDslResolvingContext())
         .build();
@@ -103,9 +106,25 @@ public final class MuleExtensionModelProvider {
   }
 
   /**
+   * @return the {@link ExtensionModel} definition containing the namespace declaration for the operation declaration DSL
+   * @since 4.5.0
+   */
+  public static ExtensionModel getOperationDslExtensionModel() {
+    return OPERATION_DSL_EXTENSION_MODEL.get();
+  }
+
+  /**
    * @return the parsed {@link MuleVersion} from the build properties.
    */
   public static MuleVersion getMuleVersion() {
     return PARSED_MULE_VERSION;
+  }
+
+  /**
+   * @return the {@link ExtensionModel} definition containing the namespace declaration for the operation declaration DSL
+   * @since 4.4.0
+   */
+  public static ExtensionModel getOperationDslExtensionModel() {
+    return OPERATION_DSL_EXTENSION_MODEL.get();
   }
 }

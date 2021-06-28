@@ -43,7 +43,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="optional" default="false" type="xsd:boolean">
+                <xsd:attribute name="optional" default="false" type="mule:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether the parameter is optional or required.
