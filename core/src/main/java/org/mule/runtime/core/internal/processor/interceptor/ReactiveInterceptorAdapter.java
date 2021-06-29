@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -143,24 +144,16 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                      component.getLocation().getLocation());
       }
       try {
-        Thread currentThread = currentThread();
-        ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        ClassLoader contextClassLoader = interceptor.getClassLoader();
-        setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
-        try {
-          interceptor.before(component.getLocation(),
-                             getResolvedParams(eventWithResolvedParams),
-                             interceptionEvent);
-        } finally {
-          setContextClassLoader(currentThread, contextClassLoader, currentClassLoader);
-        }
+        withContextClassLoader(interceptor.getClassLoader(), () -> interceptor.before(component.getLocation(),
+                                                                                      getResolvedParams(eventWithResolvedParams),
+                                                                                      interceptionEvent));
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        if (e.getCause() instanceof MessagingException) {
-          throw propagate(e.getCause());
+        if (e.getCause().getCause() instanceof MessagingException) {
+          throw propagate(e.getCause().getCause());
         } else {
-          throw propagate(new MessagingException(interceptionEvent.resolve(), e, component));
+          throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
         }
       }
     };
@@ -177,19 +170,12 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                      component.getLocation().getLocation());
       }
       try {
-        Thread currentThread = currentThread();
-        ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        ClassLoader contextClassLoader = interceptor.getClass().getClassLoader();
-        setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
-        try {
-          interceptor.after(component.getLocation(), interceptionEvent, thrown);
-        } finally {
-          setContextClassLoader(currentThread, contextClassLoader, currentClassLoader);
-        }
+        withContextClassLoader(interceptor.getClassLoader(),
+                               () -> interceptor.after(component.getLocation(), interceptionEvent, thrown));
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(resolveMessagingException(interceptionEvent.resolve(), e, component, empty()));
+        throw propagate(resolveMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
       }
     };
   }
