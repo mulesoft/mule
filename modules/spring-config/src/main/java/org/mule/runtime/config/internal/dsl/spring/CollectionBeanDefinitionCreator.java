@@ -49,6 +49,8 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
 
       Collection<ComponentAst> items = (Collection<ComponentAst>) createBeanDefinitionRequest.getParam().getValue().getRight();
 
+      items.forEach(nestedComponentParamProcessor);
+
       ManagedList<Object> managedList = items.stream()
           .map(springComponentModels::get)
           .map(innerSpringComp -> innerSpringComp.getBeanDefinition() == null

@@ -12,7 +12,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
@@ -66,7 +65,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -262,21 +260,26 @@ public class BeanDefinitionFactory {
                                            List<ComponentAst> componentModelHierarchy, ComponentAst paramOwnerComponentModel,
                                            BeanDefinitionRegistry registry, SpringConfigurationComponentLocator componentLocator,
                                            List<SpringComponentModel> paramsModels, ComponentParameterAst param,
-                                           List<ComponentAst> values) {
+                                           List<Object> values) {
         final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentModelHierarchy);
         updatedHierarchy.add(paramOwnerComponentModel);
 
         if (values != null) {
-          for (ComponentAst child : values) {
-            resolveComponentBeanDefinition(springComponentModels, emptyList(), updatedHierarchy, child,
-                                           nestedComp -> resolveComponent(springComponentModels, updatedHierarchy,
-                                                                          nestedComp, registry, componentLocator),
-                                           springComponentModel -> handleSpringComponentModel(springComponentModel,
-                                                                                              springComponentModel.getComponent(),
-                                                                                              springComponentModels,
-                                                                                              registry,
-                                                                                              componentLocator));
-          }
+          values
+              .stream()
+              .filter(child -> child instanceof ComponentAst)
+              .forEach(child -> resolveComponentBeanDefinition(springComponentModels, emptyList(), updatedHierarchy,
+                                                               (ComponentAst) child,
+                                                               nestedComp -> resolveComponent(springComponentModels,
+                                                                                              updatedHierarchy,
+                                                                                              nestedComp, registry,
+                                                                                              componentLocator),
+                                                               springComponentModel -> handleSpringComponentModel(springComponentModel,
+                                                                                                                  springComponentModel
+                                                                                                                      .getComponent(),
+                                                                                                                  springComponentModels,
+                                                                                                                  registry,
+                                                                                                                  componentLocator)));
         }
 
         resolveComponentBeanDefinitionParam(springComponentModels, updatedHierarchy, emptySet(), paramOwnerComponentModel, param,
@@ -299,7 +302,7 @@ public class BeanDefinitionFactory {
         if (complexValue instanceof List) {
           visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
                                 componentLocator, paramsModels, param,
-                                (List<ComponentAst>) complexValue);
+                                (List) complexValue);
         } else {
           resolveParamBeanDefinitionSimpleType(springComponentModels, componentModelHierarchy, paramOwnerComponentModel,
                                                registry,
@@ -316,7 +319,7 @@ public class BeanDefinitionFactory {
           if (complexValue instanceof List) {
             visitMultipleChildren(springComponentModels, componentModelHierarchy, paramOwnerComponentModel, registry,
                                   componentLocator, paramsModels, param,
-                                  (List<ComponentAst>) complexValue);
+                                  (List) complexValue);
           } else {
             resolveParamBeanDefinitionSimpleType(springComponentModels, componentModelHierarchy, paramOwnerComponentModel,
                                                  registry,
@@ -621,7 +624,7 @@ public class BeanDefinitionFactory {
             return ownerSyntax.getChild(param.getGroupModel().getName())
                 .flatMap(dslGroupSyntax -> dslGroupSyntax.getChild(param.getModel().getName()));
           } else {
-            return ownerSyntax.getChild(param.getModel().getName());
+            return param.getGenerationInformation().getSyntax();
           }
         })
         .filter(paramSyntax -> !isEmpty(paramSyntax.getElementName()))
