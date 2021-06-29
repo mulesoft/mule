@@ -17,8 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.Optional.*;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -388,7 +387,9 @@ public final class XmlExtensionLoaderDelegate {
     ArtifactAst transformedModuleAst =
         xmlToAstParser.parse("transformed_" + resource.getFile(), resultStream.toInputStream());
 
-    if (transformedModuleAst.topLevelComponentsStream().findFirst().get().getRawParameterValue(XMLNS_TNS).isPresent()) {
+    ComponentParameterAst xmlParameter =
+        transformedModuleAst.topLevelComponentsStream().findFirst().get().getParameter(XMLNS_TNS);
+    if (xmlParameter != null && xmlParameter.getRawValue() != null) {
       loadModuleExtension(extensionDeclarer, transformedModuleAst, true);
       return of(createExtensionModel(extensionDeclarer));
     } else {
@@ -457,7 +458,7 @@ public final class XmlExtensionLoaderDelegate {
         ? getTnsXmlDslModel(moduleModel, name, version)
         : getXmlDslModel(moduleModel, name, version);
     final String description = getDescription(moduleModel);
-    final String xmlnsTnsValue = moduleModel.getRawParameterValue(XMLNS_TNS).orElse(null);
+    final String xmlnsTnsValue = ofNullable(moduleModel.getParameter(XMLNS_TNS)).map(param -> param.getRawValue()).orElse(null);
     if (!comesFromTNS && xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
                                                                 XMLNS_TNS,
@@ -672,7 +673,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private XmlDslModel getTnsXmlDslModel(ComponentAst moduleModel, String name, String version) {
-    final Optional<String> namespace = moduleModel.getRawParameterValue(XMLNS_TNS);
+    final String namespace = moduleModel.getParameter(XMLNS_TNS).getRawValue();
     final String stringPrefix = TNS_PREFIX;
 
     final Map<String, String> schemaLocations = moduleModel.getRawParameterValue("xsi:schemaLocation")
@@ -686,13 +687,13 @@ public final class XmlExtensionLoaderDelegate {
         })
         .orElse(emptyMap());
 
-    final String[] tnsSchemaLocationParts = schemaLocations.get(namespace.get()).split("/");
+    final String[] tnsSchemaLocationParts = schemaLocations.get(namespace).split("/");
 
     return XmlDslModel.builder()
         .setSchemaVersion(version)
         .setPrefix(stringPrefix)
-        .setNamespace(namespace.get())
-        .setSchemaLocation(schemaLocations.get(namespace.get()))
+        .setNamespace(namespace)
+        .setSchemaLocation(schemaLocations.get(namespace))
         .setXsdFileName(tnsSchemaLocationParts[tnsSchemaLocationParts.length - 1])
         .build();
   }
