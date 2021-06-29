@@ -8,7 +8,7 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
     
-    <xsd:element name="parameter" type="type">
+    <xsd:element name="parameter" type="parameterType">
         <xsd:annotation>
             <xsd:documentation>
                 Defines an operation parameter
@@ -23,7 +23,7 @@
                     <xsd:element name="description" type="xsd:string" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The parameter's description
+                                Detailed description of the parameter, it's semantics, usage and effects
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -43,10 +43,17 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="optional" default="false" type="mule:boolean">
+                <xsd:attribute name="optional" default="false" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether the parameter is optional or required.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="expressionSupport" default="NOT_SUPPORTED" type="expressionSupportType">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The support level this parameter offers regarding expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -54,6 +61,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             A very brief overview about the parameter.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="configOverride" type="xsd:boolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the parameter should act as a Config Override.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -142,6 +156,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="public" type="xsd:boolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the operation is public and should be usable by third party components
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="summary" type="mule:nonBlankString">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -172,6 +193,19 @@
             <xsd:enumeration value="DATE_TIME"/>
             <xsd:enumeration value="OBJECT"/>
             <xsd:enumeration value="BOOLEAN"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionSupportType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Enumerates the different types of support that a given component can provide regarding expressions
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="SUPPORTED"/>
+            <xsd:enumeration value="NOT_SUPPORTED"/>
+            <xsd:enumeration value="REQUIRED"/>
         </xsd:restriction>
     </xsd:simpleType>
 
