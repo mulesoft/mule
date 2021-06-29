@@ -147,7 +147,18 @@
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element name="output" type="resultType" />
-                    <xsd:group ref="mule:messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                    <xsd:element name="body">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The operations that makes for the operation's implementation
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:group ref="mule:messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" use="required" type="mule:nonBlankString">
                     <xsd:annotation>

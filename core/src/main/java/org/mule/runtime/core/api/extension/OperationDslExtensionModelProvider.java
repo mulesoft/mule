@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.get
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 
-public class OperationDslExtensionModelProvider implements RuntimeExtensionModelProvider {
+public final class OperationDslExtensionModelProvider implements RuntimeExtensionModelProvider {
 
   @Override
   public ExtensionModel createExtensionModel() {
