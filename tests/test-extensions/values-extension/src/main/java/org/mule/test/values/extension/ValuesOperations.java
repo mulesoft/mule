@@ -27,6 +27,7 @@ import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
 import org.mule.test.values.extension.resolver.WithEnumParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithErrorValueProvider;
 import org.mule.test.values.extension.resolver.WithFourActingParametersValueProvider;
+import org.mule.test.values.extension.resolver.WithFourStreamsActingParametersValueProvider;
 import org.mule.test.values.extension.resolver.WithListParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithMapParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
@@ -190,6 +191,15 @@ public class ValuesOperations {
               extractionExpression = "actingParameter.anotherNested.field4")}) String parameterWithValues,
                                             @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
+  public void withFourBoundStreamsActingParameters(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithFourStreamsActingParametersValueProvider.class,
+      bindings = {@Binding(actingParameter = "firstStream", extractionExpression = "actingParameter.pojoStream"),
+          @Binding(actingParameter = "secondStream", extractionExpression = "actingParameter.pojoStream"),
+          @Binding(actingParameter = "thirdStream", extractionExpression = "actingParameter.pojoStream"),
+          @Binding(actingParameter = "fourthStream",
+              extractionExpression = "actingParameter.pojoStream")}) String parameterWithValues,
+                                                   MyPojo actingParameter) {}
+
   public void withBoundActingParameterArray(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithListParameterValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue",
@@ -211,8 +221,7 @@ public class ValuesOperations {
   public void withPojoFieldBoundActingParameterField(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithRequiredParameterSdkValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue",
-          extractionExpression = "actingParameter.pojoId")}) String parameterWithValues,
-                                                     MyPojo actingParameter) {}
+          extractionExpression = "actingParameter.pojoId")}) String parameterWithValues, MyPojo actingParameter) {}
 
   public void withBoundActingParameterEnum(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithEnumParameterValueProvider.class,

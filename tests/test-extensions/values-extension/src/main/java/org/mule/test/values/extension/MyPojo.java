@@ -6,20 +6,27 @@
  */
 package org.mule.test.values.extension;
 
+import org.mule.runtime.core.api.util.IOUtils;
+
+import java.io.InputStream;
+
 public class MyPojo {
 
   private String pojoId;
   private String pojoName;
   private int pojoNumber;
   private boolean pojoBoolean;
+  private InputStream pojoStream;
 
   public MyPojo() {}
 
-  public MyPojo(String pojoId, String pojoName, int pojoNumber, boolean pojoBoolean) {
+  public MyPojo(String pojoId, String pojoName, int pojoNumber, boolean pojoBoolean, InputStream pojoStream) {
     this.pojoId = pojoId;
     this.pojoName = pojoName;
     this.pojoNumber = pojoNumber;
     this.pojoBoolean = pojoBoolean;
+    this.pojoStream = pojoStream;
+
   }
 
   public String getPojoId() {
@@ -54,6 +61,14 @@ public class MyPojo {
     this.pojoBoolean = pojoBoolean;
   }
 
+  public InputStream getPojoStream() {
+    return pojoStream;
+  }
+
+  public void setPojoStream(InputStream pojoStream) {
+    this.pojoStream = pojoStream;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -69,7 +84,9 @@ public class MyPojo {
       return false;
     if (pojoId != null ? !pojoId.equals(myPojo.pojoId) : myPojo.pojoId != null)
       return false;
-    return pojoName != null ? pojoName.equals(myPojo.pojoName) : myPojo.pojoName == null;
+    if (pojoName != null ? !pojoName.equals(myPojo.pojoName) : myPojo.pojoName != null)
+      return false;
+    return pojoStream != null ? pojoStream.equals(myPojo.pojoStream) : myPojo.pojoStream == null;
   }
 
   @Override
@@ -78,6 +95,7 @@ public class MyPojo {
     result = 31 * result + (pojoName != null ? pojoName.hashCode() : 0);
     result = 31 * result + pojoNumber;
     result = 31 * result + (pojoBoolean ? 1 : 0);
+    result = 31 * result + (pojoStream != null ? pojoStream.hashCode() : 0);
     return result;
   }
 
@@ -88,6 +106,7 @@ public class MyPojo {
         ", pojoName='" + pojoName + '\'' +
         ", pojoNumber=" + pojoNumber +
         ", pojoBoolean=" + pojoBoolean +
+        ", pojoStream='" + IOUtils.toString(pojoStream) + "\'" +
         '}';
   }
 }

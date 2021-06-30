@@ -1089,6 +1089,35 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithFourBoundStreamsActingParametersType" substitutionGroup="mule:abstract-operator" name="with-four-bound-streams-acting-parameters"></xs:element>
+  <xs:complexType name="WithFourBoundStreamsActingParametersType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="acting-parameter">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="org.mule.test.values.extension.MyPojo">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionBoolean" use="optional" name="pojoBoolean"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="pojoId"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="pojoName"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="optional" name="pojoNumber"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="pojoStream"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithMapBoundActingParameterType" substitutionGroup="mule:abstract-operator" name="with-map-bound-acting-parameter"></xs:element>
   <xs:complexType name="WithMapBoundActingParameterType">
     <xs:complexContent>
@@ -1154,16 +1183,6 @@
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="actingParameter"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="org.mule.test.values.extension.MyPojo">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionBoolean" use="optional" name="pojoBoolean"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="pojoId"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="pojoName"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="pojoNumber"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
