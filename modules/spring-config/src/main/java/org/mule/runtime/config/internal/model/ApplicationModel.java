@@ -216,7 +216,7 @@ public abstract class ApplicationModel {
         } else {
           return getDecorated().getParameter(groupName, paramName);
         }
-      };
+      }
 
       @Override
       public ComponentParameterAst getParameter(String paramName) {
@@ -225,14 +225,14 @@ public abstract class ApplicationModel {
         } else {
           return getDecorated().getParameter(paramName);
         }
-      };
+      }
 
       @Override
       public Collection<ComponentParameterAst> getParameters() {
         return getDecorated().getParameters().stream()
             .filter(p -> !p.getModel().getName().equals(REDELIVERY_POLICY_PARAMETER_NAME))
             .collect(toList());
-      };
+      }
 
     });
     newFlowChildren.add(new BaseComponentAstDecorator(redeliveryPolicy) {

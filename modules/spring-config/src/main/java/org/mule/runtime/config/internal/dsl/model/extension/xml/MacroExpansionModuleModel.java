@@ -33,12 +33,16 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
+import org.mule.runtime.ast.api.util.BaseComponentAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
@@ -190,7 +194,7 @@ public class MacroExpansionModuleModel {
                                                                                                            .collect(toList()))))
               .collect(toList());
 
-          return new ComponentAst() {
+          return new BaseComponentAst() {
 
             private final ComponentIdentifier identifier = ComponentIdentifier.builder()
                 .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
@@ -205,23 +209,8 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
-              return recursiveStream(direction).spliterator();
-            }
-
-            @Override
-            public Stream<ComponentAst> directChildrenStream() {
-              return mappedGlobalElements.stream();
-            }
-
-            @Override
-            public Spliterator<ComponentAst> directChildrenSpliterator() {
-              return mappedGlobalElements.spliterator();
-            }
-
-            @Override
-            public Optional<String> getRawParameterValue(String paramName) {
-              return empty();
+            protected Collection<ComponentAst> doGetChildrenAsts() {
+              return mappedGlobalElements;
             }
 
             @Override
@@ -245,8 +234,18 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public <M> Optional<M> getModel(Class<M> modelClass) {
-              return empty();
+            protected Collection<Object> doGetModels() {
+              return emptySet();
+            }
+
+            @Override
+            protected Map<Pair<ParameterModel, ParameterGroupModel>, ComponentParameterAst> doGetParameterAsts() {
+              return emptyMap();
+            }
+
+            @Override
+            protected Map<String, String> doGetExtraParameters() {
+              return emptyMap();
             }
 
             @Override

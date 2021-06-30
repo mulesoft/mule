@@ -26,6 +26,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.util.BaseComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -137,7 +138,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(null);
 
-    ComponentAst componentModel = mock(ComponentAst.class);
+    ComponentAst componentModel = mock(BaseComponentAst.class);
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
@@ -163,7 +164,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(null);
 
-    ComponentAst componentModel = mock(ComponentAst.class);
+    ComponentAst componentModel = mock(BaseComponentAst.class);
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
@@ -193,7 +194,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     when(parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest)).thenReturn(null);
 
-    ComponentAst componentModel = mock(ComponentAst.class);
+    ComponentAst componentModel = mock(BaseComponentAst.class);
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 

@@ -21,6 +21,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
@@ -65,11 +66,11 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
   }
 
   @Override
-  public Stream<ComponentAst> recursiveStream() {
+  public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
     return concat(concat(Stream.of(this),
-                         getDecorated().directChildrenStream().flatMap(ComponentAst::recursiveStream)),
+                         getDecorated().directChildrenStream().flatMap(componentAst -> componentAst.recursiveStream(direction))),
                   directChildrenStream()
-                      .flatMap(ComponentAst::recursiveStream));
+                      .flatMap(childAst -> childAst.recursiveStream(direction)));
   }
 
   @Override
