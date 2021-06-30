@@ -88,6 +88,10 @@ public class MetadataKeyIdObjectResolverTestCase extends AbstractMuleTestCase {
     when(countryParam.getName()).thenReturn("country");
     when(cityParam.getName()).thenReturn("city");
 
+    when(continentParam.isRequired()).thenReturn(true);
+    when(countryParam.isRequired()).thenReturn(true);
+    when(cityParam.isRequired()).thenReturn(true);
+
     mockMetadataKeyModelProp(continentParam, 1);
     mockMetadataKeyModelProp(countryParam, 2);
     mockMetadataKeyModelProp(cityParam, 3);
