@@ -51,6 +51,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -173,45 +174,25 @@ public class BeanDefinitionFactory {
 
     componentModel.getModel(ParameterizedModel.class)
         .ifPresent(pmzd -> {
-          pmzd.getParameterGroupModels().forEach(pmg -> {
-            List<SpringComponentModel> groupParamsModels = new ArrayList<>();
-            AtomicBoolean anyParamPresent = new AtomicBoolean();
-            pmg.getParameterModels().forEach(pm -> {
-              final ComponentParameterAst param;
-              if (pmg.isShowInDsl()) {
-                param = componentModel.getParameter(pmg.getName(), pm.getName());
-              } else {
-                param = componentModel.getParameter(pm.getName());
-              }
 
-              if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
-                resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
-                                           componentLocator, groupParamsModels, param);
-                anyParamPresent.set(true);
-              }
+          if (pmzd instanceof SourceModel) {
+            ((SourceModel) pmzd).getSuccessCallback().ifPresent(cbk -> {
+              cbk.getParameterGroupModels().forEach(pmg -> {
+                resolveParameterGroup(springComponentModels, componentModelHierarchy, componentModel, registry, componentLocator,
+                                      paramsModels, pmg);
+              });
             });
+            ((SourceModel) pmzd).getErrorCallback().ifPresent(cbk -> {
+              cbk.getParameterGroupModels().forEach(pmg -> {
+                resolveParameterGroup(springComponentModels, componentModelHierarchy, componentModel, registry, componentLocator,
+                                      paramsModels, pmg);
+              });
+            });
+          }
 
-            if (anyParamPresent.get()) {
-              if (pmg.isShowInDsl()) {
-                final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentModelHierarchy);
-                nestedHierarchy.add(componentModel);
-
-                resolveComponentBeanDefinitionParamGroup(springComponentModels, nestedHierarchy, groupParamsModels, pmg,
-                                                         nestedComp -> resolveComponent(springComponentModels,
-                                                                                        componentModelHierarchy, nestedComp,
-                                                                                        registry, componentLocator),
-                                                         springComponentModel -> {
-                                                           paramsModels.add(springComponentModel);
-                                                           handleSpringComponentModel(springComponentModel,
-                                                                                      springComponentModel.getComponent(),
-                                                                                      springComponentModels,
-                                                                                      registry,
-                                                                                      componentLocator);
-                                                         });
-              } else {
-                paramsModels.addAll(groupParamsModels);
-              }
-            }
+          pmzd.getParameterGroupModels().forEach(pmg -> {
+            resolveParameterGroup(springComponentModels, componentModelHierarchy, componentModel, registry, componentLocator,
+                                  paramsModels, pmg);
           });
         });
 
@@ -226,6 +207,50 @@ public class BeanDefinitionFactory {
                                                                                       springComponentModels,
                                                                                       registry,
                                                                                       componentLocator));
+  }
+
+  protected void resolveParameterGroup(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                       List<ComponentAst> componentModelHierarchy, ComponentAst componentModel,
+                                       BeanDefinitionRegistry registry, SpringConfigurationComponentLocator componentLocator,
+                                       List<SpringComponentModel> paramsModels, ParameterGroupModel pmg) {
+    List<SpringComponentModel> groupParamsModels = new ArrayList<>();
+    AtomicBoolean anyParamPresent = new AtomicBoolean();
+    pmg.getParameterModels().forEach(pm -> {
+      final ComponentParameterAst param;
+      if (pmg.isShowInDsl()) {
+        param = componentModel.getParameter(pmg.getName(), pm.getName());
+      } else {
+        param = componentModel.getParameter(pm.getName());
+      }
+
+      if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
+        resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, componentModel, registry,
+                                   componentLocator, groupParamsModels, param);
+        anyParamPresent.set(true);
+      }
+    });
+
+    if (anyParamPresent.get()) {
+      if (pmg.isShowInDsl()) {
+        final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentModelHierarchy);
+        nestedHierarchy.add(componentModel);
+
+        resolveComponentBeanDefinitionParamGroup(springComponentModels, nestedHierarchy, groupParamsModels, pmg,
+                                                 nestedComp -> resolveComponent(springComponentModels,
+                                                                                componentModelHierarchy, nestedComp,
+                                                                                registry, componentLocator),
+                                                 springComponentModel -> {
+                                                   paramsModels.add(springComponentModel);
+                                                   handleSpringComponentModel(springComponentModel,
+                                                                              springComponentModel.getComponent(),
+                                                                              springComponentModels,
+                                                                              registry,
+                                                                              componentLocator);
+                                                 });
+      } else {
+        paramsModels.addAll(groupParamsModels);
+      }
+    }
   }
 
   protected Optional<SpringComponentModel> resolveParamBeanDefinition(Map<ComponentAst, SpringComponentModel> springComponentModels,
@@ -350,44 +375,8 @@ public class BeanDefinitionFactory {
 
           child.getModel(ParameterizedModel.class).ifPresent(pmzd -> {
             pmzd.getParameterGroupModels().forEach(pmg -> {
-              List<SpringComponentModel> groupParamsModels = new ArrayList<>();
-              AtomicBoolean anyParamPresent = new AtomicBoolean();
-              pmg.getParameterModels().forEach(pm -> {
-                final ComponentParameterAst param;
-                if (pmg.isShowInDsl()) {
-                  param = child.getParameter(pmg.getName(), pm.getName());
-                } else {
-                  param = child.getParameter(pm.getName());
-                }
-
-                if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
-                  resolveParamBeanDefinition(springComponentModels, componentModelHierarchy, child, registry,
-                                             componentLocator, groupParamsModels, param);
-                  anyParamPresent.set(true);
-                }
-              });
-
-              if (anyParamPresent.get()) {
-                if (pmg.isShowInDsl()) {
-                  final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentModelHierarchy);
-                  nestedHierarchy.add(child);
-
-                  resolveComponentBeanDefinitionParamGroup(springComponentModels, nestedHierarchy, groupParamsModels, pmg,
-                                                           nestedComp -> resolveComponent(springComponentModels,
-                                                                                          componentModelHierarchy, nestedComp,
-                                                                                          registry, componentLocator),
-                                                           springComponentModel -> {
-                                                             childParamsModels.add(springComponentModel);
-                                                             handleSpringComponentModel(springComponentModel,
-                                                                                        springComponentModel.getComponent(),
-                                                                                        springComponentModels,
-                                                                                        registry,
-                                                                                        componentLocator);
-                                                           });
-                } else {
-                  childParamsModels.addAll(groupParamsModels);
-                }
-              }
+              resolveParameterGroup(springComponentModels, componentModelHierarchy, child, registry, componentLocator,
+                                    childParamsModels, pmg);
             });
           });
 
