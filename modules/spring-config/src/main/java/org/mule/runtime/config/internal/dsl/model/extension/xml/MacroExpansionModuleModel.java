@@ -11,7 +11,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -33,16 +32,12 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
-import org.mule.runtime.ast.api.util.BaseComponentAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
@@ -194,7 +189,7 @@ public class MacroExpansionModuleModel {
                                                                                                            .collect(toList()))))
               .collect(toList());
 
-          return new BaseComponentAst() {
+          return new ComponentAst() {
 
             private final ComponentIdentifier identifier = ComponentIdentifier.builder()
                 .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
@@ -209,8 +204,23 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public List<ComponentAst> getDirectChildren() {
-              return mappedGlobalElements;
+            public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
+              return recursiveStream(direction).spliterator();
+            }
+
+            @Override
+            public Stream<ComponentAst> directChildrenStream() {
+              return mappedGlobalElements.stream();
+            }
+
+            @Override
+            public Spliterator<ComponentAst> directChildrenSpliterator() {
+              return mappedGlobalElements.spliterator();
+            }
+
+            @Override
+            public Optional<String> getRawParameterValue(String paramName) {
+              return empty();
             }
 
             @Override
@@ -414,12 +424,8 @@ public class MacroExpansionModuleModel {
    * @return the suffix needed to be used when macro expanding elements, or {@link Optional#empty()} otherwise.
    */
   private Optional<String> getConfigRefName(ComponentAst operationRefModel) {
-    ComponentParameterAst parameterAst = operationRefModel.getParameter(MODULE_OPERATION_CONFIG_REF);
-    if (parameterAst != null && parameterAst.getResolvedRawValue() != null) {
-      return of(parameterAst.getResolvedRawValue());
-    } else {
-      return defaultGlobalElementName();
-    }
+    return Optional.ofNullable(operationRefModel.getRawParameterValue(MODULE_OPERATION_CONFIG_REF)
+        .orElseGet(() -> defaultGlobalElementName().orElse(null)));
   }
 
   /**
