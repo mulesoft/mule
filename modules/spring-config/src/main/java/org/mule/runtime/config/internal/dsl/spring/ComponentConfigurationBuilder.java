@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -352,21 +353,25 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
+            Optional<ParameterGroupModel> groupModelOptional;
+
             // int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
             // final ComponentAst possibleGroup =
             // ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
             // ? componentModel
             // : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
-            // if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-            // return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
-            // possibleGroup.getIdentifier(),
-            // (SourceModel) ownerComponentModel);
-            // } else {
-            Optional<ParameterGroupModel> groupModelOptional =
-                parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
-                                                           createBeanDefinitionRequest.getSpringComponentModel()
-                                                               .getComponentIdentifier(),
-                                                           ownerComponentModel.getParameterGroupModels());
+            if (ownerComponentModel instanceof SourceModel) {
+              return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
+                                                                         createBeanDefinitionRequest.getSpringComponentModel()
+                                                                             .getComponentIdentifier(),
+                                                                         (SourceModel) ownerComponentModel);
+            } else {
+              groupModelOptional =
+                  parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
+                                                             createBeanDefinitionRequest.getSpringComponentModel()
+                                                                 .getComponentIdentifier(),
+                                                             ownerComponentModel.getParameterGroupModels());
+            }
             ComponentParameterAst p;
             if (groupModelOptional.isPresent()) {
               p = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
