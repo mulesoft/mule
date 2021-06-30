@@ -428,7 +428,7 @@ public class MacroExpansionModuleModel {
     if (parameterAst != null && parameterAst.getRawValue() != null) {
       return of(parameterAst.getRawValue());
     } else {
-      return defaultGlobalElementName().flatMap();
+      return defaultGlobalElementName();
     }
   }
 
