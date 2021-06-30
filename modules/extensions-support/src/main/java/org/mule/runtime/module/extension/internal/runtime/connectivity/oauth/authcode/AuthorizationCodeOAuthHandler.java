@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -167,7 +168,8 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
         .responseExpiresInExpr(grantType.getExpirationRegex())
         .responseRefreshTokenExpr(grantType.getRefreshTokenExpr())
         .responseAccessTokenExpr(grantType.getAccessTokenExpr())
-        .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getOwnerConfigName());
+        .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getOwnerConfigName())
+        .withClientCredentialsIn(toCredentialsLocation(grantType.getCredentialsPlacement()));
 
     String scopes = config.getScope()
         .orElseGet(() -> grantType.getDefaultScope().orElse(null));
