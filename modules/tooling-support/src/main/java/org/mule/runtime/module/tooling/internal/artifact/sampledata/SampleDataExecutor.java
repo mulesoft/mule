@@ -122,7 +122,7 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
   private Map<String, Object> parameterMapWithDefaults(ParameterizedElementDeclaration componentElementDeclaration,
                                                        ComponentModel componentModel) {
-    Map<String, Object> explicitParameterMaps = parametersMap(componentElementDeclaration, componentModel, false);
+    Map<String, Object> explicitParameterMaps = parametersMap(componentElementDeclaration, componentModel, true);
     if (componentModel instanceof HasOutputModel) {
       ((HasOutputModel) componentModel).getSampleDataProviderModel().ifPresent(model -> {
         // No need to identify the acting parameter is required or not, maybe be required but DSL on component
@@ -134,7 +134,7 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
         // Now we get the default values for those optional parameters from model that are marked as acting
         // parameters
         ParameterValueResolver parameterValueResolver =
-            parameterValueResolver(componentElementDeclaration, componentModel, false);
+            parameterValueResolver(componentElementDeclaration, componentModel, true);
 
         componentModel.getAllParameterModels().stream()
             .filter(p -> actingParameters.contains(p.getName()))
