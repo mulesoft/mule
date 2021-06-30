@@ -774,9 +774,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Description("The application declares an ErrorType that is needed by the policy and but the policy doesn't have it in its own ErrorType repository")
   public void appliesPolicyUsingErrorTypeDeclaredOnAppDependency() throws Exception {
     if (!shareErrorTypeRepository) {
-      // TODO MULE-19203 revert the change in the following 2 lines
-      return;
-      // expectPolicyRegistrationException();
+      expectPolicyRegistrationException();
     }
 
     configureAppWithErrorDeclarationAndPolicyWithErrorMapping();

@@ -271,9 +271,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
-        // TODO MULE-19203 for policies this includes all extensions from the app as well. It should be just the ones
-        // declared in the policy, with a feature flag for getting the ones from the app as well (ref:
-        // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
         .withExtensionModels(extensions)
         .withParentArtifact(resolveParentArtifact());
     if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)) {
