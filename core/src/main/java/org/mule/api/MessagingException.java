@@ -11,8 +11,6 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
 import static org.mule.util.ClassUtils.isConsumable;
 
-import org.apache.commons.lang.SerializationException;
-import org.apache.commons.lang.SerializationUtils;
 import org.mule.VoidMuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
@@ -22,7 +20,10 @@ import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.NullPayload;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 
 /**
@@ -390,29 +391,40 @@ public class MessagingException extends MuleException
     private void writeObject(ObjectOutputStream out) throws Exception
     {
         out.defaultWriteObject();
-        if (isSerializable(this.failingMessageProcessor)) {
+        if (isSerializable(this.failingMessageProcessor))
+        {
             out.writeBoolean(true);
             out.writeObject(this.failingMessageProcessor);
-        } else {
+        }
+        else
+        {
             out.writeBoolean(false);
         }
     }
 
-    private boolean isSerializable(Object object) {
-        if (!(object instanceof Serializable)) {
+    private boolean isSerializable(Object object)
+    {
+        if (!(object instanceof Serializable))
+        {
             return false;
         }
 
         Serializable serializableObject = (Serializable) object;
-        try {
+        try
+        {
             Field[] fields = serializableObject.getClass().getDeclaredFields();
-            for (Field field : fields) {
+            for (Field field : fields)
+            {
                 field.setAccessible(true);
-                if (!(field.get(serializableObject) instanceof Serializable)) {
+                // only comparing fields because a recursive call could create an infinite loop
+                if (!(field.get(serializableObject) instanceof Serializable))
+                {
                     return false;
                 }
             }
-        } catch (IllegalAccessException illegalAccessException) {
+        }
+        catch (IllegalAccessException illegalAccessException)
+        {
             return false;
         }
         return true;
