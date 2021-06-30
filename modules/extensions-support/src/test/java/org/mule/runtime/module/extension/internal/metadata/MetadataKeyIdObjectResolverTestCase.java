@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
@@ -83,6 +84,14 @@ public class MetadataKeyIdObjectResolverTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() {
+    when(continentParam.getName()).thenReturn("continent");
+    when(countryParam.getName()).thenReturn("country");
+    when(cityParam.getName()).thenReturn("city");
+
+    when(continentParam.isRequired()).thenReturn(true);
+    when(countryParam.isRequired()).thenReturn(true);
+    when(cityParam.isRequired()).thenReturn(true);
+
     mockMetadataKeyModelProp(continentParam, 1);
     mockMetadataKeyModelProp(countryParam, 2);
     mockMetadataKeyModelProp(cityParam, 3);
@@ -254,6 +263,22 @@ public class MetadataKeyIdObjectResolverTestCase extends AbstractMuleTestCase {
 
     keyIdObjectResolver = new MetadataKeyIdObjectResolver(componentModel);
     keyIdObjectResolver.resolve(invalidMetadataKey);
+  }
+
+  @Test
+  public void resolveGroupWithMissingOptionalParameters() throws MetadataResolvingException {
+    when(cityParam.isRequired()).thenReturn(false);
+    setParameters(continentParam, countryParam, cityParam);
+    setMetadataKeyIdModelProperty(LocationKey.class);
+
+    keyIdObjectResolver = new MetadataKeyIdObjectResolver(componentModel);
+
+    final Object key = keyIdObjectResolver.resolve(INCOMPLETE_MULTILEVEL_KEY);
+    assertThat(key, is(instanceOf(LocationKey.class)));
+    LocationKey locationKey = (LocationKey) key;
+    assertThat(locationKey, hasProperty(CONTINENT, is(AMERICA)));
+    assertThat(locationKey, hasProperty(COUNTRY, is(USA)));
+    assertThat(locationKey, hasProperty(CITY, is(nullValue())));
   }
 
   public void setParameters(ParameterModel... parameterModels) {
