@@ -3,4 +3,4 @@ http\://www.mulesoft.org/schema/mule/core/current/mule-core.xsd=META-INF/mule-co
 http\://www.mulesoft.org/schema/mule/core/current/mule-core-common.xsd=META-INF/mule-core-common.xsd
 http\://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd=META-INF/mule-domain.xsd
 http\://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd=META-INF/mule-tls.xsd
-http\://www.mulesoft.org/schema/mule/operation-dsl/current/mule-operation-dsl.xsd=META-INF/mule-operation-dsl.xsd
+http\://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd=META-INF/mule-operation.xsd

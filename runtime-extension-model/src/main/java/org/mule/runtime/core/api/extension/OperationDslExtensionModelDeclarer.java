@@ -14,10 +14,9 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOO
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CHAIN;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTYPE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OPERATION_PARAMS_STEREOTYPE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OPERATION_PARAM_STEREOTYPE;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OPERATION_STEREOTYPE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OUTPUT_ATTRIBUTES_STEREOTYPE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OUTPUT_PAYLOAD_STEREOTYPE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OUTPUT_STEREOTYPE;
@@ -35,7 +34,7 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 
 class OperationDslExtensionModelDeclarer {
 
-  private static final String DSL_PREFIX = "operation-dsl";
+  private static final String DSL_PREFIX = "operation";
   private static final String NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, DSL_PREFIX);
   private static final String SCHEMA_LOCATION =
       "http://www.mulesoft.org/schema/mule/operation-dsl/current/mule-operation-dsl.xsd";
@@ -71,7 +70,7 @@ class OperationDslExtensionModelDeclarer {
     ConstructDeclarer construct = declarer.withConstruct("def")
         .describedAs("Defines an operation")
         .allowingTopLevelDefinition()
-        .withStereotype(OPERATION_STEREOTYPE);
+        .withStereotype(OPERATION_DEF_STEREOTYPE);
 
     ParameterGroupDeclarer parameters = construct.onDefaultParameterGroup();
     parameters.withRequiredParameter("name")
@@ -117,9 +116,9 @@ class OperationDslExtensionModelDeclarer {
     declareParametersConstruct(declarer);
     declareOutputConstruct(declarer);
 
-    construct.withComponent("body")
-        .withAllowedStereotypes(CHAIN)
-        .describedAs("The operations that makes for the operation's implementation");
+    construct.withChain("body")
+            .describedAs("The operations that makes for the operation's implementation")
+            .setRequired(true);
   }
 
   private void declareOutputConstruct(ExtensionDeclarer declarer) {
@@ -128,27 +127,28 @@ class OperationDslExtensionModelDeclarer {
     ComponentDeclarer outputConstruct = declarer.withConstruct("output")
         .describedAs("Defines a operation's output types.")
         .withStereotype(OUTPUT_STEREOTYPE);
-    outputConstruct.withComponent("payload-type")
-        .withAllowedStereotypes(OUTPUT_PAYLOAD_STEREOTYPE)
-        .describedAs("Type definition for the operation's output payload");
 
-    outputConstruct.withOptionalComponent("attributes-type")
-        .withAllowedStereotypes(OUTPUT_ATTRIBUTES_STEREOTYPE)
-        .describedAs("Type definition for the operation's output attributes");
+    outputConstruct.withComponent("payload-type-component")
+            .withAllowedStereotypes(OUTPUT_PAYLOAD_STEREOTYPE)
+            .describedAs("Type definition for the operation's output payload");
 
     declarer.withConstruct("payload-type")
-        .describedAs("Type definition for the operation's output payload")
-        .withStereotype(OUTPUT_PAYLOAD_STEREOTYPE)
-        .onDefaultParameterGroup()
-        .withRequiredParameter("type")
-        .describedAs("The output payload type")
-        .withDisplayModel(DisplayModel.builder()
-            .displayName("Payload type")
-            .summary("The output payload type")
-            .example(TYPE_EXAMPLE)
-            .build())
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
+            .describedAs("Type definition for the operation's output payload")
+            .withStereotype(OUTPUT_PAYLOAD_STEREOTYPE)
+            .onDefaultParameterGroup()
+            .withRequiredParameter("type")
+            .describedAs("The output payload type")
+            .withDisplayModel(DisplayModel.builder()
+                    .displayName("Payload type")
+                    .summary("The output payload type")
+                    .example(TYPE_EXAMPLE)
+                    .build())
+            .ofType(STRING_TYPE)
+            .withExpressionSupport(NOT_SUPPORTED);
+
+    outputConstruct.withOptionalComponent("attributes-type-component")
+        .withAllowedStereotypes(OUTPUT_ATTRIBUTES_STEREOTYPE)
+        .describedAs("Type definition for the operation's output attributes");
 
     declarer.withConstruct("attributes-type")
         .describedAs("Type definition for the operation's output attributes")
@@ -168,7 +168,7 @@ class OperationDslExtensionModelDeclarer {
   private void declareParametersConstruct(ExtensionDeclarer declarer) {
     declarer.withConstruct("parameters")
         .withStereotype(OPERATION_PARAMS_STEREOTYPE)
-        .withComponent("parameter")
+        .withComponent("parameter-component")
         .withAllowedStereotypes(OPERATION_PARAM_STEREOTYPE)
         .describedAs("Groups the operation's parameters");
 
