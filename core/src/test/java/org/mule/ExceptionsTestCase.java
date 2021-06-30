@@ -61,7 +61,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
 
     @Test
     // MULE-19427
-    public final void testRoutingSerializableWithNotSerializableEndpoint() throws IOException, ClassNotFoundException
+    public final void testRoutingSerializationWithNotSerializableEndpoint() throws IOException, ClassNotFoundException
     {
         OutboundEndpoint endpoint = mock(OutboundEndpoint.class);
 
@@ -85,7 +85,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
 
     @Test
     // MULE-19427
-    public final void testRoutingSerializableWithSerializableEndpoint() throws IOException, ClassNotFoundException
+    public final void testRoutingSerializationWithSerializableEndpoint() throws IOException, ClassNotFoundException
     {
         MessageProcessor endpoint = new TestMessageProcessor();
 
