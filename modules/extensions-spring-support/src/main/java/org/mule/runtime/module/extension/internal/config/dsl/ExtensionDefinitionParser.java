@@ -697,7 +697,9 @@ public abstract class ExtensionDefinitionParser {
   protected AttributeDefinition.Builder parseAttributeParameter(ParameterModel parameterModel) {
     return parseAttributeParameter(parameterModel.getName(), parameterModel.getName(), parameterModel.getType(),
                                    parameterModel.getDefaultValue(), parameterModel.getExpressionSupport(),
-                                   parameterModel.isRequired(), parameterModel.getModelProperties(),
+                                   parameterModel.isRequired(),
+                                   !parameterModel.getAllowedStereotypes().isEmpty(),
+                                   parameterModel.getModelProperties(),
                                    parameterModel.getAllowedStereotypes());
   }
 
