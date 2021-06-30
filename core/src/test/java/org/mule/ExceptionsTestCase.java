@@ -6,7 +6,6 @@
  */
 package org.mule;
 
-import org.hamcrest.core.IsNull;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,6 +20,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
@@ -61,39 +61,45 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
 
     @Test
     // MULE-19427
-    public final void testRoutingSerializableWithNotSerializableEndpoint() throws IOException, ClassNotFoundException {
+    public final void testRoutingSerializableWithNotSerializableEndpoint() throws IOException, ClassNotFoundException
+    {
         OutboundEndpoint endpoint = mock(OutboundEndpoint.class);
 
         RoutingException rex = new RoutingException(null, endpoint);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos))
+        {
             oos.writeObject(rex);
         }
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+        try (ObjectInputStream ois = new ObjectInputStream(bais))
+        {
             Object o = ois.readObject();
             assertThat(o, instanceOf(RoutingException.class));
             RoutingException routingException = (RoutingException) o;
-            assertThat(routingException.getFailingMessageProcessor(), is(IsNull.nullValue()));
+            assertThat(routingException.getFailingMessageProcessor(), is(nullValue()));
         }
     }
 
     @Test
     // MULE-19427
-    public final void testRoutingSerializableWithSerializableEndpoint() throws IOException, ClassNotFoundException {
+    public final void testRoutingSerializableWithSerializableEndpoint() throws IOException, ClassNotFoundException
+    {
         MessageProcessor endpoint = new TestMessageProcessor();
 
         RoutingException rex = new RoutingException(null, endpoint);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos))
+        {
             oos.writeObject(rex);
         }
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+        try (ObjectInputStream ois = new ObjectInputStream(bais))
+        {
             Object o = ois.readObject();
             assertThat(o, instanceOf(RoutingException.class));
             RoutingException routingException = (RoutingException) o;
@@ -103,12 +109,14 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
         }
     }
 
-    private final static class TestMessageProcessor implements MessageProcessor, Serializable {
+    private final static class TestMessageProcessor implements MessageProcessor, Serializable
+    {
 
         String field1 = "test";
 
         @Override
-        public MuleEvent process(MuleEvent event) throws MuleException {
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
             return null;
         }
     }
