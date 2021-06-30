@@ -68,19 +68,16 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
         RoutingException rex = new RoutingException(null, endpoint);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(baos))
-        {
-            oos.writeObject(rex);
-        }
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(rex);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        try (ObjectInputStream ois = new ObjectInputStream(bais))
-        {
-            Object o = ois.readObject();
-            assertThat(o, instanceOf(RoutingException.class));
-            RoutingException routingException = (RoutingException) o;
-            assertThat(routingException.getFailingMessageProcessor(), is(nullValue()));
-        }
+        ObjectInputStream ois = new ObjectInputStream(bais);
+
+        Object o = ois.readObject();
+        assertThat(o, instanceOf(RoutingException.class));
+        RoutingException routingException = (RoutingException) o;
+        assertThat(routingException.getFailingMessageProcessor(), is(nullValue()));
     }
 
     @Test
@@ -92,21 +89,18 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
         RoutingException rex = new RoutingException(null, endpoint);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(baos))
-        {
-            oos.writeObject(rex);
-        }
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(rex);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        try (ObjectInputStream ois = new ObjectInputStream(bais))
-        {
-            Object o = ois.readObject();
-            assertThat(o, instanceOf(RoutingException.class));
-            RoutingException routingException = (RoutingException) o;
-            assertThat(routingException.getFailingMessageProcessor(), instanceOf(TestMessageProcessor.class));
-            TestMessageProcessor testMessageProcessor = (TestMessageProcessor) routingException.getFailingMessageProcessor();
-            assertThat(testMessageProcessor.field1, is("test"));
-        }
+        ObjectInputStream ois = new ObjectInputStream(bais);
+
+        Object o = ois.readObject();
+        assertThat(o, instanceOf(RoutingException.class));
+        RoutingException routingException = (RoutingException) o;
+        assertThat(routingException.getFailingMessageProcessor(), instanceOf(TestMessageProcessor.class));
+        TestMessageProcessor testMessageProcessor = (TestMessageProcessor) routingException.getFailingMessageProcessor();
+        assertThat(testMessageProcessor.field1, is("test"));
     }
 
     private final static class TestMessageProcessor implements MessageProcessor, Serializable
