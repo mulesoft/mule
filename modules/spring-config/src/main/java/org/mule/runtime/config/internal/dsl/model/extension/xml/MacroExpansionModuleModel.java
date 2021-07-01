@@ -38,6 +38,7 @@ import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
+import org.mule.runtime.ast.api.util.BaseComponentAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
@@ -189,7 +190,7 @@ public class MacroExpansionModuleModel {
                                                                                                            .collect(toList()))))
               .collect(toList());
 
-          return new ComponentAst() {
+          return new BaseComponentAst() {
 
             private final ComponentIdentifier identifier = ComponentIdentifier.builder()
                 .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
@@ -219,8 +220,8 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public Optional<String> getRawParameterValue(String paramName) {
-              return empty();
+            public List<ComponentAst> getDirectChildren() {
+              return mappedGlobalElements;
             }
 
             @Override
@@ -239,7 +240,7 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public ExtensionModel getExtensionModel() {
+            public ExtensionModel getExtension() {
               return extensionModel;
             }
 
