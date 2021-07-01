@@ -239,11 +239,6 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            protected Map<String, String> doGetExtraParameters() {
-              return emptyMap();
-            }
-
-            @Override
             public MetadataType getType() {
               return null;
             }
