@@ -209,7 +209,7 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            protected Collection<ComponentAst> doGetChildrenAsts() {
+            public List<ComponentAst> getDirectChildren() {
               return mappedGlobalElements;
             }
 
@@ -234,13 +234,8 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            protected Collection<Object> doGetModels() {
-              return emptySet();
-            }
-
-            @Override
-            protected Map<Pair<ParameterModel, ParameterGroupModel>, ComponentParameterAst> doGetParameterAsts() {
-              return emptyMap();
+            protected Object doGetActualModel() {
+              return null;
             }
 
             @Override
