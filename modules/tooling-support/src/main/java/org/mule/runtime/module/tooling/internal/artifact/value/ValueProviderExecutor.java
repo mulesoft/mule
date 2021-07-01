@@ -111,8 +111,6 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(parameterizedModel, parameterizedElementDeclaration, providerName);
 
-      ParameterValueResolver parameterValueResolver =
-          parameterValueResolver(parameterizedElementDeclaration, parameterizedModel, overrideExpressionSupport);
       ValueProviderMediator valueProviderMediator = createValueProviderMediator(parameterizedModel);
 
       ExtensionResolvingContext context = new ExtensionResolvingContext(() -> optionalConfigurationInstance,
@@ -128,7 +126,10 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
         return resultFrom(
                           withContextClassLoader(
                                                  extensionClassLoader,
-                                                 () -> valueProviderFunction.apply(valueProviderMediator, parameterValueResolver,
+                                                 () -> valueProviderFunction.apply(valueProviderMediator,
+                                                                                   parameterValueResolver(parameterizedElementDeclaration,
+                                                                                                          parameterizedModel,
+                                                                                                          overrideExpressionSupport),
                                                                                    context),
                                                  ValueResolvingException.class,
                                                  e -> {
