@@ -64,7 +64,7 @@ public class ComponentBasedIdHelper {
     // There seems to be something missing in the mock model from the unit tests and this fails.
     // return MuleAstUtils.parameterOfType(elementModel, MuleStereotypes.CONFIG)
     // .map(p -> p.getValue().reduce(identity(), v -> v.toString()));
-    return ofNullable(elementModel.getParameter(CONFIG_ATTRIBUTE_NAME)).map(param -> param.getRawValue());
+    return ofNullable(elementModel.getParameter(CONFIG_ATTRIBUTE_NAME)).map(param -> param.getResolvedRawValue());
   }
 
   /**

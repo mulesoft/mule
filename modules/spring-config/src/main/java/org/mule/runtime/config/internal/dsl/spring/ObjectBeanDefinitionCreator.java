@@ -43,8 +43,8 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
     if (!componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
       return false;
     }
-    String refParameterValue = componentModel.getParameter(REF_PARAMETER).getRawValue();
-    String classParameterValue = componentModel.getParameter(CLASS_PARAMETER).getRawValue();
+    String refParameterValue = componentModel.getParameter(REF_PARAMETER).getResolvedRawValue();
+    String classParameterValue = componentModel.getParameter(CLASS_PARAMETER).getResolvedRawValue();
     if (refParameterValue != null && classParameterValue != null) {
       throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameters. Offending resource is '%s'",
                                                                          REF_PARAMETER, CLASS_PARAMETER,
