@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.extension;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BASE_TYPE_BUILDER;
@@ -132,37 +133,43 @@ class OperationDslExtensionModelDeclarer {
             .withAllowedStereotypes(OUTPUT_PAYLOAD_STEREOTYPE)
             .describedAs("Type definition for the operation's output payload");
 
-    declarer.withConstruct("payload-type")
+    declareOutputTypeParameters(declarer.withConstruct("payload-type")
             .describedAs("Type definition for the operation's output payload")
             .withStereotype(OUTPUT_PAYLOAD_STEREOTYPE)
-            .onDefaultParameterGroup()
-            .withRequiredParameter("type")
-            .describedAs("The output payload type")
-            .withDisplayModel(DisplayModel.builder()
-                    .displayName("Payload type")
-                    .summary("The output payload type")
-                    .example(TYPE_EXAMPLE)
-                    .build())
-            .ofType(STRING_TYPE)
-            .withExpressionSupport(NOT_SUPPORTED);
+            .onDefaultParameterGroup(), "payload");
 
     outputConstruct.withOptionalComponent("attributes-type-component")
         .withAllowedStereotypes(OUTPUT_ATTRIBUTES_STEREOTYPE)
         .describedAs("Type definition for the operation's output attributes");
 
-    declarer.withConstruct("attributes-type")
+    declareOutputTypeParameters(declarer.withConstruct("attributes-type")
         .describedAs("Type definition for the operation's output attributes")
         .withStereotype(OUTPUT_ATTRIBUTES_STEREOTYPE)
-        .onDefaultParameterGroup()
-        .withRequiredParameter("type")
-        .describedAs("The output attributes type")
-        .withDisplayModel(DisplayModel.builder()
-            .displayName("Attributes type")
-            .summary("The output attributes type")
-            .example(TYPE_EXAMPLE)
-            .build())
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
+        .onDefaultParameterGroup(), "attributes");
+  }
+  
+  private ParameterGroupDeclarer declareOutputTypeParameters(ParameterGroupDeclarer group, String type) {
+    group.withRequiredParameter("type")
+            .describedAs("The output " + type + " type")
+            .withDisplayModel(DisplayModel.builder()
+                    .displayName(capitalize(type) + " type")
+                    .summary("The output " + type + " type")
+                    .example(TYPE_EXAMPLE)
+                    .build())
+            .ofType(STRING_TYPE)
+            .withExpressionSupport(NOT_SUPPORTED);
+
+    group.withOptionalParameter("mimeType")
+            .describedAs("The value media type")
+            .withDisplayModel(DisplayModel.builder()
+                    .displayName("Media Type")
+                    .summary("The value media type")
+                    .example("application/json")
+                    .build())
+            .ofType(STRING_TYPE)
+            .withExpressionSupport(NOT_SUPPORTED);
+
+    return group;
   }
 
   private void declareParametersConstruct(ExtensionDeclarer declarer) {
