@@ -312,14 +312,15 @@ public abstract class ExtensionDefinitionParser {
 
         private boolean parseAsContent(MetadataType type) {
           if (isContent) {
-            parseFromTextExpression(parameter, paramDsl,
-                                    () -> value -> valueResolverFactory.of(parameter.getName(), type, value,
-                                                                           parameter.getDefaultValue(),
-                                                                           parameter.getExpressionSupport(),
-                                                                           parameter.isRequired(),
-                                                                           parameter.getModelProperties(),
-                                                                           acceptsReferences(parameter),
-                                                                           true));
+            parseAttributeParameter(parameter);
+            // parseFromTextExpression(parameter, paramDsl,
+            // () -> value -> valueResolverFactory.of(parameter.getName(), type, value,
+            // parameter.getDefaultValue(),
+            // parameter.getExpressionSupport(),
+            // parameter.isRequired(),
+            // parameter.getModelProperties(),
+            // acceptsReferences(parameter),
+            // true));
 
             return true;
           }
