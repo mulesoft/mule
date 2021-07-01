@@ -74,6 +74,7 @@ public class BeanDefinitionFactory {
   public static final String SPRING_SINGLETON_OBJECT = "singleton";
   public static final String SOURCE_TYPE = "sourceType";
   public static final String TARGET_TYPE = "targetType";
+  public static final String OBJECT_SERIALIZER_REF = "defaultObjectSerializer-ref";
   public static final String CORE_ERROR_NS = CORE_PREFIX.toUpperCase();
 
   private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
@@ -243,13 +244,13 @@ public class BeanDefinitionFactory {
           .filter(childSpringComponentModel -> areMatchingTypes(MVELExpressionLanguage.class,
                                                                 childSpringComponentModel.getType()))
           .forEach(childSpringComponentModel -> expressionLanguage.set(childSpringComponentModel.getBeanDefinition()));
-      componentModel.getRawParameterValue("defaultObjectSerializer-ref")
-          .ifPresent(defaultObjectSerializer -> {
-            if (defaultObjectSerializer != DEFAULT_OBJECT_SERIALIZER_NAME) {
-              registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
-              registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
-            }
-          });
+      if (componentModel.getParameter(OBJECT_SERIALIZER_REF) != null) {
+        String defaultObjectSerializer = componentModel.getParameter(OBJECT_SERIALIZER_REF).getResolvedRawValue();
+        if (defaultObjectSerializer != null && defaultObjectSerializer != DEFAULT_OBJECT_SERIALIZER_NAME) {
+          registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
+          registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
+        }
+      }
       if (expressionLanguage.get() != null) {
         registry.registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage.get());
       }

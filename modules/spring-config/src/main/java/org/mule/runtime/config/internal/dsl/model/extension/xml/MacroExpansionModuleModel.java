@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -424,8 +425,12 @@ public class MacroExpansionModuleModel {
    * @return the suffix needed to be used when macro expanding elements, or {@link Optional#empty()} otherwise.
    */
   private Optional<String> getConfigRefName(ComponentAst operationRefModel) {
-    return Optional.ofNullable(operationRefModel.getRawParameterValue(MODULE_OPERATION_CONFIG_REF)
-        .orElseGet(() -> defaultGlobalElementName().orElse(null)));
+    ComponentParameterAst parameterAst = operationRefModel.getParameter(MODULE_OPERATION_CONFIG_REF);
+    if (parameterAst != null && parameterAst.getResolvedRawValue() != null) {
+      return of(parameterAst.getResolvedRawValue());
+    } else {
+      return defaultGlobalElementName();
+    }
   }
 
   /**
