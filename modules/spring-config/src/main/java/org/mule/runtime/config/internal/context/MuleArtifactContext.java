@@ -237,6 +237,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       throw new MuleRuntimeException(e);
     }
     registerErrors(applicationModel);
+    registerApplicationExtensionModel();
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -287,6 +288,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         .map(component -> component.getMetadata().getFileName().orElse("unknown") + ":"
             + component.getMetadata().getStartLine().orElse(-1))
         .collect(joining("; ", "[", "]")) + ": " + v.getMessage();
+  }
+
+  protected void registerApplicationExtensionModel() {
+    if (!artifactType.equals(APP)) {
+      return;
+    }
+
+    
   }
 
   protected void registerErrors(final ArtifactAst artifactAst) {
