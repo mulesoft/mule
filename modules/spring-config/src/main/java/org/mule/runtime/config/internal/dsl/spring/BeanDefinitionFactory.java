@@ -617,8 +617,11 @@ public class BeanDefinitionFactory {
             return ownerSyntax.getChild(param.getGroupModel().getName())
                 .flatMap(dslGroupSyntax -> dslGroupSyntax.getChild(param.getModel().getName()));
           } else {
-            if (ownerSyntax.getChild(param.getModel().getName()).isPresent()) {
-              return ownerSyntax.getChild(param.getModel().getName());
+            if (ownerSyntax.getContainedElement(param.getModel().getName()).isPresent()
+                && ownerSyntax.getContainedElement(param.getModel().getName()).get().isWrapped()) {
+              return ownerSyntax.getContainedElement(param.getModel().getName());
+              // if (ownerSyntax.getContainedElement(param.getModel().getName()).isPresent()) {
+              // return ownerSyntax.getContainedElement(param.getModel().getName());
             } else {
               return param.getGenerationInformation().getSyntax();
             }
