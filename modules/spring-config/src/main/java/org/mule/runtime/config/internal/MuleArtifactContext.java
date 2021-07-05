@@ -218,14 +218,15 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return this.muleContext.getRegistry();
   }
 
-  private void validateAllConfigElementHaveParsers() {
-    applicationModel.recursiveStream().forEach(componentModel -> {
-      if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier())) {
-        throw new RuntimeException(format("Invalid config '%s'. No definition parser found for that config",
-                                          componentModel.getIdentifier()));
-      }
-    });
-  }
+//  private void validateAllConfigElementHaveParsers() {
+//    applicationModel.recursiveStream().forEach(componentModel -> {
+//      if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier())
+//          && !componentModel.getModel(Object.class).isPresent()) {
+//        throw new RuntimeException(format("Invalid config '%s'. No definition parser found for that config",
+//                                          componentModel.getIdentifier()));
+//      }
+//    });
+//  }
 
   protected void validateArtifact(final ArtifactAst artifactAst) throws ConfigurationException {
     doValidateModel(artifactAst, v -> true);
@@ -280,7 +281,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public void initialize() {
     applicationModel = prepareAstForRuntime(applicationModel, getExtensions());
-    validateAllConfigElementHaveParsers();
+    // validateAllConfigElementHaveParsers();
   }
 
   @Override
