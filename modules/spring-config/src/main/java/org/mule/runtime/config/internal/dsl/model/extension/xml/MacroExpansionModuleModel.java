@@ -239,7 +239,7 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public ExtensionModel getExtension() {
+            public ExtensionModel getExtensionModel() {
               return extensionModel;
             }
 
