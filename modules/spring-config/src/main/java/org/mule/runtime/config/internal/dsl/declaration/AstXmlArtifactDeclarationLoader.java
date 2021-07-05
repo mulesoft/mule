@@ -219,7 +219,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   }
 
   private void declareElement(final ComponentAst component, final ArtifactDeclarer artifactDeclarer) {
-    final ElementDeclarer extensionElementsDeclarer = forExtension(component.getExtension().getName());
+    final ElementDeclarer extensionElementsDeclarer = forExtension(component.getExtensionModel().getName());
 
     component.getModel(ConstructModel.class)
         .map(model -> {
@@ -243,7 +243,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           Map<String, String> attributes = resolveAttributes(component, param -> !param.getModel().isComponentId());
 
           component.directChildrenStream()
-              .filter(config -> declareAsConnectionProvider(component.getExtension(), model, configurationDeclarer,
+              .filter(config -> declareAsConnectionProvider(component.getExtensionModel(), model, configurationDeclarer,
                                                             config, extensionElementsDeclarer))
               .collect(toList());
 
@@ -470,7 +470,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   private void declareComposableModel(ComposableModel model, DslElementSyntax elementDsl,
                                       ComponentAst composableComponent, HasNestedComponentDeclarer declarer) {
     composableComponent.directChildrenStream().forEach(child -> {
-      ElementDeclarer extensionElementsDeclarer = forExtension(child.getExtension().getName());
+      ElementDeclarer extensionElementsDeclarer = forExtension(child.getExtensionModel().getName());
 
       Reference<Boolean> componentFound = new Reference<>(false);
 
