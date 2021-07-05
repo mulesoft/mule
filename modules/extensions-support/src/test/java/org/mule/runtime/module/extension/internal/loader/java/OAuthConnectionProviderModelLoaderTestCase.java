@@ -61,7 +61,7 @@ public class OAuthConnectionProviderModelLoaderTestCase extends AbstractJavaExte
   public void includeRedirectUriInRefreshTokenRequestSettingForAuthorizationCodeIsLoaded() {
     ConfigurationDeclaration configuration = getConfiguration(extensionDeclaration, "auth-code");
     ConnectionProviderDeclaration connectionProviderDeclaration =
-        findConnectionProvider(configuration, "do-not-include-redirect-uri-param");
+        findConnectionProvider(configuration, "do-not-include-redirect-uri-in-refresh-token");
     AuthorizationCodeGrantType authorizationCodeGrantType = getAuthorizationCodeGrantType(connectionProviderDeclaration);
     assertThat(authorizationCodeGrantType.includeRedirectUriInRefreshTokenRequest(), is(false));
   }
