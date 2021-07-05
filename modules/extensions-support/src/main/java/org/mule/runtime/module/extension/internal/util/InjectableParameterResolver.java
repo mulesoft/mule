@@ -11,6 +11,8 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.keywordSafeName;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.sanitizeExpression;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.BindingContext;
@@ -27,10 +29,8 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 
@@ -47,7 +47,6 @@ public class InjectableParameterResolver {
   private final BindingContext expressionResolvingContext;
   private final ExpressionManager expressionManager;
   private final Map<String, InjectableParameterInfo> injectableParametersMap;
-  private final Set<String> availableParams = new HashSet<>();
 
   public InjectableParameterResolver(ParameterizedModel parameterizedModel,
                                      ParameterValueResolver parameterValueResolver,
@@ -73,11 +72,11 @@ public class InjectableParameterResolver {
     }
 
     String extractionExpression = injectableParameterInfo.getExtractionExpression();
-    String topLevelRequiredParameter = getParameterNameFromExtractionExpression(extractionExpression);
-    if (availableParams.contains(topLevelRequiredParameter)) {
+    String topLevelRequiredParameter = keywordSafeName(getParameterNameFromExtractionExpression(extractionExpression));
+    if (expressionResolvingContext.lookup(topLevelRequiredParameter).isPresent()) {
       try {
         parameterValue = expressionManager
-            .evaluate("#[" + injectableParameterInfo.getExtractionExpression() + "]",
+            .evaluate("#[" + sanitizeExpression(injectableParameterInfo.getExtractionExpression()) + "]",
                       DataType.fromType(getType(injectableParameterInfo.getType())),
                       expressionResolvingContext)
             .getValue();
@@ -118,8 +117,7 @@ public class InjectableParameterResolver {
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
         }
-        bindingContextBuilder.addBinding(keywordSafe(parameterModel.getName()), (TypedValue<?>) value);
-        availableParams.add(parameterModel.getName());
+        bindingContextBuilder.addBinding(keywordSafeName(parameterModel.getName()), (TypedValue<?>) value);
       }
     }
     return bindingContextBuilder.build();
@@ -131,27 +129,6 @@ public class InjectableParameterResolver {
     } catch (ValueResolvingException e) {
       return null;
     }
-  }
-
-  private String keywordSafe(String parameterName) {
-    return "_" + parameterName;
-  }
-
-  private String sanitizeExpression(String extractionExpression) {
-    StringBuilder sanitazedExpression = new StringBuilder();
-    sanitazedExpression.append("\"");
-    int extractionExpressionLength = extractionExpression.length();
-    int firstDotIndex = extractionExpression.indexOf(".");
-
-    if (firstDotIndex == -1) {
-      sanitazedExpression.append(extractionExpression);
-      sanitazedExpression.append("\"");
-    } else {
-      sanitazedExpression.append(extractionExpression.substring(0, firstDotIndex));
-      sanitazedExpression.append("\"");
-      sanitazedExpression.append(extractionExpression.substring(firstDotIndex, extractionExpressionLength));
-    }
-    return sanitazedExpression.toString();
   }
 
 }
