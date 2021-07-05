@@ -8,7 +8,7 @@
         <version>4.4.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-extensions-app-support</artifactId>
-    <name>Mule Extensions Support</name>
+    <name>Mule App Extension Support</name>
     <packaging>jar</packaging>
     <description>
         Extensions API implementation to enable reuse by leveraging Mule Applications as reusable extensions.
@@ -30,10 +30,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-extensions-api-persistence</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-connectivity-api</artifactId>
         </dependency>
         <dependency>
@@ -48,6 +44,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
         </dependency>
         
         <!--Test Dependencies-->
@@ -159,6 +156,14 @@
             <artifactId>mule-sample-data-extension</artifactId>
             <version>4.4.0-SNAPSHOT</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-extensions-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-extensions-api</artifactId>
         </dependency>
     </dependencies>
 
