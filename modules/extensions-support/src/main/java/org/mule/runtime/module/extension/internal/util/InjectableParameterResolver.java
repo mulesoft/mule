@@ -118,7 +118,7 @@ public class InjectableParameterResolver {
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
         }
-        bindingContextBuilder.addBinding(parameterModel.getName(), (TypedValue) value);
+        bindingContextBuilder.addBinding(keywordSafe(parameterModel.getName()), (TypedValue<?>) value);
         availableParams.add(parameterModel.getName());
       }
     }
@@ -131,6 +131,27 @@ public class InjectableParameterResolver {
     } catch (ValueResolvingException e) {
       return null;
     }
+  }
+
+  private String keywordSafe(String parameterName) {
+    return "_" + parameterName;
+  }
+
+  private String sanitizeExpression(String extractionExpression) {
+    StringBuilder sanitazedExpression = new StringBuilder();
+    sanitazedExpression.append("\"");
+    int extractionExpressionLength = extractionExpression.length();
+    int firstDotIndex = extractionExpression.indexOf(".");
+
+    if (firstDotIndex == -1) {
+      sanitazedExpression.append(extractionExpression);
+      sanitazedExpression.append("\"");
+    } else {
+      sanitazedExpression.append(extractionExpression.substring(0, firstDotIndex));
+      sanitazedExpression.append("\"");
+      sanitazedExpression.append(extractionExpression.substring(firstDotIndex, extractionExpressionLength));
+    }
+    return sanitazedExpression.toString();
   }
 
 }
