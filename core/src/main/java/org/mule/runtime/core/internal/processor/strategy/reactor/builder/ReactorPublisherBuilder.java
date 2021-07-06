@@ -7,8 +7,12 @@
 
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
+import static java.lang.System.currentTimeMillis;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.core.api.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
@@ -17,22 +21,21 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * Builder of a {@link Publisher} with common operations in {@link Mono} and {@link Flux}.
- * 
+ *
  * @param <T>
- * 
  * @since 4.4.0
  */
 public interface ReactorPublisherBuilder<T extends Publisher> {
 
   /**
    * @param event the {@link CoreEvent} to emit.
-   * 
    * @return a builder for a {@link Mono} that just emits one event.
    */
   public static ReactorPublisherBuilder<Mono<CoreEvent>> buildMono(CoreEvent event) {
@@ -41,7 +44,6 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
   /**
    * @param publisher the {@link Publisher} used as a base for creating the {@link Flux}.
-   *
    * @return a builder for a {@link Flux} that emits the same events from the publisher.
    */
   public static ReactorPublisherBuilder<Flux<CoreEvent>> buildFlux(Publisher<CoreEvent> publisher) {
@@ -50,41 +52,45 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
   /**
    * @param onNext what to do on next.
-   *
    * @return builder with a doOnNext operator.
    */
   public ReactorPublisherBuilder<T> doOnNext(Consumer<CoreEvent> onNext);
 
   /**
    * @param scheduler scheduler to publish on.
-   *
    * @return builder which publishes on the scheduler.
    */
   public ReactorPublisherBuilder<T> publishOn(ScheduledExecutorService scheduler);
 
   /**
    * @param processor a {@link ReactiveProcessor} to transform the {@link Publisher}.
-   *
    * @return builder for the transformed {@link Publisher}.
    */
   public ReactorPublisherBuilder<T> transform(ReactiveProcessor processor);
 
   /**
    * @param function the function that sets the conte?t on subscription.
-   *
    * @return builder for a {@link Publisher} with the subscriberContext set.
    */
   public ReactorPublisherBuilder<T> subscriberContext(Function<Context, Context> function);
 
   /**
    * @param onSubscribe operation done onSubscribe
-   *
    * @return builder for a {@link Publisher} with the onSubscribe performed.
    */
   ReactorPublisherBuilder<T> doOnSubscribe(Consumer<? super Subscription> onSubscribe);
 
-  public T build();
+  /**
+   * @param location     the {@link ComponentLocation} associated to the event
+   * @param hook         the optional {@link ProfilingDataProducer} used to notify the profiling event.
+   * @param artifactId   the profiled artifact id.
+   * @param artifactType the profiled artifact type.
+   * @return builder for a {@link Publisher} with the profiling action.
+   */
+  ReactorPublisherBuilder<T> profileEvent(ComponentLocation location, Optional<ProfilingDataProducer> hook, String artifactId,
+                                          String artifactType);
 
+  public T build();
 
   /**
    * Builder for a {@link Mono}.
@@ -132,7 +138,22 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
       return this;
     }
 
+    @Override
+    public ReactorPublisherBuilder<Mono<CoreEvent>> profileEvent(ComponentLocation location, Optional<ProfilingDataProducer> hook,
+                                                                 String artifactId, String artifactType) {
+      mono = hook.map(
+                      h -> mono.doOnNext(e -> h.event(new ComponentProcessingStrategyProfilingEventContext(e, location,
+                                                                                                           Thread.currentThread()
+                                                                                                               .getName(),
+                                                                                                           artifactId,
+                                                                                                           artifactType,
+                                                                                                           currentTimeMillis()))))
+          .orElse(mono);
+      return this;
+    }
+
   }
+
 
   /**
    * Builder for a {@link Flux}.
@@ -177,6 +198,21 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> doOnSubscribe(Consumer<? super Subscription> onSubscribe) {
       flux = flux.doOnSubscribe(onSubscribe);
+      return this;
+    }
+
+    @Override
+    public ReactorPublisherBuilder<Flux<CoreEvent>> profileEvent(ComponentLocation location, Optional<ProfilingDataProducer> hook,
+                                                                 String artifactId, String artifactType) {
+      flux = hook.map(
+                      h -> flux.doOnNext(e -> h.event(
+                                                      new ComponentProcessingStrategyProfilingEventContext(e, location,
+                                                                                                           Thread.currentThread()
+                                                                                                               .getName(),
+                                                                                                           artifactId,
+                                                                                                           artifactType,
+                                                                                                           currentTimeMillis()))))
+          .orElse(flux);
       return this;
     }
 

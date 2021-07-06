@@ -182,6 +182,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
+    builder.setPipelineLocation(getLocation());
     return builder.build();
   }
 
@@ -270,6 +271,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .stream()
         .map(FlowInterceptorFactoryAdapter::new)
         .collect(toList()), muleContext.getInjector()));
+
+    doInitialiseProcessingStrategy();
+  }
+
+  @Override
+  protected void doInitialiseProcessingStrategy() throws MuleException {
+    LOGGER.debug("Initialising processing strategy ({}) of flow '{}'...", processingStrategy, getName());
+    super.doInitialiseProcessingStrategy();
+    initialiseIfNeeded(processingStrategy, muleContext);
   }
 
   /**
