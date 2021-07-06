@@ -43,6 +43,7 @@ import org.mule.metadata.api.model.impl.DefaultFunctionType;
 import org.mule.metadata.api.model.impl.DefaultObjectFieldType;
 import org.mule.metadata.api.model.impl.DefaultObjectKeyType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
+import org.mule.metadata.api.model.impl.DefaultTupleType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 
@@ -114,7 +115,7 @@ public class MetadataTypeEnricher {
 
     @Override
     public void visitNumber(NumberType numberType) {
-      withNewAnnotations(typeBuilder.numberType());
+      type = withNewAnnotations(typeBuilder.numberType());
     }
 
     @Override
@@ -138,7 +139,7 @@ public class MetadataTypeEnricher {
 
     @Override
     public void visitTuple(TupleType tupleType) {
-      type = withNewAnnotations(typeBuilder.tupleType());
+      type = new DefaultTupleType(tupleType.getTypes(), tupleType.getMetadataFormat(), getAllTypeAnnotationsMap());
     }
 
     @Override
@@ -147,32 +148,34 @@ public class MetadataTypeEnricher {
     }
 
     @Override
-    public void visitObjectKey(ObjectKeyType type) {
-      type = new DefaultObjectKeyType(Optional.ofNullable(type.getName()),
-                                      Optional.ofNullable(type.getPattern()),
-                                      type.getAttributes(),
-                                      type.getMetadataFormat(),
+    public void visitObjectKey(ObjectKeyType objectKeyType) {
+      type = new DefaultObjectKeyType(Optional.ofNullable(objectKeyType.getName()),
+                                      Optional.ofNullable(objectKeyType.getPattern()),
+                                      objectKeyType.getAttributes(),
+                                      objectKeyType.getMetadataFormat(),
                                       getAllTypeAnnotationsMap());
     }
 
     @Override
-    public void visitAttributeKey(AttributeKeyType type) {
-      type = new DefaultAttributeKeyType(Optional.ofNullable(type.getName()),
-                                         Optional.ofNullable(type.getPattern()),
-                                         type.getMetadataFormat(),
+    public void visitAttributeKey(AttributeKeyType attributeKeyType) {
+      type = new DefaultAttributeKeyType(Optional.ofNullable(attributeKeyType.getName()),
+                                         Optional.ofNullable(attributeKeyType.getPattern()),
+                                         attributeKeyType.getMetadataFormat(),
                                          getAllTypeAnnotationsMap());
     }
 
     @Override
-    public void visitAttributeField(AttributeFieldType type) {
-      type = new DefaultAttributeFieldType(type.getKey(), type.getValue(), type.isRequired(),
-                                           type.getMetadataFormat(), getAllTypeAnnotationsMap());
+    public void visitAttributeField(AttributeFieldType attributeFieldType) {
+      type = new DefaultAttributeFieldType(attributeFieldType.getKey(), attributeFieldType.getValue(),
+                                           attributeFieldType.isRequired(),
+                                           attributeFieldType.getMetadataFormat(), getAllTypeAnnotationsMap());
     }
 
     @Override
-    public void visitObjectField(ObjectFieldType type) {
-      type = new DefaultObjectFieldType(type.getKey(), type.getValue(), type.isRequired(), type.isRepeated(),
-                                        type.getMetadataFormat(), getAllTypeAnnotationsMap());
+    public void visitObjectField(ObjectFieldType objectFieldType) {
+      type = new DefaultObjectFieldType(objectFieldType.getKey(), objectFieldType.getValue(), objectFieldType.isRequired(),
+                                        objectFieldType.isRepeated(),
+                                        objectFieldType.getMetadataFormat(), getAllTypeAnnotationsMap());
     }
 
     @Override
@@ -181,9 +184,9 @@ public class MetadataTypeEnricher {
     }
 
     @Override
-    public void visitFunction(FunctionType type) {
-      type = new DefaultFunctionType(type.getMetadataFormat(), getAllTypeAnnotationsMap(),
-                                     type.getReturnType(), type.getParameters());
+    public void visitFunction(FunctionType functionType) {
+      type = new DefaultFunctionType(functionType.getMetadataFormat(), getAllTypeAnnotationsMap(),
+                                     functionType.getReturnType(), functionType.getParameters());
     }
 
     @Override
