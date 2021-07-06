@@ -508,7 +508,12 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onValueFromTextContent() {
-      this.value = componentModel.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
+      if (componentModel != null) {
+        this.value = componentModel.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
+      } else {
+        getParameterValue(createBeanDefinitionRequest.getParam().getModel().getName(), null)
+            .ifPresent(v -> this.value = v);
+      }
     }
 
     @Override
