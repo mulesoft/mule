@@ -230,24 +230,6 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
-  public void withFourBoundStreamsActingParametersAsExpression() throws Exception {
-    ValueResult result = getValueResult("withFourBoundStreamsActingParametersAsExpression", "parameterWithValues");
-    assertThat(result.getFailure().isPresent(), is(false));
-    Set<Value> values = result.getValues();
-    assertThat(values, hasSize(4));
-    assertThat(values, hasValues("streamValue", "streamValue", "streamValue", "streamValue"));
-  }
-
-  @Test
-  public void withFourBoundStreamsActingParametersInline() throws Exception {
-    ValueResult result = getValueResult("withFourBoundStreamsActingParametersInline", "parameterWithValues");
-    assertThat(result.getFailure().isPresent(), is(false));
-    Set<Value> values = result.getValues();
-    assertThat(values, hasSize(4));
-    assertThat(values, hasValues("streamValue", "streamValue", "streamValue", "streamValue"));
-  }
-
-  @Test
   public void withBoundActingParameterArray() throws Exception {
     ValueResult result = getValueResult("withBoundActingParameterArray", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
@@ -263,7 +245,7 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     Set<Value> values = result.getValues();
     assertThat(values, hasSize(1));
     assertThat(values,
-               hasValues("MyPojo{pojoId='This is the pojo ID', pojoName='This is the pojo name', pojoNumber=23, pojoBoolean=true, pojoStream='streamValue'}"));
+               hasValues("MyPojo{pojoId='This is the pojo ID', pojoName='This is the pojo name', pojoNumber=23, pojoBoolean=true}"));
   }
 
   @Test
@@ -271,9 +253,9 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     ValueResult result = getValueResult("withMapBoundActingParameter", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
     Set<Value> values = result.getValues();
-    assertThat(values, hasSize(5));
+    assertThat(values, hasSize(4));
     assertThat(values, hasValues("pojoId : This is the pojo ID", "pojoName : This is the pojo name", "pojoNumber : 23",
-                                 "pojoBoolean : true", "pojoStream : streamValue"));
+                                 "pojoBoolean : true"));
   }
 
   @Test

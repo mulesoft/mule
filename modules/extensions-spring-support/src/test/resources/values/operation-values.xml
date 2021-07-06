@@ -139,18 +139,6 @@
             actingParameter='#[output application/json --- { "field1": "Field1 Value", "nested": { "field2" : "Field2 Value", "field3" : "Field3 Value"}, "anotherNested" : { "field4" : "Field4 Value" } }]'/>
     </flow>
 
-    <flow name="withFourBoundStreamsActingParametersAsExpression">
-        <values:with-four-bound-streams-acting-parameters
-                actingParameter='#[{ "pojoId" : "This is the pojo ID" , "pojoName" : "This is the pojo name" , "pojoNumber" : "23" , "pojoBoolean" : "true", "pojoStream" : "streamValue" }]'/>
-    </flow>
-
-    <flow name="withFourBoundStreasmActingParametersInline">
-        <values:with-four-bound-streams-acting-parameters>
-            <values:acting-parameter pojoId="This is the pojo ID" pojoName="This is the pojo name" pojoNumber="23"
-                                     pojoBoolean="true" pojoStream="streamValue"/>
-        </values:with-four-bound-streams-acting-parameters>
-    </flow>
-
     <flow name="withMissingBoundActingParameter">
         <values:with-bound-acting-parameter-field
                 actingParameter='#[output application/json --- { "someOtherField" : "Acting parameter value" }]'/>
@@ -163,12 +151,12 @@
 
     <flow name="withPojoBoundActingParameter">
         <values:with-pojo-bound-acting-parameter actingParameter='#[output application/json --- { "pojoField" : {
-          "pojoId" : "This is the pojo ID" , "pojoName" : "This is the pojo name" , "pojoNumber" : "23" , "pojoBoolean" : "true", "pojoStream" : "streamValue" } }]'/>
+          "pojoId" : "This is the pojo ID" , "pojoName" : "This is the pojo name" , "pojoNumber" : "23" , "pojoBoolean" : "true" } }]'/>
     </flow>
 
     <flow name="withMapBoundActingParameter">
         <values:with-map-bound-acting-parameter actingParameter='#[output application/json --- { "mapField" : {
-          "pojoId" : "This is the pojo ID" , "pojoName" : "This is the pojo name" , "pojoNumber" : "23" , "pojoBoolean" : "true", "pojoStream" : "streamValue" } }]'/>
+          "pojoId" : "This is the pojo ID" , "pojoName" : "This is the pojo name" , "pojoNumber" : "23" , "pojoBoolean" : "true" } }]'/>
     </flow>
 
     <flow name="withPojoFieldBoundActingParameterFieldExpression">
@@ -179,7 +167,7 @@
     <flow name="withPojoFieldBoundActingParameterFieldDsl">
         <values:with-pojo-field-bound-acting-parameter-field>
             <values:acting-parameter pojoId="This is the pojo ID" pojoName="This is the pojo name" pojoNumber="23"
-                                     pojoBoolean="true" pojoStream="#['streamValue']"/>
+                                     pojoBoolean="true"/>
         </values:with-pojo-field-bound-acting-parameter-field>
     </flow>
 
