@@ -57,8 +57,8 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
     }
   }
 
-  private void registerNotificationListeners(Set<ProfilingDataConsumer<ProfilingEventContext>> profilerDataConsumers) {
-    profilerDataConsumers.forEach(this::registerNotificationListener);
+  private void registerNotificationListeners(Set<ProfilingDataConsumer<ProfilingEventContext>> profilingDataConsumers) {
+    profilingDataConsumers.forEach(this::registerNotificationListener);
   }
 
   private void registerNotificationListener(ProfilingDataConsumer<ProfilingEventContext> profilingDataConsumer) {
@@ -68,14 +68,14 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
     addedListeners.add(profilingNotificationListener);
   }
 
-  private boolean filterByAction(ProfilingDataConsumer<ProfilingEventContext> profilerDataConsumer,
+  private boolean filterByAction(ProfilingDataConsumer<ProfilingEventContext> profilingDataConsumer,
                                  ProfilingNotification profilerNotification) {
-    return profilerDataConsumer.getProfilingEventTypes().stream()
+    return profilingDataConsumer.getProfilingEventTypes().stream()
         .anyMatch(
                   eventType -> eventType.getProfilingEventTypeIdentifier()
                       .equals(profilerNotification.getActionName()))
         &&
-        profilerDataConsumer.getEventContextFilter().test(((ProfilingEventContext) profilerNotification.getSource()));
+        profilingDataConsumer.getEventContextFilter().test(((ProfilingEventContext) profilerNotification.getSource()));
   }
 
   @Override
@@ -90,8 +90,8 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
    */
   protected abstract ProfilerDataConsumerDiscoveryStrategy getDiscoveryStrategy();
 
-  public <T extends ProfilingEventContext> void notifyEvent(T profilerEventContext, ProfilingEventType<T> action) {
-    serverNotificationHandler.fireNotification(new ProfilingNotification(profilerEventContext, action));
+  public <T extends ProfilingEventContext> void notifyEvent(T profilingEventContext, ProfilingEventType<T> action) {
+    serverNotificationHandler.fireNotification(new ProfilingNotification(profilingEventContext, action));
   }
 
   @Inject

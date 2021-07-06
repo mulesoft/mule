@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -37,6 +38,8 @@ import java.util.concurrent.Callable;
 @Story(ENRICHER)
 public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedReactiveProcessorTestCase {
 
+  public static final String ARTIFACT_ID = "artifactId";
+  public static final String ARTIFACT_TYPE = "artifactType";
   private final ReactiveProcessor reactiveProcessor = p -> p;
 
   @Rule
@@ -48,11 +51,15 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   @Mock
   private CoreEvent coreEvent;
 
+  @Mock
+  private ProfilingService profilingService;
+
   @Test
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with CPU_LITE enricher")
   public void cpuLiteEnricher() {
     ReactiveProcessor transform =
-        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> scheduler).enrich(reactiveProcessor);
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> scheduler, profilingService, ARTIFACT_ID, ARTIFACT_TYPE)
+            .enrich(reactiveProcessor);
 
     createAndExecuteEnrichedTransformer(transform, coreEvent);
 
@@ -64,7 +71,9 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with CPU_LITE_ASYNC enricher")
   public void cpuLiteAsyncEnricher() {
     ReactiveProcessor transform =
-        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> scheduler, () -> scheduler).enrich(reactiveProcessor);
+        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> scheduler, () -> scheduler, profilingService, ARTIFACT_ID,
+                                                              ARTIFACT_TYPE)
+                                                                  .enrich(reactiveProcessor);
 
     createAndExecuteEnrichedTransformer(transform, coreEvent);
 

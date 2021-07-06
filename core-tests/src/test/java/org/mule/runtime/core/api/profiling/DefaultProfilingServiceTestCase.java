@@ -172,8 +172,8 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Override
-    public void triggerProfilingEvent(TestProfilingEventContext profilerEventContext) {
-      this.defaultProfilingService.notifyEvent(profilerEventContext, TestProfilingEventType.TEST_PROFILING_EVENT_TYPE);
+    public void triggerProfilingEvent(TestProfilingEventContext profilingEventContext) {
+      this.defaultProfilingService.notifyEvent(profilingEventContext, TestProfilingEventType.TEST_PROFILING_EVENT_TYPE);
     }
   }
 

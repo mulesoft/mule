@@ -12,6 +12,14 @@ import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.FLOW_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
+
 /**
  * A {@link Notification} that produces data for troubleshooting. This is extended for using notifications for producing profiling
  * data by the runtime.
@@ -19,9 +27,52 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 public class ProfilingNotification<T extends ProfilingEventContext> extends AbstractServerNotification {
 
   private static final int TEST_NOTIFICATION_ID = PROFILING_ACTION_START_RANGE + 1;
+  private static final int STARTING_FLOW_EXECUTION_ID = PROFILING_ACTION_START_RANGE + 2;
+  private static final int PS_SCHEDULING_FLOW_EXECUTION_ID = PROFILING_ACTION_START_RANGE + 3;
+  private static final int FLOW_EXECUTED_ID = PROFILING_ACTION_START_RANGE + 4;
+  private static final int PS_SCHEDULING_OPERATION_EXECUTION_ID = PROFILING_ACTION_START_RANGE + 5;
+  private static final int STARTING_OPERATION_EXECUTION_ID = PROFILING_ACTION_START_RANGE + 6;
+  private static final int OPERATION_EXECUTED_ID = PROFILING_ACTION_START_RANGE + 7;
+  private static final int PS_FLOW_MESSAGE_PASSING_ID = PROFILING_ACTION_START_RANGE + 8;
 
   static {
+
     registerAction("test", TEST_NOTIFICATION_ID);
+
+    registerAction(
+                   STARTING_FLOW_EXECUTION.getProfilerEventTypeNamespace() + "-"
+                       + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
+                   STARTING_FLOW_EXECUTION_ID);
+
+    registerAction(PS_SCHEDULING_FLOW_EXECUTION.getProfilerEventTypeNamespace() + "-" + PS_SCHEDULING_FLOW_EXECUTION
+        .getProfilingEventTypeIdentifier(),
+                   PS_SCHEDULING_FLOW_EXECUTION_ID);
+
+    registerAction(FLOW_EXECUTED.getProfilerEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
+                   FLOW_EXECUTED_ID);
+
+    registerAction(FLOW_EXECUTED.getProfilerEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
+                   FLOW_EXECUTED_ID);
+
+    registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilerEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
+        .getProfilingEventTypeIdentifier(),
+                   PS_SCHEDULING_OPERATION_EXECUTION_ID);
+
+    registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilerEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
+        .getProfilingEventTypeIdentifier(),
+                   PS_SCHEDULING_OPERATION_EXECUTION_ID);
+
+    registerAction(STARTING_OPERATION_EXECUTION.getProfilerEventTypeNamespace() + "-" + STARTING_OPERATION_EXECUTION
+        .getProfilingEventTypeIdentifier(),
+                   STARTING_OPERATION_EXECUTION_ID);
+
+    registerAction(OPERATION_EXECUTED.getProfilerEventTypeNamespace() + "-" + OPERATION_EXECUTED
+        .getProfilingEventTypeIdentifier(),
+                   OPERATION_EXECUTED_ID);
+
+    registerAction(PS_FLOW_MESSAGE_PASSING.getProfilerEventTypeNamespace() + "-" + PS_FLOW_MESSAGE_PASSING
+        .getProfilingEventTypeIdentifier(),
+                   PS_FLOW_MESSAGE_PASSING_ID);
   }
 
   private ProfilingEventType<?> profilingEventType;

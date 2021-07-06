@@ -9,12 +9,20 @@ package org.mule.runtime.core.internal.profiling;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.FLOW_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilerDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +36,29 @@ import java.util.Map;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
-  private final Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilerDataProducers =
-      new HashMap<>();
+  protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
+      new HashMap() {
+
+        // TODO MULE-19596 replace this map when the discovery strategy based on server plugins is implemented.
+        {
+          put(FLOW_EXECUTED,
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
+          put(PS_SCHEDULING_FLOW_EXECUTION,
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_SCHEDULING_FLOW_EXECUTION));
+          put(STARTING_FLOW_EXECUTION,
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION));
+          put(PS_FLOW_MESSAGE_PASSING,
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING));
+          put(OPERATION_EXECUTED,
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED));
+          put(PS_SCHEDULING_OPERATION_EXECUTION,
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
+                                                                   PS_SCHEDULING_OPERATION_EXECUTION));
+          put(STARTING_OPERATION_EXECUTION,
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
+                                                                   STARTING_OPERATION_EXECUTION));
+        }
+      };
 
   @Override
   public ProfilerDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
@@ -39,16 +68,16 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Override
   public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(
                                                                                              ProfilingEventType<T> profilingEventType) {
-    if (!profilerDataProducers.containsKey(profilingEventType)) {
+    if (!profilingDataProducers.containsKey(profilingEventType)) {
       throw new MuleRuntimeException((createStaticMessage(format("Profiling event type not registered: %s",
                                                                  profilingEventType))));
     }
-    return (ProfilingDataProducer<T>) profilerDataProducers.get(profilingEventType);
+    return (ProfilingDataProducer<T>) profilingDataProducers.get(profilingEventType);
   }
 
   @Override
   public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
                                                                               ProfilingDataProducer<T> profilingDataProducer) {
-    profilerDataProducers.put(profilingEventType, profilingDataProducer);
+    profilingDataProducers.put(profilingEventType, profilingDataProducer);
   }
 }

@@ -21,6 +21,8 @@ import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SC
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.pipelineProcessingStrategyReactiveProcessorFrom;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getArtifactType;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
@@ -188,7 +190,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       }
       if (activeSinksCount.get() >= -pendingSinks) {
         if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
-          throw new IllegalStateException("Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
+          throw new IllegalStateException(
+                                          "Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
         } else {
           LOGGER.warn("Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
         }
@@ -321,10 +324,11 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      return pipelineProcessingStrategyReactiveProcessorFrom(pipeline, executionClassloader)
-          .withScheduler(getFlowDispatcherScheduler())
-          .withSchedulerDecorator(this::decorateScheduler)
-          .build();
+      return pipelineProcessingStrategyReactiveProcessorFrom(pipeline, executionClassloader, getArtifactId(muleContext),
+                                                             getArtifactType(muleContext))
+                                                                 .withScheduler(decorateScheduler(getFlowDispatcherScheduler()))
+                                                                 .withProfilingService(getProfilingService())
+                                                                 .build();
     }
 
     @Override

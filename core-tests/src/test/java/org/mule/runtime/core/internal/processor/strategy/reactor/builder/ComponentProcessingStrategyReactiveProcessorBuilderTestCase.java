@@ -12,19 +12,30 @@ import static org.junit.runners.Parameterized.Parameters;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 
+import java.util.Collection;
+import java.util.concurrent.Callable;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,14 +45,13 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Collection;
-import java.util.concurrent.Callable;
-
 @Feature(PROCESSING_STRATEGIES)
 @Story(REACTOR)
 @RunWith(Parameterized.class)
 public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends AbstractEnrichedReactiveProcessorTestCase {
 
+  public static final String ARTIFACT_ID = "artifactId";
+  public static final String ARTIFACT_TYPE = "artifactType";
   private final ReactiveProcessor reactiveProcessor = p -> p;
 
   private final int parallelism;
@@ -61,6 +71,12 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
   @Mock
   private CoreEvent coreEvent;
 
+  @Mock
+  private ProfilingService profilingService;
+
+  @Mock
+  private ProfilingDataProducer profilingDataProducer;
+
   public ComponentProcessingStrategyReactiveProcessorBuilderTestCase(int parallelism) {
     this.parallelism = parallelism;
   }
@@ -70,13 +86,19 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
     return asList(1, 4);
   }
 
+  @Before
+  public void before() {
+    when(profilingService.getProfilingDataProducer(any())).thenReturn(profilingDataProducer);
+  }
+
   @Test
   @Description("The reactor chain created by the builder uses the set schedulers and emits the core events")
   public void pipelineReactiveProcessorBuilt() {
     ReactiveProcessor transform =
-        processingStrategyReactiveProcessorFrom(reactiveProcessor, contextScheduler)
+        processingStrategyReactiveProcessorFrom(reactiveProcessor, contextScheduler, ARTIFACT_ID, ARTIFACT_TYPE)
             .withDispatcherScheduler(dispatcherScheduler)
             .withCallbackScheduler(callbackScheduler)
+            .withProfilingService(profilingService)
             .withParallelism(parallelism)
             .build();
 
@@ -84,5 +106,12 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
 
     verify(callbackScheduler, atLeastOnce()).submit(any(Callable.class));
     verify(dispatcherScheduler, atLeastOnce()).submit(any(Callable.class));
+
+    // The profiling data producers are obtained
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_FLOW_MESSAGE_PASSING);
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(OPERATION_EXECUTED);
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_SCHEDULING_OPERATION_EXECUTION);
+    verify(profilingDataProducer, atLeastOnce()).triggerProfilingEvent(any());
   }
 }

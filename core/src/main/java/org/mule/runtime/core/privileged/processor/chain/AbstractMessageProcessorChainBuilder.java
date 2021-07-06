@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.processor.chain;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
@@ -32,6 +33,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   protected String name;
   protected ProcessingStrategy processingStrategy;
   protected FlowExceptionHandler messagingExceptionHandler;
+  protected ComponentLocation location;
   protected MuleContext muleContext;
 
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
@@ -55,4 +57,9 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   public void setMessagingExceptionHandler(FlowExceptionHandler messagingExceptionHandler) {
     this.messagingExceptionHandler = messagingExceptionHandler;
   }
+
+  public void setPipelineLocation(ComponentLocation location) {
+    this.location = location;
+  }
+
 }
