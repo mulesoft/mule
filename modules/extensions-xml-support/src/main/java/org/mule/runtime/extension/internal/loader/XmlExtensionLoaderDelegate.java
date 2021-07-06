@@ -17,8 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.Optional.*;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -176,6 +175,7 @@ public final class XmlExtensionLoaderDelegate {
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   public static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
+  private static final String SCHEMA_LOCATION = "xsi:schemaLocation";
 
   /**
    * ENUM used to discriminate which type of {@link ParameterDeclarer} has to be created (required or not).
@@ -388,7 +388,7 @@ public final class XmlExtensionLoaderDelegate {
     ArtifactAst transformedModuleAst =
         xmlToAstParser.parse("transformed_" + resource.getFile(), resultStream.toInputStream());
 
-    if (transformedModuleAst.topLevelComponentsStream().findFirst().get().getRawParameterValue(XMLNS_TNS).isPresent()) {
+    if (transformedModuleAst.unresolvedNamespaces().containsKey(XMLNS_TNS)) {
       loadModuleExtension(extensionDeclarer, transformedModuleAst, true);
       return of(createExtensionModel(extensionDeclarer));
     } else {
@@ -454,10 +454,10 @@ public final class XmlExtensionLoaderDelegate {
     final String category = moduleModel.getRawParameterValue(CATEGORY).orElse("COMMUNITY");
     final String vendor = moduleModel.getRawParameterValue(VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
-        ? getTnsXmlDslModel(moduleModel, name, version)
+        ? getTnsXmlDslModel(moduleAst, version)
         : getXmlDslModel(moduleModel, name, version);
     final String description = getDescription(moduleModel);
-    final String xmlnsTnsValue = moduleModel.getRawParameterValue(XMLNS_TNS).orElse(null);
+    final String xmlnsTnsValue = moduleAst.unresolvedNamespaces().getOrDefault(XMLNS_TNS, null);
     if (!comesFromTNS && xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
                                                                 XMLNS_TNS,
@@ -671,28 +671,26 @@ public final class XmlExtensionLoaderDelegate {
         .collect(toSet()));
   }
 
-  private XmlDslModel getTnsXmlDslModel(ComponentAst moduleModel, String name, String version) {
-    final Optional<String> namespace = moduleModel.getRawParameterValue(XMLNS_TNS);
+  private XmlDslModel getTnsXmlDslModel(ArtifactAst moduleAst, String version) {
+    final String namespace = moduleAst.unresolvedNamespaces().get(XMLNS_TNS);
     final String stringPrefix = TNS_PREFIX;
 
-    final Map<String, String> schemaLocations = moduleModel.getRawParameterValue("xsi:schemaLocation")
-        .map(schLoc -> {
-          Map<String, String> myMap = new HashMap<>();
-          String[] pairs = schLoc.trim().split("\\s+");
-          for (int i = 0; i < pairs.length; i = i + 2) {
-            myMap.put(pairs[i], pairs[i + 1]);
-          }
-          return myMap;
-        })
-        .orElse(emptyMap());
+    final Map<String, String> schemaLocations = new HashMap<>();
+    if (moduleAst.unresolvedNamespaces().containsKey(SCHEMA_LOCATION)) {
+      String schLoc = moduleAst.unresolvedNamespaces().get(SCHEMA_LOCATION);
+      String[] pairs = schLoc.trim().split("\\s+");
+      for (int i = 0; i < pairs.length; i = i + 2) {
+        schemaLocations.put(pairs[i], pairs[i + 1]);
+      }
+    }
 
-    final String[] tnsSchemaLocationParts = schemaLocations.get(namespace.get()).split("/");
+    final String[] tnsSchemaLocationParts = schemaLocations.get(namespace).split("/");
 
     return XmlDslModel.builder()
         .setSchemaVersion(version)
         .setPrefix(stringPrefix)
-        .setNamespace(namespace.get())
-        .setSchemaLocation(schemaLocations.get(namespace.get()))
+        .setNamespace(namespace)
+        .setSchemaLocation(schemaLocations.get(namespace))
         .setXsdFileName(tnsSchemaLocationParts[tnsSchemaLocationParts.length - 1])
         .build();
   }
