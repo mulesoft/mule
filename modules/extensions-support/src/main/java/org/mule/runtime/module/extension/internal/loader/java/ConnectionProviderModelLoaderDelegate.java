@@ -128,7 +128,8 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
                                                     a.expirationExpr(),
                                                     a.refreshTokenExpr(),
                                                     a.defaultScopes(),
-                                                    a.credentialsPlacement()));
+                                                    a.credentialsPlacement(),
+                                                    a.includeRedirectUriInRefreshTokenRequest()));
     });
 
     providerType.getAnnotation(ClientCredentials.class).ifPresent(a -> {

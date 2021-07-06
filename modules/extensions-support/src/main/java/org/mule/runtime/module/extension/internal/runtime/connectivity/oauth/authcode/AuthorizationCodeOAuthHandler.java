@@ -199,6 +199,8 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
         .customParameters(config.getCustomParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
+    dancerBuilder.includeRedirectUriInRefreshTokenRequest(grantType.includeRedirectUriInRefreshTokenRequest());
+
     Pair<Optional<Flow>, Optional<Flow>> listenerFlows = getListenerFlows(config);
     listenerFlows.getFirst().ifPresent(flow -> dancerBuilder.beforeDanceCallback(beforeCallback(config, flow)));
     listenerFlows.getSecond().ifPresent(flow -> dancerBuilder.afterDanceCallback(afterCallback(config, flow)));

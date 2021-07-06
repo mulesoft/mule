@@ -57,6 +57,24 @@ public class OAuthConnectionProviderModelLoaderTestCase extends AbstractJavaExte
     assertThat(authorizationCodeGrantType.getCredentialsPlacement(), is(BODY));
   }
 
+  @Test
+  public void includeRedirectUriInRefreshTokenRequestSettingForAuthorizationCodeIsLoaded() {
+    ConfigurationDeclaration configuration = getConfiguration(extensionDeclaration, "auth-code");
+    ConnectionProviderDeclaration connectionProviderDeclaration =
+        findConnectionProvider(configuration, "do-not-include-redirect-uri-in-refresh-token");
+    AuthorizationCodeGrantType authorizationCodeGrantType = getAuthorizationCodeGrantType(connectionProviderDeclaration);
+    assertThat(authorizationCodeGrantType.includeRedirectUriInRefreshTokenRequest(), is(false));
+  }
+
+  @Test
+  public void includeRedirectUriInRefreshTokenRequestDefaultForAuthorizationCodeIsLoaded() {
+    ConfigurationDeclaration configuration = getConfiguration(extensionDeclaration, "auth-code");
+    ConnectionProviderDeclaration connectionProviderDeclaration =
+        findConnectionProvider(configuration, "scopeless");
+    AuthorizationCodeGrantType authorizationCodeGrantType = getAuthorizationCodeGrantType(connectionProviderDeclaration);
+    assertThat(authorizationCodeGrantType.includeRedirectUriInRefreshTokenRequest(), is(true));
+  }
+
   private AuthorizationCodeGrantType getAuthorizationCodeGrantType(ConnectionProviderDeclaration connectionProviderDeclaration) {
     Optional<OAuthModelProperty> oAuthModelProperty = connectionProviderDeclaration.getModelProperty(OAuthModelProperty.class);
     assertThat(oAuthModelProperty.isPresent(), is(true));
