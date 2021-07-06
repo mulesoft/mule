@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
@@ -18,7 +17,6 @@ import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATI
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.buildRawParamKeyForDocAttribute;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
@@ -595,12 +593,8 @@ public class BeanDefinitionFactory {
       final CreateBeanDefinitionRequest request =
           new CreateBeanDefinitionRequest(componentModelHierarchy, componentModel, paramsModels,
                                           buildingDefinitionOptional.orElse(null));
-      request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
       this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
                                                   componentBeanDefinitionHandler);
-    } else {
-      processComponentWrapper(springComponentModels, componentModel, nestedComponentParamProcessor,
-                              componentBeanDefinitionHandler);
     }
   }
 
@@ -620,16 +614,12 @@ public class BeanDefinitionFactory {
             if (ownerSyntax.getContainedElement(param.getModel().getName()).isPresent()
                 && ownerSyntax.getContainedElement(param.getModel().getName()).get().isWrapped()) {
               return ownerSyntax.getContainedElement(param.getModel().getName());
-              // if (ownerSyntax.getContainedElement(param.getModel().getName()).isPresent()) {
-              // return ownerSyntax.getContainedElement(param.getModel().getName());
             } else {
               return param.getGenerationInformation().getSyntax();
             }
           }
         })
         .filter(paramSyntax -> !isEmpty(paramSyntax.getElementName()))
-        // return param.getGenerationInformation().getSyntax()
-        // .filter(paramSyntax -> !isEmpty(paramSyntax.getElementName()))
         .flatMap(paramSyntax -> {
           ComponentIdentifier paramComponentIdentifier = ComponentIdentifier.builder()
               .namespaceUri(paramSyntax.getNamespace())
@@ -649,14 +639,12 @@ public class BeanDefinitionFactory {
           Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
               componentBuildingDefinitionRegistry.getBuildingDefinition(paramValueCompoenntIdentifier);
           if (buildingDefinitionOptional.isPresent()) {
-            // final ComponentAst paramOwnerComponentModel = componentModelHierarchy.get(componentModelHierarchy.size() - 1);
             final CreateBeanDefinitionRequest request =
                 new CreateBeanDefinitionRequest(componentModelHierarchy, null, paramsModels,
                                                 paramOwnerComponentModel,
                                                 param,
                                                 buildingDefinitionOptional.orElse(null),
                                                 paramComponentIdentifier);
-            request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
             this.componentModelProcessorParam.processRequest(springComponentModels, request, nestedComponentParamProcessor,
                                                              componentBeanDefinitionHandler);
             return of(request.getSpringComponentModel());
@@ -693,7 +681,6 @@ public class BeanDefinitionFactory {
                                                 null,
                                                 buildingDefinitionOptional.orElse(null),
                                                 paramGroupComponentIdentifier);
-            request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
             this.componentModelProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor,
                                                         componentBeanDefinitionHandler);
 
@@ -702,40 +689,6 @@ public class BeanDefinitionFactory {
             return empty();
           }
         });
-  }
-
-  private void processComponentWrapper(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                       ComponentAst componentModel,
-                                       Consumer<ComponentAst> nestedComponentParamProcessor,
-                                       Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    componentBuildingDefinitionRegistry.getWrappedComponent(componentModel.getIdentifier())
-        .map(wrapperElementType -> {
-          if (wrapperElementType.equals(SINGLE)) {
-            if (componentModel.directChildrenStream().count() == 0) {
-              String location =
-                  componentModel.getLocation() != null ? componentModel.getLocation().getLocation() : "";
-              throw new IllegalStateException(format("Element [%s] located at [%s] does not have any child element declared, but one is required.",
-                                                     componentModel.getIdentifier(), location));
-            }
-
-            final ComponentAst nested = componentModel.directChildrenStream().findFirst().get();
-            nestedComponentParamProcessor.accept(nested);
-            final SpringComponentModel firstSpringComponentModel = springComponentModels.get(nested);
-
-            final SpringComponentModel springComponentModel = new SpringComponentModel();
-            springComponentModel.setComponentIdentifier(componentModel.getIdentifier());
-            springComponentModel.setComponent(componentModel);
-            springComponentModel.setType(firstSpringComponentModel.getType());
-            springComponentModel.setObjectInstance(firstSpringComponentModel.getObjectInstance());
-            springComponentModel.setBeanDefinition(firstSpringComponentModel.getBeanDefinition());
-            springComponentModel.setBeanReference(firstSpringComponentModel.getBeanReference());
-            return springComponentModel;
-          } else {
-            throw new IllegalStateException(format("Element %s does not have a building definition and it should since it's of type %s",
-                                                   componentModel.getIdentifier(), wrapperElementType));
-          }
-        })
-        .ifPresent(componentBeanDefinitionHandler);
   }
 
   private BeanDefinitionCreator buildComponentModelProcessorChainOfResponsability() {
@@ -751,11 +704,12 @@ public class BeanDefinitionFactory {
     propertiesMapBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
     simpleTypeBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);
     mapEntryBeanDefinitionCreator.setNext(commonComponentModelProcessor);
+
     return eagerObjectCreator;
   }
 
   private BeanDefinitionCreator buildParamComponentModelProcessorChainOfResponsability() {
-    EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
+    // EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
     PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
     SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
@@ -764,14 +718,15 @@ public class BeanDefinitionFactory {
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
 
-    eagerObjectCreator.setNext(objectBeanDefinitionCreator);
+    // eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);
     propertiesMapBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
     simpleTypeBeanDefinitionCreator.setNext(collectionBeanDefinitionCreator);
     collectionBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);
     mapEntryBeanDefinitionCreator.setNext(mapBeanDefinitionCreator);
     mapBeanDefinitionCreator.setNext(commonComponentModelProcessor);
-    return eagerObjectCreator;
+
+    return objectBeanDefinitionCreator;
   }
 
   /**

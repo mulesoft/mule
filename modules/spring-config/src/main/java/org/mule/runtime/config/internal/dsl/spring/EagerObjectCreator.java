@@ -52,7 +52,6 @@ class EagerObjectCreator extends BeanDefinitionCreator {
                         CreateBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     Class<ConfigurableObjectProvider> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (type == null) {
       return false;
@@ -67,6 +66,9 @@ class EagerObjectCreator extends BeanDefinitionCreator {
         throw new MuleRuntimeException(createStaticMessage("Could not create an instance of '%s' using default constructor. Early created object must have a default constructor",
                                                            type.getName()));
       }
+
+      ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+
       componentBuildingDefinition.getSetterParameterDefinitions().forEach(attributeDefinition -> {
         SetterAttributeDefinition setterAttributeDefinition = (SetterAttributeDefinition) attributeDefinition;
         setterAttributeDefinition.getAttributeDefinition().accept(new AbstractAttributeDefinitionVisitor() {

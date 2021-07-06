@@ -83,6 +83,7 @@ public class CreateBeanDefinitionRequest {
 
       return objectTypeVisitor;
     });
+    getSpringComponentModel().setType(retrieveTypeVisitor().getType());
   }
 
   public List<ComponentAst> getComponentModelHierarchy() {
