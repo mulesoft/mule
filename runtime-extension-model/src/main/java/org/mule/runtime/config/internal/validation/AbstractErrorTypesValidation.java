@@ -53,7 +53,7 @@ public abstract class AbstractErrorTypesValidation implements Validation {
     if (errorMappingsAst == null) {
       return false;
     }
-    return errorMappingsAst != null && !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty();
+    return !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty();
   }
 
   protected static List<ErrorMapping> getErrorMappings(ComponentAst component) {

@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.processMuleProperties;
@@ -16,6 +17,7 @@ import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocati
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 
@@ -43,8 +45,10 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
     if (!componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
       return false;
     }
-    String refParameterValue = componentModel.getParameter(REF_PARAMETER).getResolvedRawValue();
-    String classParameterValue = componentModel.getParameter(CLASS_PARAMETER).getResolvedRawValue();
+    String refParameterValue =
+        ofNullable(componentModel.getParameter(REF_PARAMETER)).map(ComponentParameterAst::getResolvedRawValue).orElse(null);
+    String classParameterValue =
+        ofNullable(componentModel.getParameter(CLASS_PARAMETER)).map(ComponentParameterAst::getResolvedRawValue).orElse(null);
     if (refParameterValue != null && classParameterValue != null) {
       throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameters. Offending resource is '%s'",
                                                                          REF_PARAMETER, CLASS_PARAMETER,
