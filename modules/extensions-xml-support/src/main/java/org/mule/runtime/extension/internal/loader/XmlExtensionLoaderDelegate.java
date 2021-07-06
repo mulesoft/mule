@@ -449,13 +449,13 @@ public final class XmlExtensionLoaderDelegate {
                                                                 moduleModel.getIdentifier().toString())));
     }
 
-    final String name = moduleModel.getRawParameterValue(MODULE_NAME).orElse(null);
+    final String name = moduleAst.unresolvedNamespaces().getOrDefault(MODULE_NAME, null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
-    final String category = moduleModel.getRawParameterValue(CATEGORY).orElse("COMMUNITY");
-    final String vendor = moduleModel.getRawParameterValue(VENDOR).orElse("MuleSoft");
+    final String category = moduleAst.unresolvedNamespaces().getOrDefault(CATEGORY, "COMMUNITY");
+    final String vendor = moduleAst.unresolvedNamespaces().getOrDefault(VENDOR, "MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
         ? getTnsXmlDslModel(moduleAst, version)
-        : getXmlDslModel(moduleModel, name, version);
+        : getXmlDslModel(moduleAst, name, version);
     final String description = getDescription(moduleModel);
     final String xmlnsTnsValue = moduleAst.unresolvedNamespaces().getOrDefault(XMLNS_TNS, null);
     if (!comesFromTNS && xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
@@ -695,9 +695,10 @@ public final class XmlExtensionLoaderDelegate {
         .build();
   }
 
-  private XmlDslModel getXmlDslModel(ComponentAst moduleModel, String name, String version) {
-    final Optional<String> prefix = moduleModel.getRawParameterValue(MODULE_PREFIX_ATTRIBUTE);
-    final Optional<String> namespace = moduleModel.getRawParameterValue(MODULE_NAMESPACE_ATTRIBUTE);
+  private XmlDslModel getXmlDslModel(ArtifactAst artifactAst, String name, String version) {
+    final Optional<String> prefix = ofNullable(artifactAst.unresolvedNamespaces().getOrDefault(MODULE_PREFIX_ATTRIBUTE, null));
+    final Optional<String> namespace =
+        ofNullable(artifactAst.unresolvedNamespaces().getOrDefault(MODULE_NAMESPACE_ATTRIBUTE, null));
     return createXmlLanguageModel(prefix, namespace, name, version);
   }
 
