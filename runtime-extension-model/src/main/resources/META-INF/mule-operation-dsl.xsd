@@ -27,6 +27,22 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
+                    <xsd:element name="optional" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:attribute name="defaultValue" type="xsd:string">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        The parameter's default value is not provided.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                            <xsd:sequence>
+                                <xsd:element name="exclusive-optional" minOccurs="0">
+                                    <xsd:attribute name="parameters" type="mule:nonBlankString" use=""
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" use="required" type="mule:nonBlankString">
                     <xsd:annotation>
@@ -40,13 +56,6 @@
                         <xsd:documentation>
                             The parameter's type. Can be either a standard type, a custom defined complex type or a reference to
                             a top level element defined in another extension or application.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="optional" default="false" type="xsd:boolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether the parameter is optional or required.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -146,7 +155,7 @@
                             </xsd:annotation>
                         </xsd:element>
                     </xsd:sequence>
-                    <xsd:element name="parameters" type="type" maxOccurs="unbounded" minOccurs="0">
+                    <xsd:element name="parameters" type="parameterType" maxOccurs="unbounded" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The operation's input parameters.
@@ -181,6 +190,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="displayName" type="mule:nonBlankString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The operation's name in the GUI
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="summary" type="mule:nonBlankString">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -206,7 +222,7 @@
             <!--            TODO: HOW TO REPRESENT ARRAYS?-->
             <xsd:enumeration value="STRING"/>
             <xsd:enumeration value="NUMBER"/>
-            <xsd:enumeration value="STREAM"/>
+            <xsd:enumeration value="BINARY"/>
             <xsd:enumeration value="DATE"/>
             <xsd:enumeration value="DATE_TIME"/>
             <xsd:enumeration value="OBJECT"/>
