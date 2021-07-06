@@ -31,6 +31,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -42,6 +44,7 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProces
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 
 import org.reactivestreams.Publisher;
+
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
@@ -66,6 +69,12 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
 
   @Spy
   private ImmediateScheduler cpuLiteAsyncScheduler;
+
+  @Mock
+  private DiagnosticsService diagnosticsService;
+
+  @Mock
+  private MuleContext muleContext;
 
   @Mock
   private CoreEvent coreEvent;
@@ -117,13 +126,16 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
 
   private ReactiveProcessorEnricher getProcessingTypeBasedEnricher() {
     ReactiveProcessorEnricher proactorEnricher =
-        new ProactorProcessingStrategyEnricher(() -> proactorScheduler, identity(), parallelism, parallelism, parallelism);
+        new ProactorProcessingStrategyEnricher(() -> proactorScheduler, identity(), diagnosticsService, muleContext, parallelism,
+                                               parallelism,
+                                               parallelism);
 
     ReactiveProcessorEnricher cpuLiteEnricher =
-        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLiteScheduler);
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLiteScheduler, diagnosticsService, muleContext);
 
     ReactiveProcessorEnricher cpuLiteAsyncEnricher =
-        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> cpuLiteAsyncScheduler, () -> cpuLiteAsyncScheduler);
+        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> cpuLiteAsyncScheduler, () -> cpuLiteAsyncScheduler,
+                                                              diagnosticsService, muleContext);
 
     return new ProcessingTypeBasedReactiveProcessorEnricher(cpuLiteEnricher)
         .register(CPU_LITE, cpuLiteEnricher)
@@ -142,6 +154,7 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
     }
 
   }
+
 
   /**
    * Test BLOCKING {@link ReactiveProcessor}.

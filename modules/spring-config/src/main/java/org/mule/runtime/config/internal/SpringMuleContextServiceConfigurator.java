@@ -18,6 +18,7 @@ import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONEN
 import static org.mule.runtime.config.internal.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DIAGNOSTICS_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
@@ -105,6 +106,7 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.diagnostics.DefaultDiagnosticsService;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
@@ -254,6 +256,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
       .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
+      .put(MULE_DIAGNOSTICS_SERVICE_KEY, getBeanDefinition(DefaultDiagnosticsService.class))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;

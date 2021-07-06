@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory.StreamEmitterProcessingStrategy;
@@ -21,7 +23,16 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareStreamEmitterProcessingStrategyDecorator(super.create(muleContext, schedulersNamePrefix));
+    TransactionAwareStreamEmitterProcessingStrategyDecorator psDecorator =
+        new TransactionAwareStreamEmitterProcessingStrategyDecorator(super.create(muleContext, schedulersNamePrefix));
+
+    try {
+      muleContext.getInjector().inject(psDecorator);
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
+    }
+
+    return psDecorator;
   }
 
   @Override

@@ -12,6 +12,8 @@ import static java.lang.Math.max;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 
@@ -31,23 +33,30 @@ public class ProactorProcessingStrategyEnricher implements ReactiveProcessorEnri
   private final int subscribers;
   private final Supplier<Scheduler> contextSchedulerSupplier;
   private final Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator;
+  private final DiagnosticsService diagnosticsService;
+  private final MuleContext muleContext;
 
   public ProactorProcessingStrategyEnricher(Supplier<Scheduler> contextSchedulerSupplier,
                                             Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator,
+                                            DiagnosticsService diagnosticsService,
+                                            MuleContext muleContext,
                                             int maxConcurrency,
                                             int parallelism,
                                             int subscribers) {
     this.schedulerDecorator = schedulerDecorator;
+    this.diagnosticsService = diagnosticsService;
     this.maxConcurrency = maxConcurrency;
     this.parallelism = parallelism;
     this.subscribers = subscribers;
     this.contextSchedulerSupplier = contextSchedulerSupplier;
+    this.muleContext = muleContext;
   }
 
   @Override
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
-    return processingStrategyReactiveProcessorFrom(processor, contextSchedulerSupplier.get())
+    return processingStrategyReactiveProcessorFrom(processor, contextSchedulerSupplier.get(), muleContext)
         .withDispatcherScheduler(schedulerDecorator.apply(contextSchedulerSupplier.get()))
+        .withDiagnosticsService(diagnosticsService)
         .withParallelism(getChainParallelism(processor))
         .build();
   }

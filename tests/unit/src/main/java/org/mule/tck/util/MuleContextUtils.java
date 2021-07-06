@@ -48,6 +48,8 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.diagnostics.DefaultDiagnosticsService;
+import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -258,6 +260,7 @@ public class MuleContextUtils {
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
+      injectableObjects.put(DiagnosticsService.class, new DefaultDiagnosticsService());
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));

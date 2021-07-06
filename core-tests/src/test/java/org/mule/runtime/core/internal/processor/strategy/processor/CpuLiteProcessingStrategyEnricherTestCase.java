@@ -14,6 +14,8 @@ import static org.mockito.Mockito.verify;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -48,11 +50,17 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   @Mock
   private CoreEvent coreEvent;
 
+  @Mock
+  private MuleContext muleContext;
+
+  @Mock
+  private DiagnosticsService diagnosticsService;
+
   @Test
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with CPU_LITE enricher")
   public void cpuLiteEnricher() {
     ReactiveProcessor transform =
-        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> scheduler).enrich(reactiveProcessor);
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> scheduler, diagnosticsService, muleContext).enrich(reactiveProcessor);
 
     createAndExecuteEnrichedTransformer(transform, coreEvent);
 
@@ -64,7 +72,8 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with CPU_LITE_ASYNC enricher")
   public void cpuLiteAsyncEnricher() {
     ReactiveProcessor transform =
-        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> scheduler, () -> scheduler).enrich(reactiveProcessor);
+        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> scheduler, () -> scheduler, diagnosticsService, muleContext)
+            .enrich(reactiveProcessor);
 
     createAndExecuteEnrichedTransformer(transform, coreEvent);
 

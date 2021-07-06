@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessi
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.BLOCKING;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -85,6 +86,11 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
     public boolean isBlocking() {
       // Return false to indicate that this processor has a completion callback.
       return false;
+    }
+
+    @Override
+    public ComponentLocation getLocation() {
+      return null;
     }
 
     @Override

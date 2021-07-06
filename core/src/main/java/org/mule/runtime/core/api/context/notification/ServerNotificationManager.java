@@ -50,6 +50,8 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.diagnostics.notification.ProfilerNotificationListener;
+import org.mule.runtime.core.api.diagnostics.notification.ProfilingNotification;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.notification.Configuration;
 import org.mule.runtime.core.internal.context.notification.Policy;
@@ -309,6 +311,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     manager.addInterfaceToType(ConnectorMessageNotificationListener.class, ConnectorMessageNotification.class);
     manager.addInterfaceToType(FlowConstructNotificationListener.class, FlowConstructNotification.class);
     manager.addInterfaceToType(ExtensionNotificationListener.class, ExtensionNotification.class);
+    manager.addInterfaceToType(ProfilerNotificationListener.class, ProfilingNotification.class);
 
     return manager;
   }

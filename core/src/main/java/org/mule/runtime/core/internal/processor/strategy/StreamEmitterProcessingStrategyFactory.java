@@ -188,7 +188,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       }
       if (activeSinksCount.get() >= -pendingSinks) {
         if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
-          throw new IllegalStateException("Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
+          throw new IllegalStateException(
+                                          "Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
         } else {
           LOGGER.warn("Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
         }
@@ -321,9 +322,10 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      return pipelineProcessingStrategyReactiveProcessorFrom(pipeline, executionClassloader)
+      return pipelineProcessingStrategyReactiveProcessorFrom(pipeline, executionClassloader, muleContext)
           .withScheduler(getFlowDispatcherScheduler())
           .withSchedulerDecorator(this::decorateScheduler)
+          .withDiagnosticsService(getDiagnosticsService())
           .build();
     }
 
