@@ -60,12 +60,16 @@ public class ErrorHandlerRefOrOnErrorExclusiveness implements Validation {
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final ComponentParameterAst refParam = component.getParameter(REFERENCE_ATTRIBUTE);
+    if (refParam == null) {
+      return empty();
+    }
+
     if (refParam.getValue().getValue().isPresent()
         && component.directChildrenStream().count() > 0) {
       return of(create(component, refParam, this, "A reference 'error-handler' cannot have 'on-error's."));
-    } else {
-      return empty();
     }
+
+    return empty();
   }
 
 }

@@ -79,6 +79,10 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
             && !pm.getModelProperty(AllowsExpressionWithoutMarkersModelProperty.class).isPresent())
         .map(pm -> component.getParameter(pm.getName()))
         .filter(param -> {
+          if (param == null) {
+            return false;
+          }
+
           if (param.getValue().isRight() && param.getValue().getRight() instanceof String) {
             final String stringValue = (String) param.getValue().getRight();
 

@@ -52,6 +52,7 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -277,6 +278,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
           .filter(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
           .sorted(comparingInt(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
           .map(p -> resolveKeyFromSimpleValue(elementModel, p))
+          .filter(Objects::nonNull)
           .collect(toList());
       return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKeyValues"));
     }

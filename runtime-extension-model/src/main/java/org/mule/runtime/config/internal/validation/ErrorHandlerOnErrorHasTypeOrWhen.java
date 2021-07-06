@@ -97,13 +97,21 @@ public class ErrorHandlerOnErrorHasTypeOrWhen implements Validation {
       onErrorModel = referenced.get();
     }
 
-    if (!onErrorModel.getParameter(WHEN_CHOICE_ES_ATTRIBUTE).getValue().getValue().isPresent()
-        && !onErrorModel.getParameter(TYPE_ES_ATTRIBUTE).getValue().getValue().isPresent()) {
+    if (!isParameterPresent(onErrorModel, WHEN_CHOICE_ES_ATTRIBUTE) && !isParameterPresent(onErrorModel, TYPE_ES_ATTRIBUTE)) {
       return of(create(onErrorModel, this,
                        "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
     }
 
     return empty();
+  }
+
+  private boolean isParameterPresent(ComponentAst component, String parameterName) {
+    ComponentParameterAst parameterAst = component.getParameter(parameterName);
+    if (parameterAst == null) {
+      return false;
+    }
+
+    return parameterAst.getValue().getValue().isPresent();
   }
 
 }

@@ -19,6 +19,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -115,6 +116,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.xml.transform.Transformer;
@@ -704,6 +707,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private String getDescription(ComponentAst moduleModel) {
+    // TODO: return ofNullable(moduleModel.getMetadata().getDocAttributes().get(DOC_DESCRIPTION)).orElse("");
     return moduleModel.getRawParameterValue(DOC_DESCRIPTION).orElse("");
   }
 
@@ -989,37 +993,39 @@ public final class XmlExtensionLoaderDelegate {
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param, ParameterRole role) {
     final LayoutModel.LayoutModelBuilder layoutModelBuilder = builder();
 
-    param.getParameter(PASSWORD).getValue().getValue()
-        .filter(v -> (boolean) v)
-        .ifPresent(value -> layoutModelBuilder.asPassword());
+    applyToParameter(param, PASSWORD, value -> layoutModelBuilder.asPassword(), v -> (boolean) v);
+    applyToParameter(param, ORDER_ATTRIBUTE, value -> layoutModelBuilder.order((int) value));
+    applyToParameter(param, TAB_ATTRIBUTE, value -> layoutModelBuilder.tabName((String) value));
 
-    param.getParameter(ORDER_ATTRIBUTE).getValue().getValue().ifPresent(value -> layoutModelBuilder.order((int) value));
-    param.getParameter(TAB_ATTRIBUTE).getValue().getValue().ifPresent(value -> layoutModelBuilder.tabName((String) value));
+    applyToParameter(param, TYPE_ATTRIBUTE, receivedInputType -> {
+      final DisplayModel displayModel = getDisplayModel(param);
+      MetadataType parameterType = extractType((String) receivedInputType);
 
-    param.getParameter(TYPE_ATTRIBUTE).getValue().getValue()
-        .ifPresent(receivedInputType -> {
-
-          final DisplayModel displayModel = getDisplayModel(param);
-          MetadataType parameterType = extractType((String) receivedInputType);
-
-          ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, param);
-          parameterDeclarer.describedAs(getDescription(param))
-              .withLayout(layoutModelBuilder.build())
-              .withDisplayModel(displayModel)
-              .withRole(role)
-              .ofType(parameterType);
-        });
+      ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, param);
+      parameterDeclarer.describedAs(getDescription(param))
+          .withLayout(layoutModelBuilder.build())
+          .withDisplayModel(displayModel)
+          .withRole(role)
+          .ofType(parameterType);
+    });
   }
 
   private DisplayModel getDisplayModel(ComponentAst componentModel) {
     final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
-    componentModel.getParameter(DISPLAY_NAME_ATTRIBUTE)
-        .getValue().getValue().ifPresent(value -> displayModelBuilder.displayName((String) value));
-    componentModel.getParameter(SUMMARY_ATTRIBUTE)
-        .getValue().getValue().ifPresent(value -> displayModelBuilder.summary((String) value));
-    componentModel.getParameter(EXAMPLE_ATTRIBUTE)
-        .getValue().getValue().ifPresent(value -> displayModelBuilder.example((String) value));
+    applyToParameter(componentModel, DISPLAY_NAME_ATTRIBUTE, value -> displayModelBuilder.displayName((String) value));
+    applyToParameter(componentModel, SUMMARY_ATTRIBUTE, value -> displayModelBuilder.summary((String) value));
+    applyToParameter(componentModel, EXAMPLE_ATTRIBUTE, value -> displayModelBuilder.example((String) value));
     return displayModelBuilder.build();
+  }
+
+  private void applyToParameter(ComponentAst componentModel, String parameterName, final Consumer<Object> callback,
+                                final Predicate<Object> valueFilter) {
+    ofNullable(componentModel.getParameter(parameterName))
+        .ifPresent(parameterAst -> parameterAst.getValue().getValue().filter(valueFilter).ifPresent(callback));
+  }
+
+  private void applyToParameter(ComponentAst componentModel, String parameterName, Consumer<Object> callback) {
+    applyToParameter(componentModel, parameterName, callback, value -> true);
   }
 
   /**
@@ -1041,9 +1047,7 @@ public final class XmlExtensionLoaderDelegate {
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
     final String parameterName = param.getParameter(PARAMETER_NAME).getRawValue();
-    final Optional<String> parameterDefaultValue = param.getParameter(PARAMETER_DEFAULT_VALUE).getValue()
-        .mapLeft(expr -> "#[" + expr + "]")
-        .getValue();
+    final Optional<String> parameterDefaultValue = getParameterDefaultValue(param);
     final UseEnum use = UseEnum.valueOf(param.getParameter(ATTRIBUTE_USE).getValue().getRight().toString());
     if (UseEnum.REQUIRED.equals(use) && parameterDefaultValue.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",
@@ -1054,6 +1058,16 @@ public final class XmlExtensionLoaderDelegate {
     return parameterRequired ? parameterizedDeclarer.onDefaultParameterGroup().withRequiredParameter(parameterName)
         : parameterizedDeclarer.onDefaultParameterGroup().withOptionalParameter(parameterName)
             .defaultingTo(parameterDefaultValue.orElse(null));
+  }
+
+  private Optional<String> getParameterDefaultValue(ComponentAst param) {
+    ComponentParameterAst parameterAst = param.getParameter(PARAMETER_DEFAULT_VALUE);
+    if (parameterAst == null) {
+      return empty();
+    }
+    return parameterAst.getValue()
+        .mapLeft(expr -> "#[" + expr + "]")
+        .getValue();
   }
 
   private void extractOutputType(OutputDeclarer outputDeclarer, ComponentIdentifier componentIdentifier,

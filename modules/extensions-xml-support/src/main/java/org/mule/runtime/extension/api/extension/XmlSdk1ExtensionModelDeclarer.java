@@ -170,7 +170,7 @@ public class XmlSdk1ExtensionModelDeclarer {
         .withStereotype(CHAIN)
         .withChain();
 
-    operationDeclaration.withOptionalComponent("output")
+    operationDeclaration.withOptionalComponent("output-component")
         .withAllowedStereotypes(OUTPUT_STEREOTYPE);
 
     extensionDeclarer.withConstruct("output")
