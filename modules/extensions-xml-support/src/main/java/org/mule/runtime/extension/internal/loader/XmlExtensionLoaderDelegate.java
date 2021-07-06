@@ -15,9 +15,10 @@ import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.*;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -456,7 +457,7 @@ public final class XmlExtensionLoaderDelegate {
     final XmlDslModel xmlDslModel = comesFromTNS
         ? getTnsXmlDslModel(moduleAst, version)
         : getXmlDslModel(moduleAst, name, version);
-    final String description = getDescription(moduleModel);
+    final String description = moduleAst.unresolvedNamespaces().getOrDefault(DOC_DESCRIPTION, "");
     final String xmlnsTnsValue = moduleAst.unresolvedNamespaces().getOrDefault(XMLNS_TNS, null);
     if (!comesFromTNS && xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
