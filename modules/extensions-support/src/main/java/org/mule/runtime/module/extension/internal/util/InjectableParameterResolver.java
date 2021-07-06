@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.keywordSafeName;
@@ -110,9 +111,12 @@ public class InjectableParameterResolver {
         if (!(value instanceof TypedValue)) {
           String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
           try {
-            value = IOUtils.ifInputStream(value, (CheckedFunction<InputStream, ?>) IOUtils::toByteArray);
+            // Consume InputStreams so that we can read them multiple times. This will work only for parameters that are
+            // represented as an InputStream. If a parameter was a POJO with an InputStream as field, then it can be read only
+            // once.
+            value = ifInputStream(value, (CheckedFunction<InputStream, ?>) IOUtils::toByteArray);
           } catch (NotAnInputStreamException e) {
-            // do nothing
+            // do nothing, keep using the value as received
           }
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
