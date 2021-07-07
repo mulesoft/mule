@@ -1,11 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-runtime-bom</artifactId>
-        <version>4.4.0-SNAPSHOT</version>
-        <relativePath>../mule-runtime-bom/pom.xml</relativePath>
-    </parent>
     <!-- Version -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.runtime</groupId>
@@ -272,7 +266,6 @@
         <shade.plugin.version>3.1.0</shade.plugin.version>
         <build.helper.maven.plugin.version>3.0.0</build.helper.maven.plugin.version>
         <maven.help.plugin.version>2.2</maven.help.plugin.version>
-        <assembly.verifier.version>1.4</assembly.verifier.version>
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
@@ -344,6 +337,13 @@
     <!-- Declare all dependencies that are used in more than one module here. -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-runtime-bom</artifactId>
+                <version>4.4.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-api</artifactId>
@@ -1566,31 +1566,10 @@
                 <plugin>
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
-                    <version>${assembly.verifier.version}</version>
+
                     <configuration>
                         <skip>${skipVerifications}</skip>
                     </configuration>
-                    <dependencies>
-                        <!--
-                            Groovy dependency is handled by Mule differently,
-                            declare the compatible one explicitly for the plugin.
-                        -->
-                        <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy</artifactId>
-                            <classifier>indy</classifier>
-                            <version>${groovyVersion}</version>
-                        </dependency>
-                    </dependencies>
-
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila</groupId>
