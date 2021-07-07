@@ -549,6 +549,7 @@ public class BeanDefinitionFactory {
       AtomicReference<BeanDefinition> expressionLanguage = new AtomicReference<>();
 
       componentModel.directChildrenStream()
+          .filter(springComponentModels::containsKey)
           .map(springComponentModels::get)
           .filter(childSpringComponentModel -> areMatchingTypes(MVELExpressionLanguage.class,
                                                                 childSpringComponentModel.getType()))
