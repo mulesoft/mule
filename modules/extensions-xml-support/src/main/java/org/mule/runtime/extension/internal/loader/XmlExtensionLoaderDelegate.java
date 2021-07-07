@@ -890,8 +890,10 @@ public final class XmlExtensionLoaderDelegate {
 
     moduleModel.directChildrenStream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
-        .filter(operationModel -> operationModel.getParameter(ATTRIBUTE_VISIBILITY).getValue().getRight()
-            .equals(visibility.toString()))
+        .filter(operationModel -> {
+          ComponentParameterAst parameter = operationModel.getParameter(ATTRIBUTE_VISIBILITY);
+          return parameter != null && parameter.getValue().getRight().equals(visibility.toString());
+        })
         .forEach(operationModel -> extractOperationExtension(extensionDeclarer, declarer, operationModel, directedGraph,
                                                              xmlDslModel,
                                                              tnsExtensionModel));

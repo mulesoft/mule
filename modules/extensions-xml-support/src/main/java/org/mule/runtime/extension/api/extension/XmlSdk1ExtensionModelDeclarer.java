@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.property.SkipOnWalkModelProperty;
 
 /**
  * An {@link ExtensionDeclarer} for Mule's XML SDK v1
@@ -170,7 +171,8 @@ public class XmlSdk1ExtensionModelDeclarer {
         .withStereotype(CHAIN)
         .withChain();
 
-    operationDeclaration.withOptionalComponent("output-component")
+    operationDeclaration.withOptionalComponent("output")
+        .withModelProperty(new SkipOnWalkModelProperty())
         .withAllowedStereotypes(OUTPUT_STEREOTYPE);
 
     extensionDeclarer.withConstruct("output")
