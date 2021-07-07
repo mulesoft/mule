@@ -450,14 +450,14 @@ public final class XmlExtensionLoaderDelegate {
                                                                 moduleModel.getIdentifier().toString())));
     }
 
-    final String name = moduleAst.unresolvedNamespaces().getOrDefault(MODULE_NAME, null);
+    final String name = moduleModel.getRawParameterValue(MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
-    final String category = moduleAst.unresolvedNamespaces().getOrDefault(CATEGORY, "COMMUNITY");
-    final String vendor = moduleAst.unresolvedNamespaces().getOrDefault(VENDOR, "MuleSoft");
+    final String category = moduleModel.getRawParameterValue(CATEGORY).orElse("COMMUNITY");
+    final String vendor = moduleModel.getRawParameterValue(VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
         ? getTnsXmlDslModel(moduleAst, version)
         : getXmlDslModel(moduleAst, name, version);
-    final String description = moduleAst.unresolvedNamespaces().getOrDefault(DOC_DESCRIPTION, "");
+    final String description = getDescription(moduleModel);
     final String xmlnsTnsValue = moduleAst.unresolvedNamespaces().getOrDefault(XMLNS_TNS, null);
     if (!comesFromTNS && xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
