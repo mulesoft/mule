@@ -7,8 +7,10 @@
 package org.mule.runtime.config.internal.validation;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
@@ -24,6 +26,7 @@ import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,15 +52,15 @@ public abstract class AbstractErrorTypesValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
 
   protected static boolean errorMappingPresent(ComponentAst operationComponent) {
-    final ComponentParameterAst errorMappingsAst = operationComponent.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
-    if (errorMappingsAst == null) {
-      return false;
-    }
-    return !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty();
+    return ofNullable(operationComponent.getParameter(ERROR_MAPPINGS_PARAMETER_NAME))
+            .map(errorMappingsAst -> !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty())
+            .orElse(false);
   }
 
   protected static List<ErrorMapping> getErrorMappings(ComponentAst component) {
-    return (List<ErrorMapping>) component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME).getValue().getRight();
+    return ofNullable(component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME))
+            .map(parameter -> (List<ErrorMapping>) parameter.getValue().getRight())
+            .orElse(emptyList());
   }
 
   protected static Optional<ValidationResultItem> validateErrorTypeId(ComponentAst component, ComponentParameterAst parameter,
@@ -77,11 +80,6 @@ public abstract class AbstractErrorTypesValidation implements Validation {
     }
 
     return empty();
-  }
-
-  protected static Optional<ErrorType> lookup(ComponentAst component, String errorTypeParamName, ArtifactAst artifact) {
-    return artifact.getErrorTypeRepository()
-        .lookupErrorType(parserErrorType(component.getParameter("type").getResolvedRawValue()));
   }
 
   protected static ComponentIdentifier parserErrorType(String representation) {

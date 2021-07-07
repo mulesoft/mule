@@ -431,8 +431,8 @@ public final class XmlExtensionLoaderDelegate {
           .flatMap(comp -> comp.directChildrenStream())
           .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
           .forEach(comp -> {
-            final String key = comp.getParameter("name").getResolvedRawValue();
-            final String rawValue = comp.getParameter("value").getRawValue();
+            final String key = ofNullable(comp.getParameter("name")).map(ComponentParameterAst::getResolvedRawValue).orElse(null);
+            final String rawValue = ofNullable(comp.getParameter("value")).map(ComponentParameterAst::getRawValue).orElse(null);
             globalProperties.put(key,
                                  new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
                                                                          comp.getMetadata().getFileName().orElse("(n/a)"),
@@ -810,8 +810,14 @@ public final class XmlExtensionLoaderDelegate {
 
 
       testConnectionGlobalElementOptional
-          .flatMap(testConnectionGlobalElement -> testConnectionGlobalElement.getParameter(GLOBAL_ELEMENT_NAME_ATTRIBUTE)
-              .getValue().getValue())
+          .flatMap(testConnectionGlobalElement -> {
+            ComponentParameterAst parameter = testConnectionGlobalElement.getParameter(GLOBAL_ELEMENT_NAME_ATTRIBUTE);
+            if (parameter != null) {
+              return parameter.getValue().getValue();
+            } else {
+              return empty();
+            }
+          })
           .ifPresent(testConnectionGlobalElementName -> connectionProviderDeclarer
               .withModelProperty(new TestConnectionGlobalElementModelProperty((String) testConnectionGlobalElementName)));
     }
@@ -982,7 +988,7 @@ public final class XmlExtensionLoaderDelegate {
       optionalParametersComponentModel.get().directChildrenStream()
           .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
           .forEach(param -> {
-            final String role = param.getParameter(ROLE).getValue().getRight().toString();
+            final String role = ofNullable(param.getParameter(ROLE)).map(parameterAst -> parameterAst.getValue().getRight().toString()).orElse("");
             extractParameter(operationDeclarer, param, getRole(role));
           });
     }
@@ -1048,9 +1054,9 @@ public final class XmlExtensionLoaderDelegate {
    * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
-    final String parameterName = param.getParameter(PARAMETER_NAME).getRawValue();
+    final String parameterName = ofNullable(param.getParameter(PARAMETER_NAME)).map(ComponentParameterAst::getRawValue).orElse(null);
     final Optional<String> parameterDefaultValue = getParameterDefaultValue(param);
-    final UseEnum use = UseEnum.valueOf(param.getParameter(ATTRIBUTE_USE).getValue().getRight().toString());
+    final UseEnum use = UseEnum.valueOf(ofNullable(param.getParameter(ATTRIBUTE_USE)).map(parameter -> parameter.getValue().getRight().toString()).orElse(null));
     if (UseEnum.REQUIRED.equals(use) && parameterDefaultValue.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",
                                                                 parameterName, ATTRIBUTE_USE, UseEnum.REQUIRED));

@@ -105,6 +105,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -415,8 +416,12 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .filter(pm -> !groupAttributes.containsKey(pm.getName()))
         .forEach(param -> elementDsl.getChild(param.getName())
             .ifPresent(paramDsl -> {
-              final Object paramValue = paramsOwner.getParameter(param.getName()).getValue().getRight();
+              ComponentParameterAst parameterAst = paramsOwner.getParameter(param.getName());
+              if (parameterAst == null) {
+                return;
+              }
 
+              final Object paramValue = parameterAst.getValue().getRight();
               if (paramValue == null) {
                 return;
               }
@@ -439,7 +444,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .stream()
         .filter(param -> param.getRawValue() != null)
         .filter(additionalFilter)
-        .collect(toMap(param -> param.getModel().getName(), param -> param.getRawValue()));
+        .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getRawValue));
 
     if (processDocAttributes) {
       attributes.putAll(resolveDocAttributes(component));
@@ -480,8 +485,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
             componentFound.set(true);
           });
 
-      if (!componentFound.get()) {
-        declareComponent(declaration -> declarer.withComponent(declaration), child, extensionElementsDeclarer);
+      if (Boolean.FALSE.equals(componentFound.get())) {
+        declareComponent(declarer::withComponent, child, extensionElementsDeclarer);
       }
     });
   }
@@ -526,7 +531,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
             final List<ComponentParameterAst> groupParams = group.getParameterModels()
                 .stream()
                 .map(pm -> component.getParameter(pm.getName()))
-                .filter(p -> p != null)
+                .filter(Objects::nonNull)
                 .collect(toList());
 
             if (groupParams
@@ -535,7 +540,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
               declareInlineGroup(component,
                                  component.getGenerationInformation().getSyntax().get(),
                                  group, true, groupParams, groupDeclarer,
-                                 resolveParams(component, param -> groupParams.contains(param)));
+                                 resolveParams(component, groupParams::contains));
             }
           } else {
             declareNonInlineParameterGroup(declarer, component, modelDsl, group, groupDeclarer, emptyMap());
