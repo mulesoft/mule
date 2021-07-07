@@ -71,7 +71,7 @@ public class ParameterGroupExclusiveness implements Validation {
             for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
               final Collection<String> definedExclusiveParameters = exclusiveModel.getExclusiveParameterNames().stream()
                   .filter(exclParamName -> {
-                    final ComponentParameterAst value = component.getParameter(exclParamName);
+                    final ComponentParameterAst value = component.getParameter(group.getName(), exclParamName);
                     return !(value == null || !value.getValue().getValue().isPresent());
                   })
                   .collect(toList());
