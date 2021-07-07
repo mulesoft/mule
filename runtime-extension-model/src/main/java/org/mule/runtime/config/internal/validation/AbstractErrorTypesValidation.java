@@ -53,14 +53,14 @@ public abstract class AbstractErrorTypesValidation implements Validation {
 
   protected static boolean errorMappingPresent(ComponentAst operationComponent) {
     return ofNullable(operationComponent.getParameter(ERROR_MAPPINGS_PARAMETER_NAME))
-            .map(errorMappingsAst -> !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty())
-            .orElse(false);
+        .map(errorMappingsAst -> !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty())
+        .orElse(false);
   }
 
   protected static List<ErrorMapping> getErrorMappings(ComponentAst component) {
     return ofNullable(component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME))
-            .map(parameter -> (List<ErrorMapping>) parameter.getValue().getRight())
-            .orElse(emptyList());
+        .map(parameter -> (List<ErrorMapping>) parameter.getValue().getRight())
+        .orElse(emptyList());
   }
 
   protected static Optional<ValidationResultItem> validateErrorTypeId(ComponentAst component, ComponentParameterAst parameter,

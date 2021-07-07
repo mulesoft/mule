@@ -321,8 +321,9 @@ public class DslElementModel<T> {
 
             dslGroup.getParameterModels().forEach(pm -> {
               final ComponentParameterAst param = paramsOwner.getParameter(dslGroup.getName(), pm.getName());
-
-              handleParam(param, param.getModel().getType(), builder);
+              if (param != null) {
+                handleParam(param, param.getModel().getType(), builder);
+              }
             });
 
             return builder.build();

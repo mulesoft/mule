@@ -988,7 +988,8 @@ public final class XmlExtensionLoaderDelegate {
       optionalParametersComponentModel.get().directChildrenStream()
           .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
           .forEach(param -> {
-            final String role = ofNullable(param.getParameter(ROLE)).map(parameterAst -> parameterAst.getValue().getRight().toString()).orElse("");
+            final String role = ofNullable(param.getParameter(ROLE))
+                .map(parameterAst -> parameterAst.getValue().getRight().toString()).orElse("");
             extractParameter(operationDeclarer, param, getRole(role));
           });
     }
@@ -1054,9 +1055,11 @@ public final class XmlExtensionLoaderDelegate {
    * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
-    final String parameterName = ofNullable(param.getParameter(PARAMETER_NAME)).map(ComponentParameterAst::getRawValue).orElse(null);
+    final String parameterName =
+        ofNullable(param.getParameter(PARAMETER_NAME)).map(ComponentParameterAst::getRawValue).orElse(null);
     final Optional<String> parameterDefaultValue = getParameterDefaultValue(param);
-    final UseEnum use = UseEnum.valueOf(ofNullable(param.getParameter(ATTRIBUTE_USE)).map(parameter -> parameter.getValue().getRight().toString()).orElse(null));
+    final UseEnum use = UseEnum.valueOf(ofNullable(param.getParameter(ATTRIBUTE_USE))
+        .map(parameter -> parameter.getValue().getRight().toString()).orElse(null));
     if (UseEnum.REQUIRED.equals(use) && parameterDefaultValue.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",
                                                                 parameterName, ATTRIBUTE_USE, UseEnum.REQUIRED));
