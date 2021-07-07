@@ -18,6 +18,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
@@ -66,7 +67,8 @@ public class PollingSourceHasSchedulingStrategy implements Validation {
             .findAny())
         .get();
 
-    if (component.getParameter(schedulingStrategyParamModel.getName()).getValue().getRight() == null) {
+    ComponentParameterAst parameterAst = component.getParameter(schedulingStrategyParamModel.getName());
+    if (parameterAst == null || parameterAst.getValue().getRight() == null) {
       return of(ValidationResultItem.create(component, this, "The scheduling strategy has not been configured."));
     } else {
       return empty();
