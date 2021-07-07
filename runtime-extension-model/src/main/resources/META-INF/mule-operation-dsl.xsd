@@ -28,6 +28,11 @@
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element name="optional" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Indicates that the parameter is optional
+                            </xsd:documentation>
+                        </xsd:annotation>
                         <xsd:complexType>
                             <xsd:attribute name="defaultValue" type="xsd:string">
                                 <xsd:annotation>
@@ -38,6 +43,11 @@
                             </xsd:attribute>
                             <xsd:sequence>
                                 <xsd:element name="exclusive-optional" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            References other optional parameters which cannot be set at the same time as this one
+                                        </xsd:documentation>
+                                    </xsd:annotation>
                                     <xsd:attribute name="parameters" type="mule:nonBlankString" use="required">
                                         <xsd:annotation>
                                             <xsd:documentation>
