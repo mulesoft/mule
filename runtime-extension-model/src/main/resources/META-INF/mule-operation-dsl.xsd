@@ -32,25 +32,31 @@
                             <xsd:attribute name="defaultValue" type="xsd:string">
                                 <xsd:annotation>
                                     <xsd:documentation>
-                                        The parameter's default value is not provided.
+                                        The parameter's default value if not provided.
                                     </xsd:documentation>
                                 </xsd:annotation>
                             </xsd:attribute>
                             <xsd:sequence>
                                 <xsd:element name="exclusive-optional" minOccurs="0">
-                                    <xsd:attribute name="parameters" type="mule:nonBlankString" use=""
+                                    <xsd:attribute name="parameters" type="mule:nonBlankString" use="required">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                Comma separated list of parameters that this element is optional against
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:attribute>
+                                    <xsd:attribute name="oneRequired" default="false" type="xsd:boolean">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                Enforces that one of the parameters must be set at any given time
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:attribute>
                                 </xsd:element>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="name" use="required" type="mule:nonBlankString">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The parameter's name. It must be unique in the context of the owning operation.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="type" use="required" type="type">
                     <xsd:annotation>
                         <xsd:documentation>
