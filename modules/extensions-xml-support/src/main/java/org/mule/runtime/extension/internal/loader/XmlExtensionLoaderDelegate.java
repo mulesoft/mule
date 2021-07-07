@@ -147,8 +147,6 @@ public final class XmlExtensionLoaderDelegate {
   private static final String PARAMETER_DEFAULT_VALUE = "defaultValue";
   private static final String TYPE_ATTRIBUTE = "type";
   private static final String MODULE_NAME = "name";
-  private static final String MODULE_PREFIX_ATTRIBUTE = "prefix";
-  private static final String MODULE_NAMESPACE_ATTRIBUTE = "namespace";
   private static final String MODULE_NAMESPACE_NAME = "module";
   protected static final String CONFIG_NAME = "config";
 
@@ -176,7 +174,6 @@ public final class XmlExtensionLoaderDelegate {
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   public static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
-  private static final String SCHEMA_LOCATION = "xsi:schemaLocation";
 
   /**
    * ENUM used to discriminate which type of {@link ParameterDeclarer} has to be created (required or not).
@@ -389,7 +386,7 @@ public final class XmlExtensionLoaderDelegate {
     ArtifactAst transformedModuleAst =
         xmlToAstParser.parse("transformed_" + resource.getFile(), resultStream.toInputStream());
 
-    if (transformedModuleAst.unresolvedNamespaces().containsKey(XMLNS_TNS)) {
+    if (transformedModuleAst.namespaceDefinition().getUnresovedNamespaces().containsKey(XMLNS_TNS)) {
       loadModuleExtension(extensionDeclarer, transformedModuleAst, true);
       return of(createExtensionModel(extensionDeclarer));
     } else {
@@ -458,7 +455,7 @@ public final class XmlExtensionLoaderDelegate {
         ? getTnsXmlDslModel(moduleAst, version)
         : getXmlDslModel(moduleAst, name, version);
     final String description = getDescription(moduleModel);
-    final String xmlnsTnsValue = moduleAst.unresolvedNamespaces().getOrDefault(XMLNS_TNS, null);
+    final String xmlnsTnsValue = moduleAst.namespaceDefinition().getUnresovedNamespaces().getOrDefault(XMLNS_TNS, null);
     if (!comesFromTNS && xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
                                                                 XMLNS_TNS,
@@ -673,18 +670,10 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private XmlDslModel getTnsXmlDslModel(ArtifactAst moduleAst, String version) {
-    final String namespace = moduleAst.unresolvedNamespaces().get(XMLNS_TNS);
+    final String namespace = moduleAst.namespaceDefinition().getUnresovedNamespaces().get(XMLNS_TNS);
     final String stringPrefix = TNS_PREFIX;
 
-    final Map<String, String> schemaLocations = new HashMap<>();
-    if (moduleAst.unresolvedNamespaces().containsKey(SCHEMA_LOCATION)) {
-      String schLoc = moduleAst.unresolvedNamespaces().get(SCHEMA_LOCATION);
-      String[] pairs = schLoc.trim().split("\\s+");
-      for (int i = 0; i < pairs.length; i = i + 2) {
-        schemaLocations.put(pairs[i], pairs[i + 1]);
-      }
-    }
-
+    final Map<String, String> schemaLocations = moduleAst.namespaceDefinition().getSchemaLocations();
     final String[] tnsSchemaLocationParts = schemaLocations.get(namespace).split("/");
 
     return XmlDslModel.builder()
@@ -697,9 +686,8 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private XmlDslModel getXmlDslModel(ArtifactAst artifactAst, String name, String version) {
-    final Optional<String> prefix = ofNullable(artifactAst.unresolvedNamespaces().getOrDefault(MODULE_PREFIX_ATTRIBUTE, null));
-    final Optional<String> namespace =
-        ofNullable(artifactAst.unresolvedNamespaces().getOrDefault(MODULE_NAMESPACE_ATTRIBUTE, null));
+    final Optional<String> prefix = ofNullable(artifactAst.namespaceDefinition().getPrefix());
+    final Optional<String> namespace = ofNullable(artifactAst.namespaceDefinition().getNamespace());
     return createXmlLanguageModel(prefix, namespace, name, version);
   }
 
