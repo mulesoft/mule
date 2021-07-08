@@ -39,11 +39,11 @@ public abstract class CreateBeanDefinitionRequest {
    * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
    */
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
-                                     ComponentAst componentModel, List<SpringComponentModel> paramsModels,
+                                     ComponentAst component, List<SpringComponentModel> paramsModels,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
-    this(componentModelHierarchy, componentModel, paramsModels, null, null, componentBuildingDefinition,
-         componentModel != null
-             ? componentModel.getIdentifier()
+    this(componentModelHierarchy, component, paramsModels, null, null, componentBuildingDefinition,
+         component != null
+             ? component.getIdentifier()
              : componentBuildingDefinition.getComponentIdentifier());
   }
 

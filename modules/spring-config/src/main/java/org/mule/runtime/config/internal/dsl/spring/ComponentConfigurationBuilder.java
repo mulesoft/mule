@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
-import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
+import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
@@ -65,31 +65,31 @@ class ComponentConfigurationBuilder<T> {
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
   private final List<ComponentValue> complexParameters;
   private final ComponentAst ownerComponent;
-  private final ComponentAst componentModel;
+  private final ComponentAst component;
   private final CreateBeanDefinitionRequest createBeanDefinitionRequest;
   private final ComponentBuildingDefinition<T> componentBuildingDefinition;
   private final ParameterGroupUtils parameterGroupUtils = new ParameterGroupUtils();
 
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                       ComponentAst ownerComponent, ComponentAst componentModel,
+                                       ComponentAst ownerComponent, ComponentAst component,
                                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
                                        ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     this.ownerComponent = ownerComponent;
 
-    if (componentModel != null) {
-      this.componentModel = componentModel;
+    if (component != null) {
+      this.component = component;
     } else if (createBeanDefinitionRequest.getParam() != null
         && createBeanDefinitionRequest.getParam().getValue().getRight() instanceof ComponentAst) {
-      this.componentModel = ((ComponentAst) createBeanDefinitionRequest.getParam().getValue().getRight());
+      this.component = ((ComponentAst) createBeanDefinitionRequest.getParam().getValue().getRight());
     } else {
-      this.componentModel = null;
+      this.component = null;
     }
 
     this.createBeanDefinitionRequest = createBeanDefinitionRequest;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
-    this.complexParameters = collectComplexParametersWithTypes(springComponentModels, ownerComponent, componentModel);
+    this.complexParameters = collectComplexParametersWithTypes(springComponentModels, ownerComponent, component);
   }
 
   public void processConfiguration() {
@@ -103,16 +103,16 @@ class ComponentConfigurationBuilder<T> {
   }
 
   private List<ComponentValue> collectComplexParametersWithTypes(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                                 ComponentAst ownerComponent, ComponentAst componentModel) {
+                                                                 ComponentAst ownerComponent, ComponentAst component) {
     /*
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
 
-    final Stream<SpringComponentModel> baseStream = componentModel != null
+    final Stream<SpringComponentModel> baseStream = component != null
         ? concat(createBeanDefinitionRequest.getParamsModels().stream(),
                  // TODO MULE 17711 remove this second concat term
-                 componentModel.directChildrenStream()
+                 component.directChildrenStream()
                      .map(springComponentModels::get)
                      .filter(Objects::nonNull))
         : createBeanDefinitionRequest.getParamsModels().stream();
@@ -358,7 +358,7 @@ class ComponentConfigurationBuilder<T> {
             // int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
             // final ComponentAst possibleGroup =
             // ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
-            // ? componentModel
+            // ? component
             // : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
             if (ownerComponentModel instanceof SourceModel) {
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
@@ -379,9 +379,9 @@ class ComponentConfigurationBuilder<T> {
               p = ownerComponent.getParameter(parameterName);
             }
 
-            if (p == null && componentModel != null) {
+            if (p == null && component != null) {
               // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
-              return ownerComponent.getParameter(componentModel.getIdentifier().getName());
+              return ownerComponent.getParameter(component.getIdentifier().getName());
             }
 
             return p;
@@ -392,9 +392,9 @@ class ComponentConfigurationBuilder<T> {
       Object parameterValue;
       if (parameter == null) {
         // Fallback for test components that do not have an extension model.
-        parameterValue = componentModel == null
+        parameterValue = component == null
             ? null
-            : componentModel.getRawParameterValue(parameterName)
+            : component.getRawParameterValue(parameterName)
                 .map(v -> (Object) v)
                 .orElse(defaultValue);
       } else if ("frequency".equals(parameterName)
@@ -442,8 +442,8 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onUndefinedSimpleParameters() {
-      this.value = componentModel.getModel(ParameterizedModel.class)
-          .map(pm -> componentModel.getParameters().stream()
+      this.value = component.getModel(ParameterizedModel.class)
+          .map(pm -> component.getParameters().stream()
               .filter(param -> !componentBuildingDefinition.getIgnoredConfigurationParameters()
                   .contains(param.getModel().getName()))
               .filter(param -> param.getResolvedRawValue() != null)
@@ -508,8 +508,8 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onValueFromTextContent() {
-      if (componentModel != null) {
-        this.value = componentModel.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
+      if (component != null) {
+        this.value = component.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
       } else {
         getParameterValue(createBeanDefinitionRequest.getParam().getModel().getName(), null)
             .ifPresent(v -> this.value = v);

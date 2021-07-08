@@ -36,13 +36,13 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
                         CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponent();
-    if (componentModel != null
-        && (componentModel.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
-            || componentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))) {
+    ComponentAst component = createBeanDefinitionRequest.getComponent();
+    if (component != null
+        && (component.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
+            || component.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))) {
       ManagedMap<Object, Object> managedMap;
-      if (componentModel.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)) {
-        managedMap = createManagedMapFromEntries(componentModel);
+      if (component.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)) {
+        managedMap = createManagedMapFromEntries(component);
       } else {
         managedMap = new ManagedMap<>();
         final List<ComponentAst> hierarchy = createBeanDefinitionRequest.getComponentHierarchy();
@@ -63,39 +63,39 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
     return false;
   }
 
-  private ManagedMap<Object, Object> createManagedMapFromEntries(ComponentAst componentModel) {
+  private ManagedMap<Object, Object> createManagedMapFromEntries(ComponentAst component) {
     ManagedMap<Object, Object> managedMap;
     managedMap = new ManagedMap<>();
-    componentModel.directChildrenStream()
+    component.directChildrenStream()
         .forEach(innerComponent -> processAndAddMapProperty(innerComponent, managedMap));
     return managedMap;
   }
 
-  private void processAndAddMapProperty(ComponentAst componentModel, ManagedMap<Object, Object> managedMap) {
+  private void processAndAddMapProperty(ComponentAst component, ManagedMap<Object, Object> managedMap) {
     Object key =
-        resolveValue(componentModel.getRawParameterValue(KEY_ELEMENT).orElse(null),
-                     componentModel.getRawParameterValue(KEY_REF_ATTRIBUTE).orElse(null));
-    Object value = resolveValue(componentModel.getRawParameterValue(VALUE_ATTRIBUTE).orElse(null),
-                                componentModel.getRawParameterValue(VALUE_REF_ATTRIBUTE).orElse(null));
+        resolveValue(component.getRawParameterValue(KEY_ELEMENT).orElse(null),
+                     component.getRawParameterValue(KEY_REF_ATTRIBUTE).orElse(null));
+    Object value = resolveValue(component.getRawParameterValue(VALUE_ATTRIBUTE).orElse(null),
+                                component.getRawParameterValue(VALUE_REF_ATTRIBUTE).orElse(null));
     if (value == null) {
-      value = componentModel.directChildrenStream().findFirst()
+      value = component.directChildrenStream().findFirst()
           .map(this::resolveValueFromChild)
           .orElse(null);
     }
     managedMap.put(key, value);
   }
 
-  private Object resolveValueFromChild(ComponentAst componentModel) {
-    if (componentModel.getIdentifier().getName().equals(MAP_ELEMENT)) {
-      return createManagedMapFromEntries(componentModel);
+  private Object resolveValueFromChild(ComponentAst component) {
+    if (component.getIdentifier().getName().equals(MAP_ELEMENT)) {
+      return createManagedMapFromEntries(component);
     } else {
-      return createManagedListFromItems(componentModel);
+      return createManagedListFromItems(component);
     }
   }
 
-  private Object createManagedListFromItems(ComponentAst componentModel) {
+  private Object createManagedListFromItems(ComponentAst component) {
     ManagedList<Object> managedList = new ManagedList<>();
-    componentModel.directChildrenStream().forEach(childComponent -> {
+    component.directChildrenStream().forEach(childComponent -> {
       if (childComponent.getIdentifier().getName().equals(VALUE_ATTRIBUTE)) {
         managedList.add(childComponent.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null));
       } else {

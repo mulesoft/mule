@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
-import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
+import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;

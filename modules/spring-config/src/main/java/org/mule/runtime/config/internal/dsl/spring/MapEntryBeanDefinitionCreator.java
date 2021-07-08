@@ -63,25 +63,25 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
                         CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponent();
+    ComponentAst component = createBeanDefinitionRequest.getComponent();
     Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (!(MapEntryType.class.isAssignableFrom(type))) {
       return false;
     }
     ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
     createBeanDefinitionRequest.getSpringComponentModel().setType(type);
-    final String key = componentModel.getParameter(ENTRY_TYPE_KEY_PARAMETER_NAME).getResolvedRawValue();
+    final String key = component.getParameter(ENTRY_TYPE_KEY_PARAMETER_NAME).getResolvedRawValue();
     MapEntryType mapEntryType = createBeanDefinitionRequest.getSpringComponentModel().getMapEntryType();
     Object keyBeanDefinition = getConvertibleBeanDefinition(mapEntryType.getKeyType(), key,
                                                             componentBuildingDefinition.getKeyTypeConverter());
 
-    final ComponentParameterAst valueRefParam = componentModel.getParameter(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME);
+    final ComponentParameterAst valueRefParam = component.getParameter(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME);
     Object value;
     // MULE-11984: Check that generated map entries are not empty
     if (valueRefParam != null) {
       value = new RuntimeBeanReference(valueRefParam.getResolvedRawValue());
     } else {
-      value = getValue(springComponentModels, mapEntryType, componentModel, componentBuildingDefinition,
+      value = getValue(springComponentModels, mapEntryType, component, componentBuildingDefinition,
                        nestedComponentParamProcessor);
     }
 
@@ -96,12 +96,12 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
   }
 
   private Object getValue(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                          MapEntryType mapEntryType, ComponentAst componentModel,
+                          MapEntryType mapEntryType, ComponentAst component,
                           ComponentBuildingDefinition componentBuildingDefinition,
                           Consumer<ComponentAst> nestedComponentParamProcessor) {
     Class valueType = mapEntryType.getValueType();
 
-    return componentModel.getParameter(SIMPLE_TYPE_VALUE_PARAMETER_NAME).getValue()
+    return component.getParameter(SIMPLE_TYPE_VALUE_PARAMETER_NAME).getValue()
         .mapLeft(v -> getConvertibleBeanDefinition(valueType, "#[" + v + "]", componentBuildingDefinition.getTypeConverter()))
         .mapRight(v -> {
           if (isSimpleType(valueType)) {

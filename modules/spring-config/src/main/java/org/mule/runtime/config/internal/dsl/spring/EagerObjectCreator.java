@@ -67,7 +67,7 @@ class EagerObjectCreator extends BeanDefinitionCreator<CreateComponentBeanDefini
                                                            type.getName()));
       }
 
-      ComponentAst componentModel = createBeanDefinitionRequest.getComponent();
+      ComponentAst component = createBeanDefinitionRequest.getComponent();
 
       componentBuildingDefinition.getSetterParameterDefinitions().forEach(attributeDefinition -> {
         SetterAttributeDefinition setterAttributeDefinition = (SetterAttributeDefinition) attributeDefinition;
@@ -75,8 +75,8 @@ class EagerObjectCreator extends BeanDefinitionCreator<CreateComponentBeanDefini
 
           @Override
           public void onUndefinedSimpleParameters() {
-            Map<String, String> parameters = componentModel.getModel(ParameterizedModel.class)
-                .map(pm -> componentModel.getParameters().stream()
+            Map<String, String> parameters = component.getModel(ParameterizedModel.class)
+                .map(pm -> component.getParameters().stream()
                     .filter(param -> param.getResolvedRawValue() != null)
                     .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getResolvedRawValue)))
                 .orElse(null);
