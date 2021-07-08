@@ -39,14 +39,14 @@ import org.springframework.beans.factory.config.BeanDefinition;
 public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCase {
 
   public static final String TEST_STRING_RAW_VALUE = "Test Raw Value";
-  private SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator;
+  private SimpleTypeBeanComponentDefinitionCreator simpleTypeBeanDefinitionCreator;
   private Map<ComponentAst, SpringComponentModel> springComponentModels;
-  private CreateBeanDefinitionRequest createBeanDefinitionRequest;
+  private CreateComponentBeanDefinitionRequest createBeanDefinitionRequest;
 
   @Before
   public void setUp() {
-    simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
-    createBeanDefinitionRequest = mock(CreateBeanDefinitionRequest.class);
+    simpleTypeBeanDefinitionCreator = new SimpleTypeBeanComponentDefinitionCreator();
+    createBeanDefinitionRequest = mock(CreateComponentBeanDefinitionRequest.class);
     SpringComponentModel springComponentModel = new SpringComponentModel();
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
   }
@@ -76,7 +76,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     ComponentAst componentModel = mock(ComponentAst.class);
     when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
-    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
+    when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
@@ -100,7 +100,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     ComponentAst componentModel = mock(ComponentAst.class);
     when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
-    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
+    when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
@@ -128,7 +128,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
 
     ComponentAst componentModel = mock(ComponentAst.class);
     when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
-    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
+    when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, of(o -> TEST_STRING_RAW_VALUE));
 
@@ -156,7 +156,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
     when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
-    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
+    when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
@@ -181,7 +181,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
     when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
-    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
+    when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
@@ -210,7 +210,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
     when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
-    when(createBeanDefinitionRequest.getComponentModel()).thenReturn(componentModel);
+    when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, of(o -> TEST_STRING_RAW_VALUE));
 

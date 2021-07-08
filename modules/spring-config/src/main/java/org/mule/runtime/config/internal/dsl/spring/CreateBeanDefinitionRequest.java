@@ -23,10 +23,10 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class CreateBeanDefinitionRequest {
+public abstract class CreateBeanDefinitionRequest {
 
-  private final List<ComponentAst> componentModelHierarchy;
-  private final ComponentAst componentModel;
+  private final List<ComponentAst> componentHierarchy;
+  private final ComponentAst component;
   private final Collection<SpringComponentModel> paramsModels;
   private final ComponentAst paramOwnerComponentModel;
   private final ComponentParameterAst param;
@@ -35,7 +35,7 @@ public class CreateBeanDefinitionRequest {
 
   /**
    * @param parentComponentModel        the container element of the holder for the configuration attributes defined by the user
-   * @param componentModel              the holder for the configuration attributes defined by the user
+   * @param component                   the holder for the configuration attributes defined by the user
    * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
    */
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
@@ -49,27 +49,27 @@ public class CreateBeanDefinitionRequest {
 
   /**
    * @param parentComponentModel        the container element of the holder for the configuration attributes defined by the user
-   * @param componentModel              the holder for the configuration attributes defined by the user
+   * @param component                   the holder for the configuration attributes defined by the user
    * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
    */
-  public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
-                                     ComponentAst componentModel,
+  public CreateBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
+                                     ComponentAst component,
                                      Collection<SpringComponentModel> paramsModels,
                                      ComponentAst paramOwnerComponentModel,
                                      ComponentParameterAst param,
                                      ComponentBuildingDefinition componentBuildingDefinition,
                                      ComponentIdentifier componentIdentifier) {
-    this.componentModelHierarchy = componentModelHierarchy;
-    this.componentModel = componentModel;
+    this.componentHierarchy = componentHierarchy;
+    this.component = component;
     this.paramsModels = paramsModels;
     this.paramOwnerComponentModel = paramOwnerComponentModel;
     this.param = param;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
     springComponentModel.setComponentIdentifier(componentIdentifier);
-    springComponentModel.setComponent(componentModel);
+    springComponentModel.setComponent(component);
 
-    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(component);
 
     if (componentBuildingDefinition != null) {
       componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
@@ -80,19 +80,19 @@ public class CreateBeanDefinitionRequest {
     objectTypeVisitor.getMapEntryType().ifPresent(springComponentModel::setMapEntryType);
   }
 
-  public List<ComponentAst> getComponentModelHierarchy() {
-    return componentModelHierarchy;
+  public List<ComponentAst> getComponentHierarchy() {
+    return componentHierarchy;
   }
 
-  public ComponentAst getComponentModel() {
-    return componentModel;
+  public ComponentAst getComponent() {
+    return component;
   }
 
   public Collection<SpringComponentModel> getParamsModels() {
     return paramsModels;
   }
 
-  public ComponentAst getParamOwnerComponentModel() {
+  public ComponentAst getParamOwnerComponent() {
     return paramOwnerComponentModel;
   }
 
@@ -109,8 +109,8 @@ public class CreateBeanDefinitionRequest {
   }
 
   protected ComponentAst resolveOwnerComponent() {
-    for (int i = getComponentModelHierarchy().size() - 1; i >= 0; --i) {
-      final ComponentAst possibleOwner = getComponentModelHierarchy().get(i);
+    for (int i = getComponentHierarchy().size() - 1; i >= 0; --i) {
+      final ComponentAst possibleOwner = getComponentHierarchy().get(i);
 
       if (possibleOwner.getModel(ParameterizedModel.class).isPresent()) {
         return possibleOwner;

@@ -25,11 +25,11 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
+class SimpleTypeBeanParamDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
@@ -49,7 +49,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
       return true;
     }
 
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponent();
     final ComponentParameterAst valueParam = componentModel.getParameter("value");
 
     if (valueParam == null || valueParam.getResolvedRawValue() == null) {

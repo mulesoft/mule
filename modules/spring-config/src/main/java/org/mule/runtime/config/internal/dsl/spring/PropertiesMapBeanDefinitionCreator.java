@@ -29,14 +29,14 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
-class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
+class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponent();
     if (componentModel != null
         && (componentModel.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
             || componentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))) {
@@ -45,7 +45,7 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
         managedMap = createManagedMapFromEntries(componentModel);
       } else {
         managedMap = new ManagedMap<>();
-        final List<ComponentAst> hierarchy = createBeanDefinitionRequest.getComponentModelHierarchy();
+        final List<ComponentAst> hierarchy = createBeanDefinitionRequest.getComponentHierarchy();
         ComponentAst parentComponentModel = hierarchy.isEmpty() ? null : hierarchy.get(hierarchy.size() - 1);
         parentComponentModel.directChildrenStream()
             .filter(childComponentModel -> childComponentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))

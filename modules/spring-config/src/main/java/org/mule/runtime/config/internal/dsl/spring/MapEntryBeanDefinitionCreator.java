@@ -53,17 +53,17 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
+class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
 
   private static final String ENTRY_TYPE_KEY_PARAMETER_NAME = "key";
   private static final String ENTRY_TYPE_VALUE_REF_PARAMETER_NAME = "value-ref";
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponent();
     Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (!(MapEntryType.class.isAssignableFrom(type))) {
       return false;

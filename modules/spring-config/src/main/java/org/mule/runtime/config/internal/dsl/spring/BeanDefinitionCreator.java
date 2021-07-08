@@ -25,14 +25,14 @@ import org.springframework.beans.factory.config.BeanDefinition;
  *
  * @since 4.0
  */
-abstract class BeanDefinitionCreator {
+abstract class BeanDefinitionCreator<R extends CreateBeanDefinitionRequest> {
 
-  private BeanDefinitionCreator next;
+  private BeanDefinitionCreator<R> next;
 
   /**
    * @param nextBeanDefinitionCreator next processor in the chain.
    */
-  public void setNext(BeanDefinitionCreator nextBeanDefinitionCreator) {
+  public void setNext(BeanDefinitionCreator<R> nextBeanDefinitionCreator) {
     this.next = nextBeanDefinitionCreator;
   }
 
@@ -42,7 +42,7 @@ abstract class BeanDefinitionCreator {
    * @param request
    */
   public final void processRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                   CreateBeanDefinitionRequest request,
+                                   R request,
                                    Consumer<ComponentAst> nestedComponentParamProcessor,
                                    Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     if (handleRequest(springComponentModels, request, nestedComponentParamProcessor, componentBeanDefinitionHandler)) {
@@ -61,7 +61,7 @@ abstract class BeanDefinitionCreator {
    * @return true if it created the {@code BeanDefinition}, false otherwise.
    */
   abstract boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                 CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                 R createBeanDefinitionRequest,
                                  Consumer<ComponentAst> nestedComponentParamProcessor,
                                  Consumer<SpringComponentModel> componentBeanDefinitionHandler);
 

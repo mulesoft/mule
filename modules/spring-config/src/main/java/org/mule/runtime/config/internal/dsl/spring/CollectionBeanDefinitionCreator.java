@@ -31,14 +31,14 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
+class CollectionBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    if (createBeanDefinitionRequest.getComponentModelHierarchy().isEmpty()) {
+    if (createBeanDefinitionRequest.getComponentHierarchy().isEmpty()) {
       return false;
     }
 

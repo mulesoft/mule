@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
+import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
@@ -52,12 +53,12 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
  *
  * @since 4.0
  */
-abstract class CommonBeanDefinitionCreator<R extends CreateBeanDefinitionRequest> extends BeanDefinitionCreator<R> {
+class CommonDslParamGroupBeanDefinitionCreator extends BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> {
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private final BeanDefinitionPostProcessor beanDefinitionPostProcessor;
 
-  public CommonBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
+  public CommonDslParamGroupBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
 
     this.beanDefinitionPostProcessor = resolvePostProcessor();
@@ -77,6 +78,22 @@ abstract class CommonBeanDefinitionCreator<R extends CreateBeanDefinitionRequest
     }
     return (componentModel, helper) -> {
     };
+  }
+
+  @Override
+  public boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                               CreateDslParamGroupBeanDefinitionRequest request,
+                               Consumer<ComponentAst> nestedComponentParamProcessor,
+                               Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+    ComponentBuildingDefinition buildingDefinition = request.getComponentBuildingDefinition();
+    BeanDefinitionBuilder beanDefinitionBuilder =
+        createBeanDefinitionBuilder(request.getSpringComponentModel(), buildingDefinition);
+    processAnnotations(request.getSpringComponentModel(), beanDefinitionBuilder);
+    processComponentDefinitionModel(springComponentModels, request, buildingDefinition, beanDefinitionBuilder);
+
+    componentBeanDefinitionHandler.accept(request.getSpringComponentModel());
+
+    return true;
   }
 
   private BeanDefinitionBuilder createBeanDefinitionBuilder(SpringComponentModel componentModel,

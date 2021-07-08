@@ -37,15 +37,15 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-class MapBeanDefinitionCreator extends BeanDefinitionCreator {
+class MapBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
 
-    if (createBeanDefinitionRequest.getComponentModelHierarchy().isEmpty()) {
+    if (createBeanDefinitionRequest.getComponentHierarchy().isEmpty()) {
       return false;
     }
 
