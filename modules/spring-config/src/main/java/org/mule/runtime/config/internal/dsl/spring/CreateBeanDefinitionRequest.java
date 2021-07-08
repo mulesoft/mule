@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -17,7 +16,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Bean definition creation request. Provides all the required content to build a
@@ -34,7 +32,6 @@ public class CreateBeanDefinitionRequest {
   private final ComponentParameterAst param;
   private final ComponentBuildingDefinition componentBuildingDefinition;
   private final SpringComponentModel springComponentModel;
-  private final Supplier<ObjectTypeVisitor> typeVisitorRetriever;
 
   /**
    * @param parentComponentModel        the container element of the holder for the configuration attributes defined by the user
@@ -72,18 +69,14 @@ public class CreateBeanDefinitionRequest {
     springComponentModel.setComponentIdentifier(componentIdentifier);
     springComponentModel.setComponent(componentModel);
 
-    this.typeVisitorRetriever = new LazyValue<>(() -> {
-      ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
 
-      if (componentBuildingDefinition != null) {
-        componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-      } else {
-        objectTypeVisitor.onType(Object.class);
-      }
-
-      return objectTypeVisitor;
-    });
-    getSpringComponentModel().setType(retrieveTypeVisitor().getType());
+    if (componentBuildingDefinition != null) {
+      componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
+    } else {
+      objectTypeVisitor.onType(Object.class);
+    }
+    springComponentModel.setType(objectTypeVisitor.getType());
   }
 
   public List<ComponentAst> getComponentModelHierarchy() {
@@ -112,10 +105,6 @@ public class CreateBeanDefinitionRequest {
 
   public SpringComponentModel getSpringComponentModel() {
     return springComponentModel;
-  }
-
-  public ObjectTypeVisitor retrieveTypeVisitor() {
-    return typeVisitorRetriever.get();
   }
 
   protected ComponentAst resolveOwnerComponent() {

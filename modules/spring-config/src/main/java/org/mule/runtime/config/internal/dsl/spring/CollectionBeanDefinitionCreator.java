@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.toCollection;
 
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 
 import java.util.Collection;
 import java.util.Map;
@@ -43,9 +42,9 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
       return false;
     }
 
-    ObjectTypeVisitor objectTypeVisitor = createBeanDefinitionRequest.retrieveTypeVisitor();
-    if (Collection.class.isAssignableFrom(objectTypeVisitor.getType())) {
-      createBeanDefinitionRequest.getSpringComponentModel().setType(objectTypeVisitor.getType());
+    Class<Object> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
+    if (Collection.class.isAssignableFrom(type)) {
+      createBeanDefinitionRequest.getSpringComponentModel().setType(type);
 
       Collection<ComponentAst> items = (Collection<ComponentAst>) createBeanDefinitionRequest.getParam().getValue().getRight();
 
@@ -59,7 +58,7 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
           .collect(toCollection(ManagedList::new));
 
       createBeanDefinitionRequest.getSpringComponentModel()
-          .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(objectTypeVisitor.getType())
+          .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(type)
               .addConstructorArgValue(managedList).getBeanDefinition());
 
       componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());

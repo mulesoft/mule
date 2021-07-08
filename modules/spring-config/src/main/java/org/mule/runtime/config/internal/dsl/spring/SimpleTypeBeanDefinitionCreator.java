@@ -32,7 +32,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
                         CreateBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
+    Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
 
     if (!isSimpleType(type)) {
       return false;
@@ -54,9 +54,6 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
     if (valueParam == null || valueParam.getResolvedRawValue() == null) {
       return false;
-      // throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
-      // componentModel.getMetadata().getFileName().orElse("unknown"),
-      // componentModel.getMetadata().getStartLine().orElse(-1)));
     }
 
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());

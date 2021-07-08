@@ -66,11 +66,12 @@ abstract class BeanDefinitionCreator {
                                  Consumer<SpringComponentModel> componentBeanDefinitionHandler);
 
   protected BeanDefinition getConvertibleBeanDefinition(Class<?> type, Object value, Optional<TypeConverter> converter) {
-    return converter.map(
-                         typeConverter -> genericBeanDefinition(ConstantFactoryBean.class).addConstructorArgValue(typeConverter
-                             .convert(value)).getBeanDefinition())
-        .orElseGet(
-                   () -> genericBeanDefinition(type).addConstructorArgValue(value).getBeanDefinition());
+    return converter.map(typeConverter -> genericBeanDefinition(ConstantFactoryBean.class)
+        .addConstructorArgValue(typeConverter.convert(value))
+        .getBeanDefinition())
+        .orElseGet(() -> genericBeanDefinition(type)
+            .addConstructorArgValue(value)
+            .getBeanDefinition());
 
   }
 

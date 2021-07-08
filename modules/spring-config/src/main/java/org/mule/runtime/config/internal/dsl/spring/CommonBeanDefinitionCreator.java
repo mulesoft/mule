@@ -28,7 +28,6 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.security.SecurityFilter;
@@ -88,11 +87,9 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
                                CreateBeanDefinitionRequest request,
                                Consumer<ComponentAst> nestedComponentParamProcessor,
                                Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    ObjectTypeVisitor objectTypeVisitor = request.retrieveTypeVisitor();
     ComponentBuildingDefinition buildingDefinition = request.getComponentBuildingDefinition();
-    request.getSpringComponentModel().setType(objectTypeVisitor.getType());
     BeanDefinitionBuilder beanDefinitionBuilder =
-        createBeanDefinitionBuilder(objectTypeVisitor, request.getSpringComponentModel(), buildingDefinition);
+        createBeanDefinitionBuilder(request.getSpringComponentModel(), buildingDefinition);
     processAnnotations(request.getSpringComponentModel(), beanDefinitionBuilder);
     processComponentDefinitionModel(springComponentModels, request, buildingDefinition, beanDefinitionBuilder);
 
@@ -101,12 +98,11 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     return true;
   }
 
-  private BeanDefinitionBuilder createBeanDefinitionBuilder(final ObjectTypeVisitor objectTypeVisitor,
-                                                            SpringComponentModel componentModel,
+  private BeanDefinitionBuilder createBeanDefinitionBuilder(SpringComponentModel componentModel,
                                                             ComponentBuildingDefinition buildingDefinition) {
     BeanDefinitionBuilder beanDefinitionBuilder;
     if (buildingDefinition.getObjectFactoryType() != null) {
-      beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(objectTypeVisitor, componentModel, buildingDefinition);
+      beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(componentModel, buildingDefinition);
     } else {
       beanDefinitionBuilder = genericBeanDefinition(componentModel.getType());
     }
@@ -172,14 +168,12 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         .collect(toMap(e -> QName.valueOf(e.getKey()), Entry::getValue)));
   }
 
-  private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final ObjectTypeVisitor objectTypeVisitor,
-                                                                             final SpringComponentModel componentModel,
+  private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final SpringComponentModel componentModel,
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
-    componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
     return rootBeanDefinition(objectFactoryClassRepository
-        .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, objectTypeVisitor.getType(),
+        .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, componentModel.getType(),
                                new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
   }
 

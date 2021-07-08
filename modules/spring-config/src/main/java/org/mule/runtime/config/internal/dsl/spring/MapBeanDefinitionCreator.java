@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.util.stream.Collectors.toCollection;
 
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
@@ -51,7 +50,7 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator {
     }
 
     ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-    Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
+    Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null) {
 
       Collection<ComponentAst> items = (Collection<ComponentAst>) createBeanDefinitionRequest.getParam().getValue().getRight();
