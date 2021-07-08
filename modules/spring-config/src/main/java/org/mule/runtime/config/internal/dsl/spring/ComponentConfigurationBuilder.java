@@ -79,9 +79,13 @@ class ComponentConfigurationBuilder<T> {
 
     if (componentModel != null) {
       this.componentModel = componentModel;
-    } else if (createBeanDefinitionRequest.getParam() != null
-        && createBeanDefinitionRequest.getParam().getValue().getRight() instanceof ComponentAst) {
-      this.componentModel = ((ComponentAst) createBeanDefinitionRequest.getParam().getValue().getRight());
+      // TODO delgate this to the request
+    } else if (createBeanDefinitionRequest instanceof CreateParamBeanDefinitionRequest
+        && ((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam() != null
+        && ((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getValue()
+            .getRight() instanceof ComponentAst) {
+      this.componentModel =
+          ((ComponentAst) ((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getValue().getRight());
     } else {
       this.componentModel = null;
     }
@@ -355,11 +359,6 @@ class ComponentConfigurationBuilder<T> {
           .map(ownerComponentModel -> {
             Optional<ParameterGroupModel> groupModelOptional;
 
-            // int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
-            // final ComponentAst possibleGroup =
-            // ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
-            // ? componentModel
-            // : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
             if (ownerComponentModel instanceof SourceModel) {
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
                                                                          createBeanDefinitionRequest.getSpringComponentModel()
@@ -385,7 +384,6 @@ class ComponentConfigurationBuilder<T> {
             }
 
             return p;
-            // }
           })
           .orElse(null);
 
@@ -511,7 +509,7 @@ class ComponentConfigurationBuilder<T> {
       if (componentModel != null) {
         this.value = componentModel.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
       } else {
-        getParameterValue(createBeanDefinitionRequest.getParam().getModel().getName(), null)
+        getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
             .ifPresent(v -> this.value = v);
       }
     }

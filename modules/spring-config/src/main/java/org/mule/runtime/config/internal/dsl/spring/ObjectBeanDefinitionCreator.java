@@ -32,14 +32,14 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
  *
  * @since 4.0
  */
-class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
+class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
 
   private static final String REF_PARAMETER = "ref";
   private static final String CLASS_PARAMETER = "class";
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();

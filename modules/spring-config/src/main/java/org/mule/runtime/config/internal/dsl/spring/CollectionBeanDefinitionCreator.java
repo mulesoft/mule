@@ -7,16 +7,15 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.stream.Collectors.toCollection;
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 
 /**
@@ -32,21 +31,19 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
+class CollectionBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     if (createBeanDefinitionRequest.getComponentModelHierarchy().isEmpty()) {
       return false;
     }
 
-    ObjectTypeVisitor objectTypeVisitor = createBeanDefinitionRequest.retrieveTypeVisitor();
-    if (Collection.class.isAssignableFrom(objectTypeVisitor.getType())) {
-      createBeanDefinitionRequest.getSpringComponentModel().setType(objectTypeVisitor.getType());
-
+    Class<Object> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
+    if (Collection.class.isAssignableFrom(type)) {
       Collection<ComponentAst> items = (Collection<ComponentAst>) createBeanDefinitionRequest.getParam().getValue().getRight();
 
       items.forEach(nestedComponentParamProcessor);
@@ -59,7 +56,7 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
           .collect(toCollection(ManagedList::new));
 
       createBeanDefinitionRequest.getSpringComponentModel()
-          .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(objectTypeVisitor.getType())
+          .setBeanDefinition(genericBeanDefinition(type)
               .addConstructorArgValue(managedList).getBeanDefinition());
 
       componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());

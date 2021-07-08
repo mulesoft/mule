@@ -25,11 +25,11 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
+class SimpleTypeParamBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
@@ -38,21 +38,30 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator<CreateCompon
       return false;
     }
 
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
-    final ComponentParameterAst valueParam = componentModel.getParameter("value");
+    final ComponentParameterAst param = createBeanDefinitionRequest.getParam();
 
-    if (valueParam == null || valueParam.getResolvedRawValue() == null) {
-      return false;
-    }
-
-    this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());
-
+    // if (param != null) {
+    this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type,
+                                      (String) param.getValue().mapLeft(expr -> "#[" + expr + "]").getValue().orElse(null));
     componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
-
     return true;
+    // }
+
+    // ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    // final ComponentParameterAst valueParam = componentModel.getParameter("value");
+    //
+    // if (valueParam == null || valueParam.getResolvedRawValue() == null) {
+    // return false;
+    // }
+    //
+    // this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());
+    //
+    // componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+    //
+    // return true;
   }
 
-  private void setConvertibleBeanDefinition(CreateBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type,
+  private void setConvertibleBeanDefinition(CreateParamBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type,
                                             String value) {
     Optional<TypeConverter> typeConverterOptional =
         createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
