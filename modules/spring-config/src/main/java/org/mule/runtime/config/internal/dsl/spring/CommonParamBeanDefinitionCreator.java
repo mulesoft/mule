@@ -11,42 +11,28 @@ import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
-import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
-import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.security.SecurityFilter;
-import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ServiceConfigurationError;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 
 /**
  * Processor in the chain of responsibility that knows how to handle a generic {@code ComponentBuildingDefinition}.
@@ -56,28 +42,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 class CommonParamBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
-  private final BeanDefinitionPostProcessor beanDefinitionPostProcessor;
 
   public CommonParamBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
-
-    this.beanDefinitionPostProcessor = resolvePostProcessor();
-  }
-
-  private BeanDefinitionPostProcessor resolvePostProcessor() {
-    for (ClassLoader classLoader : resolveContextArtifactPluginClassLoaders()) {
-      try {
-        final BeanDefinitionPostProcessor foundProvider =
-            new SpiServiceRegistry().lookupProvider(BeanDefinitionPostProcessor.class, classLoader);
-        if (foundProvider != null) {
-          return foundProvider;
-        }
-      } catch (Exception | ServiceConfigurationError e) {
-        // Nothing to do, we just don't have compatibility plugin in the app
-      }
-    }
-    return (componentModel, helper) -> {
-    };
   }
 
   @Override
@@ -107,11 +74,11 @@ class CommonParamBeanDefinitionCreator extends BeanDefinitionCreator<CreateParam
     return beanDefinitionBuilder;
   }
 
-  private void processNestedAnnotations(ComponentAst componentModel, Map<QName, Object> previousAnnotations) {
-    if (componentModel == null) {
+  private void processNestedAnnotations(ComponentAst component, Map<QName, Object> previousAnnotations) {
+    if (component == null) {
       return;
     }
-    componentModel.directChildrenStream()
+    component.directChildrenStream()
         .filter(cdm -> cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER))
         .findFirst()
         .ifPresent(annotationsCdm -> annotationsCdm.directChildrenStream()
@@ -134,13 +101,13 @@ class CommonParamBeanDefinitionCreator extends BeanDefinitionCreator<CreateParam
     }
   }
 
-  private Map<QName, Object> processMetadataAnnotationsHelper(BeanDefinitionBuilder builder, ComponentAst componentModel) {
+  private Map<QName, Object> processMetadataAnnotationsHelper(BeanDefinitionBuilder builder, ComponentAst component) {
     Map<QName, Object> annotations = new HashMap<>();
-    if (componentModel == null) {
+    if (component == null) {
       return annotations;
     } else {
       if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
-        addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getMetadata());
+        addMetadataAnnotationsFromDocAttributes(annotations, component.getMetadata());
         builder.getBeanDefinition().getPropertyValues().addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       }
 
@@ -176,98 +143,30 @@ class CommonParamBeanDefinitionCreator extends BeanDefinitionCreator<CreateParam
   }
 
   private void processComponentDefinitionModel(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                               final CreateBeanDefinitionRequest request,
+                                               final CreateParamBeanDefinitionRequest request,
                                                ComponentBuildingDefinition componentBuildingDefinition,
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
-    final ComponentAst componentModel = request.getComponent();
-    ComponentAst ownerComponent;
-    if (componentModel != null && componentModel.getModel(ParameterizedModel.class).isPresent()) {
-      ownerComponent = componentModel;
-    } else {
-      ownerComponent = request.resolveOwnerComponent();
-      if (ownerComponent == null) {
-        ownerComponent = componentModel;
-      }
-    }
+    ComponentAst ownerComponent = request.resolveOwnerComponent();
 
-    processObjectConstructionParameters(springComponentModels, ownerComponent, componentModel, request,
+    processObjectConstructionParameters(springComponentModels, ownerComponent, null, request,
                                         componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
-    processMuleProperties(componentModel, beanDefinitionBuilder, beanDefinitionPostProcessor);
     if (componentBuildingDefinition.isPrototype()) {
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
     }
     AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
-    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(originalBeanDefinition);
-    if (originalBeanDefinition != wrappedBeanDefinition) {
-      request.getSpringComponentModel().setType(wrappedBeanDefinition.getBeanClass());
-    }
-    request.getSpringComponentModel().setBeanDefinition(wrappedBeanDefinition);
-  }
-
-  static void processMuleProperties(ComponentAst componentModel, BeanDefinitionBuilder beanDefinitionBuilder,
-                                    BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
-    if (componentModel == null) {
-      return;
-    }
-
-    // for now we skip custom-transformer since requires injection by the object factory.
-    if (beanDefinitionPostProcessor != null && beanDefinitionPostProcessor.getGenericPropertiesCustomProcessingIdentifiers()
-        .contains(componentModel.getIdentifier())) {
-      return;
-    }
-    componentModel.directChildrenStream()
-        .filter(innerComponent -> {
-          ComponentIdentifier identifier = innerComponent.getIdentifier();
-          return identifier.equals(MULE_PROPERTY_IDENTIFIER)
-              || identifier.equals(MULE_PROPERTIES_IDENTIFIER);
-        })
-        .forEach(propertyComponentModel -> {
-          Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
-          beanDefinitionBuilder.addPropertyValue(propertyValue.getFirst(), propertyValue.getSecond());
-        });
+    request.getSpringComponentModel().setBeanDefinition(originalBeanDefinition);
   }
 
   private void processObjectConstructionParameters(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                   ComponentAst ownerComponent, final ComponentAst componentModel,
-                                                   CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                                   ComponentAst ownerComponent, final ComponentAst component,
+                                                   CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
                                                    final ComponentBuildingDefinition componentBuildingDefinition,
                                                    final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
-    new ComponentConfigurationBuilder(springComponentModels, ownerComponent, componentModel, createBeanDefinitionRequest,
+    new ComponentConfigurationBuilder(springComponentModels, ownerComponent, component, createBeanDefinitionRequest,
                                       componentBuildingDefinition, beanDefinitionBuilderHelper)
                                           .processConfiguration();
 
-  }
-
-  private AbstractBeanDefinition adaptBeanDefinition(AbstractBeanDefinition originalBeanDefinition) {
-    Class beanClass;
-    if (originalBeanDefinition instanceof RootBeanDefinition) {
-      beanClass = ((RootBeanDefinition) originalBeanDefinition).getBeanClass();
-    } else {
-      try {
-        beanClass = originalBeanDefinition.getBeanClass();
-      } catch (IllegalStateException e) {
-        try {
-          beanClass = org.apache.commons.lang3.ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
-        } catch (ClassNotFoundException e2) {
-          throw new RuntimeException(e2);
-        }
-      }
-    }
-
-    BeanDefinition newBeanDefinition;
-    if (areMatchingTypes(SecurityFilter.class, beanClass)) {
-      newBeanDefinition = rootBeanDefinition(SecurityFilterMessageProcessor.class)
-          .addConstructorArgValue(originalBeanDefinition)
-          .getBeanDefinition();
-      return (AbstractBeanDefinition) newBeanDefinition;
-    } else {
-      return originalBeanDefinition;
-    }
-  }
-
-  public static boolean areMatchingTypes(Class<?> superType, Class<?> childType) {
-    return superType.isAssignableFrom(childType);
   }
 
 }

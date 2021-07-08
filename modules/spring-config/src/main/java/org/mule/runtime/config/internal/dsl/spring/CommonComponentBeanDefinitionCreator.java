@@ -22,7 +22,6 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -30,8 +29,6 @@ import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.security.SecurityFilter;
-import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -43,10 +40,8 @@ import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 
 /**
  * Processor in the chain of responsibility that knows how to handle a generic {@code ComponentBuildingDefinition}.
@@ -176,21 +171,11 @@ class CommonComponentBeanDefinitionCreator extends BeanDefinitionCreator<CreateC
   }
 
   private void processComponentDefinitionModel(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                               final CreateBeanDefinitionRequest request,
+                                               final CreateComponentBeanDefinitionRequest request,
                                                ComponentBuildingDefinition componentBuildingDefinition,
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
     final ComponentAst componentModel = request.getComponent();
-    ComponentAst ownerComponent;
-    if (componentModel != null && componentModel.getModel(ParameterizedModel.class).isPresent()) {
-      ownerComponent = componentModel;
-    } else {
-      ownerComponent = request.resolveOwnerComponent();
-      if (ownerComponent == null) {
-        ownerComponent = componentModel;
-      }
-    }
-
-    processObjectConstructionParameters(springComponentModels, ownerComponent, componentModel, request,
+    processObjectConstructionParameters(springComponentModels, componentModel, componentModel, request,
                                         componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
     processMuleProperties(componentModel, beanDefinitionBuilder, beanDefinitionPostProcessor);
@@ -198,25 +183,21 @@ class CommonComponentBeanDefinitionCreator extends BeanDefinitionCreator<CreateC
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
     }
     AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
-    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(originalBeanDefinition);
-    if (originalBeanDefinition != wrappedBeanDefinition) {
-      request.getSpringComponentModel().setType(wrappedBeanDefinition.getBeanClass());
-    }
-    request.getSpringComponentModel().setBeanDefinition(wrappedBeanDefinition);
+    request.getSpringComponentModel().setBeanDefinition(originalBeanDefinition);
   }
 
-  static void processMuleProperties(ComponentAst componentModel, BeanDefinitionBuilder beanDefinitionBuilder,
-                                    BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
-    if (componentModel == null) {
+  private void processMuleProperties(ComponentAst component, BeanDefinitionBuilder beanDefinitionBuilder,
+                                     BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
+    if (component == null) {
       return;
     }
 
     // for now we skip custom-transformer since requires injection by the object factory.
     if (beanDefinitionPostProcessor != null && beanDefinitionPostProcessor.getGenericPropertiesCustomProcessingIdentifiers()
-        .contains(componentModel.getIdentifier())) {
+        .contains(component.getIdentifier())) {
       return;
     }
-    componentModel.directChildrenStream()
+    component.directChildrenStream()
         .filter(innerComponent -> {
           ComponentIdentifier identifier = innerComponent.getIdentifier();
           return identifier.equals(MULE_PROPERTY_IDENTIFIER)
@@ -229,45 +210,14 @@ class CommonComponentBeanDefinitionCreator extends BeanDefinitionCreator<CreateC
   }
 
   private void processObjectConstructionParameters(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                   ComponentAst ownerComponent, final ComponentAst componentModel,
-                                                   CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                                   ComponentAst ownerComponent, final ComponentAst component,
+                                                   CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
                                                    final ComponentBuildingDefinition componentBuildingDefinition,
                                                    final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
-    new ComponentConfigurationBuilder(springComponentModels, ownerComponent, componentModel, createBeanDefinitionRequest,
+    new ComponentConfigurationBuilder(springComponentModels, ownerComponent, component, createBeanDefinitionRequest,
                                       componentBuildingDefinition, beanDefinitionBuilderHelper)
                                           .processConfiguration();
 
-  }
-
-  private AbstractBeanDefinition adaptBeanDefinition(AbstractBeanDefinition originalBeanDefinition) {
-    Class beanClass;
-    if (originalBeanDefinition instanceof RootBeanDefinition) {
-      beanClass = ((RootBeanDefinition) originalBeanDefinition).getBeanClass();
-    } else {
-      try {
-        beanClass = originalBeanDefinition.getBeanClass();
-      } catch (IllegalStateException e) {
-        try {
-          beanClass = org.apache.commons.lang3.ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
-        } catch (ClassNotFoundException e2) {
-          throw new RuntimeException(e2);
-        }
-      }
-    }
-
-    BeanDefinition newBeanDefinition;
-    if (areMatchingTypes(SecurityFilter.class, beanClass)) {
-      newBeanDefinition = rootBeanDefinition(SecurityFilterMessageProcessor.class)
-          .addConstructorArgValue(originalBeanDefinition)
-          .getBeanDefinition();
-      return (AbstractBeanDefinition) newBeanDefinition;
-    } else {
-      return originalBeanDefinition;
-    }
-  }
-
-  public static boolean areMatchingTypes(Class<?> superType, Class<?> childType) {
-    return superType.isAssignableFrom(childType);
   }
 
 }
