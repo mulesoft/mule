@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.value;
 
 import static java.lang.String.format;
-import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
@@ -24,7 +23,6 @@ import org.mule.sdk.api.values.ValueBuilder;
 import org.mule.sdk.api.values.ValueProvider;
 import org.mule.sdk.api.values.ValueResolvingException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
