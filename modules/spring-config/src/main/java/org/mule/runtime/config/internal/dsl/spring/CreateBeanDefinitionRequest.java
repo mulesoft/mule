@@ -77,6 +77,7 @@ public class CreateBeanDefinitionRequest {
       objectTypeVisitor.onType(Object.class);
     }
     springComponentModel.setType(objectTypeVisitor.getType());
+    objectTypeVisitor.getMapEntryType().ifPresent(springComponentModel::setMapEntryType);
   }
 
   public List<ComponentAst> getComponentModelHierarchy() {
