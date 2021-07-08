@@ -7,7 +7,9 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -21,9 +23,13 @@ import java.util.List;
  *
  * @since 4.0
  */
-abstract class CreateBeanDefinitionRequest {
+public abstract class CreateBeanDefinitionRequest {
 
   private final List<ComponentAst> componentHierarchy;
+  private final ComponentAst component;
+  private final Collection<SpringComponentModel> paramsModels;
+  private final ComponentAst paramOwnerComponentModel;
+  private final ComponentParameterAst param;
   private final ComponentBuildingDefinition componentBuildingDefinition;
   private final SpringComponentModel springComponentModel;
 
@@ -32,15 +38,38 @@ abstract class CreateBeanDefinitionRequest {
    * @param component                   the holder for the configuration attributes defined by the user
    * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
    */
-  protected CreateBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
-                                        ComponentBuildingDefinition componentBuildingDefinition,
-                                        ComponentIdentifier componentIdentifier) {
+  public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
+                                     ComponentAst component, List<SpringComponentModel> paramsModels,
+                                     ComponentBuildingDefinition componentBuildingDefinition) {
+    this(componentModelHierarchy, component, paramsModels, null, null, componentBuildingDefinition,
+         component != null
+             ? component.getIdentifier()
+             : componentBuildingDefinition.getComponentIdentifier());
+  }
+
+  /**
+   * @param parentComponentModel        the container element of the holder for the configuration attributes defined by the user
+   * @param component                   the holder for the configuration attributes defined by the user
+   * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
+   */
+  public CreateBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
+                                     ComponentAst component,
+                                     Collection<SpringComponentModel> paramsModels,
+                                     ComponentAst paramOwnerComponentModel,
+                                     ComponentParameterAst param,
+                                     ComponentBuildingDefinition componentBuildingDefinition,
+                                     ComponentIdentifier componentIdentifier) {
     this.componentHierarchy = componentHierarchy;
+    this.component = component;
+    this.paramsModels = paramsModels;
+    this.paramOwnerComponentModel = paramOwnerComponentModel;
+    this.param = param;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
     springComponentModel.setComponentIdentifier(componentIdentifier);
+    springComponentModel.setComponent(component);
 
-    ObjectTypeVisitor objectTypeVisitor = buildObjectTypeVisitor();
+    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(component);
 
     if (componentBuildingDefinition != null) {
       componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
@@ -51,12 +80,24 @@ abstract class CreateBeanDefinitionRequest {
     objectTypeVisitor.getMapEntryType().ifPresent(springComponentModel::setMapEntryType);
   }
 
-  protected ObjectTypeVisitor buildObjectTypeVisitor() {
-    return new ObjectTypeVisitor(null);
-  }
-
   public List<ComponentAst> getComponentHierarchy() {
     return componentHierarchy;
+  }
+
+  public ComponentAst getComponent() {
+    return component;
+  }
+
+  public Collection<SpringComponentModel> getParamsModels() {
+    return paramsModels;
+  }
+
+  public ComponentAst getParamOwnerComponent() {
+    return paramOwnerComponentModel;
+  }
+
+  public ComponentParameterAst getParam() {
+    return param;
   }
 
   public ComponentBuildingDefinition getComponentBuildingDefinition() {
@@ -67,13 +108,15 @@ abstract class CreateBeanDefinitionRequest {
     return springComponentModel;
   }
 
-  /**
-   * The {@link ComponentAst} to create a bean definition for this request
-   */
-  public abstract ComponentAst resolveConfigurationComponent();
+  protected ComponentAst resolveOwnerComponent() {
+    for (int i = getComponentHierarchy().size() - 1; i >= 0; --i) {
+      final ComponentAst possibleOwner = getComponentHierarchy().get(i);
 
-  /**
-   * The {@link SpringComponentModel} that represent the complex parameters of this request's component.
-   */
-  public abstract Collection<SpringComponentModel> getParamsModels();
+      if (possibleOwner.getModel(ParameterizedModel.class).isPresent()) {
+        return possibleOwner;
+      }
+    }
+
+    return null;
+  }
 }

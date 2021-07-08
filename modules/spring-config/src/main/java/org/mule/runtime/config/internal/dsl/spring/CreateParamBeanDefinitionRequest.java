@@ -15,11 +15,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import java.util.Collection;
 import java.util.List;
 
-class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionRequest {
-
-  private final Collection<SpringComponentModel> paramsModels;
-  private final ComponentAst paramOwnerComponent;
-  private final ComponentParameterAst param;
+public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionRequest {
 
   public CreateParamBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
                                           Collection<SpringComponentModel> paramsModels,
@@ -27,31 +23,8 @@ class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionRequest {
                                           ComponentParameterAst param,
                                           ComponentBuildingDefinition<?> componentBuildingDefinition,
                                           ComponentIdentifier paramComponentIdentifier) {
-    super(componentHierarchy, componentBuildingDefinition, paramComponentIdentifier);
-
-    this.paramsModels = paramsModels;
-    this.paramOwnerComponent = paramOwnerComponent;
-    this.param = param;
+    super(componentHierarchy, null, paramsModels, paramOwnerComponent, param, componentBuildingDefinition,
+          paramComponentIdentifier);
   }
 
-  public Collection<SpringComponentModel> getParamsModels() {
-    return paramsModels;
-  }
-
-  public ComponentAst getParamOwnerComponent() {
-    return paramOwnerComponent;
-  }
-
-  public ComponentParameterAst getParam() {
-    return param;
-  }
-
-  @Override
-  public ComponentAst resolveConfigurationComponent() {
-    if (getParam() != null && getParam().getValue().getRight() instanceof ComponentAst) {
-      return ((ComponentAst) getParam().getValue().getRight());
-    } else {
-      return null;
-    }
-  }
 }

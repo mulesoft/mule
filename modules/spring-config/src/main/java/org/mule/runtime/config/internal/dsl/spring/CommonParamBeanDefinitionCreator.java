@@ -33,7 +33,7 @@ class CommonParamBeanDefinitionCreator extends CommonBeanBaseDefinitionCreator<C
                                                  final CreateParamBeanDefinitionRequest request,
                                                  ComponentBuildingDefinition componentBuildingDefinition,
                                                  final BeanDefinitionBuilder beanDefinitionBuilder) {
-    processObjectConstructionParameters(springComponentModels, request.getParamOwnerComponent(), null, request,
+    processObjectConstructionParameters(springComponentModels, request.resolveOwnerComponent(), null, request,
                                         componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
     if (componentBuildingDefinition.isPrototype()) {

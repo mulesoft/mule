@@ -6,46 +6,19 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.util.Collections.emptyList;
-
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
-import java.util.Collection;
 import java.util.List;
 
-class CreateComponentBeanDefinitionRequest extends CreateBeanDefinitionRequest {
-
-  private final ComponentAst component;
+public class CreateComponentBeanDefinitionRequest extends CreateBeanDefinitionRequest {
 
   public CreateComponentBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
                                               ComponentAst component,
                                               List<SpringComponentModel> paramsModels,
                                               ComponentBuildingDefinition componentBuildingDefinition) {
-    super(componentHierarchy, componentBuildingDefinition, component.getIdentifier());
-
-    this.component = component;
-    getSpringComponentModel().setComponent(component);
+    super(componentHierarchy, component, paramsModels, componentBuildingDefinition);
   }
 
-  @Override
-  protected ObjectTypeVisitor buildObjectTypeVisitor() {
-    return new ObjectTypeVisitor(component);
-  }
-
-  public ComponentAst getComponent() {
-    return component;
-  }
-
-  @Override
-  public ComponentAst resolveConfigurationComponent() {
-    return getComponent();
-  }
-
-  @Override
-  public Collection<SpringComponentModel> getParamsModels() {
-    return emptyList();
-  }
 }

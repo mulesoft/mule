@@ -76,7 +76,15 @@ class ComponentConfigurationBuilder<T> {
                                        ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     this.ownerComponent = ownerComponent;
-    this.component = createBeanDefinitionRequest.resolveConfigurationComponent();
+
+    if (component != null) {
+      this.component = component;
+    } else if (createBeanDefinitionRequest.getParam() != null
+        && createBeanDefinitionRequest.getParam().getValue().getRight() instanceof ComponentAst) {
+      this.component = ((ComponentAst) createBeanDefinitionRequest.getParam().getValue().getRight());
+    } else {
+      this.component = null;
+    }
 
     this.createBeanDefinitionRequest = createBeanDefinitionRequest;
     this.componentBuildingDefinition = componentBuildingDefinition;
@@ -501,10 +509,9 @@ class ComponentConfigurationBuilder<T> {
     @Override
     public void onValueFromTextContent() {
       if (component != null) {
-        // TODO MULE-18782 migrate this
         this.value = component.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
       } else {
-        getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
+        getParameterValue(createBeanDefinitionRequest.getParam().getModel().getName(), null)
             .ifPresent(v -> this.value = v);
       }
     }
