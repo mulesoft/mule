@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.model.properties;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
@@ -256,8 +258,8 @@ public class PropertiesResolverUtils {
       artifactAst.topLevelComponentsStream()
           .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
           .forEach(comp -> {
-            final String key = comp.getParameter("name").getResolvedRawValue();
-            final String rawValue = comp.getParameter("value").getRawValue();
+            final String key = ofNullable(comp.getParameter("name")).map(ComponentParameterAst::getResolvedRawValue).orElse(null);
+            final String rawValue = ofNullable(comp.getParameter("value")).map(ComponentParameterAst::getRawValue).orElse(null);
             globalProperties.put(key,
                                  new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
                                                                          comp.getMetadata().getFileName().orElse("(n/a)"),
