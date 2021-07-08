@@ -12,8 +12,6 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
-import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.keywordSafeName;
-import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.sanitizeExpression;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.BindingContext;
@@ -133,6 +131,15 @@ public class InjectableParameterResolver {
     } catch (ValueResolvingException e) {
       return null;
     }
+  }
+
+  private String keywordSafeName(String parameterName) {
+    return parameterName + "_";
+  }
+
+  private String sanitizeExpression(String extractionExpression) {
+    String topLevelParameter = getParameterNameFromExtractionExpression(extractionExpression);
+    return extractionExpression.replaceFirst(topLevelParameter, keywordSafeName(topLevelParameter));
   }
 
 }
