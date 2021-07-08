@@ -209,49 +209,4 @@ public class ValueProviderUtils {
     int parameterNameDelimiter = extractionExpression.indexOf(".");
     return parameterNameDelimiter < 0 ? extractionExpression : extractionExpression.substring(0, parameterNameDelimiter);
   }
-
-  /**
-   * Modifies the parameterName in order to avoid an exception because it's a DW reserved keyword.
-   *
-   * @param parameterName the parameter name to modify
-   *
-   * @return the modified parameter name
-   * @since 4.4.0
-   */
-  public static String keywordSafeName(String parameterName) {
-    return parameterName + "_";
-  }
-
-  /**
-   * Modifies the extractionExpression by avoiding DW keywords. This involves using the keywordSafe
-   * {@link ValueProviderUtils#keywordSafeName(String)} parameter name alternatives and accessing fields and attributes enclosing
-   * their names between quotes.
-   *
-   * @param extractionExpression the expression to sanitize
-   *
-   * @return the modified expression where DW keywords have been avoided.
-   * @since 4.4.0
-   */
-  public static String sanitizeExpression(String extractionExpression) {
-    String[] parts = extractionExpression.split("\\.");
-    List<String> processedParts = new ArrayList<>();
-    processedParts.add(keywordSafeName(parts[0]));
-    for (int i = 1; i < parts.length; i++) {
-      processedParts.add(sanitizePart(parts[i]));
-    }
-    return join(".", processedParts);
-  }
-
-  private static String sanitizePart(String expressionPart) {
-    if (expressionPart.startsWith("'") || expressionPart.startsWith("\"")) {
-      return expressionPart;
-    }
-    if (expressionPart.startsWith("@")) {
-      return "@" + sanitizePart(expressionPart.substring(1));
-    }
-    return "'" + expressionPart + "'";
-  }
-
-
-
 }
