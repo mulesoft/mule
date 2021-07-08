@@ -14,6 +14,7 @@ import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Bui
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -40,8 +41,9 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final String namespace;
 
   public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
-                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context) {
-    super(definition, dslResolver, context);
+                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context,
+                                   ExtensionModel extensionModel) {
+    super(definition, dslResolver, context, extensionModel);
     this.type = type;
     this.classLoader = classLoader;
     this.typeDsl = dslResolver.resolve(type)
@@ -52,8 +54,9 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
   public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type,
                                    ClassLoader classLoader,
-                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context) {
-    super(definition, dslResolver, context);
+                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context,
+                                   ExtensionModel extensionModel) {
+    super(definition, dslResolver, context, extensionModel);
     this.name = name;
     this.namespace = namespace;
     this.type = type;

@@ -50,7 +50,6 @@ import java.util.Optional;
  */
 public abstract class AbstractComponentDefinitionParser<T extends ComponentModel> extends ExtensionDefinitionParser {
 
-  private final ExtensionModel extensionModel;
   private final T componentModel;
   private final DslElementSyntax operationDsl;
 
@@ -58,8 +57,7 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
                                            T componentModel,
                                            DslSyntaxResolver dslSyntaxResolver,
                                            ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
-    this.extensionModel = extensionModel;
+    super(definition, dslSyntaxResolver, parsingContext, extensionModel);
     this.componentModel = componentModel;
     this.operationDsl = dslSyntaxResolver.resolve(componentModel);
   }

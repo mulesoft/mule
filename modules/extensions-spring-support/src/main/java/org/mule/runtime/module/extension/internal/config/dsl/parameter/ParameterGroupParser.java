@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
+
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -32,8 +34,8 @@ public abstract class ParameterGroupParser extends ExtensionDefinitionParser {
   protected final String namespace;
 
   public ParameterGroupParser(Builder definition, ParameterGroupModel group, ClassLoader classLoader, DslElementSyntax groupDsl,
-                              DslSyntaxResolver dslResolver, ExtensionParsingContext context) {
-    super(definition, dslResolver, context);
+                              DslSyntaxResolver dslResolver, ExtensionParsingContext context, ExtensionModel extensionModel) {
+    super(definition, dslResolver, context, extensionModel);
 
     checkArgument(group.isShowInDsl(), "Cannot parse an implicit group");
     this.group = group;

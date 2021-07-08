@@ -11,6 +11,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -41,8 +42,9 @@ public class AnonymousInlineParameterGroupParser extends ParameterGroupParser {
                                              ClassLoader classLoader,
                                              DslElementSyntax groupDsl,
                                              DslSyntaxResolver dslResolver,
-                                             ExtensionParsingContext context) {
-    super(definition, group, classLoader, groupDsl, dslResolver, context);
+                                             ExtensionParsingContext context,
+                                             ExtensionModel extensionModel) {
+    super(definition, group, classLoader, groupDsl, dslResolver, context, extensionModel);
   }
 
   @Override

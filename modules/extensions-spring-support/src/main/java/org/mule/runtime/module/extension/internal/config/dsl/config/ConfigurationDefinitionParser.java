@@ -32,7 +32,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
  */
 public final class ConfigurationDefinitionParser extends ExtensionDefinitionParser {
 
-  private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
   private final DslElementSyntax configDsl;
 
@@ -40,8 +39,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
                                        ConfigurationModel configurationModel,
                                        DslSyntaxResolver dslResolver,
                                        ExtensionParsingContext parsingContext) {
-    super(definition, dslResolver, parsingContext);
-    this.extensionModel = extensionModel;
+    super(definition, dslResolver, parsingContext, extensionModel);
     this.configurationModel = configurationModel;
     this.configDsl = dslResolver.resolve(configurationModel);
   }
