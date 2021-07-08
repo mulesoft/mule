@@ -29,11 +29,11 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
-class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
+class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();

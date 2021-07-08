@@ -24,6 +24,7 @@ import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCase {
@@ -41,12 +43,12 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   public static final String TEST_STRING_RAW_VALUE = "Test Raw Value";
   private SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator;
   private Map<ComponentAst, SpringComponentModel> springComponentModels;
-  private CreateComponentBeanDefinitionRequest createBeanDefinitionRequest;
+  private CreateBeanDefinitionRequest createBeanDefinitionRequest;
 
   @Before
   public void setUp() {
     simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
-    createBeanDefinitionRequest = mock(CreateComponentBeanDefinitionRequest.class);
+    createBeanDefinitionRequest = mock(CreateBeanDefinitionRequest.class);
     SpringComponentModel springComponentModel = new SpringComponentModel();
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
   }
@@ -54,8 +56,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   @Test
   public void testHandleRequestReturnsFalse_WhenCreateBeanDefinitionRequestTypeIsNotSimpleType() {
     // Given
-    SpringComponentModel springComponentModel = createBeanDefinitionRequest.getSpringComponentModel();
-    springComponentModel.setType(SimpleTypeBeanDefinitionCreatorTestCase.class);
+    mockStringObjectTypeVisitor(createBeanDefinitionRequest, SimpleTypeBeanDefinitionCreatorTestCase.class);
 
     // When
     boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
@@ -69,8 +70,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   @Test
   public void testHandleRequestReturnsTrue_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponent() {
     // Given
-    SpringComponentModel springComponentModel = createBeanDefinitionRequest.getSpringComponentModel();
-    springComponentModel.setType(String.class);
+    mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
 
@@ -92,8 +92,9 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   @Test
   public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponentAndNoTypeConverter() {
     // Given
+    mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
+
     SpringComponentModel springComponentModel = mock(SpringComponentModel.class);
-    when(springComponentModel.getType()).then(inv -> String.class);
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
 
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
@@ -120,8 +121,9 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   @Test
   public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponentAndTypeConverter() {
     // Given
+    mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
+
     SpringComponentModel springComponentModel = mock(SpringComponentModel.class);
-    when(springComponentModel.getType()).then(inv -> String.class);
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
 
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
@@ -148,8 +150,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   @Test
   public void testHandleRequestReturnsTrue_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModel() {
     // Given
-    SpringComponentModel springComponentModel = createBeanDefinitionRequest.getSpringComponentModel();
-    springComponentModel.setType(String.class);
+    mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
     ComponentAst componentModel = mock(ComponentAst.class);
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
@@ -172,8 +173,9 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   @Test
   public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModelAndNoTypeConverter() {
     // Given
+    mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
+
     SpringComponentModel springComponentModel = mock(SpringComponentModel.class);
-    when(springComponentModel.getType()).then(inv -> String.class);
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
 
     ComponentAst componentModel = mock(ComponentAst.class);
@@ -201,8 +203,9 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
   @Test
   public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModelAndTypeConverter() {
     // Given
+    mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
+
     SpringComponentModel springComponentModel = mock(SpringComponentModel.class);
-    when(springComponentModel.getType()).then(inv -> String.class);
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
 
     ComponentAst componentModel = mock(ComponentAst.class);
@@ -232,6 +235,12 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     ComponentBuildingDefinition componentBuildingDefinition = mock(ComponentBuildingDefinition.class);
     when(componentBuildingDefinition.getTypeConverter()).thenReturn(typeConverterOptional);
     when(createBeanDefinitionRequest.getComponentBuildingDefinition()).thenReturn(componentBuildingDefinition);
+  }
+
+  private void mockStringObjectTypeVisitor(CreateBeanDefinitionRequest createBeanDefinitionRequest, Class<?> aClass) {
+    ObjectTypeVisitor objectTypeVisitor = mock(ObjectTypeVisitor.class);
+    when(objectTypeVisitor.getType()).thenAnswer((Answer<Class<?>>) invocationOnMock -> aClass);
+    when(createBeanDefinitionRequest.retrieveTypeVisitor()).thenReturn(objectTypeVisitor);
   }
 
   private static class MyComponentParameterAst implements ComponentParameterAst {

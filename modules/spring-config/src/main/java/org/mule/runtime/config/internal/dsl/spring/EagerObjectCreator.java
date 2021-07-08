@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @since 4.0
  */
-class EagerObjectCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
+class EagerObjectCreator extends BeanDefinitionCreator {
 
   /**
    * These are the set of component model types that will not support complete dependency injection and lifecycle capabilities
@@ -49,7 +49,7 @@ class EagerObjectCreator extends BeanDefinitionCreator<CreateComponentBeanDefini
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
     Class<ConfigurableObjectProvider> type = createBeanDefinitionRequest.getSpringComponentModel().getType();

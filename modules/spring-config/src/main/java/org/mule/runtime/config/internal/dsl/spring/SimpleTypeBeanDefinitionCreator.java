@@ -25,17 +25,28 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
+class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
+    Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
 
     if (!isSimpleType(type)) {
       return false;
+    }
+
+    createBeanDefinitionRequest.getSpringComponentModel().setType(type);
+
+    final ComponentParameterAst param = createBeanDefinitionRequest.getParam();
+
+    if (param != null) {
+      this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type,
+                                        (String) param.getValue().mapLeft(expr -> "#[" + expr + "]").getValue().orElse(null));
+      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
+      return true;
     }
 
     ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
@@ -43,6 +54,9 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator<CreateCompon
 
     if (valueParam == null || valueParam.getResolvedRawValue() == null) {
       return false;
+      // throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
+      // componentModel.getMetadata().getFileName().orElse("unknown"),
+      // componentModel.getMetadata().getStartLine().orElse(-1)));
     }
 
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());

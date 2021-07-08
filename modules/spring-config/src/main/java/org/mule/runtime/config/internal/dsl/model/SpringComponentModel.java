@@ -9,9 +9,6 @@ package org.mule.runtime.config.internal.dsl.model;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.dsl.api.component.TypeDefinition.MapEntryType;
-
-import java.util.Map;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
@@ -27,7 +24,6 @@ public class SpringComponentModel {
   private ComponentAst component;
   private ConfigurableObjectProvider objectInstance;
   private Class<?> type;
-  private MapEntryType mapEntryType;
   private BeanReference beanReference;
   private BeanDefinition beanDefinition;
 
@@ -77,20 +73,6 @@ public class SpringComponentModel {
    */
   public void setType(Class<?> type) {
     this.type = type;
-  }
-
-  /**
-   * @return the type of the key/values when {@link #getType()} is a {@link Map}.
-   */
-  public MapEntryType getMapEntryType() {
-    return mapEntryType;
-  }
-
-  /**
-   * @param mapEntryType the type of the key/values when {@link #getType()} is a {@link Map}.
-   */
-  public void setMapEntryType(MapEntryType mapEntryType) {
-    this.mapEntryType = mapEntryType;
   }
 
   /**

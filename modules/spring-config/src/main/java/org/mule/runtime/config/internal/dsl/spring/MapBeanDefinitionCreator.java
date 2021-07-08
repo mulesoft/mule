@@ -7,9 +7,9 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.stream.Collectors.toCollection;
-import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 
 /**
@@ -37,11 +38,11 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-class MapBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
+class MapBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest,
                         Consumer<ComponentAst> nestedComponentParamProcessor,
                         Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
 
@@ -50,7 +51,7 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefi
     }
 
     ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-    Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
+    Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
     if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null) {
 
       Collection<ComponentAst> items = (Collection<ComponentAst>) createBeanDefinitionRequest.getParam().getValue().getRight();
@@ -63,7 +64,7 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefi
           .collect(toCollection(ManagedList::new));
 
       createBeanDefinitionRequest.getSpringComponentModel()
-          .setBeanDefinition(genericBeanDefinition(MapFactoryBean.class)
+          .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(MapFactoryBean.class)
               .addConstructorArgValue(managedList).addConstructorArgValue(type).getBeanDefinition());
 
       componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
