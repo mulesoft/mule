@@ -50,8 +50,7 @@ class EagerObjectCreator extends BeanDefinitionCreator<CreateComponentBeanDefini
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
-                        Consumer<ComponentAst> nestedComponentParamProcessor,
-                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+                        Consumer<ComponentAst> nestedComponentParamProcessor) {
     Class<ConfigurableObjectProvider> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (type == null) {
       return false;
@@ -99,8 +98,6 @@ class EagerObjectCreator extends BeanDefinitionCreator<CreateComponentBeanDefini
       createBeanDefinitionRequest.getSpringComponentModel().setObjectInstance(instance);
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(rootBeanDefinition(ConstantFactoryBean.class)
           .addConstructorArgValue(instance).getBeanDefinition());
-
-      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
 
       return true;
     }).orElse(false);

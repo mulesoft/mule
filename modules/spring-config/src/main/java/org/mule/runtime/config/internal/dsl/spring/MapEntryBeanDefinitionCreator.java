@@ -61,8 +61,7 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
-                        Consumer<ComponentAst> nestedComponentParamProcessor,
-                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+                        Consumer<ComponentAst> nestedComponentParamProcessor) {
     ComponentAst component = createBeanDefinitionRequest.getComponent();
     Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (!(MapEntryType.class.isAssignableFrom(type))) {
@@ -89,8 +88,6 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
         .addConstructorArgValue(value).getBeanDefinition();
 
     createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinition);
-
-    componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
 
     return true;
   }

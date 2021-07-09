@@ -40,8 +40,7 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentB
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
-                        Consumer<ComponentAst> nestedComponentParamProcessor,
-                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+                        Consumer<ComponentAst> nestedComponentParamProcessor) {
     ComponentAst component = createBeanDefinitionRequest.getComponent();
     if (component == null || !component.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
       return false;
@@ -75,8 +74,6 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentB
       processMuleProperties(component, beanDefinitionBuilder, null);
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
     }
-
-    componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
 
     return true;
   }

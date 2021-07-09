@@ -36,8 +36,7 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamB
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
-                        Consumer<ComponentAst> nestedComponentParamProcessor,
-                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+                        Consumer<ComponentAst> nestedComponentParamProcessor) {
     if (createBeanDefinitionRequest.getComponentHierarchy().isEmpty()) {
       return false;
     }
@@ -60,8 +59,6 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamB
       createBeanDefinitionRequest.getSpringComponentModel()
           .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(type)
               .addConstructorArgValue(managedList).getBeanDefinition());
-
-      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
 
       return true;
     }

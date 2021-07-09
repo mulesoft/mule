@@ -42,8 +42,7 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefi
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateParamBeanDefinitionRequest createBeanDefinitionRequest,
-                        Consumer<ComponentAst> nestedComponentParamProcessor,
-                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+                        Consumer<ComponentAst> nestedComponentParamProcessor) {
 
     if (createBeanDefinitionRequest.getComponentHierarchy().isEmpty()) {
       return false;
@@ -65,8 +64,6 @@ class MapBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefi
       createBeanDefinitionRequest.getSpringComponentModel()
           .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(MapFactoryBean.class)
               .addConstructorArgValue(managedList).addConstructorArgValue(type).getBeanDefinition());
-
-      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
 
       return true;
     }

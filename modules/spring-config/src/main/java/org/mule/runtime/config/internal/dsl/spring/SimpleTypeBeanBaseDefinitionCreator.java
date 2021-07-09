@@ -30,8 +30,7 @@ abstract class SimpleTypeBeanBaseDefinitionCreator<R extends CreateBeanDefinitio
   @Override
   protected final boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                         R createBeanDefinitionRequest,
-                                        Consumer<ComponentAst> nestedComponentParamProcessor,
-                                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+                                        Consumer<ComponentAst> nestedComponentParamProcessor) {
     Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
 
     if (!isSimpleType(type)) {
@@ -39,13 +38,7 @@ abstract class SimpleTypeBeanBaseDefinitionCreator<R extends CreateBeanDefinitio
     }
 
     createBeanDefinitionRequest.getSpringComponentModel().setType(type);
-    if (doHandleRequest(createBeanDefinitionRequest, type)) {
-      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
-
-      return true;
-    }
-
-    return false;
+    return doHandleRequest(createBeanDefinitionRequest, type);
   }
 
   protected abstract boolean doHandleRequest(R createBeanDefinitionRequest, Class<?> type);

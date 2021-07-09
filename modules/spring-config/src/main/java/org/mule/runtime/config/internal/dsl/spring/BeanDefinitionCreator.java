@@ -43,13 +43,12 @@ abstract class BeanDefinitionCreator<R extends CreateBeanDefinitionRequest> {
    */
   public final void processRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                    R request,
-                                   Consumer<ComponentAst> nestedComponentParamProcessor,
-                                   Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
-    if (handleRequest(springComponentModels, request, nestedComponentParamProcessor, componentBeanDefinitionHandler)) {
+                                   Consumer<ComponentAst> nestedComponentParamProcessor) {
+    if (handleRequest(springComponentModels, request, nestedComponentParamProcessor)) {
       return;
     }
     if (next != null) {
-      next.processRequest(springComponentModels, request, nestedComponentParamProcessor, componentBeanDefinitionHandler);
+      next.processRequest(springComponentModels, request, nestedComponentParamProcessor);
     }
   }
 
@@ -62,8 +61,7 @@ abstract class BeanDefinitionCreator<R extends CreateBeanDefinitionRequest> {
    */
   abstract boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                  R createBeanDefinitionRequest,
-                                 Consumer<ComponentAst> nestedComponentParamProcessor,
-                                 Consumer<SpringComponentModel> componentBeanDefinitionHandler);
+                                 Consumer<ComponentAst> nestedComponentParamProcessor);
 
   protected BeanDefinition getConvertibleBeanDefinition(Class<?> type, Object value, Optional<TypeConverter> converter) {
     return converter.map(typeConverter -> genericBeanDefinition(ConstantFactoryBean.class)

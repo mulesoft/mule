@@ -34,8 +34,7 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
-                        Consumer<ComponentAst> nestedComponentParamProcessor,
-                        Consumer<SpringComponentModel> componentBeanDefinitionHandler) {
+                        Consumer<ComponentAst> nestedComponentParamProcessor) {
     ComponentAst component = createBeanDefinitionRequest.getComponent();
     if (component != null
         && (component.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
@@ -55,8 +54,6 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder
           .addConstructorArgValue(managedMap)
           .getBeanDefinition());
-
-      componentBeanDefinitionHandler.accept(createBeanDefinitionRequest.getSpringComponentModel());
 
       return true;
     }
