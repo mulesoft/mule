@@ -27,4 +27,12 @@ public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionReques
           paramComponentIdentifier);
   }
 
+  @Override
+  public ComponentAst resolveConfigurationComponent() {
+    if (getParam().getValue().getRight() instanceof ComponentAst) {
+      return ((ComponentAst) getParam().getValue().getRight());
+    } else {
+      return null;
+    }
+  }
 }

@@ -25,4 +25,8 @@ public class CreateDslParamGroupBeanDefinitionRequest extends CreateBeanDefiniti
           paramComponentIdentifier);
   }
 
+  @Override
+  public ComponentAst resolveConfigurationComponent() {
+    return null;
+  }
 }

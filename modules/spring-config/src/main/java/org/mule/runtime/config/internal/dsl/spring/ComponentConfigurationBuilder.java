@@ -72,21 +72,23 @@ class ComponentConfigurationBuilder<T> {
 
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                        ComponentAst ownerComponent, ComponentAst component,
-                                       CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                       CreateBeanDefinitionRequest request,
                                        ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     this.ownerComponent = ownerComponent;
 
-    if (component != null) {
-      this.component = component;
-    } else if (createBeanDefinitionRequest.getParam() != null
-        && createBeanDefinitionRequest.getParam().getValue().getRight() instanceof ComponentAst) {
-      this.component = ((ComponentAst) createBeanDefinitionRequest.getParam().getValue().getRight());
-    } else {
-      this.component = null;
-    }
+    this.component = request.resolveConfigurationComponent();
+    // if (component != null) {
+    // this.component = component;
+    // } else if (request instanceof CreateParamBeanDefinitionRequest
+    // && request.getParam() != null
+    // && request.getParam().getValue().getRight() instanceof ComponentAst) {
+    // this.component = ((ComponentAst) request.getParam().getValue().getRight());
+    // } else {
+    // this.component = null;
+    // }
 
-    this.createBeanDefinitionRequest = createBeanDefinitionRequest;
+    this.createBeanDefinitionRequest = request;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
     this.complexParameters = collectComplexParametersWithTypes(springComponentModels, ownerComponent, component);
@@ -118,14 +120,11 @@ class ComponentConfigurationBuilder<T> {
         : createBeanDefinitionRequest.getParamsModels().stream();
 
     return baseStream
-        .map(springModel -> {
-          Class<?> beanDefinitionType = resolveBeanDefinitionType(springModel);
-          Object bean = springModel.getBeanDefinition() != null
-              ? springModel.getBeanDefinition()
-              : springModel.getBeanReference();
-          return new ComponentValue(springModel.getComponentIdentifier(), beanDefinitionType, bean);
-        })
-        .filter(Objects::nonNull)
+        .map(springModel -> new ComponentValue(springModel.getComponentIdentifier(),
+                                               resolveBeanDefinitionType(springModel),
+                                               springModel.getBeanDefinition() != null
+                                                   ? springModel.getBeanDefinition()
+                                                   : springModel.getBeanReference()))
         .collect(toList());
   }
 
@@ -509,9 +508,10 @@ class ComponentConfigurationBuilder<T> {
     @Override
     public void onValueFromTextContent() {
       if (component != null) {
+        // TODO MULE-18782 migrate this
         this.value = component.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
       } else {
-        getParameterValue(createBeanDefinitionRequest.getParam().getModel().getName(), null)
+        getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
             .ifPresent(v -> this.value = v);
       }
     }

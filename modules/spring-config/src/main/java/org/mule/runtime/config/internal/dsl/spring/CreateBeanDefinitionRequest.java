@@ -108,6 +108,11 @@ public abstract class CreateBeanDefinitionRequest {
     return springComponentModel;
   }
 
+  /**
+   * The {@link ComponentAst} to create a bean definition for this request
+   */
+  public abstract ComponentAst resolveConfigurationComponent();
+
   protected ComponentAst resolveOwnerComponent() {
     for (int i = getComponentHierarchy().size() - 1; i >= 0; --i) {
       final ComponentAst possibleOwner = getComponentHierarchy().get(i);

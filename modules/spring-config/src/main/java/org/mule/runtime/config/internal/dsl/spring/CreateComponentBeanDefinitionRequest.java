@@ -21,4 +21,8 @@ public class CreateComponentBeanDefinitionRequest extends CreateBeanDefinitionRe
     super(componentHierarchy, component, paramsModels, componentBuildingDefinition);
   }
 
+  @Override
+  public ComponentAst resolveConfigurationComponent() {
+    return getComponent();
+  }
 }
