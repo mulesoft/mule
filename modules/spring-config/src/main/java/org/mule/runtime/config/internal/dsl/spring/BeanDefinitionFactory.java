@@ -441,7 +441,8 @@ public class BeanDefinitionFactory {
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(component.getIdentifier())) {
       final CreateComponentBeanDefinitionRequest request =
           new CreateComponentBeanDefinitionRequest(componentHierarchy, component, paramsModels,
-                                                   buildingDefinitionOptional.orElse(null));
+                                                   buildingDefinitionOptional.orElse(null),
+                                                   nestedComponentParamProcessor);
       this.componentProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor);
       return of(request.getSpringComponentModel());
     } else {
@@ -494,7 +495,8 @@ public class BeanDefinitionFactory {
                                                      paramOwnerComponent,
                                                      param,
                                                      buildingDefinitionOptional.orElse(null),
-                                                     paramComponentIdentifier);
+                                                     paramComponentIdentifier,
+                                                     nestedComponentParamProcessor);
             this.paramProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor);
             return of(request.getSpringComponentModel());
           } else {

@@ -60,17 +60,17 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest,
+                        CreateComponentBeanDefinitionRequest request,
                         Consumer<ComponentAst> nestedComponentParamProcessor) {
-    ComponentAst component = createBeanDefinitionRequest.getComponent();
-    Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
+    ComponentAst component = request.getComponent();
+    Class<?> type = request.getSpringComponentModel().getType();
     if (!(MapEntryType.class.isAssignableFrom(type))) {
       return false;
     }
-    ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-    createBeanDefinitionRequest.getSpringComponentModel().setType(type);
+    ComponentBuildingDefinition componentBuildingDefinition = request.getComponentBuildingDefinition();
+    request.getSpringComponentModel().setType(type);
     final String key = component.getParameter(ENTRY_TYPE_KEY_PARAMETER_NAME).getResolvedRawValue();
-    MapEntryType mapEntryType = createBeanDefinitionRequest.getSpringComponentModel().getMapEntryType();
+    MapEntryType mapEntryType = request.getSpringComponentModel().getMapEntryType();
     Object keyBeanDefinition = getConvertibleBeanDefinition(mapEntryType.getKeyType(), key,
                                                             componentBuildingDefinition.getKeyTypeConverter());
 
@@ -81,13 +81,13 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
       value = new RuntimeBeanReference(valueRefParam.getResolvedRawValue());
     } else {
       value = getValue(springComponentModels, mapEntryType, component, componentBuildingDefinition,
-                       nestedComponentParamProcessor);
+                       request.getNestedComponentParamProcessor());
     }
 
     AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
         .addConstructorArgValue(value).getBeanDefinition();
 
-    createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinition);
+    request.getSpringComponentModel().setBeanDefinition(beanDefinition);
 
     return true;
   }

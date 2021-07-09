@@ -14,21 +14,25 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionRequest {
 
   private final ComponentAst paramOwnerComponent;
   private final ComponentParameterAst param;
+  private final Consumer<ComponentAst> nestedComponentParamProcessor;
 
   public CreateParamBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
                                           Collection<SpringComponentModel> paramsModels,
                                           ComponentAst paramOwnerComponent,
                                           ComponentParameterAst param,
                                           ComponentBuildingDefinition<?> componentBuildingDefinition,
-                                          ComponentIdentifier paramComponentIdentifier) {
+                                          ComponentIdentifier paramComponentIdentifier,
+                                          Consumer<ComponentAst> nestedComponentParamProcessor) {
     super(componentHierarchy, null, paramsModels, componentBuildingDefinition, paramComponentIdentifier);
     this.paramOwnerComponent = paramOwnerComponent;
     this.param = param;
+    this.nestedComponentParamProcessor = nestedComponentParamProcessor;
   }
 
   @Override
@@ -48,4 +52,7 @@ public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionReques
     return param;
   }
 
+  public Consumer<ComponentAst> getNestedComponentParamProcessor() {
+    return nestedComponentParamProcessor;
+  }
 }
