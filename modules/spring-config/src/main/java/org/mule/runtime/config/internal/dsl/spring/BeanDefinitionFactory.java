@@ -292,18 +292,12 @@ public class BeanDefinitionFactory {
                                                                           componentLocator));
         }
 
-        resolveComponentBeanDefinitionComplexParam(springComponentModels, updatedHierarchy, emptySet(), paramOwnerComponent,
+        resolveComponentBeanDefinitionComplexParam(springComponentModels, updatedHierarchy, registry, componentLocator,
+                                                   emptySet(), paramOwnerComponent,
                                                    param,
                                                    nestedComp -> resolveComponent(springComponentModels, componentHierarchy,
                                                                                   nestedComp, registry, componentLocator))
-                                                                                      .ifPresent(springComponentModel -> {
-                                                                                        paramsModels.add(springComponentModel);
-                                                                                        handleSpringComponentModel(springComponentModel,
-                                                                                                                   springComponentModels,
-                                                                                                                   registry,
-                                                                                                                   componentLocator);
-                                                                                        model.set(springComponentModel);
-                                                                                      });
+                                                                                      .ifPresent(model::set);
       }
 
       @Override
@@ -347,19 +341,13 @@ public class BeanDefinitionFactory {
                                                         componentLocator, childParamsModels, pmg)));
 
           updatedHierarchy.add(child);
-          resolveComponentBeanDefinitionComplexParam(springComponentModels, updatedHierarchy, childParamsModels,
+          resolveComponentBeanDefinitionComplexParam(springComponentModels, updatedHierarchy, registry, componentLocator,
+                                                     childParamsModels,
                                                      paramOwnerComponent, param,
                                                      nestedComp -> resolveComponent(springComponentModels,
                                                                                     componentHierarchy,
                                                                                     nestedComp, registry, componentLocator))
-                                                                                        .ifPresent(springComponentModel -> {
-                                                                                          paramsModels.add(springComponentModel);
-                                                                                          handleSpringComponentModel(springComponentModel,
-                                                                                                                     springComponentModels,
-                                                                                                                     registry,
-                                                                                                                     componentLocator);
-                                                                                          model.set(springComponentModel);
-                                                                                        });
+                                                                                        .ifPresent(model::set);
         }
       }
 
@@ -385,7 +373,9 @@ public class BeanDefinitionFactory {
       }
     });
 
-    return ofNullable(model.get());
+    Optional<SpringComponentModel> resolvedModel = ofNullable(model.get());
+    resolvedModel.ifPresent(paramsModels::add);
+    return resolvedModel;
   }
 
   protected Optional<SpringComponentModel> resolveParamBeanDefinitionSimpleType(Map<ComponentAst, SpringComponentModel> springComponentModels,
@@ -399,19 +389,14 @@ public class BeanDefinitionFactory {
       final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentHierarchy);
       updatedHierarchy.add(paramOwnerComponent);
       Optional<SpringComponentModel> complexParamModel =
-          resolveComponentBeanDefinitionComplexParam(springComponentModels, updatedHierarchy, emptySet(),
+          resolveComponentBeanDefinitionComplexParam(springComponentModels, updatedHierarchy, registry, componentLocator,
+                                                     emptySet(),
                                                      paramOwnerComponent,
                                                      param,
                                                      nestedComp -> resolveComponent(springComponentModels,
                                                                                     componentHierarchy,
                                                                                     nestedComp, registry, componentLocator));
-      complexParamModel.ifPresent(springComponentModel -> {
-        paramsModels.add(springComponentModel);
-        handleSpringComponentModel(springComponentModel,
-                                   springComponentModels,
-                                   registry,
-                                   componentLocator);
-      });
+      complexParamModel.ifPresent(paramsModels::add);
       return complexParamModel;
     } else {
       return empty();
@@ -439,6 +424,8 @@ public class BeanDefinitionFactory {
 
   private Optional<SpringComponentModel> resolveComponentBeanDefinitionComplexParam(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                                                                     List<ComponentAst> componentHierarchy,
+                                                                                    BeanDefinitionRegistry registry,
+                                                                                    SpringConfigurationComponentLocator componentLocator,
                                                                                     Collection<SpringComponentModel> paramsModels,
                                                                                     ComponentAst paramOwnerComponent,
                                                                                     ComponentParameterAst param,
@@ -485,6 +472,12 @@ public class BeanDefinitionFactory {
                                                      paramComponentIdentifier,
                                                      nestedComponentParamProcessor);
             this.paramProcessor.processRequest(springComponentModels, request);
+
+            handleSpringComponentModel(request.getSpringComponentModel(),
+                                       springComponentModels,
+                                       registry,
+                                       componentLocator);
+
             return of(request.getSpringComponentModel());
           } else {
             return empty();
