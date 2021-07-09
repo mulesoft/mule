@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -28,24 +27,8 @@ public abstract class CreateBeanDefinitionRequest {
   private final List<ComponentAst> componentHierarchy;
   private final ComponentAst component;
   private final Collection<SpringComponentModel> paramsModels;
-  private final ComponentAst paramOwnerComponentModel;
-  private final ComponentParameterAst param;
   private final ComponentBuildingDefinition componentBuildingDefinition;
   private final SpringComponentModel springComponentModel;
-
-  /**
-   * @param parentComponentModel        the container element of the holder for the configuration attributes defined by the user
-   * @param component                   the holder for the configuration attributes defined by the user
-   * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
-   */
-  public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,
-                                     ComponentAst component, List<SpringComponentModel> paramsModels,
-                                     ComponentBuildingDefinition componentBuildingDefinition) {
-    this(componentModelHierarchy, component, paramsModels, null, null, componentBuildingDefinition,
-         component != null
-             ? component.getIdentifier()
-             : componentBuildingDefinition.getComponentIdentifier());
-  }
 
   /**
    * @param parentComponentModel        the container element of the holder for the configuration attributes defined by the user
@@ -55,15 +38,11 @@ public abstract class CreateBeanDefinitionRequest {
   public CreateBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
                                      ComponentAst component,
                                      Collection<SpringComponentModel> paramsModels,
-                                     ComponentAst paramOwnerComponentModel,
-                                     ComponentParameterAst param,
                                      ComponentBuildingDefinition componentBuildingDefinition,
                                      ComponentIdentifier componentIdentifier) {
     this.componentHierarchy = componentHierarchy;
     this.component = component;
     this.paramsModels = paramsModels;
-    this.paramOwnerComponentModel = paramOwnerComponentModel;
-    this.param = param;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
     springComponentModel.setComponentIdentifier(componentIdentifier);
@@ -90,14 +69,6 @@ public abstract class CreateBeanDefinitionRequest {
 
   public Collection<SpringComponentModel> getParamsModels() {
     return paramsModels;
-  }
-
-  public ComponentAst getParamOwnerComponent() {
-    return paramOwnerComponentModel;
-  }
-
-  public ComponentParameterAst getParam() {
-    return param;
   }
 
   public ComponentBuildingDefinition getComponentBuildingDefinition() {

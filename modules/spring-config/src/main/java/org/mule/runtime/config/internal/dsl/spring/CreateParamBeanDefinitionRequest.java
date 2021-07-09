@@ -17,14 +17,18 @@ import java.util.List;
 
 public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionRequest {
 
+  private final ComponentAst paramOwnerComponent;
+  private final ComponentParameterAst param;
+
   public CreateParamBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
                                           Collection<SpringComponentModel> paramsModels,
                                           ComponentAst paramOwnerComponent,
                                           ComponentParameterAst param,
                                           ComponentBuildingDefinition<?> componentBuildingDefinition,
                                           ComponentIdentifier paramComponentIdentifier) {
-    super(componentHierarchy, null, paramsModels, paramOwnerComponent, param, componentBuildingDefinition,
-          paramComponentIdentifier);
+    super(componentHierarchy, null, paramsModels, componentBuildingDefinition, paramComponentIdentifier);
+    this.paramOwnerComponent = paramOwnerComponent;
+    this.param = param;
   }
 
   @Override
@@ -35,4 +39,13 @@ public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionReques
       return null;
     }
   }
+
+  public ComponentAst getParamOwnerComponent() {
+    return paramOwnerComponent;
+  }
+
+  public ComponentParameterAst getParam() {
+    return param;
+  }
+
 }

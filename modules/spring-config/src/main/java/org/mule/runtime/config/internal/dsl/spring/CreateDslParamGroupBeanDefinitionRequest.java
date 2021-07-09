@@ -16,17 +16,25 @@ import java.util.List;
 
 public class CreateDslParamGroupBeanDefinitionRequest extends CreateBeanDefinitionRequest {
 
+  private final ComponentAst paramOwnerComponent;
+
   public CreateDslParamGroupBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
                                                   Collection<SpringComponentModel> paramsModels,
                                                   ComponentAst paramOwnerComponent,
                                                   ComponentBuildingDefinition<?> componentBuildingDefinition,
                                                   ComponentIdentifier paramComponentIdentifier) {
-    super(componentHierarchy, null, paramsModels, paramOwnerComponent, null, componentBuildingDefinition,
+    super(componentHierarchy, null, paramsModels, componentBuildingDefinition,
           paramComponentIdentifier);
+    this.paramOwnerComponent = paramOwnerComponent;
   }
 
   @Override
   public ComponentAst resolveConfigurationComponent() {
     return null;
   }
+
+  public ComponentAst getParamOwnerComponent() {
+    return paramOwnerComponent;
+  }
+
 }

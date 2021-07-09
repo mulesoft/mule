@@ -18,7 +18,7 @@ public class CreateComponentBeanDefinitionRequest extends CreateBeanDefinitionRe
                                               ComponentAst component,
                                               List<SpringComponentModel> paramsModels,
                                               ComponentBuildingDefinition componentBuildingDefinition) {
-    super(componentHierarchy, component, paramsModels, componentBuildingDefinition);
+    super(componentHierarchy, component, paramsModels, componentBuildingDefinition, component.getIdentifier());
   }
 
   @Override
