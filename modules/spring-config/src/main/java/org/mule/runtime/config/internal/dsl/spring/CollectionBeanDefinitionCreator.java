@@ -13,7 +13,6 @@ import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -35,8 +34,7 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamB
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateParamBeanDefinitionRequest request,
-                        Consumer<ComponentAst> nestedComponentParamProcessor) {
+                        CreateParamBeanDefinitionRequest request) {
     if (request.getComponentHierarchy().isEmpty()) {
       return false;
     }

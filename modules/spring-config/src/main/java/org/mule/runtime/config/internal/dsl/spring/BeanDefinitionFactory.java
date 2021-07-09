@@ -200,8 +200,6 @@ public class BeanDefinitionFactory {
                                    nestedComp -> resolveComponent(springComponentModels, nestedHierarchy, nestedComp,
                                                                   registry, componentLocator))
                                                                       .ifPresent(springComponentModel -> handleSpringComponentModel(springComponentModel,
-                                                                                                                                    springComponentModel
-                                                                                                                                        .getComponent(),
                                                                                                                                     springComponentModels,
                                                                                                                                     registry,
                                                                                                                                     componentLocator));
@@ -233,19 +231,14 @@ public class BeanDefinitionFactory {
         final List<ComponentAst> nestedHierarchy = new ArrayList<>(componentHierarchy);
         nestedHierarchy.add(component);
 
-        resolveComponentBeanDefinitionDslParamGroup(springComponentModels, nestedHierarchy, groupParamsModels, groupModel,
-                                                    nestedComp -> resolveComponent(springComponentModels,
-                                                                                   componentHierarchy, nestedComp,
-                                                                                   registry, componentLocator))
-                                                                                       .ifPresent(springComponentModel -> {
-                                                                                         paramsModels.add(springComponentModel);
-                                                                                         handleSpringComponentModel(springComponentModel,
-                                                                                                                    springComponentModel
-                                                                                                                        .getComponent(),
-                                                                                                                    springComponentModels,
-                                                                                                                    registry,
-                                                                                                                    componentLocator);
-                                                                                       });
+        resolveComponentBeanDefinitionDslParamGroup(springComponentModels, nestedHierarchy, groupParamsModels, groupModel)
+            .ifPresent(springComponentModel -> {
+              paramsModels.add(springComponentModel);
+              handleSpringComponentModel(springComponentModel,
+                                         springComponentModels,
+                                         registry,
+                                         componentLocator);
+            });
       } else {
         paramsModels.addAll(groupParamsModels);
       }
@@ -294,7 +287,6 @@ public class BeanDefinitionFactory {
               .filter(Optional::isPresent)
               .map(Optional::get)
               .forEach(springComponentModel -> handleSpringComponentModel(springComponentModel,
-                                                                          springComponentModel.getComponent(),
                                                                           springComponentModels,
                                                                           registry,
                                                                           componentLocator));
@@ -307,8 +299,6 @@ public class BeanDefinitionFactory {
                                                                                       .ifPresent(springComponentModel -> {
                                                                                         paramsModels.add(springComponentModel);
                                                                                         handleSpringComponentModel(springComponentModel,
-                                                                                                                   springComponentModel
-                                                                                                                       .getComponent(),
                                                                                                                    springComponentModels,
                                                                                                                    registry,
                                                                                                                    componentLocator);
@@ -365,8 +355,6 @@ public class BeanDefinitionFactory {
                                                                                         .ifPresent(springComponentModel -> {
                                                                                           paramsModels.add(springComponentModel);
                                                                                           handleSpringComponentModel(springComponentModel,
-                                                                                                                     springComponentModel
-                                                                                                                         .getComponent(),
                                                                                                                      springComponentModels,
                                                                                                                      registry,
                                                                                                                      componentLocator);
@@ -420,7 +408,6 @@ public class BeanDefinitionFactory {
       complexParamModel.ifPresent(springComponentModel -> {
         paramsModels.add(springComponentModel);
         handleSpringComponentModel(springComponentModel,
-                                   springComponentModel.getComponent(),
                                    springComponentModels,
                                    registry,
                                    componentLocator);
@@ -443,7 +430,7 @@ public class BeanDefinitionFactory {
           new CreateComponentBeanDefinitionRequest(componentHierarchy, component, paramsModels,
                                                    buildingDefinitionOptional.orElse(null),
                                                    nestedComponentParamProcessor);
-      this.componentProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor);
+      this.componentProcessor.processRequest(springComponentModels, request);
       return of(request.getSpringComponentModel());
     } else {
       return empty();
@@ -497,7 +484,7 @@ public class BeanDefinitionFactory {
                                                      buildingDefinitionOptional.orElse(null),
                                                      paramComponentIdentifier,
                                                      nestedComponentParamProcessor);
-            this.paramProcessor.processRequest(springComponentModels, request, nestedComponentParamProcessor);
+            this.paramProcessor.processRequest(springComponentModels, request);
             return of(request.getSpringComponentModel());
           } else {
             return empty();
@@ -508,8 +495,7 @@ public class BeanDefinitionFactory {
   private Optional<SpringComponentModel> resolveComponentBeanDefinitionDslParamGroup(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                                                                      List<ComponentAst> componentHierarchy,
                                                                                      Collection<SpringComponentModel> paramsModels,
-                                                                                     ParameterGroupModel paramGroupModel,
-                                                                                     Consumer<ComponentAst> nestedComponentParamProcessor) {
+                                                                                     ParameterGroupModel paramGroupModel) {
     final ComponentAst paramOwnerComponentModel = componentHierarchy.get(componentHierarchy.size() - 1);
 
     return paramOwnerComponentModel.getGenerationInformation().getSyntax()
@@ -530,8 +516,7 @@ public class BeanDefinitionFactory {
                                                              paramOwnerComponentModel,
                                                              buildingDefinitionOptional.orElse(null),
                                                              paramGroupComponentIdentifier);
-            this.dslParamGroupProcessor.processRequest(springComponentModels, request,
-                                                       nestedComponentParamProcessor);
+            this.dslParamGroupProcessor.processRequest(springComponentModels, request);
 
             return of(request.getSpringComponentModel());
           } else {
@@ -540,10 +525,11 @@ public class BeanDefinitionFactory {
         });
   }
 
-  protected void handleSpringComponentModel(SpringComponentModel springComponentModel, ComponentAst component,
+  protected void handleSpringComponentModel(SpringComponentModel springComponentModel,
                                             Map<ComponentAst, SpringComponentModel> springComponentModels,
                                             BeanDefinitionRegistry registry,
                                             SpringConfigurationComponentLocator componentLocator) {
+    ComponentAst component = springComponentModel.getComponent();
     springComponentModels.put(component, springComponentModel);
 
     if (component == null) {

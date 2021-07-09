@@ -58,8 +58,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     springComponentModel.setType(SimpleTypeBeanDefinitionCreatorTestCase.class);
 
     // When
-    boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
-    });
+    boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest);
 
     // Then
     assertThat(result, is(false));
@@ -80,8 +79,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
     // When
-    boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
-    });
+    boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest);
 
     // Then
     assertThat(result, is(true));
@@ -103,8 +101,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
     // When
-    simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
-    });
+    simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest);
 
     // Then
     ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = forClass(BeanDefinition.class);
@@ -130,8 +127,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     mockComponentBuildingDefinition(createBeanDefinitionRequest, of(o -> TEST_STRING_RAW_VALUE));
 
     // When
-    simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
-    });
+    simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest);
 
     // Then
     ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = forClass(BeanDefinition.class);
@@ -157,8 +153,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
     // When
-    boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
-    });
+    boolean result = simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest);
 
     // Then
     assertThat(result, is(true));
@@ -181,8 +176,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
 
     // When
-    simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
-    });
+    simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest);
 
     // Then
     ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = forClass(BeanDefinition.class);
@@ -209,8 +203,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     mockComponentBuildingDefinition(createBeanDefinitionRequest, of(o -> TEST_STRING_RAW_VALUE));
 
     // When
-    simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest, c -> {
-    });
+    simpleTypeBeanDefinitionCreator.handleRequest(springComponentModels, createBeanDefinitionRequest);
 
     // Then
     ArgumentCaptor<BeanDefinition> beanDefinitionArgumentCaptor = forClass(BeanDefinition.class);

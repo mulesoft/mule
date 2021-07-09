@@ -15,7 +15,6 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 
@@ -41,14 +40,12 @@ abstract class BeanDefinitionCreator<R extends CreateBeanDefinitionRequest> {
    *
    * @param request
    */
-  public final void processRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                   R request,
-                                   Consumer<ComponentAst> nestedComponentParamProcessor) {
-    if (handleRequest(springComponentModels, request, nestedComponentParamProcessor)) {
+  public final void processRequest(Map<ComponentAst, SpringComponentModel> springComponentModels, R request) {
+    if (handleRequest(springComponentModels, request)) {
       return;
     }
     if (next != null) {
-      next.processRequest(springComponentModels, request, nestedComponentParamProcessor);
+      next.processRequest(springComponentModels, request);
     }
   }
 
@@ -56,12 +53,10 @@ abstract class BeanDefinitionCreator<R extends CreateBeanDefinitionRequest> {
    * Instances of {@code BeanDefinitionCreator} that will be responsible to create the {@code BeanDefinition} must return true to
    * this call, otherwise they must do nothing.
    *
-   * @param createBeanDefinitionRequest the creation request.
+   * @param request the creation request.
    * @return true if it created the {@code BeanDefinition}, false otherwise.
    */
-  abstract boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                 R createBeanDefinitionRequest,
-                                 Consumer<ComponentAst> nestedComponentParamProcessor);
+  abstract boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels, R request);
 
   protected BeanDefinition getConvertibleBeanDefinition(Class<?> type, Object value, Optional<TypeConverter> converter) {
     return converter.map(typeConverter -> genericBeanDefinition(ConstantFactoryBean.class)

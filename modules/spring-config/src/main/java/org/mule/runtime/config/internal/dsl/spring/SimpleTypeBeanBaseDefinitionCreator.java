@@ -14,7 +14,6 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Bean definition creator for elements that end up representing simple types.
@@ -29,8 +28,7 @@ abstract class SimpleTypeBeanBaseDefinitionCreator<R extends CreateBeanDefinitio
 
   @Override
   protected final boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                        R createBeanDefinitionRequest,
-                                        Consumer<ComponentAst> nestedComponentParamProcessor) {
+                                        R createBeanDefinitionRequest) {
     Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
 
     if (!isSimpleType(type)) {
