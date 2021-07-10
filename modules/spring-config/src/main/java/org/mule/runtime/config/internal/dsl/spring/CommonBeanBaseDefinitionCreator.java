@@ -142,11 +142,10 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
   protected final void processObjectConstructionParameters(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                                            ComponentAst ownerComponent, final ComponentAst componentModel,
                                                            CreateBeanDefinitionRequest createBeanDefinitionRequest,
-                                                           final ComponentBuildingDefinition componentBuildingDefinition,
                                                            final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
-    new ComponentConfigurationBuilder(springComponentModels, ownerComponent, componentModel, createBeanDefinitionRequest,
-                                      componentBuildingDefinition, beanDefinitionBuilderHelper)
-                                          .processConfiguration();
+    new ComponentConfigurationBuilder<>(springComponentModels, ownerComponent, componentModel, createBeanDefinitionRequest,
+                                        beanDefinitionBuilderHelper)
+                                            .processConfiguration();
 
   }
 

@@ -19,6 +19,7 @@ import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDef
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -44,7 +45,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -59,47 +59,35 @@ import org.springframework.beans.factory.support.ManagedMap;
  */
 class ComponentConfigurationBuilder<T> {
 
-  private static final Logger logger = LoggerFactory.getLogger(ComponentConfigurationBuilder.class);
+  private static final Logger LOGGER = getLogger(ComponentConfigurationBuilder.class);
 
   private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
   private final List<ComponentValue> complexParameters;
   private final ComponentAst ownerComponent;
   private final ComponentAst component;
-  private final CreateBeanDefinitionRequest createBeanDefinitionRequest;
-  private final ComponentBuildingDefinition<T> componentBuildingDefinition;
+  private final CreateBeanDefinitionRequest<T> createBeanDefinitionRequest;
   private final ParameterGroupUtils parameterGroupUtils = new ParameterGroupUtils();
 
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                        ComponentAst ownerComponent, ComponentAst component,
-                                       CreateBeanDefinitionRequest request,
-                                       ComponentBuildingDefinition<T> componentBuildingDefinition,
+                                       CreateBeanDefinitionRequest<T> request,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     this.ownerComponent = ownerComponent;
-
     this.component = request.resolveConfigurationComponent();
-    // if (component != null) {
-    // this.component = component;
-    // } else if (request instanceof CreateParamBeanDefinitionRequest
-    // && request.getParam() != null
-    // && request.getParam().getValue().getRight() instanceof ComponentAst) {
-    // this.component = ((ComponentAst) request.getParam().getValue().getRight());
-    // } else {
-    // this.component = null;
-    // }
-
     this.createBeanDefinitionRequest = request;
-    this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
     this.complexParameters = collectComplexParametersWithTypes(springComponentModels, ownerComponent, component);
   }
 
   public void processConfiguration() {
-    for (SetterAttributeDefinition setterAttributeDefinition : componentBuildingDefinition.getSetterParameterDefinitions()) {
+    for (SetterAttributeDefinition setterAttributeDefinition : createBeanDefinitionRequest.getComponentBuildingDefinition()
+        .getSetterParameterDefinitions()) {
       AttributeDefinition attributeDefinition = setterAttributeDefinition.getAttributeDefinition();
       attributeDefinition.accept(setterVisitor(setterAttributeDefinition.getAttributeName(), attributeDefinition));
     }
-    for (AttributeDefinition attributeDefinition : componentBuildingDefinition.getConstructorAttributeDefinition()) {
+    for (AttributeDefinition attributeDefinition : createBeanDefinitionRequest.getComponentBuildingDefinition()
+        .getConstructorAttributeDefinition()) {
       attributeDefinition.accept(constructorVisitor());
     }
   }
@@ -148,7 +136,7 @@ class ComponentConfigurationBuilder<T> {
         return Object.class;
       }
     } catch (ClassNotFoundException e) {
-      logger.debug("Exception trying to determine ComponentModel type: ", e);
+      LOGGER.debug("Exception trying to determine ComponentModel type: ", e);
       return Object.class;
     }
   }
@@ -316,7 +304,8 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onReferenceSimpleParameter(final String configAttributeName) {
-      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(configAttributeName)) {
+      if (!createBeanDefinitionRequest.getComponentBuildingDefinition().getIgnoredConfigurationParameters()
+          .contains(configAttributeName)) {
         getParameterValue(configAttributeName, null)
             .ifPresent(reference -> this.value = new RuntimeBeanReference((String) reference));
       }
@@ -324,7 +313,8 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onSoftReferenceSimpleParameter(String softReference) {
-      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(softReference)) {
+      if (!createBeanDefinitionRequest.getComponentBuildingDefinition().getIgnoredConfigurationParameters()
+          .contains(softReference)) {
         getParameterValue(softReference, null)
             .ifPresent(reference -> this.value = reference);
       }
@@ -342,7 +332,8 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
-      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(parameterName)) {
+      if (!createBeanDefinitionRequest.getComponentBuildingDefinition().getIgnoredConfigurationParameters()
+          .contains(parameterName)) {
         getParameterValue(parameterName, defaultValue)
             .map(parameterValue -> typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue)
             .ifPresent(convertedParameterValue -> this.value = convertedParameterValue);
@@ -354,11 +345,6 @@ class ComponentConfigurationBuilder<T> {
           .map(ownerComponentModel -> {
             Optional<ParameterGroupModel> groupModelOptional;
 
-            // int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
-            // final ComponentAst possibleGroup =
-            // ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
-            // ? component
-            // : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
             if (ownerComponentModel instanceof SourceModel) {
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
                                                                          createBeanDefinitionRequest.getSpringComponentModel()
@@ -384,7 +370,6 @@ class ComponentConfigurationBuilder<T> {
             }
 
             return p;
-            // }
           })
           .orElse(null);
 
@@ -408,7 +393,7 @@ class ComponentConfigurationBuilder<T> {
             .orElse(null);
 
         if (defaultValue != null && parameterValue == null) {
-          logger
+          LOGGER
               .warn("Paramerter {} from extension {} has a defaultValue configured in the componentBuildingDefinition but not in the extensionModel.",
                     parameterName, ownerComponent.getIdentifier().getNamespace());
           parameterValue = defaultValue;
@@ -443,10 +428,11 @@ class ComponentConfigurationBuilder<T> {
     public void onUndefinedSimpleParameters() {
       this.value = component.getModel(ParameterizedModel.class)
           .map(pm -> component.getParameters().stream()
-              .filter(param -> !componentBuildingDefinition.getIgnoredConfigurationParameters()
+              .filter(param -> !createBeanDefinitionRequest.getComponentBuildingDefinition().getIgnoredConfigurationParameters()
                   .contains(param.getModel().getName()))
               .filter(param -> param.getResolvedRawValue() != null)
-              .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getResolvedRawValue)))
+              .collect(toMap(param -> param.getModel().getName(),
+                             ComponentParameterAst::getResolvedRawValue)))
           .orElse(null);
     }
 

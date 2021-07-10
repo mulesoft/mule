@@ -69,7 +69,6 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
                                                  BeanDefinitionBuilder beanDefinitionBuilder) {
     final ComponentAst component = request.getComponent();
     processObjectConstructionParameters(springComponentModels, component, component, request,
-                                        componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
     processMuleProperties(component, beanDefinitionBuilder, beanDefinitionPostProcessor);
     if (componentBuildingDefinition.isPrototype()) {

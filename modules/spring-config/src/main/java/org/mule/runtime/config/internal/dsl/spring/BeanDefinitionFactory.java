@@ -300,6 +300,7 @@ public class BeanDefinitionFactory {
         if (complexValue instanceof List) {
           visitMultipleChildren((List) complexValue);
         } else {
+          // references to a list defined elsewhere
           resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
                                                componentLocator)
                                                    .ifPresent(model::set);
@@ -314,6 +315,7 @@ public class BeanDefinitionFactory {
           if (complexValue instanceof List) {
             visitMultipleChildren((List) complexValue);
           } else {
+            // references to a map defined elsewhere
             resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
                                                  componentLocator)
                                                      .ifPresent(model::set);

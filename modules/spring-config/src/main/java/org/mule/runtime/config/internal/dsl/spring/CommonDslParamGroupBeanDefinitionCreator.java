@@ -34,7 +34,6 @@ class CommonDslParamGroupBeanDefinitionCreator extends CommonBeanBaseDefinitionC
                                                  ComponentBuildingDefinition componentBuildingDefinition,
                                                  final BeanDefinitionBuilder beanDefinitionBuilder) {
     processObjectConstructionParameters(springComponentModels, request.getParamOwnerComponent(), null, request,
-                                        componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
     if (componentBuildingDefinition.isPrototype()) {
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);

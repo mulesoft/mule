@@ -22,12 +22,12 @@ import java.util.List;
  *
  * @since 4.0
  */
-public abstract class CreateBeanDefinitionRequest {
+public abstract class CreateBeanDefinitionRequest<T> {
 
   private final List<ComponentAst> componentHierarchy;
   private final ComponentAst component;
   private final Collection<SpringComponentModel> paramsModels;
-  private final ComponentBuildingDefinition componentBuildingDefinition;
+  private final ComponentBuildingDefinition<T> componentBuildingDefinition;
   private final SpringComponentModel springComponentModel;
 
   /**
@@ -38,7 +38,7 @@ public abstract class CreateBeanDefinitionRequest {
   public CreateBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
                                      ComponentAst component,
                                      Collection<SpringComponentModel> paramsModels,
-                                     ComponentBuildingDefinition componentBuildingDefinition,
+                                     ComponentBuildingDefinition<T> componentBuildingDefinition,
                                      ComponentIdentifier componentIdentifier) {
     this.componentHierarchy = componentHierarchy;
     this.component = component;
@@ -71,7 +71,7 @@ public abstract class CreateBeanDefinitionRequest {
     return paramsModels;
   }
 
-  public ComponentBuildingDefinition getComponentBuildingDefinition() {
+  public ComponentBuildingDefinition<T> getComponentBuildingDefinition() {
     return componentBuildingDefinition;
   }
 
