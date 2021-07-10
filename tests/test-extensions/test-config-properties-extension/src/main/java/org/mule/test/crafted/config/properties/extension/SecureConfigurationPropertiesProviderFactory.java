@@ -37,7 +37,7 @@ public class SecureConfigurationPropertiesProviderFactory implements Configurati
   public SecureConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
                                                               UnaryOperator<String> localResolver,
                                                               ResourceProvider externalResourceProvider) {
-    String file = providerElementDeclaration.getParameter("file").getResolvex`dRawValue();
+    String file = providerElementDeclaration.getParameter("file").getResolvedRawValue();
     requireNonNull(file, "Required attribute 'file' of 'secure-configuration-properties' not found");
 
     String algorithm = providerElementDeclaration.getParameter("encrypt", "algorithm").getResolvedRawValue();
