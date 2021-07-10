@@ -342,11 +342,7 @@ public class BeanDefinitionFactory {
                                                      childParamsModels, registry, componentLocator,
                                                      nestedComp -> resolveComponent(springComponentModels, componentHierarchy,
                                                                                     nestedComp, registry, componentLocator))
-                                                                                        .ifPresent(springComponentModel -> {
-                                                                                          springComponentModel
-                                                                                              .setComponent(child);
-                                                                                          model.set(springComponentModel);
-                                                                                        });
+                                                                                        .ifPresent(model::set);
         }
       }
 
@@ -467,6 +463,13 @@ public class BeanDefinitionFactory {
                                                      nestedComponentParamProcessor);
 
             this.paramProcessor.processRequest(springComponentModels, request);
+
+            param.getValue().applyRight(v -> {
+              if (v instanceof ComponentAst) {
+                request.getSpringComponentModel().setComponent((ComponentAst) v);
+              }
+            });
+
             handleSpringComponentModel(request.getSpringComponentModel(), springComponentModels, registry, componentLocator);
             return of(request.getSpringComponentModel());
           } else {
