@@ -342,7 +342,11 @@ public class BeanDefinitionFactory {
                                                      childParamsModels, registry, componentLocator,
                                                      nestedComp -> resolveComponent(springComponentModels, componentHierarchy,
                                                                                     nestedComp, registry, componentLocator))
-                                                                                        .ifPresent(model::set);
+                                                                                        .ifPresent(springComponentModel -> {
+                                                                                          springComponentModel
+                                                                                              .setComponent(child);
+                                                                                          model.set(springComponentModel);
+                                                                                        });
         }
       }
 
