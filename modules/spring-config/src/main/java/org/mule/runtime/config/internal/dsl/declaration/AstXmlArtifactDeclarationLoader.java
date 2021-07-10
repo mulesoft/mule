@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.dsl.declaration;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Predicates.alwaysTrue;
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.sort;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
@@ -398,7 +397,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         copyExplicitAttributes(model, resolveDocAttributes(component), declarer);
       }
 
-      declareNonInlineParameterGroup(declarer, component, elementDsl, group, groupDeclarer, groupAttributes);
+      declareNonInlineParameterGroup(declarer, component, elementDsl, group, groupDeclarer);
     }
     if (!groupDeclarer.getDeclaration().getParameters().isEmpty()) {
       declarer.withParameterGroup(groupDeclarer.getDeclaration());
@@ -407,12 +406,9 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
   private void declareNonInlineParameterGroup(ParameterizedElementDeclarer<?, ?> declarer, ComponentAst paramsOwner,
                                               final DslElementSyntax elementDsl, ParameterGroupModel group,
-                                              ParameterGroupElementDeclarer groupDeclarer,
-                                              final Map<String, ComponentParameterAst> groupAttributes) {
+                                              ParameterGroupElementDeclarer groupDeclarer) {
     group.getParameterModels()
         .stream()
-        // TODO MULE-17711 remove this filter
-        .filter(pm -> !groupAttributes.containsKey(pm.getName()))
         .forEach(param -> elementDsl.getChild(param.getName())
             .ifPresent(paramDsl -> {
               final Object paramValue = paramsOwner.getParameter(param.getName()).getValue().getRight();
@@ -538,7 +534,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                                  resolveParams(component, param -> groupParams.contains(param)));
             }
           } else {
-            declareNonInlineParameterGroup(declarer, component, modelDsl, group, groupDeclarer, emptyMap());
+            declareNonInlineParameterGroup(declarer, component, modelDsl, group, groupDeclarer);
           }
 
           if (!groupDeclarer.getDeclaration().getParameters().isEmpty()) {

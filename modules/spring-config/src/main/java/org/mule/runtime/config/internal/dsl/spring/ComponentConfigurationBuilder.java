@@ -12,7 +12,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
@@ -37,12 +36,10 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -77,7 +74,7 @@ class ComponentConfigurationBuilder<T> {
     this.component = request.resolveConfigurationComponent();
     this.createBeanDefinitionRequest = request;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
-    this.complexParameters = collectComplexParametersWithTypes(springComponentModels, ownerComponent, component);
+    this.complexParameters = collectComplexParametersWithTypes();
   }
 
   public void processConfiguration() {
@@ -92,22 +89,13 @@ class ComponentConfigurationBuilder<T> {
     }
   }
 
-  private List<ComponentValue> collectComplexParametersWithTypes(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                                 ComponentAst ownerComponent, ComponentAst component) {
+  private List<ComponentValue> collectComplexParametersWithTypes() {
     /*
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
 
-    final Stream<SpringComponentModel> baseStream = component != null
-        ? concat(createBeanDefinitionRequest.getParamsModels().stream(),
-                 // TODO MULE 17711 remove this second concat term
-                 component.directChildrenStream()
-                     .map(springComponentModels::get)
-                     .filter(Objects::nonNull))
-        : createBeanDefinitionRequest.getParamsModels().stream();
-
-    return baseStream
+    return createBeanDefinitionRequest.getParamsModels().stream()
         .map(springModel -> new ComponentValue(springModel.getComponentIdentifier(),
                                                resolveBeanDefinitionType(springModel),
                                                springModel.getBeanDefinition() != null
