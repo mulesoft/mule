@@ -9,8 +9,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
-import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
-import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
@@ -64,27 +62,12 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
     }
   }
 
-  protected final void processNestedAnnotations(ComponentAst component, Map<QName, Object> previousAnnotations) {
-    if (component == null) {
-      return;
-    }
-    component.directChildrenStream()
-        .filter(cdm -> cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER))
-        .findFirst()
-        .ifPresent(annotationsCdm -> annotationsCdm.directChildrenStream()
-            .forEach(annotationCdm -> previousAnnotations
-                .put(new QName(annotationCdm.getIdentifier().getNamespaceUri(),
-                               annotationCdm.getIdentifier().getName()),
-                     annotationCdm.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null))));
-  }
-
   protected final void processAnnotations(SpringComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
     if (Component.class.isAssignableFrom(componentModel.getType())
         // ValueResolver end up generating pojos from the extension whose class is enhanced to have annotations
         || ValueResolver.class.isAssignableFrom(componentModel.getType())) {
       Map<QName, Object> annotations =
           processMetadataAnnotationsHelper(beanDefinitionBuilder, componentModel.getComponent());
-      processNestedAnnotations(componentModel.getComponent(), annotations);
       if (!annotations.isEmpty()) {
         beanDefinitionBuilder.addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       }
