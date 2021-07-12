@@ -198,6 +198,11 @@ public class MacroExpansionModuleModel {
                 .name(DEFAULT_GLOBAL_ELEMENTS).build();
 
             @Override
+            public List<ComponentAst> recursiveChildren(AstTraversalDirection direction) {
+              return recursiveStream(direction).collect(toList());
+            }
+
+            @Override
             public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
               return Stream.concat(Stream.of(this),
                                    mappedGlobalElements.stream()
@@ -207,6 +212,11 @@ public class MacroExpansionModuleModel {
             @Override
             public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
               return recursiveStream(direction).spliterator();
+            }
+
+            @Override
+            public List<ComponentAst> directChildren() {
+              return mappedGlobalElements;
             }
 
             @Override
