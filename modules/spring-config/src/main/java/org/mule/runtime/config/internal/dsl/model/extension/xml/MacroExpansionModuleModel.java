@@ -198,11 +198,6 @@ public class MacroExpansionModuleModel {
                 .name(DEFAULT_GLOBAL_ELEMENTS).build();
 
             @Override
-            public List<ComponentAst> recursiveChildren(AstTraversalDirection direction) {
-              return recursiveStream(direction).collect(toList());
-            }
-
-            @Override
             public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
               return Stream.concat(Stream.of(this),
                                    mappedGlobalElements.stream()

@@ -301,11 +301,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           }
 
           @Override
-          public List<ComponentAst> recursiveChildren(AstTraversalDirection direction) {
-            return recursiveStream(direction).collect(toList());
-          }
-
-          @Override
           public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
             return parentArtifactAst.recursiveStream(direction);
           }
