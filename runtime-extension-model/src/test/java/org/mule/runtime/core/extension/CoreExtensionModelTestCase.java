@@ -875,6 +875,6 @@ public class CoreExtensionModelTestCase {
     assertThat(paramModel.getType(), instanceOf(DefaultBooleanType.class));
     assertThat(paramModel.isRequired(), is(false));
     assertThat(paramModel.getDefaultValue(), is(false));
-    assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Boolean.class.getName()));
+    assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(boolean.class.getName()));
   }
 }
