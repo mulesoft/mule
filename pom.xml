@@ -152,6 +152,8 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
+        <muleBomVersion>4.4.0-SNAPSHOT</muleBomVersion>
+
         <activemqVersion>5.15.12</activemqVersion>
         <antVersion>1.9.15</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
@@ -340,7 +342,7 @@
             <dependency>
                 <groupId>org.mule</groupId>
                 <artifactId>mule-runtime-bom</artifactId>
-                <version>${project.version}</version>
+                <version>${muleBomVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
