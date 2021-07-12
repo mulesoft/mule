@@ -39,6 +39,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -53,6 +54,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aPropertyWithDoc",
               "displayModel": {},
               "description": "Documentation for the property",
@@ -67,6 +69,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -81,6 +84,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aHiddenPropertyWithDoc",
               "displayModel": {},
               "description": "Documentation for the hidden property",
@@ -95,6 +99,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -109,6 +114,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aPropertyDisplayModel",
               "displayModel": {
                 "displayName": "A pretty name property",
@@ -127,6 +133,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -142,6 +149,7 @@
                 "tabName": "Not General Property"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aPropertyWithPlacement",
               "displayModel": {},
               "description": "",
@@ -156,6 +164,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": true,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -164,6 +173,7 @@
                 "allowTopLevelDefinition": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -266,6 +276,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -280,6 +291,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -335,6 +347,7 @@
             "MODULE-DOCUMENTATION:CUSTOM_ERROR_HERE",
             "MODULE-DOCUMENTATION:ANOTHER_CUSTOM_ERROR_HERE"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ANOTHER_OPERATION_WITH_DOC",
             "namespace": "MODULE-DOCUMENTATION",
@@ -359,6 +372,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -373,6 +387,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramWithDoc",
                   "displayModel": {},
                   "description": "Documentation for the parameter",
@@ -387,6 +402,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -401,6 +417,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "hiddenParamWithDoc",
                   "displayModel": {},
                   "description": "Documentation for the hidden parameter",
@@ -415,6 +432,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -429,6 +447,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramDisplayModel",
                   "displayModel": {
                     "displayName": "A pretty name parameter",
@@ -447,6 +466,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -462,6 +482,7 @@
                     "tabName": "Not General Parameter"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramWithPlacement",
                   "displayModel": {},
                   "description": "",
@@ -492,6 +513,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -509,6 +531,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -531,6 +554,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -545,6 +569,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -561,6 +586,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -576,6 +602,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -671,6 +698,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -685,6 +713,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -751,6 +780,7 @@
             "MODULE-DOCUMENTATION:CUSTOM_ERROR_HERE",
             "MODULE-DOCUMENTATION:ANOTHER_CUSTOM_ERROR_HERE"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "OPERATION-WITH-DOC",
             "namespace": "MODULE-DOCUMENTATION",
@@ -775,6 +805,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -789,6 +820,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramWithDoc",
                   "displayModel": {},
                   "description": "Documentation for the parameter",
@@ -803,6 +835,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -817,6 +850,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "hiddenParamWithDoc",
                   "displayModel": {},
                   "description": "Documentation for the hidden parameter",
@@ -831,6 +865,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -845,6 +880,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramDisplayModel",
                   "displayModel": {
                     "displayName": "A pretty name parameter",
@@ -863,6 +899,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -878,6 +915,7 @@
                     "tabName": "Not General Parameter"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "paramWithPlacement",
                   "displayModel": {},
                   "description": "",
@@ -908,6 +946,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -925,6 +964,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -947,6 +987,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -961,6 +1002,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -977,6 +1019,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -992,6 +1035,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1087,6 +1131,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1101,6 +1146,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {

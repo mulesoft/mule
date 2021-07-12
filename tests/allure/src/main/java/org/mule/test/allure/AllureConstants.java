@@ -68,6 +68,32 @@ public interface AllureConstants {
     }
   }
 
+  interface ArtifactDeploymentFeature {
+
+    String APP_DEPLOYMENT = "Application Deployment";
+    String DOMAIN_DEPLOYMENT = "Domain Deployment";
+    String POLICY_DEPLOYMENT = "Policy Deployment";
+    String POLICY_REORDER = "Policy Reorder";
+
+    interface DeploymentSuccessfulStory {
+
+      String DEPLOYMENT_SUCCESS = "Deployment Success";
+
+    }
+
+    interface DeploymentFailureStory {
+
+      String DEPLOYMENT_FAILURE = "Deployment Failure";
+
+    }
+
+    interface UndeploymentFailureStory {
+
+      String UNDEPLOYMENT = "Undeployment";
+
+    }
+  }
+
   interface DeploymentTypeFeature {
 
     String DEPLOYMENT_TYPE = "Deployment type";
@@ -83,7 +109,7 @@ public interface AllureConstants {
     interface RedeploymentStory {
 
       String APPLICATION_REDEPLOYMENT = "Application Redeployment";
-      String APPLICATION_PATCHING = "Application Redeployment";
+      String APPLICATION_PATCHING = "Application Patching";
 
     }
   }
@@ -108,6 +134,12 @@ public interface AllureConstants {
   interface DeploymentConfiguration {
 
     String DEPLOYMENT_CONFIGURATION = "Deployment Configuration";
+
+    interface ApplicationConfiguration {
+
+      String APPLICATION_CONFIGURATION = "Application Configuration";
+
+    }
 
     interface LazyConnectionsStory {
 
@@ -226,6 +258,13 @@ public interface AllureConstants {
       String LOGGER = "Logger";
 
     }
+
+    interface ParseTemplateStory {
+
+      String PARSE_TEMPLATE = "Parse Template";
+
+    }
+
   }
 
   interface FtpFeature {
@@ -276,8 +315,15 @@ public interface AllureConstants {
   interface OauthFeature {
 
     String OAUTH_EXTENSION = "OAuth Extension";
+    String OCS_SUPPORT = "OCS Support";
 
     interface OauthStory {
+
+    }
+
+    interface OcsStory {
+
+      String OCS_CONNECTION_VALIDATION = "Validation of OCS data provided by the platform";
 
     }
 
@@ -318,13 +364,14 @@ public interface AllureConstants {
       String REACTOR = "Reactor";
       String DIRECT = "Direct";
       String WORK_QUEUE = "Work Queue";
+      String ENRICHER = "Enricher";
     }
 
   }
 
   interface ForkJoinStrategiesFeature {
 
-    String FORK_JOIN_STRATEGIES = "Fork/Join Strategies used by scatter-gather and foreach routers";
+    String FORK_JOIN_STRATEGIES = "Fork/Join Strategies used by scatter-gather and parallel-foreach routers";
 
     interface ForkJoinStrategiesStory {
 
@@ -433,6 +480,10 @@ public interface AllureConstants {
 
     String SCHEDULER = "Scheduler";
 
+    interface SchedulerStories {
+
+      String SCHEDULED_FLOW_EXECUTION = "Scheduled flow execution";
+    }
   }
 
   interface StreamingFeature {
@@ -513,6 +564,19 @@ public interface AllureConstants {
 
     interface TransformMessageStory {
 
+    }
+
+  }
+
+  interface SourcesFeature {
+
+    String SOURCES = "Sources";
+
+    interface SourcesStories {
+
+      String FLOW_DISPATCH = "Dispatch to flow";
+      String POLLING = "Polling";
+      String WATERMARK = "Watermark";
     }
 
   }
@@ -756,4 +820,33 @@ public interface AllureConstants {
     }
   }
 
+  interface NotificationsFeature {
+
+    String NOTIFICATIONS = "Notifications";
+  }
+
+  interface ClusteringFeature {
+
+    String CLUSTERING = "Clustering";
+
+  }
+
+  interface ArtifactPatchingFeature {
+
+    String ARTIFACT_PATCHING = "Artifact Patching";
+
+    interface ArtifactPatchingStory {
+
+    }
+  }
+  interface VariablesValues {
+
+    String VARIABLES_VALUES = "Variables";
+
+    interface NullValue {
+
+      String NULL_VALUE = "Null value";
+    }
+
+  }
 }

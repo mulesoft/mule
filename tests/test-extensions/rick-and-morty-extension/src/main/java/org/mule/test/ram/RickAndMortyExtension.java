@@ -14,6 +14,9 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.annotation.SoapMessageDispatcherProviders;
+import org.mule.sdk.api.annotation.semantics.connectivity.Endpoint;
+import org.mule.sdk.api.annotation.semantics.connectivity.Port;
+import org.mule.sdk.api.annotation.semantics.connectivity.Url;
 
 import java.util.List;
 
@@ -27,12 +30,15 @@ public class RickAndMortyExtension implements SoapServiceProvider {
   public static final String RICKS_PHRASE = "WUBBA LUBBA DUB DUB";
 
   @Parameter
+  @Url
   private String wsdlUrl;
 
   @Parameter
+  @Endpoint
   private String service;
 
   @Parameter
+  @Port
   private String port;
 
   @Override

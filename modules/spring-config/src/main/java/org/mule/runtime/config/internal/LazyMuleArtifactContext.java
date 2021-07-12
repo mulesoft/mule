@@ -16,7 +16,6 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.exception.ExceptionUtils.hasCause;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
@@ -32,7 +31,9 @@ import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.g
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -57,28 +58,29 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.lazy.LazyExpressionManagerFactoryBean;
+import org.mule.runtime.config.internal.lazy.NoOpConnectivityTesterFactory;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.metadata.cache.DelegateMetadataCacheManager;
-import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.io.File;
@@ -97,7 +99,6 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -118,6 +119,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private static final String DEFAULT_METADATA_CACHE_MANAGER_KEY = "_defaultPersistentMetadataCacheManager";
   private static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
 
+  private final boolean dslDeclarationValidationEnabled;
+
   private TrackingPostProcessor trackingPostProcessor;
 
   private final Optional<ComponentModelInitializer> parentComponentModelInitializer;
@@ -132,26 +135,29 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * registry implementation to wraps the spring ApplicationContext
    *
    * @param muleContext                                the {@link MuleContext} that own this context
-   * @param artifactDeclaration                        the mule configuration defined programmatically
+   * @param artifactAst                                the definition of the artifact to create a context for
    * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *                                                   org.mule.runtime.config.internal.SpringRegistry
-   * @param parentConfigurationProperties
-   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
-   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
+   *                                                   in this artifact.
+   * @param artifactProperties                         map of properties that can be referenced from the
+   *                                                   {@code artifactConfigResources} as external configuration values
+   * @param artifactType                               the type of artifact to determine the base objects of the created context.
+   * @param parentComponentModelInitializer
+   * @param runtimeLockFactory
+   * @param componentBuildingDefinitionRegistryFactory
    * @since 4.0
    */
-  public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
-                                 ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
+  public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
+                                 OptionalObjectsController optionalObjectsController,
+                                 Optional<ConfigurationProperties> parentConfigurationProperties,
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
-                                 Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations,
                                  LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory)
       throws BeansException {
-    super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController, parentConfigurationProperties,
-          extendArtifactProperties(artifactProperties),
-          artifactType, disableXmlValidations, componentBuildingDefinitionRegistryFactory);
+    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
+          artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
@@ -159,6 +165,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
     final CustomizationService customizationService = muleContext.getCustomizationService();
+
+    customizationService.overrideDefaultServiceClass(OBJECT_EXPRESSION_MANAGER, LazyExpressionManagerFactoryBean.class);
+    customizationService.overrideDefaultServiceImpl(OBJECT_CONNECTIVITY_TESTER_FACTORY, new NoOpConnectivityTesterFactory());
     customizationService.overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
                                                     new LazyConnectivityTestingService(this, () -> getRegistry()
                                                         .<ConnectivityTestingService>lookupByName(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
@@ -178,6 +187,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                     MuleValueProviderService.class);
 
     customizationService.overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
+
+    dslDeclarationValidationEnabled = Boolean.valueOf(artifactProperties
+        .getOrDefault(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY, Boolean.FALSE.toString()));
 
     String sharedPartitionedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
     if (sharedPartitionedPersistentObjectStorePath != null) {
@@ -235,12 +247,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     super.prepareBeanFactory(beanFactory);
     trackingPostProcessor = new TrackingPostProcessor();
     addBeanPostProcessors(beanFactory, trackingPostProcessor);
-  }
-
-  private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
-    Map<String, String> extendedArtifactProperties = new HashMap<>(artifactProperties);
-    extendedArtifactProperties.put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "true");
-    return extendedArtifactProperties;
   }
 
   private void applyLifecycle(List<Object> components, boolean applyStartPhase) {
@@ -358,7 +364,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               && comp.getLocation().getLocation().equals(locationOptional.get().toString()));
 
       final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
-      doValidateModel(minimalApplicationModel);
+
+      if (dslDeclarationValidationEnabled) {
+        doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null
+            || v.getClass().getAnnotation(IgnoreOnLazyInit.class).forceDslDeclarationValidation());
+      } else {
+        doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null);
+      }
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null
@@ -564,28 +576,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   private void resetMuleSecurityManager() {
-    boolean registerMuleSecurityManager = false;
-    // Always unregister first the default security manager from Mule.
-    try {
-      getMuleRegistry().unregisterObject(OBJECT_SECURITY_MANAGER);
-      registerMuleSecurityManager = true;
-    } catch (Exception e) {
-      // NoSuchBeanDefinitionException can be ignored
-      if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
-        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule security manager"),
-                                       e);
-      }
-    }
-    if (registerMuleSecurityManager) {
-      try {
-        // Has to be created before as the factory for SecurityManager (MuleSecurityManagerConfigurator) is expecting to
-        // retrieve it (through MuleContext and registry) while creating it. See
-        // org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
-        getMuleRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"),
-                                       e);
-      }
+    SecurityManager securityManager = getMuleRegistry().get(OBJECT_SECURITY_MANAGER);
+
+    if (securityManager != null) {
+      securityManager.getProviders().forEach(p -> securityManager.removeProvider(p.getName()));
+      securityManager.getEncryptionStrategies().forEach(s -> securityManager.removeEncryptionStrategy(s.getName()));
     }
   }
 

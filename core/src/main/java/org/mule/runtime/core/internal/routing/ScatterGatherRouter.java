@@ -8,17 +8,12 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.emptyList;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static reactor.core.publisher.Flux.fromIterable;
 
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
@@ -27,8 +22,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
 import java.util.function.Consumer;
-
-import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 
@@ -49,20 +42,9 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
 
   private List<MessageProcessorChain> routes = emptyList();
 
-  @Inject
-  ConfigurationProperties configurationProperties;
-
   @Override
   protected Consumer<CoreEvent> onEvent() {
     return event -> validateMessageIsNotConsumable(event.getMessage());
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    super.initialise();
-    if (routes.size() < 2 && !isLazyInitMode(configurationProperties)) {
-      throw new InitialisationException(noEndpointsForRouter(), null);
-    }
   }
 
   @Override
@@ -76,8 +58,6 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   }
 
   public void setRoutes(List<MessageProcessorChain> routes) {
-    checkArgument(routes.size() > 1 || isLazyInitMode(configurationProperties),
-                  "At least 2 routes are required for ScatterGather");
     this.routes = routes;
   }
 

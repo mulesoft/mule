@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -41,11 +40,9 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
@@ -229,7 +226,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setRuntimeLockFactory(runtimeLockFactory);
 
       Domain domain = getApplicationDomain(domainRepository, descriptor);
-      if (domain.getRegistry() != null) {
+      if (domain.getArtifactContext() != null) {
         artifactBuilder.setParentArtifact(domain);
       }
       if (muleContextListener != null) {

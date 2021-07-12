@@ -31,17 +31,13 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"\n" +
         "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
-        "    <flow name=\"flow\">\n" +
-        "        <foreach collection=\"1, 2, 3\">\n" +
-        "            <logger message=\"hello\"/>\n" +
-        "        </foreach>\n" +
-        "    </flow>\n" +
+        "    <configuration correlationIdGeneratorExpression=\"1, 2, 3\"/>\n" +
         "\n" +
         "</mule>");
 
     assertThat(msg.isPresent(), is(true));
     assertThat(msg.get().getMessage(),
-               containsString("A static value ('1, 2, 3') was given for parameter 'collection' but it requires an expression"));
+               containsString("A static value ('1, 2, 3') was given for parameter 'correlationIdGeneratorExpression' but it requires an expression"));
   }
 
   @Test

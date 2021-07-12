@@ -40,14 +40,30 @@ public interface MuleConfiguration {
 
   String getDomainId();
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   String getSystemModelType();
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   String getSystemName();
 
   boolean isAutoWrapMessageAwareTransform();
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   boolean isCacheMessageAsBytes();
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   boolean isEnableStreaming();
 
   boolean isValidateExpressions();
@@ -55,7 +71,9 @@ public interface MuleConfiguration {
   /**
    * @return Whether this context was deployed in lazy init mode
    * @since 4.3.0
+   * @deprecated Since 4.4 this will always return {@code false}. Components/artifacts need not to know if the deployment is lazy.
    */
+  @Deprecated
   boolean isLazyInit();
 
   @Deprecated

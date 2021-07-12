@@ -14,6 +14,7 @@ public class MuleDeploymentProperties {
   public static final String DEPLOYMENT_PROPERTY_PREFIX = "mule.application.deployment";
   public static final String MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".muteLog";
 
+  // TODO MULE-19199 Review usages of this property
   public static final String MULE_LAZY_INIT_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".lazyInit";
   public static final String MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY =
       MULE_LAZY_INIT_DEPLOYMENT_PROPERTY + ".enableXmlValidations";

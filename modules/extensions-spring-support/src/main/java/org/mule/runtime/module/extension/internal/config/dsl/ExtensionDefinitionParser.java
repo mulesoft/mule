@@ -229,9 +229,7 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         protected void defaultVisit(MetadataType metadataType) {
-          if (!parseAsContent(metadataType)) {
-            parseAttributeParameter(parameter);
-          }
+          parseAttributeParameter(parameter);
         }
 
 
@@ -312,15 +310,7 @@ public abstract class ExtensionDefinitionParser {
 
         private boolean parseAsContent(MetadataType type) {
           if (isContent) {
-            parseFromTextExpression(parameter, paramDsl,
-                                    () -> value -> valueResolverFactory.of(parameter.getName(), type, value,
-                                                                           parameter.getDefaultValue(),
-                                                                           parameter.getExpressionSupport(),
-                                                                           parameter.isRequired(),
-                                                                           parameter.getModelProperties(),
-                                                                           acceptsReferences(parameter),
-                                                                           true));
-
+            parseAttributeParameter(parameter);
             return true;
           }
 
@@ -697,7 +687,9 @@ public abstract class ExtensionDefinitionParser {
   protected AttributeDefinition.Builder parseAttributeParameter(ParameterModel parameterModel) {
     return parseAttributeParameter(parameterModel.getName(), parameterModel.getName(), parameterModel.getType(),
                                    parameterModel.getDefaultValue(), parameterModel.getExpressionSupport(),
-                                   parameterModel.isRequired(), parameterModel.getModelProperties(),
+                                   parameterModel.isRequired(),
+                                   !parameterModel.getAllowedStereotypes().isEmpty(),
+                                   parameterModel.getModelProperties(),
                                    parameterModel.getAllowedStereotypes());
   }
 

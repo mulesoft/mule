@@ -52,7 +52,9 @@ public interface MuleContextBuilder {
 
   /**
    * @param errorTypeRepository error type repository to be used in the context, is not configured a default one will be used.
+   * @deprecated error type repo is determined from the application, it may not be set. This is a no-op since 4.4.
    */
+  @Deprecated
   void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository);
 
 

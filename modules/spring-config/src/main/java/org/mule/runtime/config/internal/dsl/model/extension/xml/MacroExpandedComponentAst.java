@@ -15,12 +15,10 @@ import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_P
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentGenerationInformation;
-import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
+import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.Collection;
@@ -92,11 +90,11 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
 
   private ComponentParameterAst mapIdParam(final ComponentParameterAst originalParameter) {
     requireNonNull(originalParameter);
-    return new ComponentParameterAst() {
+    return new BaseComponentParameterAstDecorator(originalParameter) {
 
       @Override
       public <T> Either<String, T> getValue() {
-        final Either<String, T> originalValue = originalParameter.getValue();
+        final Either<String, T> originalValue = getDecorated().getValue();
 
         if (originalValue.isLeft()) {
           final String expression = "#[" + originalValue.getLeft() + "]";
@@ -112,8 +110,8 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
             .mapRight(v -> {
               if (v instanceof String) {
                 return macroExpandedRawValue((String) v);
-              } else if (originalParameter.getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
-                return mapErrorMappings(originalParameter);
+              } else if (getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
+                return mapErrorMappings(getDecorated());
               }
               return v;
             });
@@ -132,12 +130,12 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
 
       @Override
       public String getRawValue() {
-        return macroExpandedRawValue(originalParameter.getRawValue());
+        return macroExpandedRawValue(getDecorated().getRawValue());
       }
 
       @Override
       public String getResolvedRawValue() {
-        return macroExpandedRawValue(originalParameter.getResolvedRawValue());
+        return macroExpandedRawValue(getDecorated().getResolvedRawValue());
       }
 
       private String macroExpandedRawValue(final String originalRawValue) {
@@ -152,25 +150,6 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         }
       }
 
-      @Override
-      public ParameterModel getModel() {
-        return originalParameter.getModel();
-      }
-
-      @Override
-      public Optional<ComponentMetadataAst> getMetadata() {
-        return originalParameter.getMetadata();
-      }
-
-      @Override
-      public ComponentGenerationInformation getGenerationInformation() {
-        return originalParameter.getGenerationInformation();
-      }
-
-      @Override
-      public boolean isDefaultValue() {
-        return originalParameter.isDefaultValue();
-      }
     };
   }
 

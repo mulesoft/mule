@@ -10,6 +10,9 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.WATERMARK;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.resetSource;
 
@@ -24,6 +27,12 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Stories({@Story(POLLING), @Story(WATERMARK)})
 public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static int TEST_TIMEOUT = 120000;
@@ -58,7 +67,7 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
 
   @Override
   protected String getConfigFile() {
-    return "polling-source-watermark-config.xml";
+    return "source/polling-source-watermark-config.xml";
   }
 
   @Test

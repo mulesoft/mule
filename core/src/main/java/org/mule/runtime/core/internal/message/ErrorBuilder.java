@@ -25,6 +25,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.internal.exception.SuppressedMuleException;
 
+import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -258,14 +259,19 @@ public final class ErrorBuilder {
     checkState(description != null, "description exception cannot be null");
     checkState(detailedDescription != null, "detailed description exception cannot be null");
     checkState(errorType != null, "errorType exception cannot be null");
-    return new ErrorImplementation(exception, description, detailedDescription, failingComponent, errorType, errorMessage,
-                                   errors, suppressedErrors);
+    return new DeserializableErrorImplementation(exception, description, detailedDescription, failingComponent, errorType,
+                                                 errorMessage, errors, suppressedErrors);
   }
 
   /**
    * Default and only implementation of {@link Error}.
+   *
+   * @deprecated - Use DeserializableErrorImplementation instead. It's deprecated because this class implements Serializable but
+   *             it contains an attribute of type Component, which isn't Serializable.
    */
-  private static final class ErrorImplementation implements PrivilegedError {
+  @Deprecated
+  // TODO MULE-19411: Remove this implementation with DeserializableErrorImplementation.
+  static final class ErrorImplementation implements PrivilegedError {
 
     private static final long serialVersionUID = -6904692174522094021L;
 
@@ -278,9 +284,13 @@ public final class ErrorBuilder {
     private final List<Error> errors;
     private final List<Error> suppressedErrors;
 
-    private ErrorImplementation(Throwable exception, String description, String detailedDescription,
-                                Component failingComponent, ErrorType errorType,
-                                Message errorMessage, List<Error> errors, List<Error> suppressedErrors) {
+    private Object readResolve() throws ObjectStreamException {
+      return builder(this).build();
+    }
+
+    ErrorImplementation(Throwable exception, String description, String detailedDescription,
+                        Component failingComponent, ErrorType errorType,
+                        Message errorMessage, List<Error> errors, List<Error> suppressedErrors) {
       this.exception = exception;
       this.description = description;
       this.detailedDescription = detailedDescription;
@@ -376,4 +386,116 @@ public final class ErrorBuilder {
 
   }
 
+  /**
+   * Default and only non-deprecated implementation of {@link Error}.
+   */
+  static final class DeserializableErrorImplementation implements PrivilegedError {
+
+    private static final long serialVersionUID = 6703483143042822990L;
+
+    private final Throwable exception;
+    private final String description;
+    private final String detailedDescription;
+    private final String failingComponent;
+    private final ErrorType errorType;
+    private final Message muleMessage;
+    private final List<Error> errors;
+    private final List<Error> suppressedErrors;
+
+    private DeserializableErrorImplementation(Throwable exception, String description, String detailedDescription,
+                                              Component failingComponent, ErrorType errorType,
+                                              Message errorMessage, List<Error> errors, List<Error> suppressedErrors) {
+      this.exception = exception;
+      this.description = description;
+      this.detailedDescription = detailedDescription;
+      this.failingComponent = failingComponent != null ? failingComponent.getRepresentation() : null;
+      this.errorType = errorType;
+      this.muleMessage = errorMessage;
+      this.errors = unmodifiableList(errors);
+      this.suppressedErrors = unmodifiableList(suppressedErrors);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDescription() {
+      return description;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDetailedDescription() {
+      return detailedDescription;
+    }
+
+    @Override
+    public String getFailingComponent() {
+      return failingComponent;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ErrorType getErrorType() {
+      return errorType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Throwable getCause() {
+      return exception;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Message getErrorMessage() {
+      return muleMessage;
+    }
+
+    @Override
+    public List<Error> getChildErrors() {
+      return errors;
+    }
+
+    @Override
+    public List<Error> getSuppressedErrors() {
+      return suppressedErrors;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder buf = new StringBuilder(120);
+
+      // format message for multi-line output, single-line is not readable
+      buf.append(lineSeparator());
+      buf.append(getClass().getName());
+      buf.append(lineSeparator());
+      buf.append("{");
+      buf.append(lineSeparator());
+      buf.append("  description=").append(description);
+      buf.append(lineSeparator());
+      buf.append("  detailedDescription=").append(detailedDescription);
+      buf.append(lineSeparator());
+      buf.append("  errorType=").append(errorType);
+      buf.append(lineSeparator());
+      buf.append("  cause=").append(exception.getClass().getName());
+      buf.append(lineSeparator());
+      buf.append("  errorMessage=").append(defaultIfNull(muleMessage, "-"));
+      buf.append(lineSeparator());
+      buf.append("  suppressedErrors=").append(suppressedErrors);
+      buf.append(lineSeparator());
+      buf.append("  childErrors=").append(errors);
+      buf.append(lineSeparator());
+      buf.append('}');
+      return buf.toString();
+    }
+  }
 }

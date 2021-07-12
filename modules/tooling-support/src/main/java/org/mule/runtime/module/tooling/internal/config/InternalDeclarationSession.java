@@ -12,8 +12,12 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
+import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -30,11 +34,14 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
+import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedMetadataCacheIdGenerator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataComponentExecutor;
@@ -46,6 +53,7 @@ import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +82,12 @@ public class InternalDeclarationSession implements DeclarationSession {
   @Inject
   private SampleDataService sampleDataService;
 
+  @Inject
+  @Named(METADATA_CACHE_MANAGER_KEY)
+  protected MetadataCacheManager metadataCacheManager;
+
+  private LazyValue<MetadataCacheIdGenerator<ElementDeclaration>> metadataCacheIdGeneratorLazyValue;
+
   private final LazyValue<ArtifactHelper> artifactHelperLazyValue;
   private final LazyValue<ValueProviderExecutor> valueProviderExecutorLazyValue;
   private final LazyValue<MetadataKeysExecutor> metadataKeysExecutorLazyValue;
@@ -81,6 +95,15 @@ public class InternalDeclarationSession implements DeclarationSession {
   private final LazyValue<SampleDataExecutor> sampleDataExecutorLazyValue;
 
   InternalDeclarationSession(ArtifactDeclaration artifactDeclaration) {
+    this.metadataCacheIdGeneratorLazyValue =
+        new LazyValue<>(() -> {
+          DslResolvingContext dslResolvingContext = DslResolvingContext.getDefault(extensionManager.getExtensions());
+          return new DeclarationBasedMetadataCacheIdGenerator(dslResolvingContext,
+                                                              location -> artifactDeclaration
+                                                                  .findElement(builderFromStringRepresentation(location
+                                                                      .toString()).build()));
+        });
+
     this.artifactHelperLazyValue =
         new LazyValue<>(() -> new ArtifactHelper(extensionManager, componentLocator, artifactDeclaration));
 
@@ -88,11 +111,13 @@ public class InternalDeclarationSession implements DeclarationSession {
         new LazyValue<>(() -> new ValueProviderExecutor(muleContext, connectionManager, expressionManager, reflectionCache,
                                                         artifactHelper()));
     this.metadataKeysExecutorLazyValue =
-        new LazyValue<>(() -> new MetadataKeysExecutor(connectionManager, reflectionCache, expressionManager, artifactHelper()));
+        new LazyValue<>(() -> new MetadataKeysExecutor(connectionManager, reflectionCache, expressionManager, artifactHelper(),
+                                                       metadataCacheIdGenerator(),
+                                                       metadataCacheManager));
 
     this.metadataComponentExecutorLazyValue =
         new LazyValue<>(() -> new MetadataComponentExecutor(connectionManager, reflectionCache, expressionManager,
-                                                            artifactHelper()));
+                                                            artifactHelper(), metadataCacheIdGenerator(), metadataCacheManager));
 
     this.sampleDataExecutorLazyValue =
         new LazyValue<>(() -> new SampleDataExecutor(muleContext, expressionManager, sampleDataService,
@@ -101,6 +126,10 @@ public class InternalDeclarationSession implements DeclarationSession {
 
   private ArtifactHelper artifactHelper() {
     return artifactHelperLazyValue.get();
+  }
+
+  private MetadataCacheIdGenerator<ElementDeclaration> metadataCacheIdGenerator() {
+    return metadataCacheIdGeneratorLazyValue.get();
   }
 
   private ValueProviderExecutor valueProviderExecutor() {
@@ -163,6 +192,32 @@ public class InternalDeclarationSession implements DeclarationSession {
   }
 
   @Override
+  public ValueResult getFieldValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName,
+                                    String targetSelector) {
+    Optional<ExtensionModel> optionalExtensionModel = artifactHelper().findExtension(parameterizedElementDeclaration);
+    if (!optionalExtensionModel.isPresent()) {
+      return resultFrom(newFailure()
+          .withMessage(extensionNotFoundErrorMessage(parameterizedElementDeclaration.getDeclaringExtension()))
+          .withFailureCode(COMPONENT_NOT_FOUND.getName())
+          .build());
+    }
+
+    Optional<? extends ParameterizedModel> optionalParameterizedModel =
+        artifactHelper().findModel(optionalExtensionModel.get(), parameterizedElementDeclaration);
+    if (!optionalParameterizedModel.isPresent()) {
+      return resultFrom(newFailure()
+          .withMessage(couldNotFindComponentErrorMessage(parameterizedElementDeclaration))
+          .withFailureCode(COMPONENT_NOT_FOUND.getName())
+          .build());
+    }
+    return valueProviderExecutor().resolveFieldValues(
+                                                      optionalParameterizedModel.get(),
+                                                      parameterizedElementDeclaration,
+                                                      providerName,
+                                                      targetSelector);
+  }
+
+  @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration componentElementDeclaration) {
     Optional<ExtensionModel> optionalExtensionModel = artifactHelper().findExtension(componentElementDeclaration);
     if (!optionalExtensionModel.isPresent()) {
@@ -205,7 +260,11 @@ public class InternalDeclarationSession implements DeclarationSession {
     }
 
     return metadataComponentExecutor().resolveComponentMetadata(optionalComponentModel.get(), componentElementDeclaration);
+  }
 
+  @Override
+  public void disposeMetadataCache(ComponentElementDeclaration componentElementDeclaration) {
+    metadataComponentExecutor().disposeMetadataCache(componentElementDeclaration);
   }
 
   @Override

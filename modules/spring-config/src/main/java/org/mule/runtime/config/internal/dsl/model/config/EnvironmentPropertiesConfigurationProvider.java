@@ -26,6 +26,8 @@ import java.util.function.Supplier;
  *
  * @since 4.1
  */
+// TODO MULE-18786 refactor this: split env and system properties resolution. env can be cached to avoid recalculating on every
+// deployment.
 public class EnvironmentPropertiesConfigurationProvider implements ConfigurationPropertiesProvider {
 
   private final Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.config.internal;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Default implementation of {@link OptionalObjectsController}
@@ -22,8 +22,6 @@ public class DefaultOptionalObjectsController implements OptionalObjectsControll
   private final Set<String> optionalKeys = new HashSet<>();
   private final Set<String> discardedKeys = new HashSet<>();
   private final Object discardedObjectPlaceholder = new Object();
-
-
 
   @Override
   public void registerOptionalKey(String key) {

@@ -77,26 +77,33 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
               .doOnNext(result -> result.apply(spfr -> {
                 CoreEvent event = spfr.getMessagingException().getEvent();
                 SourcePolicyContext ctx = from(event);
-                noSourcePolicy.get().commonPolicy.finishFlowProcessing(event,
-                                                                       result,
-                                                                       spfr.getMessagingException(), ctx);
-              },
-                                               spsr -> noSourcePolicy.get().commonPolicy.finishFlowProcessing(spsr.getResult(),
-                                                                                                              result)))
+                NoSourcePolicy strongReference = noSourcePolicy.get();
+                if (strongReference != null) {
+                  strongReference.commonPolicy.finishFlowProcessing(event, result, spfr.getMessagingException(), ctx);
+                }
+              }, spsr -> {
+                NoSourcePolicy strongReference = noSourcePolicy.get();
+                if (strongReference != null) {
+                  strongReference.commonPolicy.finishFlowProcessing(spsr.getResult(), result);
+                }
+              }))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 final MessagingException me = (MessagingException) t;
                 final InternalEvent event = (InternalEvent) me.getEvent();
 
-                noSourcePolicy.get().commonPolicy.finishFlowProcessing(event,
-                                                                       left(new SourcePolicyFailureResult(me, () -> from(event)
-                                                                           .getResponseParametersProcessor()
-                                                                           .getFailedExecutionResponseParametersFunction()
-                                                                           .apply(me.getEvent()))),
-                                                                       me,
-                                                                       from(event));
+                NoSourcePolicy strongReference = noSourcePolicy.get();
+                if (strongReference != null) {
+                  strongReference.commonPolicy.finishFlowProcessing(event,
+                                                                    left(new SourcePolicyFailureResult(me, () -> from(event)
+                                                                        .getResponseParametersProcessor()
+                                                                        .getFailedExecutionResponseParametersFunction()
+                                                                        .apply(me.getEvent()))),
+                                                                    me,
+                                                                    from(event));
+                }
               });
 
-      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for {}", this, e));
 
       return sinkRef.getFluxSink();
     }
@@ -117,6 +124,6 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
 
   @Override
   public Disposable deferredDispose() {
-    return () -> commonPolicy.dispose();
+    return commonPolicy::dispose;
   }
 }

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
@@ -48,10 +49,12 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -71,6 +74,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,6 +82,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
@@ -85,16 +90,19 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+
 /**
  * Contains test for domain deployment
  */
+@Feature(DOMAIN_DEPLOYMENT)
 public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   private static File pluginForbiddenJavaEchoTestClassFile;
@@ -405,7 +413,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
+    assertNotNull(domain.getArtifactContext().getRegistry());
     assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
   }
 
@@ -461,7 +469,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(dummyDomainBundleFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
+    assertNotNull(domain.getArtifactContext().getRegistry());
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
     assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
@@ -526,7 +534,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
+    assertNotNull(domain.getArtifactContext().getRegistry());
     assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
   }
 
@@ -1147,7 +1155,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     domain.stop();
 
-    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
     Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
@@ -1165,7 +1173,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
 
-    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(domain);
 
     Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
@@ -1393,7 +1401,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     final Domain domain = findADomain(dummyDomainFileBuilder.getId());
-    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
 
@@ -1429,7 +1437,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     // Ensure resources are registered at domain's registry
     Domain domain = findADomain(sharedDomainFileBuilder.getId());
-    assertThat(domain.getRegistry().lookupByName("http-listener-config").isPresent(), is(true));
+    assertThat(domain.getArtifactContext().getRegistry().lookupByName("http-listener-config").isPresent(), is(true));
 
     ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
 
@@ -1941,8 +1949,63 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     withContextClassLoader(anotherClassLoader, () -> completionCallback.error(new NullPointerException()));
   }
 
+  @Test
+  @Issue("MULE-19376")
+  @Description("When both the app as the extension share a resource with the same name, the runtime should choose the extension's when the resource is obtained at an operation")
+  public void pluginDeclaredInDomainIsAbleToGetResourceWithSameNameInAppAndExtensionFromExtension() throws Exception {
+    String resourceFileName = "file.txt";
+
+    final ApplicationFileBuilder applicationFileBuilder =
+        getApplicationWithResourceFileBuilder(classloaderConnectExtensionPlugin, "app-with-connection", resourceFileName);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    assertObtainedResourceIsCorrect("/org/foo/connection/extension/" + resourceFileName, "flowWhichConnects");
+  }
+
+  @Test
+  @Issue("MULE-19376")
+  @Description("When both the app as the extension share a resource with the same name, the runtime should choose the extension's when the resource is obtained at config")
+  public void pluginDeclaredInDomainIsAbleToGetResourceWithSameNameInAppAndExtensionFromExtensionInConfig() throws Exception {
+    String resourceFileName = "file.txt";
+
+    final ApplicationFileBuilder applicationFileBuilder =
+        getApplicationWithResourceFileBuilder(classloaderConfigConnectExtensionPlugin, "app-with-config-connection",
+                                              resourceFileName);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    assertObtainedResourceIsCorrect("/org/foo/connection/extension/" + resourceFileName, "flowWhichConnects");
+  }
+
+  private void assertObtainedResourceIsCorrect(String correctResourceLocation, String flowName) throws Exception {
+    File resourceFile = getResourceFile(correctResourceLocation);
+    BufferedReader reader = Files.newBufferedReader(resourceFile.toPath(), defaultCharset());
+
+    CoreEvent result = executeApplicationFlow(flowName, null);
+    assertThat(result.getMessage().getPayload().getValue(), is(equalTo(reader.readLine())));
+  }
+
+  private ApplicationFileBuilder getApplicationWithResourceFileBuilder(ArtifactPluginFileBuilder classloaderConfigConnectExtensionPlugin,
+                                                                       String appName, String resourceName) {
+    // Given a plugin which creates a connection.
+    final ArtifactPluginFileBuilder pluginWhichCreatesConnection = classloaderConfigConnectExtensionPlugin;
+
+    return new ApplicationFileBuilder(appName).definedBy(appName + ".xml")
+        .dependingOn(pluginWhichCreatesConnection)
+        .containingResource(resourceName, resourceName);
+  }
+
   private CompletionCallback<Object, Object> getCompletionCallback(String callbackName) {
-    Registry registry = deploymentService.getApplications().get(0).getRegistry();
+    Registry registry = deploymentService.getApplications().get(0).getArtifactContext().getRegistry();
     Map<String, CompletionCallback<Object, Object>> callbacksMap =
         (Map<String, CompletionCallback<Object, Object>>) registry.lookupByName("completion.callbacks").get();
     PollingProber.probe(() -> callbacksMap.containsKey(callbackName));

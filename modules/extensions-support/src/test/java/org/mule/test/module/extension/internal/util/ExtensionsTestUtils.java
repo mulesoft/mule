@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -47,6 +48,8 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
@@ -384,5 +387,12 @@ public final class ExtensionsTestUtils {
   public static void mockImplementingType(EnrichableModel model, Class<?> type) {
     when(model.getModelProperty(ImplementingTypeModelProperty.class))
         .thenReturn(java.util.Optional.of(new ImplementingTypeModelProperty(type)));
+  }
+
+  public static ConnectionProviderDeclaration findConnectionProvider(ConfigurationDeclaration configurationDeclaration,
+                                                                     final String connectionProviderName) {
+    return (ConnectionProviderDeclaration) find(configurationDeclaration.getConnectionProviders(),
+                                                connectionProvider -> ((ConnectionProviderDeclaration) connectionProvider)
+                                                    .getName().equals(connectionProviderName));
   }
 }

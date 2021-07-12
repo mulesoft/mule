@@ -46,6 +46,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "COPY-XSDTYPE1",
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
@@ -70,6 +71,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -84,6 +86,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aParameter",
               "displayModel": {},
               "description": "",
@@ -107,6 +110,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -121,6 +125,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -137,6 +142,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -152,6 +158,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -247,6 +254,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -261,6 +269,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -320,6 +329,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET-HARDCODED-XSDTYPE1",
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
@@ -344,6 +354,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -358,6 +369,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -374,6 +386,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -389,6 +402,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -484,6 +498,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -498,6 +513,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -557,6 +573,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "IS-XSDTYPE1",
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
@@ -581,6 +598,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -595,6 +613,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aParameter",
               "displayModel": {},
               "description": "",
@@ -618,6 +637,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -632,6 +652,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -648,6 +669,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -663,6 +685,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -758,6 +781,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -772,6 +796,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -831,6 +856,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "OPERATION-WITH-CUSTOM-TYPES",
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
@@ -855,6 +881,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -869,6 +896,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "value",
               "displayModel": {},
               "description": "",
@@ -883,6 +911,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -897,6 +926,7 @@
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "value2",
               "displayModel": {},
               "description": "",
@@ -920,6 +950,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -934,6 +965,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -950,6 +982,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -965,6 +998,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1060,6 +1094,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1074,6 +1109,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {

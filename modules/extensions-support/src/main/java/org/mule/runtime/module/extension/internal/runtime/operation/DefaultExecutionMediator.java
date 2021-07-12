@@ -22,6 +22,7 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
@@ -109,9 +110,10 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       stats.addInflightOperation();
     }
 
-    try {
-      getExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context).execute(() -> {
-        executeWithInterceptors(executor, context, stats, callback);
+    try (DeferredExecutorCallback deferredCallback =
+        new DeferredExecutorCallback(getDelegateExecutorCallback(stats, callback, context))) {
+      withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
+        executeWithInterceptors(executor, context, deferredCallback);
         return null;
       });
     } catch (Exception e) {
@@ -121,6 +123,48 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
+  private ExecutorCallback getDelegateExecutorCallback(final MutableConfigurationStats stats,
+                                                       ExecutorCallback callback,
+                                                       ExecutionContextAdapter<M> context) {
+    return new ExecutorCallback() {
+
+      @Override
+      public void complete(Object value) {
+        // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
+        // Race conditions appear otherwise, specially in connection pooling scenarios.
+        if (stats != null) {
+          if (!isConnectedStreamingOperation(operationModel)) {
+            stats.discountActiveComponent();
+          }
+          stats.discountInflightOperation();
+        }
+        try {
+          interceptorChain.onSuccess(context, value);
+          callback.complete(value);
+        } catch (Throwable t) {
+          try {
+            t = handleError(t, context);
+          } finally {
+            callback.error(t);
+          }
+        }
+      }
+
+      @Override
+      public void error(Throwable t) {
+        try {
+          t = handleError(t, context);
+        } finally {
+          if (stats != null) {
+            stats.discountInflightOperation();
+            stats.discountActiveComponent();
+          }
+          callback.error(t);
+        }
+      }
+    };
+  }
+
   private void executeWithRetry(ExecutionContextAdapter<M> context,
                                 RetryPolicyTemplate retryPolicy,
                                 Consumer<ExecutorCallback> executeCommand,
@@ -128,7 +172,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     retryPolicy.applyPolicy(() -> {
       CompletableFuture<Object> future = new CompletableFuture<>();
-      executeCommand.accept(new FutureExecutionCallbackDecorator(future));
+      executeCommand.accept(new FutureExecutionCallbackAdapter(future));
       return future;
     },
                             e -> shouldRetry(e, context),
@@ -147,52 +191,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
   private void executeWithInterceptors(CompletableComponentExecutor<M> executor,
                                        ExecutionContextAdapter<M> context,
-                                       MutableConfigurationStats stats,
                                        ExecutorCallback executorCallback) {
-
-    ExecutorCallback callbackDelegate = new ExecutorCallback() {
-
-      @Override
-      public void complete(Object value) {
-        // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
-        // Race conditions appear otherwise, specially in connection pooling scenarios.
-        if (stats != null) {
-          if (!isConnectedStreamingOperation(operationModel)) {
-            stats.discountActiveComponent();
-          }
-          stats.discountInflightOperation();
-        }
-        try {
-          interceptorChain.onSuccess(context, value);
-          executorCallback.complete(value);
-        } catch (Throwable t) {
-          try {
-            t = handleError(t, context);
-          } finally {
-            executorCallback.error(t);
-          }
-        }
-      }
-
-      @Override
-      public void error(Throwable t) {
-        try {
-          t = handleError(t, context);
-        } finally {
-          if (stats != null) {
-            stats.discountInflightOperation();
-            stats.discountActiveComponent();
-          }
-          executorCallback.error(t);
-        }
-      }
-    };
-
     RetryPolicyTemplate retryPolicy = context.getRetryPolicyTemplate().orElse(null);
     if (retryPolicy != null && retryPolicy.isEnabled()) {
-      executeWithRetry(context, retryPolicy, callback -> executeCommand(executor, context, callback), callbackDelegate);
+      executeWithRetry(context, retryPolicy, callback -> executeCommand(executor, context, callback), executorCallback);
     } else {
-      executeCommand(executor, context, callbackDelegate);
+      executeCommand(executor, context, executorCallback);
     }
   }
 
@@ -224,42 +228,58 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     return e;
   }
 
-  Throwable applyBeforeInterceptors(ExecutionContextAdapter executionContext) {
-    return interceptorChain.before(executionContext, null);
+  Throwable applyBeforeInterceptors(ExecutionContextAdapter context) {
+    try {
+      return withExecutionTemplate(context, () -> {
+        RetryPolicyTemplate retryPolicy = (RetryPolicyTemplate) context.getRetryPolicyTemplate().orElse(null);
+        if (retryPolicy != null && retryPolicy.isEnabled()) {
+          CompletableFuture<Throwable> result = new CompletableFuture<>();
+
+          executeWithRetry(context, retryPolicy, callback -> {
+            final Throwable t = interceptorChain.before(context, callback);
+            if (t == null) {
+              result.complete(null);
+            }
+          },
+                           new ExecutorCallback() {
+
+                             @Override
+                             public void complete(Object value) {
+                               result.complete((Throwable) value);
+                             }
+
+                             @Override
+                             public void error(Throwable e) {
+                               result.completeExceptionally(e);
+                             }
+
+                           });
+
+          return result.get();
+        } else {
+          return interceptorChain.before(context, null);
+        }
+      });
+    } catch (Exception e) {
+      return e;
+    }
   }
 
   void applyAfterInterceptors(ExecutionContext executionContext) {
     interceptorChain.abort(executionContext);
   }
 
-  private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<ComponentModel> context) {
+  private <T> T withExecutionTemplate(ExecutionContextAdapter<ComponentModel> context, ExecutionCallback<T> callback)
+      throws Exception {
     if (context.getTransactionConfig().isPresent()) {
       return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(),
-                                                                          context.getTransactionConfig().get()));
+                                                                          context.getTransactionConfig().get()))
+                                                                              .execute(callback);
     } else {
-      return (ExecutionTemplate<T>) defaultExecutionTemplate;
+      return ((ExecutionTemplate<T>) defaultExecutionTemplate)
+          .execute(callback);
     }
   }
-
-  private static class FutureExecutionCallbackDecorator implements ExecutorCallback {
-
-    private final CompletableFuture<Object> future;
-
-    private FutureExecutionCallbackDecorator(CompletableFuture<Object> future) {
-      this.future = future;
-    }
-
-    @Override
-    public void complete(Object value) {
-      future.complete(value);
-    }
-
-    @Override
-    public void error(Throwable e) {
-      future.completeExceptionally(e);
-    }
-  }
-
 
   private static class TransformingExecutionCallbackDecorator<M extends ComponentModel> implements ExecutorCallback {
 

@@ -18,6 +18,7 @@ import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveSimpleValue;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.sourceElementNameFromSimpleValue;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -39,8 +40,8 @@ import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -286,7 +287,8 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
   private Optional<MetadataCacheId> resolveKeyFromSimpleValue(DslElementModel<?> element) {
     return resolveSimpleValue(element, locator)
         .flatMap(either -> either.reduce(this::getIdForComponentMetadata,
-                                         r -> of(new MetadataCacheId(r.hashCode(), sourceElementNameFromSimpleValue(element)))));
+                                         r -> of(new MetadataCacheId(Objects.hashCode(r),
+                                                                     sourceElementNameFromSimpleValue(element)))));
   }
 
   private MetadataCacheId createCategoryMetadataCacheId(String category) {

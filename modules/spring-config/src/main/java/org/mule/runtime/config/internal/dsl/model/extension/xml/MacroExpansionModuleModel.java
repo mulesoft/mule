@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -23,6 +24,7 @@ import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyCompone
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -208,6 +210,11 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
+            public List<ComponentAst> directChildren() {
+              return mappedGlobalElements;
+            }
+
+            @Override
             public Stream<ComponentAst> directChildrenStream() {
               return mappedGlobalElements.stream();
             }
@@ -238,13 +245,18 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public ExtensionModel getExtension() {
+            public ExtensionModel getExtensionModel() {
               return extensionModel;
             }
 
             @Override
             public <M> Optional<M> getModel(Class<M> modelClass) {
               return empty();
+            }
+
+            @Override
+            public MetadataType getType() {
+              return null;
             }
 
             @Override
@@ -418,8 +430,12 @@ public class MacroExpansionModuleModel {
    * @return the suffix needed to be used when macro expanding elements, or {@link Optional#empty()} otherwise.
    */
   private Optional<String> getConfigRefName(ComponentAst operationRefModel) {
-    return Optional.ofNullable(operationRefModel.getRawParameterValue(MODULE_OPERATION_CONFIG_REF)
-        .orElseGet(() -> defaultGlobalElementName().orElse(null)));
+    ComponentParameterAst parameterAst = operationRefModel.getParameter(MODULE_OPERATION_CONFIG_REF);
+    if (parameterAst != null && parameterAst.getResolvedRawValue() != null) {
+      return of(parameterAst.getResolvedRawValue());
+    } else {
+      return defaultGlobalElementName();
+    }
   }
 
   /**

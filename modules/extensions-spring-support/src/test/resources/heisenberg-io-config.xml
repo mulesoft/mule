@@ -15,7 +15,7 @@
                        money="1000000"
                        initialHealth="CANCER"
                        finalHealth="DEAD"
-                       labAddress="Pollos Hermanos">
+                       labAddress="#['Pollos Hermanos']">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>

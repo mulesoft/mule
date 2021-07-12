@@ -39,6 +39,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -62,6 +63,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "stereotypableIronManConfig",
               "displayModel": {},
               "description": "",
@@ -76,6 +78,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -107,6 +110,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "stereotypableMultipleConfig",
               "displayModel": {},
               "description": "",
@@ -121,6 +125,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -144,6 +149,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "stereotypableWeirdConfig",
               "displayModel": {},
               "description": "",
@@ -158,6 +164,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": true,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -166,6 +173,7 @@
                 "allowTopLevelDefinition": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -268,6 +276,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -282,6 +291,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -334,6 +344,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CALL-FLOW",
             "namespace": "MODULE-STEREOTYPES",
@@ -358,6 +369,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -381,6 +393,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "reference",
                   "displayModel": {},
                   "description": "",
@@ -411,6 +424,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -428,6 +442,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -450,6 +465,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -464,6 +480,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -480,6 +497,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -495,6 +513,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -590,6 +609,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -604,6 +624,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -663,6 +684,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "DO-SOMETHING",
             "namespace": "MODULE-STEREOTYPES",
@@ -687,6 +709,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -701,6 +724,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "aData",
                   "displayModel": {},
                   "description": "",
@@ -731,6 +755,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -748,6 +773,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -770,6 +796,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -784,6 +811,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -800,6 +828,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -815,6 +844,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -910,6 +940,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -924,6 +955,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -962,6 +994,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "MODULE-STEREOTYPES",
@@ -982,6 +1015,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1005,6 +1039,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "stereotypableIronManConfigInConnection",
                   "displayModel": {},
                   "description": "",

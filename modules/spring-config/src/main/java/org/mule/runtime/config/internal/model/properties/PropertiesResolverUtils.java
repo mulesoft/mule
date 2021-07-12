@@ -21,7 +21,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PRO
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -34,8 +34,6 @@ import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationProper
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
@@ -47,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.namespace.QName;
 
@@ -56,8 +53,6 @@ import javax.xml.namespace.QName;
  *
  */
 public class PropertiesResolverUtils {
-
-  private static final AtomicBoolean configured = new AtomicBoolean();
 
   private PropertiesResolverUtils() {
     // Nothing to do
@@ -326,24 +321,6 @@ public class PropertiesResolverUtils {
     });
 
     return providerFactoriesMap;
-  }
-
-  /**
-   * Configures {@link FeatureFlaggingService} to revert MULE-17659 for applications with <code>minMuleVersion</code> lesser than
-   * or equal to 4.2.2, or if system property {@link MuleRuntimeFeature#HONOUR_RESERVED_PROPERTIES} is set. See MULE-17659 and
-   * MULE-19038.
-   *
-   * @since 4.4.0 4.3.0
-   */
-  public static void configurePropertiesResolverFeatureFlag() {
-
-    if (!configured.getAndSet(true)) {
-      FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-
-      ffRegistry.registerFeature(HONOUR_RESERVED_PROPERTIES,
-                                 ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
-                                     && ctx.getConfiguration().getMinMuleVersion().get().newerThan("4.2.2"));
-    }
   }
 
 }

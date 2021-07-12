@@ -34,6 +34,7 @@
         <module>test-crafted-extension</module>
         <module>test-config-properties-extension</module>
         <module>test-config-properties-extension-deprecated</module>
+        <module>test-localisation-properties-extension</module>
         <module>typed-value-extension</module>
         <module>parameter-resolver-extension</module>
         <module>mule-soap-extension</module>
@@ -46,6 +47,8 @@
         <module>classloading-extension</module>
         <module>resource-extension</module>
         <module>custom-object-store-extension</module>
+        <module>semantic-terms-extension</module>
+        <module>reusable-app</module>
     </modules>
 
     <build>

@@ -6,17 +6,20 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 
 public class ContributedErrorTypeRepository implements ErrorTypeRepository {
 
-  private ErrorTypeRepository delegate;
+  private ErrorTypeRepository delegate = MULE_CORE_ERROR_TYPE_REPOSITORY;
 
   @Override
   public ErrorType addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
@@ -67,7 +70,18 @@ public class ContributedErrorTypeRepository implements ErrorTypeRepository {
     this.delegate = delegate;
   }
 
+  @Override
+  public Set<ErrorType> getErrorTypes() {
+    return delegate.getErrorTypes();
+  }
+
+  @Override
+  public Set<ErrorType> getInternalErrorTypes() {
+    return delegate.getInternalErrorTypes();
+  }
+
   public ErrorTypeRepository getDelegate() {
     return delegate;
   }
+
 }

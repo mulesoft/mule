@@ -28,6 +28,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -61,7 +62,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
-  private DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+  private final DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
   private static String TEST_STRING_KEY = "test";
   private static String TEST_STRING_VALUE = "test_value";
   private static String TEST_STRING_KEY2 = "test2";

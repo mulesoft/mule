@@ -1,14 +1,14 @@
 {
   "name": "Test Functions",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.4.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "fn",
     "namespace": "http://www.mulesoft.org/schema/mule/fn",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/fn/current/mule-fn.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.4.0-SNAPSHOT",
     "xsdFileName": "mule-fn.xsd"
   },
   "resources": [],
@@ -117,6 +117,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": true,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -131,6 +132,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -216,6 +218,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "EVALUATE",
         "namespace": "FN",
@@ -258,6 +261,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -273,6 +277,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -286,6 +291,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -301,6 +307,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -318,6 +325,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -333,6 +341,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {
@@ -365,6 +374,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -380,6 +390,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -396,6 +407,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -412,6 +424,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -513,6 +526,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -528,6 +542,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -599,6 +614,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -612,6 +628,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "echo",
               "description": "",
               "modelProperties": {}
@@ -654,6 +671,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "false",
               "role": "BEHAVIOUR",
@@ -668,6 +686,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "bool",
               "description": "",
               "modelProperties": {}
@@ -696,6 +715,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -709,6 +729,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "number",
               "description": "",
               "modelProperties": {}
@@ -736,6 +757,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -749,6 +771,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "doubles",
               "description": "",
               "modelProperties": {}
@@ -776,6 +799,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -789,6 +813,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "floats",
               "description": "",
               "modelProperties": {}
@@ -817,6 +842,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -830,6 +856,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "longs",
               "description": "",
               "modelProperties": {}
@@ -857,6 +884,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -870,6 +898,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "shorts",
               "description": "",
               "modelProperties": {}
@@ -945,6 +974,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -959,6 +989,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -972,6 +1003,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "prefix_",
               "role": "BEHAVIOUR",
@@ -986,6 +1018,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "prefix",
               "description": "",
               "modelProperties": {}
@@ -1126,6 +1159,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1139,6 +1173,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "listToSplit",
               "description": "",
               "modelProperties": {}
@@ -1167,6 +1202,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1180,6 +1216,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "groupSize",
               "description": "",
               "modelProperties": {}
@@ -1286,6 +1323,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1299,6 +1337,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pojo",
               "description": "",
               "modelProperties": {}
@@ -1370,6 +1409,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1383,6 +1423,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stream",
               "description": "",
               "modelProperties": {}
@@ -1481,6 +1522,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1494,6 +1536,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "notObject",
               "description": "",
               "modelProperties": {}
@@ -1507,6 +1550,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1520,6 +1564,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "string",
               "description": "",
               "modelProperties": {}
@@ -1549,6 +1594,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1562,6 +1608,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stream",
               "description": "",
               "modelProperties": {}
@@ -1575,6 +1622,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1588,6 +1636,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -1650,6 +1699,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1663,6 +1713,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expression",
               "description": "",
               "modelProperties": {}
@@ -1692,6 +1743,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -1706,6 +1758,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "item",
               "description": "",
               "modelProperties": {}
@@ -1719,6 +1772,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1732,6 +1786,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "returnType",
               "description": "",
               "modelProperties": {}

@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.util.stream.Collectors.toCollection;
+
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 
 import java.util.Collection;
 import java.util.Map;
@@ -29,29 +30,41 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
+class CollectionBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
-    ObjectTypeVisitor objectTypeVisitor = createBeanDefinitionRequest.retrieveTypeVisitor();
-    if (Collection.class.isAssignableFrom(objectTypeVisitor.getType())) {
-      createBeanDefinitionRequest.getSpringComponentModel().setType(objectTypeVisitor.getType());
-      ManagedList<Object> managedList = new ManagedList<>();
+                        CreateParamBeanDefinitionRequest request) {
+    if (request.getComponentHierarchy().isEmpty()) {
+      return false;
+    }
 
-      componentModel.directChildrenStream()
-          .map(springComponentModels::get)
-          .map(innerSpringComp -> innerSpringComp.getBeanDefinition() == null
-              ? innerSpringComp.getBeanReference()
-              : innerSpringComp.getBeanDefinition())
-          .forEach(managedList::add);
-
-      createBeanDefinitionRequest.getSpringComponentModel()
-          .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(objectTypeVisitor.getType())
-              .addConstructorArgValue(managedList).getBeanDefinition());
+    Class<Object> type = request.getSpringComponentModel().getType();
+    if (Collection.class.isAssignableFrom(type)) {
+      doHandleRequest(springComponentModels, request, type);
       return true;
     }
+
     return false;
+  }
+
+  private void doHandleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                               CreateParamBeanDefinitionRequest request, Class<Object> type) {
+    request.getSpringComponentModel().setType(type);
+
+    Collection<ComponentAst> items = (Collection<ComponentAst>) request.getParam().getValue().getRight();
+
+    items.forEach(request.getNestedComponentParamProcessor());
+
+    ManagedList<Object> managedList = items.stream()
+        .map(springComponentModels::get)
+        .map(innerSpringComp -> innerSpringComp.getBeanDefinition() == null
+            ? innerSpringComp.getBeanReference()
+            : innerSpringComp.getBeanDefinition())
+        .collect(toCollection(ManagedList::new));
+
+    request.getSpringComponentModel()
+        .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(type)
+            .addConstructorArgValue(managedList).getBeanDefinition());
   }
 }

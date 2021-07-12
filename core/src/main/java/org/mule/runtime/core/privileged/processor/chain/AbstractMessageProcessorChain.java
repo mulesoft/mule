@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -64,6 +63,7 @@ import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptor
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -187,8 +187,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
             return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
                                             pub -> from(pub)
-                                                .map(event -> right(MessagingException.class, event))
-                                                .doOnNext(errorSwitchSinkSinkRef::next),
+                                                .map(event -> {
+                                                  final Either<MessagingException, CoreEvent> result =
+                                                      right(MessagingException.class, event);
+                                                  errorSwitchSinkSinkRef.next(result);
+                                                  return result;
+                                                }),
                                             inflightEvents,
                                             () -> {
                                               errorSwitchSinkSinkRef.complete();
@@ -198,9 +202,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                               errorSwitchSinkSinkRef.error(t);
                                               disposeIfNeeded(errorRouter, LOGGER);
                                             }))
-                                                .map(result -> result.reduce(me -> {
-                                                  throw propagateWrappingFatal(me);
-                                                }, response -> response));
+                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
           });
 
     } else {

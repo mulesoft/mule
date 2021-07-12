@@ -83,4 +83,15 @@ public class SourcesSampleDataByLocationTestCase extends AbstractSampleDataTestC
   public void complexActingParameter() throws Exception {
     assertMessage(getSourceSampleByLocation("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameter() throws Exception {
+    assertMessage(getSourceSampleByLocation("connectionLessWithBoundActingParameter"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromContentField() throws Exception {
+
+  }
 }

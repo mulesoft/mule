@@ -6,26 +6,19 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.util.regex.Pattern.compile;
-
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 public final class ParameterGroupUtils {
-
-  private final static Pattern SANITIZE_PATTERN = compile("\\s+");
-
-  private ParameterGroupUtils() {
-    // Nothing to do
-  }
 
   /**
    * Resolves a parameter from a source component, taking into account that the success/error callbacks on the source may have
@@ -40,39 +33,53 @@ public final class ParameterGroupUtils {
    * @param ownerComponentModel
    * @return the resolved parameter
    */
-  public static ComponentParameterAst getSourceCallbackAwareParameter(ComponentAst ownerComponent, String parameterName,
-                                                                      ComponentAst possibleGroup,
-                                                                      SourceModel ownerComponentModel) {
-    List<ParameterGroupModel> sourceParamGroups = new ArrayList<>();
-    sourceParamGroups.addAll(ownerComponentModel.getParameterGroupModels());
-    ownerComponentModel.getSuccessCallback()
-        .ifPresent(scb -> sourceParamGroups.addAll(scb.getParameterGroupModels()));
-    ownerComponentModel.getErrorCallback()
-        .ifPresent(ecb -> sourceParamGroups.addAll(ecb.getParameterGroupModels()));
+  public ComponentParameterAst getSourceCallbackAwareParameter(ComponentAst ownerComponent, String parameterName,
+                                                               ComponentIdentifier possibleGroup,
+                                                               SourceModel ownerComponentModel) {
 
-    for (ParameterGroupModel parameterGroupModel : sourceParamGroups) {
-      if (parameterGroupModel.getParameter(parameterName).isPresent()
-          && parameterGroupModel.isShowInDsl()
-          && getChildElementName(ownerComponent, parameterGroupModel)
-              .map(en -> possibleGroup.getIdentifier().getName().equals(en))
-              .orElse(false)) {
-        ComponentParameterAst parameter = ownerComponent.getParameter(parameterGroupModel.getName(), parameterName);
+    Optional<ParameterGroupModel> groupModelOptional =
+        getParameterGroupModel(ownerComponent, parameterName, possibleGroup, getSourceParamGroups(ownerComponentModel));
 
-        if (parameter == null) {
-          return ownerComponent.getParameter(parameterName);
-        } else {
-          return parameter;
-        }
-      }
+    if (!groupModelOptional.isPresent()) {
+      return null;
     }
 
-    return null;
+    ComponentParameterAst parameter = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
+
+    if (parameter == null) {
+      return ownerComponent.getParameter(parameterName);
+    }
+
+    return parameter;
+
   }
 
-  private static Optional<String> getChildElementName(ComponentAst ownerComponent, NamedObject component) {
+  public Optional<ParameterGroupModel> getParameterGroupModel(ComponentAst ownerComponent, String parameterName,
+                                                              ComponentIdentifier possibleGroup,
+                                                              List<ParameterGroupModel> groupModels) {
+    return groupModels.stream()
+        .filter(parameterGroupModel -> parameterGroupModel.getParameter(parameterName).isPresent() &&
+            parameterGroupModel.isShowInDsl() &&
+            getChildElementName(ownerComponent, parameterGroupModel)
+                .map(en -> possibleGroup != null && possibleGroup.getName().equals(en))
+                .orElse(false))
+        .findFirst();
+  }
+
+  private List<ParameterGroupModel> getSourceParamGroups(SourceModel ownerComponentModel) {
+    List<ParameterGroupModel> sourceParamGroups = new ArrayList<>(ownerComponentModel.getParameterGroupModels());
+
+    ownerComponentModel.getSuccessCallback()
+        .ifPresent(scb -> sourceParamGroups.addAll(scb.getParameterGroupModels()));
+
+    ownerComponentModel.getErrorCallback()
+        .ifPresent(ecb -> sourceParamGroups.addAll(ecb.getParameterGroupModels()));
+    return sourceParamGroups;
+  }
+
+  private Optional<String> getChildElementName(ComponentAst ownerComponent, NamedObject component) {
     return ownerComponent.getGenerationInformation().getSyntax()
         .flatMap(stx -> stx.getChild(component.getName()))
-        .map(child -> child.getElementName());
+        .map(DslElementSyntax::getElementName);
   }
-
 }

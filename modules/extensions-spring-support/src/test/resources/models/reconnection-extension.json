@@ -1,14 +1,14 @@
 {
   "name": "reconnection",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.4.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "reconnection",
     "namespace": "http://www.mulesoft.org/schema/mule/reconnection",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/reconnection/current/mule-reconnection.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.4.0-SNAPSHOT",
     "xsdFileName": "mule-reconnection.xsd"
   },
   "resources": [],
@@ -22,6 +22,10 @@
       "type": "Object",
       "annotations": {
         "typeId": "org.mule.runtime.api.scheduler.SchedulingStrategy",
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "SchedulingStrategy"
+        },
         "classInformation": {
           "classname": "org.mule.runtime.api.scheduler.SchedulingStrategy",
           "hasDefaultConstructor": false,
@@ -33,9 +37,6 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeAlias": {
-          "value": "SchedulingStrategy"
         }
       },
       "fields": []
@@ -87,6 +88,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -101,6 +103,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "configId",
               "description": "",
               "modelProperties": {}
@@ -114,6 +117,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": true,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -128,6 +132,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -230,6 +235,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -245,6 +251,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -325,6 +332,7 @@
             "RECONNECTION:RETRY_EXHAUSTED",
             "RECONNECTION:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_RETRY_POLICY_TEMPLATE",
             "namespace": "RECONNECTION",
@@ -365,6 +373,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -388,6 +397,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -416,6 +426,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -431,6 +442,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -447,6 +459,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -463,6 +476,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -564,6 +578,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -579,6 +594,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -753,6 +769,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -768,6 +785,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -861,6 +879,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "RECONNECTION",
@@ -902,6 +921,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -916,6 +936,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failOn",
                   "description": "",
                   "modelProperties": {}
@@ -969,6 +990,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -983,6 +1005,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "withErrorType",
                   "description": "",
                   "modelProperties": {}
@@ -1012,6 +1035,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1035,6 +1059,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1109,7 +1134,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -1172,6 +1204,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1187,6 +1220,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -1226,6 +1260,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1241,6 +1276,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1257,6 +1293,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -1273,6 +1310,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1374,6 +1412,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1389,6 +1428,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1563,6 +1603,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1578,6 +1619,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1661,6 +1703,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "STICKY_PAGED_OPERATION",
             "namespace": "RECONNECTION",
@@ -1702,6 +1745,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1716,6 +1760,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failOn",
                   "description": "",
                   "modelProperties": {}
@@ -1769,6 +1814,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1783,6 +1829,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "withErrorType",
                   "description": "",
                   "modelProperties": {}
@@ -1812,6 +1859,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1835,6 +1883,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1909,7 +1958,14 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "repeatable-file-store-iterable"
+                          "typeId": "repeatable-file-store-iterable",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/ee/core",
+                              "localPart": "repeatable-file-store-iterable",
+                              "prefix": "ee"
+                            }
+                          }
                         },
                         "fields": [
                           {
@@ -1972,6 +2028,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1987,6 +2044,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -2026,6 +2084,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -2041,6 +2100,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2057,6 +2117,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -2073,6 +2134,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2174,6 +2236,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -2189,6 +2252,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2363,6 +2427,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -2378,6 +2443,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2418,6 +2484,7 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "RECONNECTION",
@@ -2604,6 +2671,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -2619,6 +2687,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -2681,6 +2750,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FALLIBLE_RECONNECTABLE_SOURCE",
             "namespace": "RECONNECTION",
@@ -2721,6 +2791,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -2744,6 +2815,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2757,6 +2829,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "defaultValue": false,
                   "role": "BEHAVIOUR",
@@ -2773,6 +2846,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -2897,6 +2971,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -2912,6 +2987,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -3083,6 +3159,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -3098,6 +3175,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3159,6 +3237,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "NON_RECONNECTABLE_SOURCE",
             "namespace": "RECONNECTION",
@@ -3199,6 +3278,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -3222,6 +3302,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3235,6 +3316,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "defaultValue": false,
                   "role": "BEHAVIOUR",
@@ -3251,6 +3333,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -3375,6 +3458,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -3390,6 +3474,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -3561,6 +3646,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -3576,6 +3662,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3637,6 +3724,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "RECONECTION_SOURCE",
             "namespace": "RECONNECTION",
@@ -3677,6 +3765,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -3700,6 +3789,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3713,6 +3803,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "defaultValue": false,
                   "role": "BEHAVIOUR",
@@ -3729,6 +3820,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -3853,6 +3945,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -3868,6 +3961,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -4039,6 +4133,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4054,6 +4149,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4121,6 +4217,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": true,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -4135,6 +4232,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -4160,6 +4258,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "LONG-DISCONNECTION",
             "namespace": "RECONNECTION",
@@ -4346,6 +4445,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4361,6 +4461,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -4559,6 +4660,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4574,6 +4676,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -4642,6 +4745,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SYNC-SOURCE",
             "namespace": "RECONNECTION",
@@ -4682,6 +4786,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4705,6 +4810,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4718,6 +4824,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "defaultValue": false,
                   "role": "BEHAVIOUR",
@@ -4734,6 +4841,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -4747,6 +4855,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4761,6 +4870,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "schedulingStrategy",
                   "description": "Configures the scheduler that triggers the polling",
                   "modelProperties": {
@@ -4896,6 +5006,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4911,6 +5022,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -5082,6 +5194,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5097,6 +5210,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5171,6 +5285,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SWITCH_CONNECTION",
         "namespace": "RECONNECTION",
@@ -5265,6 +5380,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -5280,6 +5396,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {

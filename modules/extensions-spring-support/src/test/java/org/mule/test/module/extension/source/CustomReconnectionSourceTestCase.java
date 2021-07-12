@@ -9,8 +9,11 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.probe;
+import static org.mule.test.allure.AllureConstants.ReconnectionPolicyFeature.RECONNECTION_POLICIES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.heisenberg.extension.ReconnectableHeisenbergSource.failedReconnections;
 import static org.mule.test.heisenberg.extension.ReconnectableHeisenbergSource.succesfulReconnections;
+
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -18,6 +21,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+
+@Features({@Feature(SOURCES), @Feature(RECONNECTION_POLICIES)})
 public class CustomReconnectionSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   public static final int TIMEOUT_MILLIS = 50000;
@@ -28,7 +35,7 @@ public class CustomReconnectionSourceTestCase extends AbstractExtensionFunctiona
 
   @Override
   protected String getConfigFile() {
-    return "custom-reconnection-source-config.xml";
+    return "source/custom-reconnection-source-config.xml";
   }
 
   @Override

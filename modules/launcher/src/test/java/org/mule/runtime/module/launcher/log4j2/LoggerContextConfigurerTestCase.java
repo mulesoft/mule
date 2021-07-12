@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -134,6 +135,16 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
       LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
       verify(rootLogger).addAppender(forcedConsoleAppender, Level.ALL, null);
     });
+  }
+
+  @Test
+  public void replaceColonWithDash() {
+    when(context.getArtifactName()).thenReturn("my:app");
+    when(context.isArtifactClassloader()).thenReturn(true);
+    contextConfigurer.update(context);
+    ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
+    verify(context.getConfiguration(), atLeastOnce()).addAppender(appenderCaptor.capture());
+    assertThat(appenderCaptor.getValue().getFileName().contains(":"), is(false));
   }
 
   @Test

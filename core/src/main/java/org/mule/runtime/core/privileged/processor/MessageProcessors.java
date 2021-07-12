@@ -9,9 +9,10 @@ package org.mule.runtime.core.privileged.processor;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
@@ -55,7 +56,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -455,7 +455,7 @@ public class MessageProcessors {
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
-            .map(propagateErrorResponseMapper())
+            .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
             .toProcessor())
         .map(MessageProcessors::toParentContext)
         .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
@@ -502,15 +502,16 @@ public class MessageProcessors {
                     .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
                                                                            completeParentIfEmpty, propagateErrors))
                     .transform(processor)
-                    .doOnNext(completeSuccessIfNeeded())
-                    .map(event -> right(MessagingException.class, event))
                     // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
                     // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
-                    .doOnError(t -> errorSwitchSinkSinkRef.error(t))
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
+                    .map(event -> right(MessagingException.class, event));
 
-                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream)
-                    .map(propagateErrorResponseMapper().andThen(MessageProcessors::toParentContext));
+                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
+                                                            completeSuccessEitherIfNeeded(),
+                                                            errorSwitchSinkSinkRef::error,
+                                                            errorSwitchSinkSinkRef::complete)
+                                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
+                                                                    .andThen(MessageProcessors::toParentContext));
               }
             }));
   }
@@ -566,12 +567,6 @@ public class MessageProcessors {
         LOGGER.error("Uncaught exception in childContextResponseHandler", e);
       }
     });
-  }
-
-  private static Function<? super Either<MessagingException, CoreEvent>, ? extends CoreEvent> propagateErrorResponseMapper() {
-    return result -> result.reduce(me -> {
-      throw propagateWrappingFatal(me);
-    }, response -> response);
   }
 
   private static CoreEvent toParentContext(final CoreEvent event) {
@@ -669,16 +664,52 @@ public class MessageProcessors {
     };
   }
 
+  private static Consumer<Either<MessagingException, CoreEvent>> completeSuccessEitherIfNeeded() {
+    return result -> result.applyRight(completeSuccessIfNeeded());
+  }
+
+  /**
+   * Helper method to get the {@link ProcessingStrategy} from a component.
+   *
+   * @param locator   the locator
+   * @param component the component from which root the processing strategy will be obtained
+   * @return the processing strategy of the root of the component if it was an instance of {@link ProcessingStrategySupplier},
+   *         empty otherwise.
+   */
+  public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
+                                                                   Component component) {
+    if (component.getLocation() == null) {
+      return empty();
+    }
+
+    return component.getLocation().getParts().get(0).getPartIdentifier()
+        // This filter is consistent with the types that implement ProcessingStrategySupplier
+        .filter(id -> id.getType().equals(FLOW)
+            // a top level router is a policy...
+            || id.getType().equals(ROUTER))
+        .flatMap(id -> getProcessingStrategy(locator, component.getRootContainerLocation()));
+  }
+
   /**
    * Helper method to get the {@link ProcessingStrategy} from a component.
    *
    * @param locator               the locator
    * @param rootContainerLocation the component root container element
-   * @return the processing strategy of the root component if it was an instance of {@link FlowConstruct}, empty otherwise.
+   * @return the processing strategy of the root component if it was an instance of {@link ProcessingStrategySupplier}, empty
+   *         otherwise.
+   *
+   * @deprecated Use {@link #getProcessingStrategy(ConfigurationComponentLocator, Component)} instead.
    */
+  @Deprecated
   public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
                                                                    Location rootContainerLocation) {
-    return locator.find(rootContainerLocation)
+    final Optional<Component> found = locator.find(rootContainerLocation);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("getProcessingStrategy - location: {} -> found: {}", rootContainerLocation,
+                   found.map(loc -> loc.getClass().getSimpleName() + ": " + loc.getLocation().getLocation()).orElse("(null)"));
+    }
+
+    return found
         .filter(loc -> loc instanceof ProcessingStrategySupplier)
         .map(loc -> ((ProcessingStrategySupplier) loc).getProcessingStrategy());
   }

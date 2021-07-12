@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -52,7 +51,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
     Application application = mock(Application.class, RETURNS_DEEP_STUBS);
 
-    Registry registry = application.getRegistry();
+    Registry registry = application.getArtifactContext().getRegistry();
     doReturn(of(mockContextWithServices())).when(registry).lookupByType(MuleContext.class);
     doReturn(of(mock(ExtensionManager.class))).when(registry).lookupByName(OBJECT_EXTENSION_MANAGER);
 
@@ -63,7 +62,6 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
         new DefaultApplicationPolicyInstance(application, policyTemplate,
                                              parameterization, mock(ServiceRepository.class),
                                              mock(ClassLoaderRepository.class),
-                                             emptyList(), emptyList(),
                                              mock(ExtensionModelLoaderRepository.class),
                                              muleContextListener);
 

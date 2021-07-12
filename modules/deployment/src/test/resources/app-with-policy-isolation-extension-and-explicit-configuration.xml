@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:policy-configuration="http://www.mulesoft.org/schema/mule/policy-configuration"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/policy-configuration http://www.mulesoft.org/schema/mule/policy-configuration/current/mule-policy-configuration.xsd">
+
+    <policy-configuration:config name="test" configurationParameter="non default value"/>
+
+    <flow name="main">
+        <scheduler>
+            <scheduling-strategy>
+                <fixed-frequency frequency="10000"/>
+            </scheduling-strategy>
+        </scheduler>
+        <set-payload value=""/>
+        <policy-configuration:check-explicit-configuration config-ref="test"/>
+    </flow>
+</mule>

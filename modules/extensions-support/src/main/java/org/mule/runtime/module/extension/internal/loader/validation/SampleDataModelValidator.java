@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTyp
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -119,7 +120,7 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
     }
 
     Map<String, MetadataType> allParameters =
-        model.getAllParameterModels().stream().collect(toMap(IntrospectionUtils::getImplementingName, ParameterModel::getType));
+        model.getAllParameterModels().stream().collect(toMap(ParameterModel::getName, ParameterModel::getType));
     String modelName = getModelName(model);
     String modelTypeName = getComponentModelTypeName(model);
 
@@ -129,24 +130,29 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
 
     for (InjectableParameterInfo parameterInfo : modelProperty.getInjectableParameters()) {
 
-      if (!allParameters.containsKey(parameterInfo.getParameterName())) {
-        problemsReporter.addError(new Problem(model,
-                                              format("The SampleDataProvider [%s] declares a parameter '%s' which doesn't exist in the %s '%s'",
-                                                     providerName, parameterInfo.getParameterName(), modelTypeName, modelName)));
-      } else {
-        MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
-        Class<?> expectedType = getType(metadataType)
-            .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                parameterInfo.getParameterName())));
-        Class<?> gotType = getType(parameterInfo.getType())
-            .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                parameterInfo.getParameterName())));
+      String parameterName = getParameterNameFromExtractionExpression(parameterInfo.getExtractionExpression());
 
-        if (!expectedType.equals(gotType)) {
-          problemsReporter.addError(new Problem(model,
-                                                format("The SampleDataProvider [%s] defines a parameter '%s' of type '%s' but in the %s '%s' is of type '%s'",
-                                                       providerName, parameterInfo.getParameterName(), gotType, modelTypeName,
-                                                       modelName, expectedType)));
+      if (!allParameters.containsKey(parameterName)) {
+        problemsReporter.addError(new Problem(model,
+                                              format("The SampleDataProvider [%s] declares to use a parameter '%s' which doesn't exist in the %s '%s'",
+                                                     providerName, parameterName, modelTypeName, modelName)));
+      } else {
+        if (parameterInfo.getExtractionExpression().equals(parameterInfo.getParameterName())) {
+          MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
+          Class<?> expectedType = getType(metadataType)
+              .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                  parameterInfo.getParameterName())));
+
+          Class<?> gotType = getType(parameterInfo.getType())
+              .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                  parameterInfo.getParameterName())));
+
+          if (!expectedType.equals(gotType)) {
+            problemsReporter.addError(new Problem(model,
+                                                  format("The SampleDataProvider [%s] defines a parameter '%s' of type '%s' but in the %s '%s' is of type '%s'",
+                                                         providerName, parameterInfo.getParameterName(), gotType, modelTypeName,
+                                                         modelName, expectedType)));
+          }
         }
       }
     }
@@ -173,6 +179,12 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
       problemsReporter
           .addError(new Problem(model,
                                 format("SampleDataProvider [%s] does not specify generics definition", providerClass.getName())));
+      return;
+    }
+    if (isVoid(providerGenericTypes.getFirst())) {
+      problemsReporter
+          .addError(new Problem(model,
+                                format("SampleDataProvider [%s] cannot have a Void return type", providerClass.getName())));
       return;
     }
 

@@ -13,6 +13,7 @@ import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.Artifact;
 
@@ -76,6 +77,15 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
    *
    * @return the registry of the artifact.
    */
+  ArtifactContext getArtifactContext();
+
+  /**
+   * Do not use this method if the artifact initialization wasn't successful or the artifact has been destroyed.
+   *
+   * @return the registry of the artifact.
+   * @deprecated Access the registry through {@link #getArtifactContext()}.
+   */
+  @Deprecated
   Registry getRegistry();
 
   /**

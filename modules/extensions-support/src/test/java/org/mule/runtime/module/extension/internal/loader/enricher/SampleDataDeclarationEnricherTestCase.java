@@ -75,15 +75,6 @@ public class SampleDataDeclarationEnricherTestCase {
     assertWithRequiredParameter(operationDeclaration, new String[] {"aliasedPayload", "aliasedAttributes"});
   }
 
-  private void assertAliasedParameter(OperationDeclaration operationDeclaration, String alias, String name) {
-    ParameterDeclaration aliasedParameterDeclaration = getNamedObject(operationDeclaration.getAllParameters(), alias);
-    Optional<DeclaringMemberModelProperty> modelProperty =
-        aliasedParameterDeclaration.getModelProperty(DeclaringMemberModelProperty.class);
-    assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getDeclaringField(), notNullValue());
-    assertThat(modelProperty.get().getDeclaringField().getName(), is(name));
-  }
-
   @Test
   public void verifyValueProviderWithOptionalParameter() {
     OperationDeclaration operationDeclaration = getNamedObject(this.declaration.getOperations(), "optionalParameters");
@@ -124,6 +115,45 @@ public class SampleDataDeclarationEnricherTestCase {
     assertThat(parameter.isRequired(), is(true));
   }
 
+  @Test
+  public void verifyExtractionExpressionOfSampleDataProviderModelWithoutBinding() {
+    OperationDeclaration operationDeclaration = getNamedObject(this.declaration.getOperations(), "connectionLess");
+
+    assertThat(operationDeclaration, notNullValue());
+    assertThat(operationDeclaration.getSampleDataProviderModel().isPresent(), is(true));
+    assertThat(operationDeclaration.getSampleDataProviderModel().get(), notNullValue());
+    assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(2));
+
+    ActingParameterModel parameter = operationDeclaration.getSampleDataProviderModel().get().getParameters().get(0);
+    assertThat(parameter, notNullValue());
+    assertThat(parameter.getName(), is("payload"));
+    assertThat(parameter.isRequired(), is(true));
+    assertThat(parameter.getExtractionExpression(), is("payload"));
+  }
+
+  @Test
+  public void verifyExtractionExpressionOfSampleDataProviderModelWithBinding() {
+    OperationDeclaration operationDeclaration =
+        getNamedObject(this.declaration.getOperations(), "connectionLessWithTwoBoundActingParameterFromContentField");
+
+    assertThat(operationDeclaration, notNullValue());
+    assertThat(operationDeclaration.getSampleDataProviderModel().isPresent(), is(true));
+    assertThat(operationDeclaration.getSampleDataProviderModel().get(), notNullValue());
+    assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(2));
+
+    ActingParameterModel parameter1 = operationDeclaration.getSampleDataProviderModel().get().getParameters().get(0);
+    assertThat(parameter1, notNullValue());
+    assertThat(parameter1.getName(), is("payload"));
+    assertThat(parameter1.isRequired(), is(true));
+    assertThat(parameter1.getExtractionExpression(), is("message.payload"));
+
+    ActingParameterModel parameter2 = operationDeclaration.getSampleDataProviderModel().get().getParameters().get(1);
+    assertThat(parameter2, notNullValue());
+    assertThat(parameter2.getName(), is("attributes"));
+    assertThat(parameter2.isRequired(), is(true));
+    assertThat(parameter2.getExtractionExpression(), is("message.attributes"));
+  }
+
   private void assertWithRequiredParameter(OperationDeclaration operationDeclaration, String[] parametersName) {
     assertThat(operationDeclaration, notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel(), notNullValue());
@@ -135,7 +165,21 @@ public class SampleDataDeclarationEnricherTestCase {
     }
   }
 
+  private void assertAliasedParameter(OperationDeclaration operationDeclaration, String alias, String name) {
+    ParameterDeclaration aliasedParameterDeclaration = getNamedObject(operationDeclaration.getAllParameters(), alias);
+    Optional<DeclaringMemberModelProperty> modelProperty =
+        aliasedParameterDeclaration.getModelProperty(DeclaringMemberModelProperty.class);
+    assertThat(modelProperty.isPresent(), is(true));
+    assertThat(modelProperty.get().getDeclaringField(), notNullValue());
+    assertThat(modelProperty.get().getDeclaringField().getName(), is(name));
+  }
+
   private org.hamcrest.Matcher<Object> item(String name, boolean required) {
     return allOf(hasProperty("name", is(name)), hasProperty("required", is(required)));
+  }
+
+  private ParameterDeclaration getParameterByOperationAndName(String operationName, String parameterName) {
+    OperationDeclaration operationDeclaration = getNamedObject(this.declaration.getOperations(), operationName);
+    return getNamedObject(operationDeclaration.getAllParameters(), parameterName);
   }
 }

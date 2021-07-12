@@ -41,7 +41,7 @@ public abstract class AbstractRedeliveryPolicy extends AbstractMessageProcessorO
     if (maxRedeliveryCount < 0) {
       throw new InitialisationException(initialisationFailure("maxRedeliveryCount must be positive"), this);
     }
-    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors,
+    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          NullExceptionHandler.getInstance());
     super.initialise();
   }

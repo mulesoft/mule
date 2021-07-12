@@ -12,6 +12,9 @@ import static org.hamcrest.number.OrderingComparison.lessThanOrEqualTo;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.WATERMARK;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -25,6 +28,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Stories({@Story(POLLING), @Story(WATERMARK)})
 public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static int PROBER_TIMEOUT = 10000;
@@ -71,7 +80,7 @@ public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTe
 
   @Override
   protected String getConfigFile() {
-    return "polling-source-limiting-config.xml";
+    return "source/polling-source-limiting-config.xml";
   }
 
   @Test

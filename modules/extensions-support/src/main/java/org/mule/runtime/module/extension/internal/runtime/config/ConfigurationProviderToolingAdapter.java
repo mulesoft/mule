@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -167,6 +168,15 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
     }, getExtensionModel());
   }
 
+  @Override
+  public Set<Value> getConfigValues(String parameterName, String targetSelector) throws ValueResolvingException {
+    return valuesWithClassLoader(() -> {
+      ConfigurationModel configurationModel = getConfigurationModel();
+      return new ValueProviderMediator<>(configurationModel, () -> muleContext, () -> reflectionCache)
+          .getValues(parameterName, targetSelector, getParameterValueResolver(configuration.getValue(), configurationModel));
+    }, getExtensionModel());
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -184,6 +194,15 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
       ValueProviderMediator<ConnectionProviderModel> valueProviderMediator =
           new ValueProviderMediator<>(model, () -> muleContext, () -> reflectionCache);
       return valueProviderMediator.getValues(parameterName, getParameterValueResolver(connection, model));
+    }), getExtensionModel());
+  }
+
+  @Override
+  public Set<Value> getConnectionValues(String parameterName, String targetSelector) throws ValueResolvingException {
+    return valuesWithClassLoader(() -> withConnectionProviderInfo((connection, model) -> {
+      ValueProviderMediator<ConnectionProviderModel> valueProviderMediator =
+          new ValueProviderMediator<>(model, () -> muleContext, () -> reflectionCache);
+      return valueProviderMediator.getValues(parameterName, targetSelector, getParameterValueResolver(connection, model));
     }), getExtensionModel());
   }
 

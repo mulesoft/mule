@@ -10,6 +10,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
@@ -19,6 +20,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
 import org.mule.metadata.api.model.UnionType;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -26,6 +28,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
@@ -51,6 +54,7 @@ import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(STREAMING)
@@ -83,6 +87,14 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   private Flow bytesCasterInTx;
 
   @Inject
+  @Named("bytesCasterInSdkScopeInside")
+  private Flow bytesCasterInSdkScopeInside;
+
+  @Inject
+  @Named("bytesCasterInSdkScopeAfter")
+  private Flow bytesCasterInSdkScopeAfter;
+
+  @Inject
   @Named("bytesCasterWithoutStreaming")
   private Flow bytesCasterWithoutStreaming;
 
@@ -104,7 +116,7 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
 
   @Override
   protected String getConfigFile() {
-    return "bytes-streaming-extension-config.xml";
+    return "streaming/bytes-streaming-extension-config.xml";
   }
 
   @Override
@@ -223,9 +235,23 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   }
 
   @Test
-  @Description("A source generates a cursor in a transaction")
+  @Description("A source generates a cursor to be consumed in a transaction")
   public void sourceStreamingInTx() throws Exception {
     startSourceAndListenSpell(bytesCasterInTx, bargainPredicate());
+  }
+
+  @Test
+  @Issue("MULE-19297")
+  @Description("A source generates a cursor to be consumed inside a scope done with the SDK")
+  public void sourceStreamingInSdkScopeInside() throws Exception {
+    startSourceAndListenSpell(bytesCasterInSdkScopeInside, bargainPredicate());
+  }
+
+  @Test
+  @Issue("MULE-19297")
+  @Description("A source generates a cursor to be consumed inside a scope done with the SDK")
+  public void sourceStreamingInSdkScopeAfter() throws Exception {
+    startSourceAndListenSpell(bytesCasterInSdkScopeAfter, bargainPredicate());
   }
 
   @Test
@@ -359,4 +385,32 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   protected boolean isGracefulShutdown() {
     return true;
   }
+
+  public static class AssertPayloadIsStreamProvider implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(event.getMessage().getPayload().getValue(), instanceOf(CursorStreamProvider.class));
+      return event;
+    }
+  }
+
+  public static class AssertPayloadIsNotStreamProvider implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(event.getMessage().getPayload().getValue(), not(instanceOf(CursorStreamProvider.class)));
+      return event;
+    }
+  }
+
+  public static class AssertVariableStreamProviderIsOpen implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(((CursorStreamProvider) (event.getVariables().get("provider").getValue())).isClosed(), is(false));
+      return event;
+    }
+  }
+
 }

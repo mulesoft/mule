@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.get
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,6 +21,8 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -94,14 +97,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
     String configResources = getConfigResources();
     if (configResources != null) {
-      return createConfigurationBuilder(configResources, emptyMap(), APP, enableLazyInit(), disableXmlValidations());
+      return createConfigurationBuilder(new String[] {configResources}, emptyMap(), APP, enableLazyInit(),
+                                        disableXmlValidations());
     }
     configResources = getConfigFile();
     if (configResources != null) {
       if (configResources.contains(",")) {
         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
       }
-      return createConfigurationBuilder(configResources, artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
+      return createConfigurationBuilder(new String[] {configResources}, artifactProperties(), APP, enableLazyInit(),
+                                        disableXmlValidations());
     }
     return createConfigurationBuilder(getConfigFiles(), artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
   }
@@ -229,6 +234,15 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    */
   public boolean enableLazyInit() {
     return false;
+  }
+
+  @Override
+  protected DefaultMuleConfiguration createMuleConfiguration() {
+    if (enableLazyInit()) {
+      return new ReconfigurableMuleConfiguration();
+    } else {
+      return super.createMuleConfiguration();
+    }
   }
 
   /**

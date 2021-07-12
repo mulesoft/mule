@@ -49,7 +49,7 @@
     <xsd:element name="mule" type="muleType">
         <xsd:annotation>
             <xsd:documentation>
-                Either the root element of a Mule configuration, or a "top-level" element in a Spring configuration that contains further Mule elements.
+                The root element of a Mule configuration.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2533,7 +2533,7 @@
     <xsd:element name="until-successful" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Attempts to route a message to the message processor it contains in an asynchronous manner.
+                Attempts to route a message to its inner chain in a synchronous manner.
                 Routing is considered successful if no error has been raised and, optionally, if the response matches an expression
             </xsd:documentation>
         </xsd:annotation>

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
@@ -70,14 +71,14 @@ public final class ExtensionErrorsRegistrant {
 
   private static void addComponentExceptionMappers(final ErrorTypeLocator errorTypeLocator, ExtensionModel extModel,
                                                    DslSyntaxResolver syntaxResolver, final ExceptionMapper mapping) {
-    extModel.getOperationModels()
-        .stream()
-        .map(model -> identifierFromModel(syntaxResolver, model))
-        .forEach(identifier -> errorTypeLocator.addComponentExceptionMapper(identifier, mapping));
-    extModel.getSourceModels()
-        .stream()
-        .map(model -> identifierFromModel(syntaxResolver, model))
-        .forEach(identifier -> errorTypeLocator.addComponentExceptionMapper(identifier, mapping));
+    concat(extModel.getConfigurationModels().stream()
+        .flatMap(config -> concat(config.getOperationModels().stream(),
+                                  config.getSourceModels().stream())),
+           concat(extModel.getOperationModels().stream(),
+                  extModel.getSourceModels().stream()))
+
+                      .map(model -> identifierFromModel(syntaxResolver, model))
+                      .forEach(identifier -> errorTypeLocator.addComponentExceptionMapper(identifier, mapping));
   }
 
   private static ComponentIdentifier identifierFromModel(DslSyntaxResolver syntaxResolver, ConnectableComponentModel model) {

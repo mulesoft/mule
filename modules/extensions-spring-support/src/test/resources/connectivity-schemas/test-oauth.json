@@ -1,0 +1,978 @@
+[
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "before": {
+              "range": "string",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "listenerConfig": {
+              "range": "string",
+              "mandatory": true
+            },
+            "externalCallbackUrl": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "callbackPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "accessTokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "authorizePath": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "connection",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "before": {
+              "range": "string",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "listenerConfig": {
+              "range": "string",
+              "mandatory": true
+            },
+            "externalCallbackUrl": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "callbackPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "accessTokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "authorizePath": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "do-not-include-redirect-uri-in-refresh-token",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "before": {
+              "range": "string",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "listenerConfig": {
+              "range": "string",
+              "mandatory": true
+            },
+            "externalCallbackUrl": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "callbackPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "accessTokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "authorizePath": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "scopeless",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "before": {
+              "range": "string",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "listenerConfig": {
+              "range": "string",
+              "mandatory": true
+            },
+            "externalCallbackUrl": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "callbackPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "accessTokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "authorizePath": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "validated-connection",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "before": {
+              "range": "string",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "listenerConfig": {
+              "range": "string",
+              "mandatory": true
+            },
+            "externalCallbackUrl": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "callbackPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "accessTokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "authorizePath": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "with-credentials-placement",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "before": {
+              "range": "string",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "listenerConfig": {
+              "range": "string",
+              "mandatory": true
+            },
+            "externalCallbackUrl": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "callbackPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "withAlias": {
+              "range": "string",
+              "mandatory": true
+            },
+            "defaultPlacement": {
+              "range": "string",
+              "mandatory": true
+            },
+            "accessTokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "header": {
+              "range": "string",
+              "mandatory": true
+            },
+            "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "queryParam": {
+              "range": "string",
+              "mandatory": true
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "authorizePath": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "with-params-connection",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthclientcredentialsconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "clientId": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "tokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "clientSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "knownCustomHeader": {
+              "range": "string",
+              "mandatory": false
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            }
+          },
+          "classTerm": "connectivity.OAuthClientCredentialsConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "client-credentials",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthClientCredentialsConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "before": {
+              "range": "string",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "listenerConfig": {
+              "range": "string",
+              "mandatory": true
+            },
+            "externalCallbackUrl": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "callbackPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "accessTokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "authorizePath": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "pooled",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
+    }
+  },
+  {
+    "assets": [
+      {
+        "assetId": "mule-connectivity-schema-test",
+        "groupId": "org.mule.runtime.test.extension",
+        "version": "1.0.0"
+      }
+    ],
+    "groupId": "com.mulesoft.schemas",
+    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "definition": {
+      "external": {
+        "core": "anypoint://semantics/core",
+        "apiContract": "anypoint://semantics/api-contract"
+      },
+      "documents": {
+        "root": {
+          "encodes": "Connection"
+        }
+      },
+      "nodeMappings": {
+        "Connection": {
+          "mapping": {
+            "before": {
+              "range": "string",
+              "mandatory": false
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "listenerConfig": {
+              "range": "string",
+              "mandatory": true
+            },
+            "externalCallbackUrl": {
+              "propertyTerm": "core.urlTemplate",
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerSecret": {
+              "propertyTerm": "connectivity.clientSecret",
+              "range": "string",
+              "mandatory": true
+            },
+            "apiVersion": {
+              "range": "number",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "callbackPath": {
+              "propertyTerm": "apiContract.path",
+              "range": "string",
+              "mandatory": true
+            },
+            "objectStore": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "accessTokenUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "scopes": {
+              "range": "string",
+              "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "prompt": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "authorizePath": {
+              "range": "string",
+              "mandatory": true
+            }
+          },
+          "classTerm": "connectivity.OAuthAuthorizationCodeConnection"
+        }
+      },
+      "uses": {
+        "connectivity": "anypoint://semantics/connectivity"
+      }
+    },
+    "version": "4.4.0-SNAPSHOT",
+    "labels": {
+      "connectionProvider": "refresh-validation",
+      "system": "Test OAuth Extension",
+      "type": "connectivity.OAuthAuthorizationCodeConnection"
+    }
+  }
+]

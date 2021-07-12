@@ -8,6 +8,7 @@ package org.mule.test.heisenberg.extension.model;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.semantics.SemanticTerms;
 
 public class BarberPreferences {
 
@@ -17,6 +18,7 @@ public class BarberPreferences {
 
   @Parameter
   @Optional
+  @SemanticTerms("hairy")
   private boolean fullyBald;
 
   @Parameter

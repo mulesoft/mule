@@ -94,4 +94,21 @@ public class ConfigurationValuesTestCase extends AbstractValuesTestCase {
     assertThat(resolvingFailure.getFailureCode(), is("CUSTOM_ERROR"));
     assertThat(resolvingFailure.getMessage(), is(ERROR_MESSAGE));
   }
+
+  @Test
+  public void withBoundActingParameter() throws Exception {
+    ValueResult result = getValueResultFromConfig("with-bound-acting-parameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void configWithParameterWithFieldValues() throws Exception {
+    Set<Value> channels =
+        getFieldValuesFromConfig("config-with-parameter-with-field-values", "securityHeaders", "security.algorithm");
+    assertThat(channels, hasSize(3));
+    assertThat(channels, hasValues("channel1", "channel2", "channel3"));
+  }
 }

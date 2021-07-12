@@ -12,9 +12,9 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -28,7 +28,9 @@ import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.GlobalElementDeclarationVisitor;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
@@ -61,7 +63,6 @@ public class ArtifactHelper {
 
   public <T> Class<T> getParameterClass(ParameterModel parameterModel, ElementDeclaration containerDeclaration) {
     return getType(parameterModel.getType(), getClassLoader(getExtensionModel(containerDeclaration)));
-
   }
 
   public <T extends ParameterizedModel & EnrichableModel> Optional<T> findModel(ExtensionModel extensionModel,
@@ -108,7 +109,16 @@ public class ArtifactHelper {
   }
 
   public Optional<ConfigurationInstance> getConfigurationInstance(String configName) {
-    return findConfigurationProvider(configName).map(cp -> cp.get(getNullEvent()));
+    return findConfigurationProvider(configName).map(cp -> {
+      CoreEvent fakeEvent = getNullEvent();
+      try {
+        return cp.get(fakeEvent);
+      } finally {
+        if (fakeEvent != null) {
+          ((BaseEventContext) fakeEvent.getContext()).success();
+        }
+      }
+    });
   }
 
   public List<String> getExtensions() {

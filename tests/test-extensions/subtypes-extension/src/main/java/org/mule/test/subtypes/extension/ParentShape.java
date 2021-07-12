@@ -6,10 +6,13 @@
  */
 package org.mule.test.subtypes.extension;
 
+import org.mule.sdk.api.annotation.semantics.connectivity.Port;
+
 import java.util.Objects;
 
 public class ParentShape {
 
+  @Port
   private Integer area;
 
   public Integer getArea() {

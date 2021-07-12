@@ -57,4 +57,8 @@ abstract class SupportsPropertiesMuleContextBuilder extends DefaultMuleContextBu
       }
     }
   }
+
+  protected Map<String, String> getArtifactProperties() {
+    return artifactProperties;
+  }
 }

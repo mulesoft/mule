@@ -40,6 +40,7 @@ public final class ArtifactContextConfiguration {
   private boolean disableXmlValidations;
   private List<ServiceConfigurator> serviceConfigurators = emptyList();
   private Optional<MuleContext> parentContext = empty();
+  private Optional<ArtifactContext> parentArtifactContext = empty();
   private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private LockFactory runtimeLockFactory;
 
@@ -117,9 +118,18 @@ public final class ArtifactContextConfiguration {
 
   /**
    * @return the parent context of this artifact context.
+   * @deprecated Use {@link #getParentArtifactContext()}.
    */
+  @Deprecated
   public Optional<MuleContext> getParentContext() {
     return parentContext;
+  }
+
+  /**
+   * @return the {@link ArtifactContext} of the parent of this artifact context.
+   */
+  public Optional<ArtifactContext> getParentArtifactContext() {
+    return parentArtifactContext;
   }
 
   /**
@@ -224,9 +234,20 @@ public final class ArtifactContextConfiguration {
     /**
      * @param parentContext the parent {@link MuleContext} of the {@link ArtifactContext} to be created.
      * @return {@code this} builder
+     * @deprecated Use {@link #setParentArtifactContext(ArtifactContext)} instead.
      */
+    @Deprecated
     public ArtifactContextConfigurationBuilder setParentContext(MuleContext parentContext) {
       artifactContextConfiguration.parentContext = of(parentContext);
+      return this;
+    }
+
+    /**
+     * @param parentContext the parent {@link MuleContext} of the {@link ArtifactContext} to be created.
+     * @return {@code this} builder
+     */
+    public ArtifactContextConfigurationBuilder setParentArtifactContext(ArtifactContext parentArtifactContext) {
+      artifactContextConfiguration.parentArtifactContext = of(parentArtifactContext);
       return this;
     }
 

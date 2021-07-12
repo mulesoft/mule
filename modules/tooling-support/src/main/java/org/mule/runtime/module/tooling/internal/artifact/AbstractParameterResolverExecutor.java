@@ -11,13 +11,17 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterGroupElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
@@ -53,17 +57,16 @@ public class AbstractParameterResolverExecutor {
   }
 
   protected ParameterValueResolver parameterValueResolver(ParameterizedElementDeclaration parameterizedElementDeclaration,
-                                                          ParameterizedModel parameterizedModel)
+                                                          ParameterizedModel parameterizedModel,
+                                                          boolean overrideExpressionSupport)
       throws ExpressionNotSupportedException {
-    Map<String, Object> parametersMap = parametersMap(parameterizedElementDeclaration, parameterizedModel);
+    Map<String, Object> parametersMap =
+        parametersMap(parameterizedElementDeclaration, parameterizedModel, overrideExpressionSupport);
 
     try {
       final ResolverSet resolverSet =
           ParametersResolver.fromValues(parametersMap,
                                         muleContext,
-                                        // Required parameters should be validated by the resolver factory instead of this
-                                        // resolver
-                                        true,
                                         reflectionCache,
                                         expressionManager,
                                         parameterizedModel.getName())
@@ -75,7 +78,8 @@ public class AbstractParameterResolverExecutor {
   }
 
   protected Map<String, Object> parametersMap(ParameterizedElementDeclaration parameterizedElementDeclaration,
-                                              ParameterizedModel parameterizedModel)
+                                              ParameterizedModel parameterizedModel,
+                                              boolean overrideExpressionSupport)
       throws ExpressionNotSupportedException {
     Map<String, Object> parametersMap = new HashMap<>();
 
@@ -95,11 +99,21 @@ public class AbstractParameterResolverExecutor {
         final ParameterModel parameterModel = parameterGroupModel.getParameter(parameterName)
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find parameter with name: '%s' in parameter group: '%s'",
                                                                             parameterName, parameterGroupName)));
-        Object value = extractValue(parameterElement.getValue(),
-                                    artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration));
-        if (!parameterModel.getExpressionSupport().equals(NOT_SUPPORTED) && isExpression(value)) {
-          throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
-                                                           parameterName));
+        Class<?> parameterClass = artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration);
+        Object value = extractValue(parameterElement.getValue(), parameterClass);
+
+        // TODO: CCNS-26. Improve this.
+        if (value instanceof String && isExpression(value)) {
+
+          if (!parameterModel.getExpressionSupport().equals(NOT_SUPPORTED) && !overrideExpressionSupport) {
+            throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
+                                                             parameterName));
+          }
+          String expression = (String) value;
+          value = extractExpression(expression)
+              .map(e -> new TypedValue<>(e, DataType.builder().mediaType("application/dw").build()))
+              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not extract expression from: "
+                  + expression)));
         }
         parametersMap.put(parameterName, value);
       }

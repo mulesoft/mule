@@ -8,9 +8,9 @@ package org.mule.runtime.core.internal.value.cache;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
-import static java.util.Objects.hash;
 import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
 import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.ArrayList;
@@ -115,7 +115,7 @@ public class ValueProviderCacheId {
     }
 
     public ValueProviderCacheIdBuilder withHashValueFrom(Object hashedObject) {
-      this.hashValue = Integer.toString(hash(hashedObject));
+      this.hashValue = Integer.toString(Objects.hashCode((hashedObject)));
       return this;
     }
 

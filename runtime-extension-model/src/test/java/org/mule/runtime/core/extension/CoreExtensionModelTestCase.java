@@ -128,7 +128,7 @@ public class CoreExtensionModelTestCase {
     assertThat(cronSchedulerType.getFields(), hasSize(2));
     assertThat(cronSchedulerType.getFieldByName("expression").get().isRequired(), is(true));
     assertThat(cronSchedulerType.getFieldByName("expression").get().getValue(), instanceOf(DefaultStringType.class));
-    assertThat(cronSchedulerType.getFieldByName("timeZone").get().isRequired(), is(true));
+    assertThat(cronSchedulerType.getFieldByName("timeZone").get().isRequired(), is(false));
     assertThat(cronSchedulerType.getFieldByName("timeZone").get().getValue(), instanceOf(DefaultStringType.class));
 
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
@@ -875,6 +875,6 @@ public class CoreExtensionModelTestCase {
     assertThat(paramModel.getType(), instanceOf(DefaultBooleanType.class));
     assertThat(paramModel.isRequired(), is(false));
     assertThat(paramModel.getDefaultValue(), is(false));
-    assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Boolean.class.getName()));
+    assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(boolean.class.getName()));
   }
 }

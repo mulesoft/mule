@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorReadingStream;
 import static org.mule.runtime.core.api.util.IOUtils.copyLarge;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
@@ -22,6 +27,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Iterator;
+
+import javax.inject.Inject;
 
 /**
  * <code>ObjectToString</code> transformer is useful for debugging. It will return human-readable output for various kinds of
@@ -29,7 +37,9 @@ import java.nio.charset.Charset;
  */
 public class ObjectToString extends AbstractTransformer implements DiscoverableTransformer {
 
-  /** Give core transformers a slighty higher priority */
+  private FeatureFlaggingService featureFlags;
+
+  /** Give core transformers a slightly higher priority */
   private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
   public ObjectToString() {
@@ -47,6 +57,16 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
 
     if (src instanceof CursorStreamProvider) {
       output = createStringFromInputStream(((CursorStreamProvider) src).openCursor(), outputEncoding);
+    } else if (src instanceof CursorIteratorProvider) {
+      // For some cases where repeatable streaming is disabled, this may consume the iterator making it unavailable for downstream
+      // components in the flow.
+      if (featureFlags.isEnabled(TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS)) {
+        output = createStringFromItearator(((CursorIteratorProvider) src).openCursor(), outputEncoding);
+      } else {
+        output = StringMessageUtils.toString(src);
+      }
+    } else if (src instanceof Iterator) {
+      output = "<<Non repeatable iterator>>";
     } else if (src instanceof InputStream) {
       output = createStringFromInputStream((InputStream) src, outputEncoding);
     } else if (src instanceof OutputHandler) {
@@ -68,6 +88,30 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
       return outputStream.toString(outputEncoding.name());
     } catch (IOException e) {
       throw new TransformerException(errorReadingStream(), e);
+    } finally {
+      try {
+        input.close();
+      } catch (IOException e) {
+        logger.warn("Could not close stream", e);
+      }
+    }
+  }
+
+  protected String createStringFromItearator(CursorIterator input, Charset outputEncoding)
+      throws TransformerException {
+    try {
+      StringBuilder output = new StringBuilder();
+
+      output.append("[");
+      for (Iterator iterator = input; iterator.hasNext();) {
+        Object item = iterator.next();
+        output.append(transform(item, outputEncoding).toString());
+        output.append(", ");
+      }
+      output.delete(output.length() - 2, output.length());
+      output.append("]");
+
+      return output.toString();
     } finally {
       try {
         input.close();
@@ -101,5 +145,24 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
   @Override
   public void setPriorityWeighting(int priorityWeighting) {
     this.priorityWeighting = priorityWeighting;
+  }
+
+  @Inject
+  public void setFeatureFlags(FeatureFlaggingService featureFlags) {
+    this.featureFlags = featureFlags;
+  }
+
+  /**
+   * Configures {@link FeatureFlaggingService} for MULE-19323.
+   *
+   * @since 4.4
+   */
+  public static void configureToStringTransformerTransformIteratorElements() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")
+                                                        || muleVersion.atLeast("4.3.1"))
+                                                    .isPresent());
   }
 }

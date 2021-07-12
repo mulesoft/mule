@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.List;
@@ -166,7 +167,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       return;
     }
     // First check if exception was not logged already
-    if (resolvedException.getFirst().getExceptionInfo().isAlreadyLogged()) {
+    // MULE-19344: Always log FlowBackPressureExceptions because they are created as a single instance.
+    if (resolvedException.getFirst().getExceptionInfo().isAlreadyLogged()
+        && !(resolvedException.getFirst() instanceof FlowBackPressureException)) {
       // Don't log anything, error while getting root or exception already logged.
       return;
     }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <object name="capture"
+            class="org.mule.test.module.extension.parameter.value.ParameterValueResolverTestCase$CaptureProcessor"/>
+
+    <some:config name="config-with-zoned-date-time-parameter" someParameter="whatever" zonedDateTime="2021-04-27T15:30:00Z"/>
+
+    <flow name="configurationWithZonedDateTimeParameter">
+        <some:retrieve-configuration config-ref="config-with-zoned-date-time-parameter"/>
+    </flow>
+
+    <flow name="sourceWithZonedDateTimeParameter" initialState="stopped">
+        <some:parameter-emitting-source zonedDateTime="2021-04-27T12:00:00-03:00"/>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="operationWithZonedDateTimeParameter">
+        <some:retrieve-zoned-date-time zonedDateTime="2021-04-28T19:30:35+03:00"/>
+    </flow>
+
+</mule>

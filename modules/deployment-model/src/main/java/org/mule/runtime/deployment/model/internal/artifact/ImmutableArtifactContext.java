@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.deployment.model.internal.artifact;
 
+import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -34,5 +37,10 @@ public class ImmutableArtifactContext implements ArtifactContext {
   @Override
   public Registry getRegistry() {
     return registry;
+  }
+
+  @Override
+  public ArtifactAst getArtifactAst() {
+    return emptyArtifact();
   }
 }

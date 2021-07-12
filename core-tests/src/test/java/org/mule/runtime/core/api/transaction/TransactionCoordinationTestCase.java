@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -19,6 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
@@ -35,6 +36,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
+@Story(TRANSACTION)
 public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
 
   private NotificationDispatcher notificationDispatcher;
@@ -60,7 +62,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     Transaction tx = mock(Transaction.class);
 
     tc.bindTransaction(tx);
-    assertEquals(tx, tc.getTransaction());
+    assertThat(tx, is(tc.getTransaction()));
     tc.unbindTransaction(tx);
   }
 
@@ -70,7 +72,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     Transaction tx = mock(Transaction.class);
 
     tc.bindTransaction(tx);
-    assertEquals(tx, tc.getTransaction());
+    assertThat(tx, is(tc.getTransaction()));
 
     try {
       Transaction tx2 = mock(Transaction.class);
@@ -185,7 +187,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     Transaction tx = mock(Transaction.class);
     tc.bindTransaction(tx);
     tc.suspendCurrentTransaction();
-    assertNull(tc.getTransaction());
+    assertThat(tc.getTransaction(), is(nullValue()));
     tc.resumeSuspendedTransaction();
     verify(tx, times(1)).suspend();
     verify(tx, times(1)).resume();
@@ -248,6 +250,35 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     tc.resolveTransaction();
     assertThat(tc.getTransaction(), nullValue());
     verify(tx, times(1)).commit();
+  }
+
+  @Test
+  @Issue("MULE-19430")
+  public void suspendMultipleTransactions() throws TransactionException {
+    assertThat(tc.getTransaction(), nullValue());
+    Transaction tx1 = mock(Transaction.class);
+    Transaction tx2 = mock(Transaction.class);
+
+    tc.bindTransaction(tx1);
+    tc.suspendCurrentTransaction();
+    assertThat(tc.getTransaction(), is(nullValue()));
+
+    tc.bindTransaction(tx2);
+    tc.suspendCurrentTransaction();
+    assertThat(tc.getTransaction(), is(nullValue()));
+
+    tc.resumeSuspendedTransaction();
+    assertThat(tc.getTransaction(), is(tx2));
+    tc.unbindTransaction(tx2);
+    assertThat(tc.getTransaction(), is(nullValue()));
+    tc.resumeSuspendedTransaction();
+    assertThat(tc.getTransaction(), is(tx1));
+
+    verify(tx1, times(1)).suspend();
+    verify(tx1, times(1)).resume();
+    verify(tx2, times(1)).suspend();
+    verify(tx2, times(1)).resume();
+
   }
 
 }

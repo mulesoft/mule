@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.DOMAIN_HOME_DIRECTORY_PROPERTY;
@@ -28,12 +24,10 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.isConfigLess;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -49,7 +43,6 @@ import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.PolicyProvider;
-import org.mule.runtime.core.internal.exception.CompositeErrorTypeRepository;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -452,7 +445,10 @@ public class ArtifactContextBuilder {
                     .setServiceConfigurators(serviceConfigurators)
                     .setRuntimeLockFactory(runtimeLockFactory);
 
-            withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
+            if (parentArtifact != null && parentArtifact.getArtifactContext() != null) {
+              artifactContextConfigurationBuilder.setParentArtifactContext(parentArtifact.getArtifactContext());
+            }
+
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
             ((DefaultMuleConfiguration) muleContext.getConfiguration()).setDataFolderName(dataFolderName);
@@ -481,9 +477,6 @@ public class ArtifactContextBuilder {
 
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
-
-          withArtifactMuleContext(parentArtifact, parentContext -> muleContextBuilder
-              .setErrorTypeRepository(createErrorTypeRepository(parentContext.getErrorTypeRepository())));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());
         }
@@ -505,43 +498,6 @@ public class ArtifactContextBuilder {
       }
       throw e;
     }
-  }
-
-  private ErrorTypeRepository createErrorTypeRepository(ErrorTypeRepository parentContextErrorTypesRepo) {
-    if (POLICY.equals(artifactType)) {
-      if (shareErrorTypeRepository()) {
-        // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
-        return createCompositeErrorTypeRepository(parentContextErrorTypesRepo);
-      } else {
-        // Since there is already a workaround to allow polices to use http connector without declaring the dependency
-        // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
-        // well.
-        return new FilteredCompositeErrorTypeRepository(getCoreErrorTypeRepo(),
-                                                        parentContextErrorTypesRepo,
-                                                        "HTTP");
-      }
-    }
-    return createCompositeErrorTypeRepository(parentContextErrorTypesRepo);
-  }
-
-  /**
-   * Creates a new {@link CompositeErrorTypeRepository} to use in mule.
-   * <p>
-   * The created repository will have a {@link ErrorTypeRepository} as child created by
-   * {@link ErrorTypeRepositoryFactory#createDefaultErrorTypeRepository()} and the given {@code parentErrorTypeRepository} as
-   * parent.
-   *
-   * @param parentErrorTypeRepository {@link ErrorTypeRepository} to be used as the parent repository
-   * @return a new {@link CompositeErrorTypeRepository} with the given {@code parentErrorTypeRepository} as the parent repository
-   */
-  public static ErrorTypeRepository createCompositeErrorTypeRepository(ErrorTypeRepository parentErrorTypeRepository) {
-    requireNonNull(parentErrorTypeRepository, "'parentErrorTypeRepository' can't be null");
-
-    return new CompositeErrorTypeRepository(getCoreErrorTypeRepo(), parentErrorTypeRepository);
-  }
-
-  private boolean shareErrorTypeRepository() {
-    return getBoolean(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY);
   }
 
   protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties() {

@@ -32,9 +32,4 @@ public abstract class TestComponentMessageProcessor extends ComponentMessageProc
           retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache, resultTransformer,
           terminationTimeout);
   }
-
-  @Override
-  protected boolean honourOperationRetryPolicyOverride() {
-    return true;
-  }
 }

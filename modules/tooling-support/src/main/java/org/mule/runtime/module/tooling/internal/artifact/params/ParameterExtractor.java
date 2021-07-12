@@ -7,18 +7,20 @@
 package org.mule.runtime.module.tooling.internal.artifact.params;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class ParameterExtractor implements ParameterValueVisitor {
@@ -36,7 +38,12 @@ public class ParameterExtractor implements ParameterValueVisitor {
 
   private Object value;
 
-  public static <T> T extractValue(ParameterValue parameterValue, Class<T> type) {
+  // TODO: CCNS-26. This approach is no longer valid. e.g: If the expected type is an stream, this fails.
+  public static Object extractValue(ParameterValue parameterValue, Class<?> type) {
+    Object extractedValue = extractValue(parameterValue);
+    if (isExpression(extractedValue)) {
+      return extractedValue;
+    }
     return objectMapper.convertValue(extractValue(parameterValue), type);
   }
 

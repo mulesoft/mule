@@ -10,10 +10,10 @@ package org.mule.test.runner.api;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classloader.IsolatedClassLoaderFactory;
-import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +21,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +164,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   /**
    * Sets the {@link List} of {@link String}s containing the extra boot packages defined to be appended to the container in
    * addition to the pre-defined ones.
-   * 
+   *
    * @param extraBootPackages {@link List} of {@link String}s containing the extra boot packages defined to be appended to the
    *                          container in addition to the pre-defined ones.
    * @return this
@@ -313,11 +311,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private Artifact getRootArtifact(File rootArtifactClassesFolder) {
     File pomFile = new File(rootArtifactClassesFolder.getParentFile().getParentFile(), POM_XML);
     logger.debug("Reading rootArtifact from pom file: {}", pomFile);
-    Model model = MavenModelFactory.createMavenProject(pomFile);
-
-    return new DefaultArtifact(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId(),
-                               model.getArtifactId(), model.getPackaging(),
-                               model.getVersion() != null ? model.getVersion() : model.getParent().getVersion());
+    return createFromPomFile(pomFile);
   }
 
 }

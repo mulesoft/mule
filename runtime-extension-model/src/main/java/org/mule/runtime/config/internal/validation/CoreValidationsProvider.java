@@ -34,8 +34,11 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new ErrorMappingTargetTypeReferencesExist(),
                   new ErrorMappingSourceTypeReferencesExist(),
                   new ErrorHandlerOnErrorTypeExists(),
+                  new RequiredParametersPresent(),
+                  new ParameterGroupExclusiveness(),
                   new ExpressionsInRequiredExpressionsParams(),
-                  new ExpressionsInConfigurationParams()
+                  new PollingSourceHasSchedulingStrategy(),
+                  new ScatterGatherRoutes()
 
     // TODO MULE-17711 (AST) re-enable (and possibly refactor) this validation
     // new ParameterAndChildForSameAttributeNotDefinedTogether(),

@@ -15,6 +15,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -22,11 +23,12 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
-import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import org.slf4j.Logger;
 
 
 public class ImmutableProcessorChildContextChainExecutor implements ChildContextChain, ProcessorChainExecutor {
@@ -53,20 +55,22 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
    */
   private final ChainExecutor chainExecutor;
 
-  private ProcessorChainExecutor delegate;
+  private final ProcessorChainExecutor delegate;
 
-  private ComponentLocation location;
+  private final ComponentLocation location;
 
   /**
    *
-   * @param event the original {@link CoreEvent} for the execution of the given chain
-   * @param chain a {@link Processor} chain to be executed
+   * @param streamingManager
+   * @param event            the original {@link CoreEvent} for the execution of the given chain
+   * @param chain            a {@link Processor} chain to be executed
    */
-  public ImmutableProcessorChildContextChainExecutor(CoreEvent event, MessageProcessorChain chain) {
+  public ImmutableProcessorChildContextChainExecutor(StreamingManager streamingManager, CoreEvent event,
+                                                     MessageProcessorChain chain) {
     this.originalEvent = event;
     this.chain = chain;
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
-    this.delegate = new ImmutableProcessorChainExecutor(this.originalEvent, this.chain);
+    this.delegate = new ImmutableProcessorChainExecutor(streamingManager, this.originalEvent, this.chain);
     this.location = chain.getLocation();
     this.chainExecutor = new ChainExecutor(chain, originalEvent);
   }

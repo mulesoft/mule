@@ -19,6 +19,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
 
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -32,11 +34,15 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Flaky;
+import io.qameta.allure.Story;
 
 /**
  * Contains test for application re-deployment on the default domain
  */
+@Feature(APP_DEPLOYMENT)
+@Story(APPLICATION_REDEPLOYMENT)
 public class ApplicationRedeploymentTestCase extends ApplicationDeploymentTestCase {
 
   public ApplicationRedeploymentTestCase(boolean parallelDeployment) {

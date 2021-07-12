@@ -13,8 +13,10 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.data.sample.SampleDataProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
@@ -125,7 +127,8 @@ public final class SampleDataProviderFactoryModelProperty implements ModelProper
                                                  Supplier<Object> connectionSupplier,
                                                  Supplier<Object> configurationSupplier,
                                                  ReflectionCache reflectionCache,
-                                                 MuleContext muleContext) {
+                                                 MuleContext muleContext,
+                                                 ParameterizedModel parameterizedModel) {
     return new SampleDataProviderFactory(
                                          this,
                                          parameterValueResolver,
@@ -134,7 +137,8 @@ public final class SampleDataProviderFactoryModelProperty implements ModelProper
                                          connectionField,
                                          configField,
                                          reflectionCache,
-                                         muleContext);
+                                         muleContext,
+                                         parameterizedModel);
   }
 
   /**
@@ -157,7 +161,14 @@ public final class SampleDataProviderFactoryModelProperty implements ModelProper
     public SampleDataProviderFactoryModelPropertyBuilder withInjectableParameter(String name,
                                                                                  MetadataType metadataType,
                                                                                  boolean isRequired) {
-      injectableParameters.add(new InjectableParameterInfo(name, metadataType, isRequired));
+      return withInjectableParameter(name, metadataType, isRequired, name);
+    }
+
+    public SampleDataProviderFactoryModelPropertyBuilder withInjectableParameter(String name,
+                                                                                 MetadataType metadataType,
+                                                                                 boolean isRequired,
+                                                                                 String extractionExpression) {
+      injectableParameters.add(new InjectableParameterInfo(name, metadataType, isRequired, extractionExpression));
       return this;
     }
 

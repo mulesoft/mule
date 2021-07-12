@@ -130,4 +130,37 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
     Set<Value> hasBeenStarted = getValuesFromSource("source-must-not-start", "hasBeenStarted");
     assertThat(hasBeenStarted, hasValues("FALSE"));
   }
+
+  @Test
+  public void sourceWithTwoBoundActingParameters() throws Exception {
+    Set<Value> values = getValuesFromSource("source-with-two-bound-acting-parameters", "parameterWithValue");
+    assertThat(values, hasSize(2));
+    assertThat(values, hasValues("oneParameterValue", "someParameterValue"));
+  }
+
+  @Test
+  public void sourceWithParameterWithFieldValues() throws Exception {
+    Set<Value> channels = getValuesFromSource("simple-source-with-parameter-with-field-values", "channel", "simple.path");
+    assertThat(channels, hasSize(3));
+    assertThat(channels, hasValues("channel1", "channel2", "channel3"));
+  }
+
+  @Test
+  public void multiLevelFieldValues() throws Exception {
+    Set<Value> values = getValuesFromSource("source-with-multi-level-field-values", "xmlBodyTemplate",
+                                            "location.continent");
+
+    ValueMatcher americaValue = valueWithId(AMERICA)
+        .withDisplayName(AMERICA)
+        .withPartName("xmlBodyTemplate.location.continent")
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName("xmlBodyTemplate.location.country")
+            .withChilds(valueWithId(BUENOS_AIRES)
+                .withDisplayName(BUENOS_AIRES)
+                .withPartName("xmlBodyTemplate.location.city")));
+
+    assertThat(values, hasValues(americaValue));
+  }
+
 }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
+
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -24,11 +25,11 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * A {@link GeneratedResourceFactory} which generates an XML file with all the {@link ExtensionModel} elements and it's

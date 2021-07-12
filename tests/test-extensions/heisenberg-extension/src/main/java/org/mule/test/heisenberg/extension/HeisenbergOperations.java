@@ -389,6 +389,10 @@ public class HeisenbergOperations implements Disposable {
     return config.getBarberPreferences();
   }
 
+  public BarberPreferences getSecondBarberPreferences(@Config HeisenbergExtension config) {
+    return config.getSecondBarberPreferences();
+  }
+
   public BarberPreferences getInlineInfo(@ParameterGroup(name = "Personal Barber",
       showInDsl = true) @DisplayName("Personal preference") BarberPreferences preferences) {
     return preferences;

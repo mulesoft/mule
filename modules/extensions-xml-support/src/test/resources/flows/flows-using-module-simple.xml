@@ -114,4 +114,13 @@
             </when>
         </choice>
     </sub-flow>
+
+    <flow name="collidingOperationAndFlowName">
+        <simple-prefix:set-payload-hardcoded-value />
+    </flow>
+    <!-- In order to manifest MULE-19010, this has to be declared after the affected flow and have the same name as the operation called within the affected flow-->
+    <flow name="set-payload-hardcoded-value">
+        <logger/>
+    </flow>
+
 </mule>

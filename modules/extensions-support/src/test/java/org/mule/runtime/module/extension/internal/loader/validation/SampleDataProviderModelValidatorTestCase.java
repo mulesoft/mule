@@ -181,7 +181,7 @@ public class SampleDataProviderModelValidatorTestCase {
     mockOperationProvider();
 
     validate();
-    assertProblems("The SampleDataProvider [ConnectedSampleDataProvider] declares a parameter 'someParam' which doesn't exist in the operation 'superOperation'");
+    assertProblems("The SampleDataProvider [ConnectedSampleDataProvider] declares to use a parameter 'someParam' which doesn't exist in the operation 'superOperation'");
   }
 
   @Test
@@ -293,6 +293,15 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
+  public void operationWithBoxedVoidReturnType() {
+    mockComponent(operationModel, builder(VoidReturnTypeSampleDataProvider.class),
+                  VoidAttributesSampleDataProvider.class.getSimpleName());
+
+    validate();
+    assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$VoidReturnTypeSampleDataProvider] cannot have a Void return type"));
+  }
+
+  @Test
   public void pagingOperationWithInputStreamPayload() {
     Method method = getPagedOperationMethod();
     mockInputStreamPaging(method);
@@ -398,6 +407,54 @@ public class SampleDataProviderModelValidatorTestCase {
 
     validate();
     assertNoErrors();
+  }
+
+  @Test
+  public void boundParameterExists() {
+    providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName");
+    when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
+        .thenReturn(of(providerBuilder.build()));
+
+    mockOperationProvider();
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void boundParameterShouldExist() {
+    providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName");
+    when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
+        .thenReturn(of(providerBuilder.build()));
+
+    mockOperationProvider();
+
+    validate();
+    assertProblems("The SampleDataProvider [ConnectedSampleDataProvider] declares to use a parameter 'anotherName' which doesn't exist in the operation 'superOperation'");
+  }
+
+  @Test
+  public void boundParameterFromExtractionExpressionExists() {
+    providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName.someTag.@attribute");
+    when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
+        .thenReturn(of(providerBuilder.build()));
+
+    mockOperationProvider();
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void boundParameterFromExtractionExpressionShouldExist() {
+    providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName.nested.fields");
+    when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
+        .thenReturn(of(providerBuilder.build()));
+
+    mockOperationProvider();
+
+    validate();
+    assertProblems("The SampleDataProvider [ConnectedSampleDataProvider] declares to use a parameter 'anotherName' which doesn't exist in the operation 'superOperation'");
   }
 
   private void assertWrongGenerics(ConnectableComponentModel model,
@@ -535,6 +592,19 @@ public class SampleDataProviderModelValidatorTestCase {
 
     @Override
     public Result<String, Void> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class VoidReturnTypeSampleDataProvider implements SampleDataProvider<Void, Void> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<Void, Void> getSample() throws SampleDataException {
       return null;
     }
   }

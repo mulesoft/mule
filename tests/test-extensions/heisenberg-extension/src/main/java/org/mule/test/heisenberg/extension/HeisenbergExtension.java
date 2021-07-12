@@ -93,6 +93,7 @@ public class HeisenbergExtension implements Lifecycle {
   public static final String RICIN_PACKS_SUMMARY = "A set of ricin packs";
   public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
   public static final String INLINE_BARBER_PREFERENCES = "Inline Barber Preferences";
+  public static final String INLINE_SECOND_BARBER_PREFERENCES = "Inline Second Barber Preferences";
   public static final String BROTHER_IN_LAW = "Brother in law";
   public static final String PARAMETER_OVERRIDED_DISPLAY_NAME = "Parameter Custom Display Name";
   public static final String PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "weaponValueMap";
@@ -196,6 +197,10 @@ public class HeisenbergExtension implements Lifecycle {
   @ParameterGroup(name = INLINE_BARBER_PREFERENCES, showInDsl = true)
   private BarberPreferences barberPreferences;
 
+  @ParameterGroup(name = INLINE_SECOND_BARBER_PREFERENCES, showInDsl = true)
+  private BarberPreferences secondBarberPreferences;
+
+
   @ParameterGroup(name = BROTHER_IN_LAW, showInDsl = true)
   @DisplayName("Brother in law")
   private HankSchrader brotherInLaw;
@@ -236,6 +241,10 @@ public class HeisenbergExtension implements Lifecycle {
 
   public BarberPreferences getBarberPreferences() {
     return barberPreferences;
+  }
+
+  public BarberPreferences getSecondBarberPreferences() {
+    return secondBarberPreferences;
   }
 
   public List<HealthStatus> getHealthProgression() {

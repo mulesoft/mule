@@ -17,7 +17,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.functional.api.flow.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
-import static org.mule.runtime.api.util.MuleSystemProperties.HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE_PROPERTY;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.tck.SimpleUnitTestSupportSchedulerService.UNIT_TEST_THREAD_GROUP;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
@@ -41,10 +40,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExtensionFunctionalTestCase {
-
-  @Rule
-  public SystemProperty muleOperationRetryPolicyTemplateOverrideProperty =
-      new SystemProperty(HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE_PROPERTY, "true");
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
