@@ -28,6 +28,7 @@ import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
@@ -193,7 +194,12 @@ class AppOperationExtensionModelDeclarer {
     declarer.onDefaultParameterGroup().withOptionalParameter("parameters")
             .describedAs("The operation's parameters")
             .withExpressionSupport(NOT_SUPPORTED)
-            .ofType(getOperationParametersArrayType());
+            .ofType(getOperationParametersArrayType())
+            .withDsl(ParameterDslConfiguration.builder()
+                    .allowsInlineDefinition(true)
+                    .allowsReferences(false)
+                    .allowTopLevelDefinition(false)
+                    .build());
   }
 
   private ArrayType getOperationParametersArrayType() {

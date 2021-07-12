@@ -7,9 +7,15 @@
 package org.mule.runtime.module.extension.app.internal.declarer;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NumberType;
+import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
@@ -18,16 +24,28 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.type.ApplicationTypeLoader;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AppExtensionModelDeclarer {
 
@@ -55,25 +73,40 @@ public class AppExtensionModelDeclarer {
   }
 
   private void parseParameters(ParameterizedDeclarer declarer, ComponentAst componentAst) {
-    Optional<ComponentAst> parameters = componentAst.directChildrenStreamByIdentifier(null, "parameters").findFirst();
-    if (!parameters.isPresent()) {
+    ComponentParameterAst parametersElement = componentAst.getParameter("parameters");
+    if (parametersElement == null) {
       return;
     }
 
-    parameters.get().directChildrenStreamByIdentifier(null, "parameter")
-            .forEach(p -> declareParameter(declarer, p));
+    List<ComponentAst> parameters = (List<ComponentAst>) parametersElement.getValue().getRight();
+    if (parameters != null) {
+      parameters.forEach(p -> declareParameter(declarer, p));
+    }
   }
 
   private void declareParameter(ParameterizedDeclarer declarer, ComponentAst parameterAst) {
     final String paramName = requiredString(parameterAst, "name");
-    final String defaultValue = optionalString(parameterAst, "defaultValue");
+    ParameterDeclarer parameter;
 
-    ParameterDeclarer parameter = defaultValue != null
-            ? declarer.onDefaultParameterGroup().withOptionalParameter(paramName).defaultingTo(defaultValue)
-            : declarer.onDefaultParameterGroup().withRequiredParameter(paramName);
+    ComponentParameterAst optionalElement = parameterAst.getParameter("optional");
+
+    if (optionalElement != null) {
+      ComponentAst optional = (ComponentAst) optionalElement.getValue().getRight();
+      parameter = declarer.onDefaultParameterGroup().withOptionalParameter(paramName)
+              .defaultingTo(optionalString(optional, "defaultValue"));
+
+      ComponentParameterAst exclusiveOptional = optional.getParameter("exclusiveOptional");
+      if (exclusiveOptional != null) {
+        parameter.withModelProperty(new ExclusiveOptionalModelProperty(parseExclusiveParametersModel((ComponentAst) exclusiveOptional.getValue().getRight())));
+      }
+    } else {
+      parameter = declarer.onDefaultParameterGroup().withRequiredParameter(paramName);
+    }
 
     parameter.describedAs(optionalString(parameterAst, "description"))
-    parameter.ofType(typeLoader.load())
+            .ofType(typeLoader.load())
+            .withExpressionSupport()
+            .withRole(BEHAVIOUR);
   }
 
   private void parseOperationOutput(OperationDeclarer operation, ComponentAst operationDefAst) {
@@ -139,5 +172,14 @@ public class AppExtensionModelDeclarer {
   private String getResolvedParameter(ComponentAst ast, String paramName) {
     ComponentParameterAst parameter = ast.getParameter(paramName);
     return parameter != null ? parameter.getResolvedRawValue() : null;
+  }
+
+  private ExclusiveParametersModel parseExclusiveParametersModel(ComponentAst componentAst) {
+    Set<String> parameters = Stream.of(requiredString(componentAst, "parameters").split(","))
+            .map(String::trim)
+            .filter(p -> !isBlank(p))
+            .collect(toCollection(LinkedHashSet::new));
+
+    return new ImmutableExclusiveParametersModel(parameters, (Boolean) componentAst.getParameter("oneRequired").getValue().getRight());
   }
 }
