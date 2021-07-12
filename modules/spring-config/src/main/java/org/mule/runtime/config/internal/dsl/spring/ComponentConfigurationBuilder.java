@@ -343,19 +343,22 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
-            if (ownerComponentModel instanceof SourceModel) {
+            ComponentParameterAst param =
+                resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
+                                                                            createBeanDefinitionRequest
+                                                                                .getSpringComponentModel()
+                                                                                .getComponentIdentifier(),
+                                                                            ownerComponentModel.getParameterGroupModels()),
+                                 parameterName);
+
+            if (param == null && ownerComponentModel instanceof SourceModel) {
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
                                                                          createBeanDefinitionRequest.getSpringComponentModel()
                                                                              .getComponentIdentifier(),
                                                                          (SourceModel) ownerComponentModel);
-            } else {
-              return resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
-                                                                                 createBeanDefinitionRequest
-                                                                                     .getSpringComponentModel()
-                                                                                     .getComponentIdentifier(),
-                                                                                 ownerComponentModel.getParameterGroupModels()),
-                                      parameterName);
             }
+
+            return param;
           })
           .orElse(null);
 
