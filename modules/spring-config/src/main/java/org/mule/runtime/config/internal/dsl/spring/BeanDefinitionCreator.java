@@ -24,14 +24,14 @@ import org.springframework.beans.factory.config.BeanDefinition;
  *
  * @since 4.0
  */
-abstract class BeanDefinitionCreator {
+abstract class BeanDefinitionCreator<R extends CreateBeanDefinitionRequest> {
 
-  private BeanDefinitionCreator next;
+  private BeanDefinitionCreator<R> next;
 
   /**
    * @param nextBeanDefinitionCreator next processor in the chain.
    */
-  public void setNext(BeanDefinitionCreator nextBeanDefinitionCreator) {
+  public void setNext(BeanDefinitionCreator<R> nextBeanDefinitionCreator) {
     this.next = nextBeanDefinitionCreator;
   }
 
@@ -40,8 +40,7 @@ abstract class BeanDefinitionCreator {
    *
    * @param request
    */
-  public final void processRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                   CreateBeanDefinitionRequest request) {
+  public final void processRequest(Map<ComponentAst, SpringComponentModel> springComponentModels, R request) {
     if (handleRequest(springComponentModels, request)) {
       return;
     }
@@ -54,18 +53,18 @@ abstract class BeanDefinitionCreator {
    * Instances of {@code BeanDefinitionCreator} that will be responsible to create the {@code BeanDefinition} must return true to
    * this call, otherwise they must do nothing.
    *
-   * @param createBeanDefinitionRequest the creation request.
+   * @param request the creation request.
    * @return true if it created the {@code BeanDefinition}, false otherwise.
    */
-  abstract boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                 CreateBeanDefinitionRequest createBeanDefinitionRequest);
+  abstract boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels, R request);
 
   protected BeanDefinition getConvertibleBeanDefinition(Class<?> type, Object value, Optional<TypeConverter> converter) {
-    return converter.map(
-                         typeConverter -> genericBeanDefinition(ConstantFactoryBean.class).addConstructorArgValue(typeConverter
-                             .convert(value)).getBeanDefinition())
-        .orElseGet(
-                   () -> genericBeanDefinition(type).addConstructorArgValue(value).getBeanDefinition());
+    return converter.map(typeConverter -> genericBeanDefinition(ConstantFactoryBean.class)
+        .addConstructorArgValue(typeConverter.convert(value))
+        .getBeanDefinition())
+        .orElseGet(() -> genericBeanDefinition(type)
+            .addConstructorArgValue(value)
+            .getBeanDefinition());
 
   }
 

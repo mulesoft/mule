@@ -35,7 +35,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @since 4.0
  */
-class EagerObjectCreator extends BeanDefinitionCreator {
+class EagerObjectCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
 
   /**
    * These are the set of component model types that will not support complete dependency injection and lifecycle capabilities
@@ -48,8 +48,7 @@ class EagerObjectCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+                        CreateComponentBeanDefinitionRequest createBeanDefinitionRequest) {
     Class<ConfigurableObjectProvider> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (type == null) {
       return false;
@@ -64,14 +63,17 @@ class EagerObjectCreator extends BeanDefinitionCreator {
         throw new MuleRuntimeException(createStaticMessage("Could not create an instance of '%s' using default constructor. Early created object must have a default constructor",
                                                            type.getName()));
       }
+
+      ComponentAst component = createBeanDefinitionRequest.getComponent();
+
       componentBuildingDefinition.getSetterParameterDefinitions().forEach(attributeDefinition -> {
         SetterAttributeDefinition setterAttributeDefinition = (SetterAttributeDefinition) attributeDefinition;
         setterAttributeDefinition.getAttributeDefinition().accept(new AbstractAttributeDefinitionVisitor() {
 
           @Override
           public void onUndefinedSimpleParameters() {
-            Map<String, String> parameters = componentModel.getModel(ParameterizedModel.class)
-                .map(pm -> componentModel.getParameters().stream()
+            Map<String, String> parameters = component.getModel(ParameterizedModel.class)
+                .map(pm -> component.getParameters().stream()
                     .filter(param -> param.getResolvedRawValue() != null)
                     .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getResolvedRawValue)))
                 .orElse(null);
@@ -94,6 +96,7 @@ class EagerObjectCreator extends BeanDefinitionCreator {
       createBeanDefinitionRequest.getSpringComponentModel().setObjectInstance(instance);
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(rootBeanDefinition(ConstantFactoryBean.class)
           .addConstructorArgValue(instance).getBeanDefinition());
+
       return true;
     }).orElse(false);
   }
