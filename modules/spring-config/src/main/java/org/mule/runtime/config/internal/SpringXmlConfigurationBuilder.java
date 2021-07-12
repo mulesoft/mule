@@ -311,6 +311,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           }
 
           @Override
+          public List<ComponentAst> topLevelComponents() {
+            return parentArtifactAst.topLevelComponents();
+          }
+
+          @Override
           public Stream<ComponentAst> topLevelComponentsStream() {
             return parentArtifactAst.topLevelComponentsStream();
           }

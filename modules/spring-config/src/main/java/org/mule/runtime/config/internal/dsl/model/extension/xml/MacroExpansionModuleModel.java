@@ -210,6 +210,11 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
+            public List<ComponentAst> directChildren() {
+              return mappedGlobalElements;
+            }
+
+            @Override
             public Stream<ComponentAst> directChildrenStream() {
               return mappedGlobalElements.stream();
             }
