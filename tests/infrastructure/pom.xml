@@ -99,7 +99,6 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <classifier>indy</classifier>
-            <version>${groovyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
