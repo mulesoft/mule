@@ -57,13 +57,11 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
   private BeanDefinitionBuilder createBeanDefinitionBuilder(SpringComponentModel componentModel,
                                                             ComponentBuildingDefinition buildingDefinition) {
-    BeanDefinitionBuilder beanDefinitionBuilder;
     if (buildingDefinition.getObjectFactoryType() != null) {
-      beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(componentModel, buildingDefinition);
+      return createBeanDefinitionBuilderFromObjectFactory(componentModel, buildingDefinition);
     } else {
-      beanDefinitionBuilder = genericBeanDefinition(componentModel.getType());
+      return genericBeanDefinition(componentModel.getType());
     }
-    return beanDefinitionBuilder;
   }
 
   protected final void processNestedAnnotations(ComponentAst component, Map<QName, Object> previousAnnotations) {
@@ -95,16 +93,14 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
   private Map<QName, Object> processMetadataAnnotationsHelper(BeanDefinitionBuilder builder, ComponentAst componentModel) {
     Map<QName, Object> annotations = new HashMap<>();
-    if (componentModel == null) {
-      return annotations;
-    } else {
-      if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
-        addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getMetadata());
-        builder.getBeanDefinition().getPropertyValues().addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
-      }
 
-      return annotations;
+    if (componentModel != null
+        && Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
+      addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getMetadata());
+      builder.getBeanDefinition().getPropertyValues().addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
     }
+
+    return annotations;
   }
 
   /**

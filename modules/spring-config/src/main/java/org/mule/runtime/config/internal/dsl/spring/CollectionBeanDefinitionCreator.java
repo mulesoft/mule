@@ -41,25 +41,30 @@ class CollectionBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamB
 
     Class<Object> type = request.getSpringComponentModel().getType();
     if (Collection.class.isAssignableFrom(type)) {
-      request.getSpringComponentModel().setType(type);
-
-      Collection<ComponentAst> items = (Collection<ComponentAst>) request.getParam().getValue().getRight();
-
-      items.forEach(request.getNestedComponentParamProcessor());
-
-      ManagedList<Object> managedList = items.stream()
-          .map(springComponentModels::get)
-          .map(innerSpringComp -> innerSpringComp.getBeanDefinition() == null
-              ? innerSpringComp.getBeanReference()
-              : innerSpringComp.getBeanDefinition())
-          .collect(toCollection(ManagedList::new));
-
-      request.getSpringComponentModel()
-          .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(type)
-              .addConstructorArgValue(managedList).getBeanDefinition());
-
+      doHandleRequest(springComponentModels, request, type);
       return true;
     }
+
     return false;
+  }
+
+  private void doHandleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                               CreateParamBeanDefinitionRequest request, Class<Object> type) {
+    request.getSpringComponentModel().setType(type);
+
+    Collection<ComponentAst> items = (Collection<ComponentAst>) request.getParam().getValue().getRight();
+
+    items.forEach(request.getNestedComponentParamProcessor());
+
+    ManagedList<Object> managedList = items.stream()
+        .map(springComponentModels::get)
+        .map(innerSpringComp -> innerSpringComp.getBeanDefinition() == null
+            ? innerSpringComp.getBeanReference()
+            : innerSpringComp.getBeanDefinition())
+        .collect(toCollection(ManagedList::new));
+
+    request.getSpringComponentModel()
+        .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(type)
+            .addConstructorArgValue(managedList).getBeanDefinition());
   }
 }

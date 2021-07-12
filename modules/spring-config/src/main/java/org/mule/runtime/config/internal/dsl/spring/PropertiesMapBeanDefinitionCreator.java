@@ -37,25 +37,29 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
     if (component != null
         && (component.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
             || component.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))) {
-      ManagedMap<Object, Object> managedMap;
-      if (component.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)) {
-        managedMap = createManagedMapFromEntries(component);
-      } else {
-        managedMap = new ManagedMap<>();
-        final List<ComponentAst> hierarchy = createBeanDefinitionRequest.getComponentHierarchy();
-        ComponentAst parentComponentModel = hierarchy.isEmpty() ? null : hierarchy.get(hierarchy.size() - 1);
-        parentComponentModel.directChildrenStream()
-            .filter(childComponentModel -> childComponentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
-            .forEach(childComponentModel -> processAndAddMapProperty(childComponentModel, managedMap));
-      }
-      BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(HashMap.class);
-      createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder
-          .addConstructorArgValue(managedMap)
-          .getBeanDefinition());
+      doHandleRequest(createBeanDefinitionRequest, component);
 
       return true;
     }
     return false;
+  }
+
+  private void doHandleRequest(CreateComponentBeanDefinitionRequest createBeanDefinitionRequest, ComponentAst component) {
+    ManagedMap<Object, Object> managedMap;
+    if (component.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)) {
+      managedMap = createManagedMapFromEntries(component);
+    } else {
+      managedMap = new ManagedMap<>();
+      final List<ComponentAst> hierarchy = createBeanDefinitionRequest.getComponentHierarchy();
+      ComponentAst parentComponentModel = hierarchy.isEmpty() ? null : hierarchy.get(hierarchy.size() - 1);
+      parentComponentModel.directChildrenStream()
+          .filter(childComponentModel -> childComponentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
+          .forEach(childComponentModel -> processAndAddMapProperty(childComponentModel, managedMap));
+    }
+    BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(HashMap.class);
+    createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder
+        .addConstructorArgValue(managedMap)
+        .getBeanDefinition());
   }
 
   private ManagedMap<Object, Object> createManagedMapFromEntries(ComponentAst component) {

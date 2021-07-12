@@ -26,7 +26,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -75,7 +74,7 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
     }
     AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
-    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(originalBeanDefinition);
+    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinitionForSecurityFilter(originalBeanDefinition);
     if (originalBeanDefinition != wrappedBeanDefinition) {
       request.getSpringComponentModel().setType(wrappedBeanDefinition.getBeanClass());
     }
@@ -105,7 +104,17 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
         });
   }
 
-  private AbstractBeanDefinition adaptBeanDefinition(AbstractBeanDefinition originalBeanDefinition) {
+  private AbstractBeanDefinition adaptBeanDefinitionForSecurityFilter(AbstractBeanDefinition originalBeanDefinition) {
+    if (areMatchingTypes(SecurityFilter.class, resolveBeanClass(originalBeanDefinition))) {
+      return rootBeanDefinition(SecurityFilterMessageProcessor.class)
+          .addConstructorArgValue(originalBeanDefinition)
+          .getBeanDefinition();
+    } else {
+      return originalBeanDefinition;
+    }
+  }
+
+  private Class resolveBeanClass(AbstractBeanDefinition originalBeanDefinition) {
     Class beanClass;
     if (originalBeanDefinition instanceof RootBeanDefinition) {
       beanClass = ((RootBeanDefinition) originalBeanDefinition).getBeanClass();
@@ -120,16 +129,7 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
         }
       }
     }
-
-    BeanDefinition newBeanDefinition;
-    if (areMatchingTypes(SecurityFilter.class, beanClass)) {
-      newBeanDefinition = rootBeanDefinition(SecurityFilterMessageProcessor.class)
-          .addConstructorArgValue(originalBeanDefinition)
-          .getBeanDefinition();
-      return (AbstractBeanDefinition) newBeanDefinition;
-    } else {
-      return originalBeanDefinition;
-    }
+    return beanClass;
   }
 
   public static boolean areMatchingTypes(Class<?> superType, Class<?> childType) {

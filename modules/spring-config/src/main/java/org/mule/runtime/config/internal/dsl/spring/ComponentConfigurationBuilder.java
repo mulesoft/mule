@@ -343,33 +343,19 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
-            Optional<ParameterGroupModel> groupModelOptional;
-
             if (ownerComponentModel instanceof SourceModel) {
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
                                                                          createBeanDefinitionRequest.getSpringComponentModel()
                                                                              .getComponentIdentifier(),
                                                                          (SourceModel) ownerComponentModel);
             } else {
-              groupModelOptional =
-                  parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
-                                                             createBeanDefinitionRequest.getSpringComponentModel()
-                                                                 .getComponentIdentifier(),
-                                                             ownerComponentModel.getParameterGroupModels());
+              return resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
+                                                                                 createBeanDefinitionRequest
+                                                                                     .getSpringComponentModel()
+                                                                                     .getComponentIdentifier(),
+                                                                                 ownerComponentModel.getParameterGroupModels()),
+                                      parameterName);
             }
-            ComponentParameterAst p;
-            if (groupModelOptional.isPresent()) {
-              p = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
-            } else {
-              p = ownerComponent.getParameter(parameterName);
-            }
-
-            if (p == null && component != null) {
-              // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
-              return ownerComponent.getParameter(component.getIdentifier().getName());
-            }
-
-            return p;
           })
           .orElse(null);
 
@@ -406,6 +392,22 @@ class ComponentConfigurationBuilder<T> {
       }
 
       return ofNullable(parameterValue);
+    }
+
+    private ComponentParameterAst resolveParameter(Optional<ParameterGroupModel> groupModelOptional, String parameterName) {
+      ComponentParameterAst param;
+      if (groupModelOptional.isPresent()) {
+        param = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
+      } else {
+        param = ownerComponent.getParameter(parameterName);
+      }
+
+      if (param == null && component != null) {
+        // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
+        return ownerComponent.getParameter(component.getIdentifier().getName());
+      }
+
+      return param;
     }
 
     private long getDefaultSchedulerFixedFrequency() {
