@@ -343,25 +343,29 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
-            if (ownerComponentModel instanceof SourceModel) {
+            ComponentParameterAst param =
+                resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
+                                                                            createBeanDefinitionRequest
+                                                                                .getSpringComponentModel()
+                                                                                .getComponentIdentifier(),
+                                                                            ownerComponentModel.getParameterGroupModels()),
+                                 parameterName);
+
+            if (param == null && ownerComponentModel instanceof SourceModel) {
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
                                                                          createBeanDefinitionRequest.getSpringComponentModel()
                                                                              .getComponentIdentifier(),
                                                                          (SourceModel) ownerComponentModel);
-            } else {
-              return resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
-                                                                                 createBeanDefinitionRequest
-                                                                                     .getSpringComponentModel()
-                                                                                     .getComponentIdentifier(),
-                                                                                 ownerComponentModel.getParameterGroupModels()),
-                                      parameterName);
             }
+
+            return param;
           })
           .orElse(null);
 
       Object parameterValue;
       if (parameter == null) {
         // Fallback for test components that do not have an extension model.
+        // TODO MULE-17778 Remove this
         parameterValue = component == null
             ? null
             : component.getRawParameterValue(parameterName)
