@@ -449,7 +449,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
-  public void extractionExpressionIsUsedForActingParameters() throws Exception{
+  public void extractionExpressionIsUsedForActingParameters() throws Exception {
     final String extractionExpression = "actingParameter";
     final String otherParameterName = "otherParameterName";
     ActingParameterModel actingParameterModel = createActingParameterModel(otherParameterName);
@@ -466,8 +466,8 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
-  //Ideally, we would want to only use the actual field but that would require us to parse the extraction expression to actually
-  //find the field required. For now, the whole parameter will be used.
+  // Ideally, we would want to only use the actual field but that would require us to parse the extraction expression to actually
+  // find the field required. For now, the whole parameter will be used.
   public void wholeParameterIsUsedIfExpressionPointsToField() throws Exception {
     final String extractionExpression = COMPLEX_ACTING_PARAMETER_NAME + ".stringParam";
     ActingParameterModel actingParameterModel = createActingParameterModel(ACTING_PARAMETER_NAME);
@@ -478,11 +478,11 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
 
     Optional<ValueProviderCacheId> operationId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
     assertThat(operationId.isPresent(), is(true));
-    //Modify a parameter that should not affect the hash
+    // Modify a parameter that should not affect the hash
     modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> {
       Map<String, ParameterValue> complexDeclaration = new HashMap<>(((ParameterObjectValue) p.getValue()).getParameters());
       complexDeclaration.put("intParam", plain("999"));
-      ((ParameterObjectValue)p.getValue()).setParameters(complexDeclaration);
+      ((ParameterObjectValue) p.getValue()).setParameters(complexDeclaration);
     });
     checkIdsAreDifferent(operationId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
@@ -535,7 +535,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
-  public void actingFieldFromNotExistentParameterIsNotConsideredForId() throws Exception{
+  public void actingFieldFromNotExistentParameterIsNotConsideredForId() throws Exception {
     final String targetSelector = "some.target.path";
     FieldValueProviderModel fieldValueProviderModel =
         createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetSelector);

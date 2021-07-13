@@ -566,7 +566,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     assertThat(id1, equalTo(id2));
   }
 
-  protected void  checkIdsAreDifferent(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
+  protected void checkIdsAreDifferent(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
     LOGGER.debug("ID1: " + id1.map(i -> collectLog(i, 0)).orElse("empty"));
     LOGGER.debug("ID2: " + id2.map(i -> collectLog(i, 0)).orElse("empty"));
     assertThat(id1, not(equalTo(id2)));
