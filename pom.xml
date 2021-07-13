@@ -1571,6 +1571,7 @@
                 <plugin>
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
+                    <version>${assembly.verifier.version}</version>
 
                     <configuration>
                         <skip>${skipVerifications}</skip>
