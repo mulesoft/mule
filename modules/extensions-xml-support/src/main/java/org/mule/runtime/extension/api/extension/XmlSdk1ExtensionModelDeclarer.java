@@ -39,10 +39,9 @@ public class XmlSdk1ExtensionModelDeclarer {
   private static final String XMLSDK1_STEREOTYPE_NAMESPACE = "XML_SDK_1";
 
   private static final StereotypeModel PARAMS_STEREOTYPE = newStereotype("PARAMETERS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
-  private static final StereotypeModel PARAM_STEREOTYPE = newStereotype("PARAMETER", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel ERRORS_STEREOTYPE = newStereotype("ERRORS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
-  private static final StereotypeModel ERROR_STEREOTYPE = newStereotype("ERROR", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel OUTPUT_STEREOTYPE = newStereotype("OUTPUT", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+  private static final StereotypeModel OUTPUT_ATTRIBUTES_STEREOTYPE = newStereotype("OUTPUT-ATTRIBUTES", XMLSDK1_STEREOTYPE_NAMESPACE).build();
 
   public ExtensionDeclarer createExtensionModel() {
     final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
@@ -133,7 +132,17 @@ public class XmlSdk1ExtensionModelDeclarer {
     operationDeclaration.withOptionalComponent("body").withChain().withStereotype(CHAIN);
 
     operationDeclaration.withOptionalComponent("output")
+        .describedAs("Defines the output of the operation if exists, void otherwise.")
         .withStereotype(OUTPUT_STEREOTYPE)
+        .onDefaultParameterGroup()
+        .withRequiredParameter("type")
+        .ofType(typeBuilder.stringType()
+            .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
+            .build());
+
+    operationDeclaration.withOptionalComponent("output-attributes")
+        .describedAs("Defines the attribute's output of the operation if exists, void otherwise.")
+        .withStereotype(OUTPUT_ATTRIBUTES_STEREOTYPE)
         .onDefaultParameterGroup()
         .withRequiredParameter("type")
         .ofType(typeBuilder.stringType()
