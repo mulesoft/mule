@@ -35,6 +35,7 @@ import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
+import org.mule.runtime.module.extension.internal.value.ValueProviderUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -72,9 +73,9 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
   @Override
   public Optional<ValueProviderCacheId> getIdForResolvedValues(ComponentAst containerComponent, String parameterName) {
     return ifContainsParameter(containerComponent, parameterName)
-        .flatMap(ParameterModel::getValueProviderModel)
-        .flatMap(valueProviderModel -> resolveParametersInformation(containerComponent)
-            .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
+            .flatMap(ParameterModel::getValueProviderModel)
+            .flatMap(valueProviderModel -> resolveParametersInformation(containerComponent)
+                    .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
   }
 
   /**
@@ -92,52 +93,51 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
   public Optional<ValueProviderCacheId> getIdForResolvedValues(ComponentAst containerComponent, String parameterName,
                                                                String targetPath) {
     return ifContainsParameter(containerComponent, parameterName)
-        .flatMap(pm -> pm.getFieldValueProviderModels().stream().filter(fm -> Objects.equal(fm.getTargetPath(), targetPath))
-            .findAny())
-        .flatMap(fieldModel -> resolveParametersInformation(containerComponent)
-            .flatMap(infoMap -> resolveId(containerComponent, fieldModel, infoMap)));
+            .flatMap(pm -> pm.getFieldValueProviderModels()
+                    .stream()
+                    .filter(fm -> Objects.equal(fm.getTargetSelector(), targetPath))
+                    .findAny())
+            .flatMap(fieldModel -> resolveParametersInformation(containerComponent)
+                    .flatMap(infoMap -> resolveId(containerComponent, fieldModel, infoMap)));
   }
 
   private Optional<ParameterModel> ifContainsParameter(ComponentAst containerComponent, String parameterName) {
     return containerComponent.getModel(ParameterizedModel.class)
-        .flatMap(parameterizedModel -> parameterizedModel
-            .getAllParameterModels()
-            .stream()
-            .filter(p -> Objects.equal(parameterName, p.getName()))
-            .findAny());
+            .flatMap(parameterizedModel -> parameterizedModel
+                    .getAllParameterModels()
+                    .stream()
+                    .filter(p -> Objects.equal(parameterName, p.getName()))
+                    .findAny());
   }
 
   private Optional<Map<String, ParameterModelInformation>> resolveParametersInformation(ComponentAst containerComponent) {
     return containerComponent.getModel(ParameterizedModel.class)
-        .map(parameterizedModel -> containerComponent.getParameters()
-            .stream()
-            .map(ParameterModelInformation::new)
-            .collect(toMap(i -> i.getParameterModel().getName(), identity())));
+            .map(parameterizedModel -> containerComponent.getParameters()
+                    .stream()
+                    .map(ParameterModelInformation::new)
+                    .collect(toMap(i -> i.getParameterModel().getName(), identity())));
   }
 
   private Optional<ValueProviderCacheId> resolveId(ComponentAst containerComponent, ValueProviderModel valueProviderModel,
                                                    Map<String, ParameterModelInformation> parameterModelsInformation) {
     final Optional<ComponentModel> compModel = containerComponent.getModel(ComponentModel.class);
 
-    if (compModel.isPresent()) {
-      return resolveForComponentModel(containerComponent, valueProviderModel, parameterModelsInformation);
-    } else {
-      return resolveForGlobalElement(containerComponent, valueProviderModel, parameterModelsInformation);
-    }
+    return compModel
+            .map(c -> resolveForComponentModel(containerComponent, valueProviderModel, parameterModelsInformation))
+            .orElse(resolveForGlobalElement(containerComponent, valueProviderModel, parameterModelsInformation));
   }
 
   private Optional<ValueProviderCacheId> resolveForGlobalElement(ComponentAst containerComponent,
                                                                  ValueProviderModel valueProviderModel,
                                                                  Map<String, ParameterModelInformation> parameterModelsInformation) {
-    List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    parts.addAll(resolveActingParameterIds(containerComponent, valueProviderModel, parameterModelsInformation));
+    List<ValueProviderCacheId> parts = new LinkedList<>(resolveActingParameterIds(containerComponent, valueProviderModel, parameterModelsInformation));
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
     String id = sourceElementName(containerComponent);
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
-        .containing(parts)));
+            .containing(parts)));
   }
 
   private Optional<ValueProviderCacheId> resolveForComponentModel(ComponentAst containerComponent,
@@ -152,7 +152,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
 
     String id = containerComponent.getIdentifier().toString();
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
-        .containing(parts)));
+            .containing(parts)));
   }
 
   private String resolveDslTagNamespace(ComponentAst containerComponent) {
@@ -166,72 +166,75 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     }
 
     return resolveConfigName(containerComponent)
-        .flatMap(config -> locator.get(Location.builder().globalName(config).build()))
-        .filter(configDslElementModel -> configDslElementModel.getModel(ConfigurationModel.class).isPresent())
-        .map(configDslElementModel -> {
-          List<ValueProviderCacheId> injectableIds = new LinkedList<>();
+            .flatMap(config -> locator.get(Location.builder().globalName(config).build()))
+            .filter(configDslElementModel -> configDslElementModel.getModel(ConfigurationModel.class).isPresent())
+            .map(configDslElementModel -> {
+              List<ValueProviderCacheId> injectableIds = new LinkedList<>();
 
-          if (valueProviderModel.requiresConfiguration()) {
-            resolveIdForInjectedElement(configDslElementModel)
-                .ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("config: ").containing(id))));
-          }
+              if (valueProviderModel.requiresConfiguration()) {
+                resolveIdForInjectedElement(configDslElementModel)
+                        .ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("config: ").containing(id))));
+              }
 
-          if (valueProviderModel.requiresConnection()) {
-            configDslElementModel.directChildrenStream()
-                .filter(nested -> nested.getModel(ConnectionProviderModel.class).isPresent())
-                .forEach(connectionProvider -> resolveIdForInjectedElement(connectionProvider)
-                    .ifPresent(id -> injectableIds
-                        .add(aValueProviderCacheId(fromElementWithName("connection: ").containing(id)))));
-          }
+              if (valueProviderModel.requiresConnection()) {
+                configDslElementModel.directChildrenStream()
+                        .filter(nested -> nested.getModel(ConnectionProviderModel.class).isPresent())
+                        .forEach(connectionProvider -> resolveIdForInjectedElement(connectionProvider)
+                                .ifPresent(id -> injectableIds
+                                        .add(aValueProviderCacheId(fromElementWithName("connection: ").containing(id)))));
+              }
 
-          return injectableIds;
-        })
-        .orElse(emptyList());
+              return injectableIds;
+            })
+            .orElse(emptyList());
   }
 
 
   private Optional<ValueProviderCacheId> resolveIdForInjectedElement(ComponentAst injectedElement) {
     return injectedElement.getModel(EnrichableModel.class)
-        .flatMap(enrichableModel -> {
-          List<String> parametersRequiredForMetadata =
-              enrichableModel
-                  .getModelProperty(RequiredForMetadataModelProperty.class)
-                  .map(RequiredForMetadataModelProperty::getRequiredParameters)
-                  .orElse(emptyList());
+            .flatMap(enrichableModel -> {
+              List<String> parametersRequiredForMetadata =
+                      enrichableModel
+                              .getModelProperty(RequiredForMetadataModelProperty.class)
+                              .map(RequiredForMetadataModelProperty::getRequiredParameters)
+                              .orElse(emptyList());
 
-          List<ValueProviderCacheId> parts = resolveParametersInformation(injectedElement)
-              .map(pi -> parametersRequiredForMetadata
-                  .stream()
-                  .filter(pi::containsKey)
-                  .map(requiredParameter -> resolveParameterId(injectedElement, pi.get(requiredParameter).getParameterAst()))
-                  .collect(toList()))
-              .orElse(emptyList());
+              List<ValueProviderCacheId> parts = resolveParametersInformation(injectedElement)
+                      .map(pi -> parametersRequiredForMetadata
+                              .stream()
+                              .filter(pi::containsKey)
+                              .map(requiredParameter -> resolveParameterId(injectedElement, pi.get(requiredParameter).getParameterAst()))
+                              .collect(toList()))
+                      .orElse(emptyList());
 
-          if (parts.isEmpty()) {
-            return empty();
-          }
+              if (parts.isEmpty()) {
+                return empty();
+              }
 
-          String sourceElementName = sourceElementNameFromSimpleValue(injectedElement);
+              String sourceElementName = sourceElementNameFromSimpleValue(injectedElement);
 
-          return of(aValueProviderCacheId(fromElementWithName(sourceElementName).withHashValueFrom(sourceElementName)
-              .containing(parts)));
-        });
+              return of(aValueProviderCacheId(fromElementWithName(sourceElementName).withHashValueFrom(sourceElementName)
+                      .containing(parts)));
+            });
   }
 
   private ValueProviderCacheId resolveValueProviderId(ValueProviderModel valueProviderModel) {
     return aValueProviderCacheId(fromElementWithName("providerId: " + valueProviderModel.getProviderId())
-        .withHashValueFrom(valueProviderModel.getProviderId()));
+            .withHashValueFrom(valueProviderModel.getProviderId()));
   }
 
   private List<ValueProviderCacheId> resolveActingParameterIds(ComponentAst containerComponent,
                                                                ValueProviderModel valueProviderModel,
                                                                Map<String, ParameterModelInformation> parameterModelsInformation) {
     return valueProviderModel.getParameters()
-        .stream()
-        .map(ActingParameterModel::getName)
-        .filter(parameterModelsInformation::containsKey)
-        .map(ap -> resolveParameterId(containerComponent, parameterModelsInformation.get(ap).getParameterAst()))
-        .collect(toList());
+            .stream()
+            .map(ActingParameterModel::getExtractionExpression)
+            .map(ValueProviderUtils::getParameterNameFromExtractionExpression)
+            .filter(parameterModelsInformation::containsKey)
+            .map(parameterModelsInformation::get)
+            .map(ParameterModelInformation::getParameterAst)
+            .map(ast -> resolveParameterId(containerComponent, ast))
+            .collect(toList());
   }
 
   private ValueProviderCacheId resolveParameterId(ComponentAst containerComponent,

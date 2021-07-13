@@ -58,7 +58,6 @@ import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
-import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
@@ -84,7 +83,6 @@ import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 import org.mule.runtime.extension.api.model.config.ImmutableConfigurationModel;
 import org.mule.runtime.extension.api.model.connection.ImmutableConnectionProviderModel;
 import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
-import org.mule.runtime.extension.api.model.parameter.ImmutableActingParameterModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterGroupModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
@@ -100,14 +98,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractMockedValueProviderExtensionTestCase extends AbstractMuleTestCase {
 
@@ -396,20 +393,20 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     return createActingParameterModel(parameterName, parameterName);
   }
 
-  protected ActingParameterModel createActingParameterModel(String parameterName, String targetPath) {
+  protected ActingParameterModel createActingParameterModel(String parameterName, String extractionExpression) {
     ActingParameterModel actingParameterModel = mock(ActingParameterModel.class);
     when(actingParameterModel.getName()).thenReturn(parameterName);
-    when(actingParameterModel.getPath()).thenReturn(targetPath);
+    when(actingParameterModel.getExtractionExpression()).thenReturn(extractionExpression);
     return actingParameterModel;
   }
 
-  protected FieldValueProviderModel createFieldValueProviderModel(String providerName, String providerId, String targetPath) {
+  protected FieldValueProviderModel createFieldValueProviderModel(String providerName, String providerId, String targetSelector) {
     FieldValueProviderModel fieldValueProviderModel = mock(FieldValueProviderModel.class);
     when(fieldValueProviderModel.getProviderName()).thenReturn(providerName);
     when(fieldValueProviderModel.getProviderId()).thenReturn(providerId);
     when(fieldValueProviderModel.requiresConnection()).thenReturn(false);
     when(fieldValueProviderModel.requiresConfiguration()).thenReturn(false);
-    when(fieldValueProviderModel.getTargetPath()).thenReturn(targetPath);
+    when(fieldValueProviderModel.getTargetSelector()).thenReturn(targetSelector);
     return fieldValueProviderModel;
   }
 
@@ -569,7 +566,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     assertThat(id1, equalTo(id2));
   }
 
-  protected void checkIdsAreDifferent(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
+  protected void  checkIdsAreDifferent(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
     LOGGER.debug("ID1: " + id1.map(i -> collectLog(i, 0)).orElse("empty"));
     LOGGER.debug("ID2: " + id2.map(i -> collectLog(i, 0)).orElse("empty"));
     assertThat(id1, not(equalTo(id2)));
