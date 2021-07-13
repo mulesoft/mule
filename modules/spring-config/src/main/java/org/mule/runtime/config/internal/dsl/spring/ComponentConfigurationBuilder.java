@@ -359,10 +359,6 @@ class ComponentConfigurationBuilder<T> {
           })
           .orElse(null);
 
-      if (parameter == null) {
-        return empty();
-      }
-
       Object parameterValue;
       if ("frequency".equals(parameterName)
           && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
