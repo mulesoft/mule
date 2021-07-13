@@ -306,9 +306,12 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
         <oldMuleArtifactVersion>4.3.0</oldMuleArtifactVersion>
-        
+
         <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
+
+        <groovyVersion>3.0.7</groovyVersion>
+        <assembly.verifier.version>1.4</assembly.verifier.version>
     </properties>
 
     <dependencies>
@@ -775,7 +778,7 @@
 
             <dependency>
                 <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-dwb-api</artifactId>                
+                <artifactId>mule-dwb-api</artifactId>
                 <version>${weaveVersion}</version>
             </dependency>
 
@@ -1568,10 +1571,32 @@
                 <plugin>
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
+                    <version>${assembly.verifier.version}</version>
 
                     <configuration>
                         <skip>${skipVerifications}</skip>
                     </configuration>
+
+                    <dependencies>
+                        <!--
+                            Groovy dependency is handled by Mule differently,
+                            declare the compatible one explicitly for the plugin.
+                        -->
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy</artifactId>
+                            <version>${groovyVersion}</version>
+                        </dependency>
+                    </dependencies>
+
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila</groupId>
@@ -1940,7 +1965,7 @@
                 <surefire.args>-agentpath:'${yourkit.agent.path}'=disablestacktelemetry,exceptions=disable,probe_disable=*,listen=all ${surefire.args.base}</surefire.args>
             </properties>
         </profile>
-		<profile>
+        <profile>
             <id>release</id>
             <properties>
                 <skipVerifications>false</skipVerifications>
