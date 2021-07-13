@@ -309,6 +309,9 @@
         
         <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
+
+        <groovyVersion>3.0.7</groovyVersion>
+        <assembly.verifier.version>1.4</assembly.verifier.version>
     </properties>
 
     <dependencies>
@@ -1572,6 +1575,27 @@
                     <configuration>
                         <skip>${skipVerifications}</skip>
                     </configuration>
+
+                    <dependencies>
+                        <!--
+                            Groovy dependency is handled by Mule differently,
+                            declare the compatible one explicitly for the plugin.
+                        -->
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy</artifactId>
+                            <version>${groovyVersion}</version>
+                        </dependency>
+                    </dependencies>
+
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila</groupId>
