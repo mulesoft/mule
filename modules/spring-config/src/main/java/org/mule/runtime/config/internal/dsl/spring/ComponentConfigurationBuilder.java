@@ -360,7 +360,14 @@ class ComponentConfigurationBuilder<T> {
           .orElse(null);
 
       Object parameterValue;
-      if ("frequency".equals(parameterName)
+      if (parameter == null) {
+        // Fallback for test components that do not have an extension model.
+        parameterValue = component == null
+            ? null
+            : component.getRawParameterValue(parameterName)
+                .map(v -> (Object) v)
+                .orElse(defaultValue);
+      } else if ("frequency".equals(parameterName)
           && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
           && parameter.isDefaultValue()) {
         // Account for inconsistency in the extension model. Ref: MULE-18262
