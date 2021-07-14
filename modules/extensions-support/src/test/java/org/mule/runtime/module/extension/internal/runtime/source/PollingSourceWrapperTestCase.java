@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -210,17 +210,32 @@ public class PollingSourceWrapperTestCase {
   }
 
   private void verifyAcceptedItemLogMessage(Logger logger, String pollItemId) {
-    verifyLogMessages(logger, String.format(PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, pollItemId));
+    verifyLogMessage(logger, PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, pollItemId);
   }
 
   private void verifyRejectedItemLogMessage(Logger logger, String pollItemId, PollContext.PollItemStatus status) {
-    verifyLogMessages(logger, String.format(PollingSourceWrapper.REJECTED_ITEM_MESSAGE, pollItemId, status));
+    verifyLogMessage(logger, PollingSourceWrapper.REJECTED_ITEM_MESSAGE, pollItemId, status);
   }
 
-  private void verifyLogMessages(Logger logger, String... expectedMessages) {
-    ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
-    verify(logger, atLeastOnce()).debug(argumentCaptor.capture());
-    List<String> messages = argumentCaptor.getAllValues();
-    assertThat(messages, hasItems(expectedMessages));
+  private void verifyLogMessage(Logger logger, String expectedMessage, Object argument) {
+    ArgumentCaptor<String> argument1Captor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Object> argument2Captor = ArgumentCaptor.forClass(Object.class);
+    verify(logger, atLeastOnce()).debug(argument1Captor.capture(), argument2Captor.capture());
+    List<String> messages = argument1Captor.getAllValues();
+    assertThat(messages, hasItem(expectedMessage));
+    int index = messages.indexOf(expectedMessage);
+    assertThat(argument2Captor.getAllValues().get(index), is(argument));
+  }
+
+  private void verifyLogMessage(Logger logger, String expectedMessage, Object argument1, Object argument2) {
+    ArgumentCaptor<String> argument1Captor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Object> argument2Captor = ArgumentCaptor.forClass(Object.class);
+    ArgumentCaptor<Object> argument3Captor = ArgumentCaptor.forClass(Object.class);
+    verify(logger, atLeastOnce()).debug(argument1Captor.capture(), argument2Captor.capture(), argument3Captor.capture());
+    List<String> messages = argument1Captor.getAllValues();
+    assertThat(messages, hasItem(expectedMessage));
+    int index = messages.indexOf(expectedMessage);
+    assertThat(argument2Captor.getAllValues().get(index), is(argument1));
+    assertThat(argument3Captor.getAllValues().get(index), is(argument2));
   }
 }

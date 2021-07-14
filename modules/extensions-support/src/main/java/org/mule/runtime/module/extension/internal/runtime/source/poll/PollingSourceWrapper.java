@@ -81,8 +81,8 @@ import org.slf4j.Logger;
  */
 public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Restartable {
 
-  public static final String REJECTED_ITEM_MESSAGE = "Item with id:[%s] rejected, status:[%s]";
-  public static final String ACCEPTED_ITEM_MESSAGE = "Item with id:[%s] accepted";
+  public static final String REJECTED_ITEM_MESSAGE = "Item with id:[%s] is rejected with status:[%s]";
+  public static final String ACCEPTED_ITEM_MESSAGE = "Item with id:[%s] is accepted";
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
   private static final String UPDATE_PROCESSED_LOCK = "OSClearing";
@@ -305,10 +305,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       String itemId = getItemId(pollItem);
       if (status != ACCEPTED || currentPollItemLimitApplied) {
-        LOGGER.debug(String.format(REJECTED_ITEM_MESSAGE, itemId, status));
+        LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status);
         rejectItem(pollItem.getResult(), callbackContext);
       } else {
-        LOGGER.debug(String.format(ACCEPTED_ITEM_MESSAGE, itemId));
+        LOGGER.debug(ACCEPTED_ITEM_MESSAGE, itemId);
       }
 
       return status;
