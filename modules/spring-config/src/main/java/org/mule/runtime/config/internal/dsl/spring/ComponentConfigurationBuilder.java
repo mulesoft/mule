@@ -362,6 +362,7 @@ class ComponentConfigurationBuilder<T> {
       Object parameterValue;
       if (parameter == null) {
         // Fallback for test components that do not have an extension model.
+        // TODO MULE-17778 Remove this
         parameterValue = component == null
             ? null
             : component.getRawParameterValue(parameterName)

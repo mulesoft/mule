@@ -6,11 +6,11 @@
  */
 package org.mule.test.crafted.config.properties.extension;
 
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.test.crafted.config.properties.extension.TestConfigPropertiesExtensionLoadingDelegate.EXTENSION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ResourceProvider;
@@ -38,19 +38,10 @@ public class SecureConfigurationPropertiesProviderFactory implements Configurati
                                                               UnaryOperator<String> localResolver,
                                                               ResourceProvider externalResourceProvider) {
     String file = providerElementDeclaration.getParameter("file").getResolvedRawValue();
-    Preconditions.checkArgument(file != null, "Required attribute 'file' of 'secure-configuration-properties' not found");
+    requireNonNull(file, "Required attribute 'file' of 'secure-configuration-properties' not found");
 
-    ComponentIdentifier encryptComponentIdentifier =
-        ComponentIdentifier.builder().namespace(EXTENSION_NAME).name("encrypt").build();
-
-    ComponentAst encrypt = providerElementDeclaration
-        .directChildrenStream()
-        .filter(c -> c.getIdentifier().equals(encryptComponentIdentifier))
-        .findFirst()
-        .get();
-
-    String algorithm = encrypt.getRawParameterValue("algorithm").orElse(null);
-    String mode = encrypt.getRawParameterValue("mode").orElse(null);
+    String algorithm = providerElementDeclaration.getParameter("encrypt", "algorithm").getResolvedRawValue();
+    String mode = providerElementDeclaration.getParameter("encrypt", "mode").getResolvedRawValue();
 
     return new SecureConfigurationPropertiesProvider(externalResourceProvider, file, algorithm, mode);
   }
