@@ -52,7 +52,6 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INT
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.NULL_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.OBJECT_STORE_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.TYPE_LOADER;
@@ -94,7 +93,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
@@ -242,16 +240,15 @@ class MuleExtensionModelDeclarer {
         .hasResponse(false)
         .describedAs("Source that schedules periodic execution of a flow.");
 
-    scheduler.withOutput().ofType(NULL_TYPE);
-    scheduler.withOutputAttributes().ofType(NULL_TYPE);
+    scheduler.withOutput().ofType(typeLoader.load(Object.class));
+    scheduler.withOutputAttributes().ofType(typeLoader.load(Object.class));
 
-    final ParameterGroupDeclarer params = scheduler.onDefaultParameterGroup();
-    params
+    scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
         .ofType(buildSchedulingStrategyType(extensionDeclarer, TYPE_LOADER))
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params
+    scheduler.onDefaultParameterGroup()
         .withOptionalParameter("disallowConcurrentExecution")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false)
@@ -548,14 +545,14 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+
     ConstructDeclarer forEach = extensionDeclarer.withConstruct("foreach")
         .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
             + " generating a message for each element.");
 
     forEach.withChain();
 
-    final ParameterGroupDeclarer params = forEach.onDefaultParameterGroup();
-    final ParameterDeclarer collectionParam = params
+    ParameterDeclarer collectionParam = forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
@@ -565,26 +562,27 @@ class MuleExtensionModelDeclarer {
         .describedAs("Expression that defines the collection to iterate over.");
     if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
       try {
-        collectionParam.withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+        collectionParam = collectionParam
+            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
       } catch (InstantiationException | IllegalAccessException e) {
         // ignore
       }
     }
 
-    params
+    forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Partitions the collection in sub-collections of the specified size.");
 
-    params
+    forEach.onDefaultParameterGroup()
         .withOptionalParameter("rootMessageVariableName")
         .ofType(STRING_TYPE)
         .defaultingTo("rootMessage")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Variable name for the original message.");
 
-    params
+    forEach.onDefaultParameterGroup()
         .withOptionalParameter("counterVariableName")
         .ofType(STRING_TYPE)
         .defaultingTo("counter")
@@ -663,8 +661,9 @@ class MuleExtensionModelDeclarer {
     flow.withComponent("source")
         .withAllowedStereotypes(MuleStereotypes.SOURCE);
     flow.withChain().setRequired(true);
-    flow.withOptionalComponent("errorHandler")
+    flow.withComponent("errorHandler")
         .withAllowedStereotypes(ERROR_HANDLER);
+
   }
 
   private void declareSubflow(ExtensionDeclarer extensionDeclarer) {
@@ -700,27 +699,26 @@ class MuleExtensionModelDeclarer {
 
     scatterGather.withRoute("route").withMinOccurs(2).withChain();
 
-    ParameterGroupDeclarer params = scatterGather.onDefaultParameterGroup();
-    params
+    scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
         .defaultingTo(Long.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
-    params
+    scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
         .ofType(INTEGER_TYPE)
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
-    params
+    scatterGather.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
 
-    params
+    scatterGather.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .defaultingTo(PAYLOAD)
@@ -742,8 +740,7 @@ class MuleExtensionModelDeclarer {
 
     parallelForeach.withChain();
 
-    ParameterGroupDeclarer params = parallelForeach.onDefaultParameterGroup();
-    ParameterDeclarer collectionParam = params
+    ParameterDeclarer collectionParam = parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
@@ -760,26 +757,26 @@ class MuleExtensionModelDeclarer {
       }
     }
 
-    params
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
         .defaultingTo(Long.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
-    params
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
         .ofType(INTEGER_TYPE)
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
-    params
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
 
-    params
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .defaultingTo(PAYLOAD)
@@ -845,9 +842,14 @@ class MuleExtensionModelDeclarer {
     declareOnErrorRoute(onErrorPropagate);
 
     errorHandler.withOptionalComponent("onError")
+        .withAllowedStereotypes(ON_ERROR)
+        .describedAs("Error handler used to reference others.");
+
+    ConstructDeclarer onError = extensionDeclarer.withConstruct("onError")
         .withStereotype(ON_ERROR)
-        .describedAs("Error handler used to reference others.")
-        .onDefaultParameterGroup()
+        .describedAs("Error handler used to reference others.");
+
+    onError.onDefaultParameterGroup()
         .withRequiredParameter("ref")
         .withAllowedStereotypes(asList(ON_ERROR))
         .ofType(STRING_TYPE)
@@ -864,7 +866,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareOnErrorRoute(NestedRouteDeclarer onError) {
-    onError.withMaxOccurs(1).withChain();
+    onError.withChain();
     declareOnErrorRouteParams(onError);
   }
 
@@ -964,15 +966,14 @@ class MuleExtensionModelDeclarer {
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
 
-    final ParameterGroupDeclarer params = configuration.onDefaultParameterGroup();
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultResponseTimeout")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("10000")
         .describedAs("The default period (ms) to wait for a synchronous response.");
 
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultTransactionTimeout")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -980,7 +981,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("The default timeout (ms) for transactions. This can also be configured on transactions, "
             + "in which case the transaction configuration is used instead of this default.");
 
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultErrorHandler-ref")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -992,7 +993,7 @@ class MuleExtensionModelDeclarer {
             .allowTopLevelDefinition(false)
             .build());
 
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("inheritIterableRepeatability")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false)
@@ -1000,7 +1001,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.")
         .withModelProperty(new SinceMuleVersionModelProperty("4.3.0"));
 
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("shutdownTimeout")
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -1014,7 +1015,7 @@ class MuleExtensionModelDeclarer {
             + "5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after "
             + "shutdown is initiated.");
 
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("maxQueueTransactionFilesSize")
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -1023,7 +1024,7 @@ class MuleExtensionModelDeclarer {
             + " Take into account that this number applies both to the set of transaction log files for XA and for local transactions. "
             + "If both types of transactions are used then the approximate maximum space used, will be twice the configured value.");
 
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultObjectSerializer-ref")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -1035,7 +1036,7 @@ class MuleExtensionModelDeclarer {
             .allowTopLevelDefinition(false)
             .build());
 
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("dynamicConfigExpiration")
         .describedAs(DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION)
         .ofType(new DynamicConfigExpirationTypeBuilder().buildDynamicConfigExpirationType())
@@ -1046,7 +1047,7 @@ class MuleExtensionModelDeclarer {
             .allowTopLevelDefinition(false)
             .build());
 
-    params
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("correlationIdGeneratorExpression")
         .ofType(STRING_TYPE)
         .withExpressionSupport(REQUIRED)

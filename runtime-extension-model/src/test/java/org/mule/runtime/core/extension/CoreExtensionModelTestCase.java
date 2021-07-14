@@ -42,6 +42,7 @@ import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
@@ -875,6 +876,6 @@ public class CoreExtensionModelTestCase {
     assertThat(paramModel.getType(), instanceOf(DefaultBooleanType.class));
     assertThat(paramModel.isRequired(), is(false));
     assertThat(paramModel.getDefaultValue(), is(false));
-    assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(boolean.class.getName()));
+    assertThat(paramModel.getType(), is(instanceOf(BooleanType.class)));
   }
 }
