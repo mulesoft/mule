@@ -293,7 +293,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureToStringTransformerTransformIteratorElements();
       configureEnablePolicyIsolation();
       configureEntityResolverFailOnFirstErrorFeature();
-      configureSetVariableWithNullPayload();
+      configureSetVariableWithNullVale();
     }
   }
 
@@ -1242,9 +1242,10 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    *
    * @since 4.4.0
    */
-  private static void configureSetVariableWithNullPayload() {
+  private static void configureSetVariableWithNullVale() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(SET_VARIABLE_WITH_NULL_VALUE, featureContext -> featureContext
             .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
+
 }
