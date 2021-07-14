@@ -625,9 +625,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     flowConstruct = new LazyValue<>(() -> (FlowConstruct) componentLocator.find(getRootContainerLocation()).orElse(null));
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
-      LOGGER
-          .debug("Message source '{}' on flow '{}' is being initialised, it is running on the primary node or no cluster restrictions are being applied.",
-                 sourceModel.getName(), getLocation().getRootContainerName());
+      boolean isPrimaryPollingInstance = clusterService.isPrimaryPollingInstance();
+      if (primaryNodeOnly) {
+        LOGGER
+            .debug("Message source '{}' on flow '{}' is being initialised, it is running on the primary node and it must only run on this node.",
+                   sourceModel.getName(), getLocation().getRootContainerName());
+      } else {
+        LOGGER
+            .debug("Message source '{}' on flow '{}' is being initialised, there are no cluster restrictions regarding which node must run the source. This node {} the primary node.",
+                   sourceModel.getName(), getLocation().getRootContainerName(), isPrimaryPollingInstance ? "is" : "is not");
+      }
+
       reallyDoInitialise();
     } else {
       LOGGER
