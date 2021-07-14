@@ -1237,15 +1237,15 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures {@link FeatureFlaggingService} to revert MULE-19443 for applications with <code>minMuleVersion</code>
-   * lesser than 4.4.0.
+   * Configures {@link FeatureFlaggingService} to revert MULE-19443 for applications with <code>minMuleVersion</code> lesser than
+   * 4.4.0.
    *
    * @since 4.4.0
    */
   private static void configureSetVariableWithNullVale() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(SET_VARIABLE_WITH_NULL_VALUE, featureContext -> featureContext
-            .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 
 }

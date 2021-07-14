@@ -72,8 +72,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
     if (!featureFlaggingService.isEnabled(SET_VARIABLE_WITH_NULL_VALUE) && typedValue.getValue() == null) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(format(
-                "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
-                key, valueEvaluator.getRawValue()));
+                            "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
+                            key, valueEvaluator.getRawValue()));
       }
       return removeProperty((PrivilegedEvent) event, key);
     }
