@@ -39,6 +39,7 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
+import org.mule.runtime.ast.api.util.BaseArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
@@ -288,7 +289,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
         return parentArtifactAst;
       } else {
-        return new ArtifactAst() {
+        return new BaseArtifactAst() {
 
           @Override
           public Set<ExtensionModel> dependencies() {
@@ -306,23 +307,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           }
 
           @Override
-          public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
-            return parentArtifactAst.recursiveSpliterator(direction);
-          }
-
-          @Override
           public List<ComponentAst> topLevelComponents() {
             return parentArtifactAst.topLevelComponents();
-          }
-
-          @Override
-          public Stream<ComponentAst> topLevelComponentsStream() {
-            return parentArtifactAst.topLevelComponentsStream();
-          }
-
-          @Override
-          public Spliterator<ComponentAst> topLevelComponentsSpliterator() {
-            return parentArtifactAst.topLevelComponentsSpliterator();
           }
 
           @Override
