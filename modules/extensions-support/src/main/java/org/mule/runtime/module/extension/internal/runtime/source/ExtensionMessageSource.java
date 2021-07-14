@@ -375,6 +375,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void reallyDoStart() throws MuleException {
+    LOGGER.debug("Message source '{}' on flow '{}' is being started", sourceModel.getName(),
+                 getLocation().getRootContainerName());
     lifecycle(() -> lifecycleManager.fireStartPhase((phase, o) -> {
       startIfNeeded(retryPolicyTemplate);
 
@@ -391,6 +393,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doStop() throws MuleException {
+    LOGGER.debug("Message source '{}' on flow '{}' is being stopped", sourceModel.getName(),
+                 getLocation().getRootContainerName());
     safeLifecycle(() -> lifecycleManager.fireStopPhase((phase, o) -> {
       synchronized (started) {
         started.set(false);
@@ -621,9 +625,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     flowConstruct = new LazyValue<>(() -> (FlowConstruct) componentLocator.find(getRootContainerLocation()).orElse(null));
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
+      LOGGER
+          .debug("Message source '{}' on flow '{}' is being initialised, it is running on the primary node or no cluster restrictions are being applied.",
+                 sourceModel.getName(), getLocation().getRootContainerName());
       reallyDoInitialise();
     } else {
+      LOGGER
+          .debug("Message source '{}' on flow '{}' is not being initialised because it should only run on the primary node of the cluster.",
+                 sourceModel.getName(), getLocation().getRootContainerName());
       new PrimaryNodeLifecycleNotificationListener(() -> {
+        LOGGER.debug("Message source '{}' on flow '{}' is being initialised because it became the primary node of the cluster.",
+                     sourceModel.getName(), getLocation().getRootContainerName());
         reallyDoInitialise();
         reallyDoStart();
       }, notificationListenerRegistry).register();
