@@ -6,29 +6,30 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static java.util.Collections.emptyMap;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.NotAnInputStreamException;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
@@ -42,14 +43,7 @@ public class InjectableParameterResolver {
 
   private static final Logger LOGGER = getLogger(InjectableParameterResolver.class);
 
-  private static final String BINDING_IDENTIFIER = "componentParameters";
-  private static final String BINDING_IDENTIFIER_ACCESS = BINDING_IDENTIFIER + ".";
-
-  private static final String EXPRESSION_PREFIX = "#[{";
-  private static final String EXPRESSION_SUFFIX = "}]";
-  private static final String EMPTY_EXPRESSION = EXPRESSION_PREFIX + EXPRESSION_SUFFIX;
-
-  private final Map<String, Object> resolvedParameterValues;
+  private final BindingContext expressionResolvingContext;
   private final ExpressionManager expressionManager;
   private final Map<String, InjectableParameterInfo> injectableParametersMap;
 
@@ -59,7 +53,7 @@ public class InjectableParameterResolver {
                                      List<InjectableParameterInfo> injectableParameters) {
     this.expressionManager = expressionManager;
     this.injectableParametersMap = getInjectableParametersMap(injectableParameters);
-    this.resolvedParameterValues = getResolvedValues(parameterValueResolver, parameterizedModel);
+    this.expressionResolvingContext = createBindingContextAndPopulateAvailableParams(parameterValueResolver, parameterizedModel);
   }
 
   /**
@@ -69,118 +63,66 @@ public class InjectableParameterResolver {
    * @return the value of the injectable parameter.
    */
   public Object getInjectableParameterValue(String parameterName) {
-    Object parameterValue;
-    parameterValue = resolvedParameterValues.get(parameterName);
+    Object parameterValue = null;
     InjectableParameterInfo injectableParameterInfo = injectableParametersMap.get(parameterName);
 
-    if (parameterValue != null) {
-      try {
-        parameterValue = expressionManager
-            .evaluate("#[payload]",
-                      DataType.fromType(getClassFromType(injectableParameterInfo.getType())),
-                      BindingContext.builder()
-                          .addBinding("payload", new TypedValue(parameterValue, DataType.fromObject(parameterValue))).build())
-            .getValue();
-      } catch (ClassNotFoundException e) {
-        LOGGER.debug("Transformation of injectable parameter '{}' failed, the same value of the resolution will be used.",
-                     parameterName);
-      }
-
+    if (injectableParameterInfo == null) {
+      throw new IllegalArgumentException("'" + parameterName + "' is not present in the resolver");
     }
 
+    String extractionExpression = injectableParameterInfo.getExtractionExpression();
+    String topLevelRequiredParameter = keywordSafeName(getParameterNameFromExtractionExpression(extractionExpression));
+    if (expressionResolvingContext.lookup(topLevelRequiredParameter).isPresent()) {
+      try {
+        parameterValue = expressionManager
+            .evaluate("#[" + sanitizeExpression(injectableParameterInfo.getExtractionExpression()) + "]",
+                      DataType.fromType(getType(injectableParameterInfo.getType())),
+                      expressionResolvingContext)
+            .getValue();
+      } catch (IllegalArgumentException e) {
+        LOGGER.debug(format("Transformation of injectable parameter '%s' failed, the same value of the resolution will be used.",
+                            parameterName),
+                     e);
+      }
+    } else {
+      LOGGER.debug("The parameter: '" + topLevelRequiredParameter
+          + "' on which the extraction expression was to be executed is not present in the context, returning null");
+    }
     return parameterValue;
   }
 
   private Map<String, InjectableParameterInfo> getInjectableParametersMap(List<InjectableParameterInfo> injectableParameters) {
-    return injectableParameters.stream().collect(toMap(injectableParameter -> injectableParameter.getParameterName(),
+    return injectableParameters.stream().collect(toMap(InjectableParameterInfo::getParameterName,
                                                        injectableParameter -> injectableParameter));
   }
 
-  private Map<String, Object> getResolvedValues(ParameterValueResolver parameterValueResolver,
-                                                ParameterizedModel parameterizedModel) {
-    BindingContext bindingContext = createBindingContext(parameterValueResolver, parameterizedModel);
-    String expression = getResolvedParameterValuesExpression(componentParameterIdentifiers(bindingContext));
-
-    if (!expression.equals(EMPTY_EXPRESSION)) {
-      return (Map<String, Object>) expressionManager
-          .evaluate(expression, DataType.builder().mapType(Map.class).build(), bindingContext)
-          .getValue();
-    } else {
-      return emptyMap();
-    }
-  }
-
-  private BindingContext createBindingContext(ParameterValueResolver parameterValueResolver,
-                                              ParameterizedModel parameterizedModel) {
-    Map<String, TypedValue> componentParameters = new HashMap();
+  private BindingContext createBindingContextAndPopulateAvailableParams(ParameterValueResolver parameterValueResolver,
+                                                                        ParameterizedModel parameterizedModel) {
     BindingContext.Builder bindingContextBuilder = BindingContext.builder();
-
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       String unaliasedName = getImplementingName(parameterModel);
       Object value = getParameterValueSafely(parameterValueResolver, unaliasedName);
       if (value == null) {
         value = getParameterValueSafely(parameterValueResolver, parameterModel.getName());
       }
-
       if (value != null) {
         if (!(value instanceof TypedValue)) {
           String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
+          try {
+            // Consume InputStreams so that we can read them multiple times. This will work only for parameters that are
+            // represented as an InputStream. If a parameter was a POJO with an InputStream as field, then it can be read only
+            // once.
+            value = ifInputStream(value, (CheckedFunction<InputStream, ?>) IOUtils::toByteArray);
+          } catch (NotAnInputStreamException e) {
+            // do nothing, keep using the value as received
+          }
           DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
           value = new TypedValue<>(value, valueDataType);
         }
-        componentParameters.put(parameterModel.getName(), (TypedValue) value);
+        bindingContextBuilder.addBinding(keywordSafeName(parameterModel.getName()), (TypedValue<?>) value);
       }
     }
-
-    bindingContextBuilder.addBinding(BINDING_IDENTIFIER,
-                                     new TypedValue(componentParameters, DataType.builder().mapType(Map.class).build()));
     return bindingContextBuilder.build();
-  }
-
-  private Collection<String> componentParameterIdentifiers(BindingContext bindingContext) {
-    return ((Map) bindingContext.lookup(BINDING_IDENTIFIER).get().getValue()).keySet();
-  }
-
-  private String getResolvedParameterValuesExpression(Collection<String> identifiers) {
-    StringBuilder expression = new StringBuilder();
-    expression.append(EXPRESSION_PREFIX);
-    expression.append(
-                      injectableParametersMap.values().stream()
-                          .filter(injectableParameterInfo -> identifiers
-                              .contains(getParameterNameFromExtractionExpression(injectableParameterInfo
-                                  .getExtractionExpression())))
-                          .map(injectableParameterInfo -> "\""
-                              + injectableParameterInfo.getParameterName() + "\"  : "
-                              + BINDING_IDENTIFIER_ACCESS
-                              + sanitizeExpression(injectableParameterInfo.getExtractionExpression()))
-                          .collect(Collectors.joining(", ")));
-    expression.append(EXPRESSION_SUFFIX);
-
-    return expression.toString();
-  }
-
-  private String sanitizeExpression(String extractionExpression) {
-    StringBuilder sanitazedExpression = new StringBuilder();
-    sanitazedExpression.append("\"");
-    int extractionExpressionLength = extractionExpression.length();
-    int firstDotIndex = extractionExpression.indexOf(".");
-
-    if (firstDotIndex == -1) {
-      sanitazedExpression.append(extractionExpression);
-      sanitazedExpression.append("\"");
-    } else {
-      sanitazedExpression.append(extractionExpression.substring(0, firstDotIndex));
-      sanitazedExpression.append("\"");
-      sanitazedExpression.append(extractionExpression.substring(firstDotIndex, extractionExpressionLength));
-    }
-    return sanitazedExpression.toString();
-  }
-
-  private Class getClassFromType(MetadataType parameterMetadataType) throws ClassNotFoundException {
-    return Thread.currentThread().getContextClassLoader()
-        .loadClass(parameterMetadataType.getAnnotation(ClassInformationAnnotation.class)
-            .map(classInformationAnnotation -> classInformationAnnotation.getClassname())
-            .orElse(Object.class.getName()));
   }
 
   private Object getParameterValueSafely(ParameterValueResolver parameterValueResolver, String parameterName) {
@@ -189,6 +131,15 @@ public class InjectableParameterResolver {
     } catch (ValueResolvingException e) {
       return null;
     }
+  }
+
+  private String keywordSafeName(String parameterName) {
+    return parameterName + "_";
+  }
+
+  private String sanitizeExpression(String extractionExpression) {
+    String topLevelParameter = getParameterNameFromExtractionExpression(extractionExpression);
+    return extractionExpression.replaceFirst(topLevelParameter, keywordSafeName(topLevelParameter));
   }
 
 }
