@@ -466,7 +466,8 @@ public class BeanDefinitionFactory {
             CreateParamBeanDefinitionRequest request =
                 new CreateParamBeanDefinitionRequest(componentHierarchy, paramsModels, paramOwnerComponent, param,
                                                      buildingDefinitionOptional
-                                                         .orElseGet(() -> noWrapperBeanDefinition(param, paramValueComponentIdentifier)),
+                                                         .orElseGet(() -> noWrapperBeanDefinition(param,
+                                                                                                  paramValueComponentIdentifier)),
                                                      paramComponentIdentifier,
                                                      nestedComponentParamProcessor);
             this.paramProcessor.processRequest(springComponentModels, request);
@@ -488,19 +489,19 @@ public class BeanDefinitionFactory {
   private ComponentBuildingDefinition noWrapperBeanDefinition(ComponentParameterAst param,
                                                               final ComponentIdentifier paramValueComponentIdentifier) {
     return param.getModel().getType()
-         .getAnnotation(ClassInformationAnnotation.class)
-         .map(cia -> {
-           try {
-             return new ComponentBuildingDefinition.Builder()
-                 .withNamespace(paramValueComponentIdentifier.getNamespace())
-                 .withIdentifier(paramValueComponentIdentifier.getName())
-                 .withTypeDefinition(fromType(forName(cia.getClassname())))
-                 .build();
-           } catch (ClassNotFoundException e) {
-             throw new MuleRuntimeException(e);
-           }
-         })
-         .orElse(null);
+        .getAnnotation(ClassInformationAnnotation.class)
+        .map(cia -> {
+          try {
+            return new ComponentBuildingDefinition.Builder()
+                .withNamespace(paramValueComponentIdentifier.getNamespace())
+                .withIdentifier(paramValueComponentIdentifier.getName())
+                .withTypeDefinition(fromType(forName(cia.getClassname())))
+                .build();
+          } catch (ClassNotFoundException e) {
+            throw new MuleRuntimeException(e);
+          }
+        })
+        .orElse(null);
   }
 
   private Optional<SpringComponentModel> resolveComponentBeanDefinitionDslParamGroup(Map<ComponentAst, SpringComponentModel> springComponentModels,
