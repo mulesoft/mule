@@ -41,7 +41,8 @@ public class XmlSdk1ExtensionModelDeclarer {
   private static final StereotypeModel PARAMS_STEREOTYPE = newStereotype("PARAMETERS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel ERRORS_STEREOTYPE = newStereotype("ERRORS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel OUTPUT_STEREOTYPE = newStereotype("OUTPUT", XMLSDK1_STEREOTYPE_NAMESPACE).build();
-  private static final StereotypeModel OUTPUT_ATTRIBUTES_STEREOTYPE = newStereotype("OUTPUT-ATTRIBUTES", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+  private static final StereotypeModel OUTPUT_ATTRIBUTES_STEREOTYPE =
+      newStereotype("OUTPUT-ATTRIBUTES", XMLSDK1_STEREOTYPE_NAMESPACE).build();
 
   public ExtensionDeclarer createExtensionModel() {
     final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
