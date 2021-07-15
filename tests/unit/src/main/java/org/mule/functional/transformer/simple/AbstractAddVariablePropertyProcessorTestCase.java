@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
@@ -24,6 +25,7 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -32,6 +34,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -61,6 +64,9 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   @Mock(lenient = true)
   private StreamingManager streamingManager;
 
+  @Mock
+  private FeatureFlaggingService featureFlaggingService;
+
   private CoreEvent event;
   private Message message;
   private final AbstractAddVariablePropertyProcessor addVariableProcessor;
@@ -68,6 +74,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
 
   public AbstractAddVariablePropertyProcessorTestCase(AbstractAddVariablePropertyProcessor abstractAddVariableProcessor) {
     addVariableProcessor = abstractAddVariableProcessor;
+
   }
 
   @Before
@@ -81,6 +88,8 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     event = createTestEvent(message);
 
     afterAssertions = () -> verify(streamingManager, never()).manage(any(CursorProvider.class), any(EventContext.class));
+
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
   }
 
   @After
