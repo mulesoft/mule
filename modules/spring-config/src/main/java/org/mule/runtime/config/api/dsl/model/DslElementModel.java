@@ -7,14 +7,10 @@
 package org.mule.runtime.config.api.dsl.model;
 
 import static com.google.common.collect.ImmutableList.copyOf;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
@@ -30,7 +26,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -266,36 +261,7 @@ public class DslElementModel<T> {
                 .forEach(pmg -> fromGroup(pmg, element, dslGroupsAsChildrenNames, builder));
           });
 
-      final List<String> paramsAsChildrenNames = element.getModel(ParameterizedModel.class)
-          .map(pmz -> pmz.getAllParameterModels()
-              .stream()
-              .flatMap(pm -> {
-                Collection<String> result = new ArrayList<>();
-
-                pm.getType().accept(new MetadataTypeVisitor() {
-
-                  @Override
-                  protected void defaultVisit(MetadataType metadataType) {
-                    result.add(hyphenize(pm.getName()));
-                  }
-
-                  @Override
-                  public void visitUnion(UnionType unionType) {
-                    defaultVisit(unionType);
-                    unionType.getTypes().forEach(t -> getTypeId(t).ifPresent(result::add));
-                  }
-                });
-
-                return result.stream();
-              })
-              .collect(toList()))
-          .orElse(emptyList());
-
       element.directChildrenStream()
-          // TODO MULE-17711 Remove this filter
-          .filter(c -> !paramsAsChildrenNames.contains(c.getIdentifier().getName())
-              && !dslGroupsAsChildrenNames.contains(c.getIdentifier())
-              && !c.getModel(ParameterModel.class).isPresent())
           .forEach(i -> {
             builder.withNestedComponent(from(i));
           });

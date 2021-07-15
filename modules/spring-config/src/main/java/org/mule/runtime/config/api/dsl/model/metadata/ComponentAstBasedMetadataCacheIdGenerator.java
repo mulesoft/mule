@@ -12,7 +12,6 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeIdFor;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getModelNameAst;
@@ -226,21 +225,10 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
   private Optional<MetadataCacheId> resolveGlobalElement(ComponentAst elementModel) {
     List<String> parameterNamesRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(elementModel);
 
-    final List<String> paramsAsChildrenNames = elementModel.getModel(ParameterizedModel.class)
-        .map(pmz -> pmz.getAllParameterModels()
-            .stream()
-            .map(pm -> hyphenize(pm.getName()))
-            .collect(toList()))
-        .orElse(emptyList());
-
-    List<MetadataCacheId> parts = Stream.concat(
-                                                elementModel.directChildrenStream()
-                                                    // TODO MULE-17711 Remove this filter
-                                                    .filter(c -> !paramsAsChildrenNames.contains(c.getIdentifier().getName())
-                                                        && !c.getModel(ParameterModel.class).isPresent())
-                                                    .map(c -> doResolve(c))
-                                                    .filter(Optional::isPresent)
-                                                    .map(Optional::get),
+    List<MetadataCacheId> parts = Stream.concat(elementModel.directChildrenStream()
+        .map(c -> doResolve(c))
+        .filter(Optional::isPresent)
+        .map(Optional::get),
                                                 elementModel.getModel(ParameterizedModel.class)
                                                     .map(pmz -> elementModel.getParameters()
                                                         .stream()
@@ -358,7 +346,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
 
     private String name;
     private int value;
-    private List<MetadataCacheId> parts = new ArrayList<>();
+    private final List<MetadataCacheId> parts = new ArrayList<>();
 
     @Override
     public CacheIdBuilderAdapter<MetadataCacheId> withSourceElementName(String name) {

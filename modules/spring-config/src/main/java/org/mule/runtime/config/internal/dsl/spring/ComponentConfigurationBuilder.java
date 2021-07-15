@@ -101,7 +101,6 @@ class ComponentConfigurationBuilder<T> {
 
     final Stream<SpringComponentModel> baseStream = component != null
         ? concat(createBeanDefinitionRequest.getParamsModels().stream(),
-                 // TODO MULE 17711 remove this second concat term
                  component.directChildrenStream()
                      .map(springComponentModels::get)
                      .filter(Objects::nonNull))

@@ -19,7 +19,6 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
@@ -59,8 +58,6 @@ import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -428,23 +425,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           if (rootComponents.contains(cm.getFirst())) {
             cm.getFirst().getComponentId()
                 .ifPresent(componentName -> createdComponentModels.add(new Pair<>(componentName, cm.getFirst())));
-          }
-
-          // TODO MULE-17711 remove this
-          if (!cm.getSecond().isEmpty() && cm.getSecond().get(cm.getSecond().size() - 1).getModel(ParameterizedModel.class)
-              .map(pmzd -> {
-                return pmzd.getParameterGroupModels().stream()
-                    .filter(ParameterGroupModel::isShowInDsl)
-                    .anyMatch(pmg -> hyphenize(pmg.getName()).equals(cm.getFirst().getIdentifier().getName()))
-                    ||
-                    pmzd.getParameterGroupModels().stream()
-                        .filter(pmg -> !pmg.isShowInDsl())
-                        .flatMap(pmg -> pmg.getParameterModels().stream())
-                        .anyMatch(pm -> hyphenize(pm.getName()).equals(cm.getFirst().getIdentifier().getName()));
-              })
-              .orElse(false)) {
-
-            return;
           }
 
           beanDefinitionFactory.resolveComponent(springComponentModels,
