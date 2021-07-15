@@ -81,6 +81,8 @@ import org.slf4j.Logger;
  */
 public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Restartable {
 
+  public static final String REJECTED_ITEM_MESSAGE = "Item with id:[%s] is rejected with status:[%s]";
+  public static final String ACCEPTED_ITEM_MESSAGE = "Item with id:[%s] is accepted";
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
   private static final String UPDATE_PROCESSED_LOCK = "OSClearing";
@@ -301,8 +303,12 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         }
       }
 
+      String itemId = getItemId(pollItem);
       if (status != ACCEPTED || currentPollItemLimitApplied) {
+        LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status);
         rejectItem(pollItem.getResult(), callbackContext);
+      } else {
+        LOGGER.debug(ACCEPTED_ITEM_MESSAGE, itemId);
       }
 
       return status;
@@ -474,13 +480,17 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       if (status == REJECT) {
         if (LOGGER.isDebugEnabled()) {
-          itemId = pollItem.getItemId().orElseGet(() -> pollItem.getResult().getAttributes().map(Object::toString).orElse(""));
+          itemId = getItemId(pollItem);
           LOGGER.debug("Source in flow '{}' is skipping item '{}' because it was rejected by the watermark", flowName, itemId);
         }
       }
 
       return status;
     }
+  }
+
+  private String getItemId(DefaultPollItem pollItem) {
+    return pollItem.getItemId().orElseGet(() -> pollItem.getResult().getAttributes().map(Object::toString).orElse(""));
   }
 
   private class DefaultPollItem implements PollItem<T, A> {
