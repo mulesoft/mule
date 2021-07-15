@@ -15,15 +15,11 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
-import org.mule.runtime.api.meta.model.nested.NestedChainModel;
-import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
-import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -61,12 +57,12 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Resolves a Component's Metadata by coordinating the several moving parts that are affected by the Metadata fetching process, so
@@ -322,21 +318,6 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        constructModel.getStereotype(),
                                                        constructModel.getModelProperties(),
                                                        constructModel.getDeprecationModel().orElse(null)));
-      }
-
-      @Override
-      public void visit(NestedComponentModel model) {
-
-      }
-
-      @Override
-      public void visit(NestedChainModel model) {
-
-      }
-
-      @Override
-      public void visit(NestedRouteModel model) {
-
       }
 
       @Override
