@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
@@ -48,11 +49,20 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
     return ERROR;
   }
 
+  private boolean errorTypeIsPresent(ComponentAst componentAst) {
+    ComponentParameterAst componentParameterAst = componentAst.getParameter("type");
+    if (componentParameterAst == null) {
+      return false;
+    }
+
+    return !isEmpty(componentParameterAst.getResolvedRawValue());
+  }
+
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER)
         // there is already another validation for the presence of this param
-        .and(component -> !StringUtils.isEmpty(component.getParameter("type").getResolvedRawValue())));
+        .and(this::errorTypeIsPresent));
   }
 
   @Override
