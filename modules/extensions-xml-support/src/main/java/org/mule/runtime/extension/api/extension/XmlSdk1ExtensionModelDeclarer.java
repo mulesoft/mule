@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOO
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CHAIN;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
@@ -130,8 +129,6 @@ public class XmlSdk1ExtensionModelDeclarer {
         .defaultingTo(Placement.DEFAULT_TAB)
         .ofType(STRING_TYPE);
 
-    operationDeclaration.withOptionalComponent("body").withChain().withStereotype(CHAIN);
-
     operationDeclaration.withOptionalComponent("output")
         .describedAs("Defines the output of the operation if exists, void otherwise.")
         .withStereotype(OUTPUT_STEREOTYPE)
@@ -149,6 +146,11 @@ public class XmlSdk1ExtensionModelDeclarer {
         .ofType(typeBuilder.stringType()
             .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
             .build());
+
+    operationDeclaration.withChain("body");
+//    operationDeclaration.withOptionalComponent("body")
+//        .withStereotype(CHAIN)
+//        .withChain();
 
     operationDeclaration.withOptionalComponent("errors")
         .withStereotype(ERRORS_STEREOTYPE)
