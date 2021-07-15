@@ -32,6 +32,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -780,6 +781,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final Sink sink = ps.createSink(flow, flow);
@@ -803,6 +805,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final Sink sink = ps.createSink(flow, flow);
@@ -823,6 +826,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final Sink sink = ps.createSink(flow, flow);
@@ -849,6 +853,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withRegisteredInternalSink");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final FluxSinkRecorder<CoreEvent> fluxSinkRecorder = new FluxSinkRecorder<>();
@@ -869,6 +874,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   public void disposeWaitsForRegisteredInternalSinkCompletion() throws MuleException, InterruptedException {
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withRegisteredInternalSink");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final Latch completionLatch = new Latch();
@@ -905,6 +911,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withConfiguredInternalPublisher");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final FluxSinkRecorder<CoreEvent> fluxSinkRecorder = new FluxSinkRecorder<>();

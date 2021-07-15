@@ -17,6 +17,7 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -59,6 +60,9 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
   private Scheduler contextScheduler;
 
   @Mock
+  private MuleContext muleContext;
+
+  @Mock
   private CoreEvent coreEvent;
 
   public ComponentProcessingStrategyReactiveProcessorBuilderTestCase(int parallelism) {
@@ -74,7 +78,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
   @Description("The reactor chain created by the builder uses the set schedulers and emits the core events")
   public void pipelineReactiveProcessorBuilt() {
     ReactiveProcessor transform =
-        processingStrategyReactiveProcessorFrom(reactiveProcessor, contextScheduler)
+        processingStrategyReactiveProcessorFrom(reactiveProcessor, contextScheduler, muleContext)
             .withDispatcherScheduler(dispatcherScheduler)
             .withCallbackScheduler(callbackScheduler)
             .withParallelism(parallelism)

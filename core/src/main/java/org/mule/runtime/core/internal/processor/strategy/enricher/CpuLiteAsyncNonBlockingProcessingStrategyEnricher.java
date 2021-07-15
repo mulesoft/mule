@@ -10,6 +10,8 @@ package org.mule.runtime.core.internal.processor.strategy.enricher;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,17 +26,24 @@ public class CpuLiteAsyncNonBlockingProcessingStrategyEnricher implements Reacti
 
   private final Supplier<Scheduler> liteSchedulerSupplier;
   private final Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier;
+  private final DiagnosticsService diagnosticsService;
+  private final MuleContext muleContext;
 
   public CpuLiteAsyncNonBlockingProcessingStrategyEnricher(Supplier<Scheduler> liteSchedulerSupplier,
-                                                           Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier) {
+                                                           Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier,
+                                                           DiagnosticsService diagnosticsService,
+                                                           MuleContext muleContext) {
     this.liteSchedulerSupplier = liteSchedulerSupplier;
     this.nonBlockingSchedulerSupplier = nonBlockingSchedulerSupplier;
+    this.diagnosticsService = diagnosticsService;
+    this.muleContext = muleContext;
   }
 
   @Override
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
-    return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get())
+    return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get(), muleContext)
         .withCallbackScheduler(nonBlockingSchedulerSupplier.get())
+        .withDiagnosticsService(diagnosticsService)
         .build();
   }
 }

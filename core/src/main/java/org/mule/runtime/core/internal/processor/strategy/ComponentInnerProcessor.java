@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 /**
@@ -26,5 +27,10 @@ public interface ComponentInnerProcessor extends ReactiveProcessor {
    * @return {@code} if the processor is blocking.
    */
   boolean isBlocking();
+
+  /**
+   * @return the component location
+   */
+  ComponentLocation getLocation();
 
 }

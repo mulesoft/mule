@@ -217,6 +217,10 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     // Empty template method
   }
 
+  protected void doInitialiseProcessingStrategy() throws MuleException {
+    // Empty template method
+  }
+
   protected void doStart() throws MuleException {
     // Empty template method
   }

@@ -14,6 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -24,6 +25,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.reactivestreams.Publisher;
+
+import javax.inject.Inject;
 
 /**
  * Base class for {@link ProcessingStrategy} decorators.
@@ -36,6 +39,9 @@ import org.reactivestreams.Publisher;
 public abstract class ProcessingStrategyDecorator implements ProcessingStrategy, Lifecycle {
 
   protected final ProcessingStrategy delegate;
+
+  @Inject
+  private MuleContext muleContext;
 
   public ProcessingStrategyDecorator(ProcessingStrategy delegate) {
     this.delegate = delegate;
@@ -83,7 +89,7 @@ public abstract class ProcessingStrategyDecorator implements ProcessingStrategy,
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(delegate);
+    initialiseIfNeeded(delegate, muleContext);
   }
 
   @Override

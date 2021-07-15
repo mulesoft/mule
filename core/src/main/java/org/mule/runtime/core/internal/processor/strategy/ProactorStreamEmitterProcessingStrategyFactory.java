@@ -143,6 +143,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     private ProactorProcessingStrategyEnricher getEnricher(Scheduler blockingScheduler) {
       return new ProactorProcessingStrategyEnricher(() -> blockingScheduler,
                                                     getSchedulerDecorator().compose(this::getRetryScheduler),
+                                                    getDiagnosticsService(),
+                                                    muleContext,
                                                     maxConcurrency,
                                                     getParallelism(),
                                                     subscribers);
