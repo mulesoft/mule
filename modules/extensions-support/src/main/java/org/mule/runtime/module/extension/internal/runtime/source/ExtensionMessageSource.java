@@ -633,7 +633,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                      sourceModel.getName(), getLocation().getRootContainerName());
         } else {
           LOGGER
-              .debug("Message source '{}' on flow '{}' is initializing. This {} the primary node of the cluster. This Message source can run on any node of the cluster.",
+              .debug("Message source '{}' on flow '{}' is initializing. This {} the primary node of the cluster.",
                      sourceModel.getName(), getLocation().getRootContainerName(), isPrimaryPollingInstance ? "is" : "is not");
         }
       }
@@ -641,7 +641,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       reallyDoInitialise();
     } else {
       LOGGER
-          .debug("Message source '{}' on flow '{}' cannot initialize. Message source '{}' can only run on the primary node of the cluster",
+          .debug("Message source '{}' on flow '{}' cannot initialize. This Message source can only run on the primary node of the cluster",
                  sourceModel.getName(), getLocation().getRootContainerName());
       new PrimaryNodeLifecycleNotificationListener(() -> {
         LOGGER.debug("Message source '{}' on flow '{}' is initializing because the node became cluster's primary.",
