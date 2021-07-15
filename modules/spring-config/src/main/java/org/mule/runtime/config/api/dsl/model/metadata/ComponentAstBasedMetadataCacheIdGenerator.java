@@ -226,16 +226,16 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
     List<String> parameterNamesRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(elementModel);
 
     List<MetadataCacheId> parts = Stream.concat(elementModel.directChildrenStream()
-        .map(c -> doResolve(c))
+        .map(this::doResolve)
         .filter(Optional::isPresent)
-        .map(Optional::get),
-                                                elementModel.getModel(ParameterizedModel.class)
-                                                    .map(pmz -> elementModel.getParameters()
-                                                        .stream()
-                                                        .filter(p -> parameterNamesRequiredForMetadata
-                                                            .contains((p.getModel()).getName()))
-                                                        .map(p -> resolveKeyFromSimpleValue(elementModel, p)))
-                                                    .orElse(Stream.empty()))
+        .map(Optional::get), elementModel.getModel(ParameterizedModel.class)
+            .map(pmz -> elementModel.getParameters()
+                .stream()
+                .filter(p -> p.getValue().getValue().isPresent())
+                .filter(p -> parameterNamesRequiredForMetadata
+                    .contains((p.getModel()).getName()))
+                .map(p -> resolveKeyFromSimpleValue(elementModel, p)))
+            .orElse(Stream.empty()))
         .collect(toList());
 
     if (parts.isEmpty()) {
@@ -262,6 +262,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
     if (isPartialFetching || resolveAllKeys) {
       List<MetadataCacheId> keyParts = elementModel.getParameters()
           .stream()
+          .filter(p -> p.getValue().getValue().isPresent())
           .filter(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
           .sorted(comparingInt(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
           .map(p -> resolveKeyFromSimpleValue(elementModel, p))
