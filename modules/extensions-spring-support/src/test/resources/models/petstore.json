@@ -23464,6 +23464,10 @@
               }
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "validators",
           "description": "",
           "modelProperties": {},

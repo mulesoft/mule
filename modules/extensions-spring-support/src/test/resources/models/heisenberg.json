@@ -28780,6 +28780,10 @@
               "namespace": "MULE"
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "processors",
           "description": "",
           "modelProperties": {},
@@ -32937,6 +32941,10 @@
               "namespace": "MULE"
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "processors",
           "description": "",
           "modelProperties": {},
@@ -33187,6 +33195,10 @@
               "namespace": "MULE"
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "chain",
           "description": "",
           "modelProperties": {},
@@ -34785,6 +34797,10 @@
               }
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "chain",
           "description": "",
           "modelProperties": {},
@@ -41704,6 +41720,10 @@
               "namespace": "MULE"
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "optionalProcessors",
           "description": "",
           "modelProperties": {},
@@ -42400,6 +42420,10 @@
               "namespace": "MULE"
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "chain",
           "description": "",
           "modelProperties": {},
@@ -46388,6 +46412,10 @@
               "namespace": "MULE"
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "operations",
           "description": "",
           "modelProperties": {},
@@ -48214,21 +48242,8 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
-          "childComponents": [
-            {
-              "isRequired": true,
-              "allowedStereotypes": [
-                {
-                  "type": "PROCESSOR",
-                  "namespace": "MULE"
-                }
-              ],
-              "name": "processors",
-              "description": "",
-              "modelProperties": {},
-              "kind": "chain"
-            }
-          ],
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -48302,6 +48317,25 @@
           "name": "when",
           "description": "",
           "modelProperties": {},
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
           "kind": "route"
         }
       ],
@@ -48384,21 +48418,8 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
-          "childComponents": [
-            {
-              "isRequired": true,
-              "allowedStereotypes": [
-                {
-                  "type": "PROCESSOR",
-                  "namespace": "MULE"
-                }
-              ],
-              "name": "processors",
-              "description": "",
-              "modelProperties": {},
-              "kind": "chain"
-            }
-          ],
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -48472,6 +48493,25 @@
           "name": "when",
           "description": "",
           "modelProperties": {},
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
           "kind": "route"
         }
       ],
@@ -48558,29 +48598,12 @@
       "nestedComponents": [
         {
           "minOccurs": 0,
-          "childComponents": [
-            {
-              "isRequired": true,
-              "allowedStereotypes": [
-                {
-                  "type": "PROCESSOR",
-                  "namespace": "MULE"
-                }
-              ],
-              "name": "processors",
-              "description": "",
-              "modelProperties": {},
-              "kind": "chain"
-            }
-          ],
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [],
           "name": "beforeCallAssertions",
           "description": "",
           "modelProperties": {},
-          "kind": "route"
-        },
-        {
-          "minOccurs": 0,
           "childComponents": [
             {
               "isRequired": true,
@@ -48590,16 +48613,45 @@
                   "namespace": "MULE"
                 }
               ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
               "name": "processors",
               "description": "",
               "modelProperties": {},
               "kind": "chain"
             }
           ],
+          "kind": "route"
+        },
+        {
+          "minOccurs": 0,
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [],
           "name": "afterCallAssertions",
           "description": "",
           "modelProperties": {},
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
           "kind": "route"
         }
       ],
@@ -48759,29 +48811,8 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
-          "childComponents": [
-            {
-              "isRequired": true,
-              "allowedStereotypes": [
-                {
-                  "type": "KILLING_OPERATION",
-                  "namespace": "HEISENBERG",
-                  "parent": {
-                    "type": "HEISENBERG-EMPIRE",
-                    "namespace": "HEISENBERG",
-                    "parent": {
-                      "type": "PROCESSOR",
-                      "namespace": "MULE"
-                    }
-                  }
-                }
-              ],
-              "name": "processors",
-              "description": "",
-              "modelProperties": {},
-              "kind": "chain"
-            }
-          ],
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -48855,25 +48886,39 @@
           "name": "killingRoute",
           "description": "",
           "modelProperties": {},
-          "kind": "route"
-        },
-        {
-          "minOccurs": 0,
           "childComponents": [
             {
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "DRUG_KILLING",
-                  "namespace": "HEISENBERG"
+                  "type": "KILLING_OPERATION",
+                  "namespace": "HEISENBERG",
+                  "parent": {
+                    "type": "HEISENBERG-EMPIRE",
+                    "namespace": "HEISENBERG",
+                    "parent": {
+                      "type": "PROCESSOR",
+                      "namespace": "MULE"
+                    }
+                  }
                 }
               ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
               "name": "processors",
               "description": "",
               "modelProperties": {},
               "kind": "chain"
             }
           ],
+          "kind": "route"
+        },
+        {
+          "minOccurs": 0,
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -48919,6 +48964,25 @@
           "name": "drugKillingRoute",
           "description": "",
           "modelProperties": {},
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "DRUG_KILLING",
+                  "namespace": "HEISENBERG"
+                }
+              ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
           "kind": "route"
         }
       ],
@@ -49001,21 +49065,8 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
-          "childComponents": [
-            {
-              "isRequired": true,
-              "allowedStereotypes": [
-                {
-                  "type": "PROCESSOR",
-                  "namespace": "MULE"
-                }
-              ],
-              "name": "processors",
-              "description": "",
-              "modelProperties": {},
-              "kind": "chain"
-            }
-          ],
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -49089,10 +49140,6 @@
           "name": "when",
           "description": "",
           "modelProperties": {},
-          "kind": "route"
-        },
-        {
-          "minOccurs": 0,
           "childComponents": [
             {
               "isRequired": true,
@@ -49102,12 +49149,22 @@
                   "namespace": "MULE"
                 }
               ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
               "name": "processors",
               "description": "",
               "modelProperties": {},
               "kind": "chain"
             }
           ],
+          "kind": "route"
+        },
+        {
+          "minOccurs": 0,
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -49153,6 +49210,25 @@
           "name": "other",
           "description": "",
           "modelProperties": {},
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
           "kind": "route"
         }
       ],
@@ -49263,21 +49339,8 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
-          "childComponents": [
-            {
-              "isRequired": true,
-              "allowedStereotypes": [
-                {
-                  "type": "PROCESSOR",
-                  "namespace": "MULE"
-                }
-              ],
-              "name": "processors",
-              "description": "",
-              "modelProperties": {},
-              "kind": "chain"
-            }
-          ],
+          "errors": [],
+          "semanticTerms": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -49351,6 +49414,25 @@
           "name": "when",
           "description": "",
           "modelProperties": {},
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "parameterGroupModels": [],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
           "kind": "route"
         }
       ],

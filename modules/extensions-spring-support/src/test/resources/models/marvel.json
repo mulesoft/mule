@@ -11558,6 +11558,10 @@
               "namespace": "MULE"
             }
           ],
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "parameterGroupModels": [],
           "name": "operations",
           "description": "",
           "modelProperties": {},
