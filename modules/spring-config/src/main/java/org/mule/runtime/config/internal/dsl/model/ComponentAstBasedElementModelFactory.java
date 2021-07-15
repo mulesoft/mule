@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.model;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -178,12 +179,15 @@ class ComponentAstBasedElementModelFactory {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}'", identifier.get());
         }
 
-        final ComponentAst fieldComponent = (ComponentAst) configuration.getParameter("value").getValue().getRight();
+        final ComponentAst fieldComponent = ofNullable(configuration.getParameter("value"))
+            .map(parameterAst -> parameterAst.getValue().getRight()).map(ComponentAst.class::cast).orElse(null);
+        if (fieldComponent == null) {
+          return;
+        }
 
         if (isMap(objectType)) {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.orElse(null));
-          typeBuilder.containing(createMapElement(objectType, modelDsl,
-                                                  fieldComponent));
+          typeBuilder.containing(createMapElement(objectType, modelDsl, fieldComponent));
           return;
         }
 

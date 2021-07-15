@@ -115,6 +115,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.xml.transform.Transformer;
@@ -794,8 +796,14 @@ public final class XmlExtensionLoaderDelegate {
 
 
       testConnectionGlobalElementOptional
-          .flatMap(testConnectionGlobalElement -> testConnectionGlobalElement.getParameter(GLOBAL_ELEMENT_NAME_ATTRIBUTE)
-              .getValue().getValue())
+          .flatMap(testConnectionGlobalElement -> {
+            ComponentParameterAst parameter = testConnectionGlobalElement.getParameter(GLOBAL_ELEMENT_NAME_ATTRIBUTE);
+            if (parameter != null) {
+              return parameter.getValue().getValue();
+            } else {
+              return empty();
+            }
+          })
           .ifPresent(testConnectionGlobalElementName -> connectionProviderDeclarer
               .withModelProperty(new TestConnectionGlobalElementModelProperty((String) testConnectionGlobalElementName)));
     }
@@ -874,8 +882,10 @@ public final class XmlExtensionLoaderDelegate {
 
     moduleModel.directChildrenStream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
-        .filter(operationModel -> operationModel.getParameter(ATTRIBUTE_VISIBILITY).getValue().getRight()
-            .equals(visibility.toString()))
+        .filter(operationModel -> {
+          ComponentParameterAst parameter = operationModel.getParameter(ATTRIBUTE_VISIBILITY);
+          return parameter != null && parameter.getValue().getRight().equals(visibility.toString());
+        })
         .forEach(operationModel -> extractOperationExtension(extensionDeclarer, declarer, operationModel, directedGraph,
                                                              xmlDslModel,
                                                              tnsExtensionModel));
@@ -960,14 +970,13 @@ public final class XmlExtensionLoaderDelegate {
   private void extractOperationParameters(OperationDeclarer operationDeclarer, ComponentAst componentModel) {
     Optional<ComponentAst> optionalParametersComponentModel = componentModel.directChildrenStream()
         .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETERS_IDENTIFIER)).findAny();
-    if (optionalParametersComponentModel.isPresent()) {
-      optionalParametersComponentModel.get().directChildrenStream()
-          .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
-          .forEach(param -> {
-            final String role = param.getParameter(ROLE).getValue().getRight().toString();
-            extractParameter(operationDeclarer, param, getRole(role));
-          });
-    }
+    optionalParametersComponentModel.ifPresent(componentAst -> componentAst.directChildrenStream()
+        .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
+        .forEach(param -> {
+          final String role = ofNullable(param.getParameter(ROLE))
+              .map(parameterAst -> parameterAst.getValue().getRight().toString()).orElse("");
+          extractParameter(operationDeclarer, param, getRole(role));
+        }));
   }
 
   private void extractProperty(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
@@ -977,37 +986,39 @@ public final class XmlExtensionLoaderDelegate {
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param, ParameterRole role) {
     final LayoutModel.LayoutModelBuilder layoutModelBuilder = builder();
 
-    param.getParameter(PASSWORD).getValue().getValue()
-        .filter(v -> (boolean) v)
-        .ifPresent(value -> layoutModelBuilder.asPassword());
+    applyToParameter(param, PASSWORD, value -> layoutModelBuilder.asPassword(), v -> (boolean) v);
+    applyToParameter(param, ORDER_ATTRIBUTE, value -> layoutModelBuilder.order((int) value));
+    applyToParameter(param, TAB_ATTRIBUTE, value -> layoutModelBuilder.tabName((String) value));
 
-    param.getParameter(ORDER_ATTRIBUTE).getValue().getValue().ifPresent(value -> layoutModelBuilder.order((int) value));
-    param.getParameter(TAB_ATTRIBUTE).getValue().getValue().ifPresent(value -> layoutModelBuilder.tabName((String) value));
+    applyToParameter(param, TYPE_ATTRIBUTE, receivedInputType -> {
+      final DisplayModel displayModel = getDisplayModel(param);
+      MetadataType parameterType = extractType((String) receivedInputType);
 
-    param.getParameter(TYPE_ATTRIBUTE).getValue().getValue()
-        .ifPresent(receivedInputType -> {
-
-          final DisplayModel displayModel = getDisplayModel(param);
-          MetadataType parameterType = extractType((String) receivedInputType);
-
-          ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, param);
-          parameterDeclarer.describedAs(getDescription(param))
-              .withLayout(layoutModelBuilder.build())
-              .withDisplayModel(displayModel)
-              .withRole(role)
-              .ofType(parameterType);
-        });
+      ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, param);
+      parameterDeclarer.describedAs(getDescription(param))
+          .withLayout(layoutModelBuilder.build())
+          .withDisplayModel(displayModel)
+          .withRole(role)
+          .ofType(parameterType);
+    });
   }
 
   private DisplayModel getDisplayModel(ComponentAst componentModel) {
     final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
-    componentModel.getParameter(DISPLAY_NAME_ATTRIBUTE)
-        .getValue().getValue().ifPresent(value -> displayModelBuilder.displayName((String) value));
-    componentModel.getParameter(SUMMARY_ATTRIBUTE)
-        .getValue().getValue().ifPresent(value -> displayModelBuilder.summary((String) value));
-    componentModel.getParameter(EXAMPLE_ATTRIBUTE)
-        .getValue().getValue().ifPresent(value -> displayModelBuilder.example((String) value));
+    applyToParameter(componentModel, DISPLAY_NAME_ATTRIBUTE, value -> displayModelBuilder.displayName((String) value));
+    applyToParameter(componentModel, SUMMARY_ATTRIBUTE, value -> displayModelBuilder.summary((String) value));
+    applyToParameter(componentModel, EXAMPLE_ATTRIBUTE, value -> displayModelBuilder.example((String) value));
     return displayModelBuilder.build();
+  }
+
+  private void applyToParameter(ComponentAst componentModel, String parameterName, final Consumer<Object> callback,
+                                final Predicate<Object> valueFilter) {
+    ofNullable(componentModel.getParameter(parameterName))
+        .ifPresent(parameterAst -> parameterAst.getValue().getValue().filter(valueFilter).ifPresent(callback));
+  }
+
+  private void applyToParameter(ComponentAst componentModel, String parameterName, Consumer<Object> callback) {
+    applyToParameter(componentModel, parameterName, callback, value -> true);
   }
 
   /**
@@ -1028,11 +1039,11 @@ public final class XmlExtensionLoaderDelegate {
    * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
-    final String parameterName = param.getParameter(PARAMETER_NAME).getRawValue();
-    final Optional<String> parameterDefaultValue = param.getParameter(PARAMETER_DEFAULT_VALUE).getValue()
-        .mapLeft(expr -> "#[" + expr + "]")
-        .getValue();
-    final UseEnum use = UseEnum.valueOf(param.getParameter(ATTRIBUTE_USE).getValue().getRight().toString());
+    final String parameterName =
+        ofNullable(param.getParameter(PARAMETER_NAME)).map(ComponentParameterAst::getRawValue).orElse(null);
+    final Optional<String> parameterDefaultValue = getParameterDefaultValue(param);
+    final UseEnum use = UseEnum.valueOf(ofNullable(param.getParameter(ATTRIBUTE_USE))
+        .map(parameter -> parameter.getValue().getRight().toString()).orElse(null));
     if (UseEnum.REQUIRED.equals(use) && parameterDefaultValue.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",
                                                                 parameterName, ATTRIBUTE_USE, UseEnum.REQUIRED));
@@ -1042,6 +1053,16 @@ public final class XmlExtensionLoaderDelegate {
     return parameterRequired ? parameterizedDeclarer.onDefaultParameterGroup().withRequiredParameter(parameterName)
         : parameterizedDeclarer.onDefaultParameterGroup().withOptionalParameter(parameterName)
             .defaultingTo(parameterDefaultValue.orElse(null));
+  }
+
+  private Optional<String> getParameterDefaultValue(ComponentAst param) {
+    ComponentParameterAst parameterAst = param.getParameter(PARAMETER_DEFAULT_VALUE);
+    if (parameterAst == null) {
+      return empty();
+    }
+    return parameterAst.getValue()
+        .mapLeft(expr -> "#[" + expr + "]")
+        .getValue();
   }
 
   private void extractOutputType(OutputDeclarer outputDeclarer, ComponentIdentifier componentIdentifier,

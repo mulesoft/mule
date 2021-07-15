@@ -24,6 +24,7 @@ import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -72,20 +73,19 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     return component.getModel(ParameterizedModel.class)
-        .map(pmz -> pmz.getAllParameterModels())
+        .map(ParameterizedModel::getAllParameterModels)
         .orElse(emptyList())
         .stream()
         .filter(pm -> REQUIRED.equals(pm.getExpressionSupport())
             && !pm.getModelProperty(AllowsExpressionWithoutMarkersModelProperty.class).isPresent())
         .map(pm -> component.getParameter(pm.getName()))
+        .filter(Objects::nonNull)
         .filter(param -> {
           if (param.getValue().isRight() && param.getValue().getRight() instanceof String) {
             final String stringValue = (String) param.getValue().getRight();
 
-            if (!stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX)
-                || !stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX)) {
-              return true;
-            }
+            return !stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX) ||
+                !stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX);
           }
 
           return false;
