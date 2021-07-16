@@ -83,7 +83,6 @@ public abstract class ApplicationModel {
   public static final String TEST_NAMESPACE = "test";
   public static final String DOC_NAMESPACE = "doc";
   public static final String GLOBAL_PROPERTY = "global-property";
-  public static final String SECURITY_MANAGER = "security-manager";
   public static final String OBJECT_ELEMENT = "object";
 
 
@@ -107,8 +106,6 @@ public abstract class ApplicationModel {
       builder().namespace(CORE_PREFIX).name(REDELIVERY_POLICY_ELEMENT).build();
   public static final ComponentIdentifier GLOBAL_PROPERTY_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(GLOBAL_PROPERTY).build();
-  public static final ComponentIdentifier SECURITY_MANAGER_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(SECURITY_MANAGER).build();
 
   public static final ComponentIdentifier SCHEDULING_STRATEGY_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER).build();

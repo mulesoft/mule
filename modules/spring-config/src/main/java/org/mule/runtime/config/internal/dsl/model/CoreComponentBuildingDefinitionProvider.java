@@ -58,8 +58,6 @@ import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.api.dsl.ConfigurableInstanceFactory;
 import org.mule.runtime.config.api.dsl.ConfigurableObjectFactory;
-import org.mule.runtime.config.internal.CustomEncryptionStrategyDelegate;
-import org.mule.runtime.config.internal.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.internal.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.NotificationConfig;
 import org.mule.runtime.config.internal.ServerNotificationManagerConfigurator;
@@ -98,10 +96,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RaiseErrorProcessor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.security.EncryptionStrategy;
-import org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator;
-import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
@@ -140,10 +134,7 @@ import org.mule.runtime.core.internal.routing.RoundRobin;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
-import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
-import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
-import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -532,47 +523,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withObjectFactoryType(CustomSecurityFilterObjectFactory.class)
         .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
         .withIgnoredConfigurationParameter(NAME)
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("encryption-security-filter")
-        .withTypeDefinition(fromType(MuleEncryptionEndpointSecurityFilter.class))
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
-        .withIgnoredConfigurationParameter(NAME)
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("security-manager")
-        .withTypeDefinition(fromType(SecurityManager.class)).withObjectFactoryType(MuleSecurityManagerConfigurator.class)
-        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("providers", fromChildCollectionConfiguration(SecurityProvider.class).build())
-        .withSetterParameterDefinition("encryptionStrategies", fromChildCollectionConfiguration(EncryptionStrategy.class).build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("custom-security-provider")
-        .withTypeDefinition(fromType(CustomSecurityProviderDelegate.class))
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("provider-ref").build())
-        .withConstructorParameterDefinition(fromSimpleParameter("name").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("custom-encryption-strategy")
-        .withTypeDefinition(fromType(CustomEncryptionStrategyDelegate.class))
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
-        .withConstructorParameterDefinition(fromSimpleParameter("name").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("secret-key-encryption-strategy")
-        .withTypeDefinition(fromType(SecretKeyEncryptionStrategy.class))
-        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("key", fromSimpleParameter("key").build())
-        .withSetterParameterDefinition("keyFactory", fromSimpleReferenceParameter("keyFactory-ref").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("password-encryption-strategy")
-        .withTypeDefinition(fromType(PasswordBasedEncryptionStrategy.class))
-        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("iterationCount", fromSimpleParameter("iterationCount").build())
-        .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
-        .withSetterParameterDefinition("salt", fromSimpleParameter("salt").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER)

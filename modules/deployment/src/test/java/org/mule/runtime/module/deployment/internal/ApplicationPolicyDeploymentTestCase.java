@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.String.format;
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -962,36 +962,6 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.removePolicy(applicationFileBuilder.getId(), parameters.getId());
 
     executeApplicationFlow("main");
-  }
-
-  @Test
-  public void redeployPolicyWithSecurityManagerDefined() throws Exception {
-    ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
-
-    policyManager.registerPolicyTemplate(policyWithPluginAndResource().getArtifactFile());
-
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG,
-                                                                                           simpleExtensionPlugin);
-
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-
-    PolicyParametrization policy = new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                             getResourceFile("/policy-using-security-manager.xml"),
-                                                             emptyList());
-
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(), policy);
-
-    executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(1));
-
-    policyManager.removePolicy(applicationFileBuilder.getId(), BAR_POLICY_ID);
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(), policy);
-
-    executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(2));
   }
 
   private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations,
