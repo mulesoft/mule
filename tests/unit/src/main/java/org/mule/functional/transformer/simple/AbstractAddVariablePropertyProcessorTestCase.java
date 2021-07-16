@@ -208,7 +208,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
 
     event = addVariableProcessor.process(event);
 
-    verifyAdded(event, PLAIN_STRING_KEY, null);
+    verifyRemoved(event, PLAIN_STRING_KEY);
   }
 
   @Test
