@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
+import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkNotNull;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
@@ -363,6 +364,7 @@ class ComponentConfigurationBuilder<T> {
           .orElse(null);
 
       Object parameterValue;
+      checkNotNull(parameter, format("Parameter '%s' is null for component '%s'", parameterName, ownerComponent));
       if ("frequency".equals(parameterName)
           && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
           && parameter.isDefaultValue()) {
@@ -376,7 +378,7 @@ class ComponentConfigurationBuilder<T> {
 
         if (defaultValue != null && parameterValue == null) {
           LOGGER
-              .warn("Paramerter {} from extension {} has a defaultValue configured in the componentBuildingDefinition but not in the extensionModel.",
+              .warn("Parameter {} from extension {} has a defaultValue configured in the componentBuildingDefinition but not in the extensionModel.",
                     parameterName, ownerComponent.getIdentifier().getNamespace());
           parameterValue = defaultValue;
         }
