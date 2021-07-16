@@ -53,9 +53,11 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
       managedMap = new ManagedMap<>();
       final List<ComponentAst> hierarchy = createBeanDefinitionRequest.getComponentHierarchy();
       ComponentAst parentComponentModel = hierarchy.isEmpty() ? null : hierarchy.get(hierarchy.size() - 1);
-      parentComponentModel.directChildrenStream()
-          .filter(childComponentModel -> childComponentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
-          .forEach(childComponentModel -> processAndAddMapProperty(childComponentModel, managedMap));
+      if (parentComponentModel != null) {
+        parentComponentModel.directChildrenStream()
+                .filter(childComponentModel -> childComponentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
+                .forEach(childComponentModel -> processAndAddMapProperty(childComponentModel, managedMap));
+      }
     }
     BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(HashMap.class);
     createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder
