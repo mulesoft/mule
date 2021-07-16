@@ -5,12 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.diagnostics.notification;
+package org.mule.runtime.core.internal.diagnostics.notification;
 
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.diagnostics.ProfilingDataConsumer;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
 import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.api.diagnostics.notification.ProfilerNotificationListener;
+import org.mule.runtime.core.api.diagnostics.notification.ProfilingNotification;
 
 /**
  * a {@link NotificationListener} that listens for profiling notifications.

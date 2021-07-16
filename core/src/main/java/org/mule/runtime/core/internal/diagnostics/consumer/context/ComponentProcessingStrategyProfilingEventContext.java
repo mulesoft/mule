@@ -5,9 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.diagnostics.consumer.context;
+package org.mule.runtime.core.internal.diagnostics.consumer.context;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Optional;

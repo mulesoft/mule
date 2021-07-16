@@ -7,11 +7,14 @@
 
 package org.mule.runtime.core.api.diagnostics;
 
+import org.mule.api.annotation.Experimental;
+
 import java.util.Set;
 
 /**
  * An strategy for discovering the available instances of {@link ProfilingDataConsumer}.
  */
+@Experimental
 public interface ProfilerDataConsumerDiscoveryStrategy {
 
   <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover();

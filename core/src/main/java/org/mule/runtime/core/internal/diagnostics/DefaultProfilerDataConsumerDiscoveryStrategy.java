@@ -5,14 +5,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.diagnostics;
+package org.mule.runtime.core.internal.diagnostics;
 
-import org.mule.runtime.core.api.diagnostics.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.api.diagnostics.ProfilerDataConsumerDiscoveryStrategy;
+import org.mule.runtime.core.api.diagnostics.ProfilingDataConsumer;
+import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
+import org.mule.runtime.core.internal.diagnostics.consumer.LoggerComponentProcessingStrategyDataConsumer;
 
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * Simple Discovery Strategy that programmatically generates the data consumers.
+ *
+ * @since 4.4
+ */
 public class DefaultProfilerDataConsumerDiscoveryStrategy
     implements ProfilerDataConsumerDiscoveryStrategy {
 

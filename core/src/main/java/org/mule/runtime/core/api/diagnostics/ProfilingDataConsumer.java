@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.api.diagnostics;
 
+import org.mule.api.annotation.Experimental;
+
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -15,6 +17,7 @@ import java.util.function.Predicate;
  *
  * @since 4.4.0
  */
+@Experimental
 public interface ProfilingDataConsumer<T extends ProfilingEventContext> {
 
   /**

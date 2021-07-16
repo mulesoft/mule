@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.diagnostics.consumer.context;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -18,6 +19,7 @@ import java.util.Optional;
  *
  * @since 4.4
  */
+@Experimental
 public interface ProcessingStrategyProfilingEventContext extends ProfilingEventContext {
 
   /**

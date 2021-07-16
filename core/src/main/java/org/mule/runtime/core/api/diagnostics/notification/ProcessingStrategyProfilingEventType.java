@@ -7,20 +7,27 @@
 
 package org.mule.runtime.core.api.diagnostics.notification;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
 import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
 
 import java.util.Objects;
 
-public class DefaultProfilingEventType implements ProfilingEventType<ProcessingStrategyProfilingEventContext> {
+/**
+ * A {@link ProfilingEventType} for processing strategies.
+ *
+ * @since 4.4
+ */
+@Experimental
+public class ProcessingStrategyProfilingEventType implements ProfilingEventType<ProcessingStrategyProfilingEventContext> {
 
   private final String name;
 
-  public static DefaultProfilingEventType of(String name) {
-    return new DefaultProfilingEventType(name);
+  public static ProcessingStrategyProfilingEventType of(String name) {
+    return new ProcessingStrategyProfilingEventType(name);
   }
 
-  private DefaultProfilingEventType(String name) {
+  private ProcessingStrategyProfilingEventType(String name) {
     this.name = name;
   }
 
@@ -35,7 +42,7 @@ public class DefaultProfilingEventType implements ProfilingEventType<ProcessingS
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    DefaultProfilingEventType that = (DefaultProfilingEventType) o;
+    ProcessingStrategyProfilingEventType that = (ProcessingStrategyProfilingEventType) o;
     return name.equals(that.name);
   }
 

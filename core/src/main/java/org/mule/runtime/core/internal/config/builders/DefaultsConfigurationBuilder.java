@@ -52,7 +52,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.diagnostics.DefaultDiagnosticsService;
+import org.mule.runtime.core.internal.diagnostics.DefaultDiagnosticsService;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
