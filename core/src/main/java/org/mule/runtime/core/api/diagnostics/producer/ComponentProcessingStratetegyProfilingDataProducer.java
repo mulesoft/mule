@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.diagnostics.hook;
+package org.mule.runtime.core.api.diagnostics.producer;
 
 import org.mule.runtime.core.api.diagnostics.DefaultDiagnosticsService;
 import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;

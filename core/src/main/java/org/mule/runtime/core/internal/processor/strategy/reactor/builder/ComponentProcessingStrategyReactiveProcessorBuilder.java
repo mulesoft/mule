@@ -126,64 +126,68 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyPublisherBuilder(
                                                                                                   ReactorPublisherBuilder<T> builder) {
 
-    // Profiling hooks
-    Optional<ProfilingDataProducer> dispatchingOperationExecutionHook =
-        hookFromDiagnosticsService(PS_SCHEDULING_OPERATION_EXECUTION);
-    Optional<ProfilingDataProducer> operationExecutionDispatchedHook = hookFromDiagnosticsService(STARTING_OPERATION_EXECUTION);
-    Optional<ProfilingDataProducer> dispatchingOperationResultHook = hookFromDiagnosticsService(OPERATION_EXECUTED);
-    Optional<ProfilingDataProducer> operationResultDispatchedHook = hookFromDiagnosticsService(PS_FLOW_MESSAGE_PASSING);
+    // Profiling data producers
+    Optional<ProfilingDataProducer> dispatchingOperationExecutionDataProducer =
+        dataProducerFromDiagnosticsService(PS_SCHEDULING_OPERATION_EXECUTION);
+    Optional<ProfilingDataProducer> operationExecutionDispatchedDataProducer =
+        dataProducerFromDiagnosticsService(STARTING_OPERATION_EXECUTION);
+    Optional<ProfilingDataProducer> dispatchingOperationResultDataProducer =
+        dataProducerFromDiagnosticsService(OPERATION_EXECUTED);
+    Optional<ProfilingDataProducer> operationResultDispatchedDataProducer =
+        dataProducerFromDiagnosticsService(PS_FLOW_MESSAGE_PASSING);
 
     // location
     ComponentLocation location = getLocation(processor);
 
     // Add the reactor processor enrichment with the processing strategy scheduling before the processor transform.
     ReactorPublisherBuilder<T> beforeProcessor =
-        getBeforeProcessorReactorChain(builder, dispatchingOperationExecutionHook, operationExecutionDispatchedHook, location,
+        getBeforeProcessorReactorChain(builder, dispatchingOperationExecutionDataProducer,
+                                       operationExecutionDispatchedDataProducer, location,
                                        muleContext.getConfiguration().getId(), muleContext.getArtifactType().getAsString());
 
     // Add the reactor processing enrichment with the processing strategy scheduling after the processor transform.
-    return getAfterProcessorReactorChain(dispatchingOperationResultHook, operationResultDispatchedHook, location,
+    return getAfterProcessorReactorChain(dispatchingOperationResultDataProducer, operationResultDispatchedDataProducer, location,
                                          muleContext.getConfiguration().getId(),
                                          muleContext.getArtifactType().getAsString(),
                                          beforeProcessor);
   }
 
-  private Optional<ProfilingDataProducer> hookFromDiagnosticsService(ProfilingEventType profilingEventType) {
+  private Optional<ProfilingDataProducer> dataProducerFromDiagnosticsService(ProfilingEventType profilingEventType) {
     return diagnosticsService.map(ds -> of(ds.getProfilingDataProducer(profilingEventType))).orElse(empty());
   }
 
   private <T extends Publisher> ReactorPublisherBuilder<T> getAfterProcessorReactorChain(
-                                                                                         Optional<ProfilingDataProducer> dispatchingOperationResultHook,
-                                                                                         Optional<ProfilingDataProducer> operationResultDispatchedHook,
+                                                                                         Optional<ProfilingDataProducer> dispatchingOperationResultDataProducer,
+                                                                                         Optional<ProfilingDataProducer> operationResultDispatchedDataProducer,
                                                                                          ComponentLocation location,
                                                                                          String artifactId,
                                                                                          String artifactType,
                                                                                          ReactorPublisherBuilder<T> beforeProcessor) {
     return callbackScheduler
         .map(sch -> beforeProcessor
-            .profileEvent(location, dispatchingOperationResultHook, artifactId, artifactType)
+            .profileEvent(location, dispatchingOperationResultDataProducer, artifactId, artifactType)
             .publishOn(sch)
-            .profileEvent(location, operationResultDispatchedHook, artifactId, artifactType))
+            .profileEvent(location, operationResultDispatchedDataProducer, artifactId, artifactType))
         .orElse(beforeProcessor
-            .profileEvent(location, dispatchingOperationResultHook, artifactId, artifactType)
-            .profileEvent(location, operationResultDispatchedHook, artifactId, artifactType))
+            .profileEvent(location, dispatchingOperationResultDataProducer, artifactId, artifactType)
+            .profileEvent(location, operationResultDispatchedDataProducer, artifactId, artifactType))
         .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, contextScheduler));
   }
 
   private <T extends Publisher> ReactorPublisherBuilder<T> getBeforeProcessorReactorChain(ReactorPublisherBuilder<T> builder,
-                                                                                          Optional<ProfilingDataProducer> dispatchingOperationExecutionHook,
-                                                                                          Optional<ProfilingDataProducer> operationExecutionDispatchedHook,
+                                                                                          Optional<ProfilingDataProducer> dispatchingOperationExecutionDataProducer,
+                                                                                          Optional<ProfilingDataProducer> operationExecutionDispatchedDataProducer,
                                                                                           ComponentLocation location,
                                                                                           String artifactId,
                                                                                           String artifactType) {
     return dispatcherScheduler
         .map(sch -> builder
-            .profileEvent(location, dispatchingOperationExecutionHook, artifactId, artifactType)
+            .profileEvent(location, dispatchingOperationExecutionDataProducer, artifactId, artifactType)
             .publishOn(sch)
-            .profileEvent(location, operationExecutionDispatchedHook, artifactId, artifactType))
+            .profileEvent(location, operationExecutionDispatchedDataProducer, artifactId, artifactType))
         .orElse(builder
-            .profileEvent(location, dispatchingOperationExecutionHook, artifactId, artifactType)
-            .profileEvent(location, operationExecutionDispatchedHook, artifactId, artifactType)
+            .profileEvent(location, dispatchingOperationExecutionDataProducer, artifactId, artifactType)
+            .profileEvent(location, operationExecutionDispatchedDataProducer, artifactId, artifactType)
             .transform(processor));
   }
 
