@@ -1104,6 +1104,9 @@ class MuleExtensionModelDeclarer {
 
     // TODO: min-max occurs
     declareDisableNotification(notificationsConstructDeclarer.withOptionalComponent("disable-notification"));
+
+    // TODO: min-max occurs
+    declareNotificationListener(notificationsConstructDeclarer.withOptionalComponent("notification-listener"));
   }
 
   private void declareEnableNotification(NestedComponentDeclarer enableNotificationDeclarer) {
@@ -1164,6 +1167,21 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The interface that will no longer receive the event.");
+  }
+
+  private void declareNotificationListener(NestedComponentDeclarer notificationListenerDeclarer) {
+    notificationListenerDeclarer.onDefaultParameterGroup()
+        .withRequiredParameter("ref")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The bean that will receive notifications.");
+
+    notificationListenerDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("subscription")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("An optional string that is compared with the event resource identifier. Only events with matching"
+            + " identifiers will be sent. If no value is given, all events are sent.");
   }
 
   private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer) {
