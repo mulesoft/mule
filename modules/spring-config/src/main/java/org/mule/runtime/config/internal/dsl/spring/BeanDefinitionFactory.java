@@ -28,7 +28,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PRO
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.loadProviderFactories;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
@@ -39,7 +38,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
@@ -550,7 +548,6 @@ public class BeanDefinitionFactory {
     // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
     // how core constructs are processed.
     processMuleConfiguration(springComponentModels, component, registry);
-    processMuleSecurityManager(springComponentModels, component, registry);
 
     componentBuildingDefinitionRegistry.getBuildingDefinition(component.getIdentifier())
         .ifPresent(componentBuildingDefinition -> {
@@ -649,21 +646,6 @@ public class BeanDefinitionFactory {
       }
     }
   }
-
-  private void processMuleSecurityManager(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                          ComponentAst component, BeanDefinitionRegistry registry) {
-    if (component.getIdentifier().equals(SECURITY_MANAGER_IDENTIFIER)) {
-      component.directChildrenStream().forEach(childComponentModel -> {
-        String identifier = childComponentModel.getIdentifier().getName();
-        if (identifier.equals("password-encryption-strategy")
-            || identifier.equals("secret-key-encryption-strategy")) {
-          registry.registerBeanDefinition(childComponentModel.getRawParameterValue(NAME_ATTRIBUTE_NAME).get(),
-                                          springComponentModels.get(childComponentModel).getBeanDefinition());
-        }
-      });
-    }
-  }
-
 
   private BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> buildComponentProcessorChainOfResponsability() {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
