@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
-import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
+import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.asDataWeaveExpression;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -29,7 +29,7 @@ public class ParameterExtractorTestCase {
   public void dateTimeTypeAsDateTime() {
     final String param = "my parameter";
     MetadataType dateTimeType = new BaseTypeBuilder(JAVA).dateTimeType().build();
-    TypedValue<?> extracted = extractValue(plain(param), dateTimeType);
+    TypedValue<?> extracted = asDataWeaveExpression(plain(param), dateTimeType);
     checkContains(extracted, "as DateTime");
   }
 
@@ -37,7 +37,7 @@ public class ParameterExtractorTestCase {
   public void dateTypeAsDate() {
     final String param = "my parameter";
     MetadataType dateType = new BaseTypeBuilder(JAVA).dateType().build();
-    TypedValue<?> extracted = extractValue(plain(param), dateType);
+    TypedValue<?> extracted = asDataWeaveExpression(plain(param), dateType);
     checkContains(extracted, "as Date");
   }
 
@@ -45,7 +45,7 @@ public class ParameterExtractorTestCase {
   public void localDateTimeTypeAsLocalDateTime() {
     final String param = "my parameter";
     MetadataType localDateTimeType = new BaseTypeBuilder(JAVA).localDateTimeType().build();
-    TypedValue<?> extracted = extractValue(plain(param), localDateTimeType);
+    TypedValue<?> extracted = asDataWeaveExpression(plain(param), localDateTimeType);
     checkContains(extracted, "as LocalDateTime");
   }
 
@@ -53,7 +53,7 @@ public class ParameterExtractorTestCase {
   public void localTimeTypeAsLocalTime() {
     final String param = "my parameter";
     MetadataType localTimeType = new BaseTypeBuilder(JAVA).localTimeType().build();
-    TypedValue<?> extracted = extractValue(plain(param), localTimeType);
+    TypedValue<?> extracted = asDataWeaveExpression(plain(param), localTimeType);
     checkContains(extracted, "as LocalTime");
   }
 
@@ -62,7 +62,7 @@ public class ParameterExtractorTestCase {
     final String param = "my parameter";
     MetadataType dateTimeType =
         new BaseTypeBuilder(JAVA).dateType().with(new TypeIdAnnotation(java.util.Date.class.getName())).build();
-    TypedValue<?> extracted = extractValue(plain(param), dateTimeType);
+    TypedValue<?> extracted = asDataWeaveExpression(plain(param), dateTimeType);
     checkContains(extracted, "as DateTime");
   }
 
@@ -71,7 +71,7 @@ public class ParameterExtractorTestCase {
     final String param = "my parameter";
     MetadataType dateTimeType =
         new BaseTypeBuilder(JAVA).dateTimeType().with(new TypeIdAnnotation(java.time.LocalDateTime.class.getName())).build();
-    TypedValue<?> extracted = extractValue(plain(param), dateTimeType);
+    TypedValue<?> extracted = asDataWeaveExpression(plain(param), dateTimeType);
     checkContains(extracted, "as LocalDateTime");
   }
 
@@ -80,7 +80,7 @@ public class ParameterExtractorTestCase {
     MetadataType metadataType = new BaseTypeBuilder(JAVA).stringType().build();
     ParameterValue level0 = ParameterObjectValue.builder().withParameter("field", plain("value")).build();
     ParameterValue parameterValue = ParameterObjectValue.builder().withParameter("level0", level0).build();
-    TypedValue<?> extracted = extractValue(parameterValue, metadataType);
+    TypedValue<?> extracted = asDataWeaveExpression(parameterValue, metadataType);
     checkContains(extracted, "{'level0':{'field':'value'}}");
   }
 
@@ -90,7 +90,7 @@ public class ParameterExtractorTestCase {
     MetadataType dateType = new BaseTypeBuilder(JAVA).dateType().build();
     MetadataType metadataType = new BaseTypeBuilder(JAVA).arrayType().of(dateType).build();
     ParameterValue parameterValue = ParameterListValue.builder().withValue(date).build();
-    TypedValue<?> extracted = extractValue(parameterValue, metadataType);
+    TypedValue<?> extracted = asDataWeaveExpression(parameterValue, metadataType);
     checkContains(extracted, "as Date");
   }
 
@@ -101,7 +101,7 @@ public class ParameterExtractorTestCase {
     ObjectTypeBuilder metadataTypeBuilder = new BaseTypeBuilder(JAVA).objectType();
     metadataTypeBuilder.addField().key("myDate").value(dateType);
     ParameterValue parameterValue = ParameterObjectValue.builder().withParameter("myDate", date).build();
-    TypedValue<?> extracted = extractValue(parameterValue, metadataTypeBuilder.build());
+    TypedValue<?> extracted = asDataWeaveExpression(parameterValue, metadataTypeBuilder.build());
     checkContains(extracted, "as Date");
   }
 

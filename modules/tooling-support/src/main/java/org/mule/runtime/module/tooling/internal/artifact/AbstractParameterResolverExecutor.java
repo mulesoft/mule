@@ -9,7 +9,7 @@ package org.mule.runtime.module.tooling.internal.artifact;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
+import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.asDataWeaveExpression;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
@@ -91,7 +91,7 @@ public class AbstractParameterResolverExecutor {
         final ParameterModel parameterModel = parameterGroupModel.getParameter(parameterName)
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find parameter with name: '%s' in parameter group: '%s'",
                                                                             parameterName, parameterGroupName)));
-        parametersMap.put(parameterName, extractValue(parameterElement.getValue(), parameterModel.getType()));
+        parametersMap.put(parameterName, asDataWeaveExpression(parameterElement.getValue(), parameterModel.getType()));
       }
     }
     return parametersMap;

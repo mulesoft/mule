@@ -40,8 +40,8 @@ import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import javax.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}
