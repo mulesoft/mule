@@ -17,19 +17,20 @@ import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategy
  */
 public class DefaultProfilingNotificationListener implements ProfilerNotificationListener<ProfilingNotification> {
 
-  public ProfilingDataConsumer<ProfilingEventContext> dataConsumer;
+  private final ProfilingDataConsumer<ProfilingEventContext> dataConsumer;
 
   @Override
   public boolean isBlocking() {
     return false;
   }
 
-  public DefaultProfilingNotificationListener(ProfilingDataConsumer dataConsumer) {
+  public DefaultProfilingNotificationListener(ProfilingDataConsumer<ProfilingEventContext> dataConsumer) {
     this.dataConsumer = dataConsumer;
   }
 
   @Override
   public void onNotification(ProfilingNotification notification) {
-    dataConsumer.onProfilingEvent(notification.getActionName(), (ProfilingEventContext) notification.getSource());
+    ProfilingEventContext profilingEventContext = (ProcessingStrategyProfilingEventContext) notification.getSource();
+    dataConsumer.onProfilingEvent(notification.getActionName(), profilingEventContext);
   }
 }

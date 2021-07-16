@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilin
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
 
 /**
@@ -43,7 +44,7 @@ public class ProfilingNotification extends AbstractServerNotification {
     registerAction(PS_FLOW_END.getProfilingEventName(), PS_FLOW_END_ID);
   }
 
-  public ProfilingNotification(Object profilingEventContext, ProfilingEventType profilingEventType) {
+  public ProfilingNotification(ProfilingEventContext profilingEventContext, ProfilingEventType profilingEventType) {
     super(profilingEventContext, getActionId(profilingEventType.getProfilingEventName()));
   }
 
