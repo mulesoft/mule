@@ -10,9 +10,11 @@ import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -47,6 +49,9 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   private StreamingManager streamingManager;
 
+  @Inject
+  FeatureFlaggingService featureFlaggingService;
+
   @Override
   public void initialise() throws InitialisationException {
     identifierEvaluator.initialize(expressionManager);
@@ -61,7 +66,17 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
       LOGGER.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
     }
+
     TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
+
+    if (!featureFlaggingService.isEnabled(SET_VARIABLE_WITH_NULL_VALUE) && typedValue.getValue() == null) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(format(
+                            "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
+                            key, valueEvaluator.getRawValue()));
+      }
+      return removeProperty((PrivilegedEvent) event, key);
+    }
 
     if (typedValue.getValue() != null) {
       typedValue = handleStreaming(typedValue, event, streamingManager);
