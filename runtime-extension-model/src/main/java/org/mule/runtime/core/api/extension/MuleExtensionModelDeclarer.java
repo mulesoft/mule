@@ -1082,11 +1082,60 @@ class MuleExtensionModelDeclarer {
 
   private void declareNotifications(ExtensionDeclarer extensionDeclarer) {
     // TODO MULE-17778: Complete this declaration
-    extensionDeclarer.withConstruct("notifications")
+    ConstructDeclarer notificationsConstructDeclarer = extensionDeclarer.withConstruct("notifications")
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
         .describedAs("Registers listeners for notifications and associates interfaces with particular events.")
         .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
+
+    notificationsConstructDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("dynamic")
+        .ofType(BOOLEAN_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo(false)
+        .describedAs("If the notification manager is dynamic, listeners can be registered dynamically at runtime via the "
+            + "MuleContext, and the configured notification can be changed. Otherwise, some parts of Mule will cache "
+            + "notification configuration for efficiency and will not generate events for newly enabled notifications or "
+            + "listeners. The default value is false.");
+
+    notificationsConstructDeclarer.onParameterGroup("notification")
+        .withDisplayModel(DisplayModel.builder().summary(
+            "Registers listeners for notifications and associates interfaces with particular events").build())
+        .withDslInlineRepresentation(true)
+        .withOptionalParameter("event-class")
+        .describedAs("The class associated with a notification event that will be delivered to the interface.\n"
+            + "This can be used instead of the 'event' attribute to specify a custom class");
+
+
+    //        <xsd:attribute name="event-class" type="substitutableClass">
+    //            <xsd:annotation>
+    //                <xsd:documentation>
+    //                    The class associated with a notification event that will be delivered to the interface.
+    //                    This can be used instead of the 'event' attribute to specify a custom class.
+    //                </xsd:documentation>
+    //            </xsd:annotation>
+    //        </xsd:attribute>
+    //        <xsd:attribute name="event" type="notificationTypes">
+    //            <xsd:annotation>
+    //                <xsd:documentation>
+    //                    The notification event to deliver.
+    //                </xsd:documentation>
+    //            </xsd:annotation>
+    //        </xsd:attribute>
+    //        <xsd:attribute name="interface-class" type="substitutableClass">
+    //            <xsd:annotation>
+    //                <xsd:documentation>
+    //                    The interface (class name) that will receive the notification event.
+    //                </xsd:documentation>
+    //            </xsd:annotation>
+    //        </xsd:attribute>
+    //        <xsd:attribute name="interface" type="notificationTypes">
+    //            <xsd:annotation>
+    //                <xsd:documentation>
+    //                    The interface that will receive the notification event.
+    //                </xsd:documentation>
+    //            </xsd:annotation>
+    //        </xsd:attribute>
   }
 
   private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer) {
