@@ -19,8 +19,13 @@ import static java.util.Optional.ofNullable;
  *
  * @since 4.4
  */
-public class ComponentProcessingStrategyProfilingEventContext extends AbstractProcessingStrategyProfilingEventContext {
+public class ComponentProcessingStrategyProfilingEventContext implements ProcessingStrategyProfilingEventContext {
 
+  private final CoreEvent e;
+  private final String artifactId;
+  private final String artifactType;
+  private String threadName;
+  private long profilingEventTimestamp;
   private final Optional<ComponentLocation> location;
 
   public ComponentProcessingStrategyProfilingEventContext(CoreEvent e,
@@ -29,14 +34,36 @@ public class ComponentProcessingStrategyProfilingEventContext extends AbstractPr
                                                           String artifactId,
                                                           String artifactType,
                                                           long profilingEventTimestamp) {
-    super(e, threadName, artifactId, artifactType, profilingEventTimestamp);
+    this.e = e;
+    this.threadName = threadName;
+    this.artifactId = artifactId;
+    this.artifactType = artifactType;
+    this.profilingEventTimestamp = profilingEventTimestamp;
     this.location = ofNullable(location);
   }
 
-  /**
-   * @return the optional {@link ComponentLocation} associated with the profiling event.
-   */
+  public CoreEvent getEvent() {
+    return e;
+  }
+
+  public String getThreadName() {
+    return threadName;
+  }
+
+  public String getArtifactId() {
+    return artifactId;
+  }
+
+  public String getArtifactType() {
+    return artifactType;
+  }
+
+  public long getTimestamp() {
+    return profilingEventTimestamp;
+  }
+
   public Optional<ComponentLocation> getLocation() {
     return location;
   }
+
 }

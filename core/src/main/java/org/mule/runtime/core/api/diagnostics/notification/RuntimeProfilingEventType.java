@@ -8,7 +8,6 @@
 package org.mule.runtime.core.api.diagnostics.notification;
 
 import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
-import org.mule.runtime.core.api.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
 
 /**
