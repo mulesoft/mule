@@ -450,7 +450,7 @@ public class CoreExtensionModelTestCase {
     final OperationModel scatterGatherModel = coreExtensionModel.getOperationModel("scatterGather").get();
 
     assertOutputsListOfMessages(scatterGatherModel);
-    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(7));
+    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(5));
 
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getName(), is("timeout"));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
@@ -494,7 +494,7 @@ public class CoreExtensionModelTestCase {
     assertThat(processorsChain, instanceOf(NestedChainModel.class));
     assertThat(processorsChain.isRequired(), is(true));
 
-    assertThat(parallelForeach.getAllParameterModels(), hasSize(8));
+    assertThat(parallelForeach.getAllParameterModels(), hasSize(6));
 
     final ParameterModel collection = parallelForeach.getAllParameterModels().get(0);
     assertThat(collection.getName(), is("collection"));

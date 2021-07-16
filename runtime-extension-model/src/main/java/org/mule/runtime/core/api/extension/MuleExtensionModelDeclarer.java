@@ -57,13 +57,6 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STR
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.TYPE_LOADER;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.VOID_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DISPLAY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
@@ -112,7 +105,6 @@ import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
-import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.reflect.TypeToken;
@@ -730,23 +722,6 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
-    scatterGather.onDefaultParameterGroup()
-        .withOptionalParameter(TARGET_PARAMETER_NAME)
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs(TARGET_PARAMETER_DESCRIPTION)
-        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-
-    scatterGather.onDefaultParameterGroup()
-        .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
-        .ofType(STRING_TYPE)
-        .defaultingTo(PAYLOAD)
-        .withExpressionSupport(REQUIRED)
-        .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
-        .withRole(BEHAVIOUR)
-        .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
-        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
-        .withModelProperty(new TargetModelProperty());
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)
@@ -790,23 +765,6 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
-    parallelForeach.onDefaultParameterGroup()
-        .withOptionalParameter(TARGET_PARAMETER_NAME)
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs(TARGET_PARAMETER_DESCRIPTION)
-        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-
-    parallelForeach.onDefaultParameterGroup()
-        .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
-        .ofType(STRING_TYPE)
-        .defaultingTo(PAYLOAD)
-        .withExpressionSupport(REQUIRED)
-        .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
-        .withRole(BEHAVIOUR)
-        .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
-        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
-        .withModelProperty(new TargetModelProperty());
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer) {
