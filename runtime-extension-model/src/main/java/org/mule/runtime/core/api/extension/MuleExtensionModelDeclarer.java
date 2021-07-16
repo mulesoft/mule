@@ -1180,6 +1180,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("subscription")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo("*")
         .describedAs("An optional string that is compared with the event resource identifier. Only events with matching"
             + " identifiers will be sent. If no value is given, all events are sent.");
   }
