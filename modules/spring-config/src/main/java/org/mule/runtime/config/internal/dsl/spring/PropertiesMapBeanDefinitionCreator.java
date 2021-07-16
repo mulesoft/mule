@@ -43,5 +43,5 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
     }
     return false;
   }
-  
+
 }
