@@ -10,7 +10,7 @@ package org.mule.runtime.core.api.diagnostics;
 /**
  * @param <T> the class that encapsulates the data for the profiling event context.
  */
-public interface ProfilingDataProducer<T> {
+public interface ProfilingDataProducer<T extends ProfilingEventContext> {
 
   /**
    * Notifies a profiling event.
