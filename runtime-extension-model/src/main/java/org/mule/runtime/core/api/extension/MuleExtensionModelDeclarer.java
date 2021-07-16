@@ -90,6 +90,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
@@ -1098,44 +1099,39 @@ class MuleExtensionModelDeclarer {
             + "notification configuration for efficiency and will not generate events for newly enabled notifications or "
             + "listeners. The default value is false.");
 
-    notificationsConstructDeclarer.onParameterGroup("notification")
-        .withDisplayModel(DisplayModel.builder().summary(
-            "Registers listeners for notifications and associates interfaces with particular events").build())
-        .withDslInlineRepresentation(true)
+    declareNotification(notificationsConstructDeclarer.withOptionalComponent("notification"));
+  }
+
+  private void declareNotification(NestedComponentDeclarer notificationDeclarer) {
+    notificationDeclarer.describedAs("Registers listeners for notifications and associates interfaces with particular events");
+
+    notificationDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("event-class")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The class associated with a notification event that will be delivered to the interface.\n"
-            + "This can be used instead of the 'event' attribute to specify a custom class");
+            + "This can be used instead of the 'event' attribute to specify a custom class.");
 
+    notificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The notification event to deliver.");
 
-    //        <xsd:attribute name="event-class" type="substitutableClass">
-    //            <xsd:annotation>
-    //                <xsd:documentation>
-    //                    The class associated with a notification event that will be delivered to the interface.
-    //                    This can be used instead of the 'event' attribute to specify a custom class.
-    //                </xsd:documentation>
-    //            </xsd:annotation>
-    //        </xsd:attribute>
-    //        <xsd:attribute name="event" type="notificationTypes">
-    //            <xsd:annotation>
-    //                <xsd:documentation>
-    //                    The notification event to deliver.
-    //                </xsd:documentation>
-    //            </xsd:annotation>
-    //        </xsd:attribute>
-    //        <xsd:attribute name="interface-class" type="substitutableClass">
-    //            <xsd:annotation>
-    //                <xsd:documentation>
-    //                    The interface (class name) that will receive the notification event.
-    //                </xsd:documentation>
-    //            </xsd:annotation>
-    //        </xsd:attribute>
-    //        <xsd:attribute name="interface" type="notificationTypes">
-    //            <xsd:annotation>
-    //                <xsd:documentation>
-    //                    The interface that will receive the notification event.
-    //                </xsd:documentation>
-    //            </xsd:annotation>
-    //        </xsd:attribute>
+    notificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface-class")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface (class name) that will receive the notification event.");
+
+    notificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface that will receive the notification event.");
+
+    notificationDeclarer.onDefaultParameterGroup()
+        .withExclusiveOptionals(ImmutableSet.of("event-class", "event", "interface-class", "interface"), true);
   }
 
   private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer) {
