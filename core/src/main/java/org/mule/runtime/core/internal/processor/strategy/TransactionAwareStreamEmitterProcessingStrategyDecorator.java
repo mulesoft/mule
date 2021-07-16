@@ -94,8 +94,8 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
     if (featureFlags.isEnabled(ENABLE_DIAGNOSTICS_SERVICE)) {
       ComponentLocation location = getLocation(pipeline);
-      ProfilingDataProducer hookFlowDispatch = diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
-      ProfilingDataProducer hookFlowEnd = diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
+      ProfilingDataProducer flowDisptchDataProducer = diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
+      ProfilingDataProducer flowEndDataProducer = diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
 
       String artifactId = muleContext.getConfiguration().getId();
       String artifactType = muleContext.getArtifactType().getAsString();
@@ -104,9 +104,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
           .flatMapMany(ctx -> {
             if (isTxActive(ctx)) {
               return buildFlux(pub)
-                  .profileEvent(location, ofNullable(hookFlowDispatch), artifactId, artifactType)
+                  .profileEvent(location, ofNullable(flowDisptchDataProducer), artifactId, artifactType)
                   .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
-                  .profileEvent(location, ofNullable(hookFlowEnd), artifactId, artifactType)
+                  .profileEvent(location, ofNullable(flowEndDataProducer), artifactId, artifactType)
                   .build();
             } else {
               return from(pub).transform(delegate.onPipeline(pipeline));
@@ -128,9 +128,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     if (featureFlags.isEnabled(ENABLE_DIAGNOSTICS_SERVICE)) {
-      ProfilingDataProducer startingOperationExecutionHook =
+      ProfilingDataProducer startingOperationExecutionDataProducer =
           diagnosticsService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
-      ProfilingDataProducer operationExecutedHook = diagnosticsService.getProfilingDataProducer(OPERATION_EXECUTED);
+      ProfilingDataProducer operationExecutedDataProducer = diagnosticsService.getProfilingDataProducer(OPERATION_EXECUTED);
       ProfilingDataProducer psSchedulingOperationExecution =
           diagnosticsService.getProfilingDataProducer(PS_SCHEDULING_OPERATION_EXECUTION);
       ProfilingDataProducer psFlowMessagePassing = diagnosticsService.getProfilingDataProducer(PS_FLOW_MESSAGE_PASSING);
@@ -143,9 +143,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             if (isTxActive(ctx)) {
               return buildFlux(pub)
                   .profileEvent(getLocation(processor), ofNullable(psSchedulingOperationExecution), artifactId, artifactType)
-                  .profileEvent(getLocation(processor), ofNullable(startingOperationExecutionHook), artifactId, artifactType)
+                  .profileEvent(getLocation(processor), ofNullable(startingOperationExecutionDataProducer), artifactId,
+                                artifactType)
                   .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
-                  .profileEvent(getLocation(processor), ofNullable(operationExecutedHook), artifactId, artifactType)
+                  .profileEvent(getLocation(processor), ofNullable(operationExecutedDataProducer), artifactId, artifactType)
                   .profileEvent(getLocation(processor), ofNullable(psFlowMessagePassing), artifactId, artifactType)
                   .build();
             } else {

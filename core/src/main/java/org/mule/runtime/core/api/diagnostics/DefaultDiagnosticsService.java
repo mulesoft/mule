@@ -8,7 +8,7 @@
 package org.mule.runtime.core.api.diagnostics;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.diagnostics.hook.ComponentProcessingStratetegyProfilingDataProducer;
+import org.mule.runtime.core.api.diagnostics.producer.ComponentProcessingStratetegyProfilingDataProducer;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_END;
@@ -104,17 +103,17 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
                                                                                                   ReactorPublisherBuilder<T> publisher) {
 
     ComponentLocation location = getLocation(pipeline);
-    Optional<ProfilingDataProducer> hookFlowDispatch = hookFromDiagnosticsService(PS_FLOW_DISPATCH);
-    Optional<ProfilingDataProducer> hookFlowEnd = hookFromDiagnosticsService(PS_FLOW_END);
+    Optional<ProfilingDataProducer> dataProducerFlowDispatch = dataProducerFromDiagnosticsService(PS_FLOW_DISPATCH);
+    Optional<ProfilingDataProducer> dataProducerFlowEnd = dataProducerFromDiagnosticsService(PS_FLOW_END);
     String artifactId = muleContext.getConfiguration().getId();
     String artifactType = muleContext.getArtifactType().getAsString();
 
-    publisher.profileEvent(location, hookFlowDispatch, artifactId, artifactType);
+    publisher.profileEvent(location, dataProducerFlowDispatch, artifactId, artifactType);
 
     return scheduler
         .map(sch -> publisher.publishOn(schedulerDecorator.apply(sch)))
         .orElse(publisher)
-        .profileEvent(location, hookFlowEnd, artifactId, artifactType)
+        .profileEvent(location, dataProducerFlowEnd, artifactId, artifactType)
         .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
         .transform(pipeline);
   }
@@ -129,7 +128,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
   }
 
 
-  private Optional<ProfilingDataProducer> hookFromDiagnosticsService(ProfilingEventType profilingEventType) {
+  private Optional<ProfilingDataProducer> dataProducerFromDiagnosticsService(ProfilingEventType profilingEventType) {
     return diagnosticsService.map(ds -> ds.getProfilingDataProducer(profilingEventType));
   }
 

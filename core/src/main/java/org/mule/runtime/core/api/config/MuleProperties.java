@@ -374,7 +374,7 @@ public class MuleProperties {
       MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 
   /**
-   * Specifies the injected bean from which diagnostics resources hooks will be required and managed.
+   * the key for the bean from which diagnostics resources will be obtained.
    *
    * @since 4.4.0
    */

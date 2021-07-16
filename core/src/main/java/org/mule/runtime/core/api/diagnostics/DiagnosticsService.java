@@ -8,7 +8,7 @@
 package org.mule.runtime.core.api.diagnostics;
 
 /**
- * Service that provides hooks to produce diagnostic data to be consumed
+ * Service that provides resources for profiling.
  *
  * @since 4.4.0
  */
@@ -16,10 +16,10 @@ public interface DiagnosticsService {
 
 
   /**
-   * Returns a hook to notify events for a profiler event type
+   * Returns a data producer to notify events for a profiler event type
    *
-   * @param profilingEventType the profiler event type for the hook
-   * @return the profiler hook
+   * @param profilingEventType the profiler event type for the {@link ProfilingDataProducer}
+   * @return the profiler data producer
    */
   ProfilingDataProducer getProfilingDataProducer(ProfilingEventType profilingEventType);
 }
