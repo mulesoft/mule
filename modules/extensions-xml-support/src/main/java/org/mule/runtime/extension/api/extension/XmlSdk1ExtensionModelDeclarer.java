@@ -6,23 +6,27 @@
  */
 package org.mule.runtime.extension.api.extension;
 
-import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.extension.api.extension.XmlSdkTypesValueProvider.ID;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
+import static org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.builder;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -41,6 +45,8 @@ public class XmlSdk1ExtensionModelDeclarer {
   private static final StereotypeModel OUTPUT_STEREOTYPE = newStereotype("OUTPUT", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel OUTPUT_ATTRIBUTES_STEREOTYPE =
       newStereotype("OUTPUT-ATTRIBUTES", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+
+  private final ValueProviderModel typesValueProvider = createTypesValueProviderModel();
 
   public ExtensionDeclarer createExtensionModel() {
     final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
@@ -95,11 +101,7 @@ public class XmlSdk1ExtensionModelDeclarer {
     parameterDefaultParamGroup
         .withRequiredParameter("name")
         .ofType(STRING_TYPE);
-    parameterDefaultParamGroup
-        .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType()
-            .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
-            .build());
+    configureTypeParameter(parameterDefaultParamGroup.withRequiredParameter("type"));
     parameterDefaultParamGroup
         .withOptionalParameter("defaultValue")
         .ofType(STRING_TYPE);
@@ -129,28 +131,21 @@ public class XmlSdk1ExtensionModelDeclarer {
         .defaultingTo(Placement.DEFAULT_TAB)
         .ofType(STRING_TYPE);
 
-    operationDeclaration.withOptionalComponent("output")
+
+
+    configureTypeParameter(operationDeclaration.withOptionalComponent("output")
         .describedAs("Defines the output of the operation if exists, void otherwise.")
         .withStereotype(OUTPUT_STEREOTYPE)
         .onDefaultParameterGroup()
-        .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType()
-            .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
-            .build());
+        .withRequiredParameter("type"));
 
-    operationDeclaration.withOptionalComponent("output-attributes")
+    configureTypeParameter(operationDeclaration.withOptionalComponent("output-attributes")
         .describedAs("Defines the attribute's output of the operation if exists, void otherwise.")
         .withStereotype(OUTPUT_ATTRIBUTES_STEREOTYPE)
         .onDefaultParameterGroup()
-        .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType()
-            .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
-            .build());
+        .withRequiredParameter("type"));
 
     operationDeclaration.withChain("body");
-//    operationDeclaration.withOptionalComponent("body")
-//        .withStereotype(CHAIN)
-//        .withChain();
 
     operationDeclaration.withOptionalComponent("errors")
         .withStereotype(ERRORS_STEREOTYPE)
@@ -158,8 +153,22 @@ public class XmlSdk1ExtensionModelDeclarer {
         .withRoute("error")
         .onDefaultParameterGroup()
         .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType().build())
+        .ofType(STRING_TYPE)
         .describedAs("Defined error for the current operation.");
+  }
+
+  private ParameterDeclarer configureTypeParameter(ParameterDeclarer parameter) {
+    return parameter.ofType(STRING_TYPE).withValueProviderModel(typesValueProvider);
+  }
+
+  private ValueProviderModel createTypesValueProviderModel() {
+    return new ValueProviderModel(emptyList(),
+        false,
+        false,
+        true, 0,
+        ID,
+        ID,
+        builder(XmlSdkTypesValueProvider.class).build());
   }
 
   private void declarePropertyElement(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
@@ -172,11 +181,8 @@ public class XmlSdk1ExtensionModelDeclarer {
         .withRequiredParameter("name")
         .asComponentId()
         .ofType(STRING_TYPE);
-    propertyDeclarationDefaultParamGroup
-        .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType()
-            .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
-            .build());
+    configureTypeParameter(propertyDeclarationDefaultParamGroup
+        .withRequiredParameter("type"));
     propertyDeclarationDefaultParamGroup
         .withOptionalParameter("defaultValue")
         .ofType(STRING_TYPE);
