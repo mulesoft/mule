@@ -128,15 +128,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   private final ProcessingStrategyFactory processingStrategyFactory;
   private final RuntimeException illegalStateException = new IllegalStateException();
 
-  /**
-   * Examples of exceptions considered fatal by Reactor as per {@link reactor.core.Exceptions#throwIfFatal}. Exceptions that are
-   * fatal for us too are excluded (VirtualMachineError, ThreadDeath, LinkageError). Relates to MULE-19593.
-   */
-  private final RuntimeException[] reactorFatalExceptions = {
-      bubble(new RuntimeException("Some bubbling error")),
-      errorCallbackNotImplemented(new RuntimeException("Some callback not implemented error")),
-  };
-
   @Rule
   public ExpectedException expectedException = none();
 
@@ -833,62 +824,40 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @Test
   @Issue("MULE-19593")
-  public void testErrorNotificationsFatalException() throws Exception {
-    for (RuntimeException exception : reactorFatalExceptions) {
-      List<MessageProcessorNotification> notificationList = new ArrayList<>();
-      setupMessageProcessorNotificationListener(notificationList);
-
-      // Builds a chain with a processor that throws an exception
-      DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-      builder.chain(new RawExceptionThrowingMessageProcessor(exception));
-
-      final CoreEvent inEvent = getTestEventUsingFlow("0");
-      try {
-        process(builder.build(), inEvent);
-        fail("Should have thrown");
-      } catch (Throwable t) {
-        // This is the most important assertion here, that the error was notified which means the chain was not
-        // broken by an uncaught exception
-        assertThat(notificationList, hasSize(2));
-
-        assertThat(t, instanceOf(MuleRuntimeException.class));
-        assertThat(t.getCause(), is(exception));
-        MessageProcessorNotification errorNotification = notificationList.get(1);
-        assertThat(errorNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
-        assertThat(errorNotification.getEventContext(), equalTo(inEvent.getContext()));
-        assertPostErrorNotificationWrappedInRuntimeException(inEvent, errorNotification, exception);
-      }
-    }
+  public void testErrorNotificationsBubblingException() throws Exception {
+    // Tests if notifications are fired on bubbling exceptions
+    final RuntimeException expectedException = bubble(new RuntimeException("Some bubbling error"));
+    testErrorNotificationsOnFatalException(expectedException, new RawExceptionThrowingMessageProcessor(expectedException));
   }
 
   @Test
   @Issue("MULE-19593")
-  public void testErrorNotificationsFatalExceptionWithOnErrorStopStrategy() throws Exception {
-    for (RuntimeException exception : reactorFatalExceptions) {
-      List<MessageProcessorNotification> notificationList = new ArrayList<>();
-      setupMessageProcessorNotificationListener(notificationList);
+  public void testErrorNotificationsErrorCallbackNotImplemented() throws Exception {
+    // Tests if notifications are fired on ErrorCallbackNotImplemented exceptions
+    final RuntimeException expectedException =
+        errorCallbackNotImplemented(new RuntimeException("Some callback not implemented error"));
+    testErrorNotificationsOnFatalException(expectedException, new RawExceptionThrowingMessageProcessor(expectedException));
+  }
 
-      // Builds a chain with a processor that throws an exception but also overrides the on error continue strategy
-      DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-      builder.chain(new RawExceptionThrowingOnErrorStopMessageProcessor(exception));
+  @Test
+  @Issue("MULE-19593")
+  public void testErrorNotificationsBubblingExceptionWithOnErrorStopStrategy() throws Exception {
+    // Tests if notifications are fired on bubbling exceptions when the processor has an inner publisher with on error
+    // stop strategy
+    final RuntimeException expectedException = bubble(new RuntimeException("Some bubbling error"));
+    testErrorNotificationsOnFatalException(expectedException,
+                                           new RawExceptionThrowingOnErrorStopMessageProcessor(expectedException));
+  }
 
-      final CoreEvent inEvent = getTestEventUsingFlow("0");
-      try {
-        process(builder.build(), inEvent);
-        fail("Should have thrown");
-      } catch (Throwable t) {
-        // This is the most important assertion here, that the error was notified which means the chain was not
-        // broken by an uncaught exception
-        assertThat(notificationList, hasSize(2));
-
-        assertThat(t, instanceOf(MuleRuntimeException.class));
-        assertThat(t.getCause(), is(exception));
-        MessageProcessorNotification errorNotification = notificationList.get(1);
-        assertThat(errorNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
-        assertThat(errorNotification.getEventContext(), equalTo(inEvent.getContext()));
-        assertPostErrorNotificationWrappedInRuntimeException(inEvent, errorNotification, exception);
-      }
-    }
+  @Test
+  @Issue("MULE-19593")
+  public void testErrorNotificationsErrorCallbackNotImplementedWithOnErrorStopStrategy() throws Exception {
+    // Tests if notifications are fired on ErrorCallbackNotImplemented exceptions when the processor has an inner
+    // publisher with on error stop strategy
+    final RuntimeException expectedException =
+        errorCallbackNotImplemented(new RuntimeException("Some callback not implemented error"));
+    testErrorNotificationsOnFatalException(expectedException,
+                                           new RawExceptionThrowingOnErrorStopMessageProcessor(expectedException));
   }
 
   @Test
@@ -983,6 +952,32 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     assertThat(postNotification.getException(), is(instanceOf(MessagingException.class)));
     assertThat(postNotification.getException().getCause(), instanceOf(RuntimeException.class));
     assertThat(postNotification.getException().getCause().getCause(), is(expectedThrowable));
+  }
+
+  private void testErrorNotificationsOnFatalException(RuntimeException exception, RawExceptionThrowingMessageProcessor processor)
+      throws Exception {
+    List<MessageProcessorNotification> notificationList = new ArrayList<>();
+    setupMessageProcessorNotificationListener(notificationList);
+
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    builder.chain(processor);
+
+    final CoreEvent inEvent = getTestEventUsingFlow("0");
+    try {
+      process(builder.build(), inEvent);
+      fail("Should have thrown");
+    } catch (Throwable t) {
+      // This is the most important assertion here, that the error was notified which means the chain was not
+      // broken by an uncaught exception
+      assertThat(notificationList, hasSize(2));
+
+      assertThat(t, instanceOf(MuleRuntimeException.class));
+      assertThat(t.getCause(), is(exception));
+      MessageProcessorNotification errorNotification = notificationList.get(1);
+      assertThat(errorNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
+      assertThat(errorNotification.getEventContext(), equalTo(inEvent.getContext()));
+      assertPostErrorNotificationWrappedInRuntimeException(inEvent, errorNotification, exception);
+    }
   }
 
   @Override
