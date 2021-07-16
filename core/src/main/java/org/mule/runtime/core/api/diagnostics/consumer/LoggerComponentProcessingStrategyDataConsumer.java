@@ -20,9 +20,11 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.Gson;
+
 import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
 import org.mule.runtime.core.api.diagnostics.ProfilingDataConsumer;
 import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
+
 import org.slf4j.Logger;
 
 /**
@@ -39,6 +41,7 @@ public class LoggerComponentProcessingStrategyDataConsumer
   public static final String ARTIFACT_TYPE_KEY = "artifactType";
   public static final String RUNTIME_CORE_EVENT_CORRELATION_ID = "runtimeCoreEventCorrelationId";
   public static final String PROFILING_EVENT_TYPE = "profilingEventType";
+  public static final String LOCATION = "location";
 
   private final Gson gson = new Gson();
 
@@ -58,6 +61,7 @@ public class LoggerComponentProcessingStrategyDataConsumer
     eventMap.put(ARTIFACT_ID_KEY, profilingEventContext.getArtifactId());
     eventMap.put(ARTIFACT_TYPE_KEY, profilingEventContext.getArtifactType());
     eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, profilingEventContext.getEvent().getCorrelationId());
+    profilingEventContext.getLocation().map(loc -> eventMap.put(LOCATION, loc.getLocation()));
 
     return eventMap;
   }

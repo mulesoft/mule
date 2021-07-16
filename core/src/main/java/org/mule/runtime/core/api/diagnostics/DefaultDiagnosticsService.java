@@ -63,8 +63,8 @@ public class DefaultDiagnosticsService extends AbstractDiagnosticsService {
   public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(ProfilingEventType<T> profilingEventType) {
     if (!profilerDataProducers.containsKey(profilingEventType)) {
       throw new MuleRuntimeException((createStaticMessage(format(
-          "Profiling event type not registered: %s",
-          profilingEventType))));
+                                                                 "Profiling event type not registered: %s",
+                                                                 profilingEventType))));
     }
     return (ProfilingDataProducer<T>) profilerDataProducers.get(profilingEventType);
   }
