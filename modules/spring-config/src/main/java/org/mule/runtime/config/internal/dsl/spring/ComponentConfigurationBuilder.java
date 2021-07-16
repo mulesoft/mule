@@ -14,14 +14,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
-import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkNotNull;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -364,8 +362,9 @@ class ComponentConfigurationBuilder<T> {
           .orElse(null);
 
       Object parameterValue;
-      checkNotNull(parameter, format("Parameter '%s' is null for component '%s'", parameterName, ownerComponent));
-      if ("frequency".equals(parameterName)
+      if (parameter == null) {
+        parameterValue = null;
+      } else if ("frequency".equals(parameterName)
           && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
           && parameter.isDefaultValue()) {
         // Account for inconsistency in the extension model. Ref: MULE-18262
