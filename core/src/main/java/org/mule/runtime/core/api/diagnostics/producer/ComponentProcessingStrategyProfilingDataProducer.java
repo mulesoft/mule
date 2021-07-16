@@ -11,20 +11,21 @@ import org.mule.runtime.core.api.diagnostics.DefaultDiagnosticsService;
 import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
 import org.mule.runtime.core.api.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
 
 /**
  * Default {@link ProfilingDataProducer} returned by a diagnostic service.
  *
  * @since 4.4
  */
-public class ComponentProcessingStratetegyProfilingDataProducer
+public class ComponentProcessingStrategyProfilingDataProducer
     implements ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext> {
 
   private final DefaultDiagnosticsService diagnosticService;
-  private final ProfilingEventType profilingEventType;
+  private final ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType;
 
-  public ComponentProcessingStratetegyProfilingDataProducer(DefaultDiagnosticsService diagnosticService,
-                                                            ProfilingEventType profilingEventType) {
+  public ComponentProcessingStrategyProfilingDataProducer(DefaultDiagnosticsService diagnosticService,
+                                                          ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
     this.diagnosticService = diagnosticService;
     this.profilingEventType = profilingEventType;
   }

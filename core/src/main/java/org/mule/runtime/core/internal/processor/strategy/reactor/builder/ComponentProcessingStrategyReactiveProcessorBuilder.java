@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
@@ -22,7 +21,9 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
+import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
+import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
 
@@ -125,13 +126,13 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
                                                                                                   ReactorPublisherBuilder<T> builder) {
 
     // Profiling data producers
-    Optional<ProfilingDataProducer> dispatchingOperationExecutionDataProducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dispatchingOperationExecutionDataProducer =
         dataProducerFromDiagnosticsService(PS_SCHEDULING_OPERATION_EXECUTION);
-    Optional<ProfilingDataProducer> operationExecutionDispatchedDataProducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> operationExecutionDispatchedDataProducer =
         dataProducerFromDiagnosticsService(STARTING_OPERATION_EXECUTION);
-    Optional<ProfilingDataProducer> dispatchingOperationResultDataProducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dispatchingOperationResultDataProducer =
         dataProducerFromDiagnosticsService(OPERATION_EXECUTED);
-    Optional<ProfilingDataProducer> operationResultDispatchedDataProducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> operationResultDispatchedDataProducer =
         dataProducerFromDiagnosticsService(PS_FLOW_MESSAGE_PASSING);
 
     // location
@@ -150,13 +151,13 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
                                          beforeProcessor);
   }
 
-  private Optional<ProfilingDataProducer> dataProducerFromDiagnosticsService(ProfilingEventType profilingEventType) {
-    return diagnosticsService.map(ds -> of(ds.getProfilingDataProducer(profilingEventType))).orElse(empty());
+  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromDiagnosticsService(ProfilingEventType<T> profilingEventType) {
+    return diagnosticsService.map(ds -> ds.getProfilingDataProducer(profilingEventType));
   }
 
   private <T extends Publisher> ReactorPublisherBuilder<T> getAfterProcessorReactorChain(
-                                                                                         Optional<ProfilingDataProducer> dispatchingOperationResultDataProducer,
-                                                                                         Optional<ProfilingDataProducer> operationResultDispatchedDataProducer,
+                                                                                         Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dispatchingOperationResultDataProducer,
+                                                                                         Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> operationResultDispatchedDataProducer,
                                                                                          ComponentLocation location,
                                                                                          String artifactId,
                                                                                          String artifactType,
@@ -173,8 +174,8 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   }
 
   private <T extends Publisher> ReactorPublisherBuilder<T> getBeforeProcessorReactorChain(ReactorPublisherBuilder<T> builder,
-                                                                                          Optional<ProfilingDataProducer> dispatchingOperationExecutionDataProducer,
-                                                                                          Optional<ProfilingDataProducer> operationExecutionDispatchedDataProducer,
+                                                                                          Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dispatchingOperationExecutionDataProducer,
+                                                                                          Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> operationExecutionDispatchedDataProducer,
                                                                                           ComponentLocation location,
                                                                                           String artifactId,
                                                                                           String artifactType) {
