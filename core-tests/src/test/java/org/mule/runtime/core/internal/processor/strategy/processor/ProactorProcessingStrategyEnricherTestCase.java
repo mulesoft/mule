@@ -72,7 +72,7 @@ public class ProactorProcessingStrategyEnricherTestCase extends AbstractEnriched
         new ProactorProcessingStrategyEnricher(() -> dispatcherScheduler, identity(), mock(DiagnosticsService.class),
                                                mock(MuleContext.class), parallelism,
                                                parallelism, parallelism)
-            .enrich(reactiveProcessor);
+                                                   .enrich(reactiveProcessor);
 
     createAndExecuteEnrichedTransformer(transform, coreEvent);
 
