@@ -18,8 +18,11 @@ import java.io.InputStream;
  * password, salt, iteration count and algorithm may be set on the strategy.
  *
  * @since 4.0
+ * 
+ * @deprecated Mule Runtime no longer provides implementations for this.
  */
 @NoImplement
+@Deprecated
 public interface EncryptionStrategy extends Initialisable, NamedObject {
 
   /**
