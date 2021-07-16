@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_END;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
+import static org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils.getLocation;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils;
 import org.mule.runtime.core.privileged.processor.chain.HasLocation;
 import org.reactivestreams.Publisher;
 
@@ -117,16 +119,6 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
         .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
         .transform(pipeline);
   }
-
-
-  private ComponentLocation getLocation(ReactiveProcessor pipeline) {
-    if (pipeline instanceof HasLocation) {
-      return ((HasLocation) pipeline).resolveLocation();
-    }
-
-    return null;
-  }
-
 
   private Optional<ProfilingDataProducer> dataProducerFromDiagnosticsService(ProfilingEventType profilingEventType) {
     return diagnosticsService.map(ds -> ds.getProfilingDataProducer(profilingEventType));
