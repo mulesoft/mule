@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -844,6 +845,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       final CoreEvent inEvent = getTestEventUsingFlow("0");
       try {
         process(builder.build(), inEvent);
+        fail("Should have thrown");
       } catch (Throwable t) {
         // This is the most important assertion here, that the error was notified which means the chain was not
         // broken by an uncaught exception
@@ -873,6 +875,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       final CoreEvent inEvent = getTestEventUsingFlow("0");
       try {
         process(builder.build(), inEvent);
+        fail("Should have thrown");
       } catch (Throwable t) {
         // This is the most important assertion here, that the error was notified which means the chain was not
         // broken by an uncaught exception
