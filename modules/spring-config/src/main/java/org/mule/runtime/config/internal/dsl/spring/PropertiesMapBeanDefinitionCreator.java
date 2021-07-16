@@ -38,79 +38,10 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
     if (component != null
         && (component.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)
             || component.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))) {
-      doHandleRequest(createBeanDefinitionRequest, component);
 
       return true;
     }
     return false;
   }
-
-  private void doHandleRequest(CreateComponentBeanDefinitionRequest createBeanDefinitionRequest, ComponentAst component) {
-    ManagedMap<Object, Object> managedMap;
-    if (component.getIdentifier().equals(MULE_PROPERTIES_IDENTIFIER)) {
-      managedMap = createManagedMapFromEntries(component);
-    } else {
-      managedMap = new ManagedMap<>();
-      final List<ComponentAst> hierarchy = createBeanDefinitionRequest.getComponentHierarchy();
-      ComponentAst parentComponentModel = hierarchy.isEmpty() ? null : hierarchy.get(hierarchy.size() - 1);
-      if (parentComponentModel != null) {
-        parentComponentModel.directChildrenStream()
-                .filter(childComponentModel -> childComponentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
-                .forEach(childComponentModel -> processAndAddMapProperty(childComponentModel, managedMap));
-      }
-    }
-    BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(HashMap.class);
-    createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder
-        .addConstructorArgValue(managedMap)
-        .getBeanDefinition());
-  }
-
-  private ManagedMap<Object, Object> createManagedMapFromEntries(ComponentAst component) {
-    ManagedMap<Object, Object> managedMap;
-    managedMap = new ManagedMap<>();
-    component.directChildrenStream()
-        .forEach(innerComponent -> processAndAddMapProperty(innerComponent, managedMap));
-    return managedMap;
-  }
-
-  private void processAndAddMapProperty(ComponentAst component, ManagedMap<Object, Object> managedMap) {
-    Object key =
-        resolveValue(getRawParameterValue(component, KEY_ELEMENT).orElse(null),
-                     getRawParameterValue(component, KEY_REF_ATTRIBUTE).orElse(null));
-    Object value = resolveValue(getRawParameterValue(component, VALUE_ATTRIBUTE).orElse(null),
-                                getRawParameterValue(component, VALUE_REF_ATTRIBUTE).orElse(null));
-    if (value == null) {
-      value = component.directChildrenStream().findFirst()
-          .map(this::resolveValueFromChild)
-          .orElse(null);
-    }
-    managedMap.put(key, value);
-  }
-
-  private Object resolveValueFromChild(ComponentAst component) {
-    if (component.getIdentifier().getName().equals(MAP_ELEMENT)) {
-      return createManagedMapFromEntries(component);
-    } else {
-      return createManagedListFromItems(component);
-    }
-  }
-
-  private Object createManagedListFromItems(ComponentAst component) {
-    ManagedList<Object> managedList = new ManagedList<>();
-    component.directChildrenStream().forEach(childComponent -> {
-      if (childComponent.getIdentifier().getName().equals(VALUE_ATTRIBUTE)) {
-        managedList.add(getRawParameterValue(childComponent, BODY_RAW_PARAM_NAME).orElse(null));
-      } else {
-        managedList.add(new RuntimeBeanReference(getRawParameterValue(childComponent, BEAN_REF_ATTRIBUTE).orElse(null)));
-      }
-    });
-    return managedList;
-  }
-
-  private Object resolveValue(String value, String reference) {
-    if (reference != null) {
-      return new RuntimeBeanReference(reference);
-    }
-    return value;
-  }
+  
 }
