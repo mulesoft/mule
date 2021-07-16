@@ -849,4 +849,16 @@ public interface AllureConstants {
     }
 
   }
+
+  interface Diagnostics {
+
+    String DIAGNOSTICS = "Diagnostics";
+
+
+    interface DiagnosticsServiceStory {
+
+      String DEFAULT_DIAGNOSTICS_SERVICE = "Default Diagnostics Service";
+
+    }
+  }
 }

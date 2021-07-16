@@ -24,7 +24,9 @@ import java.util.Map;
 
 
 /**
- * Default diagnostic service for the runtime
+ * Default diagnostic service for the runtime.
+ * <p>
+ * This is based on the Notification API.
  *
  * @since 4.4.0
  */
@@ -61,8 +63,8 @@ public class DefaultDiagnosticsService extends AbstractDiagnosticsService {
   public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(ProfilingEventType<T> profilingEventType) {
     if (!profilerDataProducers.containsKey(profilingEventType)) {
       throw new MuleRuntimeException((createStaticMessage(format(
-                                                                 "Profiling event type not registered: %s",
-                                                                 profilingEventType))));
+          "Profiling event type not registered: %s",
+          profilingEventType))));
     }
     return (ProfilingDataProducer<T>) profilerDataProducers.get(profilingEventType);
   }
