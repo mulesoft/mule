@@ -11,8 +11,8 @@ import static java.lang.System.currentTimeMillis;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
+import org.mule.runtime.core.api.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
@@ -143,14 +143,13 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     public ReactorPublisherBuilder<Mono<CoreEvent>> profileEvent(ComponentLocation location,
                                                                  Optional<ProfilingDataProducer> dataProducer,
                                                                  String artifactId, String artifactType) {
-      mono = dataProducer.map(
-                              h -> mono.doOnNext(e -> h.event(new ComponentProcessingStrategyProfilingEventContext(e, location,
-                                                                                                                   Thread
-                                                                                                                       .currentThread()
-                                                                                                                       .getName(),
-                                                                                                                   artifactId,
-                                                                                                                   artifactType,
-                                                                                                                   currentTimeMillis()))))
+      mono = dataProducer.map(dp -> mono.doOnNext(e -> dp.event(new ComponentProcessingStrategyProfilingEventContext(e, location,
+                                                                                                                     Thread
+                                                                                                                         .currentThread()
+                                                                                                                         .getName(),
+                                                                                                                     artifactId,
+                                                                                                                     artifactType,
+                                                                                                                     currentTimeMillis()))))
           .orElse(mono);
       return this;
     }
@@ -208,15 +207,14 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     public ReactorPublisherBuilder<Flux<CoreEvent>> profileEvent(ComponentLocation location,
                                                                  Optional<ProfilingDataProducer> dataProducer,
                                                                  String artifactId, String artifactType) {
-      flux = dataProducer.map(
-                              h -> flux.doOnNext(e -> h.event(
-                                                              new ComponentProcessingStrategyProfilingEventContext(e, location,
-                                                                                                                   Thread
-                                                                                                                       .currentThread()
-                                                                                                                       .getName(),
-                                                                                                                   artifactId,
-                                                                                                                   artifactType,
-                                                                                                                   currentTimeMillis()))))
+      flux = dataProducer.map(dp -> flux.doOnNext(e -> dp.event(
+                                                                new ComponentProcessingStrategyProfilingEventContext(e, location,
+                                                                                                                     Thread
+                                                                                                                         .currentThread()
+                                                                                                                         .getName(),
+                                                                                                                     artifactId,
+                                                                                                                     artifactType,
+                                                                                                                     currentTimeMillis()))))
           .orElse(flux);
       return this;
     }

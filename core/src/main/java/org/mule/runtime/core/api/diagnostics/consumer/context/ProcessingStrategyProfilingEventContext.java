@@ -7,8 +7,11 @@
 
 package org.mule.runtime.core.api.diagnostics.consumer.context;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+
+import java.util.Optional;
 
 /**
  * General context for processing strategy profiling data.
@@ -36,5 +39,10 @@ public interface ProcessingStrategyProfilingEventContext extends ProfilingEventC
    * @return the artifact type of the profiling event.
    */
   String getArtifactType();
+
+  /**
+   * @return the optional {@link ComponentLocation} associated with the profiling event.
+   */
+  Optional<ComponentLocation> getLocation();
 
 }
