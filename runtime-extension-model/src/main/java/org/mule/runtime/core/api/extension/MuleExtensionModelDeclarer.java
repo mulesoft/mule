@@ -1134,9 +1134,6 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The interface that will receive the notification event.");
-
-    enableNotificationDeclarer.onDefaultParameterGroup()
-        .withExclusiveOptionals(ImmutableSet.of("event-class", "event", "interface-class", "interface"), true);
   }
 
   private void declareDisableNotification(NestedComponentDeclarer disableNotificationDeclarer) {
@@ -1167,9 +1164,6 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The interface that will no longer receive the event.");
-
-    disableNotificationDeclarer.onDefaultParameterGroup()
-        .withExclusiveOptionals(ImmutableSet.of("event-class", "event", "interface-class", "interface"), true);
   }
 
   private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer) {
