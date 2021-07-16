@@ -99,14 +99,13 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
             boolean hasNewError = event.getError().map(err -> !isOriginalError(err, original.getError())).orElse(false);
             return new Pair(pair.getFirst(), pair.getSecond() || hasNewError);
           })
-          .doOnNext(p -> {
-            Pair<List<CoreEvent>, Boolean> pair = (Pair<List<CoreEvent>, Boolean>) p;
+          .doOnNext(pair -> {
             if (pair.getSecond()) {
               throw propagate(createCompositeRoutingException(pair.getFirst().stream()
                   .map(event -> removeOriginalError(event, original.getError())).collect(toList())));
             }
           })
-          .map(pair -> ((Pair<List<CoreEvent>, Boolean>) pair).getFirst())
+          .map(Pair::getFirst)
           .doOnNext(mergeVariables(original, resultBuilder))
           .map(createResultEvent(original, resultBuilder));
     };
