@@ -15,8 +15,8 @@ import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilin
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
+import static org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils.getLocation;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
@@ -24,8 +24,6 @@ import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
-import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
@@ -189,21 +187,5 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
             .profileEvent(location, dispatchingOperationExecutionDataProducer, artifactId, artifactType)
             .profileEvent(location, operationExecutionDispatchedDataProducer, artifactId, artifactType)
             .transform(processor));
-  }
-
-  private ComponentLocation getLocation(ReactiveProcessor processor) {
-    if (processor instanceof InterceptedReactiveProcessor) {
-      return getLocation(((InterceptedReactiveProcessor) processor).getProcessor());
-    }
-
-    if (processor instanceof Component) {
-      return ((Component) processor).getLocation();
-    }
-
-    if (processor instanceof ComponentInnerProcessor) {
-      return ((ComponentInnerProcessor) processor).getLocation();
-    }
-
-    return null;
   }
 }
