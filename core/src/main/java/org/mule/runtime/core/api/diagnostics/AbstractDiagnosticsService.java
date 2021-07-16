@@ -10,9 +10,11 @@ package org.mule.runtime.core.api.diagnostics;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_DIAGNOSTICS_SERVICE;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
@@ -29,7 +31,7 @@ import javax.inject.Inject;
  *
  * @since 4.4.0
  */
-public abstract class AbstractDiagnosticsService implements DiagnosticsService, Initialisable, Disposable {
+public abstract class AbstractDiagnosticsService implements DiagnosticsService, Initialisable, Startable, Disposable {
 
   @Inject
   protected ServerNotificationManager notificationManager;
@@ -37,13 +39,15 @@ public abstract class AbstractDiagnosticsService implements DiagnosticsService, 
   @Inject
   private ServerNotificationHandler serverNotificationHandler;
 
-  @Inject
   FeatureFlaggingService featureFlags;
 
   private final Set<NotificationListener<ProfilingNotification>> addedListeners = new HashSet<>();
 
   @Override
-  public void initialise() throws InitialisationException {
+  public void initialise() throws InitialisationException {}
+
+  @Override
+  public void start() throws MuleException {
     if (featureFlags.isEnabled(ENABLE_DIAGNOSTICS_SERVICE)) {
       registerNotificationListeners(getDiscoveryStrategy().discover());
     }
@@ -81,5 +85,10 @@ public abstract class AbstractDiagnosticsService implements DiagnosticsService, 
 
   public <T extends ProfilingEventContext> void notifyEvent(T profilerEventContext, ProfilingEventType<T> action) {
     serverNotificationHandler.fireNotification(new ProfilingNotification(profilerEventContext, action));
+  }
+
+  @Inject
+  public void setFeatureFlags(FeatureFlaggingService featureFlags) {
+    this.featureFlags = featureFlags;
   }
 }
