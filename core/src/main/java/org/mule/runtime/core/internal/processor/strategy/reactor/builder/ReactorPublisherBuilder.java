@@ -154,23 +154,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
       return this;
     }
 
-    // @Override
-    // public ReactorPublisherBuilder<Mono<CoreEvent>> profileEvent(ComponentLocation location,
-    // Optional<ProfilingDataProducer> dataProducer,
-    // String artifactId, String artifactType) {
-    // mono = dataProducer.map(dp -> mono.doOnNext(e -> dp.event(new ComponentProcessingStrategyProfilingEventContext(e, location,
-    // Thread
-    // .currentThread()
-    // .getName(),
-    // artifactId,
-    // artifactType,
-    // currentTimeMillis()))))
-    // .orElse(mono);
-    // return this;
-    // }
-
   }
-
 
   /**
    * Builder for a {@link Flux}.
@@ -233,22 +217,5 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
           .orElse(flux);
       return this;
     }
-
-    // @Override
-    // public ReactorPublisherBuilder<Flux<CoreEvent>> profileEvent(ComponentLocation location,
-    // Optional<ProfilingDataProducer> dataProducer,
-    // String artifactId, String artifactType) {
-    // flux = dataProducer.map(dp -> flux.doOnNext(e -> dp.event(
-    // new ComponentProcessingStrategyProfilingEventContext(e, location,
-    // Thread
-    // .currentThread()
-    // .getName(),
-    // artifactId,
-    // artifactType,
-    // currentTimeMillis()))))
-    // .orElse(flux);
-    // return this;
-    // }
-
   }
 }
