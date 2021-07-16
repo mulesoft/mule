@@ -44,7 +44,8 @@ public class ProfilingNotification extends AbstractServerNotification {
     registerAction(PS_FLOW_END.getProfilingEventName(), PS_FLOW_END_ID);
   }
 
-  public ProfilingNotification(ProfilingEventContext profilingEventContext, ProfilingEventType profilingEventType) {
+  public <T extends ProfilingEventContext> ProfilingNotification(T profilingEventContext,
+                                                                 ProfilingEventType<T> profilingEventType) {
     super(profilingEventContext, getActionId(profilingEventType.getProfilingEventName()));
   }
 
