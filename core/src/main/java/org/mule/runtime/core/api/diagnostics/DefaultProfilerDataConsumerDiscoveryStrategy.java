@@ -7,17 +7,18 @@
 
 package org.mule.runtime.core.api.diagnostics;
 
-import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.core.api.diagnostics.consumer.LoggerComponentProcessingStrategyDataConsumer;
 
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 public class DefaultProfilerDataConsumerDiscoveryStrategy
     implements ProfilerDataConsumerDiscoveryStrategy {
 
   @Override
-  public Set<ProfilingDataConsumer> discover() {
-    // Add default profiler data consumers by the mule
-    return ImmutableSet.of(new LoggerComponentProcessingStrategyDataConsumer());
+  public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
+    return (Set<S>) ImmutableSet.of(new LoggerComponentProcessingStrategyDataConsumer());
   }
+
 }

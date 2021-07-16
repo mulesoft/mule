@@ -19,9 +19,10 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.diagnostics.notification.ProfilingNotification;
 import org.mule.runtime.core.api.diagnostics.notification.DefaultProfilingNotificationListener;
 
-import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 /**
  * A {@link AbstractDiagnosticsService} that discovers available {@link ProfilingDataConsumer}
@@ -39,36 +40,34 @@ public abstract class AbstractDiagnosticsService implements DiagnosticsService, 
   @Inject
   FeatureFlaggingService featureFlags;
 
-  private final Set<NotificationListener> addedListeners = new HashSet<>();
+  private final Set<NotificationListener<ProfilingNotification>> addedListeners = new HashSet<>();
 
   @Override
   public void initialise() throws InitialisationException {
     if (featureFlags.isEnabled(ENABLE_DIAGNOSTICS_SERVICE)) {
-      Set<ProfilingDataConsumer> profilerDataConsumers = getDiscoveryStrategy().discover();
-      registerNotificationListeners(profilerDataConsumers);
+      registerNotificationListeners(getDiscoveryStrategy().discover());
     }
   }
 
-  protected void registerNotificationListeners(Set<ProfilingDataConsumer> profilerDataConsumers) {
+  private void registerNotificationListeners(Set<ProfilingDataConsumer<ProfilingEventContext>> profilerDataConsumers) {
     profilerDataConsumers.forEach(this::registerNotificationListener);
   }
 
-  private void registerNotificationListener(ProfilingDataConsumer profilerDataConsumer) {
+  private void registerNotificationListener(ProfilingDataConsumer<ProfilingEventContext> profilingDataConsumer) {
     NotificationListener<ProfilingNotification> profilingNotificationListener =
-        new DefaultProfilingNotificationListener(profilerDataConsumer);
-
+        new DefaultProfilingNotificationListener(profilingDataConsumer);
+    notificationManager.addListenerSubscription(profilingNotificationListener, pn -> filterByAction(profilingDataConsumer, pn));
     addedListeners.add(profilingNotificationListener);
-    notificationManager.addListenerSubscription(profilingNotificationListener, pn -> filterByAction(profilerDataConsumer, pn));
   }
 
-  private boolean filterByAction(ProfilingDataConsumer profilerDataConsumer, ProfilingNotification profilerNotification) {
-    Set<ProfilingEventType> profilerEventTypes = profilerDataConsumer.profilerEventTypes();
-    return profilerEventTypes.stream()
+  private boolean filterByAction(ProfilingDataConsumer<ProfilingEventContext> profilerDataConsumer,
+                                 ProfilingNotification profilerNotification) {
+    return profilerDataConsumer.profilerEventTypes().stream()
         .anyMatch(
                   eventType -> eventType.getProfilingEventName()
                       .equals(profilerNotification.getActionName()))
         &&
-        profilerDataConsumer.selector().test(profilerNotification.getSource());
+        profilerDataConsumer.selector().test(((ProfilingEventContext) profilerNotification.getSource()));
   }
 
   @Override
@@ -80,7 +79,7 @@ public abstract class AbstractDiagnosticsService implements DiagnosticsService, 
 
   protected abstract ProfilerDataConsumerDiscoveryStrategy getDiscoveryStrategy();
 
-  public void notifyEvent(ProfilingEventContext profilerEventContext, ProfilingEventType action) {
+  public <T extends ProfilingEventContext> void notifyEvent(T profilerEventContext, ProfilingEventType<T> action) {
     serverNotificationHandler.fireNotification(new ProfilingNotification(profilerEventContext, action));
   }
 }

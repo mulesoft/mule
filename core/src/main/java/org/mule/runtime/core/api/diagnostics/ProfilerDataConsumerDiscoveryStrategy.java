@@ -14,6 +14,6 @@ import java.util.Set;
  */
 public interface ProfilerDataConsumerDiscoveryStrategy {
 
-  Set<ProfilingDataConsumer> discover();
+  <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover();
 
 }
