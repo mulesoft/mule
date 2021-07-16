@@ -21,5 +21,5 @@ public interface DiagnosticsService {
    * @param profilingEventType the profiler event type for the {@link ProfilingDataProducer}
    * @return the profiler data producer
    */
-  ProfilingDataProducer getProfilingDataProducer(ProfilingEventType profilingEventType);
+  <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(ProfilingEventType<T> profilingEventType);
 }
