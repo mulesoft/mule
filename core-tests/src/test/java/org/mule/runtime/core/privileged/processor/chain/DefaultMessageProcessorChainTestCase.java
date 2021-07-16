@@ -50,7 +50,10 @@ import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.Exceptions.bubble;
+import static reactor.core.Exceptions.errorCallbackNotImplemented;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -123,6 +126,15 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   private final AtomicInteger nonBlockingProcessorsExecuted = new AtomicInteger(0);
   private final ProcessingStrategyFactory processingStrategyFactory;
   private final RuntimeException illegalStateException = new IllegalStateException();
+
+  /**
+   * Examples of exceptions considered fatal by Reactor as per {@link reactor.core.Exceptions#throwIfFatal}. Exceptions that are
+   * fatal for us too are excluded (VirtualMachineError, ThreadDeath, LinkageError). Relates to MULE-19593.
+   */
+  private final RuntimeException[] reactorFatalExceptions = {
+      bubble(new RuntimeException("Some bubbling error")),
+      errorCallbackNotImplemented(new RuntimeException("Some callback not implemented error")),
+  };
 
   @Rule
   public ExpectedException expectedException = none();
@@ -819,6 +831,64 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   }
 
   @Test
+  @Issue("MULE-19593")
+  public void testErrorNotificationsFatalException() throws Exception {
+    for (RuntimeException exception : reactorFatalExceptions) {
+      List<MessageProcessorNotification> notificationList = new ArrayList<>();
+      setupMessageProcessorNotificationListener(notificationList);
+
+      // Builds a chain with a processor that throws an exception
+      DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+      builder.chain(new RawExceptionThrowingMessageProcessor(exception));
+
+      final CoreEvent inEvent = getTestEventUsingFlow("0");
+      try {
+        process(builder.build(), inEvent);
+      } catch (Throwable t) {
+        // This is the most important assertion here, that the error was notified which means the chain was not
+        // broken by an uncaught exception
+        assertThat(notificationList, hasSize(2));
+
+        assertThat(t, instanceOf(MuleRuntimeException.class));
+        assertThat(t.getCause(), is(exception));
+        MessageProcessorNotification errorNotification = notificationList.get(1);
+        assertThat(errorNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
+        assertThat(errorNotification.getEventContext(), equalTo(inEvent.getContext()));
+        assertPostErrorNotificationWrappedInRuntimeException(inEvent, errorNotification, exception);
+      }
+    }
+  }
+
+  @Test
+  @Issue("MULE-19593")
+  public void testErrorNotificationsFatalExceptionWithOnErrorStopStrategy() throws Exception {
+    for (RuntimeException exception : reactorFatalExceptions) {
+      List<MessageProcessorNotification> notificationList = new ArrayList<>();
+      setupMessageProcessorNotificationListener(notificationList);
+
+      // Builds a chain with a processor that throws an exception but also overrides the on error continue strategy
+      DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+      builder.chain(new RawExceptionThrowingOnErrorStopMessageProcessor(exception));
+
+      final CoreEvent inEvent = getTestEventUsingFlow("0");
+      try {
+        process(builder.build(), inEvent);
+      } catch (Throwable t) {
+        // This is the most important assertion here, that the error was notified which means the chain was not
+        // broken by an uncaught exception
+        assertThat(notificationList, hasSize(2));
+
+        assertThat(t, instanceOf(MuleRuntimeException.class));
+        assertThat(t.getCause(), is(exception));
+        MessageProcessorNotification errorNotification = notificationList.get(1);
+        assertThat(errorNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
+        assertThat(errorNotification.getEventContext(), equalTo(inEvent.getContext()));
+        assertPostErrorNotificationWrappedInRuntimeException(inEvent, errorNotification, exception);
+      }
+    }
+  }
+
+  @Test
   public void subscriptionContextPropagation() throws Exception {
     final ProcessingStrategy processingStrategy = processingStrategyFactory.create(muleContext, "");
     initialiseIfNeeded(processingStrategy);
@@ -898,6 +968,18 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     assertThat(postNotification.getEvent().getError().get().getCause(), is(illegalStateException));
     assertThat(postNotification.getException(), is(instanceOf(MessagingException.class)));
     assertThat(postNotification.getException().getCause(), is(illegalStateException));
+  }
+
+  private void assertPostErrorNotificationWrappedInRuntimeException(CoreEvent inEvent,
+                                                                    MessageProcessorNotification postNotification,
+                                                                    Throwable expectedThrowable) {
+    assertThat(postNotification.getEvent(), not(equalTo(inEvent)));
+    assertThat(postNotification.getEvent().getError().isPresent(), is(true));
+    assertThat(postNotification.getEvent().getError().get().getCause(), instanceOf(RuntimeException.class));
+    assertThat(postNotification.getEvent().getError().get().getCause().getCause(), is(expectedThrowable));
+    assertThat(postNotification.getException(), is(instanceOf(MessagingException.class)));
+    assertThat(postNotification.getException().getCause(), instanceOf(RuntimeException.class));
+    assertThat(postNotification.getException().getCause().getCause(), is(expectedThrowable));
   }
 
   @Override
@@ -1177,6 +1259,54 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       return mock(ComponentLocation.class);
     }
 
+  }
+
+  /**
+   * Processor that throws a RuntimeException without any wrapping (which is something that could eventually happen).
+   */
+  private static class RawExceptionThrowingMessageProcessor extends AbstractComponent implements Processor, InternalProcessor {
+
+    private final RuntimeException exception;
+
+    public RawExceptionThrowingMessageProcessor(RuntimeException exception) {
+      this.exception = exception;
+    }
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      throw exception;
+    }
+
+    @Override
+    public ComponentLocation getLocation() {
+      // Implementing this method is necessary in order to receive notifications (which is what we are going to use for
+      // asserting)
+      return mock(ComponentLocation.class);
+    }
+  }
+
+  /**
+   * Processor that overrides the continue strategy for errors that the {@link AbstractMessageProcessorChain} sets. Some
+   * processors or adapters might be using this mechanism internally to set their own error handlers, so we have to make sure this
+   * does not break the flow on errors (specially on exceptions that are considered fatal by Reactor). Relates to MULE-19593.
+   */
+  private static class RawExceptionThrowingOnErrorStopMessageProcessor extends RawExceptionThrowingMessageProcessor {
+
+    public RawExceptionThrowingOnErrorStopMessageProcessor(RuntimeException exception) {
+      super(exception);
+    }
+
+    @Override
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      // It is important not to apply the onErrorStop on the input publisher (that will remove the onErrorContinue strategy
+      // from the whole chain which would defeat the purpose of these tests)
+      // The onErrorStop must be applied to an inner publisher and the exception must come from an operator in that same
+      // publisher
+      return from(publisher)
+          .flatMap(event -> just(event)
+              .transform(super::apply)
+              .onErrorStop());
+    }
   }
 
 }
