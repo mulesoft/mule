@@ -241,8 +241,7 @@ public class DslElementModel<T> {
 
     private ComponentConfiguration from(ComponentAst element) {
       InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
-          .withIdentifier(element.getIdentifier())
-          .withValue(element.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null));
+          .withIdentifier(element.getIdentifier());
 
       List<ComponentIdentifier> dslGroupsAsChildrenNames = new ArrayList<>();
 
