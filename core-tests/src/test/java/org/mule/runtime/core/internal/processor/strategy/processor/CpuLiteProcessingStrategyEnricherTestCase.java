@@ -60,7 +60,8 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with CPU_LITE enricher")
   public void cpuLiteEnricher() {
     ReactiveProcessor transform =
-        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> scheduler, diagnosticsService, muleContext).enrich(reactiveProcessor);
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> scheduler, diagnosticsService, muleContext)
+            .enrich(reactiveProcessor);
 
     createAndExecuteEnrichedTransformer(transform, coreEvent);
 
