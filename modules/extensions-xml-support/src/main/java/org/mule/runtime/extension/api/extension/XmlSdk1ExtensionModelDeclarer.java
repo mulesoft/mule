@@ -163,12 +163,12 @@ public class XmlSdk1ExtensionModelDeclarer {
 
   private ValueProviderModel createTypesValueProviderModel() {
     return new ValueProviderModel(emptyList(),
-        false,
-        false,
-        true, 0,
-        ID,
-        ID,
-        builder(XmlSdkTypesValueProvider.class).build());
+                                  false,
+                                  false,
+                                  true, 0,
+                                  ID,
+                                  ID,
+                                  builder(XmlSdkTypesValueProvider.class).build());
   }
 
   private void declarePropertyElement(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {

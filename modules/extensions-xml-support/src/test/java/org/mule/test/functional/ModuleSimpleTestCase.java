@@ -28,14 +28,14 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @Feature(XML_SDK)
-//@RunnerDelegateTo(Parameterized.class)
+// @RunnerDelegateTo(Parameterized.class)
 public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Parameterized.Parameter
   public String configFile = "flows/nested/flows-using-module-simple-proxy.xml";
 
   @Parameterized.Parameter(1)
-  public String[] paths= new String[] {"modules/module-simple.xml", "modules/nested/module-simple-proxy.xml"};
+  public String[] paths = new String[] {"modules/module-simple.xml", "modules/nested/module-simple-proxy.xml"};
 
   @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
   public static Collection<Object[]> data() {
