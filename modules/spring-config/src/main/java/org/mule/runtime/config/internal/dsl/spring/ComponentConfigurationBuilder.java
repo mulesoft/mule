@@ -363,7 +363,7 @@ class ComponentConfigurationBuilder<T> {
 
       Object parameterValue;
       if (parameter == null) {
-        parameterValue = null;
+        parameterValue = defaultValue;
       } else if ("frequency".equals(parameterName)
           && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
           && parameter.isDefaultValue()) {
