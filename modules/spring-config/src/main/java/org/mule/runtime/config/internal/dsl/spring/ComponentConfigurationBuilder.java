@@ -343,31 +343,27 @@ class ComponentConfigurationBuilder<T> {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
             if (ownerComponentModel instanceof SourceModel) {
-              return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
-                                                                         createBeanDefinitionRequest.getSpringComponentModel()
-                                                                             .getComponentIdentifier(),
-                                                                         (SourceModel) ownerComponentModel);
-            } else {
-              return resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
-                                                                                 createBeanDefinitionRequest
-                                                                                     .getSpringComponentModel()
-                                                                                     .getComponentIdentifier(),
-                                                                                 ownerComponentModel.getParameterGroupModels()),
-                                      parameterName);
+              ComponentParameterAst sourceCallbackAwareParameter =
+                  parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
+                                                                      createBeanDefinitionRequest.getSpringComponentModel()
+                                                                          .getComponentIdentifier(),
+                                                                      (SourceModel) ownerComponentModel);
+              if (sourceCallbackAwareParameter != null) {
+                return sourceCallbackAwareParameter;
+              }
             }
+
+            return resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
+                                                                               createBeanDefinitionRequest
+                                                                                   .getSpringComponentModel()
+                                                                                   .getComponentIdentifier(),
+                                                                               ownerComponentModel.getParameterGroupModels()),
+                                    parameterName);
           })
           .orElse(null);
 
       Object parameterValue;
-      if (parameter == null) {
-        // Fallback for test components that do not have an extension model.
-        // TODO MULE-17778 Remove this
-        parameterValue = component == null
-            ? null
-            : component.getRawParameterValue(parameterName)
-                .map(v -> (Object) v)
-                .orElse(defaultValue);
-      } else if ("frequency".equals(parameterName)
+      if ("frequency".equals(parameterName)
           && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
           && parameter.isDefaultValue()) {
         // Account for inconsistency in the extension model. Ref: MULE-18262
