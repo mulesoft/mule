@@ -1099,38 +1099,76 @@ class MuleExtensionModelDeclarer {
             + "notification configuration for efficiency and will not generate events for newly enabled notifications or "
             + "listeners. The default value is false.");
 
-    declareNotification(notificationsConstructDeclarer.withOptionalComponent("notification"));
+    // TODO: min-max occurs
+    declareEnableNotification(notificationsConstructDeclarer.withOptionalComponent("notification"));
+
+    // TODO: min-max occurs
+    declareDisableNotification(notificationsConstructDeclarer.withOptionalComponent("disable-notification"));
   }
 
-  private void declareNotification(NestedComponentDeclarer notificationDeclarer) {
-    notificationDeclarer.describedAs("Registers listeners for notifications and associates interfaces with particular events");
+  private void declareEnableNotification(NestedComponentDeclarer enableNotificationDeclarer) {
+    enableNotificationDeclarer
+        .describedAs("Registers listeners for notifications and associates interfaces with particular events");
 
-    notificationDeclarer.onDefaultParameterGroup()
+    enableNotificationDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("event-class")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The class associated with a notification event that will be delivered to the interface.\n"
             + "This can be used instead of the 'event' attribute to specify a custom class.");
 
-    notificationDeclarer.onDefaultParameterGroup()
+    enableNotificationDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("event")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The notification event to deliver.");
 
-    notificationDeclarer.onDefaultParameterGroup()
+    enableNotificationDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("interface-class")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The interface (class name) that will receive the notification event.");
 
-    notificationDeclarer.onDefaultParameterGroup()
+    enableNotificationDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("interface")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The interface that will receive the notification event.");
 
-    notificationDeclarer.onDefaultParameterGroup()
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withExclusiveOptionals(ImmutableSet.of("event-class", "event", "interface-class", "interface"), true);
+  }
+
+  private void declareDisableNotification(NestedComponentDeclarer disableNotificationDeclarer) {
+    disableNotificationDeclarer.describedAs("Blocks the association of an event with a particular interface. This "
+        + "filters events after the association with a particular interface (and so takes precedence).");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event-class")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The class associated with an event that will no longer be delivered to any interface. This can be "
+            + "used instead of the 'event' attribute to specify a custom class.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The event you no longer want to deliver.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface-class")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface (class name) that will no longer receive the event.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface that will no longer receive the event.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
         .withExclusiveOptionals(ImmutableSet.of("event-class", "event", "interface-class", "interface"), true);
   }
 
