@@ -7,11 +7,14 @@
 
 package org.mule.runtime.core.api.diagnostics;
 
+import org.mule.api.annotation.Experimental;
+
 /**
  * Service that provides resources for profiling.
  *
  * @since 4.4.0
  */
+@Experimental
 public interface DiagnosticsService {
 
 

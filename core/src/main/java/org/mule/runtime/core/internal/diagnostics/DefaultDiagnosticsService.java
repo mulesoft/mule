@@ -5,23 +5,26 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.diagnostics;
+package org.mule.runtime.core.internal.diagnostics;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_END;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
+import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_END;
+import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
-import static java.lang.String.format;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.diagnostics.producer.ComponentProcessingStrategyProfilingDataProducer;
+import org.mule.runtime.core.api.diagnostics.ProfilerDataConsumerDiscoveryStrategy;
+import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
+import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
+import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
+import org.mule.runtime.core.internal.diagnostics.producer.ComponentProcessingStrategyProfilingDataProducer;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  * Default diagnostic service for the runtime.
@@ -35,6 +38,7 @@ public class DefaultDiagnosticsService extends AbstractDiagnosticsService {
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilerDataProducers =
       new HashMap() {
 
+        // TODO MULE-19596 replace this map when the discovery strategy based on server plugins is implemented.
         {
           put(PS_FLOW_END,
               new ComponentProcessingStrategyProfilingDataProducer(DefaultDiagnosticsService.this, PS_FLOW_END));
@@ -60,7 +64,8 @@ public class DefaultDiagnosticsService extends AbstractDiagnosticsService {
   }
 
   @Override
-  public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(ProfilingEventType<T> profilingEventType) {
+  public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(
+                                                                                             ProfilingEventType<T> profilingEventType) {
     if (!profilerDataProducers.containsKey(profilingEventType)) {
       throw new MuleRuntimeException((createStaticMessage(format(
                                                                  "Profiling event type not registered: %s",

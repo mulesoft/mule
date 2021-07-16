@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilin
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
+import static org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils.getLocation;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
@@ -32,6 +33,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
+import org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.ArrayDeque;
@@ -163,22 +165,6 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             }
           });
     }
-  }
-
-  private ComponentLocation getLocation(ReactiveProcessor processor) {
-    if (processor instanceof HasLocation) {
-      return ((HasLocation) processor).resolveLocation();
-    }
-    if (processor instanceof InterceptedReactiveProcessor) {
-      return getLocation(((InterceptedReactiveProcessor) processor).getProcessor());
-    }
-
-    if (processor instanceof Component) {
-      return ((Component) processor).getLocation();
-    }
-
-
-    return null;
   }
 
   private boolean isTxActive(Context ctx) {

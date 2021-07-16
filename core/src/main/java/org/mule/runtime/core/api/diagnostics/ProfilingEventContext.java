@@ -7,9 +7,12 @@
 
 package org.mule.runtime.core.api.diagnostics;
 
+import org.mule.api.annotation.Experimental;
+
 /**
  * The general event context to encapsulate profiling data.
  */
+@Experimental
 public interface ProfilingEventContext {
 
   /**

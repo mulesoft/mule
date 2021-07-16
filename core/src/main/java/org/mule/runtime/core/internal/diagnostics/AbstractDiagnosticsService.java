@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.diagnostics;
+package org.mule.runtime.core.internal.diagnostics;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_DIAGNOSTICS_SERVICE;
 
@@ -18,8 +18,13 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
+import org.mule.runtime.core.api.diagnostics.ProfilerDataConsumerDiscoveryStrategy;
+import org.mule.runtime.core.api.diagnostics.ProfilingDataConsumer;
+import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
+import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
+import org.mule.runtime.core.internal.diagnostics.notification.DefaultProfilingNotificationListener;
 import org.mule.runtime.core.api.diagnostics.notification.ProfilingNotification;
-import org.mule.runtime.core.api.diagnostics.notification.DefaultProfilingNotificationListener;
 
 import java.util.HashSet;
 import java.util.Set;

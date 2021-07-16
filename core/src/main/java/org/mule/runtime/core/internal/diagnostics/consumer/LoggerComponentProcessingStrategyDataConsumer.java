@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.diagnostics.consumer;
+package org.mule.runtime.core.internal.diagnostics.consumer;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
@@ -47,8 +47,8 @@ public class LoggerComponentProcessingStrategyDataConsumer
 
   @Override
   public void onProfilingEvent(String profilingEventType, ProcessingStrategyProfilingEventContext profilingEventContext) {
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info(gson.toJson(getInfoMap(profilingEventType, profilingEventContext)));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(gson.toJson(getInfoMap(profilingEventType, profilingEventContext)));
     }
   }
 

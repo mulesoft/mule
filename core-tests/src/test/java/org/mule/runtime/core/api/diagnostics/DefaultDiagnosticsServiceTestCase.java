@@ -30,12 +30,14 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.internal.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
-import org.mule.runtime.core.api.diagnostics.notification.DefaultProfilingNotificationListener;
+import org.mule.runtime.core.internal.diagnostics.notification.DefaultProfilingNotificationListener;
 import org.mule.runtime.core.api.diagnostics.notification.ProfilingNotification;
-import org.mule.runtime.core.api.diagnostics.producer.ComponentProcessingStrategyProfilingDataProducer;
+import org.mule.runtime.core.internal.diagnostics.producer.ComponentProcessingStrategyProfilingDataProducer;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.diagnostics.DefaultDiagnosticsService;
+import org.mule.runtime.core.internal.diagnostics.DefaultProfilerDataConsumerDiscoveryStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;

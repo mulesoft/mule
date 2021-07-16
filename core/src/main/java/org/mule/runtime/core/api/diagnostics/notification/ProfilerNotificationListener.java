@@ -7,13 +7,15 @@
 
 package org.mule.runtime.core.api.diagnostics.notification;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.notification.NotificationListener;
 
 /**
  * An interface for {@link ProfilingNotification} listeners.
- * 
+ *
  * @param <T> extension of {@link ProfilingNotification}
  */
+@Experimental
 public interface ProfilerNotificationListener<T extends ProfilingNotification>
     extends NotificationListener<ProfilingNotification> {
 

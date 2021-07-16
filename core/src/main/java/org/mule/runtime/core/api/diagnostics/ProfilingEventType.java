@@ -7,11 +7,14 @@
 
 package org.mule.runtime.core.api.diagnostics;
 
+import org.mule.api.annotation.Experimental;
+
 /**
  * The profiling event type.
  *
  * @param <T> the {@link ProfilingEventContext} associated to the type.
  */
+@Experimental
 public interface ProfilingEventType<T extends ProfilingEventContext> {
 
   /**

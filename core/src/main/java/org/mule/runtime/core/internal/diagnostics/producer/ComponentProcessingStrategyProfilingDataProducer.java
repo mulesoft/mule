@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.diagnostics.producer;
+package org.mule.runtime.core.internal.diagnostics.producer;
 
-import org.mule.runtime.core.api.diagnostics.DefaultDiagnosticsService;
+import org.mule.runtime.core.internal.diagnostics.DefaultDiagnosticsService;
 import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
 import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
-import org.mule.runtime.core.api.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.internal.diagnostics.consumer.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
 
 /**
