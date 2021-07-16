@@ -8,9 +8,10 @@ package org.mule.functional.policy.api.extension;
 
 import static org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider.TEST_POLICY_NAMESPACE;
 import static org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider.TEST_POLICY_PREFIX;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.SELECT;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -18,7 +19,6 @@ import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
@@ -64,21 +64,17 @@ class TestPolicyExtensionModelDeclarer {
         .withRequiredParameter("name")
         .describedAs("The name used to identify this policy.")
         .asComponentId()
-        .ofType(typeBuilder.stringType().build());
+        .ofType(STRING_TYPE);
 
-    final NestedRouteDeclarer sourceDeclarer = proxyDeclarer
-        .withRoute("source")
+    proxyDeclarer
+        .withChain("source")
+        .setRequired(false)
         .withModelProperty(new CustomLocationPartModelProperty("source", false));
 
-    sourceDeclarer.withChain();
-
-    final NestedRouteDeclarer operationDeclarer = proxyDeclarer
-        .withRoute("operation")
+    proxyDeclarer
+        .withChain("operation")
         .withModelProperty(new CustomLocationPartModelProperty("operation", false));
-
-    operationDeclarer.withChain();
   }
-
 
   private void declareExecuteNext(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer executeNext = extensionDeclarer
@@ -87,8 +83,8 @@ class TestPolicyExtensionModelDeclarer {
 
     // By this operation alone we cannot determine what its output will be, it will depend on the context on which this operation
     // is located.
-    executeNext.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
-    executeNext.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
+    executeNext.withOutput().ofType(ANY_TYPE);
+    executeNext.withOutputAttributes().ofType(ANY_TYPE);
   }
 
 }

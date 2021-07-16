@@ -11,11 +11,15 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_TLS_SCHEMA_LOCATION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 /**
  * An {@link ExtensionDeclarer} containing the namespace declaration for the tls module.
@@ -25,7 +29,7 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 class TlsExtensionModelDeclarer {
 
   ExtensionDeclarer createExtensionModel() {
-    return new ExtensionDeclarer()
+    ExtensionDeclarer declarer = new ExtensionDeclarer()
         .named(TLS_PREFIX)
         .describedAs("Mule Runtime and Integration Platform: TLS components")
         .onVersion(MULE_VERSION)
@@ -39,6 +43,18 @@ class TlsExtensionModelDeclarer {
             .setXsdFileName(TLS_PREFIX + ".xsd")
             .setSchemaLocation(MULE_TLS_SCHEMA_LOCATION)
             .build());
+
+    ConstructDeclarer context = declarer.withConstruct("context")
+        .describedAs("Reusable configuration element for TLS. A TLS context optionally defines a key store and a trust store.\n" +
+            "The key store contains the private and public keys of this server/client. The trust store contains\n" +
+            "certificates of the trusted servers/clients.")
+        .allowingTopLevelDefinition();
+
+    ParameterGroupDeclarer contextParams = context.onDefaultParameterGroup();
+    contextParams.withRequiredParameter("name")
+        .describedAs()
+        .ofType(STRING_TYPE)
+        .asComponentId();
   }
 
 }
