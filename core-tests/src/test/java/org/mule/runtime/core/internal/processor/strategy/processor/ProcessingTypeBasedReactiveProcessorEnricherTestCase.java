@@ -20,17 +20,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -43,10 +32,21 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingType
 import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Collection;
 import java.util.concurrent.Callable;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.reactivestreams.Publisher;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(ENRICHER)
@@ -154,7 +154,6 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
     }
 
   }
-
 
   /**
    * Test BLOCKING {@link ReactiveProcessor}.
