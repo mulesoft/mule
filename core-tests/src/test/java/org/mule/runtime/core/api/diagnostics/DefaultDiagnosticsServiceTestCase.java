@@ -34,7 +34,7 @@ import org.mule.runtime.core.api.diagnostics.consumer.context.ComponentProcessin
 import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.diagnostics.notification.DefaultProfilingNotificationListener;
 import org.mule.runtime.core.api.diagnostics.notification.ProfilingNotification;
-import org.mule.runtime.core.api.diagnostics.producer.ComponentProcessingStratetegyProfilingDataProducer;
+import org.mule.runtime.core.api.diagnostics.producer.ComponentProcessingStrategyProfilingDataProducer;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -123,10 +123,12 @@ public class DefaultDiagnosticsServiceTestCase extends AbstractMuleContextTestCa
   @Test
   @Description("When the data producer generates data, a notification is triggered")
   public void notificationTriggeredOnProfilingEvent() {
-    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> profilingDataProducer = diagnosticsService.getProfilingDataProducer(OPERATION_EXECUTED);
-    profilingDataProducer.event(new ComponentProcessingStrategyProfilingEventContext(coreEvent, location, THREAD_NAME, ARTIFACT_ID,
-                                                                                     ARTIFACT_TYPE,
-                                                                                     currentTimeMillis()));
+    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> profilingDataProducer =
+        diagnosticsService.getProfilingDataProducer(OPERATION_EXECUTED);
+    profilingDataProducer
+        .event(new ComponentProcessingStrategyProfilingEventContext(coreEvent, location, THREAD_NAME, ARTIFACT_ID,
+                                                                    ARTIFACT_TYPE,
+                                                                    currentTimeMillis()));
 
     verify(notificationManager).fireNotification(any(ProfilingNotification.class));
 
@@ -134,8 +136,9 @@ public class DefaultDiagnosticsServiceTestCase extends AbstractMuleContextTestCa
 
 
   private void assertCorrectDataProducerFor(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
-    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> profilingDataProducer = diagnosticsService.getProfilingDataProducer(profilingEventType);
-    assertThat(profilingDataProducer, instanceOf(ComponentProcessingStratetegyProfilingDataProducer.class));
+    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> profilingDataProducer =
+        diagnosticsService.getProfilingDataProducer(profilingEventType);
+    assertThat(profilingDataProducer, instanceOf(ComponentProcessingStrategyProfilingDataProducer.class));
   }
 
 }
