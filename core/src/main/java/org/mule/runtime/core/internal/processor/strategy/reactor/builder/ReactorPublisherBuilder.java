@@ -87,7 +87,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    * @param artifactType the profiled artifact type.
    * @return builder for a {@link Publisher} with the profiling action.
    */
-  ReactorPublisherBuilder<T> profileEvent(ComponentLocation location, Optional<ProfilingDataProducer> dataProducer,
+  ReactorPublisherBuilder<T> profileEvent(ComponentLocation location, Optional<? extends ProfilingDataProducer> dataProducer,
                                           String artifactId,
                                           String artifactType);
 
@@ -141,7 +141,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
     @Override
     public ReactorPublisherBuilder<Mono<CoreEvent>> profileEvent(ComponentLocation location,
-                                                                 Optional<ProfilingDataProducer> dataProducer,
+                                                                 Optional<? extends ProfilingDataProducer> dataProducer,
                                                                  String artifactId, String artifactType) {
       mono = dataProducer.map(dp -> mono.doOnNext(e -> dp.event(new ComponentProcessingStrategyProfilingEventContext(e, location,
                                                                                                                      Thread
@@ -153,6 +153,21 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
           .orElse(mono);
       return this;
     }
+
+    // @Override
+    // public ReactorPublisherBuilder<Mono<CoreEvent>> profileEvent(ComponentLocation location,
+    // Optional<ProfilingDataProducer> dataProducer,
+    // String artifactId, String artifactType) {
+    // mono = dataProducer.map(dp -> mono.doOnNext(e -> dp.event(new ComponentProcessingStrategyProfilingEventContext(e, location,
+    // Thread
+    // .currentThread()
+    // .getName(),
+    // artifactId,
+    // artifactType,
+    // currentTimeMillis()))))
+    // .orElse(mono);
+    // return this;
+    // }
 
   }
 
@@ -205,7 +220,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
     @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> profileEvent(ComponentLocation location,
-                                                                 Optional<ProfilingDataProducer> dataProducer,
+                                                                 Optional<? extends ProfilingDataProducer> dataProducer,
                                                                  String artifactId, String artifactType) {
       flux = dataProducer.map(dp -> flux.doOnNext(e -> dp.event(
                                                                 new ComponentProcessingStrategyProfilingEventContext(e, location,
@@ -218,6 +233,22 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
           .orElse(flux);
       return this;
     }
+
+    // @Override
+    // public ReactorPublisherBuilder<Flux<CoreEvent>> profileEvent(ComponentLocation location,
+    // Optional<ProfilingDataProducer> dataProducer,
+    // String artifactId, String artifactType) {
+    // flux = dataProducer.map(dp -> flux.doOnNext(e -> dp.event(
+    // new ComponentProcessingStrategyProfilingEventContext(e, location,
+    // Thread
+    // .currentThread()
+    // .getName(),
+    // artifactId,
+    // artifactType,
+    // currentTimeMillis()))))
+    // .orElse(flux);
+    // return this;
+    // }
 
   }
 }

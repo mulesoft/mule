@@ -17,7 +17,7 @@ import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilin
 import static java.lang.String.format;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.diagnostics.producer.ComponentProcessingStratetegyProfilingDataProducer;
+import org.mule.runtime.core.api.diagnostics.producer.ComponentProcessingStrategyProfilingDataProducer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,41 +30,40 @@ import java.util.Map;
  */
 public class DefaultDiagnosticsService extends AbstractDiagnosticsService {
 
-  protected Map<ProfilingEventType, ProfilingDataProducer> profilerDataProducers =
-      new HashMap<ProfilingEventType, ProfilingDataProducer>() {
+  protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilerDataProducers =
+      new HashMap() {
 
         {
           put(PS_FLOW_END,
-              new ComponentProcessingStratetegyProfilingDataProducer(DefaultDiagnosticsService.this, PS_FLOW_END));
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultDiagnosticsService.this, PS_FLOW_END));
           put(PS_FLOW_DISPATCH,
-              new ComponentProcessingStratetegyProfilingDataProducer(DefaultDiagnosticsService.this, PS_FLOW_DISPATCH));
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultDiagnosticsService.this, PS_FLOW_DISPATCH));
           put(PS_FLOW_MESSAGE_PASSING,
-              new ComponentProcessingStratetegyProfilingDataProducer(DefaultDiagnosticsService.this, PS_FLOW_MESSAGE_PASSING));
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultDiagnosticsService.this, PS_FLOW_MESSAGE_PASSING));
           put(OPERATION_EXECUTED,
-              new ComponentProcessingStratetegyProfilingDataProducer(DefaultDiagnosticsService.this, OPERATION_EXECUTED));
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultDiagnosticsService.this, OPERATION_EXECUTED));
           put(PS_SCHEDULING_OPERATION_EXECUTION,
-              new ComponentProcessingStratetegyProfilingDataProducer(DefaultDiagnosticsService.this,
-                                                                     PS_SCHEDULING_OPERATION_EXECUTION));
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultDiagnosticsService.this,
+                                                                   PS_SCHEDULING_OPERATION_EXECUTION));
           put(STARTING_OPERATION_EXECUTION,
-              new ComponentProcessingStratetegyProfilingDataProducer(DefaultDiagnosticsService.this,
-                                                                     STARTING_OPERATION_EXECUTION));
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultDiagnosticsService.this,
+                                                                   STARTING_OPERATION_EXECUTION));
         }
 
       };
-
-  @Override
-  public ProfilingDataProducer getProfilingDataProducer(ProfilingEventType profilingEventType) {
-    if (!profilerDataProducers.containsKey(profilingEventType)) {
-      throw new MuleRuntimeException((createStaticMessage(format(
-                                                                 "Profiling event type not registered: %s",
-                                                                 profilingEventType))));
-    }
-    return profilerDataProducers.get(profilingEventType);
-  }
 
   @Override
   public ProfilerDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
     return new DefaultProfilerDataConsumerDiscoveryStrategy();
   }
 
+  @Override
+  public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(ProfilingEventType<T> profilingEventType) {
+    if (!profilerDataProducers.containsKey(profilingEventType)) {
+      throw new MuleRuntimeException((createStaticMessage(format(
+                                                                 "Profiling event type not registered: %s",
+                                                                 profilingEventType))));
+    }
+    return (ProfilingDataProducer<T>) profilerDataProducers.get(profilingEventType);
+  }
 }
