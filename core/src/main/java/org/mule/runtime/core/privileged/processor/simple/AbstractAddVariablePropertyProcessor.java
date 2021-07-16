@@ -14,13 +14,13 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_N
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.StringUtils;
