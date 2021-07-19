@@ -58,8 +58,10 @@ public class PropertyComponentUtils {
     if (name != null) {
       return new Pair<>(name, value);
     } else {
-      return new Pair<>(PROPERTY_NAME_PROPERTY_ATTRIBUTE,
-                        new RuntimeBeanReference(propertyComponentModel.getRawParameterValue("ref").orElse(null)));
+      String beanName =
+          propertyComponentModel.getParameter("ref") != null ? propertyComponentModel.getParameter("ref").getResolvedRawValue()
+              : null;
+      return new Pair<>(PROPERTY_NAME_PROPERTY_ATTRIBUTE, new RuntimeBeanReference(beanName));
     }
   }
 
