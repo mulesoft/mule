@@ -234,7 +234,7 @@
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <groovyVersion>3.0.7</groovyVersion>
-        <assembly.verifier.version>1.4</assembly.verifier.version>
+        <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
         <allureJunitVersion>2.8.1</allureJunitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
@@ -595,6 +595,8 @@
                         <skip>${skipVerifications}</skip>
                     </configuration>
 
+                    <!-- // @todo[question]: Given that the plugin now uses Groovy 3.0.8, should this be set here?-->
+                    <!-- ref: https://github.com/mulesoft/mule-assembly-verifier-plugin/blob/31e94d9efcf987b935191f3af17633147d7c8e43/pom.xml#L38-L42 -->
                     <dependencies>
                         <!--
                             Groovy dependency is handled by Mule differently,
@@ -607,6 +609,7 @@
                         </dependency>
                     </dependencies>
 
+                    <!-- // @todo: Why is the execution configure here and not here: https://github.com/mulesoft/mule-ee-distributions/blob/e6370956039d68d2f9f2bfea00dab46bae685ad8/standalone/pom.xml#L138-->
                     <executions>
                         <execution>
                             <phase>package</phase>
