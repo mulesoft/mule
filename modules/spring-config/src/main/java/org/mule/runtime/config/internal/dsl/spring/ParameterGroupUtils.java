@@ -41,7 +41,7 @@ public final class ParameterGroupUtils {
         getParameterGroupModel(ownerComponent, parameterName, possibleGroup, getSourceParamGroups(ownerComponentModel));
 
     if (!groupModelOptional.isPresent()) {
-      return null;
+      return ownerComponent.getParameter(parameterName);
     }
 
     ComponentParameterAst parameter = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
