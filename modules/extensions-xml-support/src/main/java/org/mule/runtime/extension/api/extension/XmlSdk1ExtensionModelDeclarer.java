@@ -94,6 +94,7 @@ public class XmlSdk1ExtensionModelDeclarer {
 
     final ParameterGroupDeclarer parameterDefaultParamGroup = operationDeclaration.withOptionalComponent("parameters")
         .withStereotype(PARAMS_STEREOTYPE)
+        // TODO: MULE-19605
         .withRoute("parameter")
         .withMinOccurs(0)
         .onDefaultParameterGroup();
@@ -150,6 +151,7 @@ public class XmlSdk1ExtensionModelDeclarer {
     operationDeclaration.withOptionalComponent("errors")
         .withStereotype(ERRORS_STEREOTYPE)
         .describedAs("Collection of errors that might be thrown by the current operation.")
+        // TODO: MULE-19605
         .withRoute("error")
         .onDefaultParameterGroup()
         .withRequiredParameter("type")
