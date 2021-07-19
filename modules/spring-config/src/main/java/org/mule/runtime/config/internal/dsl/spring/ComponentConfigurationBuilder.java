@@ -16,11 +16,11 @@ import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getRawParameterValue;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -343,34 +343,30 @@ class ComponentConfigurationBuilder<T> {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> {
             if (ownerComponentModel instanceof SourceModel) {
-              ComponentParameterAst sourceCallbackAwareParameter =
-                  parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
-                                                                      createBeanDefinitionRequest.getSpringComponentModel()
-                                                                          .getComponentIdentifier(),
-                                                                      (SourceModel) ownerComponentModel);
-              if (sourceCallbackAwareParameter != null) {
-                return sourceCallbackAwareParameter;
-              }
-            }
-
-            return resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
-                                                                               createBeanDefinitionRequest
-                                                                                   .getSpringComponentModel()
-                                                                                   .getComponentIdentifier(),
-                                                                               ownerComponentModel.getParameterGroupModels()),
-                                    parameterName);
-          })
-          .orElseGet(() -> {
-            if (!ownerComponent.getModel(Object.class).isPresent()) {
-              return ownerComponent.getParameter(parameterName);
+              return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
+                                                                         createBeanDefinitionRequest.getSpringComponentModel()
+                                                                             .getComponentIdentifier(),
+                                                                         (SourceModel) ownerComponentModel);
             } else {
-              return null;
+              return resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
+                                                                                 createBeanDefinitionRequest
+                                                                                     .getSpringComponentModel()
+                                                                                     .getComponentIdentifier(),
+                                                                                 ownerComponentModel.getParameterGroupModels()),
+                                      parameterName);
             }
-          });
+          })
+          .orElse(null);
 
       Object parameterValue;
       if (parameter == null) {
-        parameterValue = defaultValue;
+        // Fallback for test components that do not have an extension model.
+        // TODO MULE-17778 Remove this
+        parameterValue = component == null
+            ? null
+            : component.getRawParameterValue(parameterName)
+                .map(v -> (Object) v)
+                .orElse(defaultValue);
       } else if ("frequency".equals(parameterName)
           && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
           && parameter.isDefaultValue()) {
@@ -384,7 +380,7 @@ class ComponentConfigurationBuilder<T> {
 
         if (defaultValue != null && parameterValue == null) {
           LOGGER
-              .warn("Parameter {} from extension {} has a defaultValue configured in the componentBuildingDefinition but not in the extensionModel.",
+              .warn("Paramerter {} from extension {} has a defaultValue configured in the componentBuildingDefinition but not in the extensionModel.",
                     parameterName, ownerComponent.getIdentifier().getNamespace());
           parameterValue = defaultValue;
         }
@@ -501,7 +497,7 @@ class ComponentConfigurationBuilder<T> {
     public void onValueFromTextContent() {
       if (component != null) {
         // TODO MULE-18782 migrate this
-        this.value = getRawParameterValue(component, BODY_RAW_PARAM_NAME).orElse(null);
+        this.value = component.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
       } else {
         getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
             .ifPresent(v -> this.value = v);

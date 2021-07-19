@@ -216,6 +216,11 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
+            public Optional<String> getRawParameterValue(String paramName) {
+              return empty();
+            }
+
+            @Override
             public Collection<ComponentParameterAst> getParameters() {
               return emptySet();
             }

@@ -21,7 +21,6 @@ import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.CoreDslConstants;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
@@ -101,15 +100,11 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
                       ofNullable(errorMappingComponentModel.getTarget()));
   }
 
-  private static Optional<String> getRawParameterValue(ComponentAst componentAst, String parameterName) {
-    return ofNullable(componentAst.getParameter(parameterName)).map(ComponentParameterAst::getResolvedRawValue);
-  }
-
   private void genericValidation(String moduleNamespace, OperationModel operationModel, ComponentAst elementComponentModel,
                                  ProblemsReporter problemsReporter, String attributeToValidate,
                                  ComponentIdentifier workingIdentifier) {
     genericValidation(moduleNamespace, operationModel, problemsReporter, attributeToValidate, workingIdentifier,
-                      getRawParameterValue(elementComponentModel, attributeToValidate));
+                      elementComponentModel.getRawParameterValue(attributeToValidate));
   }
 
   private void genericValidation(String moduleNamespace, OperationModel operationModel, ProblemsReporter problemsReporter,

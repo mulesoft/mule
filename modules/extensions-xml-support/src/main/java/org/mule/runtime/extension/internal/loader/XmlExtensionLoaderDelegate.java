@@ -439,10 +439,6 @@ public final class XmlExtensionLoaderDelegate {
     }));
   }
 
-  private static Optional<String> getRawParameterValue(ComponentAst componentAst, String parameterName) {
-    return ofNullable(componentAst.getParameter(parameterName)).map(ComponentParameterAst::getResolvedRawValue);
-  }
-
   private void loadModuleExtension(ExtensionDeclarer declarer, ArtifactAst moduleAst, boolean comesFromTNS) {
     ComponentAst moduleModel = getModuleComponentModel(moduleAst);
     if (!moduleModel.getIdentifier().equals(MODULE_IDENTIFIER)) {
@@ -451,10 +447,10 @@ public final class XmlExtensionLoaderDelegate {
                                                                 moduleModel.getIdentifier().toString())));
     }
 
-    final String name = getRawParameterValue(moduleModel, MODULE_NAME).orElse(null);
+    final String name = moduleModel.getRawParameterValue(MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
-    final String category = getRawParameterValue(moduleModel, CATEGORY).orElse("COMMUNITY");
-    final String vendor = getRawParameterValue(moduleModel, VENDOR).orElse("MuleSoft");
+    final String category = moduleModel.getRawParameterValue(CATEGORY).orElse("COMMUNITY");
+    final String vendor = moduleModel.getRawParameterValue(VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
         ? getTnsXmlDslModel(moduleAst, version)
         : getXmlDslModel(moduleAst, name, version);
@@ -696,8 +692,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private String getDescription(ComponentAst moduleModel) {
-    // TODO: Use metadata instead.
-    return getRawParameterValue(moduleModel, DOC_DESCRIPTION).orElse("");
+    return moduleModel.getRawParameterValue(DOC_DESCRIPTION).orElse("");
   }
 
   private List<ComponentAst> extractGlobalElementsFrom(ComponentAst moduleModel) {
@@ -811,9 +806,8 @@ public final class XmlExtensionLoaderDelegate {
                                                                 List<ComponentAst> globalElementsComponentModel) {
     final List<ComponentAst> markedAsTestConnectionGlobalElements =
         globalElementsComponentModel.stream()
-            .filter(globalElementComponentModel -> getRawParameterValue(globalElementComponentModel,
-                                                                        MODULE_CONNECTION_MARKER_ATTRIBUTE)
-                                                                            .map(Boolean::parseBoolean).orElse(false))
+            .filter(globalElementComponentModel -> globalElementComponentModel
+                .getRawParameterValue(MODULE_CONNECTION_MARKER_ATTRIBUTE).map(Boolean::parseBoolean).orElse(false))
             .collect(toList());
 
     if (markedAsTestConnectionGlobalElements.size() > 1) {
@@ -1071,7 +1065,7 @@ public final class XmlExtensionLoaderDelegate {
       // if tye element is absent, it will default to the VOID type
       if (outputAttributesComponentModel.isPresent()) {
         String receivedOutputAttributeType =
-            getRawParameterValue(outputAttributesComponentModel.get(), TYPE_ATTRIBUTE).orElse(null);
+            outputAttributesComponentModel.get().getRawParameterValue(TYPE_ATTRIBUTE).orElse(null);
         metadataType = extractType(receivedOutputAttributeType);
       } else {
         metadataType = BaseTypeBuilder.create(JAVA).voidType().build();

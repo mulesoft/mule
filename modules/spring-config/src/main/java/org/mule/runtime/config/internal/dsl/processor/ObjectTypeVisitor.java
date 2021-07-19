@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.dsl.processor;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getRawParameterValue;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -68,15 +67,15 @@ public class ObjectTypeVisitor implements TypeDefinitionVisitor {
     try {
       type =
           ClassUtils.getClass(Thread.currentThread().getContextClassLoader(),
-                              getRawParameterValue(componentModel, attributeName).orElse(null));
+                              componentModel.getRawParameterValue(attributeName).orElse(null));
       if (!enforcedClass.isAssignableFrom(type)) {
         throw new MuleRuntimeException(createStaticMessage("Class definition for type %s on element %s is not the same nor inherits from %s",
-                                                           getRawParameterValue(componentModel, attributeName).orElse(null),
+                                                           componentModel.getRawParameterValue(attributeName).orElse(null),
                                                            componentModel.getIdentifier(), enforcedClass.getName()));
       }
     } catch (ClassNotFoundException e) {
       throw new MuleRuntimeException(createStaticMessage("Error while trying to locate Class definition for type %s on element %s",
-                                                         getRawParameterValue(componentModel, attributeName).orElse(null),
+                                                         componentModel.getRawParameterValue(attributeName).orElse(null),
                                                          componentModel.getIdentifier()),
                                      e);
     }
