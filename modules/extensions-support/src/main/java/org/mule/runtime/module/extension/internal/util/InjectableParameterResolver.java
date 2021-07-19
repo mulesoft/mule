@@ -53,7 +53,7 @@ public class InjectableParameterResolver {
                                      List<InjectableParameterInfo> injectableParameters) {
     this.expressionManager = expressionManager;
     this.injectableParametersMap = getInjectableParametersMap(injectableParameters);
-    this.expressionResolvingContext = createBindingContextAndPopulateAvailableParams(parameterValueResolver, parameterizedModel);
+    this.expressionResolvingContext = createBindingContext(parameterValueResolver, parameterizedModel);
   }
 
   /**
@@ -96,8 +96,8 @@ public class InjectableParameterResolver {
                                                        injectableParameter -> injectableParameter));
   }
 
-  private BindingContext createBindingContextAndPopulateAvailableParams(ParameterValueResolver parameterValueResolver,
-                                                                        ParameterizedModel parameterizedModel) {
+  private BindingContext createBindingContext(ParameterValueResolver parameterValueResolver,
+                                              ParameterizedModel parameterizedModel) {
     BindingContext.Builder bindingContextBuilder = BindingContext.builder();
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       String unaliasedName = getImplementingName(parameterModel);
