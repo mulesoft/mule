@@ -6,11 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -23,6 +29,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -75,6 +82,19 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
                                        fromChildConfiguration(CursorProviderFactory.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
 
+    if (hasOutputGroup()) {
+      finalBuilder = finalBuilder
+          .withSetterParameterDefinition(TARGET_PARAMETER_NAME,
+                                         fromSimpleParameter(TARGET_PARAMETER_NAME).build())
+          .withSetterParameterDefinition(TARGET_VALUE_PARAMETER_NAME,
+                                         fromSimpleParameter(TARGET_VALUE_PARAMETER_NAME).build());
+    }
+
+    if (hasErrorMappingsGroup()) {
+      finalBuilder = finalBuilder
+          .withSetterParameterDefinition(ERROR_MAPPINGS_PARAMETER_NAME,
+                                         fromChildCollectionConfiguration(EnrichedErrorMapping.class).build());
+    }
 
     Optional<? extends NestableElementModel> nestedChain = componentModel.getNestedComponents().stream()
         .filter(c -> c instanceof NestedChainModel)
@@ -101,11 +121,20 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
     return finalBuilder;
   }
 
+  private boolean hasErrorMappingsGroup() {
+    return componentModel.getParameterGroupModels()
+        .stream()
+        .anyMatch(pg -> pg.getName().equals(ERROR_MAPPINGS));
+  }
+
+  private boolean hasOutputGroup() {
+    return componentModel.getParameterGroupModels()
+        .stream()
+        .anyMatch(pg -> pg.getName().equals(OUTPUT));
+  }
+
   protected abstract Class<? extends ComponentMessageProcessor> getMessageProcessorType();
 
   protected abstract Class<? extends ComponentMessageProcessorObjectFactory> getMessageProcessorFactoryType();
 
-  protected final T getComponentModel() {
-    return componentModel;
-  }
 }
