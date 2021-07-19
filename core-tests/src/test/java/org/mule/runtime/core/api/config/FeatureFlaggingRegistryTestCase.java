@@ -25,7 +25,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.size.SmallTest;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Predicate;
 
 @SmallTest
 @Feature(DEPLOYMENT_CONFIGURATION)
@@ -34,17 +40,27 @@ public class FeatureFlaggingRegistryTestCase {
 
   private FeatureFlaggingRegistry featureFlaggingRegistry;
 
+  Map<org.mule.runtime.api.config.Feature, Predicate<MuleContext>> configurations = new HashMap<>();
+  Map<org.mule.runtime.api.config.Feature, Predicate<FeatureContext>> featureFlagConfigurations = new HashMap<>();
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setUp() {
     featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    // To reset the feature flags after the test.
+    featureFlaggingRegistry.getFeatureConfigurations().forEach((feature, condition) -> configurations.put(feature, condition));
+    featureFlaggingRegistry.getFeatureFlagConfigurations()
+        .forEach((feature, condition) -> featureFlagConfigurations.put(feature, condition));
   }
 
   @After
   public void after() {
     featureFlaggingRegistry.clearFeatureConfigurations();
+    // Resetting the feature flags after the test.
+    configurations.forEach((feature, condition) -> featureFlaggingRegistry.registerFeature(feature, condition));
+    featureFlagConfigurations.forEach((feature, condition) -> featureFlaggingRegistry.registerFeatureFlag(feature, condition));
   }
 
   @Test
