@@ -12,14 +12,19 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_INTERVAL;
 import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
+import static org.mule.sdk.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
+import static org.mule.sdk.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
+import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -37,10 +42,13 @@ import org.mule.sdk.api.runtime.source.PollingSource;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -77,17 +85,19 @@ public class PollingSourceWrapperTestCase {
   @Mock
   private ComponentLocation componentLocationMock;
 
-  @Mock
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private SourceCallback callbackMock;
 
   private PollingSource pollingSource = mock(PollingSource.class);
   private SchedulingStrategy schedulingStrategy = mock(SchedulingStrategy.class);
-  private Logger logger = mock(Logger.class);
+
+  private Logger logger;
+  private List<String> debugMessages;
+  private List<String> traceMessages;
 
   @InjectMocks
   private PollingSourceWrapper<Object, Object> pollingSourceWrapper =
-      new PollingSourceWrapper<Object, Object>(pollingSource, schedulingStrategy, Integer.MAX_VALUE,
-                                               mock(SystemExceptionHandler.class));
+      new PollingSourceWrapper<Object, Object>(pollingSource, schedulingStrategy, 4, mock(SystemExceptionHandler.class));
 
   @Before
   public void setUp() throws Exception {
@@ -103,6 +113,12 @@ public class PollingSourceWrapperTestCase {
         return null;
       }
     });
+
+    when(lockFactoryMock.createLock(anyString()).tryLock()).thenReturn(true);
+
+    logger = createMockLogger();
+    debugMessages = new ArrayList<>();
+    traceMessages = new ArrayList<>();
   }
 
   @Test
@@ -121,28 +137,67 @@ public class PollingSourceWrapperTestCase {
 
   @Test
   public void loggingOnAcceptedItem() throws MuleException, Exception {
-    stubPollItem(Optional.empty());
-    Logger origLogger = setLogger(pollingSourceWrapper, "LOGGER", logger);
-    try {
-      pollingSourceWrapper.onStart(callbackMock);
-      verifyAcceptedItemLogMessage(logger, "");
-    } finally {
-      // restore original logger
-      setLogger(pollingSourceWrapper, "LOGGER", origLogger);
-    }
+    stubPollItem(Collections.singletonList(null), Collections.singletonList(null));
+    startSourcePollWithMockedLogger();
+    verifyLogMessage(debugMessages, PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, "");
   }
 
   @Test
-  public void loggingOnRejectedItem() throws MuleException, Exception {
-    stubPollItem(Optional.of(POLL_ITEM_ID));
-    Logger origLogger = setLogger(pollingSourceWrapper, "LOGGER", logger);
-    try {
-      pollingSourceWrapper.onStart(callbackMock);
-      verifyRejectedItemLogMessage(logger, POLL_ITEM_ID, PollContext.PollItemStatus.ALREADY_IN_PROCESS);
-    } finally {
-      // restore original logger
-      setLogger(pollingSourceWrapper, "LOGGER", origLogger);
-    }
+  public void loggingOnRejectedItem() throws Exception {
+    when(lockFactoryMock.createLock(anyString()).tryLock()).thenReturn(false);
+    stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(null));
+    startSourcePollWithMockedLogger();
+    verifyLogMessage(debugMessages, PollingSourceWrapper.REJECTED_ITEM_MESSAGE, POLL_ITEM_ID, ALREADY_IN_PROCESS);
+  }
+
+  @Test
+  public void loggingOnCreatedWatermark() throws Exception {
+    String watermark = "5";
+    stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(watermark));
+    startSourcePollWithMockedLogger();
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
+  }
+
+  @Test
+  public void loggingOnUpdatedWatermark() throws Exception {
+    List<String> ids = Arrays.asList("id1", "id2", "id3", "id4");
+    List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8);
+    stubPollItem(ids, watermarks);
+    startSourcePollWithMockedLogger();
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3, -1,
+                     TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, "itemWatermark", 5, -1,
+                     TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, "itemWatermark", 8, -1,
+                     TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
+
+  }
+
+  @Test
+  public void loggingOnUpdatedWatermarkWithPollLimit() throws MuleException, Exception {
+    List<String> ids = Arrays.asList("id1", "id2", "id3", "id4", "id5");
+    List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8, 4);
+    stubPollItem(ids, watermarks);
+    startSourcePollWithMockedLogger();
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3, -1,
+                     TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, "itemWatermark", 5, -1,
+                     TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, "itemWatermark", 8, -1,
+                     TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, "itemWatermark", 4, 1,
+                     TEST_FLOW_NAME);
+    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 4, TEST_FLOW_NAME);
   }
 
   private void assertPersistentStoreIsCreated(String expectedName, Long expirationInterval) {
@@ -168,6 +223,45 @@ public class PollingSourceWrapperTestCase {
     setFieldValue(pollingSourceWrapper, "componentLocation", componentLocationMock, false);
   }
 
+  private Logger createMockLogger() {
+    Logger logger = mock(Logger.class);
+    Answer answer = new Answer() {
+
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        String method = invocation.getMethod().getName();
+        String message = invocation.getArgument(0, String.class);
+        Object[] messageArgs = Arrays.copyOfRange(invocation.getArguments(), 1, invocation.getArguments().length);
+        if (method.equals("debug")) {
+          debugMessages.add(formatMessage(message, messageArgs));
+        } else {
+          traceMessages.add(formatMessage(message, messageArgs));
+        }
+        return null;
+      }
+    };
+    doAnswer(answer).when(logger).debug(anyString(), (Object) any());
+    doAnswer(answer).when(logger).debug(anyString(), any(), any());
+    doAnswer(answer).when(logger).trace(anyString(), any(), any());
+    doAnswer(answer).when(logger).trace(anyString(), (Object[]) any());
+    return logger;
+  }
+
+  private String formatMessage(String message, Object... args) {
+    String newMessage = message.replaceAll("\\{\\}", "%s");
+    return String.format(newMessage, args);
+  }
+
+  private void startSourcePollWithMockedLogger() throws Exception {
+    Logger origLogger = setLogger(pollingSourceWrapper, "LOGGER", logger);
+    try {
+      pollingSourceWrapper.onStart(callbackMock);
+    } finally {
+      // restore original logger
+      setLogger(pollingSourceWrapper, "LOGGER", origLogger);
+    }
+  }
+
   private Logger setLogger(Object object, String fieldName, Logger newLogger) throws Exception {
     Field field = object.getClass().getDeclaredField(fieldName);
     field.setAccessible(true);
@@ -191,51 +285,32 @@ public class PollingSourceWrapperTestCase {
     return oldLogger;
   }
 
-  private void stubPollItem(Optional<String> pollItemId) {
+  private void stubPollItem(List<String> pollItemIds, List<Serializable> pollItemWatermarks) {
     doAnswer(new Answer() {
 
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
-        PollContext pollContext = (PollContext) invocation.getArgument(0);
-        pollContext
-            .accept(item -> {
-              if (pollItemId.isPresent()) {
-                ((PollContext.PollItem) item).setId(pollItemId.get());
-              }
-              ((PollContext.PollItem) item).setResult(Result.builder().output("test").build());
-            });
+        PollContext pollContext = invocation.getArgument(0, PollContext.class);
+        for (int i = 0; i < pollItemIds.size(); i++) {
+          String id = pollItemIds.get(i);
+          Serializable watermark = pollItemWatermarks.get(i);
+          pollContext
+              .accept(item -> {
+                if (id != null) {
+                  ((PollContext.PollItem) item).setId(id);
+                }
+                if (watermark != null) {
+                  ((PollContext.PollItem) item).setWatermark(watermark);
+                }
+                ((PollContext.PollItem) item).setResult(Result.builder().output("test").build());
+              });
+        } ;
         return null;
       }
     }).when(pollingSource).poll(any());
   }
 
-  private void verifyAcceptedItemLogMessage(Logger logger, String pollItemId) {
-    verifyLogMessage(logger, PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, pollItemId);
-  }
-
-  private void verifyRejectedItemLogMessage(Logger logger, String pollItemId, PollContext.PollItemStatus status) {
-    verifyLogMessage(logger, PollingSourceWrapper.REJECTED_ITEM_MESSAGE, pollItemId, status);
-  }
-
-  private void verifyLogMessage(Logger logger, String expectedMessage, Object argument) {
-    ArgumentCaptor<String> argument1Captor = ArgumentCaptor.forClass(String.class);
-    ArgumentCaptor<Object> argument2Captor = ArgumentCaptor.forClass(Object.class);
-    verify(logger, atLeastOnce()).debug(argument1Captor.capture(), argument2Captor.capture());
-    List<String> messages = argument1Captor.getAllValues();
-    assertThat(messages, hasItem(expectedMessage));
-    int index = messages.indexOf(expectedMessage);
-    assertThat(argument2Captor.getAllValues().get(index), is(argument));
-  }
-
-  private void verifyLogMessage(Logger logger, String expectedMessage, Object argument1, Object argument2) {
-    ArgumentCaptor<String> argument1Captor = ArgumentCaptor.forClass(String.class);
-    ArgumentCaptor<Object> argument2Captor = ArgumentCaptor.forClass(Object.class);
-    ArgumentCaptor<Object> argument3Captor = ArgumentCaptor.forClass(Object.class);
-    verify(logger, atLeastOnce()).debug(argument1Captor.capture(), argument2Captor.capture(), argument3Captor.capture());
-    List<String> messages = argument1Captor.getAllValues();
-    assertThat(messages, hasItem(expectedMessage));
-    int index = messages.indexOf(expectedMessage);
-    assertThat(argument2Captor.getAllValues().get(index), is(argument1));
-    assertThat(argument3Captor.getAllValues().get(index), is(argument2));
+  private void verifyLogMessage(List<String> messages, String expectedMessage, Object... arguments) {
+    assertThat(messages, hasItem(formatMessage(expectedMessage, arguments)));
   }
 }
