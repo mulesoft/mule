@@ -360,7 +360,13 @@ class ComponentConfigurationBuilder<T> {
                                                                                ownerComponentModel.getParameterGroupModels()),
                                     parameterName);
           })
-          .orElse(null);
+          .orElseGet(() -> {
+            if (!ownerComponent.getModel(Object.class).isPresent()) {
+              return ownerComponent.getParameter(parameterName);
+            } else {
+              return null;
+            }
+          });
 
       Object parameterValue;
       if (parameter == null) {
