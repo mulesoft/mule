@@ -95,10 +95,12 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
+import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
@@ -122,6 +124,8 @@ import com.google.gson.reflect.TypeToken;
 class MuleExtensionModelDeclarer {
 
   private static final Class<? extends ModelProperty> allowsExpressionWithoutMarkersModelPropertyClass;
+  private static final ClassValueModel NOTIFICATION_CLASS_VALUE_MODEL =
+      new ClassValueModel(singletonList(NotificationListener.class.getName()));
 
   static {
     Class<? extends ModelProperty> foundClass = null;
@@ -1099,13 +1103,8 @@ class MuleExtensionModelDeclarer {
             + "notification configuration for efficiency and will not generate events for newly enabled notifications or "
             + "listeners. The default value is false.");
 
-    // TODO: min-max occurs
     declareEnableNotification(notificationsConstructDeclarer.withOptionalComponent("notification"));
-
-    // TODO: min-max occurs
     declareDisableNotification(notificationsConstructDeclarer.withOptionalComponent("disable-notification"));
-
-    // TODO: min-max occurs
     declareNotificationListener(notificationsConstructDeclarer.withOptionalComponent("notification-listener"));
   }
 
@@ -1116,6 +1115,9 @@ class MuleExtensionModelDeclarer {
     enableNotificationDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("event-class")
         .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Event class").build())
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The class associated with a notification event that will be delivered to the interface.\n"
             + "This can be used instead of the 'event' attribute to specify a custom class.");
@@ -1129,6 +1131,9 @@ class MuleExtensionModelDeclarer {
     enableNotificationDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("interface-class")
         .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Interface class").build())
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The interface (class name) that will receive the notification event.");
 
@@ -1147,6 +1152,9 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("event-class")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Event class").build())
         .describedAs("The class associated with an event that will no longer be delivered to any interface. This can be "
             + "used instead of the 'event' attribute to specify a custom class.");
 
@@ -1159,6 +1167,9 @@ class MuleExtensionModelDeclarer {
     disableNotificationDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("interface-class")
         .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Interface class").build())
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The interface (class name) that will no longer receive the event.");
 
@@ -1170,6 +1181,11 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareNotificationListener(NestedComponentDeclarer notificationListenerDeclarer) {
+    notificationListenerDeclarer.describedAs("Registers a bean as a listener with the notification system. Events are "
+        + "dispatched by reflection - the listener will receive all events associated with any interfaces it implements."
+        + " The relationship between interfaces and events is configured by the notification and disable-notification "
+        + "elements.");
+
     notificationListenerDeclarer.onDefaultParameterGroup()
         .withRequiredParameter("ref")
         .ofType(STRING_TYPE)

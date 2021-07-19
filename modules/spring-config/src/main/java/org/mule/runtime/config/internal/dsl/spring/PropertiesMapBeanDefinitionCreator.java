@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
+import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getRawParameterValue;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.VALUE_ATTRIBUTE;
@@ -72,10 +73,10 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
 
   private void processAndAddMapProperty(ComponentAst component, ManagedMap<Object, Object> managedMap) {
     Object key =
-        resolveValue(component.getRawParameterValue(KEY_ELEMENT).orElse(null),
-                     component.getRawParameterValue(KEY_REF_ATTRIBUTE).orElse(null));
-    Object value = resolveValue(component.getRawParameterValue(VALUE_ATTRIBUTE).orElse(null),
-                                component.getRawParameterValue(VALUE_REF_ATTRIBUTE).orElse(null));
+        resolveValue(getRawParameterValue(component, KEY_ELEMENT).orElse(null),
+                     getRawParameterValue(component, KEY_REF_ATTRIBUTE).orElse(null));
+    Object value = resolveValue(getRawParameterValue(component, VALUE_ATTRIBUTE).orElse(null),
+                                getRawParameterValue(component, VALUE_REF_ATTRIBUTE).orElse(null));
     if (value == null) {
       value = component.directChildrenStream().findFirst()
           .map(this::resolveValueFromChild)
@@ -96,9 +97,9 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator<CreateCom
     ManagedList<Object> managedList = new ManagedList<>();
     component.directChildrenStream().forEach(childComponent -> {
       if (childComponent.getIdentifier().getName().equals(VALUE_ATTRIBUTE)) {
-        managedList.add(childComponent.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null));
+        managedList.add(getRawParameterValue(childComponent, BODY_RAW_PARAM_NAME).orElse(null));
       } else {
-        managedList.add(new RuntimeBeanReference(childComponent.getRawParameterValue(BEAN_REF_ATTRIBUTE).orElse(null)));
+        managedList.add(new RuntimeBeanReference(getRawParameterValue(childComponent, BEAN_REF_ATTRIBUTE).orElse(null)));
       }
     });
     return managedList;
