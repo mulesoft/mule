@@ -90,6 +90,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -327,6 +328,11 @@ public class HeisenbergOperations implements Disposable {
         extensionsClient.execute(extensionName, operationName, createOperationParameters(configName, operationParameters))
             .getOutput();
     return output instanceof TypedValue ? (String) ((TypedValue) output).getValue() : (String) output;
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String executeWithMapParam(LinkedHashMap<String, Object> mapParameters) throws MuleException {
+    return mapParameters.toString();
   }
 
   private OperationParameters createOperationParameters(String configName, Map<String, Object> operationParameters) {
@@ -627,7 +633,7 @@ public class HeisenbergOperations implements Disposable {
     return new InputStream() {
 
       private int bytesRead = 0;
-      private byte[] name = config.getPersonalInfo().getName().getBytes();
+      private final byte[] name = config.getPersonalInfo().getName().getBytes();
 
       @Override
       public int read() {

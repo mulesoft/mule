@@ -19,7 +19,7 @@ public class ParameterResolverOnPojoTestCase extends AbstractParameterResolverTe
 
   @Override
   protected String getConfigFile() {
-    return "parameter-resolver-on-pojo-config.xml";
+    return "parameter/parameter-resolver-on-pojo-config.xml";
   }
 
   @Test
