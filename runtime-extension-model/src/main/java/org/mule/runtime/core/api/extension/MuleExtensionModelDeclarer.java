@@ -57,6 +57,13 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STR
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.TYPE_LOADER;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.VOID_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DISPLAY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
@@ -105,6 +112,7 @@ import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
+import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.reflect.TypeToken;
@@ -166,13 +174,6 @@ class MuleExtensionModelDeclarer {
     declareObject(extensionDeclarer);
     declareFlow(extensionDeclarer);
     declareSubflow(extensionDeclarer);
-    declareConfiguration(extensionDeclarer);
-    declareConfigurationProperties(extensionDeclarer);
-
-    // operations
-    declareUntilSuccessful(extensionDeclarer);
-    declareForEach(extensionDeclarer, TYPE_LOADER);
-    declareAsync(extensionDeclarer);
     declareChoice(extensionDeclarer);
     declareErrorHandler(extensionDeclarer);
     declareTry(extensionDeclarer);
@@ -180,6 +181,13 @@ class MuleExtensionModelDeclarer {
     declareParallelForEach(extensionDeclarer, TYPE_LOADER);
     declareFirstSuccessful(extensionDeclarer);
     declareRoundRobin(extensionDeclarer);
+    declareConfiguration(extensionDeclarer);
+    declareConfigurationProperties(extensionDeclarer);
+    declareAsync(extensionDeclarer);
+    declareForEach(extensionDeclarer, TYPE_LOADER);
+    declareUntilSuccessful(extensionDeclarer);
+
+    // operations
     declareFlowRef(extensionDeclarer);
     declareIdempotentValidator(extensionDeclarer);
     declareLogger(extensionDeclarer);
@@ -347,11 +355,8 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareAsync(ExtensionDeclarer extensionDeclarer) {
-    OperationDeclarer async = extensionDeclarer.withOperation("async")
+    ConstructDeclarer async = extensionDeclarer.withConstruct("async")
         .describedAs("Processes the nested list of message processors asynchronously.");
-
-    async.withOutput().ofType(VOID_TYPE);
-    async.withOutputAttributes().ofType(VOID_TYPE);
 
     async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
     async.onDefaultParameterGroup()
@@ -547,7 +552,6 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-
     ConstructDeclarer forEach = extensionDeclarer.withConstruct("foreach")
         .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
             + " generating a message for each element.");
@@ -564,8 +568,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Expression that defines the collection to iterate over.");
     if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
       try {
-        collectionParam = collectionParam
-            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+        collectionParam.withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
       } catch (InstantiationException | IllegalAccessException e) {
         // ignore
       }
@@ -594,12 +597,10 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer) {
-    OperationDeclarer untilSuccessful = extensionDeclarer.withOperation("untilSuccessful")
+    ConstructDeclarer untilSuccessful = extensionDeclarer.withConstruct("untilSuccessful")
         .describedAs("Attempts to route a message to its inner chain in a synchronous manner. " +
             "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.");
 
-    untilSuccessful.withOutput().ofType(ANY_TYPE);
-    untilSuccessful.withOutputAttributes().ofType(ANY_TYPE);
     untilSuccessful.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
 
     untilSuccessful.onDefaultParameterGroup()
@@ -620,16 +621,14 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer) {
-    OperationDeclarer choice = extensionDeclarer.withOperation("choice")
+    ConstructDeclarer choice = extensionDeclarer.withConstruct("choice")
         .describedAs("Sends the message to the first message processor whose condition is satisfied. "
             + "If none of the conditions are satisfied, it sends the message to the configured default message processor "
             + "or fails if there is none.")
         .withErrorModel(routingError);
 
-    choice.withOutput().ofType(VOID_TYPE);
-    choice.withOutputAttributes().ofType(VOID_TYPE);
-
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
+    when.withChain();
     ParameterDeclarer expressionParam = when.onDefaultParameterGroup()
         .withRequiredParameter("expression")
         .ofType(BOOLEAN_TYPE);
@@ -644,7 +643,7 @@ class MuleExtensionModelDeclarer {
     }
 
     expressionParam.describedAs("The expression to evaluate.");
-    choice.withRoute("otherwise").withMaxOccurs(1);
+    choice.withRoute("otherwise").withMaxOccurs(1).withChain();
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer) {
@@ -683,32 +682,27 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareFirstSuccessful(ExtensionDeclarer extensionDeclarer) {
-    OperationDeclarer firstSuccessful = extensionDeclarer.withOperation("firstSuccessful")
+    ConstructDeclarer firstSuccessful = extensionDeclarer.withConstruct("firstSuccessful")
         .describedAs("Sends a message to a list of message processors until one processes it successfully.");
 
-    firstSuccessful.withOutput().ofType(ANY_TYPE);
-    firstSuccessful.withOutputAttributes().ofType(ANY_TYPE);
-
-    firstSuccessful.withRoute("route").withMinOccurs(1);
+    firstSuccessful.withRoute("route").withChain();
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
-    OperationDeclarer roundRobin = extensionDeclarer.withOperation("roundRobin")
+    ConstructDeclarer roundRobin = extensionDeclarer.withConstruct("roundRobin")
         .describedAs("Send each message received to the next message processor in a circular list of targets.");
 
-    roundRobin.withOutput().ofType(ANY_TYPE);
-    roundRobin.withOutputAttributes().ofType(ANY_TYPE);
     roundRobin.withRoute("route").withMinOccurs(1).withChain();
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-    OperationDeclarer scatterGather = extensionDeclarer.withOperation("scatterGather")
+    ConstructDeclarer scatterGather = extensionDeclarer.withConstruct("scatterGather")
         .describedAs("Sends the same message to multiple message processors in parallel.")
         .withErrorModel(compositeRoutingError);
 
-    scatterGather.withRoute("route").withMinOccurs(2);
-    scatterGather.withOutput().ofType(arrayOfMessagesMetadataType);
-    scatterGather.withOutputAttributes().ofType(VOID_TYPE);
+    scatterGather.withRoute("route").withMinOccurs(2).withChain();
+    // scatterGather.withOutput().ofType(arrayOfMessagesMetadataType);
+    // scatterGather.withOutputAttributes().ofType(VOID_TYPE);
 
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
@@ -722,18 +716,35 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
+    scatterGather.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_PARAMETER_NAME)
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs(TARGET_PARAMETER_DESCRIPTION)
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
+
+    scatterGather.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
+        .ofType(STRING_TYPE)
+        .defaultingTo(PAYLOAD)
+        .withExpressionSupport(REQUIRED)
+        .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
+        .withRole(BEHAVIOUR)
+        .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
+        .withModelProperty(new TargetModelProperty());
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)
   }
 
   private void declareParallelForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-    OperationDeclarer parallelForeach = extensionDeclarer.withOperation("parallelForeach")
+    ConstructDeclarer parallelForeach = extensionDeclarer.withConstruct("parallelForeach")
         .describedAs("Splits the same message and processes each part in parallel.")
         .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0"));
 
-    parallelForeach.withOutput().ofType(arrayOfMessagesMetadataType);
-    parallelForeach.withOutputAttributes().ofType(VOID_TYPE);
+    // parallelForeach.withOutput().ofType(arrayOfMessagesMetadataType);
+    // parallelForeach.withOutputAttributes().ofType(VOID_TYPE);
     parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);;
 
     ParameterDeclarer collectionParam = parallelForeach.onDefaultParameterGroup()
@@ -765,15 +776,29 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
+    parallelForeach.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_PARAMETER_NAME)
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs(TARGET_PARAMETER_DESCRIPTION)
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
+
+    parallelForeach.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
+        .ofType(STRING_TYPE)
+        .defaultingTo(PAYLOAD)
+        .withExpressionSupport(REQUIRED)
+        .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
+        .withRole(BEHAVIOUR)
+        .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
+        .withModelProperty(new TargetModelProperty());
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer) {
-    OperationDeclarer tryScope = extensionDeclarer.withOperation("try")
+    ConstructDeclarer tryScope = extensionDeclarer.withConstruct("try")
         .describedAs("Processes the nested list of message processors, "
             + "within a transaction and with it's own error handler if required.");
-
-    tryScope.withOutput().ofType(VOID_TYPE);
-    tryScope.withOutputAttributes().ofType(VOID_TYPE);
 
     tryScope.onDefaultParameterGroup()
         .withOptionalParameter("transactionalAction")

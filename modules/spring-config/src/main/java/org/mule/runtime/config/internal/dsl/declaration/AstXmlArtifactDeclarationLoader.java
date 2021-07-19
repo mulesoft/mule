@@ -496,9 +496,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
           Map<String, String> attributes = resolveAttributes(child, alwaysTrue());
 
-          declareParameterizedComponent((ParameterizedModel) nestedModel,
-                                        routeDsl, routeDeclarer, attributes, child);
-          declareComposableModel((ComposableModel) nestedModel, elementDsl, child, routeDeclarer);
+          declareParameterizedComponent(nestedModel, routeDsl, routeDeclarer, attributes, child);
+          declareComposableModel(nestedModel, elementDsl, child, routeDeclarer);
           return routeDeclarer.getDeclaration();
         });
   }
