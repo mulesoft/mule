@@ -45,6 +45,9 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
   @Override
   public boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels, R request) {
     ComponentBuildingDefinition buildingDefinition = request.getComponentBuildingDefinition();
+    if (buildingDefinition == null) {
+      return false;
+    }
     BeanDefinitionBuilder beanDefinitionBuilder =
         createBeanDefinitionBuilder(request.getSpringComponentModel(), buildingDefinition);
     processAnnotations(request.getSpringComponentModel(), beanDefinitionBuilder);
