@@ -81,11 +81,9 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
-import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -144,12 +142,6 @@ class MuleExtensionModelDeclarer {
   final ErrorModel compositeRoutingError = newError(COMPOSITE_ROUTING).withParent(routingError).build();
   final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
-  private final ArrayType arrayOfMessagesMetadataType = BASE_TYPE_BUILDER.arrayType()
-      .of(new MessageMetadataTypeBuilder()
-          .payload(ANY_TYPE)
-          .attributes(ANY_TYPE)
-          .build())
-      .build();
 
   ExtensionDeclarer createExtensionModel() {
 
@@ -701,8 +693,6 @@ class MuleExtensionModelDeclarer {
         .withErrorModel(compositeRoutingError);
 
     scatterGather.withRoute("route").withMinOccurs(2).withChain();
-    // scatterGather.withOutput().ofType(arrayOfMessagesMetadataType);
-    // scatterGather.withOutputAttributes().ofType(VOID_TYPE);
 
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
@@ -743,8 +733,6 @@ class MuleExtensionModelDeclarer {
         .describedAs("Splits the same message and processes each part in parallel.")
         .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0"));
 
-    // parallelForeach.withOutput().ofType(arrayOfMessagesMetadataType);
-    // parallelForeach.withOutputAttributes().ofType(VOID_TYPE);
     parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);;
 
     ParameterDeclarer collectionParam = parallelForeach.onDefaultParameterGroup()
