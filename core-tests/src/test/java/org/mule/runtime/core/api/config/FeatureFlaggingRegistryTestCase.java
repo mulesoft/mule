@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.config.TestingFeatures.TESTING_FEATURE;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
-import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
@@ -26,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.size.SmallTest;
 
@@ -34,14 +34,14 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 @SmallTest
-@Feature(DEPLOYMENT_CONFIGURATION)
+@io.qameta.allure.Feature(DEPLOYMENT_CONFIGURATION)
 @Story(FEATURE_FLAGGING)
 public class FeatureFlaggingRegistryTestCase {
 
   private FeatureFlaggingRegistry featureFlaggingRegistry;
 
-  Map<org.mule.runtime.api.config.Feature, Predicate<MuleContext>> configurations = new HashMap<>();
-  Map<org.mule.runtime.api.config.Feature, Predicate<FeatureContext>> featureFlagConfigurations = new HashMap<>();
+  Map<Feature, Predicate<MuleContext>> configurations = new HashMap<>();
+  Map<Feature, Predicate<FeatureContext>> featureFlagConfigurations = new HashMap<>();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
