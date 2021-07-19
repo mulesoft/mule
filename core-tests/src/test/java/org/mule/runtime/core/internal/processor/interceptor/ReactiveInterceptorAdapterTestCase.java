@@ -2180,8 +2180,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     private final Matcher<?> matcher;
 
-    public OptionalMatcher(Matcher<?> causeMatcher) {
-      this.matcher = causeMatcher;
+    public OptionalMatcher(Matcher<?> valueMatcher) {
+      this.matcher = valueMatcher;
     }
 
     public void describeTo(Description description) {
@@ -2194,7 +2194,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
 
     protected void describeMismatchSafely(Optional<T> item, Description description) {
-      description.appendText("cause ");
+      description.appendText("optional ");
       if (!item.isPresent()) {
         description.appendText("value is not present");
       } else {
