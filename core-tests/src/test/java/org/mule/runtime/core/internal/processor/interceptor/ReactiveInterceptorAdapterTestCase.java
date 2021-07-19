@@ -831,7 +831,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  @Issue("MULE-19525")
+  @Issue("MULE-19593")
   public void interceptedThrowsErrorCallbackNotImplemented() throws Exception {
     UnsupportedOperationException expectedException = errorCallbackNotImplemented(new RuntimeException("Some Error"));
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
