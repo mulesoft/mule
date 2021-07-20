@@ -90,14 +90,17 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
+import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
@@ -121,6 +124,8 @@ import com.google.gson.reflect.TypeToken;
 class MuleExtensionModelDeclarer {
 
   private static final Class<? extends ModelProperty> allowsExpressionWithoutMarkersModelPropertyClass;
+  private static final ClassValueModel NOTIFICATION_CLASS_VALUE_MODEL =
+      new ClassValueModel(singletonList(NotificationListener.class.getName()));
 
   static {
     Class<? extends ModelProperty> foundClass = null;
@@ -1082,11 +1087,118 @@ class MuleExtensionModelDeclarer {
 
   private void declareNotifications(ExtensionDeclarer extensionDeclarer) {
     // TODO MULE-17778: Complete this declaration
-    extensionDeclarer.withConstruct("notifications")
+    ConstructDeclarer notificationsConstructDeclarer = extensionDeclarer.withConstruct("notifications")
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
         .describedAs("Registers listeners for notifications and associates interfaces with particular events.")
         .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
+
+    notificationsConstructDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("dynamic")
+        .ofType(BOOLEAN_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo(false)
+        .describedAs("If the notification manager is dynamic, listeners can be registered dynamically at runtime via the "
+            + "MuleContext, and the configured notification can be changed. Otherwise, some parts of Mule will cache "
+            + "notification configuration for efficiency and will not generate events for newly enabled notifications or "
+            + "listeners. The default value is false.");
+
+    declareEnableNotification(notificationsConstructDeclarer.withOptionalComponent("notification"));
+    declareDisableNotification(notificationsConstructDeclarer.withOptionalComponent("disable-notification"));
+    declareNotificationListener(notificationsConstructDeclarer.withOptionalComponent("notification-listener"));
+  }
+
+  private void declareEnableNotification(NestedComponentDeclarer enableNotificationDeclarer) {
+    enableNotificationDeclarer
+        .describedAs("Registers listeners for notifications and associates interfaces with particular events");
+
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event-class")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Event class").build())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The class associated with a notification event that will be delivered to the interface.\n"
+            + "This can be used instead of the 'event' attribute to specify a custom class.");
+
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The notification event to deliver.");
+
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface-class")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Interface class").build())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface (class name) that will receive the notification event.");
+
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface that will receive the notification event.");
+  }
+
+  private void declareDisableNotification(NestedComponentDeclarer disableNotificationDeclarer) {
+    disableNotificationDeclarer.describedAs("Blocks the association of an event with a particular interface. This "
+        + "filters events after the association with a particular interface (and so takes precedence).");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event-class")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Event class").build())
+        .describedAs("The class associated with an event that will no longer be delivered to any interface. This can be "
+            + "used instead of the 'event' attribute to specify a custom class.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The event you no longer want to deliver.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface-class")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Interface class").build())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface (class name) that will no longer receive the event.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface that will no longer receive the event.");
+  }
+
+  private void declareNotificationListener(NestedComponentDeclarer notificationListenerDeclarer) {
+    notificationListenerDeclarer.describedAs("Registers a bean as a listener with the notification system. Events are "
+        + "dispatched by reflection - the listener will receive all events associated with any interfaces it implements."
+        + " The relationship between interfaces and events is configured by the notification and disable-notification "
+        + "elements.");
+
+    notificationListenerDeclarer.onDefaultParameterGroup()
+        .withRequiredParameter("ref")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The bean that will receive notifications.");
+
+    notificationListenerDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("subscription")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo("*")
+        .describedAs("An optional string that is compared with the event resource identifier. Only events with matching"
+            + " identifiers will be sent. If no value is given, all events are sent.");
   }
 
   private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer) {
