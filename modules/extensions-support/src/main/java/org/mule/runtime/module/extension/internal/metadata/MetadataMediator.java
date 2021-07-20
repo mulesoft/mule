@@ -325,21 +325,6 @@ public final class MetadataMediator<T extends ComponentModel> {
       }
 
       @Override
-      public void visit(NestedComponentModel model) {
-
-      }
-
-      @Override
-      public void visit(NestedChainModel model) {
-
-      }
-
-      @Override
-      public void visit(NestedRouteModel model) {
-
-      }
-
-      @Override
       public void visit(OperationModel operationModel) {
         OutputModel typedOutputModel =
             resolveOutputModelType(operationModel.getOutput(), outputMetadataDescriptor.getPayloadMetadata());
