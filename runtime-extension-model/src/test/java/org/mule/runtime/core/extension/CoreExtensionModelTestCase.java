@@ -27,7 +27,6 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.VOID_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -55,7 +54,6 @@ import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
@@ -449,7 +447,6 @@ public class CoreExtensionModelTestCase {
   public void scatterGather() {
     final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
 
-    // assertOutputsListOfMessages(scatterGatherModel);
     assertThat(scatterGatherModel.getAllParameterModels(), hasSize(4));
 
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getName(), is("timeout"));
@@ -484,8 +481,6 @@ public class CoreExtensionModelTestCase {
   @Test
   public void parallelForeach() {
     final ConstructModel parallelForeach = coreExtensionModel.getConstructModel("parallelForeach").get();
-
-    // assertOutputsListOfMessages(parallelForeach);
 
     assertThat(parallelForeach.getModelProperty(SinceMuleVersionModelProperty.class).map(mp -> mp.getVersion().toString())
         .orElse("NO MODEL PROPERTY"), equalTo("4.2.0"));
@@ -530,18 +525,10 @@ public class CoreExtensionModelTestCase {
     assertThat(targetValue.isRequired(), is(false));
   }
 
-  private void assertOutputsListOfMessages(HasOutputModel model) {
-    MetadataType outputType = model.getOutput().getType();
-    assertThat(outputType, is(instanceOf(ArrayType.class)));
-    assertThat(((ArrayType) outputType).getType(), is(instanceOf(MessageMetadataType.class)));
-    assertThat(model.getOutputAttributes().getType(), equalTo(VOID_TYPE));
-  }
-
   @Test
   public void async() {
     final ConstructModel asyncModel = coreExtensionModel.getConstructModel("async").get();
 
-    // assertOutputTypes(asyncModel, VOID_TYPE, VOID_TYPE);
     assertThat(asyncModel.getNestedComponents(), hasSize(1));
     NestableElementModel processors = asyncModel.getNestedComponents().get(0);
     assertThat(processors, instanceOf(NestedChainModel.class));
@@ -562,7 +549,6 @@ public class CoreExtensionModelTestCase {
   public void tryScope() {
     final ConstructModel tryModel = coreExtensionModel.getConstructModel("try").get();
 
-    // assertOutputTypes(tryModel, VOID_TYPE, VOID_TYPE);
     List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
     assertThat(allParameterModels, hasSize(2));
 
@@ -583,7 +569,6 @@ public class CoreExtensionModelTestCase {
   public void untilSuccessful() {
     final ConstructModel untilSuccessful = coreExtensionModel.getConstructModel("untilSuccessful").get();
 
-    // assertOutputTypes(untilSuccessful, ANY_TYPE, ANY_TYPE);
     List<ParameterModel> allParameterModels = untilSuccessful.getAllParameterModels();
     assertThat(allParameterModels, hasSize(2));
 
@@ -606,7 +591,6 @@ public class CoreExtensionModelTestCase {
   public void firstSuccessful() {
     final ConstructModel firstSuccessful = coreExtensionModel.getConstructModel("firstSuccessful").get();
 
-    // assertOutputTypes(firstSuccessful, ANY_TYPE, ANY_TYPE);
     List<ParameterModel> allParameterModels = firstSuccessful.getAllParameterModels();
     assertThat(allParameterModels, hasSize(0));
   }

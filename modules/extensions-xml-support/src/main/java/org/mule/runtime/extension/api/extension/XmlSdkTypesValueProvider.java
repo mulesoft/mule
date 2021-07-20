@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * Open {@link ValueProvider} which returns the keys for the primitive types.
  * <p>
- * This is needed because XML SDKcan also point to types defined in the application's catalog.
+ * This is needed because XML SDK can also point to types defined in the application's catalog.
  *
  * @since 4.4.0
  */

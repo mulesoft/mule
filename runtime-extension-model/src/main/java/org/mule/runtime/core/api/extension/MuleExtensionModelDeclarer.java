@@ -684,7 +684,10 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer roundRobin = extensionDeclarer.withConstruct("roundRobin")
         .describedAs("Send each message received to the next message processor in a circular list of targets.");
 
-    roundRobin.withRoute("route").withMinOccurs(1).withChain();
+    roundRobin.withRoute("route")
+        // it doesn't make sense for it to have less than two routes, but the XSD allows for just one.
+        .withMinOccurs(1)
+        .withChain();
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
