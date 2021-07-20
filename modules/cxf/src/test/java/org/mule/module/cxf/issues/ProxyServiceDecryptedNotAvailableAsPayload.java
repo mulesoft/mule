@@ -55,14 +55,6 @@ public class ProxyServiceDecryptedNotAvailableAsPayload extends FunctionalTestCa
     {
         ClientPasswordCallback.setPassword("secret");
     }
-    
-    @Test
-    public void testDecryptedPayloadAvailable() throws Exception
-    {
-        MuleMessage msg = getTestMuleMessage(SOAP_REQUEST);
-        MuleMessage muleMessage = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/client", msg, HTTP_REQUEST_OPTIONS);
-        assertThat(muleMessage.getPayloadAsString(), equalTo(SOAP_RESPONSE));
-    }
 
     @Override
     protected String getConfigFile()
