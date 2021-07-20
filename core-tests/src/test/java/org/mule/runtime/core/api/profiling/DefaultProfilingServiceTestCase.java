@@ -142,8 +142,10 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
    */
   private static class TestProfilingDataConsumer implements ProfilingDataConsumer<TestProfilingEventContext> {
 
+
     @Override
-    public void onProfilingEvent(String profilerEventIdentifier, TestProfilingEventContext profilerEventContext) {
+    public void onProfilingEvent(ProfilingEventType<TestProfilingEventContext> profilingEventType,
+                                 TestProfilingEventContext profilingEventContext) {
       // Nothing to do.
     }
 

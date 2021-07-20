@@ -34,6 +34,6 @@ public class DefaultProfilingNotificationListener implements ProfilerNotificatio
   @Override
   public void onNotification(ProfilingNotification notification) {
     ProfilingEventContext profilingEventContext = (ProfilingEventContext) notification.getSource();
-    dataConsumer.onProfilingEvent(notification.getActionName(), profilingEventContext);
+    dataConsumer.onProfilingEvent(notification.getProfilingEventType(), profilingEventContext);
   }
 }

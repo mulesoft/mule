@@ -16,7 +16,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
  * A {@link Notification} that produces data for troubleshooting. This is extended for using notifications for producing profiling
  * data by the runtime.
  */
-public class ProfilingNotification extends AbstractServerNotification {
+public class ProfilingNotification<T extends ProfilingEventContext> extends AbstractServerNotification {
 
   private static final int TEST_NOTIFICATION_ID = PROFILING_ACTION_START_RANGE + 1;
 
@@ -24,9 +24,12 @@ public class ProfilingNotification extends AbstractServerNotification {
     registerAction("test", TEST_NOTIFICATION_ID);
   }
 
+  private ProfilingEventType<?> profilingEventType;
+
   public <T extends ProfilingEventContext> ProfilingNotification(T profilingEventContext,
                                                                  ProfilingEventType<T> profilingEventType) {
     super(profilingEventContext, getActionId(profilingEventType.getProfilingEventTypeIdentifier()));
+    this.profilingEventType = profilingEventType;
   }
 
   @Override
@@ -39,4 +42,10 @@ public class ProfilingNotification extends AbstractServerNotification {
     return "ProfilingServerNotification";
   }
 
+  /**
+   * @return the {@link ProfilingEventType} for the notification.
+   */
+  public ProfilingEventType<?> getProfilingEventType() {
+    return profilingEventType;
+  }
 }
