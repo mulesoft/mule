@@ -10,7 +10,6 @@ import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getRawParameterValue;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ComponentAst;
