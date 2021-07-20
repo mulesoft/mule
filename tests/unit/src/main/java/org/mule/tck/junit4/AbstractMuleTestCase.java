@@ -37,6 +37,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.tck.report.ThreadDumpOnTimeOut;
 
@@ -51,6 +52,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.DisableOnDebug;
 import org.junit.rules.RuleChain;
@@ -72,6 +74,10 @@ public abstract class AbstractMuleTestCase {
   public static final int DEFAULT_TEST_TIMEOUT_SECS = 60;
 
   public static final String TEST_TIMEOUT_SYSTEM_PROPERTY = "mule.test.timeoutSecs";
+
+  @ClassRule
+  public static SystemProperty rawParametersSystemProperty =
+      new SystemProperty("org.mule.runtime.ast.internal.DefaultComponentAst.INCLUDE_RAW_PARAMETERS", "true");
 
   /**
    * Indicates whether the text boxes will be logged when starting each test case.
