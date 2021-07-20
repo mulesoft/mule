@@ -780,6 +780,18 @@ public interface AllureConstants {
 
   }
 
+  interface JavaSdk {
+
+    String JAVA_SDK = "Java SDK";
+
+    interface Parameters {
+
+      String PARAMETERS = "Parameters definitions in Java SDK";
+
+    }
+
+  }
+
   interface XmlSdk {
 
     String XML_SDK = "Xml SDK";

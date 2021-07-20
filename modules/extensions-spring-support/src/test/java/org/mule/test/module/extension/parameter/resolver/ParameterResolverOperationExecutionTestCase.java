@@ -18,6 +18,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.JavaSdk.Parameters.PARAMETERS;
 
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -29,6 +31,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(JAVA_SDK)
+@Story(PARAMETERS)
 public class ParameterResolverOperationExecutionTestCase extends AbstractParameterResolverTestCase {
 
   @Rule
@@ -38,8 +45,8 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
       allOf(notNullValue(), instanceOf(Ricin.class), hasProperty("microgramsPerKilo", is(100L)));
 
   @Override
-  protected String[] getConfigFiles() {
-    return new String[] {"parameter-resolver-operation-config.xml"};
+  protected String getConfigFile() {
+    return "parameter/parameter-resolver-operation-config.xml";
   }
 
   @Override

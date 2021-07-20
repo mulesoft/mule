@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor.DEFAULT_COLLECTION_TYPE;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
-import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.ast.api.ComponentAst;
@@ -100,9 +99,7 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
     return component.getParameter(SIMPLE_TYPE_VALUE_PARAMETER_NAME).getValue()
         .mapLeft(v -> getConvertibleBeanDefinition(valueType, "#[" + v + "]", componentBuildingDefinition.getTypeConverter()))
         .mapRight(v -> {
-          if (isSimpleType(valueType)) {
-            return getConvertibleBeanDefinition(valueType, v, componentBuildingDefinition.getTypeConverter());
-          } else if (List.class.isAssignableFrom(valueType)) {
+          if (List.class.isAssignableFrom(valueType)) {
             final Collection<ComponentAst> values = (Collection<ComponentAst>) v;
             values.forEach(nestedComponentParamProcessor);
             ManagedList<Object> managedList = values.stream()
@@ -115,11 +112,13 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
             return genericBeanDefinition(DEFAULT_COLLECTION_TYPE)
                 .addConstructorArgValue(managedList)
                 .getBeanDefinition();
-          } else {
+          } else if (v instanceof ComponentAst) {
             nestedComponentParamProcessor.accept((ComponentAst) v);
             final SpringComponentModel childSpringComponent = springComponentModels.get(v);
             BeanDefinition beanDefinition = childSpringComponent.getBeanDefinition();
             return beanDefinition != null ? beanDefinition : childSpringComponent.getBeanReference();
+          } else {
+            return getConvertibleBeanDefinition(valueType, v, componentBuildingDefinition.getTypeConverter());
           }
         })
         .getValue()
