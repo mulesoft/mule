@@ -190,6 +190,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     extensionManager = muleContext.getExtensionManager();
 
+    // TODO (MULE-19608) remove this and make it into a component building definition
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
                                   componentBuildingDefinitionRegistryFactory.create(getExtensions()));

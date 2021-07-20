@@ -83,6 +83,8 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
 
   static void processMuleProperties(ComponentAst component, BeanDefinitionBuilder beanDefinitionBuilder,
                                     BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
+    // TODO (MULE-19608) remove this method, by having a component building definition that
+    // allows to have the properties being set as any other component
     if (component == null) {
       return;
     }
