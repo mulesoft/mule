@@ -6,21 +6,27 @@
  */
 package org.mule.runtime.extension.api.extension;
 
-import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CHAIN;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.extension.api.extension.XmlSdkTypesValueProvider.ID;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
+import static org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.builder;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -35,10 +41,12 @@ public class XmlSdk1ExtensionModelDeclarer {
   private static final String XMLSDK1_STEREOTYPE_NAMESPACE = "XML_SDK_1";
 
   private static final StereotypeModel PARAMS_STEREOTYPE = newStereotype("PARAMETERS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
-  private static final StereotypeModel PARAM_STEREOTYPE = newStereotype("PARAMETER", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel ERRORS_STEREOTYPE = newStereotype("ERRORS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
-  private static final StereotypeModel ERROR_STEREOTYPE = newStereotype("ERROR", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel OUTPUT_STEREOTYPE = newStereotype("OUTPUT", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+  private static final StereotypeModel OUTPUT_ATTRIBUTES_STEREOTYPE =
+      newStereotype("OUTPUT-ATTRIBUTES", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+
+  private final ValueProviderModel typesValueProvider = createTypesValueProviderModel();
 
   public ExtensionDeclarer createExtensionModel() {
     final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
@@ -58,54 +66,24 @@ public class XmlSdk1ExtensionModelDeclarer {
             .setSchemaLocation(buildSchemaLocation("module", "http://www.mulesoft.org/schema/mule/module"))
             .build());
 
-    final ConstructDeclarer propertyDeclaration = extensionDeclarer.withConstruct("property");
-    final ParameterGroupDeclarer propertyDeclarationDefaultParamGroup = propertyDeclaration
-        .allowingTopLevelDefinition()
-        .onDefaultParameterGroup();
-    propertyDeclarationDefaultParamGroup
-        .withRequiredParameter("name")
-        .asComponentId()
-        .ofType(typeBuilder.stringType().build());
-    propertyDeclarationDefaultParamGroup
-        .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType()
-            .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
-            .build());
-    propertyDeclarationDefaultParamGroup
-        .withOptionalParameter("defaultValue")
-        .ofType(typeBuilder.stringType().build());
-    propertyDeclarationDefaultParamGroup
-        .withOptionalParameter("use")
-        .defaultingTo("AUTO")
-        .ofType(typeBuilder.stringType()
-            .enumOf("REQUIRED", "OPTIONAL", "AUTO")
-            .build());
+    declarePropertyElement(extensionDeclarer, typeBuilder);
+    declareOperation(typeBuilder, extensionDeclarer);
 
-    propertyDeclarationDefaultParamGroup
-        .withOptionalParameter("password")
-        .defaultingTo(false)
-        .ofType(typeBuilder.booleanType().build());
+    return extensionDeclarer;
+  }
 
-    addDisplayParams(typeBuilder, propertyDeclarationDefaultParamGroup);
-    propertyDeclarationDefaultParamGroup
-        .withOptionalParameter("order")
-        .ofType(typeBuilder.numberType().build());
-    propertyDeclarationDefaultParamGroup
-        .withOptionalParameter("tab")
-        .defaultingTo(Placement.DEFAULT_TAB)
-        .ofType(typeBuilder.stringType().build());
+  private void declareOperation(BaseTypeBuilder typeBuilder, ExtensionDeclarer extensionDeclarer) {
+    final ConstructDeclarer operationDeclaration = extensionDeclarer.withConstruct("operation")
+        .allowingTopLevelDefinition();
 
-    final ConstructDeclarer operationDeclaration = extensionDeclarer.withConstruct("operation");
-    final ParameterGroupDeclarer operationDefaultParamGroup = operationDeclaration
-        .allowingTopLevelDefinition()
-        .onDefaultParameterGroup();
+    final ParameterGroupDeclarer operationDefaultParamGroup = operationDeclaration.onDefaultParameterGroup();
     operationDefaultParamGroup
         .withRequiredParameter("name")
         .asComponentId()
-        .ofType(typeBuilder.stringType().build())
+        .ofType(STRING_TYPE)
         .describedAs("Every operation must be named so that it can be called in a mule application.");
 
-    addDisplayParams(typeBuilder, operationDefaultParamGroup);
+    addDisplayParams(operationDefaultParamGroup);
     operationDefaultParamGroup
         .withOptionalParameter("visibility")
         .defaultingTo(PUBLIC.name())
@@ -114,29 +92,20 @@ public class XmlSdk1ExtensionModelDeclarer {
             .build())
         .describedAs("Describes weather the operation can be accessible outside the module or not.");
 
-    operationDeclaration.withOptionalComponent("parameters")
-        .withAllowedStereotypes(PARAMS_STEREOTYPE);
-
-    extensionDeclarer.withConstruct("parameters")
+    final ParameterGroupDeclarer parameterDefaultParamGroup = operationDeclaration.withOptionalComponent("parameters")
         .withStereotype(PARAMS_STEREOTYPE)
-        .withComponent("parameter")
-        .withAllowedStereotypes(PARAM_STEREOTYPE);
-
-    final ParameterGroupDeclarer parameterDefaultParamGroup = extensionDeclarer.withConstruct("parameter")
-        .withStereotype(PARAM_STEREOTYPE)
+        // TODO: MULE-19605
+        .withRoute("parameter")
+        .withMinOccurs(0)
         .onDefaultParameterGroup();
 
     parameterDefaultParamGroup
         .withRequiredParameter("name")
-        .ofType(typeBuilder.stringType().build());
-    parameterDefaultParamGroup
-        .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType()
-            .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
-            .build());
+        .ofType(STRING_TYPE);
+    configureTypeParameter(parameterDefaultParamGroup.withRequiredParameter("type"));
     parameterDefaultParamGroup
         .withOptionalParameter("defaultValue")
-        .ofType(typeBuilder.stringType().build());
+        .ofType(STRING_TYPE);
     parameterDefaultParamGroup
         .withOptionalParameter("use")
         .defaultingTo("AUTO")
@@ -152,69 +121,107 @@ public class XmlSdk1ExtensionModelDeclarer {
     parameterDefaultParamGroup
         .withOptionalParameter("password")
         .defaultingTo(false)
-        .ofType(typeBuilder.booleanType().build());
+        .ofType(BOOLEAN_TYPE);
 
-    addDisplayParams(typeBuilder, parameterDefaultParamGroup);
+    addDisplayParams(parameterDefaultParamGroup);
     parameterDefaultParamGroup
         .withOptionalParameter("order")
-        .ofType(typeBuilder.numberType().build());
+        .ofType(INTEGER_TYPE);
     parameterDefaultParamGroup
         .withOptionalParameter("tab")
         .defaultingTo(Placement.DEFAULT_TAB)
-        .ofType(typeBuilder.stringType().build());
+        .ofType(STRING_TYPE);
 
-    operationDeclaration.withOptionalComponent("body")
-        .withAllowedStereotypes(CHAIN);
 
-    extensionDeclarer.withConstruct("body")
-        .withStereotype(CHAIN)
-        .withChain();
 
-    operationDeclaration.withOptionalComponent("output")
-        .withAllowedStereotypes(OUTPUT_STEREOTYPE);
-
-    extensionDeclarer.withConstruct("output")
+    configureTypeParameter(operationDeclaration.withOptionalComponent("output")
+        .describedAs("Defines the output of the operation if exists, void otherwise.")
         .withStereotype(OUTPUT_STEREOTYPE)
         .onDefaultParameterGroup()
-        .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType()
-            .enumOf(PRIMITIVE_TYPES.keySet().toArray(new String[PRIMITIVE_TYPES.size()]))
-            .build());
+        .withRequiredParameter("type"));
+
+    configureTypeParameter(operationDeclaration.withOptionalComponent("output-attributes")
+        .describedAs("Defines the attribute's output of the operation if exists, void otherwise.")
+        .withStereotype(OUTPUT_ATTRIBUTES_STEREOTYPE)
+        .onDefaultParameterGroup()
+        .withRequiredParameter("type"));
+
+    operationDeclaration.withChain("body");
 
     operationDeclaration.withOptionalComponent("errors")
-        .withAllowedStereotypes(ERRORS_STEREOTYPE)
-        .describedAs("Collection of errors that might be thrown by the current operation.");
-
-    extensionDeclarer.withConstruct("errors")
         .withStereotype(ERRORS_STEREOTYPE)
-        .withComponent("error")
-        .withAllowedStereotypes(ERROR_STEREOTYPE);
-
-    final ParameterGroupDeclarer errorDefaultParamGroup = extensionDeclarer.withConstruct("error")
-        .withStereotype(ERROR_STEREOTYPE)
-        .onDefaultParameterGroup();
-
-    errorDefaultParamGroup
+        .describedAs("Collection of errors that might be thrown by the current operation.")
+        // TODO: MULE-19605
+        .withRoute("error")
+        .onDefaultParameterGroup()
         .withRequiredParameter("type")
-        .ofType(typeBuilder.stringType().build())
+        .ofType(STRING_TYPE)
         .describedAs("Defined error for the current operation.");
-
-    return extensionDeclarer;
   }
 
-  private void addDisplayParams(final BaseTypeBuilder typeBuilder, final ParameterGroupDeclarer ownerParamGroup) {
+  private ParameterDeclarer configureTypeParameter(ParameterDeclarer parameter) {
+    return parameter.ofType(STRING_TYPE).withValueProviderModel(typesValueProvider);
+  }
+
+  private ValueProviderModel createTypesValueProviderModel() {
+    return new ValueProviderModel(emptyList(),
+                                  false,
+                                  false,
+                                  true, 0,
+                                  ID,
+                                  ID,
+                                  builder(XmlSdkTypesValueProvider.class).build());
+  }
+
+  private void declarePropertyElement(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
+    final ConstructDeclarer propertyDeclaration = extensionDeclarer.withConstruct("property")
+        .allowingTopLevelDefinition();
+
+    final ParameterGroupDeclarer propertyDeclarationDefaultParamGroup = propertyDeclaration.onDefaultParameterGroup();
+
+    propertyDeclarationDefaultParamGroup
+        .withRequiredParameter("name")
+        .asComponentId()
+        .ofType(STRING_TYPE);
+    configureTypeParameter(propertyDeclarationDefaultParamGroup
+        .withRequiredParameter("type"));
+    propertyDeclarationDefaultParamGroup
+        .withOptionalParameter("defaultValue")
+        .ofType(STRING_TYPE);
+    propertyDeclarationDefaultParamGroup
+        .withOptionalParameter("use")
+        .defaultingTo("AUTO")
+        .ofType(typeBuilder.stringType()
+            .enumOf("REQUIRED", "OPTIONAL", "AUTO")
+            .build());
+
+    propertyDeclarationDefaultParamGroup
+        .withOptionalParameter("password")
+        .defaultingTo(false)
+        .ofType(BOOLEAN_TYPE);
+
+    addDisplayParams(propertyDeclarationDefaultParamGroup);
+    propertyDeclarationDefaultParamGroup
+        .withOptionalParameter("order")
+        .ofType(INTEGER_TYPE);
+    propertyDeclarationDefaultParamGroup
+        .withOptionalParameter("tab")
+        .defaultingTo(Placement.DEFAULT_TAB)
+        .ofType(STRING_TYPE);
+  }
+
+  private void addDisplayParams(final ParameterGroupDeclarer ownerParamGroup) {
     ownerParamGroup
         .withOptionalParameter("displayName")
-        .ofType(typeBuilder.stringType().build())
+        .ofType(STRING_TYPE)
         .describedAs("Display name of the operation. It can be any string. When empty, it will default to an auto generated one from the name attribute.");
     ownerParamGroup
         .withOptionalParameter("summary")
-        .ofType(typeBuilder.stringType().build())
+        .ofType(STRING_TYPE)
         .describedAs("A very brief overview about this operation.");
     ownerParamGroup
         .withOptionalParameter("example")
-        .ofType(typeBuilder.stringType().build())
+        .ofType(STRING_TYPE)
         .describedAs("An example about the content of this operation.");
   }
-
 }

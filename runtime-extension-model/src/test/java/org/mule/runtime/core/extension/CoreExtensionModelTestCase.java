@@ -24,6 +24,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
@@ -43,6 +44,7 @@ import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
@@ -53,6 +55,7 @@ import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -222,12 +225,9 @@ public class CoreExtensionModelTestCase {
     final SourceModel schedulerModel = coreExtensionModel.getSourceModel("scheduler").get();
     assertThat(schedulerModel.getStereotype(), is(SOURCE));
 
+    assertOutputTypes(schedulerModel, ANY_TYPE, ANY_TYPE);
     assertThat(schedulerModel.getErrorModels(), empty());
     assertThat(schedulerModel.hasResponse(), is(false));
-    assertThat(schedulerModel.getOutput().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(schedulerModel.getOutput().hasDynamicType(), is(false));
-    assertThat(schedulerModel.getOutputAttributes().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(schedulerModel.getOutputAttributes().hasDynamicType(), is(false));
 
     final List<ParameterModel> paramModels = schedulerModel.getAllParameterModels();
     assertThat(paramModels, hasSize(2));
@@ -412,6 +412,11 @@ public class CoreExtensionModelTestCase {
     assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().get(0), is(OBJECT_STORE));
   }
 
+  private void assertOutputTypes(HasOutputModel model, MetadataType payload, MetadataType attributes) {
+    assertThat(model.getOutput().getType(), equalTo(payload));
+    assertThat(model.getOutputAttributes().getType(), equalTo(attributes));
+  }
+
   @Test
   public void choice() {
     final ConstructModel choiceModel = coreExtensionModel.getConstructModel("choice").get();
@@ -441,7 +446,6 @@ public class CoreExtensionModelTestCase {
   @Test
   public void scatterGather() {
     final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
-
 
     assertThat(scatterGatherModel.getAllParameterModels(), hasSize(4));
 
@@ -563,9 +567,9 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void untilSuccessful() {
-    final ConstructModel tryModel = coreExtensionModel.getConstructModel("untilSuccessful").get();
+    final ConstructModel untilSuccessful = coreExtensionModel.getConstructModel("untilSuccessful").get();
 
-    List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
+    List<ParameterModel> allParameterModels = untilSuccessful.getAllParameterModels();
     assertThat(allParameterModels, hasSize(2));
 
     ParameterModel action = allParameterModels.get(0);
@@ -585,9 +589,9 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void firstSuccessful() {
-    final ConstructModel tryModel = coreExtensionModel.getConstructModel("firstSuccessful").get();
+    final ConstructModel firstSuccessful = coreExtensionModel.getConstructModel("firstSuccessful").get();
 
-    List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
+    List<ParameterModel> allParameterModels = firstSuccessful.getAllParameterModels();
     assertThat(allParameterModels, hasSize(0));
   }
 
