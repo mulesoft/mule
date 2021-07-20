@@ -194,19 +194,7 @@ public class MuleInvoker implements Invoker
     }
 
     protected Object extractPayload(Message cxfMessage)
-    {   
-        if (cxfMmessageProcessor.isProxy())
-        {
-            // First we have to verify if we have the resulting stream reader (in case the message
-            // has been intercepted and changed, we have no list but the actual XMLStreamReader)        
-            XMLStreamReader streamReader = cxfMessage.getContent(XMLStreamReader.class);
-            
-            if (streamReader != null)
-            {
-                return streamReader;
-            }
-        }
-        
+    {           
         List<Object> list = CastUtils.cast(cxfMessage.getContent(List.class));
         if (list == null)
         {
