@@ -110,7 +110,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     ProfilingDataProducer<TestProfilingEventContext> profilingDataProducer =
         profilingService.getProfilingDataProducer(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE);
     profilingDataProducer
-        .trigggerProfilingEvent(new TestProfilingEventContext());
+        .triggerProfilingEvent(new TestProfilingEventContext());
 
     verify(notificationManager).fireNotification(any(ProfilingNotification.class));
   }
@@ -172,7 +172,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Override
-    public void trigggerProfilingEvent(TestProfilingEventContext profilerEventContext) {
+    public void triggerProfilingEvent(TestProfilingEventContext profilerEventContext) {
       this.defaultProfilingService.notifyEvent(profilerEventContext, TestProfilingEventType.TEST_PROFILING_EVENT_TYPE);
     }
   }
