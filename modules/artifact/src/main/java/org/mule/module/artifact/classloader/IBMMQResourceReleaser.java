@@ -45,10 +45,10 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   private final static String INHERITABLE_THREADLOCALS_FIELD = "inheritableThreadLocals";
   private final static String THREADLOCAL_MAP_TABLE_CLASS = "java.lang.ThreadLocal$ThreadLocalMap";
   private final static String JUL_KNOWN_LEVEL_CLASS = "java.util.logging.Level$KnownLevel";
-  private final static String IBM_MQ_MBEAN_DOMAIN="IBM MQ";
-  private final static String IBM_MQ_WORK_QUEUE_MANAGER_CLASS ="com.ibm.msg.client.commonservices.workqueue.WorkQueueManager";
-  private final static String IBM_MQ_ENVIRONMENT_CLASS="com.ibm.mq.MQEnvironment";
-  private final static String IBM_MQ_COMMON_SERVICES_CLASS ="com.ibm.mq.internal.MQCommonServices";
+  private final static String IBM_MQ_MBEAN_DOMAIN = "IBM MQ";
+  private final static String IBM_MQ_WORK_QUEUE_MANAGER_CLASS = "com.ibm.msg.client.commonservices.workqueue.WorkQueueManager";
+  private final static String IBM_MQ_ENVIRONMENT_CLASS = "com.ibm.mq.MQEnvironment";
+  private final static String IBM_MQ_COMMON_SERVICES_CLASS = "com.ibm.mq.internal.MQCommonServices";
   private final ClassLoader driverClassLoader;
 
 
@@ -60,6 +60,8 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     cleanJULKnownLevels();
     cleanMQCommonServices();
     cleanMQEnvironment();
+    cleanJmsTls();
+    cleanTraceController();
     removeThreadLocals();
   }
 
@@ -227,26 +229,38 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
 
   /**
-   * Clears the JmsTls and TraceController static final references.
-   * @param c ClassLader to look for the classes definitions.
+   * Clears the JmsTls static final references.
    */
-  private void clearJmsTlsAndTraceController(ClassLoader c) {
+  private void cleanJmsTls() {
     /*
-    The JmsTls and the TraceController classes keep several references in private static final fields
+    The JmsTls class keep several references in a private static final field
     This references avoid the proper ClassLoader disposal.
      */
     try {
       //JmsTls
-      Class myClass = Class.forName("com.ibm.msg.client.jms.internal.JmsTls", false, c);
+      Class myClass = Class.forName("com.ibm.msg.client.jms.internal.JmsTls", false, driverClassLoader);
       clearPrivateStaticField(myClass, "myInstance", true);
-      //TraceController
-      myClass = Class.forName("com.ibm.msg.client.commonservices.trace.Trace", false, c);
-      clearPrivateStaticField(myClass, "traceController", false);
     } catch (Exception ex) {
-      LOGGER.warn("Caught Exception when clearing JmsTls and TraceController: {}", ex.getMessage(), ex);
+      LOGGER.warn("Caught Exception when clearing JmsTls: {}", ex.getMessage(), ex);
     }
   }
 
+  /**
+   * Clears the TraceController static final reference.
+   */
+  private void cleanTraceController() {
+    /*
+    The TraceController classes keep several references in private static final field
+    This references avoid the proper ClassLoader disposal.
+     */
+    try {
+      //TraceController
+      Class myClass = Class.forName("com.ibm.msg.client.commonservices.trace.Trace", false, driverClassLoader);
+      clearPrivateStaticField(myClass, "traceController", false);
+    } catch (Exception ex) {
+      LOGGER.warn("Caught Exception when clearing TraceController: {}", ex.getMessage(), ex);
+    }
+  }
 
 
   /**
@@ -328,9 +342,6 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
                 LOGGER.debug("ClassLoader: {}", this.getClass().getClassLoader().getClass().getName());
               }
               Object x = threadLocal.get();
-              if (nonNull(x) && x.getClass().getCanonicalName().startsWith("com.ibm")) {
-                clearJmsTlsAndTraceController(x.getClass().getClassLoader());
-              }
               if (nonNull(x)) {
                 if (LOGGER.isDebugEnabled()) {
                   LOGGER.debug("ThreadLocal ClassLoader: {}", x.getClass().getClassLoader());
