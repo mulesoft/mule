@@ -499,6 +499,7 @@ class ComponentConfigurationBuilder<T> {
     @Override
     public void onValueFromTextContent() {
       if (component != null && component.getParameter(SCRIPT_PARAMETER) != null) {
+        // TODO (MULE-19618) review the necessity for this (ee-transform extension model) + this entire class
         this.value = component.getParameter(SCRIPT_PARAMETER).getResolvedRawValue();
       } else {
         getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
