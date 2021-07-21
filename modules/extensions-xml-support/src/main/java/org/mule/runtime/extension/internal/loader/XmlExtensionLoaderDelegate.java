@@ -395,7 +395,12 @@ public final class XmlExtensionLoaderDelegate {
 
   private ComponentAst getModuleComponentModel(ArtifactAst moduleAst) {
     moduleAst.updatePropertiesResolver(getConfigurationPropertiesResolver(moduleAst));
-    return moduleAst.topLevelComponentsStream().findAny().get();
+    return moduleAst.topLevelComponentsStream()
+        .filter(c -> MODULE_IDENTIFIER.equals(c.getIdentifier()))
+        .findFirst()
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(
+            "The root element of a module must be '%s' but it wasn't found",
+            MODULE_IDENTIFIER.toString()))));
   }
 
   private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ArtifactAst ast) {
@@ -444,11 +449,6 @@ public final class XmlExtensionLoaderDelegate {
 
   private void loadModuleExtension(ExtensionDeclarer declarer, ArtifactAst moduleAst, boolean comesFromTNS) {
     ComponentAst moduleModel = getModuleComponentModel(moduleAst);
-    if (!moduleModel.getIdentifier().equals(MODULE_IDENTIFIER)) {
-      throw new MuleRuntimeException(createStaticMessage(format("The root element of a module must be '%s', but found '%s'",
-                                                                MODULE_IDENTIFIER.toString(),
-                                                                moduleModel.getIdentifier().toString())));
-    }
 
     final String name = getStringParameter(moduleModel, MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
@@ -695,7 +695,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private String getDescription(ComponentAst moduleModel) {
-    // TODO: Use metadata instead.
+    moduleModel.getMetadata().getDocAttributes().get(DOC_DESCRIPTION);
     return getStringParameter(moduleModel, DOC_DESCRIPTION).orElse("");
   }
 
