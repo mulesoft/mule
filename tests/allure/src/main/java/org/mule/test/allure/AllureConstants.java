@@ -861,4 +861,16 @@ public interface AllureConstants {
     }
 
   }
+
+  interface Profiling {
+
+    String PROFILING = "Profiling";
+
+
+    interface ProfilingServiceStory {
+
+      String DEFAULT_PROFILING_SERVICE = "Default Profiling Service";
+
+    }
+  }
 }
