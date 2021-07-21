@@ -10,7 +10,6 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BASE_TYPE_BUILDER;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
@@ -68,13 +67,14 @@ public class XmlSdk1ExtensionModelDeclarer {
             .setSchemaLocation(buildSchemaLocation("module", "http://www.mulesoft.org/schema/mule/module"))
             .build());
 
+    declareModuleConstruct(extensionDeclarer, typeBuilder);
     declarePropertyElement(extensionDeclarer, typeBuilder);
     declareOperation(typeBuilder, extensionDeclarer);
 
     return extensionDeclarer;
   }
 
-  private void declareModuleConstruct(ExtensionDeclarer extensionDeclarer) {
+  private void declareModuleConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
     ConstructDeclarer module = extensionDeclarer.withConstruct("module")
         .describedAs("A module is defined by three types of elements: properties, global elements and operations.")
         .allowingTopLevelDefinition();
@@ -88,7 +88,7 @@ public class XmlSdk1ExtensionModelDeclarer {
 
     params.withOptionalParameter("category")
         .describedAs("Set of defined categories for a module.")
-        .ofType(BASE_TYPE_BUILDER.stringType().enumOf("COMMUNITY", "SELECT", "PREMIUM", "CERTIFIED").build())
+        .ofType(typeBuilder.stringType().enumOf("COMMUNITY", "SELECT", "PREMIUM", "CERTIFIED").build())
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("COMMUNITY");
 
@@ -122,9 +122,6 @@ public class XmlSdk1ExtensionModelDeclarer {
             "the end if they are present and hyphenizing the resulting name.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
-
-
-
   }
 
   private void declareOperation(BaseTypeBuilder typeBuilder, ExtensionDeclarer extensionDeclarer) {
@@ -186,8 +183,6 @@ public class XmlSdk1ExtensionModelDeclarer {
         .withOptionalParameter("tab")
         .defaultingTo(Placement.DEFAULT_TAB)
         .ofType(STRING_TYPE);
-
-
 
     configureTypeParameter(operationDeclaration.withOptionalComponent("output")
         .describedAs("Defines the output of the operation if exists, void otherwise.")
