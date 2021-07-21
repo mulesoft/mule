@@ -17,6 +17,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -49,6 +50,9 @@ public abstract class AbstractErrorTypesValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
 
   protected static boolean errorMappingPresent(ComponentAst operationComponent) {
+    if (!operationComponent.getModel(ParameterizedModel.class).isPresent()) {
+      return false;
+    }
     final ComponentParameterAst errorMappingsAst = operationComponent.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
     return errorMappingsAst != null && errorMappingsAst.getValue().getValue().isPresent();
   }
