@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal;
 
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
@@ -121,20 +119,19 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
     return finalBuilder;
   }
 
-  private boolean hasErrorMappingsGroup() {
-    return componentModel.getParameterGroupModels()
-        .stream()
-        .anyMatch(pg -> pg.getName().equals(ERROR_MAPPINGS));
+  protected boolean hasErrorMappingsGroup() {
+    return false;
   }
 
-  private boolean hasOutputGroup() {
-    return componentModel.getParameterGroupModels()
-        .stream()
-        .anyMatch(pg -> pg.getName().equals(OUTPUT));
+  protected boolean hasOutputGroup() {
+    return false;
   }
 
   protected abstract Class<? extends ComponentMessageProcessor> getMessageProcessorType();
 
   protected abstract Class<? extends ComponentMessageProcessorObjectFactory> getMessageProcessorFactoryType();
 
+  public final T getComponentModel() {
+    return componentModel;
+  }
 }
