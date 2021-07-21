@@ -88,10 +88,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   public static final String WATERMARK_RETURNED_MESSAGE =
       "Watermark with key:[{}] and value:[{}] returned from the ObjectStore for flow:[{}]";
   public static final String WATERMARK_NOT_RETURNED_MESSAGE =
-      "Watermark with key:[{}] does not exist on the ObjectStore for flow:[{}]";
+      "Watermark with key:[{}] not found on the ObjectStore for flow:[{}]";
   public static final String WATERMARK_REMOVED_MESSAGE = "Watermark with key:[{}] removed from the ObjectStore for flow:[{}]";
   public static final String WATERMARK_COMPARISON_MESSAGE =
-      "Watermark comparison of {}:[{}] with {}:[{}] gives result:[{}] for flow:[{}]";
+      "Watermark comparison of {}:[{}] with {}:[{}] for flow:[{}] returns:[{}]";
 
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
@@ -248,7 +248,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       }
     }
     int result = comparator.compare(w1, w2);
-    LOGGER.trace(WATERMARK_COMPARISON_MESSAGE, w1Label, w1, w2Label, w2, result, flowName);
+    LOGGER.trace(WATERMARK_COMPARISON_MESSAGE, w1Label, w1, w2Label, w2, flowName, result);
     return result;
   }
 
