@@ -342,13 +342,7 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> doResolveParameter(createBeanDefinitionRequest.getParameter(parameterName)))
-          .orElseGet(() -> {
-            if (!ownerComponent.getModel(Object.class).isPresent()) {
-              return ownerComponent.getParameter(parameterName);
-            } else {
-              return null;
-            }
-          });
+          .orElse(null);
 
       Object parameterValue;
       if (parameter == null) {
