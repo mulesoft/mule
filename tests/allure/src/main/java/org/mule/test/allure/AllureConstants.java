@@ -862,7 +862,6 @@ public interface AllureConstants {
 
   }
 
-<<<<<<< HEAD
   interface Profiling {
 
     String PROFILING = "Profiling";
