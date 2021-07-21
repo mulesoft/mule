@@ -104,7 +104,6 @@ import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -359,7 +358,7 @@ public final class XmlExtensionLoaderDelegate {
    * simpler {@link ExtensionModel} if there are references to the TNS prefix defined by the {@link #XMLNS_TNS}.
    *
    * @param resource             <module/>'s resource
-   * @param extensionModelHelper with the complete list of extensions the current module depends on
+   * @param extensionModels models for the extensions in context
    * @return an {@link ExtensionModel} if there's a {@link #XMLNS_TNS} defined, {@link Optional#empty()} otherwise
    * @throws IOException if it fails reading the resource
    */
@@ -439,8 +438,8 @@ public final class XmlExtensionLoaderDelegate {
     }));
   }
 
-  private static Optional<String> getRawParameterValue(ComponentAst componentAst, String parameterName) {
-    return ofNullable(componentAst.getParameter(parameterName)).map(ComponentParameterAst::getResolvedRawValue);
+  private static Optional<String> getStringParameter(ComponentAst componentAst, String parameterName) {
+    return ofNullable(componentAst.getParameter(parameterName)).map(c -> (String) c.getValue().getRight());
   }
 
   private void loadModuleExtension(ExtensionDeclarer declarer, ArtifactAst moduleAst, boolean comesFromTNS) {
@@ -451,10 +450,10 @@ public final class XmlExtensionLoaderDelegate {
                                                                 moduleModel.getIdentifier().toString())));
     }
 
-    final String name = getRawParameterValue(moduleModel, MODULE_NAME).orElse(null);
+    final String name = getStringParameter(moduleModel, MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
-    final String category = getRawParameterValue(moduleModel, CATEGORY).orElse("COMMUNITY");
-    final String vendor = getRawParameterValue(moduleModel, VENDOR).orElse("MuleSoft");
+    final String category = getStringParameter(moduleModel, CATEGORY).orElse("COMMUNITY");
+    final String vendor = getStringParameter(moduleModel, VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
         ? getTnsXmlDslModel(moduleAst, version)
         : getXmlDslModel(moduleAst, name, version);
@@ -697,7 +696,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private String getDescription(ComponentAst moduleModel) {
     // TODO: Use metadata instead.
-    return getRawParameterValue(moduleModel, DOC_DESCRIPTION).orElse("");
+    return getStringParameter(moduleModel, DOC_DESCRIPTION).orElse("");
   }
 
   private List<ComponentAst> extractGlobalElementsFrom(ComponentAst moduleModel) {
@@ -811,7 +810,7 @@ public final class XmlExtensionLoaderDelegate {
                                                                 List<ComponentAst> globalElementsComponentModel) {
     final List<ComponentAst> markedAsTestConnectionGlobalElements =
         globalElementsComponentModel.stream()
-            .filter(globalElementComponentModel -> getRawParameterValue(globalElementComponentModel,
+            .filter(globalElementComponentModel -> getStringParameter(globalElementComponentModel,
                                                                         MODULE_CONNECTION_MARKER_ATTRIBUTE)
                                                                             .map(Boolean::parseBoolean).orElse(false))
             .collect(toList());
@@ -1071,7 +1070,7 @@ public final class XmlExtensionLoaderDelegate {
       // if tye element is absent, it will default to the VOID type
       if (outputAttributesComponentModel.isPresent()) {
         String receivedOutputAttributeType =
-            getRawParameterValue(outputAttributesComponentModel.get(), TYPE_ATTRIBUTE).orElse(null);
+            getStringParameter(outputAttributesComponentModel.get(), TYPE_ATTRIBUTE).orElse(null);
         metadataType = extractType(receivedOutputAttributeType);
       } else {
         metadataType = BaseTypeBuilder.create(JAVA).voidType().build();
