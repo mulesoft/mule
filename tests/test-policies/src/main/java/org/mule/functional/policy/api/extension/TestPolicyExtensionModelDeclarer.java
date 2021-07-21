@@ -14,8 +14,6 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -32,8 +30,6 @@ import org.mule.runtime.module.extension.api.loader.java.property.CustomLocation
 class TestPolicyExtensionModelDeclarer {
 
   public ExtensionDeclarer createExtensionModel() {
-    final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
-
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named(TEST_POLICY_PREFIX)
         .describedAs("Mule Runtime and Integration Platform: test Policy components")
@@ -49,13 +45,13 @@ class TestPolicyExtensionModelDeclarer {
             .setSchemaLocation(buildSchemaLocation(TEST_POLICY_PREFIX, TEST_POLICY_NAMESPACE))
             .build());
 
-    declareProxy(typeBuilder, extensionDeclarer);
+    declareProxy(extensionDeclarer);
     declareExecuteNext(extensionDeclarer);
 
     return extensionDeclarer;
   }
 
-  private void declareProxy(final BaseTypeBuilder typeBuilder, ExtensionDeclarer extensionDeclarer) {
+  private void declareProxy(ExtensionDeclarer extensionDeclarer) {
     final ConstructDeclarer proxyDeclarer = extensionDeclarer.withConstruct("proxy")
         .allowingTopLevelDefinition();
 
@@ -67,13 +63,17 @@ class TestPolicyExtensionModelDeclarer {
         .ofType(STRING_TYPE);
 
     proxyDeclarer
-        .withChain("source")
-        .setRequired(false)
-        .withModelProperty(new CustomLocationPartModelProperty("source", false));
+        .withRoute("source")
+        .withMinOccurs(0)
+        .withModelProperty(new CustomLocationPartModelProperty("source", false))
+        .withChain();
 
     proxyDeclarer
-        .withChain("operation")
-        .withModelProperty(new CustomLocationPartModelProperty("operation", false));
+        .withRoute("operation")
+        .withMinOccurs(1)
+        .withMaxOccurs(1)
+        .withModelProperty(new CustomLocationPartModelProperty("operation", false))
+        .withChain();
   }
 
   private void declareExecuteNext(ExtensionDeclarer extensionDeclarer) {
