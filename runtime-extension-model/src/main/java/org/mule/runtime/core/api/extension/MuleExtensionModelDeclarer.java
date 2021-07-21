@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.extension;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -81,9 +82,11 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -111,12 +114,15 @@ import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTy
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
+import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.reflect.TypeToken;
+
+import java.util.Map;
 
 /**
  * An {@link ExtensionDeclarer} for Mule's Core Runtime
@@ -237,6 +243,13 @@ class MuleExtensionModelDeclarer {
 
     object.onDefaultParameterGroup()
         .withExclusiveOptionals(ImmutableSet.of("ref", "class"), true);
+
+    object.onDefaultParameterGroup().withOptionalParameter("property")
+        .ofType(BaseTypeBuilder.create(JAVA).objectType()
+            .with(new ClassInformationAnnotation(Map.class, asList(String.class, String.class))).openWith(STRING_TYPE)
+            .build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true).build())
+        .withModelProperty(new NoWrapperModelProperty());
   }
 
   private void declareExportedTypes(ExtensionDeclarer extensionDeclarer) {

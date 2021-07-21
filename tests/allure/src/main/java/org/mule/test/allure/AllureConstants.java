@@ -870,7 +870,16 @@ public interface AllureConstants {
     interface ProfilingServiceStory {
 
       String DEFAULT_PROFILING_SERVICE = "Default Profiling Service";
+    }
+  }
 
+  interface ObjectTag {
+
+    String OBJECT_TAG_FEATURE = "Object";
+
+    interface ObjectPropertiesStory {
+
+      String OBJECT_PROPERTIES = "Object properties";
     }
   }
 }

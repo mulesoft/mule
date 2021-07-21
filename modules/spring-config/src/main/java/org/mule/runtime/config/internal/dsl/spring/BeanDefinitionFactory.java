@@ -650,15 +650,13 @@ public class BeanDefinitionFactory {
   private BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> buildComponentProcessorChainOfResponsability() {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
-    PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
     SimpleTypeBeanComponentDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanComponentDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     CommonComponentBeanDefinitionCreator commonComponentModelProcessor =
         new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository);
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
-    objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);
-    propertiesMapBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
+    objectBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
     simpleTypeBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);
     mapEntryBeanDefinitionCreator.setNext(commonComponentModelProcessor);
 
