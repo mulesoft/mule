@@ -8,6 +8,7 @@ package org.mule.runtime.extension.api.extension;
 
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.meta.Category.SELECT;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
@@ -66,10 +67,61 @@ public class XmlSdk1ExtensionModelDeclarer {
             .setSchemaLocation(buildSchemaLocation("module", "http://www.mulesoft.org/schema/mule/module"))
             .build());
 
+    declareModuleConstruct(extensionDeclarer, typeBuilder);
     declarePropertyElement(extensionDeclarer, typeBuilder);
     declareOperation(typeBuilder, extensionDeclarer);
 
     return extensionDeclarer;
+  }
+
+  private void declareModuleConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
+    ConstructDeclarer module = extensionDeclarer.withConstruct("module")
+        .describedAs("A module is defined by three types of elements: properties, global elements and operations.")
+        .allowingTopLevelDefinition();
+
+    final ParameterGroupDeclarer params = module.onDefaultParameterGroup();
+    params.withRequiredParameter("name")
+        .describedAs("Name of the module that identifies it.")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .asComponentId();
+
+    params.withOptionalParameter("category")
+        .describedAs("Set of defined categories for a module.")
+        .ofType(typeBuilder.stringType().enumOf("COMMUNITY", "SELECT", "PREMIUM", "CERTIFIED").build())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo("COMMUNITY");
+
+    params.withOptionalParameter("vendor")
+        .describedAs("Expected vendor of the module.")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo("MuleSoft");
+
+    params.withOptionalParameter("requiredEntitlement")
+        .describedAs("The required entitlement in the customer module license.")
+        .ofType(BOOLEAN_TYPE)
+        .defaultingTo(false)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    params.withOptionalParameter("allowsEvaluationLicense")
+        .describedAs("If the module can be run with an evaluation license.")
+        .ofType(BOOLEAN_TYPE)
+        .defaultingTo(true)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    params.withOptionalParameter("namespace")
+        .describedAs("Expected namespace of the module to look for when generating the schemas. If left empty it will " +
+            "default to http://www.mulesoft.org/schema/mule/[prefix], where [prefix] is the attribute prefix attribute value.")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    params.withOptionalParameter("prefix")
+        .describedAs("Expected prefix of the module to look for when generating the schemas. If left empty it will create a " +
+            "default one based on the extension's name, removing the words \"extension\", \"module\" or \"connector\" at " +
+            "the end if they are present and hyphenizing the resulting name.")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
   }
 
   private void declareOperation(BaseTypeBuilder typeBuilder, ExtensionDeclarer extensionDeclarer) {
@@ -132,8 +184,6 @@ public class XmlSdk1ExtensionModelDeclarer {
         .defaultingTo(Placement.DEFAULT_TAB)
         .ofType(STRING_TYPE);
 
-
-
     configureTypeParameter(operationDeclaration.withOptionalComponent("output")
         .describedAs("Defines the output of the operation if exists, void otherwise.")
         .withStereotype(OUTPUT_STEREOTYPE)
@@ -175,6 +225,11 @@ public class XmlSdk1ExtensionModelDeclarer {
 
   private void declarePropertyElement(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
     final ConstructDeclarer propertyDeclaration = extensionDeclarer.withConstruct("property")
+        .describedAs("A property element defines an input value for the operation in which it is define. Such property must be " +
+            "defined with a meaningful name, a type which defines the kind of content the property must have and optionally a " +
+            "default value that will be used if the invocation to the operation does not defines a value for the property. " +
+            "The property can be accessed within the body definition of the operation using an expression such as " +
+            "#[property.paramName]")
         .allowingTopLevelDefinition();
 
     final ParameterGroupDeclarer propertyDeclarationDefaultParamGroup = propertyDeclaration.onDefaultParameterGroup();

@@ -1152,7 +1152,9 @@
   "modelProperties": {
     "org.mule.runtime.extension.api.property.XmlExtensionModelProperty": {
       "namespacesDependencies": [
-        "http://www.w3.org/2001/XMLSchema-instance",
+        "http://www.mulesoft.org/schema/mule/petstore",
+        "http://www.mulesoft.org/schema/mule/marvel",
+        "http://www.mulesoft.org/schema/mule/module",
         "http://www.mulesoft.org/schema/mule/core"
       ]
     }
