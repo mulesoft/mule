@@ -96,7 +96,7 @@ public class XmlSdk1ExtensionModelDeclarer {
         .describedAs("Expected vendor of the module.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
-        .defaultingTo("Mulesoft");
+        .defaultingTo("MuleSoft");
 
     params.withOptionalParameter("requiredEntitlement")
         .describedAs("The required entitlement in the customer module license.")
