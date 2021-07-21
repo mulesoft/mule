@@ -225,6 +225,11 @@ public class XmlSdk1ExtensionModelDeclarer {
 
   private void declarePropertyElement(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
     final ConstructDeclarer propertyDeclaration = extensionDeclarer.withConstruct("property")
+        .describedAs("A property element defines an input value for the operation in which it is define. Such property must be " +
+            "defined with a meaningful name, a type which defines the kind of content the property must have and optionally a " +
+            "default value that will be used if the invocation to the operation does not defines a value for the property. " +
+            "The property can be accessed within the body definition of the operation using an expression such as " +
+            "#[property.paramName]")
         .allowingTopLevelDefinition();
 
     final ParameterGroupDeclarer propertyDeclarationDefaultParamGroup = propertyDeclaration.onDefaultParameterGroup();

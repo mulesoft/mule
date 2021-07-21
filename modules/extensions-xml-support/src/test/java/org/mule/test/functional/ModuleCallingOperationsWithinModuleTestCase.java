@@ -41,8 +41,8 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractCeXmlEx
 
   @Parameterized.Parameters(name = "{index}: Running tests for {0} (validating XML [{2}])")
   public static Collection<Object[]> data() {
-    return asList(getSimpleScenario(false),
-                  getSimpleScenario(true),
+    return asList(//getSimpleScenario(false),
+//                  getSimpleScenario(true),
                   getNestedModulesScenario(false),
                   getNestedModulesScenario(true));
   }
