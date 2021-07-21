@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
+import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -98,6 +99,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
   private final ResourceReleaser classLoaderReferenceReleaser;
   private volatile boolean shouldReleaseJdbcReferences = false;
+  private volatile boolean shouldReleaseIbmMQResources = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
   private final ResourceReleaser scalaClassValueReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
@@ -260,6 +262,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
         !(clazz.equals(Driver.class) || clazz.isInterface() || isAbstract(clazz.getModifiers()))) {
       shouldReleaseJdbcReferences = true;
     }
+    if (!shouldReleaseIbmMQResources && name.startsWith("com.ibm.mq")) {
+      shouldReleaseIbmMQResources = true;
+    }
     return clazz;
   }
 
@@ -306,6 +311,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     } catch (Exception e) {
       reportPossibleLeak(e, artifactId);
     }
+
+    if (shouldReleaseIbmMQResources) {
+      new IBMMQResourceReleaser(this).release();
+    }
+
     super.dispose();
     shutdownListeners();
   }
