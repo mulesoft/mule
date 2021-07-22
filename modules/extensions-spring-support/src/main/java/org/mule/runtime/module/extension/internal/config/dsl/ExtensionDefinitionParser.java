@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -269,7 +270,7 @@ public abstract class ExtensionDefinitionParser {
             if (!paramDsl.supportsTopLevelDeclaration() && paramDsl.supportsChildDeclaration()) {
               parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
             }
-            parseObjectParameter(parameter, paramDsl);
+            parseAstParameter(parameter, paramDsl);
           } else {
             parseObject(parameter.getName(), parameter.getName(), objectType, parameter.getDefaultValue(),
                         parameter.getExpressionSupport(), parameter.isRequired(), acceptsReferences(parameter),
@@ -310,7 +311,7 @@ public abstract class ExtensionDefinitionParser {
 
         private boolean parseAsContent(MetadataType type) {
           if (isContent) {
-            parseObjectParameter(parameter, paramDsl);
+            parseAstParameter(parameter, paramDsl);
             return true;
           }
 
@@ -554,25 +555,6 @@ public abstract class ExtensionDefinitionParser {
                                    .orElse(emptyList()),
                                isContent);
 
-
-          // parseAttributeParameter(fieldName, fieldName, type, defaultValue, expressionSupport, false, emptySet(),
-          // objectField.getAnnotation(StereotypeTypeAnnotation.class)
-          // .map(StereotypeTypeAnnotation::getAllowedStereotypes)
-          // .orElse(emptyList()));
-
-          // addDefinition(definitionBuilder
-          // .withIdentifier(fieldDsl.get().getElementName())
-          // .withTypeDefinition(fromType(String.class))
-          // .withTypeConverter(value -> valueResolverFactory.of(fieldName, type, value, defaultValue,
-          // expressionSupport, false, emptySet(),
-          // false, isContent))
-          // .build());
-
-          // parseFromTextExpression(fieldName, fieldDsl.get(),
-          // () -> value -> valueResolverFactory.of(fieldName, type, value, defaultValue,
-          // expressionSupport, false, emptySet(),
-          // false, isContent));
-
           return true;
         }
 
@@ -682,7 +664,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   protected ClassLoader getContextClassLoader() {
-    return Thread.currentThread().getContextClassLoader();
+    return currentThread().getContextClassLoader();
   }
 
   protected void parseFromTextExpression(ParameterModel parameter, DslElementSyntax dsl, Supplier<TypeConverter> typeConverter) {
@@ -691,7 +673,6 @@ public abstract class ExtensionDefinitionParser {
 
   protected void parseFromTextExpression(String key, DslElementSyntax paramDsl, Supplier<TypeConverter> typeConverter) {
     addParameter(getChildKey(key), AttributeDefinition.Builder.fromSimpleParameter(key, typeConverter.get()));
-    // addParameter(getChildKey(key), fromChildConfiguration(String.class).withWrapperIdentifier(paramDsl.getElementName()));
 
     addDefinition(definitionBuilder
         .withIdentifier(paramDsl.getElementName())
@@ -788,7 +769,7 @@ public abstract class ExtensionDefinitionParser {
    *
    * @param parameterModel a {@link ParameterModel}
    */
-  protected void parseObjectParameter(ParameterModel parameterModel, DslElementSyntax paramDsl) {
+  protected void parseAstParameter(ParameterModel parameterModel, DslElementSyntax paramDsl) {
     if (isContent(parameterModel)) {
       parseFromTextExpression(parameterModel, paramDsl,
                               () -> value -> valueResolverFactory.of(parameterModel.getName(),

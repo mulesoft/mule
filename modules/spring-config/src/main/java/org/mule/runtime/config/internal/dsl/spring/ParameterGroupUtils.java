@@ -40,7 +40,7 @@ public final class ParameterGroupUtils {
     Optional<ParameterGroupModel> groupModelOptional =
         getParameterGroupModel(ownerComponent, parameterName, possibleGroup, getSourceParamGroups(ownerComponentModel));
 
-    if (!groupModelOptional.isPresent()) { //
+    if (!groupModelOptional.isPresent()) {
       return null;
     }
 

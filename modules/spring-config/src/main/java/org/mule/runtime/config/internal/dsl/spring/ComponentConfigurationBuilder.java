@@ -21,7 +21,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQ
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -335,7 +334,7 @@ class ComponentConfigurationBuilder<T> {
       if (!createBeanDefinitionRequest.getComponentBuildingDefinition().getIgnoredConfigurationParameters()
           .contains(parameterName)) {
         getParameterValue(parameterName, defaultValue)
-            .map(parameterValue -> typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue) //
+            .map(parameterValue -> typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue)
             .ifPresent(convertedParameterValue -> this.value = convertedParameterValue);
       }
     }

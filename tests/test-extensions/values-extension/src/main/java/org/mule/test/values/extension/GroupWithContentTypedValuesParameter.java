@@ -20,7 +20,4 @@ public class GroupWithContentTypedValuesParameter {
     return typedBody;
   }
 
-  public GroupWithContentTypedValuesParameter() {
-    System.out.println("");
-  }
 }
