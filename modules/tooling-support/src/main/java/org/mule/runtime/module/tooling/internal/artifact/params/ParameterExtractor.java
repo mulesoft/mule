@@ -39,8 +39,15 @@ public class ParameterExtractor implements ParameterValueVisitor {
 
   private static final DataType DW_DATA_TYPE = DataType.builder().mediaType("application/dw").build();
 
-  public static TypedValue<?> extractValue(ParameterValue parameterValue, MetadataType expectedType) {
-    String dataWeaveValue = extractAsDataWeave(parameterValue, expectedType);
+  public static TypedValue<String> asDataWeaveExpression(ParameterValue parameterValue) {
+    return asTypedValue(extractAsDataWeave(parameterValue, null));
+  }
+
+  public static TypedValue<String> asDataWeaveExpression(ParameterValue parameterValue, MetadataType expectedType) {
+    return asTypedValue(extractAsDataWeave(parameterValue, expectedType));
+  }
+
+  private static TypedValue<String> asTypedValue(String dataWeaveValue) {
     if (isExpression(dataWeaveValue)) {
       String expression = dataWeaveValue;
       dataWeaveValue = extractExpression(dataWeaveValue)
