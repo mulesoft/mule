@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
-
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -39,9 +36,7 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
 
   @Override
   protected boolean hasErrorMappingsGroup() {
-    return getComponentModel().getParameterGroupModels()
-        .stream()
-        .anyMatch(pg -> pg.getName().equals(ERROR_MAPPINGS));
+    return !getComponentModel().getErrorModels().isEmpty();
   }
 
   @Override
@@ -55,9 +50,7 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
       }
     });
 
-    return !isVoid.get() && getComponentModel().getParameterGroupModels()
-        .stream()
-        .anyMatch(pg -> pg.getName().equals(OUTPUT));
+    return !isVoid.get();
   }
 
   @Override
