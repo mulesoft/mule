@@ -46,9 +46,16 @@ public final class ParameterGroupUtils {
 
     ComponentParameterAst parameter = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
 
-    if (parameter == null) {
-      return ownerComponent.getParameter(parameterName);
-    }
+    // if (parameter == null) {
+    // return ownerComponent.getParameter(parameterName);
+    // }
+
+    // if(parameter == null) {
+    // return resolveParameter(getParameterGroupModel(ownerComponent, parameterName,
+    // possibleGroup,
+    // ownerComponentModel.getParameterGroupModels()),
+    // parameterName);
+    // }
 
     return parameter;
 
@@ -66,7 +73,7 @@ public final class ParameterGroupUtils {
         .findFirst();
   }
 
-  private List<ParameterGroupModel> getSourceParamGroups(SourceModel ownerComponentModel) {
+  public List<ParameterGroupModel> getSourceParamGroups(SourceModel ownerComponentModel) {
     List<ParameterGroupModel> sourceParamGroups = new ArrayList<>(ownerComponentModel.getParameterGroupModels());
 
     ownerComponentModel.getSuccessCallback()

@@ -518,19 +518,16 @@ public class BeanDefinitionFactory {
               .name(groupSyntax.getElementName())
               .build();
 
-          Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-              componentBuildingDefinitionRegistry.getBuildingDefinition(paramGroupComponentIdentifier);
-          if (buildingDefinitionOptional.isPresent()) {
-            final CreateDslParamGroupBeanDefinitionRequest request =
-                new CreateDslParamGroupBeanDefinitionRequest(componentHierarchy, paramsModels, paramOwnerComponentModel,
-                                                             buildingDefinitionOptional.orElse(null),
-                                                             paramGroupComponentIdentifier);
+          return componentBuildingDefinitionRegistry.getBuildingDefinition(paramGroupComponentIdentifier)
+              .map(buildingDefinition -> {
+                final CreateDslParamGroupBeanDefinitionRequest request =
+                    new CreateDslParamGroupBeanDefinitionRequest(paramGroupModel, componentHierarchy, paramsModels,
+                                                                 paramOwnerComponentModel, buildingDefinition,
+                                                                 paramGroupComponentIdentifier);
 
-            this.dslParamGroupProcessor.processRequest(springComponentModels, request);
-            return of(request.getSpringComponentModel());
-          } else {
-            return empty();
-          }
+                this.dslParamGroupProcessor.processRequest(springComponentModels, request);
+                return request.getSpringComponentModel();
+              });
         });
   }
 
