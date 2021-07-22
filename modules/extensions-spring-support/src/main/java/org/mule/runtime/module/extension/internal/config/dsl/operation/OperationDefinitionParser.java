@@ -6,14 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
+import org.mule.metadata.api.model.VoidType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.module.extension.internal.AbstractComponentDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link OperationMessageProcessor} instances through a
@@ -28,6 +33,25 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
                                    DslSyntaxResolver dslSyntaxResolver,
                                    ExtensionParsingContext parsingContext) {
     super(definition, extensionModel, operationModel, dslSyntaxResolver, parsingContext);
+  }
+
+  @Override
+  protected boolean hasErrorMappingsGroup() {
+    return !getComponentModel().getModelProperty(NoErrorMappingModelProperty.class).isPresent();
+  }
+
+  @Override
+  protected boolean hasOutputGroup() {
+    AtomicBoolean isVoid = new AtomicBoolean();
+    getComponentModel().getOutput().getType().accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitVoid(VoidType voidType) {
+        isVoid.set(true);
+      }
+    });
+
+    return !isVoid.get();
   }
 
   @Override
