@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
+import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
@@ -498,9 +499,13 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onValueFromTextContent() {
-      if (component != null && component.getParameter(SCRIPT_PARAMETER) != null) {
-        // TODO (MULE-19618) review the necessity for this (ee-transform extension model) + this entire class
-        this.value = component.getParameter(SCRIPT_PARAMETER).getResolvedRawValue();
+      if (component != null) {
+        if (component.getParameter(SCRIPT_PARAMETER) != null) {
+          // TODO (MULE-19618) review the necessity for this (ee-transform extension model) + this entire class
+          this.value = component.getParameter(SCRIPT_PARAMETER).getResolvedRawValue();
+        } else {
+          this.value = component.getParameter(BODY_RAW_PARAM_NAME).getResolvedRawValue();
+        }
       } else {
         getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
             .ifPresent(v -> this.value = v);
