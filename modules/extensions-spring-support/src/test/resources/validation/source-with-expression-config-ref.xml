@@ -12,18 +12,17 @@
                        dateOfBirth="1959-09-07T00:00:00"
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="0"
-                       recipe="recipes"
                        initialHealth="CANCER"
-                       finalHealth="CANCER"
-                       monthlyIncomes="monthlyIncomes"
-                       candidateDoors="candidateDoors"
-                       enemies="#[mel:[]]">
+                       finalHealth="CANCER">
+        <heisenberg:enemies/>
+		<heisenberg:monthly-incomes />
+        <heisenberg:known-addresses />
     </heisenberg:config>
 
     <flow name="source" initialState="stopped">
-        <heisenberg:listen-payments initialBatchNumber="0" config-ref="#[mel:dynamic]" />
+        <heisenberg:listen-payments initialBatchNumber="0" config-ref="#[dynamic]" />
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
     </flow>
 
 </mule>

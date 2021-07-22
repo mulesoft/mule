@@ -69,20 +69,20 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   }
 
   @Test
+  // TODO MULE-19350 Update this test
   public void operationWithExpressionConfigReference() throws Exception {
-    expectedException.expect(ConfigurationException.class);
+    expectedException.expect(InitialisationException.class);
     expectedException
-        .expectMessage("[validation/operation-with-expression-config-ref.xml:19]: "
-            + "Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
+        .expectMessage("Cannot resolve reference to bean '#[dynamic]' while setting bean property 'parameters' with key [config-ref]; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No bean named '#[dynamic]' available");
     loadConfiguration("validation/operation-with-expression-config-ref.xml");
   }
 
   @Test
+  // TODO MULE-19350 Update this test
   public void sourceWithExpressionConfigReference() throws Exception {
-    expectedException.expect(ConfigurationException.class);
+    expectedException.expect(InitialisationException.class);
     expectedException
-        .expectMessage("[validation/source-with-expression-config-ref.xml:20]: "
-            + "Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
+        .expectMessage("Cannot resolve reference to bean '#[dynamic]' while setting bean property 'parameters' with key [config-ref]; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No bean named '#[dynamic]' available");
     loadConfiguration("validation/source-with-expression-config-ref.xml");
   }
 
