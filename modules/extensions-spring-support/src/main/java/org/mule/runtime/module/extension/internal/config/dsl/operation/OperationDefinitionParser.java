@@ -36,7 +36,7 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
 
   @Override
   protected boolean hasErrorMappingsGroup() {
-    return !getComponentModel().getErrorModels().isEmpty();
+    return true;
   }
 
   @Override
