@@ -19,10 +19,6 @@
                        monthlyIncomes="monthlyIncomes"
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors">
-        <heisenberg:enemies>
-            <heisenberg:enemy value="Gustavo Fring"/>
-            <heisenberg:enemy value="Hank"/>
-        </heisenberg:enemies>
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
             <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
@@ -45,10 +41,6 @@
                        monthlyIncomes="monthlyIncomes"
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors">
-        <heisenberg:enemies>
-            <heisenberg:enemy value="Gustavo Fring"/>
-            <heisenberg:enemy value="Hank"/>
-        </heisenberg:enemies>
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
             <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
