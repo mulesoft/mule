@@ -375,7 +375,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void reallyDoStart() throws MuleException {
-    LOGGER.debug("Message source '{}' on flow '{}' is being started", sourceModel.getName(),
+    LOGGER.debug("Message source '{}' on flow '{}' is starting", sourceModel.getName(),
                  getLocation().getRootContainerName());
     lifecycle(() -> lifecycleManager.fireStartPhase((phase, o) -> {
       startIfNeeded(retryPolicyTemplate);
@@ -393,7 +393,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doStop() throws MuleException {
-    LOGGER.debug("Message source '{}' on flow '{}' is being stopped", sourceModel.getName(),
+    LOGGER.debug("Message source '{}' on flow '{}' is stopping", sourceModel.getName(),
                  getLocation().getRootContainerName());
     safeLifecycle(() -> lifecycleManager.fireStopPhase((phase, o) -> {
       synchronized (started) {
@@ -629,11 +629,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         boolean isPrimaryPollingInstance = clusterService.isPrimaryPollingInstance();
         if (primaryNodeOnly) {
           LOGGER
-              .debug("Message source '{}' on flow '{}' is being initialised, it is running on the primary node and it must only run on this node.",
+              .debug("Message source '{}' on flow '{}' running on the primary node is initializing. Note that this Message source must run on the primary node only.",
                      sourceModel.getName(), getLocation().getRootContainerName());
         } else {
           LOGGER
-              .debug("Message source '{}' on flow '{}' is being initialised, there are no cluster restrictions regarding which node must run the source. This node {} the primary node.",
+              .debug("Message source '{}' on flow '{}' is initializing. This {} the primary node of the cluster.",
                      sourceModel.getName(), getLocation().getRootContainerName(), isPrimaryPollingInstance ? "is" : "is not");
         }
       }
@@ -641,10 +641,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       reallyDoInitialise();
     } else {
       LOGGER
-          .debug("Message source '{}' on flow '{}' is not being initialised because it should only run on the primary node of the cluster.",
+          .debug("Message source '{}' on flow '{}' cannot initialize. This Message source can only run on the primary node of the cluster",
                  sourceModel.getName(), getLocation().getRootContainerName());
       new PrimaryNodeLifecycleNotificationListener(() -> {
-        LOGGER.debug("Message source '{}' on flow '{}' is being initialised because it became the primary node of the cluster.",
+        LOGGER.debug("Message source '{}' on flow '{}' is initializing because the node became cluster's primary.",
                      sourceModel.getName(), getLocation().getRootContainerName());
         reallyDoInitialise();
         reallyDoStart();
