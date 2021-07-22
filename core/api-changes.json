@@ -237,6 +237,33 @@
           "methodName": "isPayloadStatisticsEnabled",
           "elementKind": "method",
           "justification": "EE-7419: Needed to verify if payload stats are enabled"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.reflect.Field org.mule.runtime.core.api.util.ClassUtils::getField(java.lang.Class<?>, java.lang.String, boolean) throws java.lang.NoSuchFieldException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "ClassUtils",
+          "methodName": "getField",
+          "elementKind": "method",
+          "justification": "MULE-19620: Perform IBM MQ Classes cleanup in order to avoid ClassLoader leaks"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method <T> T org.mule.runtime.core.api.util.ClassUtils::getStaticFieldValue(java.lang.Class<?>, java.lang.String, boolean) throws java.lang.NoSuchFieldException, java.lang.IllegalAccessException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "ClassUtils",
+          "methodName": "getStaticFieldValue",
+          "elementKind": "method",
+          "justification": "MULE-19620: Perform IBM MQ Classes cleanup in order to avoid ClassLoader leaks"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.util.ClassUtils::setStaticFieldValue(java.lang.Class<?>, java.lang.String, java.lang.Object, boolean) throws java.lang.NoSuchFieldException, java.lang.IllegalAccessException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "ClassUtils",
+          "methodName": "setStaticFieldValue",
+          "elementKind": "method",
+          "justification": "MULE-19620: Perform IBM MQ Classes cleanup in order to avoid ClassLoader leaks"
         }
       ]
     }
