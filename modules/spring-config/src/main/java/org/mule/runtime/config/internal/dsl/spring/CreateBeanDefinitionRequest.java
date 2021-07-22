@@ -97,6 +97,9 @@ public abstract class CreateBeanDefinitionRequest<T> {
     return null;
   }
 
+  /**
+   * Resolve a parameter with the provided name in the scope of the param owner of this request.
+   */
   public ComponentParameterAst getParameter(String parameterName) {
     return getComponent().getParameter(parameterName);
   }
