@@ -504,7 +504,8 @@ class ComponentConfigurationBuilder<T> {
           // TODO (MULE-19618) review the necessity for this (ee-transform extension model) + this entire class
           this.value = component.getParameter(SCRIPT_PARAMETER).getResolvedRawValue();
         } else {
-          this.value = component.getParameter(BODY_RAW_PARAM_NAME).getResolvedRawValue();
+          ComponentParameterAst bodyParameter = component.getParameter(BODY_RAW_PARAM_NAME);
+          this.value = bodyParameter != null ? bodyParameter.getResolvedRawValue() : null;
         }
       } else {
         getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
