@@ -877,6 +877,7 @@ public class CoreExtensionModelTestCase {
   private void assertSchedulingStrategy(ParameterModel paramModel) {
     assertThat(paramModel.getName(), is("schedulingStrategy"));
     assertThat(paramModel.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModel.getDslConfiguration().allowsReferences(), is(false));
     assertThat(paramModel.getType(), instanceOf(DefaultObjectType.class));
     assertThat(paramModel.isRequired(), is(true));
     assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
