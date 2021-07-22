@@ -699,7 +699,7 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="1" maxOccurs="1" name="success-info">
+          <xs:element minOccurs="0" maxOccurs="1" name="success-info">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -735,7 +735,7 @@
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="1" maxOccurs="1" name="error-info">
+          <xs:element minOccurs="0" maxOccurs="1" name="error-info">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -864,7 +864,7 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="1" maxOccurs="1" name="success-info">
+          <xs:element minOccurs="0" maxOccurs="1" name="success-info">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -900,7 +900,7 @@
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="1" maxOccurs="1" name="error-info">
+          <xs:element minOccurs="0" maxOccurs="1" name="error-info">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -1026,7 +1026,7 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="1" maxOccurs="1" name="success-info">
+          <xs:element minOccurs="0" maxOccurs="1" name="success-info">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -1062,7 +1062,7 @@
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="1" maxOccurs="1" name="error-info">
+          <xs:element minOccurs="0" maxOccurs="1" name="error-info">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -1184,7 +1184,7 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="1" maxOccurs="1" name="success-info">
+          <xs:element minOccurs="0" maxOccurs="1" name="success-info">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -1220,7 +1220,7 @@
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="1" maxOccurs="1" name="error-info">
+          <xs:element minOccurs="0" maxOccurs="1" name="error-info">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -2649,7 +2649,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="1" maxOccurs="1" name="personal-info-argument">
+          <xs:element minOccurs="0" maxOccurs="1" name="personal-info-argument">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">

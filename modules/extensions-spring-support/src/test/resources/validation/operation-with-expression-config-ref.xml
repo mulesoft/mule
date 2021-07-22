@@ -12,15 +12,13 @@
                        dateOfBirth="1959-09-07T00:00:00"
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="1000000"
-                       recipe="recipes"
                        initialHealth="CANCER"
-                       monthlyIncomes="monthlyIncomes"
-                       finalHealth="DEAD"
-                       candidateDoors="candidateDoors">
+                       finalHealth="DEAD">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
+		<heisenberg:monthly-incomes />
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
             <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
@@ -29,10 +27,11 @@
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
+        <heisenberg:known-addresses />
     </heisenberg:config>
 
     <flow name="sayMyName">
-        <heisenberg:say-my-name config-ref="#[mel:dynamic]"/>
+        <heisenberg:say-my-name config-ref="#[dynamic]"/>
     </flow>
 
 </mule>

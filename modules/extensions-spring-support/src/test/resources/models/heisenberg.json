@@ -1648,7 +1648,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": true,
+              "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
               "fieldValueProviderModels": [],
@@ -19264,7 +19264,7 @@
                       }
                     },
                     "hasDynamicType": false,
-                    "required": true,
+                    "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
                     "fieldValueProviderModels": [],
@@ -19916,7 +19916,7 @@
                       }
                     },
                     "hasDynamicType": false,
-                    "required": true,
+                    "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
                     "fieldValueProviderModels": [],
@@ -21564,7 +21564,7 @@
                       }
                     },
                     "hasDynamicType": false,
-                    "required": true,
+                    "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
                     "fieldValueProviderModels": [],
@@ -22216,7 +22216,7 @@
                       }
                     },
                     "hasDynamicType": false,
-                    "required": true,
+                    "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
                     "fieldValueProviderModels": [],
@@ -23925,7 +23925,7 @@
                       }
                     },
                     "hasDynamicType": false,
-                    "required": true,
+                    "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
                     "fieldValueProviderModels": [],
@@ -24577,7 +24577,7 @@
                       }
                     },
                     "hasDynamicType": false,
-                    "required": true,
+                    "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
                     "fieldValueProviderModels": [],
@@ -26262,7 +26262,7 @@
                       }
                     },
                     "hasDynamicType": false,
-                    "required": true,
+                    "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
                     "fieldValueProviderModels": [],
@@ -26914,7 +26914,7 @@
                       }
                     },
                     "hasDynamicType": false,
-                    "required": true,
+                    "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
                     "fieldValueProviderModels": [],
@@ -28462,7 +28462,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": true,
+              "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
               "fieldValueProviderModels": [],
@@ -37595,7 +37595,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": true,
+              "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
               "fieldValueProviderModels": [],
@@ -52734,8 +52734,7 @@
                 },
                 {
                   "key": {
-                    "name": "knownAddresses",
-                    "required": "true"
+                    "name": "knownAddresses"
                   },
                   "model": {
                     "type": "Array",
@@ -53801,8 +53800,7 @@
               },
               {
                 "key": {
-                  "name": "knownAddresses",
-                  "required": "true"
+                  "name": "knownAddresses"
                 },
                 "model": {
                   "type": "Array",
@@ -56744,8 +56742,7 @@
         },
         {
           "key": {
-            "name": "knownAddresses",
-            "required": "true"
+            "name": "knownAddresses"
           },
           "model": {
             "type": "Array",
