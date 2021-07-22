@@ -90,6 +90,9 @@ public class HeisenbergSource extends Source<String, Object> {
   public static volatile boolean receivedInlineOnSuccess;
   public static volatile boolean receivedInlineOnError;
 
+  public static volatile PersonalInfo receivedInlineOnSuccessData;
+  public static volatile PersonalInfo receivedInlineOnErrorData;
+
   public static volatile TerminateStatus terminateStatus;
   public static java.util.Optional<Error> error;
 
@@ -190,6 +193,7 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null
         && successInfo.getDescription() != null;
+    receivedInlineOnSuccessData = successInfo;
     executedOnSuccess = true;
 
     notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
@@ -209,6 +213,7 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG)
         && infoError.getDescription() != null;
+    receivedInlineOnErrorData = infoError;
     executedOnError = true;
     notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
     if (propagateError) {
@@ -246,6 +251,9 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @Override
   public synchronized void onStop() {
+    receivedInlineOnSuccessData = null;
+    receivedInlineOnErrorData = null;
+
     if (executor != null && scheduledFuture != null) {
       scheduledFuture.cancel(true);
       executor.stop();
