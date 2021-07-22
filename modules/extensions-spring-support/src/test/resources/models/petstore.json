@@ -23464,6 +23464,8 @@
               }
             }
           ],
+          "minOccurs": 1,
+          "maxOccurs": 1,
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
