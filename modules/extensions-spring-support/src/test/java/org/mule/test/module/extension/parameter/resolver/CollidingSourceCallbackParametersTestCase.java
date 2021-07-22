@@ -6,8 +6,8 @@
  */
 package org.mule.test.module.extension.parameter.resolver;
 
-import static java.lang.Integer.getInteger;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static java.lang.Integer.parseInt;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.probe;
@@ -53,7 +53,7 @@ public class CollidingSourceCallbackParametersTestCase extends AbstractExtension
     sourceCallbackError.start();
 
     probe(() -> executedOnError);
-    assertThat(receivedInlineOnErrorData.getAge(), is(getInteger(AGE)));
-    assertThat(receivedInlineOnErrorData.getKnownAddresses(), empty());
+    assertThat(receivedInlineOnErrorData.getAge(), is(parseInt(AGE)));
+    assertThat(receivedInlineOnErrorData.getKnownAddresses(), is(nullValue()));
   }
 }

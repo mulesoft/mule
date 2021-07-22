@@ -21,7 +21,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQ
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -66,7 +66,6 @@ class ComponentConfigurationBuilder<T> {
   private final ComponentAst ownerComponent;
   private final ComponentAst component;
   private final CreateBeanDefinitionRequest<T> createBeanDefinitionRequest;
-  private final ParameterGroupUtils parameterGroupUtils = new ParameterGroupUtils();
 
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                        ComponentAst ownerComponent, ComponentAst component,
@@ -340,9 +339,7 @@ class ComponentConfigurationBuilder<T> {
 
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
-          .map(ownerComponentModel -> {
-            return doResolveParameter(createBeanDefinitionRequest.getParameter(parameterName));
-          })
+          .map(ownerComponentModel -> doResolveParameter(createBeanDefinitionRequest.getParameter(parameterName)))
           .orElseGet(() -> {
             if (!ownerComponent.getModel(Object.class).isPresent()) {
               return ownerComponent.getParameter(parameterName);
@@ -379,17 +376,6 @@ class ComponentConfigurationBuilder<T> {
       }
 
       return ofNullable(parameterValue);
-    }
-
-    private ComponentParameterAst resolveParameter(Optional<ParameterGroupModel> groupModelOptional, String parameterName) {
-      ComponentParameterAst param;
-      if (groupModelOptional.isPresent()) {
-        param = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
-      } else {
-        param = ownerComponent.getParameter(parameterName);
-      }
-
-      return doResolveParameter(param);
     }
 
     private ComponentParameterAst doResolveParameter(ComponentParameterAst param) {
