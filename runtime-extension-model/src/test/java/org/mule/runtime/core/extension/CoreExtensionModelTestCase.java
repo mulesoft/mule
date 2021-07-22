@@ -271,7 +271,7 @@ public class CoreExtensionModelTestCase {
     assertThat(object.allowsTopLevelDeclaration(), is(true));
 
     final List<ParameterModel> paramModels = object.getAllParameterModels();
-    assertThat(paramModels, hasSize(3));
+    assertThat(paramModels, hasSize(4));
 
     ParameterModel name = paramModels.get(0);
     assertThat(name.getName(), is("name"));
