@@ -67,7 +67,6 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
   @Override
   protected Builder doParse(Builder definitionBuilder)
       throws ConfigurationException {
-
     Builder finalBuilder = definitionBuilder.withIdentifier(operationDsl.getElementName())
         .withTypeDefinition(fromType(getMessageProcessorType()))
         .withObjectFactoryType(getMessageProcessorFactoryType())
