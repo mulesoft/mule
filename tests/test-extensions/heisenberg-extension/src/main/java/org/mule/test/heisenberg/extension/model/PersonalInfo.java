@@ -60,6 +60,7 @@ public class PersonalInfo {
   private Calendar dateOfGraduation;
 
   @Parameter
+  @Optional
   @Placement(order = 7)
   private List<String> knownAddresses;
 
