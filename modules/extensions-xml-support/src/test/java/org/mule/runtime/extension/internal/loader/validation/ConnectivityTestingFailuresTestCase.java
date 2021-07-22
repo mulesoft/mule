@@ -109,11 +109,13 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
   }
 
   private ExtensionModel getFileExtension() {
-    return mockedExtension("file", "config", "connection", true);
+    ExtensionDeclarer extensionDeclarer = mockedExtensionDeclarer("file", "config", "connection", true);
+    extensionDeclarer.withConstruct("matcher");
+    return mockedExtension(extensionDeclarer);
   }
 
   private ExtensionModel getPetstoreExtension(boolean supportsConnectivityTesting) {
-    return mockedExtension("petstore", "config", "connection", supportsConnectivityTesting);
+    return mockedExtension(mockedExtensionDeclarer("petstore", "config", "connection", supportsConnectivityTesting));
   }
 
   private void setExpectedMessage(String... conflictingGlobalElements) {
@@ -121,8 +123,8 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     exception.expectMessage(Arrays.stream(conflictingGlobalElements).collect(Collectors.joining(", ")));
   }
 
-  private ExtensionModel mockedExtension(final String name, final String config, final String connectionProvider,
-                                         boolean supportsConnectivityTesting) {
+  private ExtensionDeclarer mockedExtensionDeclarer(final String name, final String config, final String connectionProvider,
+                                                    boolean supportsConnectivityTesting) {
     final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault()
         .createTypeLoader(ConnectivityTestingFailuresTestCase.class.getClassLoader());
 
@@ -141,6 +143,10 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
         .ofType(typeLoader.load(String.class))
         .asComponentId();
 
+    return extensionDeclarer;
+  }
+
+  private ExtensionModel mockedExtension(final ExtensionDeclarer extensionDeclarer) {
     return new ExtensionModelFactory()
         .create(new DefaultExtensionLoadingContext(extensionDeclarer, currentThread().getContextClassLoader(),
                                                    new NullDslResolvingContext()));
