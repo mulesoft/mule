@@ -114,15 +114,14 @@ import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTy
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
-import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
+import java.util.Map;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.reflect.TypeToken;
-
-import java.util.Map;
 
 /**
  * An {@link ExtensionDeclarer} for Mule's Core Runtime
@@ -267,7 +266,8 @@ class MuleExtensionModelDeclarer {
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
         .ofType(buildSchedulingStrategyType(extensionDeclarer, TYPE_LOADER))
-        .withExpressionSupport(NOT_SUPPORTED);
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDsl(ParameterDslConfiguration.builder().allowsReferences(false).build());
 
     scheduler.onDefaultParameterGroup()
         .withOptionalParameter("disallowConcurrentExecution")
