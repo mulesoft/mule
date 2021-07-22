@@ -21,9 +21,8 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQ
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -67,7 +66,6 @@ class ComponentConfigurationBuilder<T> {
   private final ComponentAst ownerComponent;
   private final ComponentAst component;
   private final CreateBeanDefinitionRequest<T> createBeanDefinitionRequest;
-  private final ParameterGroupUtils parameterGroupUtils = new ParameterGroupUtils();
 
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                        ComponentAst ownerComponent, ComponentAst component,
@@ -333,33 +331,17 @@ class ComponentConfigurationBuilder<T> {
     public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
       if (!createBeanDefinitionRequest.getComponentBuildingDefinition().getIgnoredConfigurationParameters()
           .contains(parameterName)) {
-        getParameterValue(parameterName, defaultValue)
-            .map(parameterValue -> typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue)
-            .ifPresent(convertedParameterValue -> this.value = convertedParameterValue);
+        this.value = getParameterValue(parameterName, defaultValue)
+            .map(parameterValue -> typeConverter
+                .map(tc -> tc.convert(parameterValue))
+                .orElse(parameterValue))
+            .orElse(null);
       }
     }
 
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
-          .map(ownerComponentModel -> {
-            if (ownerComponentModel instanceof SourceModel) {
-              ComponentParameterAst sourceCallbackAwareParameter =
-                  parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName,
-                                                                      createBeanDefinitionRequest.getSpringComponentModel()
-                                                                          .getComponentIdentifier(),
-                                                                      (SourceModel) ownerComponentModel);
-              if (sourceCallbackAwareParameter != null) {
-                return sourceCallbackAwareParameter;
-              }
-            }
-
-            return resolveParameter(parameterGroupUtils.getParameterGroupModel(ownerComponent, parameterName,
-                                                                               createBeanDefinitionRequest
-                                                                                   .getSpringComponentModel()
-                                                                                   .getComponentIdentifier(),
-                                                                               ownerComponentModel.getParameterGroupModels()),
-                                    parameterName);
-          })
+          .map(ownerComponentModel -> doResolveParameter(createBeanDefinitionRequest.getParameter(parameterName)))
           .orElseGet(() -> {
             if (!ownerComponent.getModel(Object.class).isPresent()) {
               return ownerComponent.getParameter(parameterName);
@@ -398,14 +380,7 @@ class ComponentConfigurationBuilder<T> {
       return ofNullable(parameterValue);
     }
 
-    private ComponentParameterAst resolveParameter(Optional<ParameterGroupModel> groupModelOptional, String parameterName) {
-      ComponentParameterAst param;
-      if (groupModelOptional.isPresent()) {
-        param = ownerComponent.getParameter(groupModelOptional.get().getName(), parameterName);
-      } else {
-        param = ownerComponent.getParameter(parameterName);
-      }
-
+    private ComponentParameterAst doResolveParameter(ComponentParameterAst param) {
       if (param == null && component != null) {
         // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
         return ownerComponent.getParameter(component.getIdentifier().getName());

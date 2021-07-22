@@ -961,6 +961,123 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ListenPaymentsAllOptionalType" substitutionGroup="mule:abstract-message-source" name="listen-payments-all-optional"></xs:element>
+  <xs:complexType name="ListenPaymentsAllOptionalType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="labeled-ricin">
+                  <xs:complexType>
+                    <xs:sequence maxOccurs="1">
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="next-door">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="ricin-packs">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="success-info">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
+                            <xs:complexType>
+                              <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+                  <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="methylamine">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Methylamine"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="error-info">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
+                            <xs:complexType>
+                              <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+                  <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-ListenPaymentsAllOptional-backPressureStrategyEnumType" use="optional" default="FAIL" name="onCapacityOverload">
+          <xs:annotation>
+            <xs:documentation>Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
+        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="fail"></xs:attribute>
+        <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
+        <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="methylamine"></xs:attribute>
+        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="propagateError"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ReconnectableListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="reconnectable-listen-payments"></xs:element>
   <xs:complexType name="ReconnectableListenPaymentsType">
     <xs:complexContent>
@@ -3743,6 +3860,19 @@
     </xs:union>
   </xs:simpleType>
   <xs:simpleType name="Heisenberg-ListenPayments-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="Heisenberg-ListenPaymentsAllOptional-backPressureStrategyEnumType">
     <xs:union>
       <xs:simpleType>
         <xs:restriction base="xs:string">

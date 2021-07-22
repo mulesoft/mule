@@ -457,31 +457,45 @@ public class BeanDefinitionFactory {
                   .build())
               .orElse(paramComponentIdentifier);
 
-          Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-              componentBuildingDefinitionRegistry.getBuildingDefinition(paramValueComponentIdentifier);
-          if (buildingDefinitionOptional.isPresent()
-              || param.getModel().getModelProperty(NoWrapperModelProperty.class).isPresent()) {
-            CreateParamBeanDefinitionRequest request =
-                new CreateParamBeanDefinitionRequest(componentHierarchy, paramsModels, paramOwnerComponent, param,
-                                                     buildingDefinitionOptional
-                                                         .orElseGet(() -> noWrapperBeanDefinition(param,
-                                                                                                  paramValueComponentIdentifier)),
-                                                     paramComponentIdentifier,
-                                                     nestedComponentParamProcessor);
-            this.paramProcessor.processRequest(springComponentModels, request);
+          return resolveComplexParamBuildingDefinition(param, paramValueComponentIdentifier)
+              .map(buildingDefinition -> {
+                CreateParamBeanDefinitionRequest request =
+                    new CreateParamBeanDefinitionRequest(componentHierarchy, paramsModels, paramOwnerComponent, param,
+                                                         buildingDefinition, paramComponentIdentifier,
+                                                         nestedComponentParamProcessor);
+                this.paramProcessor.processRequest(springComponentModels, request);
 
-            param.getValue().applyRight(v -> {
-              if (v instanceof ComponentAst) {
-                request.getSpringComponentModel().setComponent((ComponentAst) v);
-              }
-            });
+                param.getValue().applyRight(v -> {
+                  if (v instanceof ComponentAst) {
+                    request.getSpringComponentModel().setComponent((ComponentAst) v);
+                  }
+                });
 
-            handleSpringComponentModel(request.getSpringComponentModel(), springComponentModels, registry, componentLocator);
-            return of(request.getSpringComponentModel());
-          } else {
-            return empty();
-          }
+                handleSpringComponentModel(request.getSpringComponentModel(), springComponentModels, registry, componentLocator);
+                return request.getSpringComponentModel();
+              });
         });
+  }
+
+  private Optional<ComponentBuildingDefinition<?>> resolveComplexParamBuildingDefinition(ComponentParameterAst param,
+                                                                                         final ComponentIdentifier paramValueComponentIdentifier) {
+    if (param.getModel().getModelProperty(NoWrapperModelProperty.class).isPresent()) {
+      return param.getModel().getType()
+          .getAnnotation(ClassInformationAnnotation.class)
+          .map(cia -> {
+            try {
+              return new ComponentBuildingDefinition.Builder()
+                  .withNamespace(paramValueComponentIdentifier.getNamespace())
+                  .withIdentifier(paramValueComponentIdentifier.getName())
+                  .withTypeDefinition(fromType(forName(cia.getClassname())))
+                  .build();
+            } catch (ClassNotFoundException e) {
+              throw new MuleRuntimeException(e);
+            }
+          });
+    } else {
+      return componentBuildingDefinitionRegistry.getBuildingDefinition(paramValueComponentIdentifier);
+    }
   }
 
   private ComponentBuildingDefinition noWrapperBeanDefinition(ComponentParameterAst param,
@@ -518,19 +532,16 @@ public class BeanDefinitionFactory {
               .name(groupSyntax.getElementName())
               .build();
 
-          Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-              componentBuildingDefinitionRegistry.getBuildingDefinition(paramGroupComponentIdentifier);
-          if (buildingDefinitionOptional.isPresent()) {
-            final CreateDslParamGroupBeanDefinitionRequest request =
-                new CreateDslParamGroupBeanDefinitionRequest(componentHierarchy, paramsModels, paramOwnerComponentModel,
-                                                             buildingDefinitionOptional.orElse(null),
-                                                             paramGroupComponentIdentifier);
+          return componentBuildingDefinitionRegistry.getBuildingDefinition(paramGroupComponentIdentifier)
+              .map(buildingDefinition -> {
+                final CreateDslParamGroupBeanDefinitionRequest request =
+                    new CreateDslParamGroupBeanDefinitionRequest(paramGroupModel, componentHierarchy, paramsModels,
+                                                                 paramOwnerComponentModel, buildingDefinition,
+                                                                 paramGroupComponentIdentifier);
 
-            this.dslParamGroupProcessor.processRequest(springComponentModels, request);
-            return of(request.getSpringComponentModel());
-          } else {
-            return empty();
-          }
+                this.dslParamGroupProcessor.processRequest(springComponentModels, request);
+                return request.getSpringComponentModel();
+              });
         });
   }
 
