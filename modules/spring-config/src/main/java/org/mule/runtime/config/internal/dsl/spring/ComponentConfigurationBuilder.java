@@ -331,9 +331,11 @@ class ComponentConfigurationBuilder<T> {
     public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
       if (!createBeanDefinitionRequest.getComponentBuildingDefinition().getIgnoredConfigurationParameters()
           .contains(parameterName)) {
-        getParameterValue(parameterName, defaultValue)
-            .map(parameterValue -> typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue)
-            .ifPresent(convertedParameterValue -> this.value = convertedParameterValue);
+        this.value = getParameterValue(parameterName, defaultValue)
+            .map(parameterValue -> typeConverter
+                .map(tc -> tc.convert(parameterValue))
+                .orElse(parameterValue))
+            .orElse(null);
       }
     }
 
