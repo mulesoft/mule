@@ -208,6 +208,7 @@ class MuleExtensionModelDeclarer {
     // misc
     declareNotifications(extensionDeclarer);
     declareGlobalProperties(extensionDeclarer);
+    declareGlobalFunctions(extensionDeclarer);
 
     return extensionDeclarer;
   }
@@ -1102,7 +1103,6 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareNotifications(ExtensionDeclarer extensionDeclarer) {
-    // TODO MULE-17778: Complete this declaration
     ConstructDeclarer notificationsConstructDeclarer = extensionDeclarer.withConstruct("notifications")
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
@@ -1235,5 +1235,11 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The value of the property. This replaces each occurence of a property placeholder.");
+  }
+
+  private void declareGlobalFunctions(ExtensionDeclarer extensionDeclarer) {
+    final ConstructDeclarer globalFunctionsDeclarer = extensionDeclarer.withConstruct("globalFunctions")
+        .allowingTopLevelDefinition()
+        .describedAs("A global property is a named string. It can be inserted in most attribute values using standard (${key}) property placeholders.");
   }
 }
