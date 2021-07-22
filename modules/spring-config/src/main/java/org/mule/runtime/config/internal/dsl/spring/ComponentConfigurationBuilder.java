@@ -16,7 +16,6 @@ import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getRawParameterValue;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
@@ -59,6 +58,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 class ComponentConfigurationBuilder<T> {
 
   private static final Logger LOGGER = getLogger(ComponentConfigurationBuilder.class);
+  private static final String SCRIPT_PARAMETER = "script";
 
   private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
@@ -469,8 +469,13 @@ class ComponentConfigurationBuilder<T> {
     @Override
     public void onValueFromTextContent() {
       if (component != null) {
-        // TODO MULE-18782 migrate this
-        this.value = getRawParameterValue(component, BODY_RAW_PARAM_NAME).orElse(null);
+        if (component.getParameter(SCRIPT_PARAMETER) != null) {
+          // TODO (MULE-19618) review the necessity for this (ee-transform extension model) + this entire class
+          this.value = component.getParameter(SCRIPT_PARAMETER).getResolvedRawValue();
+        } else {
+          ComponentParameterAst bodyParameter = component.getParameter(BODY_RAW_PARAM_NAME);
+          this.value = bodyParameter != null ? bodyParameter.getResolvedRawValue() : null;
+        }
       } else {
         getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
             .ifPresent(v -> this.value = v);
