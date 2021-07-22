@@ -73,6 +73,7 @@ import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -271,7 +272,7 @@ public class CoreExtensionModelTestCase {
     assertThat(object.allowsTopLevelDeclaration(), is(true));
 
     final List<ParameterModel> paramModels = object.getAllParameterModels();
-    assertThat(paramModels, hasSize(3));
+    assertThat(paramModels, hasSize(4));
 
     ParameterModel name = paramModels.get(0);
     assertThat(name.getName(), is("name"));
@@ -297,6 +298,14 @@ public class CoreExtensionModelTestCase {
     ExclusiveParametersModel exclusiveParameterModel = exclusiveParametersModels.get(0);
     assertThat(exclusiveParameterModel.getExclusiveParameterNames(), contains("ref", "class"));
     assertThat(exclusiveParameterModel.isOneRequired(), is(true));
+
+    ParameterModel properties = paramModels.get(3);
+    assertThat(properties.getName(), is("property"));
+    assertThat(properties.isRequired(), is(false));
+    assertThat(properties.getType(), instanceOf(DefaultObjectType.class));
+    assertThat(properties.getType().getAnnotations(), hasSize(1));
+    assertThat(properties.getType().getAnnotation(ClassInformationAnnotation.class).get().getClassname(),
+               is(Map.class.getName()));
   }
 
   @Test
