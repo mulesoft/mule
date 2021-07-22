@@ -17,45 +17,58 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import static java.beans.Introspector.flushCaches;
+import static java.lang.Boolean.getBoolean;
+import static java.lang.Thread.getAllStackTraces;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.mule.runtime.core.api.util.ClassUtils.getField;
+import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.setStaticFieldValue;
 
-
+/**
+ * A Utility class for releasing all the known references that may lead to
+ * a ClassLoader leak.
+ */
 public class IBMMQResourceReleaser implements ResourceReleaser {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IBMMQResourceReleaser.class);
-  private static final String JMSCC_THREAD_POOL_MASTER_NAME = "JMSCCThreadPoolMaster";
 
+  private static final String AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME = "avoid.ibm.mq.cleanup";
+  private static final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP =
+      getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
+
+  private static final String JMSCC_THREAD_POOL_MASTER_NAME = "JMSCCThreadPoolMaster";
   private final static String THREADLOCALS_FIELD = "threadLocals";
   private final static String INHERITABLE_THREADLOCALS_FIELD = "inheritableThreadLocals";
   private final static String THREADLOCAL_MAP_TABLE_CLASS = "java.lang.ThreadLocal$ThreadLocalMap";
   private final static String JUL_KNOWN_LEVEL_CLASS = "java.util.logging.Level$KnownLevel";
   private final static String IBM_MQ_MBEAN_DOMAIN = "IBM MQ";
-  private final static String IBM_MQ_WORK_QUEUE_MANAGER_CLASS = "com.ibm.msg.client.commonservices.workqueue.WorkQueueManager";
-  private final static String IBM_MQ_ENVIRONMENT_CLASS = "com.ibm.mq.MQEnvironment";
   private final static String IBM_MQ_COMMON_SERVICES_CLASS = "com.ibm.mq.internal.MQCommonServices";
+  private final static String IBM_MQ_ENVIRONMENT_CLASS = "com.ibm.mq.MQEnvironment";
+  private final static String IBM_MQ_JMS_TLS_CLASS = "com.ibm.msg.client.jms.internal.JmsTls";
+  private final static String IBM_MQ_TRACE_CLASS = "com.ibm.msg.client.commonservices.trace.Trace";
   private final ClassLoader driverClassLoader;
 
 
   @Override
   public void release() {
+    if (IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP) {
+      LOGGER.debug("Avoiding IBM MQ resources cleanup.");
+      return;
+    }
+
     LOGGER.debug("Releasing IBM MQ resources");
-    //TODO add property to avoid releasing this resources
+
     removeMBeans();
     cleanJULKnownLevels();
     cleanMQCommonServices();
@@ -63,6 +76,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     cleanJmsTls();
     cleanTraceController();
     removeThreadLocals();
+
   }
 
   /**
@@ -73,46 +87,24 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * Disposes all the IBM MQ related threads.
-   */
-  public void disposeMQThreads() {
-    for (Thread thread : getAllThreads()) {
-      if (thread.getName().equals(JMSCC_THREAD_POOL_MASTER_NAME)) {
-        killThreadPoolMaster(thread);
-      }
-    }
-    try {
-      Class<?> wqmClass = Class.forName(IBM_MQ_WORK_QUEUE_MANAGER_CLASS, false, driverClassLoader);
-      Method m = wqmClass.getDeclaredMethod("close");
-      m.invoke(null);
-    } catch (Throwable e) {
-      LOGGER.warn("An error occurred trying to close the WorkQueueManager", e);
-    }
-  }
-
-  /**
-   * Removes the two known registered MBeans of the IBM MQ Driver.
+   * The IBM MQ Driver registers two MBeans for management.
+   * When disposing the application / domain, this beans keep references
+   * to classes loaded by this ClassLoader. When the application is removed,
+   * the ClassLoader is leaked due this references.
+   *
+   * The two known mbeans are
    *  * TraceControl
    *  * PropertyStoreControl
+   *
    */
   public void removeMBeans() {
 
-    /*
-    The IBM MQ Driver registers two MBeans for management.
-    When disposing the application / domain, this beans keep references
-    to classes loaded by this ClassLoader. When the application is removed,
-    the ClassLoader is leaked due this references.
-     */
-
-    // IBM MQ // IBM WebSphere MQ
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Removing registered MBeans of the IBM MQ Driver (if present)");
-    }
+    LOGGER.debug("Removing registered MBeans of the IBM MQ Driver (if present)");
 
     MBeanServer mBeanServer = getPlatformMBeanServer();
     Set<ObjectInstance> instances = mBeanServer.queryMBeans(null, null);
     if (LOGGER.isDebugEnabled()) {
-      instances.stream()
+      instances
           .forEach(x -> LOGGER.debug("MBean Found: Class Name: {} // Object Name: {}", x.getClassName(), x.getObjectName()));
     }
 
@@ -124,11 +116,10 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
       if (driverClassLoader == mBeanServer.getClassLoaderFor(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys))) {
         mBeanServer.unregisterMBean(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys));
       }
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Unregistered IBM MQ TraceControl MBean");
-      }
+      LOGGER.debug("Unregistered IBM MQ TraceControl MBean");
+
     } catch (javax.management.InstanceNotFoundException | MalformedObjectNameException | MBeanRegistrationException e) {
-      LOGGER.warn(e.getMessage(), e);
+      LOGGER.warn("Caught exception unregistering the IBM MQ TraceControl MBean: {}", e.getMessage(), e);
     }
 
     //IBM WebSphere MQ:type=CommonServices,name=PropertyStoreControl
@@ -138,9 +129,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
       if (driverClassLoader == mBeanServer.getClassLoaderFor(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys))) {
         mBeanServer.unregisterMBean(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys));
       }
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Unregistered IBM MQ PropertyStoreControl MBean");
-      }
+      LOGGER.debug("Unregistered IBM MQ PropertyStoreControl MBean");
     } catch (javax.management.InstanceNotFoundException | MalformedObjectNameException | MBeanRegistrationException e) {
       LOGGER.warn("Caught exception removing known IBM MQ Mbeans: {}", e.getMessage(), e);
     }
@@ -148,26 +137,23 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * Clears the references for the Java Util Logging.
+   *  The IBM MQ Driver registers custom Java Util Logging (JUL) Levels.
+   *  the JUL Classes are loaded by system Classloader. So there are references left
+   *  from outside the application context. So, it retains instances and leaks the application
+   *  ClassLoader.
+   *  This method removes the knownLevels registered by the Classes Loaded by the driver ClassLoader.
    */
   public void cleanJULKnownLevels() {
-    /*
-        The IBM MQ Driver registers custom Java Util Logging (JUL) Levels.
-        the JUL Classes are loaded by system Classloader. So there are references left
-        from outside the application context. So, it retains instances and leaks the application
-        ClassLoader.
-     */
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Cleaning Java Util Logging references");
-    }
-    try {
-      Class<?> knownLevelClass =
-          Class.forName(JUL_KNOWN_LEVEL_CLASS, false, driverClassLoader);
-      Field levelObjectField = getField(knownLevelClass, "levelObject");
 
+    LOGGER.debug("Cleaning Java Util Logging references");
+
+    try {
+
+      Class<?> knownLevelClass = loadClass(JUL_KNOWN_LEVEL_CLASS, driverClassLoader);
+      Field levelObjectField = getField(knownLevelClass, "levelObject", false);
       synchronized (knownLevelClass) {
-        final Map<?, List> nameToLevels = (Map<?, List>) getStaticFieldValue(knownLevelClass, "nameToLevels");
-        final Map<?, List> intToLevels = (Map<?, List>) getStaticFieldValue(knownLevelClass, "intToLevels");
+        final Map<?, List> nameToLevels = (Map<?, List>) getStaticFieldValue(knownLevelClass, "nameToLevels", false);
+        final Map<?, List> intToLevels = (Map<?, List>) getStaticFieldValue(knownLevelClass, "intToLevels", false);
         if (nameToLevels != null) {
           final Set removed = processJULKnownLevels(levelObjectField, nameToLevels);
           if (intToLevels != null) {
@@ -209,54 +195,29 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * Kills the ThreadPool master thread for IBM classes.
-   * @param thread
-   */
-  private void killThreadPoolMaster(Thread thread) {
-    Class<? extends Thread> threadClass = thread.getClass();
-    boolean shouldCleanThread = isThreadFromCurrentClassLoader(threadClass);
-    if (shouldCleanThread) {
-      try {
-        Method closeMethod = threadClass.getDeclaredMethod("close");
-        closeMethod.setAccessible(true);
-        closeMethod.invoke(thread);
-        thread.interrupt();
-      } catch (Throwable e) {
-        LOGGER.warn("Caught exception when closing the '" + JMSCC_THREAD_POOL_MASTER_NAME + "' Thread: {}", e.getMessage(), e);
-      }
-    }
-  }
-
-
-  /**
-   * Clears the JmsTls static final references.
+   * The JmsTls class keep several references in a private static final field
+   * This references avoid the proper ClassLoader disposal.
+   * This method performs the JmsTls Class cleanup.
    */
   private void cleanJmsTls() {
-    /*
-    The JmsTls class keep several references in a private static final field
-    This references avoid the proper ClassLoader disposal.
-     */
     try {
-      //JmsTls
-      Class myClass = Class.forName("com.ibm.msg.client.jms.internal.JmsTls", false, driverClassLoader);
-      clearPrivateStaticField(myClass, "myInstance", true);
+      Class jmsTlsClass = loadClass(IBM_MQ_JMS_TLS_CLASS, driverClassLoader);
+      setStaticFieldValue(jmsTlsClass, "myInstance", null, true);
     } catch (Exception ex) {
       LOGGER.warn("Caught Exception when clearing JmsTls: {}", ex.getMessage(), ex);
     }
   }
 
   /**
-   * Clears the TraceController static final reference.
+   * The TraceController classes keep several references in private static final field
+   * This references avoid the proper ClassLoader disposal.
+   * This method performs the TraceController cleanup.
    */
   private void cleanTraceController() {
-    /*
-    The TraceController classes keep several references in private static final field
-    This references avoid the proper ClassLoader disposal.
-     */
+
     try {
-      //TraceController
-      Class myClass = Class.forName("com.ibm.msg.client.commonservices.trace.Trace", false, driverClassLoader);
-      clearPrivateStaticField(myClass, "traceController", false);
+      Class traceClass = loadClass(IBM_MQ_TRACE_CLASS, driverClassLoader);
+      setStaticFieldValue(traceClass, "traceController", null, true);
     } catch (Exception ex) {
       LOGGER.warn("Caught Exception when clearing TraceController: {}", ex.getMessage(), ex);
     }
@@ -264,34 +225,31 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
 
   /**
-   * Removes thread local variables registered in non application threads.
+   * While analyzing the HeapDumps looking for the ClassLoader Leak causes,
+   * there were ThreadLocal references to driver classes in threads that do not belong to
+   * the application being disposed. This references leads to a ClassLoader leak.
+   * This method removes the thread local references to instances of classes loaded by the driver classloader.
    */
   public void removeThreadLocals() {
-
-    /*
-    While analyzing the HeapDumps looking for the ClassLoader Leak causes,
-    there were ThreadLocal references to driver classes in threads that do not belong to
-    the application being disposed. This references leads to a ClassLoader leak.
-     */
 
     Field threadLocalsField = null;
     Field inheritableThreadLocalsField = null;
     Field threadLocalMapTableField = null;
 
     try {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Removing ThreadLocals");
-      }
-      threadLocalsField = getField(Thread.class, THREADLOCALS_FIELD);
-      inheritableThreadLocalsField = getField(Thread.class, INHERITABLE_THREADLOCALS_FIELD);
-      Class<?> threadLocalMapTableClass = Class.forName(THREADLOCAL_MAP_TABLE_CLASS);
-      threadLocalMapTableField = getField(threadLocalMapTableClass, "table");
+
+      LOGGER.debug("Removing ThreadLocals");
+
+      threadLocalsField = getField(Thread.class, THREADLOCALS_FIELD, false);
+      inheritableThreadLocalsField = getField(Thread.class, INHERITABLE_THREADLOCALS_FIELD, false);
+      Class<?> threadLocalMapTableClass = loadClass(THREADLOCAL_MAP_TABLE_CLASS, driverClassLoader);
+      threadLocalMapTableField = getField(threadLocalMapTableClass, "table", false);
     } catch (NoSuchFieldException | ClassNotFoundException ex) {
       LOGGER.warn("Caught Exception  while getting required fields: {}", ex.getMessage(), ex);
     }
 
 
-    for (Thread thread : getAllThreads()) {
+    for (Thread thread : getAllStackTraces().keySet()) {
       LOGGER.debug("Processing Thread: {} / {}", thread.getThreadGroup().getName(), thread.getName());
 
       if (nonNull(threadLocalsField)) {
@@ -354,7 +312,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
                   threadLocal.remove();
                   threadLocal.set(null);
                   reference.clear();
-                  Field threadLocalMapEntryValueField = getField(entry.getClass(), "value");
+                  Field threadLocalMapEntryValueField = getField(entry.getClass(), "value", false);
                   threadLocalMapEntryValueField.set(entry, null);
                   ((Reference<?>) entry).clear();
                 }
@@ -376,8 +334,8 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
    */
   public void cleanMQCommonServices() {
     try {
-      Class<?> mqCommonServicesClass = Class.forName(IBM_MQ_COMMON_SERVICES_CLASS, false, driverClassLoader);
-      clearPrivateStaticField(mqCommonServicesClass, "jmqiEnv", true);
+      Class<?> mqCommonServicesClass = loadClass(IBM_MQ_COMMON_SERVICES_CLASS, driverClassLoader);
+      setStaticFieldValue(mqCommonServicesClass, "jmqiEnv", null, true);
     } catch (Exception ex) {
       LOGGER.warn("Caught Exception cleaning MQCommonServices: {}", ex.getMessage(), ex);
     }
@@ -388,108 +346,10 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
    */
   public void cleanMQEnvironment() {
     try {
-      Class<?> mqEnvironmentClass = Class.forName(IBM_MQ_ENVIRONMENT_CLASS, false, driverClassLoader);
-      clearPrivateStaticField(mqEnvironmentClass, "defaultMQCxManager", false);
+      Class<?> mqEnvironmentClass = loadClass(IBM_MQ_ENVIRONMENT_CLASS, driverClassLoader);
+      setStaticFieldValue(mqEnvironmentClass, "defaultMQCxManager", null, true);
     } catch (Exception ex) {
       LOGGER.warn("Caught Exception cleaning MQEnvironment: {}", ex.getMessage(), ex);
-    }
-  }
-
-
-
-  /**
-   * Checks if the thread belongs to this class ClassLoader
-   * @param threadClass The thread to validate
-   * @return true if the thread belongs to this class ClassLoader
-   */
-  private boolean isThreadFromCurrentClassLoader(Class<? extends Thread> threadClass) {
-    ClassLoader threadParentClassLoader = threadClass.getClassLoader().getParent();
-    ClassLoader connectorParentClassLoader = this.getClass().getClassLoader().getParent();
-    return connectorParentClassLoader == threadParentClassLoader;
-  }
-
-
-  /**
-   * Lists all the threads.
-   * @return a List including all the threads.
-   */
-  private List<Thread> getAllThreads() {
-
-    ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-    while (threadGroup.getParent() != null) {
-      threadGroup = threadGroup.getParent();
-    }
-
-    int threadCount = threadGroup.activeCount() + 100;
-    Thread[] threads = new Thread[threadCount];
-    int actualThreadCount = threadGroup.enumerate(threads);
-
-    while (actualThreadCount == threadCount) {
-      threadCount *= 2;
-      threads = new Thread[threadCount];
-      actualThreadCount = threadGroup.enumerate(threads);
-    }
-    return Arrays.stream(threads).filter(Objects::nonNull).collect(Collectors.toList());
-  }
-
-  /**
-   * Clears a private static field.
-   * @param c Target Class
-   * @param fieldName Target field.
-   * @param isFinal indicates if the target field is final
-   * @throws Exception The field does not exists or is not accesible.
-   */
-  private void clearPrivateStaticField(Class<?> c, String fieldName, boolean isFinal) throws Exception {
-    clearPrivateField(c, fieldName, null, isFinal);
-  }
-
-  /***
-   * Clears a private field value.
-   * @param c Class of the target
-   * @param fieldName field to clear
-   * @param instance Instance to remove the field value. Null for static fields.
-   * @param isFinal indicates if the target field is final
-   * @throws Exception The field does not exists or is not accesible.
-   */
-  private void clearPrivateField(Class<?> c, String fieldName, Object instance, boolean isFinal) throws Exception {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Clearing{}{} field of class {}", isNull(instance) ? " static" : "", isFinal ? " final" : "",
-                   c.getCanonicalName());
-    }
-    Field field = getField(c, fieldName);
-    if (isFinal) {
-      Field modifiersField = getField(Field.class, "modifiers");
-      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-    }
-    field.set(instance, null);
-  }
-
-  /**
-   * Gets the desired field of a class making it accessible.
-   * @param classArg Class of the requested field
-   * @param name field Name
-   * @return Selected field
-   * @throws NoSuchFieldException The selected field does not exists.
-   */
-  private Field getField(Class<?> classArg, String name) throws NoSuchFieldException {
-    Field field = classArg.getDeclaredField(name);
-    field.setAccessible(true);
-    return field;
-  }
-
-  /**
-   * Gets the private static field value for a given clasess
-   * @param c the target class
-   * @param fieldName the target field
-   * @return the value for the target field of the given class.
-   */
-  private Object getStaticFieldValue(Class<?> c, String fieldName) {
-    try {
-      Field field = getField(c, fieldName);
-      return field.get(null);
-    } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
-      return null;
     }
   }
 
