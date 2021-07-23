@@ -246,6 +246,11 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
+            public Map<String, Object> getAnnotations() {
+              return emptyMap();
+            }
+
+            @Override
             public ComponentMetadataAst getMetadata() {
               return EMPTY_METADATA;
             }

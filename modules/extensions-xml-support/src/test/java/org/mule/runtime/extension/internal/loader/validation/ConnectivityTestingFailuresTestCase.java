@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ATTRIBUTE;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.TestConnectionValidator.TEST_CONNECTION_SELECTED_ELEMENT_INVALID;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -102,7 +102,7 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     assertThat(problemsReporter.getWarnings().size(), is(1));
     assertThat(problemsReporter.getWarnings().get(0).getMessage(), is(format(TEST_CONNECTION_SELECTED_ELEMENT_INVALID,
                                                                              "http-requester-config",
-                                                                             MODULE_CONNECTION_MARKER_ATTRIBUTE,
+                                                                             MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE,
                                                                              "petstore:config")));
     assertThat(problemsReporter.getWarnings().get(0).getComponent(), is(loaded.getConfigurationModels().get(0)));
 

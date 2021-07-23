@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
+import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -104,7 +105,7 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
     }
 
     beanAnnotations.putAll(metadata.getDocAttributes().entrySet().stream()
-        .collect(toMap(e -> QName.valueOf(e.getKey()), Entry::getValue)));
+        .collect(toMap(e -> new QName(NS_MULE_DOCUMENTATION, e.getKey()), Entry::getValue)));
   }
 
   private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final SpringComponentModel componentModel,
