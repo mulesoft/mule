@@ -246,7 +246,7 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
-            public Map<String, String> getAnnotations() {
+            public Map<String, Object> getAnnotations() {
               return emptyMap();
             }
 

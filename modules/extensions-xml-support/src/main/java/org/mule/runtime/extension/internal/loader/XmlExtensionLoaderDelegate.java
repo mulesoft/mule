@@ -793,13 +793,13 @@ public final class XmlExtensionLoaderDelegate {
     final List<ComponentAst> markedAsTestConnectionGlobalElements =
         globalElementsComponentModel.stream()
             .filter(globalElementComponentModel -> {
-              String connection =
+              Object connection =
                   globalElementComponentModel.getAnnotations().get(MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.toString());
               if (connection == null) {
                 return false;
               }
 
-              return parseBoolean(connection);
+              return parseBoolean(connection.toString());
             })
             .collect(toList());
 
