@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_DIAGNOSTICS_SERVICE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
@@ -16,11 +16,11 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.construct.BackPressureReason;
-import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
@@ -50,7 +50,7 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
   private ReactiveProcessorEnricher processorEnricher = null;
 
   @Inject
-  DiagnosticsService diagnosticsService;
+  ProfilingService profilingService;
 
   @Inject
   MuleContext muleContext;
@@ -127,18 +127,18 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
 
     this.cpuLightScheduler = createCpuLightScheduler(cpuLightSchedulerSupplier);
     CpuLiteNonBlockingProcessingStrategyEnricher cpuLiteEnricher =
-        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLightScheduler, getDiagnosticsService(), muleContext);
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLightScheduler, getProfilingService(), muleContext);
     CpuLiteAsyncNonBlockingProcessingStrategyEnricher cpuLiteAsyncEnricher =
         new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> cpuLightScheduler, this::getNonBlockingTaskScheduler,
-                                                              getDiagnosticsService(), muleContext);
+                                                              getProfilingService(), muleContext);
 
     return new ProcessingTypeBasedReactiveProcessorEnricher(cpuLiteEnricher)
         .register(CPU_LITE, cpuLiteEnricher)
         .register(CPU_LITE_ASYNC, cpuLiteAsyncEnricher);
   }
 
-  protected DiagnosticsService getDiagnosticsService() {
-    return featureFlags.isEnabled(ENABLE_DIAGNOSTICS_SERVICE) ? diagnosticsService : null;
+  protected ProfilingService getProfilingService() {
+    return featureFlags.isEnabled(ENABLE_PROFILING_SERVICE) ? profilingService : null;
   }
 
   @Override
@@ -186,7 +186,7 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
    */
   public static void configureEnableDiagnosticsService() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_DIAGNOSTICS_SERVICE,
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_PROFILING_SERVICE,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.5.0"))
                                                     .isPresent());

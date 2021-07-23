@@ -10,21 +10,19 @@ package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_END;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_END;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
 import static org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils.getLocation;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
-import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
-import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils;
-import org.mule.runtime.core.privileged.processor.chain.HasLocation;
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
@@ -46,7 +44,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
   private final ClassLoader executionClassloader;
   private final MuleContext muleContext;
   private Optional<ScheduledExecutorService> scheduler = empty();
-  private Optional<DiagnosticsService> diagnosticsService = empty();
+  private Optional<ProfilingService> diagnosticsService = empty();
   private UnaryOperator<ScheduledExecutorService> schedulerDecorator = UnaryOperator.identity();
 
   private PipelineProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor pipeline, ClassLoader executionClassloader,
@@ -92,7 +90,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
    * @return the builder with decorator set.
    */
   public PipelineProcessingStrategyReactiveProcessorBuilder withDiagnosticsService(
-                                                                                   DiagnosticsService diagnosticsService) {
+                                                                                   ProfilingService diagnosticsService) {
     this.diagnosticsService = ofNullable(diagnosticsService);
     return this;
   }

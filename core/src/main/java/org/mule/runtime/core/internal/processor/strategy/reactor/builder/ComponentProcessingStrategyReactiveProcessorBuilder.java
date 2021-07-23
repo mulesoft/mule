@@ -8,22 +8,22 @@ package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
 import static org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils.getLocation;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
-import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
-import org.mule.runtime.core.api.diagnostics.ProfilingEventContext;
-import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
-import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.api.profiling.consumer.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
 
@@ -51,7 +51,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   private MuleContext muleContext;
   private Optional<ScheduledExecutorService> dispatcherScheduler = empty();
   private Optional<ScheduledExecutorService> callbackScheduler = empty();
-  private Optional<DiagnosticsService> diagnosticsService = empty();
+  private Optional<ProfilingService> diagnosticsService = empty();
 
   public ComponentProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor processor, Scheduler contextScheduler,
                                                              MuleContext muleContext) {
@@ -103,10 +103,10 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   }
 
   /**
-   * @param diagnosticsService {@link DiagnosticsService} for profiling processing strategy logic.
+   * @param diagnosticsService {@link ProfilingService} for profiling processing strategy logic.
    * @return the builder being created.
    */
-  public ComponentProcessingStrategyReactiveProcessorBuilder withDiagnosticsService(DiagnosticsService diagnosticsService) {
+  public ComponentProcessingStrategyReactiveProcessorBuilder withDiagnosticsService(ProfilingService diagnosticsService) {
     this.diagnosticsService = ofNullable(diagnosticsService);
     return this;
   }

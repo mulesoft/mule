@@ -8,7 +8,7 @@
 package org.mule.runtime.core.internal.diagnostics.consumer.context;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.api.profiling.consumer.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Optional;
@@ -25,8 +25,8 @@ public class ComponentProcessingStrategyProfilingEventContext implements Process
   private final CoreEvent e;
   private final String artifactId;
   private final String artifactType;
-  private String threadName;
-  private long profilingEventTimestamp;
+  private final String threadName;
+  private final long profilingEventTimestamp;
   private final Optional<ComponentLocation> location;
 
   public ComponentProcessingStrategyProfilingEventContext(CoreEvent e,
@@ -59,7 +59,8 @@ public class ComponentProcessingStrategyProfilingEventContext implements Process
     return artifactType;
   }
 
-  public long getTimestamp() {
+  @Override
+  public long getTriggerTimestamp() {
     return profilingEventTimestamp;
   }
 

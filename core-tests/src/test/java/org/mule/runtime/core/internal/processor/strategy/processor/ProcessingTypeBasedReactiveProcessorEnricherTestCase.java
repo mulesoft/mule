@@ -20,8 +20,8 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -71,7 +71,7 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
   private ImmediateScheduler cpuLiteAsyncScheduler;
 
   @Mock
-  private DiagnosticsService diagnosticsService;
+  private ProfilingService profilingService;
 
   @Mock
   private MuleContext muleContext;
@@ -126,16 +126,16 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
 
   private ReactiveProcessorEnricher getProcessingTypeBasedEnricher() {
     ReactiveProcessorEnricher proactorEnricher =
-        new ProactorProcessingStrategyEnricher(() -> proactorScheduler, identity(), diagnosticsService, muleContext, parallelism,
+        new ProactorProcessingStrategyEnricher(() -> proactorScheduler, identity(), profilingService, muleContext, parallelism,
                                                parallelism,
                                                parallelism);
 
     ReactiveProcessorEnricher cpuLiteEnricher =
-        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLiteScheduler, diagnosticsService, muleContext);
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLiteScheduler, profilingService, muleContext);
 
     ReactiveProcessorEnricher cpuLiteAsyncEnricher =
         new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> cpuLiteAsyncScheduler, () -> cpuLiteAsyncScheduler,
-                                                              diagnosticsService, muleContext);
+                                                              profilingService, muleContext);
 
     return new ProcessingTypeBasedReactiveProcessorEnricher(cpuLiteEnricher)
         .register(CPU_LITE, cpuLiteEnricher)

@@ -21,8 +21,8 @@ import io.qameta.allure.Story;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatchers;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -69,7 +69,7 @@ public class ProactorProcessingStrategyEnricherTestCase extends AbstractEnriched
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with proactor enricher")
   public void proactorEnricher() {
     ReactiveProcessor transform =
-        new ProactorProcessingStrategyEnricher(() -> dispatcherScheduler, identity(), mock(DiagnosticsService.class),
+        new ProactorProcessingStrategyEnricher(() -> dispatcherScheduler, identity(), mock(ProfilingService.class),
                                                mock(MuleContext.class), parallelism,
                                                parallelism, parallelism)
                                                    .enrich(reactiveProcessor);

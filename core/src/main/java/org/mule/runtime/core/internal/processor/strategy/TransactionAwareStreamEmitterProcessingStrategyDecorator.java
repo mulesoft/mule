@@ -8,12 +8,12 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_DIAGNOSTICS_SERVICE;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
@@ -21,19 +21,17 @@ import static org.mule.runtime.core.internal.processor.strategy.util.ReactivePro
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
-import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
+import org.mule.runtime.core.api.profiling.consumer.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
-import org.mule.runtime.core.internal.processor.strategy.util.ReactiveProcessorUtils;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.ArrayDeque;
@@ -42,7 +40,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.mule.runtime.core.privileged.processor.chain.HasLocation;
 import reactor.util.context.Context;
 
 import javax.inject.Inject;
@@ -62,7 +59,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   public static final String UNKNOWN_FLOW = "unknown_flow";
 
   @Inject
-  private DiagnosticsService diagnosticsService;
+  private ProfilingService diagnosticsService;
 
   @Inject
   private FeatureFlaggingService featureFlags;
@@ -94,10 +91,12 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
 
   @Override
   public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-    if (featureFlags.isEnabled(ENABLE_DIAGNOSTICS_SERVICE)) {
+    if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
       ComponentLocation location = getLocation(pipeline);
-      ProfilingDataProducer flowDisptchDataProducer = diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
-      ProfilingDataProducer flowEndDataProducer = diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
+      ProfilingDataProducer<ProcessingStrategyProfilingEventContext> flowDispatchDataProducer =
+          diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
+      ProfilingDataProducer<ProcessingStrategyProfilingEventContext> flowEndDataProducer =
+          diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
 
       String artifactId = muleContext.getConfiguration().getId();
       String artifactType = muleContext.getArtifactType().getAsString();
@@ -106,7 +105,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
           .flatMapMany(ctx -> {
             if (isTxActive(ctx)) {
               return buildFlux(pub)
-                  .profileEvent(location, ofNullable(flowDisptchDataProducer), artifactId, artifactType)
+                  .profileEvent(location, ofNullable(flowDispatchDataProducer), artifactId, artifactType)
                   .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
                   .profileEvent(location, ofNullable(flowEndDataProducer), artifactId, artifactType)
                   .build();
@@ -129,13 +128,15 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
 
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    if (featureFlags.isEnabled(ENABLE_DIAGNOSTICS_SERVICE)) {
-      ProfilingDataProducer startingOperationExecutionDataProducer =
+    if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
+      ProfilingDataProducer<ProcessingStrategyProfilingEventContext> startingOperationExecutionDataProducer =
           diagnosticsService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
-      ProfilingDataProducer operationExecutedDataProducer = diagnosticsService.getProfilingDataProducer(OPERATION_EXECUTED);
-      ProfilingDataProducer psSchedulingOperationExecution =
+      ProfilingDataProducer<ProcessingStrategyProfilingEventContext> operationExecutedDataProducer =
+          diagnosticsService.getProfilingDataProducer(OPERATION_EXECUTED);
+      ProfilingDataProducer<ProcessingStrategyProfilingEventContext> psSchedulingOperationExecution =
           diagnosticsService.getProfilingDataProducer(PS_SCHEDULING_OPERATION_EXECUTION);
-      ProfilingDataProducer psFlowMessagePassing = diagnosticsService.getProfilingDataProducer(PS_FLOW_MESSAGE_PASSING);
+      ProfilingDataProducer<ProcessingStrategyProfilingEventContext> psFlowMessagePassing =
+          diagnosticsService.getProfilingDataProducer(PS_FLOW_MESSAGE_PASSING);
 
       String artifactId = muleContext.getConfiguration().getId();
       String artifactType = muleContext.getArtifactType().getAsString();

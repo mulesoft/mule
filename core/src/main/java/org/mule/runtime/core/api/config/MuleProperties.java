@@ -374,13 +374,6 @@ public class MuleProperties {
       MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 
   /**
-   * the key for the bean from which diagnostics resources will be obtained.
-   *
-   * @since 4.4.0
-   */
-  public static final String MULE_DIAGNOSTICS_SERVICE_KEY = "mule.diagnostics.service.key";
-
-  /**
    * @return Whether MEL is set as the default EL according to {@link #MULE_MEL_AS_DEFAULT}
    * @since 4.2.0
    */

@@ -12,17 +12,17 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_END;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_END;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.pipelineProcessingStrategyReactiveProcessorFrom;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
-import org.mule.runtime.core.api.diagnostics.ProfilingDataProducer;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -55,12 +55,12 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
 
   @Mock
   private CoreEvent coreEvent;
-  
+
   @Mock
   private MuleConfiguration configuration;
 
   @Mock
-  private DiagnosticsService diagnosticsService;
+  private ProfilingService profilingService;
 
   @Mock
   private ProfilingDataProducer profilerProducer;
@@ -73,7 +73,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
     when(muleContext.getConfiguration()).thenReturn(configuration);
     when(configuration.getId()).thenReturn("artifactId");
     when(muleContext.getArtifactType()).thenReturn(ArtifactType.APP);
-    when(diagnosticsService.getProfilingDataProducer(any())).thenReturn(profilerProducer);
+    when(profilingService.getProfilingDataProducer(any())).thenReturn(profilerProducer);
   }
 
   @Test
@@ -83,7 +83,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
         pipelineProcessingStrategyReactiveProcessorFrom(reactiveProcessor, Thread.currentThread().getContextClassLoader(),
                                                         muleContext)
                                                             .withScheduler(flowDispatcherScheduler)
-                                                            .withDiagnosticsService(diagnosticsService)
+                                                            .withDiagnosticsService(profilingService)
                                                             .withSchedulerDecorator(identity())
                                                             .build();
 
@@ -92,8 +92,8 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
     verify(flowDispatcherScheduler, atLeastOnce()).submit(any(Callable.class));
 
     // The profiler data producers are obtained
-    verify(diagnosticsService, atLeastOnce()).getProfilingDataProducer(PS_FLOW_DISPATCH);
-    verify(diagnosticsService, atLeastOnce()).getProfilingDataProducer(PS_FLOW_END);
-    verify(profilerProducer, atLeastOnce()).event(any());
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_FLOW_DISPATCH);
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_FLOW_END);
+    verify(profilerProducer, atLeastOnce()).triggerProfilingEvent(any());
   }
 }

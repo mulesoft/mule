@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.processor.strategy.enricher;
 
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.diagnostics.DiagnosticsService;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,16 +26,16 @@ public class CpuLiteAsyncNonBlockingProcessingStrategyEnricher implements Reacti
 
   private final Supplier<Scheduler> liteSchedulerSupplier;
   private final Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier;
-  private final DiagnosticsService diagnosticsService;
+  private final ProfilingService profilingService;
   private final MuleContext muleContext;
 
   public CpuLiteAsyncNonBlockingProcessingStrategyEnricher(Supplier<Scheduler> liteSchedulerSupplier,
                                                            Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier,
-                                                           DiagnosticsService diagnosticsService,
+                                                           ProfilingService profilingService,
                                                            MuleContext muleContext) {
     this.liteSchedulerSupplier = liteSchedulerSupplier;
     this.nonBlockingSchedulerSupplier = nonBlockingSchedulerSupplier;
-    this.diagnosticsService = diagnosticsService;
+    this.profilingService = profilingService;
     this.muleContext = muleContext;
   }
 
@@ -43,7 +43,7 @@ public class CpuLiteAsyncNonBlockingProcessingStrategyEnricher implements Reacti
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
     return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get(), muleContext)
         .withCallbackScheduler(nonBlockingSchedulerSupplier.get())
-        .withDiagnosticsService(diagnosticsService)
+        .withDiagnosticsService(profilingService)
         .build();
   }
 }

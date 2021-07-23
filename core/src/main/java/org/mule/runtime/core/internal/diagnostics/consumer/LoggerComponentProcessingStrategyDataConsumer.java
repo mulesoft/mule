@@ -8,22 +8,23 @@
 package org.mule.runtime.core.internal.diagnostics.consumer;
 
 import static com.google.common.collect.ImmutableSet.of;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.api.diagnostics.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_DISPATCH;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.google.gson.Gson;
 
-import org.mule.runtime.core.api.diagnostics.ProfilingEventType;
-import org.mule.runtime.core.api.diagnostics.ProfilingDataConsumer;
-import org.mule.runtime.core.api.diagnostics.consumer.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.core.api.profiling.consumer.context.ProcessingStrategyProfilingEventContext;
 
 import org.slf4j.Logger;
 
@@ -46,17 +47,19 @@ public class LoggerComponentProcessingStrategyDataConsumer
   private final Gson gson = new Gson();
 
   @Override
-  public void onProfilingEvent(String profilingEventType, ProcessingStrategyProfilingEventContext profilingEventContext) {
+  public void onProfilingEvent(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
+                               ProcessingStrategyProfilingEventContext profilingEventContext) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(gson.toJson(getInfoMap(profilingEventType, profilingEventContext)));
     }
   }
 
-  private Map<String, String> getInfoMap(String profilingEventType,
+  private Map<String, String> getInfoMap(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
                                          ProcessingStrategyProfilingEventContext profilingEventContext) {
     Map<String, String> eventMap = new HashMap<>();
-    eventMap.put(PROFILING_EVENT_TYPE, profilingEventType);
-    eventMap.put(PROFILING_EVENT_TIMESTAMP_KEY, Long.toString(profilingEventContext.getTimestamp()));
+    eventMap.put(PROFILING_EVENT_TYPE,
+                 profilingEventType.getProfilerEventTypeNamespace() + ":" + profilingEventType.getProfilingEventTypeIdentifier());
+    eventMap.put(PROFILING_EVENT_TIMESTAMP_KEY, Long.toString(profilingEventContext.getTriggerTimestamp()));
     eventMap.put(PROCESSING_THREAD_KEY, profilingEventContext.getThreadName());
     eventMap.put(ARTIFACT_ID_KEY, profilingEventContext.getArtifactId());
     eventMap.put(ARTIFACT_TYPE_KEY, profilingEventContext.getArtifactType());
@@ -67,8 +70,13 @@ public class LoggerComponentProcessingStrategyDataConsumer
   }
 
   @Override
-  public Set<ProfilingEventType<ProcessingStrategyProfilingEventContext>> profilerEventTypes() {
+  public Set<ProfilingEventType<ProcessingStrategyProfilingEventContext>> getProfilingEventTypes() {
     return of(PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION, OPERATION_EXECUTED,
               PS_FLOW_MESSAGE_PASSING, PS_FLOW_DISPATCH, PS_FLOW_DISPATCH);
+  }
+
+  @Override
+  public Predicate<ProcessingStrategyProfilingEventContext> getEventContextFilter() {
+    return processingStrategyProfilingEventContext -> true;
   }
 }
