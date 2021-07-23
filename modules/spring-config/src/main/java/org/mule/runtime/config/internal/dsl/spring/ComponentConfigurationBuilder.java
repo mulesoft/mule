@@ -58,7 +58,6 @@ import org.springframework.beans.factory.support.ManagedMap;
 class ComponentConfigurationBuilder<T> {
 
   private static final Logger LOGGER = getLogger(ComponentConfigurationBuilder.class);
-  private static final String SCRIPT_PARAMETER = "script";
 
   private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
@@ -469,13 +468,8 @@ class ComponentConfigurationBuilder<T> {
     @Override
     public void onValueFromTextContent() {
       if (component != null) {
-        if (component.getParameter(SCRIPT_PARAMETER) != null) {
-          // TODO (MULE-19618) review the necessity for this (ee-transform extension model) + this entire class
-          this.value = component.getParameter(SCRIPT_PARAMETER).getResolvedRawValue();
-        } else {
-          ComponentParameterAst bodyParameter = component.getParameter(BODY_RAW_PARAM_NAME);
-          this.value = bodyParameter != null ? bodyParameter.getResolvedRawValue() : null;
-        }
+        ComponentParameterAst bodyParameter = component.getParameter(BODY_RAW_PARAM_NAME);
+        this.value = bodyParameter != null ? bodyParameter.getResolvedRawValue() : null;
       } else {
         getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
             .ifPresent(v -> this.value = v);
