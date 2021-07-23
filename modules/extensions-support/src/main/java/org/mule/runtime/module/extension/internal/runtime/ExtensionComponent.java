@@ -171,7 +171,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
-  protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
+  protected LazyValue<MetadataCacheIdGenerator<ComponentAst>> cacheIdGeneratorLazyValue;
 
   private Function<CoreEvent, Optional<ConfigurationInstance>> configurationResolver;
 
@@ -539,7 +539,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private MetadataCacheId getMetadataCacheId() {
-    return cacheIdGenerator.getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
+    return cacheIdGeneratorLazyValue.get().getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
         .map(id -> {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(id.getParts().toString());
@@ -685,12 +685,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private void setCacheIdGenerator() {
-    DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
-    ComponentLocator<ComponentAst> configLocator = location -> componentLocator
-        .find(location)
-        .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
+    this.cacheIdGeneratorLazyValue = new LazyValue<>(() -> {
+      DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
+      ComponentLocator<ComponentAst> configLocator = location -> componentLocator
+          .find(location)
+          .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
 
-    this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
+      return cacheIdGeneratorFactory.create(context, configLocator);
+    });
   }
 
   private ValueProviderMediator getValueProviderMediator() {
