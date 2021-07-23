@@ -813,7 +813,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(source.getOutputAttributes().getType(), equalTo(outputMetadataType));
 
     ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
-    assertThat(config.getMessageSources(), hasSize(4));
+    assertThat(config.getMessageSources(), hasSize(5));
     assertHeisenbergSource(config.getMessageSources().get(0), ASYNC_SOURCE_NAME, AsyncHeisenbergSource.class);
     assertHeisenbergSource(config.getMessageSources().get(1), SOURCE_NAME, HeisenbergSource.class);
   }
