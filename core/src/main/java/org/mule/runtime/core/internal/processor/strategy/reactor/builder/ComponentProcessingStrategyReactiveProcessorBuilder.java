@@ -51,7 +51,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   private MuleContext muleContext;
   private Optional<ScheduledExecutorService> dispatcherScheduler = empty();
   private Optional<ScheduledExecutorService> callbackScheduler = empty();
-  private Optional<ProfilingService> diagnosticsService = empty();
+  private Optional<ProfilingService> profilingService = empty();
 
   public ComponentProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor processor, Scheduler contextScheduler,
                                                              MuleContext muleContext) {
@@ -103,11 +103,11 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   }
 
   /**
-   * @param diagnosticsService {@link ProfilingService} for profiling processing strategy logic.
+   * @param profilingService {@link ProfilingService} for profiling processing strategy logic.
    * @return the builder being created.
    */
-  public ComponentProcessingStrategyReactiveProcessorBuilder withDiagnosticsService(ProfilingService diagnosticsService) {
-    this.diagnosticsService = ofNullable(diagnosticsService);
+  public ComponentProcessingStrategyReactiveProcessorBuilder withProfilingService(ProfilingService profilingService) {
+    this.profilingService = ofNullable(profilingService);
     return this;
   }
 
@@ -127,13 +127,13 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
 
     // Profiling data producers
     Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dispatchingOperationExecutionDataProducer =
-        dataProducerFromDiagnosticsService(PS_SCHEDULING_OPERATION_EXECUTION);
+        dataProducerFromProfilingService(PS_SCHEDULING_OPERATION_EXECUTION);
     Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> operationExecutionDispatchedDataProducer =
-        dataProducerFromDiagnosticsService(STARTING_OPERATION_EXECUTION);
+        dataProducerFromProfilingService(STARTING_OPERATION_EXECUTION);
     Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dispatchingOperationResultDataProducer =
-        dataProducerFromDiagnosticsService(OPERATION_EXECUTED);
+        dataProducerFromProfilingService(OPERATION_EXECUTED);
     Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> operationResultDispatchedDataProducer =
-        dataProducerFromDiagnosticsService(PS_FLOW_MESSAGE_PASSING);
+        dataProducerFromProfilingService(PS_FLOW_MESSAGE_PASSING);
 
     // location
     ComponentLocation location = getLocation(processor);
@@ -151,8 +151,8 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
                                          beforeProcessor);
   }
 
-  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromDiagnosticsService(ProfilingEventType<T> profilingEventType) {
-    return diagnosticsService.map(ds -> ds.getProfilingDataProducer(profilingEventType));
+  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromProfilingService(ProfilingEventType<T> profilingEventType) {
+    return profilingService.map(ds -> ds.getProfilingDataProducer(profilingEventType));
   }
 
   private <T extends Publisher> ReactorPublisherBuilder<T> getAfterProcessorReactorChain(

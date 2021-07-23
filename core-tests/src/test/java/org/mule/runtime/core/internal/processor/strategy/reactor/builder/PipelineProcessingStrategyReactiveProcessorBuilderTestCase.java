@@ -83,7 +83,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
         pipelineProcessingStrategyReactiveProcessorFrom(reactiveProcessor, Thread.currentThread().getContextClassLoader(),
                                                         muleContext)
                                                             .withScheduler(flowDispatcherScheduler)
-                                                            .withDiagnosticsService(profilingService)
+                                                            .withProfilingService(profilingService)
                                                             .withSchedulerDecorator(identity())
                                                             .build();
 

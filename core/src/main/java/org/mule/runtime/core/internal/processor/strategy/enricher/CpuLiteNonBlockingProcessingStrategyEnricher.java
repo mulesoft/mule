@@ -38,7 +38,7 @@ public class CpuLiteNonBlockingProcessingStrategyEnricher implements ReactivePro
   @Override
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
     return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get(), muleContext)
-        .withDiagnosticsService(profilingService)
+        .withProfilingService(profilingService)
         .build();
   }
 }

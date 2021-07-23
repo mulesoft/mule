@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.diagnostics.consumer.context;
+package org.mule.runtime.core.internal.profiling.context;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.profiling.consumer.context.ProcessingStrategyProfilingEventContext;

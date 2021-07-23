@@ -59,7 +59,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   public static final String UNKNOWN_FLOW = "unknown_flow";
 
   @Inject
-  private ProfilingService diagnosticsService;
+  private ProfilingService profilingService;
 
   @Inject
   private FeatureFlaggingService featureFlags;
@@ -94,9 +94,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
       ComponentLocation location = getLocation(pipeline);
       ProfilingDataProducer<ProcessingStrategyProfilingEventContext> flowDispatchDataProducer =
-          diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
+          profilingService.getProfilingDataProducer(PS_FLOW_DISPATCH);
       ProfilingDataProducer<ProcessingStrategyProfilingEventContext> flowEndDataProducer =
-          diagnosticsService.getProfilingDataProducer(PS_FLOW_DISPATCH);
+          profilingService.getProfilingDataProducer(PS_FLOW_DISPATCH);
 
       String artifactId = muleContext.getConfiguration().getId();
       String artifactType = muleContext.getArtifactType().getAsString();
@@ -130,13 +130,13 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
       ProfilingDataProducer<ProcessingStrategyProfilingEventContext> startingOperationExecutionDataProducer =
-          diagnosticsService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
+          profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
       ProfilingDataProducer<ProcessingStrategyProfilingEventContext> operationExecutedDataProducer =
-          diagnosticsService.getProfilingDataProducer(OPERATION_EXECUTED);
+          profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
       ProfilingDataProducer<ProcessingStrategyProfilingEventContext> psSchedulingOperationExecution =
-          diagnosticsService.getProfilingDataProducer(PS_SCHEDULING_OPERATION_EXECUTION);
+          profilingService.getProfilingDataProducer(PS_SCHEDULING_OPERATION_EXECUTION);
       ProfilingDataProducer<ProcessingStrategyProfilingEventContext> psFlowMessagePassing =
-          diagnosticsService.getProfilingDataProducer(PS_FLOW_MESSAGE_PASSING);
+          profilingService.getProfilingDataProducer(PS_FLOW_MESSAGE_PASSING);
 
       String artifactId = muleContext.getConfiguration().getId();
       String artifactType = muleContext.getArtifactType().getAsString();

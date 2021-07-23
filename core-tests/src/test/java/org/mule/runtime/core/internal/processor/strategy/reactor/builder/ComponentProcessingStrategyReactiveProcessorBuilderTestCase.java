@@ -109,7 +109,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
         processingStrategyReactiveProcessorFrom(reactiveProcessor, contextScheduler, muleContext)
             .withDispatcherScheduler(dispatcherScheduler)
             .withCallbackScheduler(callbackScheduler)
-            .withDiagnosticsService(profilingService)
+            .withProfilingService(profilingService)
             .withParallelism(parallelism)
             .build();
 

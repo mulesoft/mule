@@ -43,7 +43,7 @@ public class CpuLiteAsyncNonBlockingProcessingStrategyEnricher implements Reacti
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
     return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get(), muleContext)
         .withCallbackScheduler(nonBlockingSchedulerSupplier.get())
-        .withDiagnosticsService(profilingService)
+        .withProfilingService(profilingService)
         .build();
   }
 }

@@ -19,7 +19,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -177,18 +176,5 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
 
   protected int getBufferQueueSize() {
     return DEFAULT_BUFFER_SIZE;
-  }
-
-  /**
-   * Configures {@link FeatureFlaggingService} for MULE-19588.
-   *
-   * @since 4.4
-   */
-  public static void configureEnableDiagnosticsService() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_PROFILING_SERVICE,
-                                                featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0"))
-                                                    .isPresent());
   }
 }

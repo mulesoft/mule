@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.diagnostics.consumer;
+package org.mule.runtime.core.internal.profiling.consumer;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;

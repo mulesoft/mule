@@ -325,7 +325,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       return pipelineProcessingStrategyReactiveProcessorFrom(pipeline, executionClassloader, muleContext)
           .withScheduler(getFlowDispatcherScheduler())
           .withSchedulerDecorator(this::decorateScheduler)
-          .withDiagnosticsService(getProfilingService())
+          .withProfilingService(getProfilingService())
           .build();
     }
 

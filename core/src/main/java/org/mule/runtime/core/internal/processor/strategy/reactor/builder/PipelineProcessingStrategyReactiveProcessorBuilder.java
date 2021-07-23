@@ -44,7 +44,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
   private final ClassLoader executionClassloader;
   private final MuleContext muleContext;
   private Optional<ScheduledExecutorService> scheduler = empty();
-  private Optional<ProfilingService> diagnosticsService = empty();
+  private Optional<ProfilingService> profilingService = empty();
   private UnaryOperator<ScheduledExecutorService> schedulerDecorator = UnaryOperator.identity();
 
   private PipelineProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor pipeline, ClassLoader executionClassloader,
@@ -86,12 +86,12 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
   }
 
   /**
-   * @param diagnosticsService the diagnostics service used for profiling
+   * @param profilingService the profiling service used for profiling.
    * @return the builder with decorator set.
    */
-  public PipelineProcessingStrategyReactiveProcessorBuilder withDiagnosticsService(
-                                                                                   ProfilingService diagnosticsService) {
-    this.diagnosticsService = ofNullable(diagnosticsService);
+  public PipelineProcessingStrategyReactiveProcessorBuilder withProfilingService(
+                                                                                 ProfilingService profilingService) {
+    this.profilingService = ofNullable(profilingService);
     return this;
   }
 
@@ -103,8 +103,8 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
                                                                                                   ReactorPublisherBuilder<T> publisher) {
 
     ComponentLocation location = getLocation(pipeline);
-    Optional<ProfilingDataProducer> dataProducerFlowDispatch = dataProducerFromDiagnosticsService(PS_FLOW_DISPATCH);
-    Optional<ProfilingDataProducer> dataProducerFlowEnd = dataProducerFromDiagnosticsService(PS_FLOW_END);
+    Optional<ProfilingDataProducer> dataProducerFlowDispatch = dataProducerFromProfilingService(PS_FLOW_DISPATCH);
+    Optional<ProfilingDataProducer> dataProducerFlowEnd = dataProducerFromProfilingService(PS_FLOW_END);
     String artifactId = muleContext.getConfiguration().getId();
     String artifactType = muleContext.getArtifactType().getAsString();
 
@@ -118,8 +118,8 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
         .transform(pipeline);
   }
 
-  private Optional<ProfilingDataProducer> dataProducerFromDiagnosticsService(ProfilingEventType profilingEventType) {
-    return diagnosticsService.map(ds -> ds.getProfilingDataProducer(profilingEventType));
+  private Optional<ProfilingDataProducer> dataProducerFromProfilingService(ProfilingEventType profilingEventType) {
+    return profilingService.map(ds -> ds.getProfilingDataProducer(profilingEventType));
   }
 
 }

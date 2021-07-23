@@ -56,7 +56,7 @@ public class ProactorProcessingStrategyEnricher implements ReactiveProcessorEnri
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
     return processingStrategyReactiveProcessorFrom(processor, contextSchedulerSupplier.get(), muleContext)
         .withDispatcherScheduler(schedulerDecorator.apply(contextSchedulerSupplier.get()))
-        .withDiagnosticsService(profilingService)
+        .withProfilingService(profilingService)
         .withParallelism(getChainParallelism(processor))
         .build();
   }

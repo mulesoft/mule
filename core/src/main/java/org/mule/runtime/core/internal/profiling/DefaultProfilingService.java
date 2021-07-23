@@ -21,7 +21,7 @@ import org.mule.runtime.api.profiling.ProfilerDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.core.internal.diagnostics.producer.ComponentProcessingStrategyProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
 
 import java.util.HashMap;
 import java.util.Map;
