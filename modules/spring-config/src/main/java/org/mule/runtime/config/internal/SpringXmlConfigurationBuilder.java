@@ -68,6 +68,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -326,7 +327,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           }
 
           @Override
-          public List<ImportedResource> getImportedResources() {
+          public Collection<ImportedResource> getImportedResources() {
             return parentArtifactAst.getImportedResources();
           }
         };
