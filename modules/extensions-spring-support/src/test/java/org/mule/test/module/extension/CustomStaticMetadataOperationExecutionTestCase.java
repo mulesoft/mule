@@ -13,21 +13,22 @@ import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.CS
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.JSON_VALUE;
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.XML_VALUE;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.test.metadata.extension.CustomStaticMetadataSource;
 
-import javax.inject.Inject;
-
 import java.io.IOException;
+
+import javax.inject.Inject;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 public class CustomStaticMetadataOperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -119,6 +120,18 @@ public class CustomStaticMetadataOperationExecutionTestCase extends AbstractExte
   @Test
   public void customInput() throws Exception {
     String payload = (String) flowRunner("custom-input").run().getMessage().getPayload().getValue();
+    assertEqualJsons(payload, JSON_VALUE);
+  }
+
+  @Test
+  public void customIntersectionTypeInput() throws Exception {
+    String payload = (String) flowRunner("custom-intersection-type-input").run().getMessage().getPayload().getValue();
+    assertEqualJsons(payload, JSON_VALUE);
+  }
+
+  @Test
+  public void customIntersectionTypeOutput() throws Exception {
+    String payload = (String) flowRunner("custom-intersection-type-output").run().getMessage().getPayload().getValue();
     assertEqualJsons(payload, JSON_VALUE);
   }
 
