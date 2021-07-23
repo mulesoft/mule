@@ -549,11 +549,11 @@ public abstract class ExtensionDefinitionParser {
 
       private boolean parseAsContent(boolean isContent, MetadataType type) {
         if (isContent) {
-          parseObjectParameter(fieldName, fieldName, type, fieldDsl.get(), defaultValue, expressionSupport, false, emptySet(),
-                               objectField.getAnnotation(StereotypeTypeAnnotation.class)
-                                   .map(StereotypeTypeAnnotation::getAllowedStereotypes)
-                                   .orElse(emptyList()),
-                               isContent);
+          parseAstParameter(fieldName, fieldName, type, fieldDsl.get(), defaultValue, expressionSupport, false, emptySet(),
+                            objectField.getAnnotation(StereotypeTypeAnnotation.class)
+                                .map(StereotypeTypeAnnotation::getAllowedStereotypes)
+                                .orElse(emptyList()),
+                            isContent);
 
           return true;
         }
@@ -672,7 +672,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   protected void parseFromTextExpression(String key, DslElementSyntax paramDsl, Supplier<TypeConverter> typeConverter) {
-    addParameter(getChildKey(key), AttributeDefinition.Builder.fromSimpleParameter(key, typeConverter.get()));
+    addParameter(getChildKey(key), fromSimpleParameter(key, typeConverter.get()));
 
     addDefinition(definitionBuilder
         .withIdentifier(paramDsl.getElementName())
@@ -741,11 +741,11 @@ public abstract class ExtensionDefinitionParser {
     return definitionBuilder;
   }
 
-  protected void parseObjectParameter(String key, String name, MetadataType type, DslElementSyntax dsl,
-                                      Object defaultValue,
-                                      ExpressionSupport expressionSupport, boolean required,
-                                      Set<ModelProperty> modelProperties,
-                                      List<StereotypeModel> allowedStereotypes, boolean content) {
+  protected void parseAstParameter(String key, String name, MetadataType type, DslElementSyntax dsl,
+                                   Object defaultValue,
+                                   ExpressionSupport expressionSupport, boolean required,
+                                   Set<ModelProperty> modelProperties,
+                                   List<StereotypeModel> allowedStereotypes, boolean content) {
     if (content) {
       parseFromTextExpression(name, dsl, () -> value -> valueResolverFactory.of(name,
                                                                                 type,
