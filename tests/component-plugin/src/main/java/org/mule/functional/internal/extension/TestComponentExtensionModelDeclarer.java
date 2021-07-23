@@ -187,8 +187,6 @@ class TestComponentExtensionModelDeclarer {
         .describedAs("Configures whether or not to filter the logs to compare before comparison, removing delimiter lines and special characters")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(true);
-
-
   }
 
   private void declareOnErrorCheckLog(HasOperationDeclarer declarer) {
