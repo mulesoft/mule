@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
+import org.mule.metadata.api.model.VoidType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.module.extension.internal.AbstractComponentDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
@@ -28,6 +30,16 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
                                    DslSyntaxResolver dslSyntaxResolver,
                                    ExtensionParsingContext parsingContext) {
     super(definition, extensionModel, operationModel, dslSyntaxResolver, parsingContext);
+  }
+
+  @Override
+  protected boolean hasErrorMappingsGroup() {
+    return !getComponentModel().getModelProperty(NoErrorMappingModelProperty.class).isPresent();
+  }
+
+  @Override
+  protected boolean hasOutputGroup() {
+    return !(getComponentModel().getOutput().getType() instanceof VoidType);
   }
 
   @Override
