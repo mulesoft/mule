@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.loader;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
@@ -116,12 +117,12 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.jgrapht.Graph;
@@ -131,6 +132,8 @@ import org.jgrapht.graph.DefaultEdge;
 import org.vibur.objectpool.ConcurrentPool;
 import org.vibur.objectpool.PoolService;
 import org.vibur.objectpool.util.ConcurrentLinkedQueueCollection;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -156,7 +159,6 @@ public final class XmlExtensionLoaderDelegate {
 
   private static final String CATEGORY = "category";
   private static final String VENDOR = "vendor";
-  private static final String DOC_DESCRIPTION = "doc:description";
   private static final String PASSWORD = "password";
   private static final String ORDER_ATTRIBUTE = "order";
   private static final String TAB_ATTRIBUTE = "tab";
@@ -170,7 +172,10 @@ public final class XmlExtensionLoaderDelegate {
   private static final String NAMESPACE_SEPARATOR = ":";
 
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
-  public static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
+  private static final QName MODULE_CONNECTION_MARKER_ANNOTATION_QNAME =
+      new QName("http://www.w3.org/2000/xmlns/", "connection", "xmlns");
+  public static final String MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE =
+      MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.getPrefix() + ":" + MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.getLocalPart();
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
 
   /**
@@ -787,14 +792,20 @@ public final class XmlExtensionLoaderDelegate {
                                                                 List<ComponentAst> globalElementsComponentModel) {
     final List<ComponentAst> markedAsTestConnectionGlobalElements =
         globalElementsComponentModel.stream()
-            .filter(globalElementComponentModel -> getStringParameter(globalElementComponentModel,
-                                                                      MODULE_CONNECTION_MARKER_ATTRIBUTE)
-                                                                          .map(Boolean::parseBoolean).orElse(false))
+            .filter(globalElementComponentModel -> {
+              String connection =
+                  globalElementComponentModel.getAnnotations().get(MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.toString());
+              if (connection == null) {
+                return false;
+              }
+
+              return parseBoolean(connection);
+            })
             .collect(toList());
 
     if (markedAsTestConnectionGlobalElements.size() > 1) {
       throw new MuleRuntimeException(createStaticMessage(format("It can only be one global element marked as test connectivity [%s] but found [%d], offended global elements are: [%s]",
-                                                                MODULE_CONNECTION_MARKER_ATTRIBUTE,
+                                                                MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE,
                                                                 markedAsTestConnectionGlobalElements.size(),
                                                                 markedAsTestConnectionGlobalElements.stream()
                                                                     .map(ComponentAst::getComponentId)
@@ -806,7 +817,8 @@ public final class XmlExtensionLoaderDelegate {
     if (!testConnectionGlobalElement.isPresent()) {
       testConnectionGlobalElement = findTestConnectionGlobalElementFrom(globalElementsComponentModel);
     } else {
-      // validates that the MODULE_CONNECTION_MARKER_ATTRIBUTE is on a correct XML element that supports test connection
+      // validates that the MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE is on a correct XML element that supports test
+      // connection
       Optional<ComponentAst> temporalTestConnectionGlobalElement =
           findTestConnectionGlobalElementFrom(singletonList(testConnectionGlobalElement.get()));
       if ((!temporalTestConnectionGlobalElement.isPresent())
@@ -838,7 +850,7 @@ public final class XmlExtensionLoaderDelegate {
     if (testConnectionComponentModels.size() > 1) {
       throw new MuleRuntimeException(createStaticMessage(format("There are [%d] global elements that can be potentially used for test connection when it should be just one. Mark any of them with the attribute [%s=\"true\"], offended global elements are: [%s]",
                                                                 testConnectionComponentModels.size(),
-                                                                MODULE_CONNECTION_MARKER_ATTRIBUTE,
+                                                                MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE,
                                                                 testConnectionComponentModels.stream()
                                                                     .map(ComponentAst::getComponentId)
                                                                     .filter(Optional::isPresent)

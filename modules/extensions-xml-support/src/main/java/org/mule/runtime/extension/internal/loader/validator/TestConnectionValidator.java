@@ -7,7 +7,7 @@
 package org.mule.runtime.extension.internal.loader.validator;
 
 import static java.lang.String.format;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ATTRIBUTE;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
@@ -39,7 +39,7 @@ public class TestConnectionValidator implements ExtensionModelValidator {
           problemsReporter.addWarning(new Problem(model,
                                                   format(TEST_CONNECTION_SELECTED_ELEMENT_INVALID,
                                                          mp.getMarkedElement(),
-                                                         MODULE_CONNECTION_MARKER_ATTRIBUTE,
+                                                         MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE,
                                                          mp.getOffendingElement())));
         });
 
