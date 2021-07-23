@@ -23,7 +23,9 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.metadata.extension.resolver.CsvInputStaticTypeResolver;
 import org.mule.test.metadata.extension.resolver.JavaOutputStaticTypeResolver;
+import org.mule.test.metadata.extension.resolver.JsonInputStaticIntersectionTypeResolver;
 import org.mule.test.metadata.extension.resolver.JsonInputStaticTypeResolver;
+import org.mule.test.metadata.extension.resolver.JsonOutputStaticIntersectionTypeResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -33,11 +35,11 @@ import java.util.Map;
 
 public class CustomStaticMetadataOperations {
 
-  private static final ClassLoader cl = currentThread().getContextClassLoader();
   public static final String CSV_VALUE = "Name,LastName\\njuan,desimoni\\nesteban,wasinger";
-  public static final String XML_VALUE = IOUtils.toString(cl.getResourceAsStream("order.xml"));
   public static final String JSON_VALUE = "{\"age\":12,\"dni\": 1478231}";
   public static final String JSON_ARRAY_VALUE = "[{\"age\":12,\"dni\": 1478231}, {\"age\":25,\"dni\": 37562148}]";
+  private static final ClassLoader cl = currentThread().getContextClassLoader();
+  public static final String XML_VALUE = IOUtils.toString(cl.getResourceAsStream("order.xml"));
 
   @OutputXmlType(schema = "order.xsd", qname = "shiporder")
   public InputStream xmlOutput() {
@@ -145,6 +147,16 @@ public class CustomStaticMetadataOperations {
   @MediaType("application/json")
   public String customTypeInput(@TypeResolver(JsonInputStaticTypeResolver.class) InputStream type) {
     return IOUtils.toString(type);
+  }
+
+  @MediaType("application/json")
+  public String customIntersectionTypeInput(@TypeResolver(JsonInputStaticIntersectionTypeResolver.class) InputStream data) {
+    return IOUtils.toString(data);
+  }
+
+  @OutputResolver(output = JsonOutputStaticIntersectionTypeResolver.class)
+  public String customIntersectionTypeOutput() {
+    return JSON_VALUE;
   }
 
   @AttributesXmlType(schema = "order.xsd", qname = "shiporder")
