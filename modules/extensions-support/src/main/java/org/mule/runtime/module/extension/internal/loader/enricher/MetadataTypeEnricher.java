@@ -22,6 +22,7 @@ import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.FunctionType;
+import org.mule.metadata.api.model.IntersectionType;
 import org.mule.metadata.api.model.LocalDateTimeType;
 import org.mule.metadata.api.model.LocalTimeType;
 import org.mule.metadata.api.model.MetadataType;
@@ -40,6 +41,7 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.model.impl.DefaultAttributeFieldType;
 import org.mule.metadata.api.model.impl.DefaultAttributeKeyType;
 import org.mule.metadata.api.model.impl.DefaultFunctionType;
+import org.mule.metadata.api.model.impl.DefaultIntersectionType;
 import org.mule.metadata.api.model.impl.DefaultObjectFieldType;
 import org.mule.metadata.api.model.impl.DefaultObjectKeyType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
@@ -67,10 +69,10 @@ public class MetadataTypeEnricher {
 
   private static class TypeEnricherVisitor extends MetadataTypeVisitor {
 
-    private MetadataType type;
     private final MetadataType target;
     private final BaseTypeBuilder typeBuilder;
     private final Set<TypeAnnotation> annotations;
+    private MetadataType type;
 
     private TypeEnricherVisitor(MetadataType target, Set<TypeAnnotation> annotations) {
       this.target = target;
@@ -212,6 +214,12 @@ public class MetadataTypeEnricher {
     @Override
     public void visitTypeParameter(TypeParameterType defaultTypeParameter) {
       type = withNewAnnotations(typeBuilder.typeParameter(defaultTypeParameter.getName()));
+    }
+
+    @Override
+    public void visitIntersection(IntersectionType intersectionType) {
+      type = new DefaultIntersectionType(intersectionType.getTypes(), intersectionType.getMetadataFormat(),
+                                         getAllTypeAnnotationsMap());
     }
 
     private <T extends TypeBuilder & WithAnnotation> MetadataType withNewAnnotations(T builder) {
