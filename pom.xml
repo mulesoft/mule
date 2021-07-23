@@ -155,7 +155,7 @@
         <muleBomVersion>4.4.0-SNAPSHOT</muleBomVersion>
 
         <activemqVersion>5.15.12</activemqVersion>
-        <antVersion>1.9.15</antVersion>
+        <antVersion>1.10.9</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <apacheHttpClientVersion>4.5.13</apacheHttpClientVersion>
