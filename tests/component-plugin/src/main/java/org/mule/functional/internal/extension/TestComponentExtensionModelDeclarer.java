@@ -63,7 +63,7 @@ class TestComponentExtensionModelDeclarer {
 
   public ExtensionDeclarer createExtensionModel() {
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
-        .named("test")
+        .named("Test Component Plugin")
         .describedAs("Test component for performing assertions")
         .onVersion(MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
@@ -375,7 +375,7 @@ class TestComponentExtensionModelDeclarer {
         .describedAs("A processor that can be used for testing message flows. It is a configurable component. The return data for the component can be set so that users can simulate a call to a real service. This component can also track invocation history and fire notifications when messages are received.");
 
     processor.withOutput().ofType(ANY_TYPE);
-    processor.withOutput().ofType(ANY_TYPE);
+    processor.withOutputAttributes().ofType(ANY_TYPE);
 
     ParameterGroupDeclarer params = processor.onParameterGroup("return-data").withDslInlineRepresentation(true);
     params.withOptionalParameter("file")
@@ -450,9 +450,7 @@ class TestComponentExtensionModelDeclarer {
     params.withOptionalParameter("id")
         .describedAs("The name of this processor")
         .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .asComponentId();
-
+        .withExpressionSupport(NOT_SUPPORTED);
   }
 
   private SourceDeclarer voidSource(HasSourceDeclarer declarer, String name) {
