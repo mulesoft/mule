@@ -13,12 +13,17 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
+/**
+ * {@link RuntimeExtensionModelProvider} for the Test Component Plugin
+ *
+ * @since 4.4.0
+ */
 public class TestComponentRuntimeExtensionModelProvider implements RuntimeExtensionModelProvider {
 
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(new DefaultExtensionLoadingContext(new TestComponentExtensionModelDeclarer().createExtensionModel(),
-          TestComponentRuntimeExtensionModelProvider.class.getClassLoader(),
-          new NullDslResolvingContext())));
+                                                 TestComponentRuntimeExtensionModelProvider.class.getClassLoader(),
+                                                 new NullDslResolvingContext())));
 
 
   @Override

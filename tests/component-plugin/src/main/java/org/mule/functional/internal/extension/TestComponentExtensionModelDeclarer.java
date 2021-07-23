@@ -47,7 +47,7 @@ import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
 /**
- * An {@link ExtensionDeclarer} for test Policy components
+ * An {@link ExtensionDeclarer} for the Test Component Plugin
  *
  * @since 4.4
  */
@@ -257,7 +257,8 @@ class TestComponentExtensionModelDeclarer {
         .describedAs("A fully qualified classname of the exception object to throw. Must be a TypedException unless an error is provided as well.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().classValue(new ClassValueModel(singletonList("org.mule.runtime.api.exception.TypedException"))).build());
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(new ClassValueModel(singletonList("org.mule.runtime.api.exception.TypedException"))).build());
 
     params.withOptionalParameter("errorType")
         .describedAs("The error to throw. If provided, the exception will be used as cause for a TypedException.")
@@ -381,7 +382,7 @@ class TestComponentExtensionModelDeclarer {
     params.withOptionalParameter("file")
         .describedAs("The location of a file to load. The file can point to a resource on the classpath or on disk.")
         .ofType(STRING_TYPE)
-        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, ANY, new String[]{})).build())
+        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, ANY, new String[] {})).build())
         .withExpressionSupport(NOT_SUPPORTED);
 
     params = processor.onParameterGroup("callback").withDslInlineRepresentation(true);
@@ -389,7 +390,8 @@ class TestComponentExtensionModelDeclarer {
         .describedAs("A user-defined callback that is invoked when the test component is invoked. This can be useful for capturing information such as message counts. Use the {{class}} attribute to specify the callback class name, which must be an object that implements {{org.mule.tck.functional.EventCallback}}.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().classValue(new ClassValueModel(singletonList("org.mule.tck.functional.EventCallback"))).build());
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(new ClassValueModel(singletonList("org.mule.tck.functional.EventCallback"))).build());
 
     params = processor.onDefaultParameterGroup();
     params.withOptionalParameter("processingType")
@@ -400,7 +402,8 @@ class TestComponentExtensionModelDeclarer {
         .describedAs("The class name of a processor to be instantiated and executed")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().classValue(new ClassValueModel(singletonList("org.mule.runtime.core.api.processor.Processor"))).build());
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(new ClassValueModel(singletonList("org.mule.runtime.core.api.processor.Processor"))).build());
 
     params.withOptionalParameter("throwException")
         .describedAs("Whether the component should throw an exception before any processing takes place.")
