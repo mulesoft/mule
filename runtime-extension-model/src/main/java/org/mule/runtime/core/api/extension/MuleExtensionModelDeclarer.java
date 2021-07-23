@@ -114,15 +114,14 @@ import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTy
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
-import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
+import java.util.Map;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.reflect.TypeToken;
-
-import java.util.Map;
 
 /**
  * An {@link ExtensionDeclarer} for Mule's Core Runtime
@@ -248,7 +247,8 @@ class MuleExtensionModelDeclarer {
         .ofType(BaseTypeBuilder.create(JAVA).objectType()
             .with(new ClassInformationAnnotation(Map.class, asList(String.class, String.class))).openWith(STRING_TYPE)
             .build())
-        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true).build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
+            .allowsReferences(false).build())
         .withModelProperty(new NoWrapperModelProperty());
   }
 
@@ -267,7 +267,11 @@ class MuleExtensionModelDeclarer {
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
         .ofType(buildSchedulingStrategyType(extensionDeclarer, TYPE_LOADER))
-        .withExpressionSupport(NOT_SUPPORTED);
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsReferences(false)
+            .allowsInlineDefinition(true)
+            .allowTopLevelDefinition(false).build());
 
     scheduler.onDefaultParameterGroup()
         .withOptionalParameter("disallowConcurrentExecution")
@@ -351,10 +355,10 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Defines the prefix of the object store names. This will only be used for the internally built object store.");
 
-    validator.onDefaultParameterGroup().withOptionalParameter("objectStore").withDsl(
-                                                                                     ParameterDslConfiguration.builder()
-                                                                                         .allowsInlineDefinition(true)
-                                                                                         .allowsReferences(true).build())
+    validator.onDefaultParameterGroup().withOptionalParameter("objectStore")
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(true).build())
         .ofType(OBJECT_STORE_TYPE).withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(OBJECT_STORE))
         .describedAs("The object store where the IDs of the processed events are going to be stored. " +
