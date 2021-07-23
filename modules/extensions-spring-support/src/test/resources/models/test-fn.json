@@ -530,7 +530,7 @@
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": false,
+                "allowsInlineDefinition": true,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
@@ -549,7 +549,7 @@
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
+                    "localPart": "error-mappings",
                     "prefix": "mule"
                   }
                 },
