@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.internal.extension;
+package org.mule.functional.api.extension;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -42,7 +42,8 @@ import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
@@ -51,7 +52,7 @@ import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
  *
  * @since 4.4
  */
-class TestComponentExtensionModelDeclarer {
+public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDelegate {
 
   private static final StereotypeModel LOG_CHECKER = newStereotype("LOG_CHECKER", "TEST")
       .withParent(MuleStereotypes.PROCESSOR)
@@ -61,14 +62,14 @@ class TestComponentExtensionModelDeclarer {
       .withParent(MuleStereotypes.PROCESSOR)
       .build();
 
-  public ExtensionDeclarer createExtensionModel() {
-    ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
+  @Override
+  public void accept(ExtensionDeclarer extensionDeclarer, ExtensionLoadingContext context) {
+    extensionDeclarer
         .named("Test Component Plugin")
         .describedAs("Test component for performing assertions")
         .onVersion(MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(COMMUNITY)
-        .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix("test")
             .setNamespace("http://www.mulesoft.org/schema/mule/test")
@@ -98,8 +99,6 @@ class TestComponentExtensionModelDeclarer {
     declareMethodCall(extensionDeclarer);
     declareCause(extensionDeclarer);
     declareCheckSummary(extensionDeclarer);
-
-    return extensionDeclarer;
   }
 
   private void declareCheckSummary(HasOperationDeclarer declarer) {
