@@ -38,6 +38,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ImportedResource;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
@@ -67,6 +68,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -322,6 +324,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
             // well.
             return new FilteredErrorTypeRepository(parentArtifactAst.getErrorTypeRepository(), singleton("HTTP"));
+          }
+
+          @Override
+          public Collection<ImportedResource> getImportedResources() {
+            return parentArtifactAst.getImportedResources();
           }
         };
       }
