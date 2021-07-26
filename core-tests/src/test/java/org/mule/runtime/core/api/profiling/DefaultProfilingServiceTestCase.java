@@ -201,7 +201,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
       }
 
       @Override
-      public String getProfilerEventTypeNamespace() {
+      public String getProfilingEventTypeNamespace() {
         return "test-namespace";
       }
 

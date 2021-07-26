@@ -69,13 +69,13 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
   }
 
   private boolean filterByAction(ProfilingDataConsumer<ProfilingEventContext> profilingDataConsumer,
-                                 ProfilingNotification profilerNotification) {
+                                 ProfilingNotification profilingNotification) {
     return profilingDataConsumer.getProfilingEventTypes().stream()
         .anyMatch(
                   eventType -> eventType.getProfilingEventTypeIdentifier()
-                      .equals(profilerNotification.getActionName()))
+                      .equals(profilingNotification.getActionName()))
         &&
-        profilingDataConsumer.getEventContextFilter().test(((ProfilingEventContext) profilerNotification.getSource()));
+        profilingDataConsumer.getEventContextFilter().test(((ProfilingEventContext) profilingNotification.getSource()));
   }
 
   @Override

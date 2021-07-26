@@ -40,37 +40,37 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
     registerAction("test", TEST_NOTIFICATION_ID);
 
     registerAction(
-                   STARTING_FLOW_EXECUTION.getProfilerEventTypeNamespace() + "-"
+                   STARTING_FLOW_EXECUTION.getProfilingEventTypeNamespace() + "-"
                        + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
                    STARTING_FLOW_EXECUTION_ID);
 
-    registerAction(PS_SCHEDULING_FLOW_EXECUTION.getProfilerEventTypeNamespace() + "-" + PS_SCHEDULING_FLOW_EXECUTION
+    registerAction(PS_SCHEDULING_FLOW_EXECUTION.getProfilingEventTypeNamespace() + "-" + PS_SCHEDULING_FLOW_EXECUTION
         .getProfilingEventTypeIdentifier(),
                    PS_SCHEDULING_FLOW_EXECUTION_ID);
 
-    registerAction(FLOW_EXECUTED.getProfilerEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
+    registerAction(FLOW_EXECUTED.getProfilingEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
                    FLOW_EXECUTED_ID);
 
-    registerAction(FLOW_EXECUTED.getProfilerEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
+    registerAction(FLOW_EXECUTED.getProfilingEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
                    FLOW_EXECUTED_ID);
 
-    registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilerEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
+    registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilingEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
         .getProfilingEventTypeIdentifier(),
                    PS_SCHEDULING_OPERATION_EXECUTION_ID);
 
-    registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilerEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
+    registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilingEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
         .getProfilingEventTypeIdentifier(),
                    PS_SCHEDULING_OPERATION_EXECUTION_ID);
 
-    registerAction(STARTING_OPERATION_EXECUTION.getProfilerEventTypeNamespace() + "-" + STARTING_OPERATION_EXECUTION
+    registerAction(STARTING_OPERATION_EXECUTION.getProfilingEventTypeNamespace() + "-" + STARTING_OPERATION_EXECUTION
         .getProfilingEventTypeIdentifier(),
                    STARTING_OPERATION_EXECUTION_ID);
 
-    registerAction(OPERATION_EXECUTED.getProfilerEventTypeNamespace() + "-" + OPERATION_EXECUTED
+    registerAction(OPERATION_EXECUTED.getProfilingEventTypeNamespace() + "-" + OPERATION_EXECUTED
         .getProfilingEventTypeIdentifier(),
                    OPERATION_EXECUTED_ID);
 
-    registerAction(PS_FLOW_MESSAGE_PASSING.getProfilerEventTypeNamespace() + "-" + PS_FLOW_MESSAGE_PASSING
+    registerAction(PS_FLOW_MESSAGE_PASSING.getProfilingEventTypeNamespace() + "-" + PS_FLOW_MESSAGE_PASSING
         .getProfilingEventTypeIdentifier(),
                    PS_FLOW_MESSAGE_PASSING_ID);
   }

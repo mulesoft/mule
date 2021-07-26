@@ -44,7 +44,7 @@ public class ProcessingStrategyProfilingEventType implements ProfilingEventType<
   }
 
   @Override
-  public String getProfilerEventTypeNamespace() {
+  public String getProfilingEventTypeNamespace() {
     return profilingEventTypeNamespace;
   }
 

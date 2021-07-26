@@ -60,7 +60,7 @@ public class LoggerComponentProcessingStrategyDataConsumer
                                          ProcessingStrategyProfilingEventContext profilingEventContext) {
     Map<String, String> eventMap = new HashMap<>();
     eventMap.put(PROFILING_EVENT_TYPE,
-                 profilingEventType.getProfilerEventTypeNamespace() + ":" + profilingEventType.getProfilingEventTypeIdentifier());
+                 profilingEventType.getProfilingEventTypeNamespace() + ":" + profilingEventType.getProfilingEventTypeIdentifier());
     eventMap.put(PROFILING_EVENT_TIMESTAMP_KEY, Long.toString(profilingEventContext.getTriggerTimestamp()));
     eventMap.put(PROCESSING_THREAD_KEY, profilingEventContext.getThreadName());
     eventMap.put(ARTIFACT_ID_KEY, profilingEventContext.getArtifactId());
