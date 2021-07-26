@@ -34,7 +34,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "mystic",
       "system": "Marvel",
@@ -76,7 +76,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooling-mystic",
       "system": "Marvel",
@@ -118,7 +118,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "missile",
       "system": "Marvel",
@@ -160,7 +160,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "odd-missile",
       "system": "Marvel",
