@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
@@ -31,14 +31,14 @@ abstract class AbstractErrorMappingValidation implements Validation {
   public final Predicate<List<ComponentAst>> applicable() {
     return currentElemement(component -> component.getModel(OperationModel.class)
         .map(opModel -> !opModel.getModelProperty(NoErrorMappingModelProperty.class).isPresent()
-            && component.getParameter(DEFAULT_GROUP_NAME, ERROR_MAPPINGS_PARAMETER_NAME) != null
-            && component.getParameter(DEFAULT_GROUP_NAME, ERROR_MAPPINGS_PARAMETER_NAME).getValue().getValue().isPresent())
+            && component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME) != null
+            && component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME).getValue().getValue().isPresent())
         .orElse(false));
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    final ComponentParameterAst errorMappingsParam = component.getParameter(DEFAULT_GROUP_NAME, ERROR_MAPPINGS_PARAMETER_NAME);
+    final ComponentParameterAst errorMappingsParam = component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME);
     return errorMappingsParam.<List<ErrorMapping>>getValue()
         .reduce(l -> empty(),
                 mappings -> validateErrorMapping(component, errorMappingsParam, mappings));
