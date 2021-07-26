@@ -29,6 +29,7 @@ import org.mule.metadata.api.model.impl.DefaultBooleanType;
 import org.mule.metadata.api.model.impl.DefaultDateTimeType;
 import org.mule.metadata.api.model.impl.DefaultDateType;
 import org.mule.metadata.api.model.impl.DefaultFunctionType;
+import org.mule.metadata.api.model.impl.DefaultIntersectionType;
 import org.mule.metadata.api.model.impl.DefaultLocalDateTimeType;
 import org.mule.metadata.api.model.impl.DefaultLocalTimeType;
 import org.mule.metadata.api.model.impl.DefaultNothingType;
@@ -171,6 +172,11 @@ public class MetadataTypeEnricherTestCase {
   @Test
   public void enrichTypeParameterType() {
     verify(new DefaultTypeParameterType("Type Name", JAVA, emptyMap()));
+  }
+
+  @Test
+  public void enrichIntersectionType() {
+    verify(new DefaultIntersectionType(singletonList(new DefaultAnyType(JAVA, emptyMap())), JAVA, emptyMap()));
   }
 
   public void verify(MetadataType type) {
