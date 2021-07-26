@@ -106,6 +106,8 @@ import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
+import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -208,6 +210,7 @@ class MuleExtensionModelDeclarer {
     // misc
     declareNotifications(extensionDeclarer);
     declareGlobalProperties(extensionDeclarer);
+    declareSecurityManager(extensionDeclarer, TYPE_LOADER);
 
     return extensionDeclarer;
   }
@@ -1236,4 +1239,37 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The value of the property. This replaces each occurence of a property placeholder.");
   }
+
+  private void declareSecurityManager(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer securityManagerDeclarer = extensionDeclarer.withConstruct("securityManager")
+        .allowingTopLevelDefinition()
+        .describedAs("The default security manager provides basic support for security functions. Other modules (PGP, Spring) provide more advanced functionality.");
+
+    securityManagerDeclarer
+        .onDefaultParameterGroup()
+        .withOptionalParameter("providers")
+        .ofType(BaseTypeBuilder.create(JAVA)
+            .arrayType()
+            .of(typeLoader.load(SecurityProvider.class))
+            .build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
+            .allowsReferences(false).build())
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+
+    securityManagerDeclarer
+        .onDefaultParameterGroup()
+        .withOptionalParameter("encryptionStrategies")
+        .ofType(BaseTypeBuilder.create(JAVA)
+            .arrayType()
+            .of(typeLoader.load(EncryptionStrategy.class))
+            .build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
+            .allowsReferences(false).build())
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+
+    // TODO Auto-generated method stub
+
+  }
+
+
 }
