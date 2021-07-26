@@ -103,28 +103,27 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
   }
 
   private void declareCheckSummary(HasOperationDeclarer declarer) {
-    ParameterGroupDeclarer params = voidOperation(declarer, "checkSummary")
+    OperationDeclarer checkSummaryDeclarer = voidOperation(declarer, "checkSummary")
         .describedAs("Evaluates the log summary to be logged, checking that it contains the information expected.")
-        .withStereotype(LOG_CHECKER)
-        .onDefaultParameterGroup();
+        .withStereotype(LOG_CHECKER);
 
-    ObjectTypeBuilder summaryBuilder = BASE_TYPE_BUILDER.objectType();
-    summaryBuilder.addField().key("key").value(STRING_TYPE).required();
-    summaryBuilder.addField().key("value").value(STRING_TYPE).required(false);
-    summaryBuilder.addField().key("valueStartsWith").value(STRING_TYPE).required(false);
+    NestedComponentDeclarer summaryInfoDeclarer = checkSummaryDeclarer
+        .withComponent("summaryInfo")
+        .describedAs("An element expected log summary information");
 
-    params.withRequiredParameter("summaryInfos")
-        .describedAs("An element expected log summary information")
-        .ofType(BASE_TYPE_BUILDER.arrayType().of(summaryBuilder).build())
-        .withDsl(ParameterDslConfiguration.builder()
-            .allowsReferences(false)
-            .allowTopLevelDefinition(false)
-            .allowsInlineDefinition(true)
-            .build())
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+    ParameterGroupDeclarer summaryInfoParams = summaryInfoDeclarer.onDefaultParameterGroup();
+    summaryInfoParams.withRequiredParameter("key")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+    summaryInfoParams.withOptionalParameter("value")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+    summaryInfoParams.withOptionalParameter("valueStartsWith")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter("exclusiveContent")
+    checkSummaryDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("exclusiveContent")
         .describedAs("Specifies if the content to check should be the only one present(true) or it allows another information(false)")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false);
