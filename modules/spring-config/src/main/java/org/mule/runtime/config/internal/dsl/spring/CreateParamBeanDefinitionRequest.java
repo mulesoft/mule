@@ -57,7 +57,7 @@ public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionReques
   }
 
   @Override
-  public ComponentParameterAst getParameter(String parameterName) {
-    return resolveOwnerComponent().getParameter(parameterName);
+  public ComponentParameterAst getParameter(String groupName, String parameterName) {
+    return resolveOwnerComponent().getParameter(groupName, parameterName);
   }
 }

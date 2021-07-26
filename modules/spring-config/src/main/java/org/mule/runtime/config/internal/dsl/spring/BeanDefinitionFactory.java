@@ -220,11 +220,7 @@ public class BeanDefinitionFactory {
     groupModel.getParameterModels()
         .forEach(pm -> {
           final ComponentParameterAst param;
-          if (groupModel.isShowInDsl()) {
-            param = component.getParameter(groupModel.getName(), pm.getName());
-          } else {
-            param = component.getParameter(pm.getName());
-          }
+          param = component.getParameter(groupModel.getName(), pm.getName());
 
           if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
             groupParamsModels

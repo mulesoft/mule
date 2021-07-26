@@ -100,7 +100,7 @@ public abstract class CreateBeanDefinitionRequest<T> {
   /**
    * Resolve a parameter with the provided name in the scope of the param owner of this request.
    */
-  public ComponentParameterAst getParameter(String parameterName) {
-    return getComponent().getParameter(parameterName);
+  public ComponentParameterAst getParameter(String groupName, String parameterName) {
+    return getComponent().getParameter(groupName, parameterName);
   }
 }

@@ -411,7 +411,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .stream()
         .forEach(param -> elementDsl.getChild(param.getName())
             .ifPresent(paramDsl -> {
-              final Object paramValue = paramsOwner.getParameter(param.getName()).getValue().getRight();
+              final Object paramValue = paramsOwner.getParameter(group.getName(), param.getName()).getValue().getRight();
 
               if (paramValue == null) {
                 return;
@@ -520,7 +520,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           if (group.isShowInDsl()) {
             final List<ComponentParameterAst> groupParams = group.getParameterModels()
                 .stream()
-                .map(pm -> component.getParameter(pm.getName()))
+                .map(pm -> component.getParameter(group.getName(), pm.getName()))
                 .filter(p -> p != null)
                 .collect(toList());
 

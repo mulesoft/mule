@@ -10,6 +10,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 
@@ -64,7 +65,7 @@ public class ComponentBasedIdHelper {
     // There seems to be something missing in the mock model from the unit tests and this fails.
     // return MuleAstUtils.parameterOfType(elementModel, MuleStereotypes.CONFIG)
     // .map(p -> p.getValue().reduce(identity(), v -> v.toString()));
-    return ofNullable(elementModel.getParameter(CONFIG_ATTRIBUTE_NAME)).map(param -> param.getResolvedRawValue());
+    return ofNullable(elementModel.getParameter(DEFAULT_GROUP_NAME, CONFIG_ATTRIBUTE_NAME)).map(param -> param.getResolvedRawValue());
   }
 
   /**

@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.processMuleProperties;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
@@ -45,8 +46,8 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentB
       return false;
     }
 
-    ComponentParameterAst refParameterAst = component.getParameter(REF_PARAMETER);
-    ComponentParameterAst classParameterAst = component.getParameter(CLASS_PARAMETER);
+    ComponentParameterAst refParameterAst = component.getParameter(DEFAULT_GROUP_NAME, REF_PARAMETER);
+    ComponentParameterAst classParameterAst = component.getParameter(DEFAULT_GROUP_NAME, CLASS_PARAMETER);
     String refParameterValue = refParameterAst != null ? refParameterAst.getResolvedRawValue() : null;
     String classParameterValue = classParameterAst != null ? classParameterAst.getResolvedRawValue() : null;
 

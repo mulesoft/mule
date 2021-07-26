@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getRawParameterValue;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
@@ -25,6 +26,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.util.MuleAstUtils;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
@@ -341,8 +343,10 @@ class ComponentConfigurationBuilder<T> {
 
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
-          .map(ownerComponentModel -> doResolveParameter(createBeanDefinitionRequest.getParameter(parameterName)))
-          .orElseGet(() -> {
+          .map(ownerComponentModel -> getGroupAndParametersPairs(ownerComponentModel)
+                  .map(pgn -> doResolveParameter(createBeanDefinitionRequest.getParameter(pgn.getFirst().getName(), pgn.getSecond().getName())))
+                  .findFirst()
+          ).orElseGet(() -> {
             if (!ownerComponent.getModel(Object.class).isPresent()) {
               return ownerComponent.getParameter(parameterName);
             } else {
