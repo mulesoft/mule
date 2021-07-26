@@ -112,8 +112,8 @@ public class ValueProviderUtils {
   private static Map<Integer, String> orderParts(List<ParameterModel> parameters, String providerId, String targetSelector) {
     if (parameters.size() == 1 && !parameters.get(0).getFieldValueProviderModels().isEmpty()) {
       String providerName = parameters.get(0).getFieldValueProviderModels().stream()
-          .filter(fieldValueProviderModel -> fieldValueProviderModel.getProviderName()
-              .equals(parameters.get(0).getName() + "." + targetSelector))
+          .filter(fieldValueProviderModel -> fieldValueProviderModel.getTargetSelector()
+              .equals(targetSelector))
           .map(fieldValueProviderModel -> fieldValueProviderModel.getProviderName()).findAny().get();
       return parameters.get(0).getFieldValueProviderModels().stream()
           .filter(fieldValueProviderModel -> fieldValueProviderModel.getProviderName().equals(providerName))

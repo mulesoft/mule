@@ -98,7 +98,7 @@ public class DefaultExtensionSchemaGeneratorTestCase extends FileGenerationParam
 
   @Override
   protected boolean shouldUpdateExpectedFilesOnError() {
-    return true;
+    return UPDATE_EXPECTED_FILES_ON_ERROR;
   }
 
   @Override
