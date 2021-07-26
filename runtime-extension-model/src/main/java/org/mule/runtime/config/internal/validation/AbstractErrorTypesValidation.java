@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -49,12 +50,13 @@ public abstract class AbstractErrorTypesValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
 
   protected static boolean errorMappingPresent(ComponentAst operationComponent) {
-    final ComponentParameterAst errorMappingsAst = operationComponent.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
+    final ComponentParameterAst errorMappingsAst =
+        operationComponent.getParameter(DEFAULT_GROUP_NAME, ERROR_MAPPINGS_PARAMETER_NAME);
     return errorMappingsAst != null && errorMappingsAst.getValue().getValue().isPresent();
   }
 
   protected static List<ErrorMapping> getErrorMappings(ComponentAst component) {
-    return (List<ErrorMapping>) component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME).getValue().getRight();
+    return (List<ErrorMapping>) component.getParameter(DEFAULT_GROUP_NAME, ERROR_MAPPINGS_PARAMETER_NAME).getValue().getRight();
   }
 
   protected static Optional<ValidationResultItem> validateErrorTypeId(ComponentAst component, ComponentParameterAst parameter,
@@ -78,7 +80,7 @@ public abstract class AbstractErrorTypesValidation implements Validation {
 
   protected static Optional<ErrorType> lookup(ComponentAst component, String errorTypeParamName, ArtifactAst artifact) {
     return artifact.getErrorTypeRepository()
-        .lookupErrorType(parserErrorType(component.getParameter("type").getResolvedRawValue()));
+        .lookupErrorType(parserErrorType(component.getParameter(DEFAULT_GROUP_NAME, "type").getResolvedRawValue()));
   }
 
   protected static ComponentIdentifier parserErrorType(String representation) {

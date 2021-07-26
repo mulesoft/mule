@@ -11,6 +11,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -71,7 +73,7 @@ public class ParameterGroupExclusiveness implements Validation {
             for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
               final Collection<String> definedExclusiveParameters = exclusiveModel.getExclusiveParameterNames().stream()
                   .filter(exclParamName -> {
-                    final ComponentParameterAst value = component.getParameter(exclParamName);
+                    final ComponentParameterAst value = component.getParameter(group.getName(), exclParamName);
                     return !(value == null || !value.getValue().getValue().isPresent());
                   })
                   .collect(toList());
@@ -84,7 +86,8 @@ public class ParameterGroupExclusiveness implements Validation {
                                         Joiner.on(", ").join(exclusiveModel.getExclusiveParameterNames()))));
               } else if (definedExclusiveParameters.size() > 1) {
                 return of(create(component,
-                                 definedExclusiveParameters.stream().map(component::getParameter).collect(toList()),
+                                 definedExclusiveParameters.stream().map(param -> component.getParameter(group.getName(), param))
+                                     .collect(toList()),
                                  this,
                                  format("Element <%s>, the following parameters cannot be set at the same time: [%s].",
                                         getModelName(pmzd),
@@ -93,8 +96,9 @@ public class ParameterGroupExclusiveness implements Validation {
             }
           }
 
-          return pmzd.getAllParameterModels().stream()
-              .map(pm -> component.getParameter(pm.getName()))
+          return getGroupAndParametersPairs(pmzd)
+              .map(groupAndParam -> component.getParameter(groupAndParam.getFirst().getName(),
+                                                           groupAndParam.getSecond().getName()))
               .filter(param -> param != null && param.getValue().getRight() instanceof ComponentAst)
               // validate any nested pojos as well...
               .map(param -> validate((ComponentAst) param.getValue().getRight(), artifact))
