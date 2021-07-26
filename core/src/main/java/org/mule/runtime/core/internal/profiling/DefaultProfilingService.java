@@ -9,13 +9,13 @@ package org.mule.runtime.core.internal.profiling;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.FLOW_EXECUTED;
-import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
-import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
-import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
-import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
-import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.FLOW_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
