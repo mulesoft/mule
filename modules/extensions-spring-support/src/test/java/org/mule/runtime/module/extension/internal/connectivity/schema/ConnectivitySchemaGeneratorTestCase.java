@@ -10,10 +10,10 @@ import static com.google.gson.JsonParser.parseString;
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 
 import org.mule.extension.test.extension.reconnection.ReconnectionExtension;
-import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -42,8 +42,6 @@ import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Collection;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -83,14 +81,6 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
     return createExtensionModels(extensions);
   }
 
-  @Inject
-  private ExpressionLanguage expressionLanguage;
-
-  private final ExchangeAssetDescriptor exchangeAssetDescriptor = new ExchangeAssetDescriptor(
-                                                                                              "org.mule.runtime.test.extension",
-                                                                                              "mule-connectivity-schema-test",
-                                                                                              "1.0.0");
-
   private final ConnectivitySchemaGenerator generator = ConnectivitySchemaGeneratorBuilder.newInstance()
       .setConnectionTermsExtractor(ConnectionProviderModel::getSemanticTerms)
       .setParameterTermsExtractor(ParameterModel::getSemanticTerms)
@@ -106,11 +96,16 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
 
   @Override
   protected boolean shouldUpdateExpectedFilesOnError() {
-    return UPDATE_EXPECTED_FILES_ON_ERROR;
+    return true;//UPDATE_EXPECTED_FILES_ON_ERROR;
   }
 
   @Override
   protected String doGenerate(ExtensionModel extensionUnderTest) throws Exception {
+    ExchangeAssetDescriptor exchangeAssetDescriptor = new ExchangeAssetDescriptor(
+        "org.mule.runtime.test.extension",
+        "mule-connector-" + hyphenize(extensionUnderTest.getName().toLowerCase()).replaceAll(" ", "-"),
+        "1.0.0");
+
     JSONArray array = new JSONArray();
     List<ConnectivitySchema> schemas = generator.generateSchemas(extensionUnderTest, exchangeAssetDescriptor);
     for (ConnectivitySchema schema : schemas) {
