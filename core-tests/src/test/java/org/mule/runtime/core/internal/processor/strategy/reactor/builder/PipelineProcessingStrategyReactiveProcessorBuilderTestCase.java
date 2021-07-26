@@ -12,17 +12,15 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.FLOW_EXECUTED;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.pipelineProcessingStrategyReactiveProcessorFrom;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -86,6 +84,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
 
     // The profiling data producers are obtained
     verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_SCHEDULING_FLOW_EXECUTION);
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(STARTING_FLOW_EXECUTION);
     verify(profilingService, atLeastOnce()).getProfilingDataProducer(FLOW_EXECUTED);
     verify(profilingProducer, atLeastOnce()).triggerProfilingEvent(any());
   }
