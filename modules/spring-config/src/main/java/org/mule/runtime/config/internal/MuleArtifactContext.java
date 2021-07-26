@@ -416,7 +416,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     final Set<ComponentAst> rootComponents = resolveRootComponents(applicationModel);
 
-    recursiveStreamWithHierarchy(applicationModel, BOTTOM_UP)
+    recursiveStreamWithHierarchy(applicationModel, BOTTOM_UP, true)
         // Create component if must not be root is mandatory or component is a root component or component is child of a root
         // component
         .filter(cm -> !mustBeRoot || rootComponents.contains(cm.getFirst())
