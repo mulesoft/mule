@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
@@ -30,6 +31,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.util.MuleAstUtils;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -316,7 +318,7 @@ public class DslElementModel<T> {
         fromDslGroup(pmg, element, dslGroupsAsChildrenNames, builder);
       } else {
         pmg.getParameterModels().forEach(pm -> {
-          ComponentParameterAst param = element.getParameter(pm.getName());
+          ComponentParameterAst param = element.getParameter(pmg.getName(), pm.getName());
           if (param != null && param.getValue().getValue().isPresent()) {
             handleParam(param, param.getModel().getType(), builder);
           }
@@ -341,7 +343,7 @@ public class DslElementModel<T> {
 
       AtomicBoolean paramHandled = new AtomicBoolean(false);
       pmg.getParameterModels().forEach(pm -> {
-        ComponentParameterAst param = element.getParameter(pm.getName());
+        ComponentParameterAst param = element.getParameter(pmg.getName(), pm.getName());
         if (param != null && param.getValue().getValue().isPresent()) {
           paramHandled.set(true);
           handleParam(param, param.getModel().getType(), dslElementBuilder);

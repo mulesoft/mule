@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
@@ -117,7 +118,7 @@ class ComponentAstBasedElementModelFactory {
 
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
 
-        final ComponentParameterAst param = configuration.getParameter(name);
+        final ComponentParameterAst param = configuration.getParameter(DEFAULT_GROUP_NAME, name);
         if (param != null) {
           String value = param.getRawValue();
           LOGGER.trace("getComponentChildVisitor#defaultVisit: '{}': '{}'", identifier, value);
@@ -169,7 +170,8 @@ class ComponentAstBasedElementModelFactory {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}'", identifier.get());
         }
 
-        final ComponentAst fieldComponent = (ComponentAst) configuration.getParameter("value").getValue().getRight();
+        final ComponentAst fieldComponent =
+            (ComponentAst) configuration.getParameter(DEFAULT_GROUP_NAME, "value").getValue().getRight();
 
         if (isMap(objectType)) {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.orElse(null));
@@ -178,7 +180,7 @@ class ComponentAstBasedElementModelFactory {
           return;
         }
 
-        final ComponentParameterAst param = configuration.getParameter(name);
+        final ComponentParameterAst param = configuration.getParameter(DEFAULT_GROUP_NAME, name);
         String value = param != null ? param.getRawValue() : null;
         if (!isBlank(value)) {
           typeBuilder.containing(DslElementModel.builder()
@@ -237,11 +239,11 @@ class ComponentAstBasedElementModelFactory {
 
         entry.containing(DslElementModel.builder()
             .withModel(typeLoader.load(String.class))
-            .withValue(entryConfig.getParameter(KEY_ATTRIBUTE_NAME).getRawValue())
+            .withValue(entryConfig.getParameter(DEFAULT_GROUP_NAME, KEY_ATTRIBUTE_NAME).getRawValue())
             .withDsl(entryDsl.getAttribute(KEY_ATTRIBUTE_NAME).get())
             .build());
 
-        String value = entryConfig.getParameter(VALUE_ATTRIBUTE_NAME).getRawValue();
+        String value = entryConfig.getParameter(DEFAULT_GROUP_NAME, VALUE_ATTRIBUTE_NAME).getRawValue();
         if (isBlank(value)) {
           entryType.accept(getComponentChildVisitor(entry, entryConfig, entryType,
                                                     VALUE_ATTRIBUTE_NAME, entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME).get(),
@@ -277,7 +279,8 @@ class ComponentAstBasedElementModelFactory {
     // Have to keep the order of the elements consistent so the generated metadata keys are backwards compatible
     populateConnectionProviderElements(builder, configuration);
     populateParameterizedElements(model, elementDsl, builder, configuration,
-                                  paramGroupModel -> paramModel -> configuration.getParameter(paramModel.getName()));
+                                  paramGroupModel -> paramModel -> configuration.getParameter(DEFAULT_GROUP_NAME,
+                                                                                              paramModel.getName()));
     populateComposableElements(builder, configuration);
 
     if (model instanceof SourceModel) {
@@ -312,7 +315,7 @@ class ComponentAstBasedElementModelFactory {
         .forEach(g -> {
           g.getParameterModels().forEach(p -> {
             addElementParameter(configuration, parameters, elementDsl, builder, p,
-                                paramModel -> configuration.getParameter(paramModel.getName()));
+                                paramModel -> configuration.getParameter(DEFAULT_GROUP_NAME, paramModel.getName()));
           });
         });
   }
@@ -417,7 +420,7 @@ class ComponentAstBasedElementModelFactory {
       return;
     }
 
-    final ComponentParameterAst parameter = configuration.getParameter(paramModel.getName());
+    final ComponentParameterAst parameter = configuration.getParameter(DEFAULT_GROUP_NAME, paramModel.getName());
     final Object paramValue = parameter != null ? parameter.getValue().getRight() : null;
 
     Object paramComponent;

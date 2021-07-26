@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.stream.Collectors.toCollection;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor.DEFAULT_COLLECTION_TYPE;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -67,12 +68,12 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
     }
     ComponentBuildingDefinition componentBuildingDefinition = request.getComponentBuildingDefinition();
     request.getSpringComponentModel().setType(type);
-    final String key = component.getParameter(ENTRY_TYPE_KEY_PARAMETER_NAME).getResolvedRawValue();
+    final String key = component.getParameter(DEFAULT_GROUP_NAME, ENTRY_TYPE_KEY_PARAMETER_NAME).getResolvedRawValue();
     MapEntryType mapEntryType = request.getSpringComponentModel().getMapEntryType();
     Object keyBeanDefinition = getConvertibleBeanDefinition(mapEntryType.getKeyType(), key,
                                                             componentBuildingDefinition.getKeyTypeConverter());
 
-    final ComponentParameterAst valueRefParam = component.getParameter(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME);
+    final ComponentParameterAst valueRefParam = component.getParameter(DEFAULT_GROUP_NAME, ENTRY_TYPE_VALUE_REF_PARAMETER_NAME);
     Object value;
     // MULE-11984: Check that generated map entries are not empty
     if (valueRefParam != null) {
@@ -96,7 +97,7 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
                           Consumer<ComponentAst> nestedComponentParamProcessor) {
     Class valueType = mapEntryType.getValueType();
 
-    return component.getParameter(SIMPLE_TYPE_VALUE_PARAMETER_NAME).getValue()
+    return component.getParameter(DEFAULT_GROUP_NAME, SIMPLE_TYPE_VALUE_PARAMETER_NAME).getValue()
         .mapLeft(v -> getConvertibleBeanDefinition(valueType, "#[" + v + "]", componentBuildingDefinition.getTypeConverter()))
         .mapRight(v -> {
           if (List.class.isAssignableFrom(valueType)) {

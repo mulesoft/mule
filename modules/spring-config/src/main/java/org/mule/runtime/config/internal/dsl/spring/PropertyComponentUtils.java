@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -46,27 +47,29 @@ public class PropertyComponentUtils {
     String nameKey = getNameAttributeName(propertyComponentModel.getIdentifier());
 
     Object value;
-    if (propertyComponentModel.getParameter(refKey) != null) {
-      value = propertyComponentModel.getParameter(refKey).getResolvedRawValue();
+    if (propertyComponentModel.getParameter(DEFAULT_GROUP_NAME, refKey) != null) {
+      value = propertyComponentModel.getParameter(DEFAULT_GROUP_NAME, refKey).getResolvedRawValue();
     } else {
-      value = propertyComponentModel.getParameter(VALUE_PARAMETER_NAME) != null
-          ? propertyComponentModel.getParameter(VALUE_PARAMETER_NAME).getResolvedRawValue()
+      value = propertyComponentModel.getParameter(DEFAULT_GROUP_NAME, VALUE_PARAMETER_NAME) != null
+          ? propertyComponentModel.getParameter(DEFAULT_GROUP_NAME, VALUE_PARAMETER_NAME).getResolvedRawValue()
           : null;
     }
 
-    String name = propertyComponentModel.getParameter(nameKey).getResolvedRawValue();
+    String name = propertyComponentModel.getParameter(DEFAULT_GROUP_NAME, nameKey).getResolvedRawValue();
     if (name != null) {
       return new Pair<>(name, value);
     } else {
       String beanName =
-          propertyComponentModel.getParameter("ref") != null ? propertyComponentModel.getParameter("ref").getResolvedRawValue()
+          propertyComponentModel.getParameter(DEFAULT_GROUP_NAME, "ref") != null
+              ? propertyComponentModel.getParameter(DEFAULT_GROUP_NAME, "ref").getResolvedRawValue()
               : null;
       return new Pair<>(PROPERTY_NAME_PROPERTY_ATTRIBUTE, new RuntimeBeanReference(beanName));
     }
   }
 
   public static Optional<String> getRawParameterValue(ComponentAst componentAst, String parameterName) {
-    return ofNullable(componentAst.getParameter(parameterName)).map(ComponentParameterAst::getResolvedRawValue);
+    return ofNullable(componentAst.getParameter(DEFAULT_GROUP_NAME, parameterName))
+        .map(ComponentParameterAst::getResolvedRawValue);
   }
 
   private static String getNameAttributeName(ComponentIdentifier identifier) {

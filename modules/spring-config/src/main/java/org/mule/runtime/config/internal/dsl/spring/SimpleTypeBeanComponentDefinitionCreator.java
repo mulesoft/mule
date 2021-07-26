@@ -9,6 +9,8 @@ package org.mule.runtime.config.internal.dsl.spring;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+
 /**
  * Bean definition creator for elements that end up representing simple types.
  * <p>
@@ -22,7 +24,7 @@ class SimpleTypeBeanComponentDefinitionCreator extends SimpleTypeBeanBaseDefinit
   @Override
   protected boolean doHandleRequest(CreateComponentBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type) {
     ComponentAst component = createBeanDefinitionRequest.getComponent();
-    final ComponentParameterAst valueParam = component.getParameter("value");
+    final ComponentParameterAst valueParam = component.getParameter(DEFAULT_GROUP_NAME, "value");
 
     if (valueParam == null || valueParam.getResolvedRawValue() == null) {
       return false;

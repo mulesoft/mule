@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.getGroupAndParametersPairs;
@@ -343,12 +344,13 @@ class ComponentConfigurationBuilder<T> {
 
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
-          .map(ownerComponentModel -> getGroupAndParametersPairs(ownerComponentModel)
-                  .map(pgn -> doResolveParameter(createBeanDefinitionRequest.getParameter(pgn.getFirst().getName(), pgn.getSecond().getName())))
-                  .findFirst()
-          ).orElseGet(() -> {
+          .flatMap(ownerComponentModel -> getGroupAndParametersPairs(ownerComponentModel)
+              .map(pgn -> doResolveParameter(createBeanDefinitionRequest.getParameter(pgn.getFirst().getName(),
+                                                                                      pgn.getSecond().getName())))
+              .findFirst())
+          .orElseGet(() -> {
             if (!ownerComponent.getModel(Object.class).isPresent()) {
-              return ownerComponent.getParameter(parameterName);
+              return ownerComponent.getParameter(DEFAULT_GROUP_NAME, parameterName);
             } else {
               return null;
             }
@@ -387,7 +389,7 @@ class ComponentConfigurationBuilder<T> {
     private ComponentParameterAst doResolveParameter(ComponentParameterAst param) {
       if (param == null && component != null) {
         // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
-        return ownerComponent.getParameter(component.getIdentifier().getName());
+        return ownerComponent.getParameter(DEFAULT_GROUP_NAME, component.getIdentifier().getName());
       }
 
       return param;

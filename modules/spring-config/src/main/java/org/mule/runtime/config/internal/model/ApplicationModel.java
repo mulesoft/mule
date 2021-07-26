@@ -182,24 +182,26 @@ public abstract class ApplicationModel {
       }
 
       return flow.directChildrenStream().findFirst()
-              .filter(comp -> comp.getModel(SourceModel.class).isPresent())
-              .flatMap(comp -> getGroupAndParametersPairs(comp.getModel(SourceModel.class).get())
-                      .filter(pairGroupSource -> {
-                        final ComponentParameterAst redeliveryPolicyParam = comp.getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME);
-                        if (redeliveryPolicyParam != null) {
-                          final ComponentAst redeliveryPolicy = (ComponentAst) redeliveryPolicyParam.getValue().getRight();
-                          if (redeliveryPolicy != null) {
-                            return true;
-                          }
-                        }
-                        return false;
-                      })
-                      .map(pairGroupSource -> {
-                        final ComponentAst redeliveryPolicy = (ComponentAst) comp.getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME).getValue().getRight();
-                        return transformFlowWithRedeliveryPolicy(flow, comp, redeliveryPolicy);
-                      })
-                      .findFirst()
-              ).orElse(flow);
+          .filter(comp -> comp.getModel(SourceModel.class).isPresent())
+          .flatMap(comp -> getGroupAndParametersPairs(comp.getModel(SourceModel.class).get())
+              .filter(pairGroupSource -> {
+                final ComponentParameterAst redeliveryPolicyParam =
+                    comp.getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME);
+                if (redeliveryPolicyParam != null) {
+                  final ComponentAst redeliveryPolicy = (ComponentAst) redeliveryPolicyParam.getValue().getRight();
+                  if (redeliveryPolicy != null) {
+                    return true;
+                  }
+                }
+                return false;
+              })
+              .map(pairGroupSource -> {
+                final ComponentAst redeliveryPolicy = (ComponentAst) comp
+                    .getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME).getValue().getRight();
+                return transformFlowWithRedeliveryPolicy(flow, comp, redeliveryPolicy);
+              })
+              .findFirst())
+          .orElse(flow);
     });
   }
 
