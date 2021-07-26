@@ -106,11 +106,14 @@ import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
+import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
+import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
@@ -208,6 +211,7 @@ class MuleExtensionModelDeclarer {
     // misc
     declareNotifications(extensionDeclarer);
     declareGlobalProperties(extensionDeclarer);
+    declareSecurityManager(extensionDeclarer, TYPE_LOADER);
 
     return extensionDeclarer;
   }
@@ -758,7 +762,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Splits the same message and processes each part in parallel.")
         .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0"));
 
-    parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);;
+    parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
 
     ParameterDeclarer collectionParam = parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
@@ -886,7 +890,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareOnErrorRoute(NestedRouteDeclarer onError) {
-    onError.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);;
+    onError.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
     declareOnErrorRouteParams(onError);
   }
 
@@ -1235,5 +1239,43 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The value of the property. This replaces each occurence of a property placeholder.");
+  }
+
+  private void declareSecurityManager(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer securityManagerDeclarer = extensionDeclarer.withConstruct("securityManager")
+        .allowingTopLevelDefinition()
+        .describedAs("The default security manager provides basic support for security functions. Other modules (PGP, Spring) provide more advanced functionality.");
+
+    ObjectType securityProviderType = BaseTypeBuilder.create(JAVA).objectType()
+        .with(new ClassInformationAnnotation(SecurityProvider.class))
+        .with(new InfrastructureTypeAnnotation())
+        .build();
+
+    securityManagerDeclarer
+        .onDefaultParameterGroup()
+        .withOptionalParameter("providers")
+        .ofType(BaseTypeBuilder.create(JAVA)
+            .arrayType()
+            .of(securityProviderType)
+            .build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
+            .allowsReferences(false).build())
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+
+    ObjectType exceptionStrategyType = BaseTypeBuilder.create(JAVA).objectType()
+        .with(new ClassInformationAnnotation(EncryptionStrategy.class))
+        .with(new InfrastructureTypeAnnotation())
+        .build();
+
+    securityManagerDeclarer
+        .onDefaultParameterGroup()
+        .withOptionalParameter("encryptionStrategies")
+        .ofType(BaseTypeBuilder.create(JAVA)
+            .arrayType()
+            .of(exceptionStrategyType)
+            .build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
+            .allowsReferences(false).build())
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 }
