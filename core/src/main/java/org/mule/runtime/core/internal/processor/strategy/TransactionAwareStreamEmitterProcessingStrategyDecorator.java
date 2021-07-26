@@ -129,15 +129,6 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
 
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> startingOperationExecutionDataProducer =
-        profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
-    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> operationExecutedDataProducer =
-        profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
-    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> psSchedulingOperationExecution =
-        profilingService.getProfilingDataProducer(PS_SCHEDULING_OPERATION_EXECUTION);
-    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> psFlowMessagePassing =
-        profilingService.getProfilingDataProducer(PS_FLOW_MESSAGE_PASSING);
-
     ComponentLocation location = getLocation(processor);
     String artifactId = muleContext.getConfiguration().getId();
     String artifactType = muleContext.getArtifactType().getAsString();
