@@ -435,7 +435,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     params.withOptionalParameter("enableNotifications")
         .describedAs("Whether to fire a {{FunctionalTestNotification}} when a message is received by the processor. Test cases can register to receive these notifications and make assertions on the current message.")
         .ofType(BOOLEAN_TYPE)
-        .defaultingTo(false)
+        .defaultingTo(true)
         .withExpressionSupport(NOT_SUPPORTED);
 
     params.withOptionalParameter("appendString")
