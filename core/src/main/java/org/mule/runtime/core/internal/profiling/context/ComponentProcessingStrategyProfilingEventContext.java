@@ -8,7 +8,7 @@
 package org.mule.runtime.core.internal.profiling.context;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.profiling.consumer.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Optional;
@@ -43,8 +43,9 @@ public class ComponentProcessingStrategyProfilingEventContext implements Process
     this.location = ofNullable(location);
   }
 
-  public CoreEvent getEvent() {
-    return event;
+  @Override
+  public String getCorrelationId() {
+    return event.getCorrelationId();
   }
 
   public String getThreadName() {
