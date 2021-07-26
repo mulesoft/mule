@@ -263,7 +263,9 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
         parameterModels.add(parameterModel);
       } else if (parameterModel.getFieldValueProviderModels()
           .stream()
-          .anyMatch(fieldValueProviderModel -> fieldValueProviderModel.getProviderName().equals(valueName))) {
+          .anyMatch(fieldValueProviderModel -> fieldValueProviderModel.getProviderName()
+              .substring(0, fieldValueProviderModel.getProviderName().lastIndexOf("_")).equals(valueName))) {
+
         parameterModels.add(parameterModel);
       }
     }
