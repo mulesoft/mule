@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
@@ -57,7 +58,7 @@ public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesVal
 
       final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(errorTypeId);
       if (!errorType.isPresent()) {
-        return of(create(component, component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME), this,
+        return of(create(component, component.getParameter(DEFAULT_GROUP_NAME, ERROR_MAPPINGS_PARAMETER_NAME), this,
                          format("Could not find error '%s'.", errorMapping.getSource())));
       }
     }

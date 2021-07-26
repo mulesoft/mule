@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
@@ -49,13 +50,13 @@ public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation 
     return currentElemement(comp -> (comp.getIdentifier().equals(ON_ERROR_IDENTIFIER)
         || comp.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)
         || comp.getIdentifier().equals(ON_ERROR_CONTINUE_IDENTIFIER))
-        && comp.getParameter("type") != null
-        && comp.getParameter("type").getResolvedRawValue() != null);
+        && comp.getParameter(DEFAULT_GROUP_NAME, "type") != null
+        && comp.getParameter(DEFAULT_GROUP_NAME, "type").getResolvedRawValue() != null);
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
-    final ComponentParameterAst errorTypeParam = onErrorModel.getParameter("type");
+    final ComponentParameterAst errorTypeParam = onErrorModel.getParameter(DEFAULT_GROUP_NAME, "type");
     for (String type : errorTypeParam.getResolvedRawValue().split(",")) {
       final ComponentIdentifier parsedErrorType = parserErrorType(type.trim());
 
