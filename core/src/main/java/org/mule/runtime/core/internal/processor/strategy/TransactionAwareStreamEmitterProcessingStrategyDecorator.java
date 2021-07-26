@@ -121,7 +121,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   private Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> getDataProducer(
                                                                                                    ProfilingEventType<ProcessingStrategyProfilingEventContext> eventType) {
     if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
-      of(profilingService.getProfilingDataProducer(eventType));
+      return of(profilingService.getProfilingDataProducer(eventType));
     }
 
     // In case the profiling feature is not enabled there is no data producer.
