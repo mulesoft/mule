@@ -102,7 +102,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
           if (isTxActive(ctx)) {
-            // The profiling events related to processing strategy scheduling are triggered independently of this being
+            // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
                 .profileEvent(location, ofNullable(getDataProducer(PS_SCHEDULING_FLOW_EXECUTION)), artifactId, artifactType)
@@ -146,7 +146,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
           if (isTxActive(ctx)) {
-            // The profiling events related to processing strategy scheduling are triggered independently of this being
+            // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
                 .profileEvent(location, ofNullable(getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION)), artifactId, artifactType)
