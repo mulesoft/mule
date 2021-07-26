@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.api.profiling.ProfilerDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
@@ -86,9 +86,9 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
   }
 
   /**
-   * @return returns the {@link ProfilerDataConsumerDiscoveryStrategy} used by this service.
+   * @return returns the {@link ProfilingDataConsumerDiscoveryStrategy} used by this service.
    */
-  protected abstract ProfilerDataConsumerDiscoveryStrategy getDiscoveryStrategy();
+  protected abstract ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy();
 
   public <T extends ProfilingEventContext> void notifyEvent(T profilingEventContext, ProfilingEventType<T> action) {
     serverNotificationHandler.fireNotification(new ProfilingNotification(profilingEventContext, action));

@@ -22,7 +22,7 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.profiling.ProfilerDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
@@ -95,7 +95,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Test
   @Description("The correct discovery strategy is set")
   public void correctDiscoveryStrategy() {
-    assertThat(profilingService.getDiscoveryStrategy(), instanceOf(TestProfilerDataConsumerDiscoveryStrategy.class));
+    assertThat(profilingService.getDiscoveryStrategy(), instanceOf(TestProfilingDataConsumerDiscoveryStrategy.class));
   }
 
   @Test
@@ -116,20 +116,20 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   }
 
   /**
-   * Stub {@link DefaultProfilingService} with a test {@link ProfilerDataConsumerDiscoveryStrategy}.
+   * Stub {@link DefaultProfilingService} with a test {@link ProfilingDataConsumerDiscoveryStrategy}.
    */
   private static class TestDefaultProfilingService extends DefaultProfilingService {
 
     @Override
-    public ProfilerDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return new TestProfilerDataConsumerDiscoveryStrategy();
+    public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+      return new TestProfilingDataConsumerDiscoveryStrategy();
     }
   }
 
   /**
-   * Stub for a {@link ProfilerDataConsumerDiscoveryStrategy}.
+   * Stub for a {@link ProfilingDataConsumerDiscoveryStrategy}.
    */
-  private static class TestProfilerDataConsumerDiscoveryStrategy implements ProfilerDataConsumerDiscoveryStrategy {
+  private static class TestProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
 
     @Override
     public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {

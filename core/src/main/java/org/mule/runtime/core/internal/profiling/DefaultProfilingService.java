@@ -18,7 +18,7 @@ import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingE
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.profiling.ProfilerDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
@@ -61,8 +61,8 @@ public class DefaultProfilingService extends AbstractProfilingService {
       };
 
   @Override
-  public ProfilerDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-    return new DefaultProfilerDataConsumerDiscoveryStrategy();
+  public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+    return new DefaultProfilingDataConsumerDiscoveryStrategy();
   }
 
   @Override
