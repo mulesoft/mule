@@ -12,6 +12,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SE
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.FLOW_EXECUTED;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
@@ -101,7 +102,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
           if (isTxActive(ctx)) {
+            // The profiling events related to processing strategy scheduling are triggered independently of this being
+            // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
+                .profileEvent(location, ofNullable(getDataProducer(PS_SCHEDULING_FLOW_EXECUTION)), artifactId, artifactType)
                 .profileEvent(location, ofNullable(getDataProducer(STARTING_FLOW_EXECUTION)), artifactId, artifactType)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
                 .profileEvent(location, ofNullable(getDataProducer(FLOW_EXECUTED)), artifactId, artifactType)
