@@ -10,7 +10,7 @@ package org.mule.runtime.core.internal.profiling;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.notification.ProfilerNotificationListener;
+import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificationListener;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 
 /**
@@ -18,7 +18,7 @@ import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificati
  *
  * @since 4.4
  */
-public class DefaultProfilingNotificationListener implements ProfilerNotificationListener<ProfilingNotification> {
+public class DefaultProfilingNotificationListener implements ProfilingNotificationListener<ProfilingNotification> {
 
   private final ProfilingDataConsumer<ProfilingEventContext> dataConsumer;
 
