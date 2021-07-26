@@ -35,6 +35,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
@@ -375,6 +376,14 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     processor.withOutput().ofType(ANY_TYPE);
     processor.withOutputAttributes().ofType(ANY_TYPE);
 
+    NestedComponentDeclarer callbackDeclarer = processor.withOptionalComponent("callback");
+    callbackDeclarer.onDefaultParameterGroup().withOptionalParameter("class")
+        .describedAs("A user-defined callback that is invoked when the test component is invoked. This can be useful for capturing information such as message counts. Use the {{class}} attribute to specify the callback class name, which must be an object that implements {{org.mule.tck.functional.EventCallback}}.")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(new ClassValueModel(singletonList("org.mule.tck.functional.EventCallback"))).build());
+
     ParameterGroupDeclarer params = processor.onParameterGroup("return-data").withDslInlineRepresentation(true);
     params.withOptionalParameter("file")
         .describedAs("The location of a file to load. The file can point to a resource on the classpath or on disk.")
@@ -382,18 +391,11 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, ANY, new String[] {})).build())
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params = processor.onParameterGroup("callback").withDslInlineRepresentation(true);
-    params.withOptionalParameter("class")
-        .describedAs("A user-defined callback that is invoked when the test component is invoked. This can be useful for capturing information such as message counts. Use the {{class}} attribute to specify the callback class name, which must be an object that implements {{org.mule.tck.functional.EventCallback}}.")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder()
-            .classValue(new ClassValueModel(singletonList("org.mule.tck.functional.EventCallback"))).build());
-
     params = processor.onDefaultParameterGroup();
     params.withOptionalParameter("processingType")
         .describedAs("The kind of work this component will report to do, in order to affect the behavior of the Processing Strategy.")
         .ofType(BASE_TYPE_BUILDER.stringType().enumOf("CPU_INTENSIVE", "CPU_LITE", "BLOCKING", "IO_RW", "CPU_LITE_ASYNC").build())
+        .defaultingTo("CPU_LITE")
         .withExpressionSupport(NOT_SUPPORTED);
     params.withOptionalParameter("class")
         .describedAs("The class name of a processor to be instantiated and executed")
