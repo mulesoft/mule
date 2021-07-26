@@ -7,7 +7,8 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.FLOW_EXECUTED;
 import static org.mule.runtime.core.api.profiling.notification.RuntimeProfilingEventType.OPERATION_EXECUTED;
@@ -41,6 +42,7 @@ import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorato
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -105,10 +107,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
-                .profileEvent(location, ofNullable(getDataProducer(PS_SCHEDULING_FLOW_EXECUTION)), artifactId, artifactType)
-                .profileEvent(location, ofNullable(getDataProducer(STARTING_FLOW_EXECUTION)), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(PS_SCHEDULING_FLOW_EXECUTION), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(STARTING_FLOW_EXECUTION), artifactId, artifactType)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
-                .profileEvent(location, ofNullable(getDataProducer(FLOW_EXECUTED)), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(FLOW_EXECUTED), artifactId, artifactType)
                 .build();
           } else {
             return from(pub).transform(delegate.onPipeline(pipeline));
@@ -116,14 +118,14 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
         });
   }
 
-  private ProfilingDataProducer<ProcessingStrategyProfilingEventContext> getDataProducer(
-                                                                                         ProfilingEventType<ProcessingStrategyProfilingEventContext> eventType) {
+  private Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> getDataProducer(
+                                                                                                   ProfilingEventType<ProcessingStrategyProfilingEventContext> eventType) {
     if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
-      profilingService.getProfilingDataProducer(eventType);
+      of(profilingService.getProfilingDataProducer(eventType));
     }
 
     // In case the profiling feature is not enabled there is no data producer.
-    return null;
+    return empty();
   }
 
 
@@ -140,11 +142,11 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
-                .profileEvent(location, ofNullable(getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION)), artifactId, artifactType)
-                .profileEvent(location, ofNullable(getDataProducer(STARTING_OPERATION_EXECUTION)), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(STARTING_OPERATION_EXECUTION), artifactId, artifactType)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
-                .profileEvent(location, ofNullable(getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION)), artifactId, artifactType)
-                .profileEvent(location, ofNullable(getDataProducer(PS_FLOW_MESSAGE_PASSING)), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(OPERATION_EXECUTED), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(PS_FLOW_MESSAGE_PASSING), artifactId, artifactType)
                 .build();
           } else {
             return from(pub).transform(delegate.onProcessor(processor));
