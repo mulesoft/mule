@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
+import static org.mule.runtime.config.internal.util.AstUtils.getParameter;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -171,7 +172,7 @@ class ComponentAstBasedElementModelFactory {
         }
 
         final ComponentAst fieldComponent =
-            (ComponentAst) configuration.getParameter(DEFAULT_GROUP_NAME, "value").getValue().getRight();
+            (ComponentAst) getParameter(configuration, "value", null).getValue().getRight();
 
         if (isMap(objectType)) {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.orElse(null));
@@ -180,7 +181,7 @@ class ComponentAstBasedElementModelFactory {
           return;
         }
 
-        final ComponentParameterAst param = configuration.getParameter(DEFAULT_GROUP_NAME, name);
+        final ComponentParameterAst param = getParameter(configuration, name, null);
         String value = param != null ? param.getRawValue() : null;
         if (!isBlank(value)) {
           typeBuilder.containing(DslElementModel.builder()
@@ -239,11 +240,11 @@ class ComponentAstBasedElementModelFactory {
 
         entry.containing(DslElementModel.builder()
             .withModel(typeLoader.load(String.class))
-            .withValue(entryConfig.getParameter(DEFAULT_GROUP_NAME, KEY_ATTRIBUTE_NAME).getRawValue())
+            .withValue(getParameter(entryConfig, KEY_ATTRIBUTE_NAME, null).getRawValue())
             .withDsl(entryDsl.getAttribute(KEY_ATTRIBUTE_NAME).get())
             .build());
 
-        String value = entryConfig.getParameter(DEFAULT_GROUP_NAME, VALUE_ATTRIBUTE_NAME).getRawValue();
+        String value = getParameter(entryConfig, VALUE_ATTRIBUTE_NAME, null).getRawValue();
         if (isBlank(value)) {
           entryType.accept(getComponentChildVisitor(entry, entryConfig, entryType,
                                                     VALUE_ATTRIBUTE_NAME, entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME).get(),
@@ -315,9 +316,18 @@ class ComponentAstBasedElementModelFactory {
         .forEach(g -> {
           g.getParameterModels().forEach(p -> {
             addElementParameter(configuration, parameters, elementDsl, builder, p,
-                                paramModel -> configuration.getParameter(DEFAULT_GROUP_NAME, paramModel.getName()));
+                                paramModel -> configuration.getParameter(getGroupName(g), paramModel.getName()));
           });
         });
+  }
+
+  private String getGroupName(ParameterGroupModel groupModel) {
+    try {
+      return groupModel.getName();
+    } catch (IllegalArgumentException e) {
+      // TODO MULE-19614: Remove this catch.
+      return DEFAULT_GROUP_NAME;
+    }
   }
 
   private void populateConnectionProviderElements(DslElementModel.Builder builder, ComponentAst configuration) {
@@ -420,7 +430,7 @@ class ComponentAstBasedElementModelFactory {
       return;
     }
 
-    final ComponentParameterAst parameter = configuration.getParameter(DEFAULT_GROUP_NAME, paramModel.getName());
+    final ComponentParameterAst parameter = paramFetcher.apply(paramModel);
     final Object paramValue = parameter != null ? parameter.getValue().getRight() : null;
 
     Object paramComponent;
