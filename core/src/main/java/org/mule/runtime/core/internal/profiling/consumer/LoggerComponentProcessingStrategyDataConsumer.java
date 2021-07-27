@@ -51,8 +51,9 @@ public class LoggerComponentProcessingStrategyDataConsumer
   @Override
   public void onProfilingEvent(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
                                ProcessingStrategyProfilingEventContext profilingEventContext) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(gson.toJson(getInfoMap(profilingEventType, profilingEventContext)));
+    Logger logger = getDataConsumerLogger();
+    if (logger.isDebugEnabled()) {
+      logger.debug(gson.toJson(getInfoMap(profilingEventType, profilingEventContext)));
     }
   }
 
@@ -82,5 +83,12 @@ public class LoggerComponentProcessingStrategyDataConsumer
   @Override
   public Predicate<ProcessingStrategyProfilingEventContext> getEventContextFilter() {
     return processingStrategyProfilingEventContext -> true;
+  }
+
+  /**
+   * @return the logger used for consuming the profiling data.
+   */
+  protected Logger getDataConsumerLogger() {
+    return LOGGER;
   }
 }

@@ -70,12 +70,4 @@ public final class ProfilingUtils {
     return muleContext.getArtifactType().getAsString();
   }
 
-  /**
-   * @return the fully qualified profiling notification identifier considering the namespace.
-   */
-  public static String getFullyQualifiedProfilingNotificationIdentifier(ProfilingEventType profilingEventType) {
-    return profilingEventType.getProfilingEventTypeNamespace() + PROFILING_NAMESPACE_IDENTIFIER_SEPARATOR
-        + profilingEventType
-            .getProfilingEventTypeIdentifier();
-  }
 }

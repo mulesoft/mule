@@ -67,7 +67,6 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     Map<String, Object> objects = new HashMap<>();
-    super.getStartUpRegistryObjects().putAll(objects);
     objects.put(OBJECT_NOTIFICATION_DISPATCHER, notificationManager);
     objects.put(OBJECT_NOTIFICATION_HANDLER, notificationManager);
     return objects;

@@ -19,7 +19,6 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_S
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getFullyQualifiedProfilingNotificationIdentifier;
 
 /**
  * A {@link Notification} that produces data for troubleshooting. This is extended for using notifications for producing profiling
@@ -36,11 +35,14 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   private static final int OPERATION_EXECUTED_ID = PROFILING_ACTION_START_RANGE + 7;
   private static final int PS_FLOW_MESSAGE_PASSING_ID = PROFILING_ACTION_START_RANGE + 8;
 
+  /**
+   * The separator between the profiling identifier and the namespace.
+   */
   public static final String PROFILING_NAMESPACE_IDENTIFIER_SEPARATOR = ":";
 
   static {
 
-    registerAction("test", TEST_NOTIFICATION_ID);
+    registerAction("test-namespace:test", TEST_NOTIFICATION_ID);
 
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(STARTING_FLOW_EXECUTION), STARTING_FLOW_EXECUTION_ID);
 
@@ -83,5 +85,14 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
    */
   public ProfilingEventType<?> getProfilingEventType() {
     return profilingEventType;
+  }
+
+  /**
+   * @return the fully qualified profiling notification identifier considering the namespace.
+   */
+  public static String getFullyQualifiedProfilingNotificationIdentifier(ProfilingEventType profilingEventType) {
+    return profilingEventType.getProfilingEventTypeNamespace() + PROFILING_NAMESPACE_IDENTIFIER_SEPARATOR
+        + profilingEventType
+            .getProfilingEventTypeIdentifier();
   }
 }

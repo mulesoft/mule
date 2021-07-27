@@ -1,0 +1,210 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.runtime.core.api.profiling;
+
+import static com.google.common.collect.ImmutableSet.of;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.FLOW_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.ARTIFACT_ID_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.ARTIFACT_TYPE_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.LOCATION;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROCESSING_THREAD_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROFILING_EVENT_TIMESTAMP_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROFILING_EVENT_TYPE;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.RUNTIME_CORE_EVENT_CORRELATION_ID;
+import static org.mule.runtime.core.internal.profiling.notification.ProfilingNotification.getFullyQualifiedProfilingNotificationIdentifier;
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.slf4j.Logger;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.gson.Gson;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+@Feature(PROFILING)
+@Story(DEFAULT_PROFILING_SERVICE)
+@RunWith(Parameterized.class)
+public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContextTestCase {
+
+  public static final String THREAD_NAME = "threadName";
+  public static final String ARTIFACT_ID = "artifactId";
+  public static final String ARTIFACT_TYPE = "artifactType";
+  public static final long PROFILING_EVENT_TIMESTAMP = 5678L;
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
+
+  @Rule
+  public SystemProperty systemProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
+
+  @Mock
+  private CoreEvent event;
+
+  @Mock
+  private ComponentLocation location;
+
+  @Mock
+  private Logger logger;
+
+  private final Gson gson = new Gson();
+
+  private final ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType;
+
+  private ProfilingService profilingService;
+
+  @Before
+  public void before() throws Exception {
+    when(logger.isDebugEnabled()).thenReturn(true);
+    profilingService = getTestProfilingService();
+  }
+
+  private ProfilingService getTestProfilingService() throws MuleException {
+    ProfilingService profilingService = new TestDefaultProfilingService(logger);
+    initialiseIfNeeded(profilingService, muleContext);
+    startIfNeeded(profilingService);
+    return profilingService;
+  }
+
+  @Parameters(name = "eventType: {0}")
+  public static Collection<ProfilingEventType<ProcessingStrategyProfilingEventContext>> eventType() {
+    return asList(PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION, OPERATION_EXECUTED,
+                  PS_FLOW_MESSAGE_PASSING, PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION,
+                  FLOW_EXECUTED);
+  }
+
+  public ProcessingStrategyDataConsumersTestCase(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
+    this.profilingEventType = profilingEventType;
+  }
+
+  @Test
+  @Description("When a profiling event related to processing strategy is triggered, the data consumers process the data accordingly.")
+  public void dataConsumersForProcessingStrategiesProfilingEventTypesConsumeDataAccordingly() {
+    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> dataProducer =
+        profilingService.getProfilingDataProducer(profilingEventType);
+
+    ComponentProcessingStrategyProfilingEventContext profilerEventContext =
+        new ComponentProcessingStrategyProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
+                                                             PROFILING_EVENT_TIMESTAMP);
+    dataProducer.triggerProfilingEvent(
+                                       profilerEventContext);
+
+    verify(logger).debug(jsonToLog(profilingEventType, profilerEventContext));
+  }
+
+  /**
+   * Stub {@link DefaultProfilingService} with a test {@link ProfilingDataConsumerDiscoveryStrategy}.
+   */
+  private static class TestDefaultProfilingService extends DefaultProfilingService {
+
+    private final Logger logger;
+
+    public TestDefaultProfilingService(Logger logger) {
+      this.logger = logger;
+
+    }
+
+    @Override
+    public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+      return new TestProfilingDataConsumerDiscoveryStrategy(logger);
+    }
+
+  }
+
+  /**
+   * Stub {@link ProfilingDataConsumerDiscoveryStrategy}
+   */
+  private static class TestProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
+
+    private final Logger logger;
+
+    public TestProfilingDataConsumerDiscoveryStrategy(Logger logger) {
+      this.logger = logger;
+    }
+
+    @Override
+    public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
+      return (Set<S>) of(new TestLoggerComponentProcessingStrategyDataConsumer(logger));
+    }
+  }
+
+  /**
+   * Stub {@link LoggerComponentProcessingStrategyDataConsumer} for injecting a mocked {@link Logger}
+   */
+  private static class TestLoggerComponentProcessingStrategyDataConsumer extends LoggerComponentProcessingStrategyDataConsumer {
+
+    private final Logger logger;
+
+    public TestLoggerComponentProcessingStrategyDataConsumer(Logger logger) {
+      super();
+      this.logger = logger;
+    }
+
+    @Override
+    protected Logger getDataConsumerLogger() {
+      return logger;
+    }
+  }
+
+  private String jsonToLog(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
+                           ProcessingStrategyProfilingEventContext profilingEventContext) {
+    Map<String, String> eventMap = new HashMap<>();
+    eventMap.put(PROFILING_EVENT_TYPE,
+                 getFullyQualifiedProfilingNotificationIdentifier(profilingEventType));
+    eventMap.put(PROFILING_EVENT_TIMESTAMP_KEY, Long.toString(profilingEventContext.getTriggerTimestamp()));
+    eventMap.put(PROCESSING_THREAD_KEY, profilingEventContext.getThreadName());
+    eventMap.put(ARTIFACT_ID_KEY, profilingEventContext.getArtifactId());
+    eventMap.put(ARTIFACT_TYPE_KEY, profilingEventContext.getArtifactType());
+    eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, profilingEventContext.getCorrelationId());
+    profilingEventContext.getLocation().map(loc -> eventMap.put(LOCATION, loc.getLocation()));
+
+    return gson.toJson(eventMap);
+  }
+
+}

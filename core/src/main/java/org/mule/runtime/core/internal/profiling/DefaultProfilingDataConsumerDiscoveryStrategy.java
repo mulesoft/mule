@@ -26,7 +26,6 @@ public class DefaultProfilingDataConsumerDiscoveryStrategy implements ProfilingD
 
   @Override
   public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
-    // No data consumers.
     return (Set<S>) ImmutableSet.of(new LoggerComponentProcessingStrategyDataConsumer());
   }
 
