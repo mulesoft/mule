@@ -305,7 +305,7 @@ public class DslElementModel<T> {
         fromDslGroup(pmg, element, dslGroupsAsChildrenNames, builder);
       } else {
         pmg.getParameterModels().forEach(pm -> {
-          ComponentParameterAst param = element.getParameter(pmg.getName(), pm.getName());
+          ComponentParameterAst param = element.getParameter(getGroupName(pmg), pm.getName());
           if (param != null && param.getValue().getValue().isPresent()) {
             handleParam(param, param.getModel().getType(), builder);
           }
@@ -339,7 +339,7 @@ public class DslElementModel<T> {
     protected void fromDslGroup(ParameterGroupModel pmg, ComponentAst element, List<ComponentIdentifier> dslGroupsAsChildrenNames,
                                 InternalComponentConfiguration.Builder builder) {
       final DslElementSyntax dslElementSyntax =
-          element.getGenerationInformation().getSyntax().get().getChild(pmg.getName()).get();
+          element.getGenerationInformation().getSyntax().get().getChild(getGroupName(pmg)).get();
 
       final ComponentIdentifier dslGroupIdentifier = ComponentIdentifier.builder()
           .namespaceUri(dslElementSyntax.getNamespace())
@@ -353,7 +353,7 @@ public class DslElementModel<T> {
 
       AtomicBoolean paramHandled = new AtomicBoolean(false);
       pmg.getParameterModels().forEach(pm -> {
-        ComponentParameterAst param = element.getParameter(pmg.getName(), pm.getName());
+        ComponentParameterAst param = element.getParameter(getGroupName(pmg), pm.getName());
         if (param != null && param.getValue().getValue().isPresent()) {
           paramHandled.set(true);
           handleParam(param, param.getModel().getType(), dslElementBuilder);
