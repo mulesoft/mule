@@ -23,6 +23,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
@@ -65,6 +66,7 @@ import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
@@ -77,6 +79,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class CoreExtensionModelTestCase {
 
@@ -488,6 +492,18 @@ public class CoreExtensionModelTestCase {
   }
 
   @Test
+  @Issue("MULE-19653")
+  public void scatterGatherOutputParams() {
+    final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
+
+    ParameterGroupModel outputGroup =
+        scatterGatherModel.getParameterGroupModels().stream().filter(pg -> pg.getName().equals(OUTPUT)).findAny().get();
+
+    assertThat(outputGroup.getParameter(TARGET_PARAMETER_NAME).isPresent(), is(true));
+    assertThat(outputGroup.getParameter(TARGET_VALUE_PARAMETER_NAME).isPresent(), is(true));
+  }
+
+  @Test
   public void parallelForeach() {
     final ConstructModel parallelForeach = coreExtensionModel.getConstructModel("parallelForeach").get();
 
@@ -532,6 +548,18 @@ public class CoreExtensionModelTestCase {
     assertThat(targetValue.getExpressionSupport(), is(REQUIRED));
     assertThat(targetValue.getType(), instanceOf(StringType.class));
     assertThat(targetValue.isRequired(), is(false));
+  }
+
+  @Test
+  @Issue("MULE-19653")
+  public void parallelForeachOutputParams() {
+    final ConstructModel parallelForeach = coreExtensionModel.getConstructModel("parallelForeach").get();
+
+    ParameterGroupModel outputGroup =
+        parallelForeach.getParameterGroupModels().stream().filter(pg -> pg.getName().equals(OUTPUT)).findAny().get();
+
+    assertThat(outputGroup.getParameter(TARGET_PARAMETER_NAME).isPresent(), is(true));
+    assertThat(outputGroup.getParameter(TARGET_VALUE_PARAMETER_NAME).isPresent(), is(true));
   }
 
   @Test
