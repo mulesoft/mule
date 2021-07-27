@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.getGroupAndParametersPairs;
@@ -312,13 +313,22 @@ public class DslElementModel<T> {
       }
     }
 
+    private String getGroupName(ParameterGroupModel groupModel) {
+      try {
+        return groupModel.getName();
+      } catch (IllegalArgumentException e) {
+        // TODO MULE-19614: Remove this catch and check the integration test ParameterAstTestCase.
+        return DEFAULT_GROUP_NAME;
+      }
+    }
+
     protected void fromGroup(ParameterGroupModel pmg, ComponentAst element, List<ComponentIdentifier> dslGroupsAsChildrenNames,
                              InternalComponentConfiguration.Builder builder) {
       if (pmg.isShowInDsl()) {
         fromDslGroup(pmg, element, dslGroupsAsChildrenNames, builder);
       } else {
         pmg.getParameterModels().forEach(pm -> {
-          ComponentParameterAst param = element.getParameter(pmg.getName(), pm.getName());
+          ComponentParameterAst param = element.getParameter(getGroupName(pmg), pm.getName());
           if (param != null && param.getValue().getValue().isPresent()) {
             handleParam(param, param.getModel().getType(), builder);
           }
