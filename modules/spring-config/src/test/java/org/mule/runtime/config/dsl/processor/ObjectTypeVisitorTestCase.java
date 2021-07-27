@@ -7,13 +7,20 @@
 
 package org.mule.runtime.config.dsl.processor;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.internal.processor.AbstractProcessor;
@@ -88,8 +95,19 @@ public class ObjectTypeVisitorTestCase {
 
 
   private ComponentAstBuilder baseComponentModelBuilder() {
+    ParameterModel parameterModel = mock(ParameterModel.class);
+    when(parameterModel.getName()).thenReturn("type");
+
+    ParameterGroupModel groupModel = mock(ParameterGroupModel.class);
+    when(groupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(groupModel.getParameterModels()).thenReturn(singletonList(parameterModel));
+
+    ParameterizedModel parameterizedModel = mock(ParameterizedModel.class);
+    when(parameterizedModel.getParameterGroupModels()).thenReturn(singletonList(groupModel));
+
     return ComponentAstBuilder.builder()
         .withIdentifier(ComponentIdentifier.builder().namespace("ns").name("comp").build())
+        .withParameterizedModel(parameterizedModel)
         .withMetadata(EMPTY_METADATA);
   }
 
