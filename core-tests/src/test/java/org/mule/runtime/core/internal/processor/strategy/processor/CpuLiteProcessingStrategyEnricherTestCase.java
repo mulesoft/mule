@@ -38,10 +38,6 @@ import java.util.concurrent.Callable;
 @Story(ENRICHER)
 public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedReactiveProcessorTestCase {
 
-  public static final String ARTIFACT_ID = "artifactId";
-  public static final String ARTIFACT_TYPE = "artifactType";
-  private final ReactiveProcessor reactiveProcessor = p -> p;
-
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
 

@@ -44,11 +44,6 @@ import java.util.concurrent.Callable;
 @RunWith(Parameterized.class)
 public class ProactorProcessingStrategyEnricherTestCase extends AbstractEnrichedReactiveProcessorTestCase {
 
-  public static final String ARTIFACT_ID = "artifactId";
-  public static final String ARTIFACT_TYPE = "artifactType";
-
-  private final ReactiveProcessor reactiveProcessor = p -> p;
-
   private final int parallelism;
 
   @Rule

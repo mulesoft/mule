@@ -50,10 +50,6 @@ import org.mockito.junit.MockitoRule;
 @RunWith(Parameterized.class)
 public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends AbstractEnrichedReactiveProcessorTestCase {
 
-  public static final String ARTIFACT_ID = "artifactId";
-  public static final String ARTIFACT_TYPE = "artifactType";
-  private final ReactiveProcessor reactiveProcessor = p -> p;
-
   private final int parallelism;
 
   @Rule
