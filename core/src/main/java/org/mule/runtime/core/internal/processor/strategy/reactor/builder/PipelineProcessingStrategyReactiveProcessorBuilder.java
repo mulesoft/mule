@@ -13,7 +13,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.FLOW
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getLocation;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;

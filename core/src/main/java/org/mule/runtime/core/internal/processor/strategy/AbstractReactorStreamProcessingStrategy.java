@@ -11,8 +11,8 @@ import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURR
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getArtifactId;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getArtifactType;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;

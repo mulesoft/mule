@@ -7,6 +7,9 @@
 
 package org.mule.runtime.core.internal.profiling;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getFullyQualifiedProfilingNotificationIdentifier;
+
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -27,8 +30,6 @@ import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificati
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 
 /**
  * A {@link AbstractProfilingService} that discovers available {@link ProfilingDataConsumer}
@@ -72,8 +73,8 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
                                  ProfilingNotification profilingNotification) {
     return profilingDataConsumer.getProfilingEventTypes().stream()
         .anyMatch(
-                  eventType -> eventType.getProfilingEventTypeIdentifier()
-                      .equals(profilingNotification.getActionName()))
+                  eventType -> (getFullyQualifiedProfilingNotificationIdentifier(eventType))
+                      .equalsIgnoreCase(profilingNotification.getActionName()))
         &&
         profilingDataConsumer.getEventContextFilter().test(((ProfilingEventContext) profilingNotification.getSource()));
   }

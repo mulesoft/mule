@@ -21,8 +21,8 @@ import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SC
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.pipelineProcessingStrategyReactiveProcessorFrom;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getArtifactId;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getArtifactType;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;

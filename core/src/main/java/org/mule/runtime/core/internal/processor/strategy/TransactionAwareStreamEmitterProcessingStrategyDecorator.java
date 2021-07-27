@@ -20,9 +20,9 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STAR
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getArtifactId;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getArtifactType;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProcessingStrategyProfilingUtils.getLocation;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 

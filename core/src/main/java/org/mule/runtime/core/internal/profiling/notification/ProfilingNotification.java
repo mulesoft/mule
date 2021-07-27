@@ -19,6 +19,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_S
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getFullyQualifiedProfilingNotificationIdentifier;
 
 /**
  * A {@link Notification} that produces data for troubleshooting. This is extended for using notifications for producing profiling
@@ -35,44 +36,35 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   private static final int OPERATION_EXECUTED_ID = PROFILING_ACTION_START_RANGE + 7;
   private static final int PS_FLOW_MESSAGE_PASSING_ID = PROFILING_ACTION_START_RANGE + 8;
 
+  public static final String PROFILING_NAMESPACE_IDENTIFIER_SEPARATOR = ":";
+
   static {
 
     registerAction("test", TEST_NOTIFICATION_ID);
 
-    registerAction(
-                   STARTING_FLOW_EXECUTION.getProfilingEventTypeNamespace() + "-"
-                       + STARTING_FLOW_EXECUTION.getProfilingEventTypeIdentifier(),
-                   STARTING_FLOW_EXECUTION_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(STARTING_FLOW_EXECUTION), STARTING_FLOW_EXECUTION_ID);
 
-    registerAction(PS_SCHEDULING_FLOW_EXECUTION.getProfilingEventTypeNamespace() + "-" + PS_SCHEDULING_FLOW_EXECUTION
-        .getProfilingEventTypeIdentifier(),
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_SCHEDULING_FLOW_EXECUTION),
                    PS_SCHEDULING_FLOW_EXECUTION_ID);
 
-    registerAction(FLOW_EXECUTED.getProfilingEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
-                   FLOW_EXECUTED_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(FLOW_EXECUTED), FLOW_EXECUTED_ID);
 
-    registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilingEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
-        .getProfilingEventTypeIdentifier(),
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_SCHEDULING_OPERATION_EXECUTION),
                    PS_SCHEDULING_OPERATION_EXECUTION_ID);
 
-    registerAction(STARTING_OPERATION_EXECUTION.getProfilingEventTypeNamespace() + "-" + STARTING_OPERATION_EXECUTION
-        .getProfilingEventTypeIdentifier(),
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(STARTING_OPERATION_EXECUTION),
                    STARTING_OPERATION_EXECUTION_ID);
 
-    registerAction(OPERATION_EXECUTED.getProfilingEventTypeNamespace() + "-" + OPERATION_EXECUTED
-        .getProfilingEventTypeIdentifier(),
-                   OPERATION_EXECUTED_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(OPERATION_EXECUTED), OPERATION_EXECUTED_ID);
 
-    registerAction(PS_FLOW_MESSAGE_PASSING.getProfilingEventTypeNamespace() + "-" + PS_FLOW_MESSAGE_PASSING
-        .getProfilingEventTypeIdentifier(),
-                   PS_FLOW_MESSAGE_PASSING_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_FLOW_MESSAGE_PASSING), PS_FLOW_MESSAGE_PASSING_ID);
   }
 
-  private ProfilingEventType<?> profilingEventType;
+  private final ProfilingEventType<?> profilingEventType;
 
   public <T extends ProfilingEventContext> ProfilingNotification(T profilingEventContext,
                                                                  ProfilingEventType<T> profilingEventType) {
-    super(profilingEventContext, getActionId(profilingEventType.getProfilingEventTypeIdentifier()));
+    super(profilingEventContext, getActionId(getFullyQualifiedProfilingNotificationIdentifier(profilingEventType)));
     this.profilingEventType = profilingEventType;
   }
 
