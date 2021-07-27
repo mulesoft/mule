@@ -345,6 +345,7 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .flatMap(ownerComponentModel -> getGroupAndParametersPairs(ownerComponentModel)
+              .filter(groupAndParam -> groupAndParam.getSecond().getName().equals(parameterName))
               .map(pgn -> doResolveParameter(createBeanDefinitionRequest.getParameter(pgn.getFirst().getName(),
                                                                                       pgn.getSecond().getName())))
               .findFirst())
