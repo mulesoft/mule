@@ -7,6 +7,8 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -58,6 +60,24 @@ public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionReques
 
   @Override
   public ComponentParameterAst getParameter(String groupName, String parameterName) {
-    return resolveOwnerComponent().getParameter(groupName, parameterName);
+    List<ComponentAst> h = getComponentHierarchy();
+    for (ComponentAst componentAst : h) {
+      if (!componentAst.getModel(ParameterizedModel.class).isPresent()) {
+        continue;
+      }
+
+      ParameterizedModel parameterizedModel = componentAst.getModel(ParameterizedModel.class).get();
+      for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
+        if (!parameterGroupModel.getName().equals(groupName)) {
+          continue;
+        }
+
+        if (parameterGroupModel.getParameter(parameterName).isPresent()) {
+          return componentAst.getParameter(groupName, parameterName);
+        }
+      }
+    }
+
+    return null;
   }
 }

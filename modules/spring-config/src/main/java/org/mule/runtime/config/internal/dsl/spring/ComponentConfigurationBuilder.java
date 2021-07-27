@@ -348,6 +348,7 @@ class ComponentConfigurationBuilder<T> {
               .filter(groupAndParam -> groupAndParam.getSecond().getName().equals(parameterName))
               .map(pgn -> doResolveParameter(createBeanDefinitionRequest.getParameter(pgn.getFirst().getName(),
                                                                                       pgn.getSecond().getName())))
+              .filter(Objects::nonNull)
               .findFirst())
           .orElseGet(() -> {
             if (!ownerComponent.getModel(Object.class).isPresent()) {
