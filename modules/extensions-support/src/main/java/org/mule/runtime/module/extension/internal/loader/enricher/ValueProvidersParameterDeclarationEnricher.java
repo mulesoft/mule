@@ -15,6 +15,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.loader.utils.FieldValueProviderNameUtils.getFieldValueProviderName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderId;
@@ -250,7 +251,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
           .ifPresent(field -> requiresConfiguration.set(true));
 
       int partOrder = 1;
-      String providerName = name + "_" + hash(fieldValues.targetSelectors());
+      String providerName = getFieldValueProviderName(name, fieldValues.targetSelectors());
       for (String targetSelector : fieldValues.targetSelectors()) {
         ValueProviderFactoryModelProperty valueProviderFactoryModelProperty = propertyBuilder.build();
         valueProviderFactoryModelProperties.put(targetSelector, valueProviderFactoryModelProperty);

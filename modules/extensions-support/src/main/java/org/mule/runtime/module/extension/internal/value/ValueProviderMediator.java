@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.module.extension.internal.loader.utils.FieldValueProviderNameUtils.getParameterName;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.cloneAndEnrichValue;
 
@@ -263,8 +264,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
         parameterModels.add(parameterModel);
       } else if (parameterModel.getFieldValueProviderModels()
           .stream()
-          .anyMatch(fieldValueProviderModel -> fieldValueProviderModel.getProviderName()
-              .substring(0, fieldValueProviderModel.getProviderName().lastIndexOf("_")).equals(valueName))) {
+          .anyMatch(fieldValueProviderModel -> getParameterName(fieldValueProviderModel).equals(valueName))) {
 
         parameterModels.add(parameterModel);
       }
