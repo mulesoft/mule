@@ -31,6 +31,7 @@ import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 
 /**
  * An {@link ExtensionDeclarer} for Mule's XML SDK v1
@@ -42,6 +43,7 @@ public class XmlSdk1ExtensionModelDeclarer {
   private static final String XMLSDK1_STEREOTYPE_NAMESPACE = "XML_SDK_1";
 
   private static final StereotypeModel PARAMS_STEREOTYPE = newStereotype("PARAMETERS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+  private static final StereotypeModel PROPERTY_STEREOTYPE = newStereotype("PROPERTY", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel ERRORS_STEREOTYPE = newStereotype("ERRORS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel OUTPUT_STEREOTYPE = newStereotype("OUTPUT", XMLSDK1_STEREOTYPE_NAMESPACE).build();
   private static final StereotypeModel OUTPUT_ATTRIBUTES_STEREOTYPE =
@@ -70,8 +72,21 @@ public class XmlSdk1ExtensionModelDeclarer {
     declareModuleConstruct(extensionDeclarer, typeBuilder);
     declarePropertyElement(extensionDeclarer, typeBuilder);
     declareOperation(typeBuilder, extensionDeclarer);
+    declareConnectionConstruct(extensionDeclarer);
 
     return extensionDeclarer;
+  }
+
+  private void declareConnectionConstruct(ExtensionDeclarer extensionDeclarer) {
+    extensionDeclarer.withConstruct("connection")
+        .describedAs("A connection defines a set of properties that will be tight to the connection provider mechanism rather " +
+            "than the configuration (default behaviour).")
+        .allowingTopLevelDefinition()
+        .withOptionalComponent("properties")
+        .withAllowedStereotypes(PROPERTY_STEREOTYPE)
+        .withMinOccurs(0)
+        .withMaxOccurs(null)
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 
   private void declareModuleConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
@@ -229,7 +244,8 @@ public class XmlSdk1ExtensionModelDeclarer {
             "default value that will be used if the invocation to the operation does not defines a value for the property. " +
             "The property can be accessed within the body definition of the operation using an expression such as " +
             "#[property.paramName]")
-        .allowingTopLevelDefinition();
+        .allowingTopLevelDefinition()
+        .withStereotype(PROPERTY_STEREOTYPE);
 
     final ParameterGroupDeclarer propertyDeclarationDefaultParamGroup = propertyDeclaration.onDefaultParameterGroup();
 
