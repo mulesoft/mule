@@ -51,13 +51,6 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
     registerAction(FLOW_EXECUTED.getProfilingEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
                    FLOW_EXECUTED_ID);
 
-    registerAction(FLOW_EXECUTED.getProfilingEventTypeNamespace() + "-" + FLOW_EXECUTED.getProfilingEventTypeIdentifier(),
-                   FLOW_EXECUTED_ID);
-
-    registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilingEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
-        .getProfilingEventTypeIdentifier(),
-                   PS_SCHEDULING_OPERATION_EXECUTION_ID);
-
     registerAction(PS_SCHEDULING_OPERATION_EXECUTION.getProfilingEventTypeNamespace() + "-" + PS_SCHEDULING_OPERATION_EXECUTION
         .getProfilingEventTypeIdentifier(),
                    PS_SCHEDULING_OPERATION_EXECUTION_ID);
