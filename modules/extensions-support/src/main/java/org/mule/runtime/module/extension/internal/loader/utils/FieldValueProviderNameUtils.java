@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 
 public class FieldValueProviderNameUtils {
 
-  private static String FIELD_VALUE_PROVIDER_NAME_FORMAT = "%s<%s>";
+  private static String FIELD_VALUE_PROVIDER_NAME_FORMAT = "%s[%s]";
 
   private FieldValueProviderNameUtils() {};
 
