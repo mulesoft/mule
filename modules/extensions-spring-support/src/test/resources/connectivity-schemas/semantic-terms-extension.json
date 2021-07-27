@@ -100,7 +100,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "api-key",
       "system": "Semantic Terms",
@@ -213,7 +213,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "basic-auth",
       "system": "Semantic Terms",
@@ -326,7 +326,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "client-secret",
       "system": "Semantic Terms",
@@ -464,7 +464,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "custom",
       "system": "Semantic Terms",
@@ -567,7 +567,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "digest",
       "system": "Semantic Terms",
@@ -670,7 +670,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "kerberos",
       "system": "Semantic Terms",
@@ -773,7 +773,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "unsecured",
       "system": "Semantic Terms",

@@ -45,7 +45,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "rick-and-morty-connection",
       "system": "RAM",
