@@ -8,6 +8,7 @@ package org.mule.test.crafted.config.properties.extension;
 
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.test.crafted.config.properties.extension.TestConfigPropertiesExtensionLoadingDelegate.EXTENSION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -37,7 +38,7 @@ public class SecureConfigurationPropertiesProviderFactory implements Configurati
   public SecureConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
                                                               UnaryOperator<String> localResolver,
                                                               ResourceProvider externalResourceProvider) {
-    String file = providerElementDeclaration.getParameter("file").getResolvedRawValue();
+    String file = providerElementDeclaration.getParameter(DEFAULT_GROUP_NAME, "file").getResolvedRawValue();
     requireNonNull(file, "Required attribute 'file' of 'secure-configuration-properties' not found");
 
     String algorithm = providerElementDeclaration.getParameter("encrypt", "algorithm").getResolvedRawValue();
