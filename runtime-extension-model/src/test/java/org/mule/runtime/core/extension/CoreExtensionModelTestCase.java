@@ -140,7 +140,7 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(20));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(21));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 

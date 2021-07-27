@@ -7,16 +7,14 @@
 package org.mule.runtime.core.api.security;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 
 /**
- * A factory class for providing secret keys to an instance of {@code SecretKeyEncryptionStrategy}.
+ * A factory class for providing secret keys to an instance of {@link SecretKeyEncryptionStrategy}.
  * 
  * @see SecretKeyEncryptionStrategy
- * 
- * @deprecated SecretKeyEncryptionStrategy does not exist anymore.
  */
 @NoImplement
-@Deprecated
 public interface SecretKeyFactory {
 
   byte[] getKey();
