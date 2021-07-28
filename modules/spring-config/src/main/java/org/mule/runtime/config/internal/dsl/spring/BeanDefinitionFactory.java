@@ -665,7 +665,8 @@ public class BeanDefinitionFactory {
         String identifier = childComponentModel.getIdentifier().getName();
         if (identifier.equals("password-encryption-strategy")
             || identifier.equals("secret-key-encryption-strategy")) {
-          registry.registerBeanDefinition(childComponentModel.getParameter(NAME_ATTRIBUTE_NAME).getResolvedRawValue(),
+          registry.registerBeanDefinition(childComponentModel.getParameter(DEFAULT_GROUP_NAME, NAME_ATTRIBUTE_NAME)
+              .getResolvedRawValue(),
                                           springComponentModels.get(childComponentModel).getBeanDefinition());
         }
       });
