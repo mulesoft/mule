@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
@@ -62,12 +63,13 @@ public class ErrorMappingTargetTypeReferencesExist extends AbstractErrorTypesVal
       final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
 
       if (errorNamespaces.contains(errorTypeId.getNamespace())) {
-        return validateErrorTypeId(component, component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME), artifact, this,
+        return validateErrorTypeId(component, component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME), artifact,
+                                   this,
                                    errorMapping.getTarget(), errorTypeId);
       } else if (artifact.getParent()
           .map(p -> p.getErrorTypeRepository().getErrorNamespaces().contains(errorTypeId.getNamespace()))
           .orElse(false)) {
-        return of(create(component, component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME), this,
+        return of(create(component, component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME), this,
                          format("Cannot use error type '%s': namespace already exists.", errorMapping.getTarget())));
       }
     }

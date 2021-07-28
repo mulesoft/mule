@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
@@ -52,12 +53,12 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER)
         // there is already another validation for the presence of this param
-        .and(component -> !StringUtils.isEmpty(component.getParameter("type").getResolvedRawValue())));
+        .and(component -> !StringUtils.isEmpty(component.getParameter(DEFAULT_GROUP_NAME, "type").getResolvedRawValue())));
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    final ComponentParameterAst errorTypeParam = component.getParameter("type");
+    final ComponentParameterAst errorTypeParam = component.getParameter(DEFAULT_GROUP_NAME, "type");
     final String errorTypeString = errorTypeParam.getResolvedRawValue();
 
     final Set<String> errorNamespaces = artifact.dependencies().stream()
