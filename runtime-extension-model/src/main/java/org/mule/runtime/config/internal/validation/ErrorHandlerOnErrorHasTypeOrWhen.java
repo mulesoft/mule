@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsComponentId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
@@ -82,7 +83,7 @@ public class ErrorHandlerOnErrorHasTypeOrWhen implements Validation {
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
     if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
-      final ComponentParameterAst errorRefParam = onErrorModel.getParameter(REFERENCE_ATTRIBUTE);
+      final ComponentParameterAst errorRefParam = onErrorModel.getParameter(DEFAULT_GROUP_NAME, REFERENCE_ATTRIBUTE);
       final Optional<String> refAttr = errorRefParam.getValue().getValue();
       final Optional<ComponentAst> referenced = refAttr
           .flatMap(sharedOnErrorName -> artifact.topLevelComponentsStream()
@@ -106,7 +107,7 @@ public class ErrorHandlerOnErrorHasTypeOrWhen implements Validation {
   }
 
   boolean isParameterPresent(ComponentAst componentAst, String name) {
-    ComponentParameterAst parameterAst = componentAst.getParameter(name);
+    ComponentParameterAst parameterAst = componentAst.getParameter(DEFAULT_GROUP_NAME, name);
     if (parameterAst == null) {
       return false;
     }

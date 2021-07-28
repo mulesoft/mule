@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
@@ -96,9 +97,11 @@ public class RequiredParametersPresent implements Validation {
         .orElse(Stream.empty());
 
     return concat(paramsStream, component.getModel(ParameterizedModel.class)
-        .map(pmzd -> pmzd.getAllParameterModels().stream()
-            .filter(this::isDoValidation)
-            .map(pm -> new Pair<>(pm, component.getParameter(pm.getName()))))
+        .map(pmzd -> getGroupAndParametersPairs(pmzd)
+            .filter(groupAndParameter -> isDoValidation(groupAndParameter.getSecond()))
+            .map(groupAndParameter -> new Pair<>(groupAndParameter.getSecond(),
+                                                 component.getParameter(groupAndParameter.getFirst().getName(),
+                                                                        groupAndParameter.getSecond().getName()))))
         .orElse(Stream.empty()));
   }
 
