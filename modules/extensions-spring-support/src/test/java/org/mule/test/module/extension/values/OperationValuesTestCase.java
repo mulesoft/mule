@@ -449,6 +449,38 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
+  public void parameterWithMultipleMultiLevelFieldValuesWithSameVP() throws Exception {
+    Set<Value> values = getValues("parameterWithMultipleMultiLevelFieldValuesWithSameVP", "body", "target.location.continent");
+
+    ValueMatcher americaValue = valueWithId(AMERICA)
+        .withDisplayName(AMERICA)
+        .withPartName("body.target.location.continent")
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName("body.target.location.country")
+            .withChilds(valueWithId(BUENOS_AIRES)
+                .withDisplayName(BUENOS_AIRES)
+                .withPartName("body.target.location.city")));
+
+    assertThat(values, hasValues(americaValue));
+
+    Set<Value> otherValues =
+        getValues("parameterWithMultipleMultiLevelFieldValuesWithSameVP", "body", "source.location.continent");
+
+    ValueMatcher otherAmericaValue = valueWithId(AMERICA)
+        .withDisplayName(AMERICA)
+        .withPartName("body.source.location.continent")
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName("body.source.location.country")
+            .withChilds(valueWithId(BUENOS_AIRES)
+                .withDisplayName(BUENOS_AIRES)
+                .withPartName("body.source.location.city")));
+
+    assertThat(otherValues, hasValues(otherAmericaValue));
+  }
+
+  @Test
   public void actingParameterWithReservedName() throws Exception {
     Set<Value> channels = getValues("actingParameterWithReservedName", "parameterWithValues");
     assertThat(channels, hasSize(1));

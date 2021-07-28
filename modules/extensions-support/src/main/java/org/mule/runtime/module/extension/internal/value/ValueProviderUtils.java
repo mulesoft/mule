@@ -111,11 +111,14 @@ public class ValueProviderUtils {
 
   private static Map<Integer, String> orderParts(List<ParameterModel> parameters, String providerId, String targetSelector) {
     if (parameters.size() == 1 && !parameters.get(0).getFieldValueProviderModels().isEmpty()) {
+      String providerName = parameters.get(0).getFieldValueProviderModels().stream()
+          .filter(fieldValueProviderModel -> fieldValueProviderModel.getTargetSelector()
+              .equals(targetSelector))
+          .map(fieldValueProviderModel -> fieldValueProviderModel.getProviderName()).findAny().get();
       return parameters.get(0).getFieldValueProviderModels().stream()
-          .filter(fieldValueProviderModel -> fieldValueProviderModel.getProviderId().equals(providerId))
+          .filter(fieldValueProviderModel -> fieldValueProviderModel.getProviderName().equals(providerName))
           .collect(toMap(ValueProviderModel::getPartOrder,
                          fieldModel -> parameters.get(0).getName() + "." + fieldModel.getTargetSelector(),
-                         // TODO: MULE-19484 Take into account merge for multilevel.
                          (partName, anotherPartName) -> partName.substring(partName.indexOf(".") + 1).equals(targetSelector)
                              ? partName
                              : anotherPartName));
