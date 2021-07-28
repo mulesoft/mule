@@ -131,8 +131,8 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   private static class TestProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
 
     @Override
-    public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
-      return (Set<S>) ImmutableSet.of(new TestProfilingDataConsumer());
+    public Set<ProfilingDataConsumer<? extends ProfilingEventContext>> discover() {
+      return ImmutableSet.of(new TestProfilingDataConsumer());
     }
   }
 

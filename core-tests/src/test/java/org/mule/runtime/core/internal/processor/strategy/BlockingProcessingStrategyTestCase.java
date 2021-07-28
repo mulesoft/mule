@@ -35,8 +35,9 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
 
   private static ComponentLocation componentLocation = mock(ComponentLocation.class);
 
-  public BlockingProcessingStrategyTestCase(Mode mode) {
-    super(mode);
+  public BlockingProcessingStrategyTestCase(Mode mode, boolean profiling) {
+    // The blocking processing strategy does not implement profiling yet
+    super(mode, false);
   }
 
   @Override
