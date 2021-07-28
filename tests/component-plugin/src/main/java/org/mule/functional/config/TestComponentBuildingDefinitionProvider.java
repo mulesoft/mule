@@ -124,7 +124,11 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("callback")
-        .withTypeDefinition(fromConfigurationAttribute("class")).build());
+        .withTypeDefinition(fromConfigurationAttribute(
+                                                       // TODO MULE-19657 add the group name
+                                                       // "callback",
+                                                       "class"))
+        .build());
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("assert")
