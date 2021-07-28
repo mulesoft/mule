@@ -714,6 +714,16 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ParameterWithMultipleMultilevelFieldValueUsingSameProviderType" substitutionGroup="mule:abstract-operator" name="parameter-with-multiple-multilevel-field-value-using-same-provider"></xs:element>
+  <xs:complexType name="ParameterWithMultipleMultilevelFieldValueUsingSameProviderType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ParameterWithTwoFieldWithSameValuesType" substitutionGroup="mule:abstract-operator" name="parameter-with-two-field-with-same-values"></xs:element>
   <xs:complexType name="ParameterWithTwoFieldWithSameValuesType">
     <xs:complexContent>
