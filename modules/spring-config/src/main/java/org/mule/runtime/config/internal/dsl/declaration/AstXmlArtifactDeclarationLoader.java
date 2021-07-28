@@ -658,7 +658,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .filter(id -> !(id.equals("SetPayload") || id.equals("SetAttributes") || id.equals("SetVariable")))
         .ifPresent(objectValue::ofType);
 
-    final ComponentParameterAst configRefParam = component.getParameter(DEFAULT_GROUP_NAME, CONFIG_ATTRIBUTE_NAME);
+    final ComponentParameterAst configRefParam = component.getParameter(getAliasName(objectType), CONFIG_ATTRIBUTE_NAME);
     if (configRefParam != null && configRefParam.getRawValue() != null) {
       objectValue.withParameter(CONFIG_ATTRIBUTE_NAME,
                                 ParameterSimpleValue.of(configRefParam.getRawValue(), STRING));
