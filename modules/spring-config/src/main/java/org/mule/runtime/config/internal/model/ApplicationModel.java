@@ -22,6 +22,7 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
@@ -182,18 +183,13 @@ public abstract class ApplicationModel {
 
       return flow.directChildrenStream().findFirst()
           .filter(comp -> comp.getModel(SourceModel.class).isPresent())
-          .flatMap(comp -> comp.getModel(SourceModel.class).get()
-              .getParameterGroupModels()
-              .stream()
-              .flatMap(g -> g.getParameterModels().stream().map(p -> new Pair<>(g, p)))
+          .flatMap(comp -> getGroupAndParametersPairs(comp.getModel(SourceModel.class).get())
               .filter(pairGroupSource -> {
                 final ComponentParameterAst redeliveryPolicyParam =
                     comp.getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME);
                 if (redeliveryPolicyParam != null) {
                   final ComponentAst redeliveryPolicy = (ComponentAst) redeliveryPolicyParam.getValue().getRight();
-                  if (redeliveryPolicy != null) {
-                    return true;
-                  }
+                  return redeliveryPolicy != null;
                 }
                 return false;
               })
