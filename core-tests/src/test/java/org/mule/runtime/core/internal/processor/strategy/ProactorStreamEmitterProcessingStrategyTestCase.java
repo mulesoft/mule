@@ -60,7 +60,9 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -84,6 +86,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -109,9 +112,16 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   private static final Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategyTestCase.class);
 
   private final ProfilingService profilingService = new DefaultProfilingService() {
+
     @Override
     public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return (() -> singleton(profilingDataConsumer));
+      return (new ProfilingDataConsumerDiscoveryStrategy() {
+
+        @Override
+        public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
+          return singleton((S) profilingDataConsumer);
+        }
+      });
     }
   };
 
@@ -952,10 +962,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     muleContext.start();
     triggerableMessageSource = new TriggerableMessageSource(FAIL);
     flow = flowBuilder.get()
-            .source(triggerableMessageSource)
-            .processors(cpuLightProcessor)
-            .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, MAX_VALUE))
-            .build();
+        .source(triggerableMessageSource)
+        .processors(cpuLightProcessor)
+        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, MAX_VALUE))
+        .build();
     startFlow();
     processFlow(newEvent());
     assertProcessingStrategyProfiling();

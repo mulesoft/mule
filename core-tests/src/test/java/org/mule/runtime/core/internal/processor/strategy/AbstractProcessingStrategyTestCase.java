@@ -148,7 +148,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
-  protected final ProfilingDataConsumer<ProcessingStrategyProfilingEventContext> profilingDataConsumer = mock(ProfilingDataConsumer.class);
+  protected final ProfilingDataConsumer profilingDataConsumer = mock(ProfilingDataConsumer.class);
 
   protected Mode mode;
   protected static final String CPU_LIGHT = "cpuLight";
@@ -248,15 +248,15 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   public AbstractProcessingStrategyTestCase(Mode mode, boolean profiling) {
     this.mode = mode;
     this.enableProfilingServiceProperty =
-            new SystemProperty((MuleRuntimeFeature.ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get()),
-                    Boolean.toString(profiling));
+        new SystemProperty((MuleRuntimeFeature.ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get()),
+                           Boolean.toString(profiling));
   }
 
   @Parameterized.Parameters(name = "{0} - Profiling: {1}")
   public static List<Object[]> modeParameters() {
     return asList(new Object[] {FLOW, false},
-            new Object[] {FLOW, true},
-            new Object[] {SOURCE, false});
+                  new Object[] {FLOW, true},
+                  new Object[] {SOURCE, false});
   }
 
   @Before
@@ -309,7 +309,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
         .messagingExceptionHandler((exception, event) -> event);
 
     // Profiling events mocking
-    when(profilingDataConsumer.getProfilingEventTypes()).thenReturn(new HashSet<>(Arrays.asList(PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION, FLOW_EXECUTED, PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION, OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
+    when(profilingDataConsumer.getProfilingEventTypes())
+        .thenReturn(new HashSet<>(Arrays.asList(PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION, FLOW_EXECUTED,
+                                                PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION,
+                                                OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
     when(profilingDataConsumer.getEventContextFilter()).thenReturn(processingStrategyProfilingEventContext -> true);
   }
 
@@ -653,12 +656,18 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected void assertProcessingStrategyProfiling() {
     if (enableProfilingServiceProperty.getValue().equals("true")) {
       InOrder profilingDataConsumerAssertions = inOrder(profilingDataConsumer);
-      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1)).onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
-      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1)).onProfilingEvent(eq(PS_SCHEDULING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
-      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1)).onProfilingEvent(eq(STARTING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
-      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1)).onProfilingEvent(eq(OPERATION_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
-      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1)).onProfilingEvent(eq(PS_FLOW_MESSAGE_PASSING), any(ProcessingStrategyProfilingEventContext.class));
-      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1)).onProfilingEvent(eq(FLOW_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(PS_SCHEDULING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(STARTING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(OPERATION_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(PS_FLOW_MESSAGE_PASSING), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(FLOW_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
     } else {
       verifyZeroInteractions(profilingDataConsumer);
     }

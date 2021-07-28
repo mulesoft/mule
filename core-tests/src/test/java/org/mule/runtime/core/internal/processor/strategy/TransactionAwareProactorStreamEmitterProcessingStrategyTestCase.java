@@ -143,7 +143,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
   @Test
   public void testTransactionProfiling() throws Exception {
     getInstance()
-            .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
     testProfiling();
   }
 
