@@ -29,6 +29,7 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_T
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
@@ -434,8 +435,8 @@ public final class XmlExtensionLoaderDelegate {
           .flatMap(comp -> comp.directChildrenStream())
           .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
           .forEach(comp -> {
-            final String key = comp.getParameter("name").getResolvedRawValue();
-            final String rawValue = comp.getParameter("value").getRawValue();
+            final String key = comp.getParameter(DEFAULT_GROUP_NAME, "name").getResolvedRawValue();
+            final String rawValue = comp.getParameter(DEFAULT_GROUP_NAME, "value").getRawValue();
             globalProperties.put(key,
                                  new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
                                                                          comp.getMetadata().getFileName().orElse("(n/a)"),
@@ -448,7 +449,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private static Optional<String> getStringParameter(ComponentAst componentAst, String parameterName) {
-    return ofNullable(componentAst.getParameter(parameterName)).map(c -> (String) c.getValue().getRight());
+    return ofNullable(componentAst.getParameter(DEFAULT_GROUP_NAME, parameterName)).map(c -> (String) c.getValue().getRight());
   }
 
   private void loadModuleExtension(ExtensionDeclarer declarer, ArtifactAst artifactAst, boolean comesFromTNS) {
@@ -780,7 +781,8 @@ public final class XmlExtensionLoaderDelegate {
 
 
       testConnectionGlobalElementOptional
-          .flatMap(testConnectionGlobalElement -> testConnectionGlobalElement.getParameter(GLOBAL_ELEMENT_NAME_ATTRIBUTE)
+          .flatMap(testConnectionGlobalElement -> testConnectionGlobalElement
+              .getParameter(DEFAULT_GROUP_NAME, GLOBAL_ELEMENT_NAME_ATTRIBUTE)
               .getValue().getValue())
           .ifPresent(testConnectionGlobalElementName -> connectionProviderDeclarer
               .withModelProperty(new TestConnectionGlobalElementModelProperty((String) testConnectionGlobalElementName)));
@@ -868,7 +870,7 @@ public final class XmlExtensionLoaderDelegate {
 
     moduleAst.directChildrenStream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
-        .filter(operationModel -> operationModel.getParameter(ATTRIBUTE_VISIBILITY).getValue().getRight()
+        .filter(operationModel -> operationModel.getParameter(DEFAULT_GROUP_NAME, ATTRIBUTE_VISIBILITY).getValue().getRight()
             .equals(visibility.toString()))
         .forEach(operationModel -> extractOperationExtension(extensionDeclarer, declarer, operationModel, directedGraph,
                                                              xmlDslModel,
@@ -958,7 +960,7 @@ public final class XmlExtensionLoaderDelegate {
       optionalParametersComponentModel.get().directChildrenStream()
           .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
           .forEach(param -> {
-            final String role = param.getParameter(ROLE).getValue().getRight().toString();
+            final String role = param.getParameter(DEFAULT_GROUP_NAME, ROLE).getValue().getRight().toString();
             extractParameter(operationDeclarer, param, getRole(role));
           });
     }
@@ -971,14 +973,16 @@ public final class XmlExtensionLoaderDelegate {
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param, ParameterRole role) {
     final LayoutModel.LayoutModelBuilder layoutModelBuilder = builder();
 
-    param.getParameter(PASSWORD).getValue().getValue()
+    param.getParameter(DEFAULT_GROUP_NAME, PASSWORD).getValue().getValue()
         .filter(v -> (boolean) v)
         .ifPresent(value -> layoutModelBuilder.asPassword());
 
-    param.getParameter(ORDER_ATTRIBUTE).getValue().getValue().ifPresent(value -> layoutModelBuilder.order((int) value));
-    param.getParameter(TAB_ATTRIBUTE).getValue().getValue().ifPresent(value -> layoutModelBuilder.tabName((String) value));
+    param.getParameter(DEFAULT_GROUP_NAME, ORDER_ATTRIBUTE).getValue().getValue()
+        .ifPresent(value -> layoutModelBuilder.order((int) value));
+    param.getParameter(DEFAULT_GROUP_NAME, TAB_ATTRIBUTE).getValue().getValue()
+        .ifPresent(value -> layoutModelBuilder.tabName((String) value));
 
-    param.getParameter(TYPE_ATTRIBUTE).getValue().getValue()
+    param.getParameter(DEFAULT_GROUP_NAME, TYPE_ATTRIBUTE).getValue().getValue()
         .ifPresent(receivedInputType -> {
 
           final DisplayModel displayModel = getDisplayModel(param);
@@ -995,11 +999,11 @@ public final class XmlExtensionLoaderDelegate {
 
   private DisplayModel getDisplayModel(ComponentAst componentModel) {
     final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
-    componentModel.getParameter(DISPLAY_NAME_ATTRIBUTE)
+    componentModel.getParameter(DEFAULT_GROUP_NAME, DISPLAY_NAME_ATTRIBUTE)
         .getValue().getValue().ifPresent(value -> displayModelBuilder.displayName((String) value));
-    componentModel.getParameter(SUMMARY_ATTRIBUTE)
+    componentModel.getParameter(DEFAULT_GROUP_NAME, SUMMARY_ATTRIBUTE)
         .getValue().getValue().ifPresent(value -> displayModelBuilder.summary((String) value));
-    componentModel.getParameter(EXAMPLE_ATTRIBUTE)
+    componentModel.getParameter(DEFAULT_GROUP_NAME, EXAMPLE_ATTRIBUTE)
         .getValue().getValue().ifPresent(value -> displayModelBuilder.example((String) value));
     return displayModelBuilder.build();
   }
@@ -1022,11 +1026,11 @@ public final class XmlExtensionLoaderDelegate {
    * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
-    final String parameterName = param.getParameter(PARAMETER_NAME).getRawValue();
-    final Optional<String> parameterDefaultValue = param.getParameter(PARAMETER_DEFAULT_VALUE).getValue()
+    final String parameterName = param.getParameter(DEFAULT_GROUP_NAME, PARAMETER_NAME).getRawValue();
+    final Optional<String> parameterDefaultValue = param.getParameter(DEFAULT_GROUP_NAME, PARAMETER_DEFAULT_VALUE).getValue()
         .mapLeft(expr -> "#[" + expr + "]")
         .getValue();
-    final UseEnum use = UseEnum.valueOf(param.getParameter(ATTRIBUTE_USE).getValue().getRight().toString());
+    final UseEnum use = UseEnum.valueOf(param.getParameter(DEFAULT_GROUP_NAME, ATTRIBUTE_USE).getValue().getRight().toString());
     if (UseEnum.REQUIRED.equals(use) && parameterDefaultValue.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",
                                                                 parameterName, ATTRIBUTE_USE, UseEnum.REQUIRED));
@@ -1096,7 +1100,7 @@ public final class XmlExtensionLoaderDelegate {
         .filter(child -> child.getIdentifier().equals(OPERATION_ERROR_IDENTIFIER))
         .forEach(param -> {
           final String namespace = xmlDslModel.getPrefix().toUpperCase();
-          final String errorType = (String) param.getParameter(ERROR_TYPE_ATTRIBUTE).getValue().getRight();
+          final String errorType = (String) param.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_ATTRIBUTE).getValue().getRight();
 
           if (errorType.contains(NAMESPACE_SEPARATOR)) {
             throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> [%s] that contains a reserved character [%s]",
@@ -1115,7 +1119,7 @@ public final class XmlExtensionLoaderDelegate {
       operationModel.recursiveStream()
           .forEach(comp -> {
             if (comp.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
-              final ComponentParameterAst parameter = comp.getParameter(ERROR_TYPE_ATTRIBUTE);
+              final ComponentParameterAst parameter = comp.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_ATTRIBUTE);
 
               if (parameter != null) {
                 parameter.getValue().getValue()
