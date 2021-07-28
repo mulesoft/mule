@@ -22,6 +22,7 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
@@ -39,6 +40,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_EL
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -172,24 +174,29 @@ public abstract class ApplicationModel {
   private static ArtifactAst processSourcesRedeliveryPolicy(ArtifactAst ast) {
     return copyRecursively(ast, flow -> {
 
-      if (FLOW_IDENTIFIER.equals(flow.getIdentifier())) {
-        return flow.directChildrenStream().findFirst()
-            .filter(comp -> comp.getModel(SourceModel.class).isPresent())
-            .flatMap(source -> {
-              final ComponentParameterAst redeliveryPolicyParam = source.getParameter(REDELIVERY_POLICY_PARAMETER_NAME);
-              if (redeliveryPolicyParam != null) {
-                final ComponentAst redeliveryPolicy = (ComponentAst) redeliveryPolicyParam.getValue().getRight();
-                if (redeliveryPolicy != null) {
-                  return of(transformFlowWithRedeliveryPolicy(flow, source, redeliveryPolicy));
-                }
-              }
-              return empty();
-            })
-            .orElse(flow);
+      if (!FLOW_IDENTIFIER.equals(flow.getIdentifier())) {
+        return flow;
       }
 
-      return flow;
-
+      return flow.directChildrenStream().findFirst()
+          .filter(comp -> comp.getModel(SourceModel.class).isPresent())
+          .flatMap(comp -> getGroupAndParametersPairs(comp.getModel(SourceModel.class).get())
+              .filter(pairGroupSource -> {
+                final ComponentParameterAst redeliveryPolicyParam =
+                    comp.getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME);
+                if (redeliveryPolicyParam != null) {
+                  final ComponentAst redeliveryPolicy = (ComponentAst) redeliveryPolicyParam.getValue().getRight();
+                  return redeliveryPolicy != null;
+                }
+                return false;
+              })
+              .map(pairGroupSource -> {
+                final ComponentAst redeliveryPolicy = (ComponentAst) comp
+                    .getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME).getValue().getRight();
+                return transformFlowWithRedeliveryPolicy(flow, comp, redeliveryPolicy);
+              })
+              .findFirst())
+          .orElse(flow);
     });
   }
 
@@ -212,15 +219,6 @@ public abstract class ApplicationModel {
           return null;
         } else {
           return getDecorated().getParameter(groupName, paramName);
-        }
-      };
-
-      @Override
-      public ComponentParameterAst getParameter(String paramName) {
-        if (REDELIVERY_POLICY_PARAMETER_NAME.equals(paramName)) {
-          return null;
-        } else {
-          return getDecorated().getParameter(paramName);
         }
       };
 
