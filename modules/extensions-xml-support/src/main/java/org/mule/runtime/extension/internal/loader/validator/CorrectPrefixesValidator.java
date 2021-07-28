@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.loader.validator;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
@@ -102,7 +103,8 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
   }
 
   private static Optional<String> getRawParameterValue(ComponentAst componentAst, String parameterName) {
-    return ofNullable(componentAst.getParameter(parameterName)).map(ComponentParameterAst::getResolvedRawValue);
+    return ofNullable(componentAst.getParameter(DEFAULT_GROUP_NAME, parameterName))
+        .map(ComponentParameterAst::getResolvedRawValue);
   }
 
   private void genericValidation(String moduleNamespace, OperationModel operationModel, ComponentAst elementComponentModel,

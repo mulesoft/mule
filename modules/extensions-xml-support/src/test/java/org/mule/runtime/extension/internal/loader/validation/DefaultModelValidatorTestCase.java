@@ -141,7 +141,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
                                                         "MODULE-USING-RAISE-ERROR",
                                                         "WRONG-PREFIX",
                                                         "fail-raise-error-nested"))));
-    getExtensionModelFrom("validation/module-using-raise-error-wrong-type.xml");
+    getExtensionModelFrom("validation/module-using-raise-error-wrong-type.xml", getDependencyExtensions());
   }
 
   @Test
