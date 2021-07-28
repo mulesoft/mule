@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.getGroupAndParametersPairs;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 

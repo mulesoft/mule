@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.getGroupAndParametersPairs;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;

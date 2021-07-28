@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.getGroupAndParametersPairs;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 
 import org.mule.metadata.api.model.MetadataType;
