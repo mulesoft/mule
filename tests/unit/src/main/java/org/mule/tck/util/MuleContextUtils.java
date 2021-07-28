@@ -22,6 +22,7 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
@@ -242,6 +243,8 @@ public class MuleContextUtils {
         mock(ConfigurationComponentLocator.class, withSettings().lenient());
     when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
     when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
+
+    when(muleContext.getArtifactType()).thenReturn(APP);
 
     try {
       when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);
