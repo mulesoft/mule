@@ -244,8 +244,6 @@ public class MuleContextUtils {
     when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
     when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
 
-    when(muleContext.getArtifactType()).thenReturn(APP);
-
     try {
       when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);
 
