@@ -8,6 +8,7 @@ package org.mule.test.crafted.localisation.properties.extension;
 
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.test.crafted.localisation.properties.extension.TestLocalisationPropertiesExtensionLoadingDelegate.EXTENSION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -32,7 +33,7 @@ public class LocalisationConfigurationPropertiesProviderFactory implements Confi
   public LocalisationConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
                                                                     UnaryOperator<String> localResolver,
                                                                     ResourceProvider externalResourceProvider) {
-    String file = providerElementDeclaration.getParameter("file").getResolvedRawValue();
+    String file = providerElementDeclaration.getParameter(DEFAULT_GROUP_NAME, "file").getResolvedRawValue();
     requireNonNull(file, "Required attribute 'file' of 'locale-configuration-properties' not found");
 
     String locale = requireNonNull(providerElementDeclaration.getParameter("language", "locale").getResolvedRawValue(),
