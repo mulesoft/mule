@@ -2044,7 +2044,7 @@
                         }
                       ],
                       "partOrder": 1,
-                      "providerName": "body",
+                      "providerName": "body[1461735806]",
                       "providerId": "Channels value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": true,
@@ -2055,7 +2055,7 @@
                       "targetSelector": "workspace",
                       "parameters": [],
                       "partOrder": 1,
-                      "providerName": "body",
+                      "providerName": "body[1108864149]",
                       "providerId": "Workspaces value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": true,
@@ -2549,7 +2549,7 @@
                       "targetSelector": "workspace",
                       "parameters": [],
                       "partOrder": 1,
-                      "providerName": "body",
+                      "providerName": "body[1476786057]",
                       "providerId": "Chat multilevel value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": true,
@@ -2560,7 +2560,7 @@
                       "targetSelector": "channelId",
                       "parameters": [],
                       "partOrder": 2,
-                      "providerName": "body",
+                      "providerName": "body[1476786057]",
                       "providerId": "Chat multilevel value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": true,
@@ -6290,7 +6290,7 @@
                       "targetSelector": "url.protocol",
                       "parameters": [],
                       "partOrder": 1,
-                      "providerName": "urlFormat",
+                      "providerName": "urlFormat[1247438903]",
                       "providerId": "Simple value provider",
                       "requiresConfiguration": false,
                       "requiresConnection": false,
@@ -8239,7 +8239,7 @@
                   "targetSelector": "security.algorithm",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "securityHeaders",
+                  "providerName": "securityHeaders[1527156927]",
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -10250,7 +10250,7 @@
                     }
                   ],
                   "partOrder": 1,
-                  "providerName": "xmlBody",
+                  "providerName": "xmlBody[889604573]",
                   "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -11272,7 +11272,7 @@
                   "targetSelector": "channel",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "body",
+                  "providerName": "body[738950403]",
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -11283,7 +11283,7 @@
                   "targetSelector": "location.continent",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "body",
+                  "providerName": "body[555189570]",
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -11294,7 +11294,7 @@
                   "targetSelector": "location.country",
                   "parameters": [],
                   "partOrder": 2,
-                  "providerName": "body",
+                  "providerName": "body[555189570]",
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -11305,7 +11305,7 @@
                   "targetSelector": "location.city",
                   "parameters": [],
                   "partOrder": 3,
-                  "providerName": "body",
+                  "providerName": "body[555189570]",
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -11510,6 +11510,321 @@
       "errors": [],
       "semanticTerms": [],
       "stereotype": {
+        "type": "PARAMETER_WITH_MULTIPLE_MULTILEVEL_FIELD_VALUE_USING_SAME_PROVIDER",
+        "namespace": "VALUES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VALUES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "json",
+                "type": "Any",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.io.InputStream",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Closeable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [
+                {
+                  "targetSelector": "channel",
+                  "parameters": [],
+                  "partOrder": 1,
+                  "providerName": "body[738950403]",
+                  "providerId": "Simple value provider",
+                  "requiresConfiguration": false,
+                  "requiresConnection": false,
+                  "isOpen": true,
+                  "modelProperties": {}
+                },
+                {
+                  "targetSelector": "source.location.continent",
+                  "parameters": [],
+                  "partOrder": 1,
+                  "providerName": "body[454891919]",
+                  "providerId": "SdkMultiLevelValueProvider-id",
+                  "requiresConfiguration": false,
+                  "requiresConnection": false,
+                  "isOpen": true,
+                  "modelProperties": {}
+                },
+                {
+                  "targetSelector": "source.location.country",
+                  "parameters": [],
+                  "partOrder": 2,
+                  "providerName": "body[454891919]",
+                  "providerId": "SdkMultiLevelValueProvider-id",
+                  "requiresConfiguration": false,
+                  "requiresConnection": false,
+                  "isOpen": true,
+                  "modelProperties": {}
+                },
+                {
+                  "targetSelector": "source.location.city",
+                  "parameters": [],
+                  "partOrder": 3,
+                  "providerName": "body[454891919]",
+                  "providerId": "SdkMultiLevelValueProvider-id",
+                  "requiresConfiguration": false,
+                  "requiresConnection": false,
+                  "isOpen": true,
+                  "modelProperties": {}
+                },
+                {
+                  "targetSelector": "target.location.continent",
+                  "parameters": [],
+                  "partOrder": 1,
+                  "providerName": "body[438906683]",
+                  "providerId": "SdkMultiLevelValueProvider-id",
+                  "requiresConfiguration": false,
+                  "requiresConnection": false,
+                  "isOpen": true,
+                  "modelProperties": {}
+                },
+                {
+                  "targetSelector": "target.location.country",
+                  "parameters": [],
+                  "partOrder": 2,
+                  "providerName": "body[438906683]",
+                  "providerId": "SdkMultiLevelValueProvider-id",
+                  "requiresConfiguration": false,
+                  "requiresConnection": false,
+                  "isOpen": true,
+                  "modelProperties": {}
+                },
+                {
+                  "targetSelector": "target.location.city",
+                  "parameters": [],
+                  "partOrder": 3,
+                  "providerName": "body[438906683]",
+                  "providerId": "SdkMultiLevelValueProvider-id",
+                  "requiresConfiguration": false,
+                  "requiresConnection": false,
+                  "isOpen": true,
+                  "modelProperties": {}
+                }
+              ],
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "#[payload]",
+              "role": "PRIMARY_CONTENT",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "body",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "description": {
+                    "value": "Determines that an error thrown by this operation should be mapped to another"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
+                  }
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "errorMapping"
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "source"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "target",
+                        "required": "true"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeDefinition"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Error Mapping"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "errorMappings",
+              "description": "Set of error mappings",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "error-mappings",
+                    "prefix": "mule"
+                  }
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 12
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "Error Mappings",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "parameterWithMultipleMultilevelFieldValueUsingSameProvider",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "semanticTerms": [],
+      "stereotype": {
         "type": "PARAMETER_WITH_TWO_FIELD_WITH_SAME_VALUES",
         "namespace": "VALUES",
         "parent": {
@@ -11554,7 +11869,7 @@
                   "targetSelector": "source.channelId",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "body",
+                  "providerName": "body[1348475029]",
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -11565,7 +11880,7 @@
                   "targetSelector": "target.channelId",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "body",
+                  "providerName": "body[1967057567]",
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -12868,7 +13183,7 @@
                   "targetSelector": "simple.path",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "body",
+                  "providerName": "body[1464227103]",
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -12879,7 +13194,7 @@
                   "targetSelector": "another.simple.path",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "body",
+                  "providerName": "body[1923087478]",
                   "providerId": "TrueFalseValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -13128,7 +13443,7 @@
                   "targetSelector": "simple.path",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "body",
+                  "providerName": "body[1464227103]",
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -14055,7 +14370,7 @@
                     }
                   ],
                   "partOrder": 1,
-                  "providerName": "xmlBody",
+                  "providerName": "xmlBody[2045583786]",
                   "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -14310,7 +14625,7 @@
                     }
                   ],
                   "partOrder": 1,
-                  "providerName": "xmlBody",
+                  "providerName": "xmlBody[2045583786]",
                   "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -23085,7 +23400,7 @@
                   "targetSelector": "simple.path",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "channel",
+                  "providerName": "channel[1464227103]",
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -23671,7 +23986,7 @@
                   "targetSelector": "channel",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "xmlBodyTemplate",
+                  "providerName": "xmlBodyTemplate[738950403]",
                   "providerId": "Simple value provider",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -23682,7 +23997,7 @@
                   "targetSelector": "location.continent",
                   "parameters": [],
                   "partOrder": 1,
-                  "providerName": "xmlBodyTemplate",
+                  "providerName": "xmlBodyTemplate[555189570]",
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -23693,7 +24008,7 @@
                   "targetSelector": "location.country",
                   "parameters": [],
                   "partOrder": 2,
-                  "providerName": "xmlBodyTemplate",
+                  "providerName": "xmlBodyTemplate[555189570]",
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
@@ -23704,7 +24019,7 @@
                   "targetSelector": "location.city",
                   "parameters": [],
                   "partOrder": 3,
-                  "providerName": "xmlBodyTemplate",
+                  "providerName": "xmlBodyTemplate[555189570]",
                   "providerId": "SdkMultiLevelValueProvider-id",
                   "requiresConfiguration": false,
                   "requiresConnection": false,
