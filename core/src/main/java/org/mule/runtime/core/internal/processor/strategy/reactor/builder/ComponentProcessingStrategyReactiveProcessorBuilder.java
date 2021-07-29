@@ -7,10 +7,10 @@
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.OPERATION_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_FLOW_MESSAGE_PASSING;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
