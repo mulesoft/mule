@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.stream.Collectors.toMap;
+import static javax.xml.namespace.QName.valueOf;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
@@ -17,7 +18,6 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -83,7 +83,7 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
     if (componentModel != null
         && Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
-      addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getMetadata());
+      addMetadataAnnotationsFromDocAttributes(annotations, componentModel);
       builder.getBeanDefinition().getPropertyValues().addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
     }
 
@@ -94,17 +94,20 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
    * Populates the passed beanAnnotations with the other passed parameters.
    *
    * @param beanAnnotations the map with annotations to populate
-   * @param metadata        the parser metadata for the object being created
+   * @param component       the parser metadata for the object being created
    */
   protected void addMetadataAnnotationsFromDocAttributes(Map<QName, Object> beanAnnotations,
-                                                         ComponentMetadataAst metadata) {
-    String sourceCode = metadata.getSourceCode().orElse(null);
+                                                         ComponentAst component) {
+    String sourceCode = component.getMetadata().getSourceCode().orElse(null);
 
     if (sourceCode != null) {
       beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, maskPasswords(sourceCode));
     }
 
-    beanAnnotations.putAll(metadata.getDocAttributes().entrySet().stream()
+    beanAnnotations.putAll(component.getAnnotations().entrySet().stream()
+        .collect(toMap(e -> valueOf(e.getKey()), Entry::getValue)));
+
+    beanAnnotations.putAll(component.getMetadata().getDocAttributes().entrySet().stream()
         .collect(toMap(e -> new QName(NS_MULE_DOCUMENTATION, e.getKey()), Entry::getValue)));
   }
 

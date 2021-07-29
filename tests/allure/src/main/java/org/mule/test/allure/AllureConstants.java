@@ -660,6 +660,12 @@ public interface AllureConstants {
 
     }
 
+    interface DslAnnotationsStory {
+
+      String DSL_ANNOTATIONS_STORY = "Mule DSL Annotations";
+
+    }
+
   }
 
   interface ConfigurationProperties {
