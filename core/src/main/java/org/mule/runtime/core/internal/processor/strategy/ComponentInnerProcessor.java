@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.HasLocation;
 
 /**
  * Specialization of {@link ReactiveProcessor} that allows execution of a mule component taking into account its processing
@@ -18,7 +19,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
  *
  * @since 4.3
  */
-public interface ComponentInnerProcessor extends ReactiveProcessor {
+public interface ComponentInnerProcessor extends ReactiveProcessor, HasLocation {
 
   /**
    * Indicates that the component is blocking.

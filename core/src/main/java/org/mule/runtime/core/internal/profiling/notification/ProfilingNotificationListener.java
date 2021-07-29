@@ -17,7 +17,7 @@ import org.mule.runtime.api.notification.NotificationListener;
  *
  * @param <T> extension of {@link ProfilingNotification}
  */
-public interface ProfilerNotificationListener<T extends ProfilingNotification>
+public interface ProfilingNotificationListener<T extends ProfilingNotification>
     extends NotificationListener<ProfilingNotification> {
 
 }

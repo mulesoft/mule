@@ -7,25 +7,26 @@
 
 package org.mule.runtime.core.internal.profiling;
 
-import org.mule.runtime.api.profiling.ProfilerDataConsumerDiscoveryStrategy;
+import com.google.common.collect.ImmutableSet;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
 
 /**
- * Simple {@link ProfilerDataConsumerDiscoveryStrategy} that programmatically generates the data consumers.
+ * Simple {@link ProfilingDataConsumerDiscoveryStrategy} that programmatically generates the data consumers.
  *
  * @since 4.4
  */
-public class DefaultProfilerDataConsumerDiscoveryStrategy implements ProfilerDataConsumerDiscoveryStrategy {
+public class DefaultProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
 
   @Override
   public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
-    // No data consumers.
-    return emptySet();
+    return (Set<S>) ImmutableSet.of(new LoggerComponentProcessingStrategyDataConsumer());
   }
 
 }

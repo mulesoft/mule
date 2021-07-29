@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy.enricher;
 
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
@@ -24,17 +25,27 @@ public class CpuLiteAsyncNonBlockingProcessingStrategyEnricher implements Reacti
 
   private final Supplier<Scheduler> liteSchedulerSupplier;
   private final Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier;
+  private final ProfilingService profilingService;
+  private final String artifactId;
+  private final String artifactType;
 
   public CpuLiteAsyncNonBlockingProcessingStrategyEnricher(Supplier<Scheduler> liteSchedulerSupplier,
-                                                           Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier) {
+                                                           Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier,
+                                                           ProfilingService profilingService,
+                                                           String artifactId,
+                                                           String artifactType) {
     this.liteSchedulerSupplier = liteSchedulerSupplier;
     this.nonBlockingSchedulerSupplier = nonBlockingSchedulerSupplier;
+    this.profilingService = profilingService;
+    this.artifactId = artifactId;
+    this.artifactType = artifactType;
   }
 
   @Override
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
-    return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get())
+    return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get(), artifactId, artifactType)
         .withCallbackScheduler(nonBlockingSchedulerSupplier.get())
+        .withProfilingService(profilingService)
         .build();
   }
 }
