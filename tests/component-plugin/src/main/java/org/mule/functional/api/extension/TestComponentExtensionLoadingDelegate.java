@@ -441,7 +441,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     params.withOptionalParameter("appendString")
         .describedAs("A string value that will be appended to every message payload that passes through the processor. Note that by setting this property you implicitly select that the message payload will be converted to a string and that a string payload will be returned.")
         .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
+        .withExpressionSupport(SUPPORTED);
 
     params.withOptionalParameter("waitTime")
         .describedAs("The time in milliseconds to wait before returning a result. All processing happens in the processor before the wait begins.")
