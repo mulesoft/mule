@@ -43,7 +43,7 @@ public final class DefaultConfigurationPropertiesProviderFactory implements Conf
                                                         ResourceProvider externalResourceProvider) {
     String file = requireNonNull(providerElementDeclaration.getParameter(DEFAULT_GROUP_NAME, "file").getResolvedRawValue(),
                                  "Required attribute 'file' of 'configuration-properties' not found");
-    final ComponentParameterAst encodingParam = providerElementDeclaration.getParameter("encoding");
+    final ComponentParameterAst encodingParam = providerElementDeclaration.getParameter(DEFAULT_GROUP_NAME, "encoding");
     String encoding = encodingParam != null ? encodingParam.getResolvedRawValue() : null;
     return new DefaultConfigurationPropertiesProvider(file, encoding, externalResourceProvider);
   }
