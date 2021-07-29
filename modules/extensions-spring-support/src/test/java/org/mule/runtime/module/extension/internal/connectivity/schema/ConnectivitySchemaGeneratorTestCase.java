@@ -96,15 +96,17 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
 
   @Override
   protected boolean shouldUpdateExpectedFilesOnError() {
-    return true;//UPDATE_EXPECTED_FILES_ON_ERROR;
+    return UPDATE_EXPECTED_FILES_ON_ERROR;
   }
 
   @Override
   protected String doGenerate(ExtensionModel extensionUnderTest) throws Exception {
     ExchangeAssetDescriptor exchangeAssetDescriptor = new ExchangeAssetDescriptor(
-        "org.mule.runtime.test.extension",
-        "mule-connector-" + hyphenize(extensionUnderTest.getName().toLowerCase()).replaceAll(" ", "-"),
-        "1.0.0");
+                                                                                  "org.mule.runtime.test.extension",
+                                                                                  "mule-connector-"
+                                                                                      + hyphenize(extensionUnderTest.getName()
+                                                                                          .toLowerCase()).replaceAll(" ", "-"),
+                                                                                  "1.0.0");
 
     JSONArray array = new JSONArray();
     List<ConnectivitySchema> schemas = generator.generateSchemas(extensionUnderTest, exchangeAssetDescriptor);
