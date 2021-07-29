@@ -1,14 +1,14 @@
 {
   "name": "RAM",
   "description": "",
-  "version": "4.4.0-SNAPSHOT",
+  "version": "4.5.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "ram",
     "namespace": "http://www.mulesoft.org/schema/mule/ram",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/ram/current/mule-ram.xsd",
-    "schemaVersion": "4.4.0-SNAPSHOT",
+    "schemaVersion": "4.5.0-SNAPSHOT",
     "xsdFileName": "mule-ram.xsd"
   },
   "resources": [],
@@ -1036,7 +1036,7 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": false,
+                    "allowsInlineDefinition": true,
                     "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
@@ -1055,7 +1055,7 @@
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "error-mapping",
+                        "localPart": "error-mappings",
                         "prefix": "mule"
                       }
                     },

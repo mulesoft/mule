@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.processor;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -65,17 +66,16 @@ public class ObjectTypeVisitor implements TypeDefinitionVisitor {
   @Override
   public void onConfigurationAttribute(String attributeName, Class<?> enforcedClass) {
     try {
-      type =
-          ClassUtils.getClass(Thread.currentThread().getContextClassLoader(),
-                              componentModel.getRawParameterValue(attributeName).orElse(null));
+      type = ClassUtils.getClass(currentThread().getContextClassLoader(),
+                                 componentModel.getParameter(attributeName).getResolvedRawValue());
       if (!enforcedClass.isAssignableFrom(type)) {
         throw new MuleRuntimeException(createStaticMessage("Class definition for type %s on element %s is not the same nor inherits from %s",
-                                                           componentModel.getRawParameterValue(attributeName).orElse(null),
+                                                           componentModel.getParameter(attributeName).getResolvedRawValue(),
                                                            componentModel.getIdentifier(), enforcedClass.getName()));
       }
     } catch (ClassNotFoundException e) {
       throw new MuleRuntimeException(createStaticMessage("Error while trying to locate Class definition for type %s on element %s",
-                                                         componentModel.getRawParameterValue(attributeName).orElse(null),
+                                                         componentModel.getParameter(attributeName).getResolvedRawValue(),
                                                          componentModel.getIdentifier()),
                                      e);
     }

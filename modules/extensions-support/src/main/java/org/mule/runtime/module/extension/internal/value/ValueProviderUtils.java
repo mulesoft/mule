@@ -207,5 +207,4 @@ public class ValueProviderUtils {
     int parameterNameDelimiter = extractionExpression.indexOf(".");
     return parameterNameDelimiter < 0 ? extractionExpression : extractionExpression.substring(0, parameterNameDelimiter);
   }
-
 }

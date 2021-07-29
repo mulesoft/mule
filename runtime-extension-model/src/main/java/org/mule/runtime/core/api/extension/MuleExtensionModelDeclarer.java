@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.extension;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -81,34 +82,46 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
+import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
+import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
+import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
+import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
+
+import java.util.Map;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.reflect.TypeToken;
@@ -121,6 +134,8 @@ import com.google.gson.reflect.TypeToken;
 class MuleExtensionModelDeclarer {
 
   private static final Class<? extends ModelProperty> allowsExpressionWithoutMarkersModelPropertyClass;
+  private static final ClassValueModel NOTIFICATION_CLASS_VALUE_MODEL =
+      new ClassValueModel(singletonList(NotificationListener.class.getName()));
 
   static {
     Class<? extends ModelProperty> foundClass = null;
@@ -133,12 +148,13 @@ class MuleExtensionModelDeclarer {
     allowsExpressionWithoutMarkersModelPropertyClass = foundClass;
   }
 
+  static final String DEFAULT_LOG_LEVEL = "INFO";
+
   final ErrorModel anyError = newError(ANY).build();
   final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
   final ErrorModel compositeRoutingError = newError(COMPOSITE_ROUTING).withParent(routingError).build();
   final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
-  static final String DEFAULT_LOG_LEVEL = "INFO";
 
   ExtensionDeclarer createExtensionModel() {
 
@@ -187,7 +203,7 @@ class MuleExtensionModelDeclarer {
     declareRaiseError(extensionDeclarer);
 
     // sources
-    declareScheduler(extensionDeclarer, TYPE_LOADER);
+    declareScheduler(extensionDeclarer);
 
     // errors
     declareErrors(extensionDeclarer);
@@ -195,6 +211,7 @@ class MuleExtensionModelDeclarer {
     // misc
     declareNotifications(extensionDeclarer);
     declareGlobalProperties(extensionDeclarer);
+    declareSecurityManager(extensionDeclarer, TYPE_LOADER);
 
     return extensionDeclarer;
   }
@@ -229,24 +246,36 @@ class MuleExtensionModelDeclarer {
 
     object.onDefaultParameterGroup()
         .withExclusiveOptionals(ImmutableSet.of("ref", "class"), true);
+
+    object.onDefaultParameterGroup().withOptionalParameter("property")
+        .ofType(BaseTypeBuilder.create(JAVA).objectType()
+            .with(new ClassInformationAnnotation(Map.class, asList(String.class, String.class))).openWith(STRING_TYPE)
+            .build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
+            .allowsReferences(false).build())
+        .withModelProperty(new NoWrapperModelProperty());
   }
 
   private void declareExportedTypes(ExtensionDeclarer extensionDeclarer) {
     extensionDeclarer.getDeclaration().addType((ObjectType) OBJECT_STORE_TYPE);
   }
 
-  private void declareScheduler(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareScheduler(ExtensionDeclarer extensionDeclarer) {
     SourceDeclarer scheduler = extensionDeclarer.withMessageSource("scheduler")
         .hasResponse(false)
         .describedAs("Source that schedules periodic execution of a flow.");
 
-    scheduler.withOutput().ofType(typeLoader.load(Object.class));
-    scheduler.withOutputAttributes().ofType(typeLoader.load(Object.class));
+    scheduler.withOutput().ofType(ANY_TYPE);
+    scheduler.withOutputAttributes().ofType(ANY_TYPE);
 
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
         .ofType(buildSchedulingStrategyType(extensionDeclarer, TYPE_LOADER))
-        .withExpressionSupport(NOT_SUPPORTED);
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsReferences(false)
+            .allowsInlineDefinition(true)
+            .allowTopLevelDefinition(false).build());
 
     scheduler.onDefaultParameterGroup()
         .withOptionalParameter("disallowConcurrentExecution")
@@ -330,10 +359,10 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Defines the prefix of the object store names. This will only be used for the internally built object store.");
 
-    validator.onDefaultParameterGroup().withOptionalParameter("objectStore").withDsl(
-                                                                                     ParameterDslConfiguration.builder()
-                                                                                         .allowsInlineDefinition(true)
-                                                                                         .allowsReferences(true).build())
+    validator.onDefaultParameterGroup().withOptionalParameter("objectStore")
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(true).build())
         .ofType(OBJECT_STORE_TYPE).withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(OBJECT_STORE))
         .describedAs("The object store where the IDs of the processed events are going to be stored. " +
@@ -347,7 +376,7 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer async = extensionDeclarer.withConstruct("async")
         .describedAs("Processes the nested list of message processors asynchronously.");
 
-    async.withChain();
+    async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
     async.onDefaultParameterGroup()
         .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
@@ -361,7 +390,6 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer) {
-
     OperationDeclarer flowRef = extensionDeclarer.withOperation("flowRef")
         .describedAs("Allows a \u0027flow\u0027 to be referenced so that message processing will continue in the referenced flow "
             + "before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the "
@@ -410,7 +438,6 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets the log category.");
-
   }
 
   private void declareSetPayload(ExtensionDeclarer extensionDeclarer) {
@@ -438,7 +465,6 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type, e.g. text/plain or application/json");
-
   }
 
   private void declareSetVariable(ExtensionDeclarer extensionDeclarer) {
@@ -521,7 +547,6 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The variable name.");
-
   }
 
   private void declareRaiseError(ExtensionDeclarer extensionDeclarer) {
@@ -545,7 +570,6 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-
     ConstructDeclarer forEach = extensionDeclarer.withConstruct("foreach")
         .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
             + " generating a message for each element.");
@@ -562,8 +586,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Expression that defines the collection to iterate over.");
     if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
       try {
-        collectionParam = collectionParam
-            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+        collectionParam.withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
       } catch (InstantiationException | IllegalAccessException e) {
         // ignore
       }
@@ -596,7 +619,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Attempts to route a message to its inner chain in a synchronous manner. " +
             "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.");
 
-    untilSuccessful.withChain();
+    untilSuccessful.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
 
     untilSuccessful.onDefaultParameterGroup()
         .withOptionalParameter("maxRetries")
@@ -637,9 +660,7 @@ class MuleExtensionModelDeclarer {
       }
     }
 
-    expressionParam
-        .describedAs("The expression to evaluate.");
-
+    expressionParam.describedAs("The expression to evaluate.");
     choice.withRoute("otherwise").withMaxOccurs(1).withChain();
   }
 
@@ -658,9 +679,9 @@ class MuleExtensionModelDeclarer {
         .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize its performance when processing messages.")
         .ofType(INTEGER_TYPE);
 
-    flow.withComponent("source")
+    flow.withOptionalComponent("source")
         .withAllowedStereotypes(MuleStereotypes.SOURCE);
-    flow.withChain().setRequired(true);
+    flow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
     flow.withComponent("errorHandler")
         .withAllowedStereotypes(ERROR_HANDLER);
 
@@ -689,7 +710,10 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer roundRobin = extensionDeclarer.withConstruct("roundRobin")
         .describedAs("Send each message received to the next message processor in a circular list of targets.");
 
-    roundRobin.withRoute("route").withChain();
+    roundRobin.withRoute("route")
+        // it doesn't make sense for it to have less than two routes, but the XSD allows for just one.
+        .withMinOccurs(1)
+        .withChain();
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -738,7 +762,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Splits the same message and processes each part in parallel.")
         .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0"));
 
-    parallelForeach.withChain();
+    parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
 
     ParameterDeclarer collectionParam = parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
@@ -809,7 +833,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Transaction type supported. Availability will depend on the runtime version, "
             + "though LOCAL is always available.");
 
-    tryScope.withChain();
+    tryScope.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
     tryScope.withOptionalComponent("errorHandler")
         .withAllowedStereotypes(ERROR_HANDLER);
   }
@@ -866,7 +890,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareOnErrorRoute(NestedRouteDeclarer onError) {
-    onError.withChain();
+    onError.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
     declareOnErrorRouteParams(onError);
   }
 
@@ -966,14 +990,15 @@ class MuleExtensionModelDeclarer {
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
 
-    configuration.onDefaultParameterGroup()
+    final ParameterGroupDeclarer params = configuration.onDefaultParameterGroup();
+    params
         .withOptionalParameter("defaultResponseTimeout")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("10000")
         .describedAs("The default period (ms) to wait for a synchronous response.");
 
-    configuration.onDefaultParameterGroup()
+    params
         .withOptionalParameter("defaultTransactionTimeout")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -981,7 +1006,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("The default timeout (ms) for transactions. This can also be configured on transactions, "
             + "in which case the transaction configuration is used instead of this default.");
 
-    configuration.onDefaultParameterGroup()
+    params
         .withOptionalParameter("defaultErrorHandler-ref")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -993,7 +1018,7 @@ class MuleExtensionModelDeclarer {
             .allowTopLevelDefinition(false)
             .build());
 
-    configuration.onDefaultParameterGroup()
+    params
         .withOptionalParameter("inheritIterableRepeatability")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false)
@@ -1001,7 +1026,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.")
         .withModelProperty(new SinceMuleVersionModelProperty("4.3.0"));
 
-    configuration.onDefaultParameterGroup()
+    params
         .withOptionalParameter("shutdownTimeout")
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -1015,7 +1040,7 @@ class MuleExtensionModelDeclarer {
             + "5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after "
             + "shutdown is initiated.");
 
-    configuration.onDefaultParameterGroup()
+    params
         .withOptionalParameter("maxQueueTransactionFilesSize")
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -1024,7 +1049,7 @@ class MuleExtensionModelDeclarer {
             + " Take into account that this number applies both to the set of transaction log files for XA and for local transactions. "
             + "If both types of transactions are used then the approximate maximum space used, will be twice the configured value.");
 
-    configuration.onDefaultParameterGroup()
+    params
         .withOptionalParameter("defaultObjectSerializer-ref")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -1036,7 +1061,7 @@ class MuleExtensionModelDeclarer {
             .allowTopLevelDefinition(false)
             .build());
 
-    configuration.onDefaultParameterGroup()
+    params
         .withOptionalParameter("dynamicConfigExpiration")
         .describedAs(DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION)
         .ofType(new DynamicConfigExpirationTypeBuilder().buildDynamicConfigExpirationType())
@@ -1047,7 +1072,7 @@ class MuleExtensionModelDeclarer {
             .allowTopLevelDefinition(false)
             .build());
 
-    configuration.onDefaultParameterGroup()
+    params
         .withOptionalParameter("correlationIdGeneratorExpression")
         .ofType(STRING_TYPE)
         .withExpressionSupport(REQUIRED)
@@ -1082,11 +1107,118 @@ class MuleExtensionModelDeclarer {
 
   private void declareNotifications(ExtensionDeclarer extensionDeclarer) {
     // TODO MULE-17778: Complete this declaration
-    extensionDeclarer.withConstruct("notifications")
+    ConstructDeclarer notificationsConstructDeclarer = extensionDeclarer.withConstruct("notifications")
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
         .describedAs("Registers listeners for notifications and associates interfaces with particular events.")
         .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
+
+    notificationsConstructDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("dynamic")
+        .ofType(BOOLEAN_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo(false)
+        .describedAs("If the notification manager is dynamic, listeners can be registered dynamically at runtime via the "
+            + "MuleContext, and the configured notification can be changed. Otherwise, some parts of Mule will cache "
+            + "notification configuration for efficiency and will not generate events for newly enabled notifications or "
+            + "listeners. The default value is false.");
+
+    declareEnableNotification(notificationsConstructDeclarer.withOptionalComponent("notification"));
+    declareDisableNotification(notificationsConstructDeclarer.withOptionalComponent("disable-notification"));
+    declareNotificationListener(notificationsConstructDeclarer.withOptionalComponent("notification-listener"));
+  }
+
+  private void declareEnableNotification(NestedComponentDeclarer enableNotificationDeclarer) {
+    enableNotificationDeclarer
+        .describedAs("Registers listeners for notifications and associates interfaces with particular events");
+
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event-class")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Event class").build())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The class associated with a notification event that will be delivered to the interface.\n"
+            + "This can be used instead of the 'event' attribute to specify a custom class.");
+
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The notification event to deliver.");
+
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface-class")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Interface class").build())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface (class name) that will receive the notification event.");
+
+    enableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface that will receive the notification event.");
+  }
+
+  private void declareDisableNotification(NestedComponentDeclarer disableNotificationDeclarer) {
+    disableNotificationDeclarer.describedAs("Blocks the association of an event with a particular interface. This "
+        + "filters events after the association with a particular interface (and so takes precedence).");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event-class")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Event class").build())
+        .describedAs("The class associated with an event that will no longer be delivered to any interface. This can be "
+            + "used instead of the 'event' attribute to specify a custom class.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("event")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The event you no longer want to deliver.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface-class")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(DisplayModel.builder()
+            .classValue(NOTIFICATION_CLASS_VALUE_MODEL)
+            .displayName("Interface class").build())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface (class name) that will no longer receive the event.");
+
+    disableNotificationDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("interface")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The interface that will no longer receive the event.");
+  }
+
+  private void declareNotificationListener(NestedComponentDeclarer notificationListenerDeclarer) {
+    notificationListenerDeclarer.describedAs("Registers a bean as a listener with the notification system. Events are "
+        + "dispatched by reflection - the listener will receive all events associated with any interfaces it implements."
+        + " The relationship between interfaces and events is configured by the notification and disable-notification "
+        + "elements.");
+
+    notificationListenerDeclarer.onDefaultParameterGroup()
+        .withRequiredParameter("ref")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The bean that will receive notifications.");
+
+    notificationListenerDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("subscription")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo("*")
+        .describedAs("An optional string that is compared with the event resource identifier. Only events with matching"
+            + " identifiers will be sent. If no value is given, all events are sent.");
   }
 
   private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer) {
@@ -1107,5 +1239,43 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The value of the property. This replaces each occurence of a property placeholder.");
+  }
+
+  private void declareSecurityManager(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer securityManagerDeclarer = extensionDeclarer.withConstruct("securityManager")
+        .allowingTopLevelDefinition()
+        .describedAs("The default security manager provides basic support for security functions. Other modules (PGP, Spring) provide more advanced functionality.");
+
+    ObjectType securityProviderType = BaseTypeBuilder.create(JAVA).objectType()
+        .with(new ClassInformationAnnotation(SecurityProvider.class))
+        .with(new InfrastructureTypeAnnotation())
+        .build();
+
+    securityManagerDeclarer
+        .onDefaultParameterGroup()
+        .withOptionalParameter("providers")
+        .ofType(BaseTypeBuilder.create(JAVA)
+            .arrayType()
+            .of(securityProviderType)
+            .build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
+            .allowsReferences(false).build())
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+
+    ObjectType exceptionStrategyType = BaseTypeBuilder.create(JAVA).objectType()
+        .with(new ClassInformationAnnotation(EncryptionStrategy.class))
+        .with(new InfrastructureTypeAnnotation())
+        .build();
+
+    securityManagerDeclarer
+        .onDefaultParameterGroup()
+        .withOptionalParameter("encryptionStrategies")
+        .ofType(BaseTypeBuilder.create(JAVA)
+            .arrayType()
+            .of(exceptionStrategyType)
+            .build())
+        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
+            .allowsReferences(false).build())
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 }

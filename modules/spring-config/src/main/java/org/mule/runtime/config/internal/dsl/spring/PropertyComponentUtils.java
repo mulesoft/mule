@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 
@@ -13,6 +14,9 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
+
+import java.util.Optional;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -41,37 +45,28 @@ public class PropertyComponentUtils {
     String refKey = getReferenceAttributeName(propertyComponentModel.getIdentifier());
     String nameKey = getNameAttributeName(propertyComponentModel.getIdentifier());
 
-    return propertyComponentModel.directChildrenStream()
-        .findFirst()
-        .map(springMap -> {
-          if (!springMap.getIdentifier().getName().equals("map")) {
-            throw new MuleRuntimeException(createStaticMessage("Unrecognized property model identifier: "
-                + springMap.getIdentifier()));
-          }
+    Object value;
+    if (propertyComponentModel.getParameter(refKey) != null) {
+      value = propertyComponentModel.getParameter(refKey).getResolvedRawValue();
+    } else {
+      value = propertyComponentModel.getParameter(VALUE_PARAMETER_NAME) != null
+          ? propertyComponentModel.getParameter(VALUE_PARAMETER_NAME).getResolvedRawValue()
+          : null;
+    }
 
-          ManagedMap<String, Object> propertiesMap = new ManagedMap<>();
-          springMap.directChildrenStream().forEach(mapEntry -> {
-            Object value = mapEntry.getRawParameterValue(VALUE_PARAMETER_NAME)
-                .map(v -> (Object) v)
-                .orElseGet(() -> new RuntimeBeanReference(mapEntry.getRawParameterValue(REFERENCE_MULE_PROPERTY_ATTRIBUTE)
-                    .orElse(null)));
+    String name = propertyComponentModel.getParameter(nameKey).getResolvedRawValue();
+    if (name != null) {
+      return new Pair<>(name, value);
+    } else {
+      String beanName =
+          propertyComponentModel.getParameter("ref") != null ? propertyComponentModel.getParameter("ref").getResolvedRawValue()
+              : null;
+      return new Pair<>(PROPERTY_NAME_PROPERTY_ATTRIBUTE, new RuntimeBeanReference(beanName));
+    }
+  }
 
-            propertiesMap.put(mapEntry.getRawParameterValue(PROPERTY_NAME_MULE_PROPERTY_ATTRIBUTE).orElse(null), value);
-          });
-          return new Pair<>(propertyComponentModel.getComponentId().orElse(null), (Object) propertiesMap);
-        })
-        .orElseGet(() -> {
-          Object value = propertyComponentModel.getRawParameterValue(refKey)
-              .map(v -> (Object) new RuntimeBeanReference(v))
-              .orElseGet(() -> propertyComponentModel.getRawParameterValue(VALUE_PARAMETER_NAME)
-                  .orElse(null));
-
-          return propertyComponentModel.getRawParameterValue(nameKey)
-              .map(name -> new Pair<>(name, value))
-              .orElseGet(() -> new Pair<>(PROPERTY_NAME_PROPERTY_ATTRIBUTE,
-                                          new RuntimeBeanReference(propertyComponentModel.getRawParameterValue("ref")
-                                              .orElse(null))));
-        });
+  public static Optional<String> getRawParameterValue(ComponentAst componentAst, String parameterName) {
+    return ofNullable(componentAst.getParameter(parameterName)).map(ComponentParameterAst::getResolvedRawValue);
   }
 
   private static String getNameAttributeName(ComponentIdentifier identifier) {

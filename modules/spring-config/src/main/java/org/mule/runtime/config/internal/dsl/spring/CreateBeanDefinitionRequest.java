@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -94,5 +95,12 @@ public abstract class CreateBeanDefinitionRequest<T> {
     }
 
     return null;
+  }
+
+  /**
+   * Resolve a parameter with the provided name in the scope of the param owner of this request.
+   */
+  public ComponentParameterAst getParameter(String parameterName) {
+    return getComponent().getParameter(parameterName);
   }
 }

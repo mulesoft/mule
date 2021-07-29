@@ -35,16 +35,8 @@ public class LocalisationConfigurationPropertiesProviderFactory implements Confi
     String file = providerElementDeclaration.getParameter("file").getResolvedRawValue();
     requireNonNull(file, "Required attribute 'file' of 'locale-configuration-properties' not found");
 
-    ComponentIdentifier languageComponentIdentifier =
-        ComponentIdentifier.builder().namespace(EXTENSION_NAME).name("language").build();
-
-    ComponentAst language = providerElementDeclaration
-        .directChildrenStream()
-        .filter(c -> c.getIdentifier().equals(languageComponentIdentifier))
-        .findFirst()
-        .get();
-
-    String locale = language.getRawParameterValue("locale").orElseThrow(() -> new RuntimeException("A locale must be specified"));
+    String locale = requireNonNull(providerElementDeclaration.getParameter("language", "locale").getResolvedRawValue(),
+                                   "A locale must be specified");
 
     return new LocalisationConfigurationPropertiesProvider(externalResourceProvider, file, locale);
   }

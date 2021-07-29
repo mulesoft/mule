@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -14,7 +13,6 @@ import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
@@ -29,8 +27,6 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.UnionType;
-import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -47,16 +43,11 @@ import org.mule.runtime.config.api.dsl.model.DslElementModel.Builder;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.extension.api.property.QNameModelProperty;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -333,35 +324,7 @@ class ComponentAstBasedElementModelFactory {
   }
 
   private void populateComposableElements(DslElementModel.Builder builder, ComponentAst configuration) {
-    final List<String> paramsAsChildrenNames = configuration.getModel(ParameterizedModel.class)
-        .map(pmz -> pmz.getAllParameterModels()
-            .stream()
-            .flatMap(pm -> {
-              Set<String> unions = new HashSet<>();
-              // Workaround for reconnection-strategy
-              pm.getType().accept(new MetadataTypeVisitor() {
-
-                @Override
-                public void visitUnion(UnionType union) {
-                  union.getTypes()
-                      .stream()
-                      .map(t -> MetadataTypeUtils.getTypeId(t))
-                      .filter(Optional::isPresent)
-                      .map(Optional::get)
-                      .forEach(unions::add);
-                }
-              });
-
-              return Stream.concat(unions.stream(), pm.getModelProperty(QNameModelProperty.class)
-                  .map(qnmp -> Stream.of(hyphenize(pm.getName()), qnmp.getValue().getLocalPart()))
-                  .orElseGet(() -> Stream.of(hyphenize(pm.getName()))));
-            })
-            .collect(toList()))
-        .orElse(emptyList());
-
     configuration.directChildrenStream()
-        // TODO MULE-17711 Remove this filter
-        .filter(c -> !paramsAsChildrenNames.contains(c.getIdentifier().getName()))
         .filter(c -> !c.getModel(ConnectionProviderModel.class).isPresent())
         .forEach(nestedComponentConfig -> create(nestedComponentConfig).ifPresent(builder::containing));
   }

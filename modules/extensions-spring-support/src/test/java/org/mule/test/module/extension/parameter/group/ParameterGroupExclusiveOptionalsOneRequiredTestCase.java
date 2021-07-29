@@ -8,6 +8,8 @@ package org.mule.test.module.extension.parameter.group;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.JavaSdk.Parameters.PARAMETERS;
 
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.some.extension.SomeAliasedParameterGroupOneRequiredConfig;
@@ -17,6 +19,11 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(JAVA_SDK)
+@Story(PARAMETERS)
 public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override

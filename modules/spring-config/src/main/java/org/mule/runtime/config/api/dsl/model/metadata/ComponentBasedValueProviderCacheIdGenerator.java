@@ -9,9 +9,7 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
@@ -35,19 +33,14 @@ public class ComponentBasedValueProviderCacheIdGenerator implements ValueProvide
   @Override
   public Optional<ValueProviderCacheId> getIdForResolvedValues(ComponentAst containerComponent, String parameterName) {
     checkArgument(containerComponent != null, "Cannot generate a Cache Key for a 'null' component");
-    if (isConnection(containerComponent)) {
-      return getConnectionModel(containerComponent)
-          .flatMap(connection -> delegate.getIdForResolvedValues(connection, parameterName));
-    }
+    return elementModelFactory.create(containerComponent).flatMap(e -> delegate.getIdForResolvedValues(e, parameterName));
+  }
+
+  @Override
+  public Optional<ValueProviderCacheId> getIdForResolvedValues(ComponentAst containerComponent, String parameterName,
+                                                               String targetPath) {
+    checkArgument(containerComponent != null, "Cannot generate a Cache Key for a 'null' component");
     return elementModelFactory.create(containerComponent)
-        .flatMap(e -> delegate.getIdForResolvedValues(e, parameterName));
-  }
-
-  private boolean isConnection(ComponentAst componentAst) {
-    return componentAst.getModel(ConnectionProviderModel.class).isPresent();
-  }
-
-  private Optional<DslElementModel<ComponentAst>> getConnectionModel(ComponentAst componentAst) {
-    return elementModelFactory.create(componentAst);
+        .flatMap(e -> delegate.getIdForResolvedValues(e, parameterName, targetPath));
   }
 }

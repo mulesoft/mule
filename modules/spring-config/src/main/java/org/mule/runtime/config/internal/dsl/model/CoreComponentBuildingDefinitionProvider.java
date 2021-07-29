@@ -63,7 +63,6 @@ import org.mule.runtime.config.internal.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.internal.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.NotificationConfig;
 import org.mule.runtime.config.internal.ServerNotificationManagerConfigurator;
-import org.mule.runtime.config.internal.dsl.processor.CustomSecurityFilterObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.ReconnectionConfigObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
@@ -140,10 +139,9 @@ import org.mule.runtime.core.internal.routing.RoundRobin;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
+import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
-import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
-import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -518,20 +516,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleParameter("subscription", getNotificationSubscriptionConverter())
             .withDefaultValue(ANY_SELECTOR_STRING)
             .build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("username-password-filter")
-        .withTypeDefinition(fromType(UsernamePasswordAuthenticationFilter.class))
-        .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
-        .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
-        .withIgnoredConfigurationParameter(NAME)
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("custom-security-filter")
-        .withTypeDefinition(fromType(Processor.class))
-        .withObjectFactoryType(CustomSecurityFilterObjectFactory.class)
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
-        .withIgnoredConfigurationParameter(NAME)
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("encryption-security-filter")

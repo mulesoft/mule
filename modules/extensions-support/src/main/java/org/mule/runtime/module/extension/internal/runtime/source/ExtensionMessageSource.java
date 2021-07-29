@@ -375,6 +375,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void reallyDoStart() throws MuleException {
+    LOGGER.debug("Message source '{}' on flow '{}' is starting", sourceModel.getName(),
+                 getLocation().getRootContainerName());
     lifecycle(() -> lifecycleManager.fireStartPhase((phase, o) -> {
       startIfNeeded(retryPolicyTemplate);
 
@@ -391,6 +393,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doStop() throws MuleException {
+    LOGGER.debug("Message source '{}' on flow '{}' is stopping", sourceModel.getName(),
+                 getLocation().getRootContainerName());
     safeLifecycle(() -> lifecycleManager.fireStopPhase((phase, o) -> {
       synchronized (started) {
         started.set(false);
@@ -621,9 +625,27 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     flowConstruct = new LazyValue<>(() -> (FlowConstruct) componentLocator.find(getRootContainerLocation()).orElse(null));
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
+      if (LOGGER.isDebugEnabled()) {
+        boolean isPrimaryPollingInstance = clusterService.isPrimaryPollingInstance();
+        if (primaryNodeOnly) {
+          LOGGER
+              .debug("Message source '{}' on flow '{}' running on the primary node is initializing. Note that this Message source must run on the primary node only.",
+                     sourceModel.getName(), getLocation().getRootContainerName());
+        } else {
+          LOGGER
+              .debug("Message source '{}' on flow '{}' is initializing. This {} the primary node of the cluster.",
+                     sourceModel.getName(), getLocation().getRootContainerName(), isPrimaryPollingInstance ? "is" : "is not");
+        }
+      }
+
       reallyDoInitialise();
     } else {
+      LOGGER
+          .debug("Message source '{}' on flow '{}' cannot initialize. This Message source can only run on the primary node of the cluster",
+                 sourceModel.getName(), getLocation().getRootContainerName());
       new PrimaryNodeLifecycleNotificationListener(() -> {
+        LOGGER.debug("Message source '{}' on flow '{}' is initializing because the node became cluster's primary.",
+                     sourceModel.getName(), getLocation().getRootContainerName());
         reallyDoInitialise();
         reallyDoStart();
       }, notificationListenerRegistry).register();

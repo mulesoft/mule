@@ -780,6 +780,18 @@ public interface AllureConstants {
 
   }
 
+  interface JavaSdk {
+
+    String JAVA_SDK = "Java SDK";
+
+    interface Parameters {
+
+      String PARAMETERS = "Parameters definitions in Java SDK";
+
+    }
+
+  }
+
   interface XmlSdk {
 
     String XML_SDK = "Xml SDK";
@@ -848,5 +860,26 @@ public interface AllureConstants {
       String NULL_VALUE = "Null value";
     }
 
+  }
+
+  interface Profiling {
+
+    String PROFILING = "Profiling";
+
+
+    interface ProfilingServiceStory {
+
+      String DEFAULT_PROFILING_SERVICE = "Default Profiling Service";
+    }
+  }
+
+  interface ObjectTag {
+
+    String OBJECT_TAG_FEATURE = "Object";
+
+    interface ObjectPropertiesStory {
+
+      String OBJECT_PROPERTIES = "Object properties";
+    }
   }
 }

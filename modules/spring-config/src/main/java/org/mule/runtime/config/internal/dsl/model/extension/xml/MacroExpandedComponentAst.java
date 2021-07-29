@@ -154,12 +154,6 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
   }
 
   @Override
-  public Optional<String> getRawParameterValue(String paramName) {
-    return super.getRawParameterValue(paramName)
-        .map(this::mapParamValue);
-  }
-
-  @Override
   public Optional<String> getComponentId() {
     return super.getComponentId()
         .map(this::mapParamValue);

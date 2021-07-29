@@ -10,6 +10,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
@@ -86,6 +87,12 @@ public class ValuesOperations {
                                          @ParameterGroup(name = "ValuesGroup",
                                              showInDsl = true) GroupWithValuesParameter optionsParameter) {
 
+  }
+
+  @MediaType(value = "*/*", strict = false)
+  public Object contentTypedValuesInsideShowInDslGroup(@ParameterGroup(name = "ContentTypedValuesGroup",
+      showInDsl = true) GroupWithContentTypedValuesParameter optionsParameter) {
+    return optionsParameter.getBody().getValue();
   }
 
   public void withErrorValueProvider(@org.mule.sdk.api.annotation.values.OfValues(WithErrorValueProvider.class) String values,

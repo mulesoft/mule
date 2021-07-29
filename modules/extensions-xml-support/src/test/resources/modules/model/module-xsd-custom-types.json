@@ -258,7 +258,7 @@
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": false,
+                "allowsInlineDefinition": true,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
@@ -276,7 +276,7 @@
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
+                    "localPart": "error-mappings",
                     "prefix": "mule"
                   }
                 },
@@ -502,7 +502,7 @@
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": false,
+                "allowsInlineDefinition": true,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
@@ -520,7 +520,7 @@
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
+                    "localPart": "error-mappings",
                     "prefix": "mule"
                   }
                 },
@@ -785,7 +785,7 @@
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": false,
+                "allowsInlineDefinition": true,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
@@ -803,7 +803,7 @@
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
+                    "localPart": "error-mappings",
                     "prefix": "mule"
                   }
                 },
@@ -1098,7 +1098,7 @@
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": false,
+                "allowsInlineDefinition": true,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
@@ -1116,7 +1116,7 @@
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
+                    "localPart": "error-mappings",
                     "prefix": "mule"
                   }
                 },
@@ -1152,7 +1152,9 @@
   "modelProperties": {
     "org.mule.runtime.extension.api.property.XmlExtensionModelProperty": {
       "namespacesDependencies": [
-        "http://www.w3.org/2001/XMLSchema-instance",
+        "http://www.mulesoft.org/schema/mule/petstore",
+        "http://www.mulesoft.org/schema/mule/marvel",
+        "http://www.mulesoft.org/schema/mule/module",
         "http://www.mulesoft.org/schema/mule/core"
       ]
     }

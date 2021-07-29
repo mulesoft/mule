@@ -434,7 +434,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private ArtifactAst buildMinimalApplicationModel(final Predicate<ComponentAst> basePredicate) {
     return graph.minimalArtifactFor(basePredicate
         .or(cm -> cm.getModel(HasStereotypeModel.class)
-            .map(stm -> stm.getStereotype().isAssignableTo(APP_CONFIG))
+            .map(stm -> stm.getStereotype() != null && stm.getStereotype().isAssignableTo(APP_CONFIG))
             .orElse(false)));
   }
 

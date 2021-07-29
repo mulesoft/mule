@@ -1593,57 +1593,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="username-password-filter" type="usernamePasswordFilterType" substitutionGroup="abstract-security-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Authenticates a message based on username and password expressions.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="usernamePasswordFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractSecurityFilterType">
-                <xsd:attribute name="username" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A Mule expression which extracts the username from the message. Defaults to #[mel:message.inboundProperties.username].
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="password" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A Mule expression which extracts the password from the message. Defaults to #[mel:message.inboundProperties.password].
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-security-filter" type="customSecurityFilterType" substitutionGroup="abstract-security-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allows developers to configure custom security filters
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="customSecurityFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractSecurityFilterType">
-                <xsd:attribute name="ref" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the security filter to use.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <!--==============================================================-->
     <!--   Interceptor elements                                       -->
     <!--==============================================================-->

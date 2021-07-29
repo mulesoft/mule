@@ -55,4 +55,9 @@ public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionReques
   public Consumer<ComponentAst> getNestedComponentParamProcessor() {
     return nestedComponentParamProcessor;
   }
+
+  @Override
+  public ComponentParameterAst getParameter(String parameterName) {
+    return resolveOwnerComponent().getParameter(parameterName);
+  }
 }

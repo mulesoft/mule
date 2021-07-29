@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.rx;
 
 import static reactor.core.Exceptions.isBubbling;
+import static reactor.core.Exceptions.isErrorCallbackNotImplemented;
 import static reactor.core.Exceptions.propagate;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -206,6 +207,9 @@ public class Exceptions {
     } else if (t instanceof VirtualMachineError) {
       return new MuleFatalException(t);
     } else if (isBubbling(t)) {
+      return new MuleRuntimeException(unwrap(t));
+    } else if (isErrorCallbackNotImplemented(t)) {
+      // This type of fatal Reactor exceptions was added later see MULE-19593 for more details
       return new MuleRuntimeException(unwrap(t));
     } else {
       return t;

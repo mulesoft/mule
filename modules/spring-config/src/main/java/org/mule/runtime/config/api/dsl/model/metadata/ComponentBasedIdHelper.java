@@ -120,8 +120,9 @@ public class ComponentBasedIdHelper {
       String name = component.getIdentifier().toString();
       this.idBuilderSupplier = cacheKeyBuilderSupplier;
       this.idBuilder = idBuilderSupplier.get().withSourceElementName(name).withHashValue(Objects.hashCode(name));
-      this.idBuilder.containing(component.getParameters().stream().map(p -> computeIdFor(component, p, cacheKeyBuilderSupplier))
-          .collect(toList()));
+      this.idBuilder.containing(component.getParameters().stream()
+          .filter(componentParameterAst -> componentParameterAst.getValue().getValue().isPresent())
+          .map(p -> computeIdFor(component, p, cacheKeyBuilderSupplier)).collect(toList()));
     }
 
     private Void hashForLeft(String s) {
@@ -139,6 +140,7 @@ public class ComponentBasedIdHelper {
         final ComponentAst c = (ComponentAst) o;
         this.idBuilder.containing(c.getParameters()
             .stream()
+            .filter(componentParameterAst -> componentParameterAst.getValue().getValue().isPresent())
             .sorted(comparing(p -> p.getModel().getName()))
             .map(p -> computeIdFor(c, p, idBuilderSupplier))
             .collect(toList()));
@@ -174,14 +176,15 @@ public class ComponentBasedIdHelper {
     private Void hashForRight(Object o) {
       if (o instanceof ComponentAst) {
         final ComponentAst c = (ComponentAst) o;
-        c.getParameters().stream().sorted(comparing(p -> p.getModel().getName())).forEach(p -> {
-          hashBuilder.append(p.getModel().getName());
-          if (p.getModel().getType() instanceof ArrayType) {
-            hashForList((Collection<ComponentAst>) p.getValue().getRight());
-          } else {
-            p.getValue().reduce(leftFunction, rightFunction);
-          }
-        });
+        c.getParameters().stream().filter(componentParameterAst -> componentParameterAst.getValue().getValue().isPresent())
+            .sorted(comparing(p -> p.getModel().getName())).forEach(p -> {
+              hashBuilder.append(p.getModel().getName());
+              if (p.getModel().getType() instanceof ArrayType) {
+                hashForList((Collection<ComponentAst>) p.getValue().getRight());
+              } else {
+                p.getValue().reduce(leftFunction, rightFunction);
+              }
+            });
       } else {
         hashBuilder.append(o);
       }

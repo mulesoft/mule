@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:values="http://www.mulesoft.org/schema/mule/values"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
+
+    <flow name="contentTypedValuesInsideShowInDslGroup">
+        <values:content-typed-values-inside-show-in-dsl-group>
+            <values:content-typed-values-group>
+            	<values:typed-body><![CDATA[123]]></values:typed-body>
+            </values:content-typed-values-group>
+        </values:content-typed-values-inside-show-in-dsl-group>
+    </flow>
+
+</mule>

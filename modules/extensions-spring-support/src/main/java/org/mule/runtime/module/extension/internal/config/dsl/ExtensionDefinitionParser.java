@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -269,7 +270,7 @@ public abstract class ExtensionDefinitionParser {
             if (!paramDsl.supportsTopLevelDeclaration() && paramDsl.supportsChildDeclaration()) {
               parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
             }
-            parseObjectParameter(parameter, paramDsl);
+            parseAstParameter(parameter, paramDsl);
           } else {
             parseObject(parameter.getName(), parameter.getName(), objectType, parameter.getDefaultValue(),
                         parameter.getExpressionSupport(), parameter.isRequired(), acceptsReferences(parameter),
@@ -310,7 +311,7 @@ public abstract class ExtensionDefinitionParser {
 
         private boolean parseAsContent(MetadataType type) {
           if (isContent) {
-            parseAttributeParameter(parameter);
+            parseAstParameter(parameter, paramDsl);
             return true;
           }
 
@@ -333,7 +334,8 @@ public abstract class ExtensionDefinitionParser {
    */
   protected void parseMapParameters(ParameterModel parameter, ObjectType objectType, DslElementSyntax paramDsl) {
     parseMapParameters(parameter.getName(), parameter.getName(), objectType, parameter.getDefaultValue(),
-                       parameter.getExpressionSupport(), parameter.isRequired(), paramDsl, parameter.getModelProperties());
+                       parameter.getExpressionSupport(), parameter.isRequired(), paramDsl, parameter.getModelProperties(),
+                       parameter.getAllowedStereotypes());
   }
 
   /**
@@ -348,8 +350,10 @@ public abstract class ExtensionDefinitionParser {
    */
   protected void parseMapParameters(String key, String name, ObjectType dictionaryType, Object defaultValue,
                                     ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl,
-                                    Set<ModelProperty> modelProperties) {
-    parseAttributeParameter(key, name, dictionaryType, defaultValue, expressionSupport, required, modelProperties, emptyList());
+                                    Set<ModelProperty> modelProperties,
+                                    List<StereotypeModel> allowedStereotypes) {
+    parseAttributeParameter(key, name, dictionaryType, defaultValue, expressionSupport, required, true, modelProperties,
+                            allowedStereotypes);
 
     Class<? extends Map> mapType = getType(dictionaryType);
     if (ConcurrentMap.class.equals(mapType)) {
@@ -480,12 +484,10 @@ public abstract class ExtensionDefinitionParser {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        if (!parseAsContent(isContent, metadataType)) {
-          parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet(),
-                                  objectField.getAnnotation(StereotypeTypeAnnotation.class)
-                                      .map(StereotypeTypeAnnotation::getAllowedStereotypes)
-                                      .orElse(emptyList()));
-        }
+        parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet(),
+                                objectField.getAnnotation(StereotypeTypeAnnotation.class)
+                                    .map(StereotypeTypeAnnotation::getAllowedStereotypes)
+                                    .orElse(emptyList()));
       }
 
       @Override
@@ -510,7 +512,7 @@ public abstract class ExtensionDefinitionParser {
         if (objectType.isOpen()) {
           if (!parseAsContent(isContent, objectType)) {
             parseMapParameters(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, fieldDsl.get(),
-                               emptySet());
+                               emptySet(), emptyList());
           }
           return;
         }
@@ -547,10 +549,11 @@ public abstract class ExtensionDefinitionParser {
 
       private boolean parseAsContent(boolean isContent, MetadataType type) {
         if (isContent) {
-          parseFromTextExpression(fieldName, fieldDsl.get(),
-                                  () -> value -> valueResolverFactory.of(fieldName, type, value, defaultValue,
-                                                                         expressionSupport, false, emptySet(),
-                                                                         false, isContent));
+          parseAstParameter(fieldName, fieldName, type, fieldDsl.get(), defaultValue, expressionSupport, false, emptySet(),
+                            objectField.getAnnotation(StereotypeTypeAnnotation.class)
+                                .map(StereotypeTypeAnnotation::getAllowedStereotypes)
+                                .orElse(emptyList()),
+                            isContent);
 
           return true;
         }
@@ -661,7 +664,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   protected ClassLoader getContextClassLoader() {
-    return Thread.currentThread().getContextClassLoader();
+    return currentThread().getContextClassLoader();
   }
 
   protected void parseFromTextExpression(ParameterModel parameter, DslElementSyntax dsl, Supplier<TypeConverter> typeConverter) {
@@ -669,7 +672,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   protected void parseFromTextExpression(String key, DslElementSyntax paramDsl, Supplier<TypeConverter> typeConverter) {
-    addParameter(getChildKey(key), fromChildConfiguration(String.class).withWrapperIdentifier(paramDsl.getElementName()));
+    addParameter(getChildKey(key), fromSimpleParameter(key, typeConverter.get()));
 
     addDefinition(definitionBuilder
         .withIdentifier(paramDsl.getElementName())
@@ -708,7 +711,7 @@ public abstract class ExtensionDefinitionParser {
                                                                 ExpressionSupport expressionSupport, boolean required,
                                                                 Set<ModelProperty> modelProperties,
                                                                 List<StereotypeModel> allowedStereotypes) {
-    return parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, true,
+    return parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, !allowedStereotypes.isEmpty(),
                                    modelProperties, allowedStereotypes);
   }
 
@@ -738,12 +741,35 @@ public abstract class ExtensionDefinitionParser {
     return definitionBuilder;
   }
 
+  protected void parseAstParameter(String key, String name, MetadataType type, DslElementSyntax dsl,
+                                   Object defaultValue,
+                                   ExpressionSupport expressionSupport, boolean required,
+                                   Set<ModelProperty> modelProperties,
+                                   List<StereotypeModel> allowedStereotypes, boolean content) {
+    if (content) {
+      parseFromTextExpression(name, dsl, () -> value -> valueResolverFactory.of(name,
+                                                                                type,
+                                                                                value,
+                                                                                defaultValue,
+                                                                                expressionSupport,
+                                                                                required,
+                                                                                modelProperties,
+                                                                                !allowedStereotypes.isEmpty(),
+                                                                                content));
+    } else {
+      parseObjectParameter(key, name, (ObjectType) type,
+                           defaultValue, expressionSupport, required,
+                           !allowedStereotypes.isEmpty(), dsl, modelProperties,
+                           allowedStereotypes);
+    }
+  }
+
   /**
    * Registers a definition for a {@link ParameterModel} which represents an {@link ObjectType}
    *
    * @param parameterModel a {@link ParameterModel}
    */
-  protected void parseObjectParameter(ParameterModel parameterModel, DslElementSyntax paramDsl) {
+  protected void parseAstParameter(ParameterModel parameterModel, DslElementSyntax paramDsl) {
     if (isContent(parameterModel)) {
       parseFromTextExpression(parameterModel, paramDsl,
                               () -> value -> valueResolverFactory.of(parameterModel.getName(),

@@ -8,6 +8,11 @@ package org.mule.runtime.core.api.extension;
 
 import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.ANY;
+import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.BOOLEAN;
+import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.NUMBER;
+import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
+import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 
@@ -43,12 +48,13 @@ public final class MuleExtensionModelProvider {
       .createTypeLoader(MuleExtensionModelProvider.class.getClassLoader());
 
   public static final BaseTypeBuilder BASE_TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
-  public static final MetadataType STRING_TYPE = BASE_TYPE_BUILDER.stringType().build();
+  public static final MetadataType STRING_TYPE = loadPrimitive(STRING);
   public static final MetadataType INTEGER_TYPE = TYPE_LOADER.load(Integer.class);
-  public static final MetadataType BOOLEAN_TYPE = TYPE_LOADER.load(boolean.class);
-  public static final MetadataType OBJECT_TYPE = BASE_TYPE_BUILDER.objectType().build();
-  public static final MetadataType ANY_TYPE = BASE_TYPE_BUILDER.anyType().build();
-  public static final MetadataType VOID_TYPE = TYPE_LOADER.load(void.class);
+  public static final MetadataType NUMBER_TYPE = loadPrimitive(NUMBER);
+  public static final MetadataType BOOLEAN_TYPE = loadPrimitive(BOOLEAN);
+  public static final MetadataType NULL_TYPE = BASE_TYPE_BUILDER.nullType().build();
+  public static final MetadataType ANY_TYPE = loadPrimitive(ANY);
+  public static final MetadataType VOID_TYPE = BASE_TYPE_BUILDER.voidType().build();
   public static final MetadataType OBJECT_STORE_TYPE = TYPE_LOADER.load(ObjectStore.class);
 
   static {
@@ -59,6 +65,10 @@ public final class MuleExtensionModelProvider {
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private static MetadataType loadPrimitive(String id) {
+    return PRIMITIVE_TYPES.get(id);
   }
 
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()

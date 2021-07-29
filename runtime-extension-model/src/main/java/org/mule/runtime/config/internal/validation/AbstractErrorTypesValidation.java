@@ -50,10 +50,7 @@ public abstract class AbstractErrorTypesValidation implements Validation {
 
   protected static boolean errorMappingPresent(ComponentAst operationComponent) {
     final ComponentParameterAst errorMappingsAst = operationComponent.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
-    if (errorMappingsAst == null) {
-      return false;
-    }
-    return errorMappingsAst != null && !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty();
+    return errorMappingsAst != null && errorMappingsAst.getValue().getValue().isPresent();
   }
 
   protected static List<ErrorMapping> getErrorMappings(ComponentAst component) {

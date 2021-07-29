@@ -12,6 +12,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.JavaSdk.Parameters.PARAMETERS;
 
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -20,11 +22,16 @@ import org.mule.test.parameter.resolver.extension.extension.SomeSource;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(JAVA_SDK)
+@Story(PARAMETERS)
 public class ParameterResolverOnConfigTestCase extends AbstractParameterResolverTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "parameter-resolver-on-pojo-config.xml";
+    return "parameter/parameter-resolver-on-pojo-config.xml";
   }
 
   @Override

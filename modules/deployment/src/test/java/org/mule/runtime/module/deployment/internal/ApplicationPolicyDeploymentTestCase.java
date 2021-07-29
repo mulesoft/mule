@@ -27,6 +27,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
@@ -52,7 +53,6 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POL
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
 
-import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -177,7 +177,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     this.shareErrorTypeRepoSystemProperty =
         new SystemProperty(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY, Boolean.toString(shareErrorType));
     this.enablePolicyIsolationSystemProperty =
-        new SystemProperty((MuleRuntimeFeature.ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
+        new SystemProperty((ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
                            Boolean.toString(enablePolicyIsolation));
   }
 
@@ -773,7 +773,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Issue("MULE-18196")
   @Description("The application declares an ErrorType that is needed by the policy and but the policy doesn't have it in its own ErrorType repository")
   public void appliesPolicyUsingErrorTypeDeclaredOnAppDependency() throws Exception {
-    if (!shareErrorTypeRepository) {
+    if (!shareErrorTypeRepository && parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
       expectPolicyRegistrationException();
     }
 

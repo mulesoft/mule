@@ -35,6 +35,7 @@ import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
+import org.mule.runtime.module.extension.internal.value.ValueProviderUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -77,6 +78,29 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
             .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
   }
 
+  /**
+   * {@inheritDoc}
+   * <p/>
+   * The returned {@link ValueProviderCacheId} will contain all acting parameters required by the
+   * {@link org.mule.runtime.extension.api.values.ValueProvider} as parts. In case the {@link ComponentAst} corresponds to a
+   * Source or Operation, if the {@link org.mule.runtime.extension.api.values.ValueProvider} requires a connection or a
+   * configuration, their id will be added as part. The resolution of a config or connection id as part is different from the one
+   * done when their are the one's holding the resolving parameter. In the case they are parts needed by another
+   * {@link org.mule.runtime.extension.api.values.ValueProvider}, acting parameters will not exist. Therefore, only parameters
+   * required for metadata are used as input to calculate the {@link ValueProviderCacheId}.
+   */
+  @Override
+  public Optional<ValueProviderCacheId> getIdForResolvedValues(ComponentAst containerComponent, String parameterName,
+                                                               String targetPath) {
+    return ifContainsParameter(containerComponent, parameterName)
+        .flatMap(pm -> pm.getFieldValueProviderModels()
+            .stream()
+            .filter(fm -> Objects.equal(fm.getTargetSelector(), targetPath))
+            .findAny())
+        .flatMap(fieldModel -> resolveParametersInformation(containerComponent)
+            .flatMap(infoMap -> resolveId(containerComponent, fieldModel, infoMap)));
+  }
+
   private Optional<ParameterModel> ifContainsParameter(ComponentAst containerComponent, String parameterName) {
     return containerComponent.getModel(ParameterizedModel.class)
         .flatMap(parameterizedModel -> parameterizedModel
@@ -98,19 +122,17 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
                                                    Map<String, ParameterModelInformation> parameterModelsInformation) {
     final Optional<ComponentModel> compModel = containerComponent.getModel(ComponentModel.class);
 
-    if (compModel.isPresent()) {
-      return resolveForComponentModel(containerComponent, valueProviderModel, parameterModelsInformation);
-    } else {
-      return resolveForGlobalElement(containerComponent, valueProviderModel, parameterModelsInformation);
-    }
+    return compModel
+        .map(c -> resolveForComponentModel(containerComponent, valueProviderModel, parameterModelsInformation))
+        .orElse(resolveForGlobalElement(containerComponent, valueProviderModel, parameterModelsInformation));
   }
 
   private Optional<ValueProviderCacheId> resolveForGlobalElement(ComponentAst containerComponent,
                                                                  ValueProviderModel valueProviderModel,
                                                                  Map<String, ParameterModelInformation> parameterModelsInformation) {
-    List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    parts.addAll(resolveActingParameterIds(containerComponent, valueProviderModel, parameterModelsInformation));
+    List<ValueProviderCacheId> parts =
+        new LinkedList<>(resolveActingParameterIds(containerComponent, valueProviderModel, parameterModelsInformation));
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
@@ -207,9 +229,12 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
                                                                Map<String, ParameterModelInformation> parameterModelsInformation) {
     return valueProviderModel.getParameters()
         .stream()
-        .map(ActingParameterModel::getName)
+        .map(ActingParameterModel::getExtractionExpression)
+        .map(ValueProviderUtils::getParameterNameFromExtractionExpression)
         .filter(parameterModelsInformation::containsKey)
-        .map(ap -> resolveParameterId(containerComponent, parameterModelsInformation.get(ap).getParameterAst()))
+        .map(parameterModelsInformation::get)
+        .map(ParameterModelInformation::getParameterAst)
+        .map(ast -> resolveParameterId(containerComponent, ast))
         .collect(toList());
   }
 

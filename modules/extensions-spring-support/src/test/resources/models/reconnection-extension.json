@@ -1,14 +1,14 @@
 {
   "name": "reconnection",
   "description": "",
-  "version": "4.4.0-SNAPSHOT",
+  "version": "4.5.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "reconnection",
     "namespace": "http://www.mulesoft.org/schema/mule/reconnection",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/reconnection/current/mule-reconnection.xsd",
-    "schemaVersion": "4.4.0-SNAPSHOT",
+    "schemaVersion": "4.5.0-SNAPSHOT",
     "xsdFileName": "mule-reconnection.xsd"
   },
   "resources": [],
@@ -582,7 +582,7 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": false,
+                    "allowsInlineDefinition": true,
                     "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
@@ -601,7 +601,7 @@
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "error-mapping",
+                        "localPart": "error-mappings",
                         "prefix": "mule"
                       }
                     },
@@ -1416,7 +1416,7 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": false,
+                    "allowsInlineDefinition": true,
                     "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
@@ -1435,7 +1435,7 @@
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "error-mapping",
+                        "localPart": "error-mappings",
                         "prefix": "mule"
                       }
                     },
@@ -2240,7 +2240,7 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": false,
+                    "allowsInlineDefinition": true,
                     "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
@@ -2259,7 +2259,7 @@
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "error-mapping",
+                        "localPart": "error-mappings",
                         "prefix": "mule"
                       }
                     },
@@ -5384,7 +5384,7 @@
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": false,
+                "allowsInlineDefinition": true,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
@@ -5403,7 +5403,7 @@
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
+                    "localPart": "error-mappings",
                     "prefix": "mule"
                   }
                 },

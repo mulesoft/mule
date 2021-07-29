@@ -34,7 +34,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "Values",
@@ -71,7 +71,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "chat",
       "system": "Values",
@@ -121,7 +121,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValueWithRequiredParam",
       "system": "Values",
@@ -171,7 +171,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValuesWithRequiredParamsFromParamGroup",
       "system": "Values",
@@ -221,7 +221,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "WithValuesWithRequiredParamsFromShowInDslGroup",
       "system": "Values",
@@ -267,7 +267,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "failure-connection",
       "system": "Values",
@@ -309,7 +309,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-parameter-with-field-values",
       "system": "Values",
@@ -351,7 +351,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-value-parameter",
       "system": "Values",
@@ -409,7 +409,7 @@
         "connectivity": "anypoint://semantics/connectivity"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "withValueFourBoundActingParameters",
       "system": "Values",

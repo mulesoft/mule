@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.lang.Class.forName;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
@@ -33,6 +34,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
@@ -44,9 +46,11 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -59,6 +63,7 @@ import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -445,7 +450,7 @@ public class BeanDefinitionFactory {
               .name(paramSyntax.getElementName())
               .build();
 
-          final ComponentIdentifier paramValueCompoenntIdentifier = param.getGenerationInformation().getSyntax()
+          final ComponentIdentifier paramValueComponentIdentifier = param.getGenerationInformation().getSyntax()
               .filter(paramValueSyntax -> !isEmpty(paramSyntax.getElementName()))
               .map(paramValueSyntax -> ComponentIdentifier.builder()
                   .namespaceUri(paramValueSyntax.getNamespace())
@@ -454,28 +459,63 @@ public class BeanDefinitionFactory {
                   .build())
               .orElse(paramComponentIdentifier);
 
-          Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-              componentBuildingDefinitionRegistry.getBuildingDefinition(paramValueCompoenntIdentifier);
-          if (buildingDefinitionOptional.isPresent()) {
-            final CreateParamBeanDefinitionRequest request =
-                new CreateParamBeanDefinitionRequest(componentHierarchy, paramsModels, paramOwnerComponent, param,
-                                                     buildingDefinitionOptional.orElse(null), paramComponentIdentifier,
-                                                     nestedComponentParamProcessor);
+          return resolveComplexParamBuildingDefinition(param, paramValueComponentIdentifier)
+              .map(buildingDefinition -> {
+                CreateParamBeanDefinitionRequest request =
+                    new CreateParamBeanDefinitionRequest(componentHierarchy, paramsModels, paramOwnerComponent, param,
+                                                         buildingDefinition, paramComponentIdentifier,
+                                                         nestedComponentParamProcessor);
+                this.paramProcessor.processRequest(springComponentModels, request);
 
-            this.paramProcessor.processRequest(springComponentModels, request);
+                param.getValue().applyRight(v -> {
+                  if (v instanceof ComponentAst) {
+                    request.getSpringComponentModel().setComponent((ComponentAst) v);
+                  }
+                });
 
-            param.getValue().applyRight(v -> {
-              if (v instanceof ComponentAst) {
-                request.getSpringComponentModel().setComponent((ComponentAst) v);
-              }
-            });
-
-            handleSpringComponentModel(request.getSpringComponentModel(), springComponentModels, registry, componentLocator);
-            return of(request.getSpringComponentModel());
-          } else {
-            return empty();
-          }
+                handleSpringComponentModel(request.getSpringComponentModel(), springComponentModels, registry, componentLocator);
+                return request.getSpringComponentModel();
+              });
         });
+  }
+
+  private Optional<ComponentBuildingDefinition<?>> resolveComplexParamBuildingDefinition(ComponentParameterAst param,
+                                                                                         final ComponentIdentifier paramValueComponentIdentifier) {
+    if (param.getModel().getModelProperty(NoWrapperModelProperty.class).isPresent()) {
+      return param.getModel().getType()
+          .getAnnotation(ClassInformationAnnotation.class)
+          .map(cia -> {
+            try {
+              return new ComponentBuildingDefinition.Builder()
+                  .withNamespace(paramValueComponentIdentifier.getNamespace())
+                  .withIdentifier(paramValueComponentIdentifier.getName())
+                  .withTypeDefinition(fromType(forName(cia.getClassname())))
+                  .build();
+            } catch (ClassNotFoundException e) {
+              throw new MuleRuntimeException(e);
+            }
+          });
+    } else {
+      return componentBuildingDefinitionRegistry.getBuildingDefinition(paramValueComponentIdentifier);
+    }
+  }
+
+  private ComponentBuildingDefinition noWrapperBeanDefinition(ComponentParameterAst param,
+                                                              final ComponentIdentifier paramValueComponentIdentifier) {
+    return param.getModel().getType()
+        .getAnnotation(ClassInformationAnnotation.class)
+        .map(cia -> {
+          try {
+            return new ComponentBuildingDefinition.Builder()
+                .withNamespace(paramValueComponentIdentifier.getNamespace())
+                .withIdentifier(paramValueComponentIdentifier.getName())
+                .withTypeDefinition(fromType(forName(cia.getClassname())))
+                .build();
+          } catch (ClassNotFoundException e) {
+            throw new MuleRuntimeException(e);
+          }
+        })
+        .orElse(null);
   }
 
   private Optional<SpringComponentModel> resolveComponentBeanDefinitionDslParamGroup(Map<ComponentAst, SpringComponentModel> springComponentModels,
@@ -494,19 +534,16 @@ public class BeanDefinitionFactory {
               .name(groupSyntax.getElementName())
               .build();
 
-          Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-              componentBuildingDefinitionRegistry.getBuildingDefinition(paramGroupComponentIdentifier);
-          if (buildingDefinitionOptional.isPresent()) {
-            final CreateDslParamGroupBeanDefinitionRequest request =
-                new CreateDslParamGroupBeanDefinitionRequest(componentHierarchy, paramsModels, paramOwnerComponentModel,
-                                                             buildingDefinitionOptional.orElse(null),
-                                                             paramGroupComponentIdentifier);
+          return componentBuildingDefinitionRegistry.getBuildingDefinition(paramGroupComponentIdentifier)
+              .map(buildingDefinition -> {
+                final CreateDslParamGroupBeanDefinitionRequest request =
+                    new CreateDslParamGroupBeanDefinitionRequest(paramGroupModel, componentHierarchy, paramsModels,
+                                                                 paramOwnerComponentModel, buildingDefinition,
+                                                                 paramGroupComponentIdentifier);
 
-            this.dslParamGroupProcessor.processRequest(springComponentModels, request);
-            return of(request.getSpringComponentModel());
-          } else {
-            return empty();
-          }
+                this.dslParamGroupProcessor.processRequest(springComponentModels, request);
+                return request.getSpringComponentModel();
+              });
         });
   }
 
@@ -631,26 +668,23 @@ public class BeanDefinitionFactory {
         String identifier = childComponentModel.getIdentifier().getName();
         if (identifier.equals("password-encryption-strategy")
             || identifier.equals("secret-key-encryption-strategy")) {
-          registry.registerBeanDefinition(childComponentModel.getRawParameterValue(NAME_ATTRIBUTE_NAME).get(),
+          registry.registerBeanDefinition(childComponentModel.getParameter(NAME_ATTRIBUTE_NAME).getResolvedRawValue(),
                                           springComponentModels.get(childComponentModel).getBeanDefinition());
         }
       });
     }
   }
 
-
   private BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> buildComponentProcessorChainOfResponsability() {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
-    PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
     SimpleTypeBeanComponentDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanComponentDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     CommonComponentBeanDefinitionCreator commonComponentModelProcessor =
         new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository);
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
-    objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);
-    propertiesMapBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
+    objectBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
     simpleTypeBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);
     mapEntryBeanDefinitionCreator.setNext(commonComponentModelProcessor);
 
