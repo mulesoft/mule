@@ -58,6 +58,11 @@ public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionReques
 
   @Override
   public ComponentParameterAst getParameter(String parameterName) {
-    return resolveOwnerComponent().getParameter(parameterName);
+    // TODO MULE-19672 When decoupling from the dsl representation, properly propagate the group information to use here instead
+    // of iterating.
+    return resolveOwnerComponent().getParameters().stream()
+        .filter(p -> p.getModel().getName().equals(parameterName))
+        .findFirst()
+        .orElse(null);
   }
 }

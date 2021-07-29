@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsNamespace;
@@ -421,7 +422,7 @@ public class MacroExpansionModuleModel {
    * @return the suffix needed to be used when macro expanding elements, or {@link Optional#empty()} otherwise.
    */
   private Optional<String> getConfigRefName(ComponentAst operationRefModel) {
-    ComponentParameterAst parameterAst = operationRefModel.getParameter(MODULE_OPERATION_CONFIG_REF);
+    ComponentParameterAst parameterAst = operationRefModel.getParameter(DEFAULT_GROUP_NAME, MODULE_OPERATION_CONFIG_REF);
     if (parameterAst != null && parameterAst.getResolvedRawValue() != null) {
       return of(parameterAst.getResolvedRawValue());
     } else {
