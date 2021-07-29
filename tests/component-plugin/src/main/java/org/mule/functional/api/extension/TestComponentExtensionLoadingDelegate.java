@@ -345,7 +345,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .describedAs("Assertion processor used to assert an expression, invocation count and thread.")
         .onDefaultParameterGroup();
 
-    params.withRequiredParameter("expression")
+    params.withOptionalParameter("expression")
         .ofType(BOOLEAN_TYPE)
         .withExpressionSupport(REQUIRED);
 
