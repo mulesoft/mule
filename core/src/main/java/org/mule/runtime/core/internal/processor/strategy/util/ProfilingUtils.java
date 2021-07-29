@@ -12,12 +12,12 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
-import org.mule.runtime.core.privileged.processor.chain.HasLocation;
+import org.mule.runtime.core.api.processor.HasLocation;
 
 /**
  * Utility methods for handling profiling of processing strategy.
  * <p>
- * MULE-19594: Handle expression problem for Reactive Processor (ComponentLocation)
+ * MULE-19594: refactor the way of retrieving the component location from generic reactive processor.
  *
  * @since 4.0
  */
@@ -45,25 +45,17 @@ public final class ProfilingUtils {
 
   /**
    * @param muleContext the {@link MuleContext} from which to return the artifactId
-   * @return the artifact id if possible.
+   * @return the artifact id.
    */
   public static String getArtifactId(MuleContext muleContext) {
-    if (muleContext.getConfiguration() == null) {
-      return "UNKNOWN_ARTIFACT_ID";
-    }
-
     return muleContext.getConfiguration().getId();
   }
 
   /**
    * @param muleContext the {@link MuleContext} from which to return the artifactId
-   * @return the artifact id if possible.
+   * @return the artifact type.
    */
   public static String getArtifactType(MuleContext muleContext) {
-    if (muleContext.getArtifactType() == null) {
-      return "UNKNOWN_ARTIFACT_TYPE";
-    }
-
     return muleContext.getArtifactType().getAsString();
   }
 

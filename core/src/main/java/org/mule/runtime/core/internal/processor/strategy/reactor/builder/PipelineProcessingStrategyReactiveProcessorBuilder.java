@@ -8,6 +8,8 @@
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventType.PS_SCHEDULING_FLOW_EXECUTION;
@@ -111,7 +113,11 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
 
   private Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducerFromProfilingService(
                                                                                                                     ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
-    return ofNullable(profilingService).map(profilingService -> profilingService.getProfilingDataProducer(profilingEventType));
+    if (profilingService == null) {
+      return empty();
+    } else {
+      return of(profilingService.getProfilingDataProducer(profilingEventType));
+    }
   }
 
 }

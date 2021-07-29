@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.privileged.processor.chain.HasLocation;
+import org.mule.runtime.core.api.processor.HasLocation;
 
 /**
  * Specialization of {@link ReactiveProcessor} that allows execution of a mule component taking into account its processing
