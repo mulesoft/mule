@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -65,17 +66,23 @@ public class ObjectTypeVisitor implements TypeDefinitionVisitor {
 
   @Override
   public void onConfigurationAttribute(String attributeName, Class<?> enforcedClass) {
+    onConfigurationAttribute(DEFAULT_GROUP_NAME, attributeName, enforcedClass);
+  }
+
+  @Override
+  public void onConfigurationAttribute(String groupName, String attributeName, Class<?> enforcedClass) {
+    String attributeValue = componentModel.getParameter(groupName, attributeName).getResolvedRawValue();
     try {
       type = ClassUtils.getClass(currentThread().getContextClassLoader(),
-                                 componentModel.getParameter(attributeName).getResolvedRawValue());
+                                 attributeValue);
       if (!enforcedClass.isAssignableFrom(type)) {
         throw new MuleRuntimeException(createStaticMessage("Class definition for type %s on element %s is not the same nor inherits from %s",
-                                                           componentModel.getParameter(attributeName).getResolvedRawValue(),
+                                                           attributeValue,
                                                            componentModel.getIdentifier(), enforcedClass.getName()));
       }
     } catch (ClassNotFoundException e) {
       throw new MuleRuntimeException(createStaticMessage("Error while trying to locate Class definition for type %s on element %s",
-                                                         componentModel.getParameter(attributeName).getResolvedRawValue(),
+                                                         attributeValue,
                                                          componentModel.getIdentifier()),
                                      e);
     }
