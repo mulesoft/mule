@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
@@ -59,7 +60,7 @@ public class ErrorHandlerRefOrOnErrorExclusiveness implements Validation {
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    final ComponentParameterAst refParam = component.getParameter(REFERENCE_ATTRIBUTE);
+    final ComponentParameterAst refParam = component.getParameter(DEFAULT_GROUP_NAME, REFERENCE_ATTRIBUTE);
     if (refParam.getValue().getValue().isPresent()
         && component.directChildrenStream().count() > 0) {
       return of(create(component, refParam, this, "A reference 'error-handler' cannot have 'on-error's."));

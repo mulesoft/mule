@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsComponentId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
@@ -58,12 +59,12 @@ public class FlowRefPointsToExistingFlow implements Validation {
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER))
-        .and(currentElemement(componentModel -> componentModel.getParameter("name").getValue().isRight()));
+        .and(currentElemement(componentModel -> componentModel.getParameter(DEFAULT_GROUP_NAME, "name").getValue().isRight()));
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    final ComponentParameterAst param = component.getParameter("name");
+    final ComponentParameterAst param = component.getParameter(DEFAULT_GROUP_NAME, "name");
     return param.getValue()
         .reduce(l -> empty(),
                 nameAttribute -> {

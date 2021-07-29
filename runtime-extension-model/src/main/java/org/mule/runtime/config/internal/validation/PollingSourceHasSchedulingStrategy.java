@@ -10,12 +10,15 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
@@ -60,13 +63,15 @@ public class PollingSourceHasSchedulingStrategy implements Validation {
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    final ParameterModel schedulingStrategyParamModel = component.getModel(SourceModel.class)
-        .flatMap(srcModel -> srcModel.getAllParameterModels().stream()
-            .filter(pm -> isScheduler(pm.getType()))
+    final Pair<ParameterGroupModel, ParameterModel> schedulingStrategyParamModel = component.getModel(SourceModel.class)
+        .flatMap(srcModel -> getGroupAndParametersPairs(srcModel)
+            .filter(pm -> isScheduler(pm.getSecond().getType()))
             .findAny())
         .get();
 
-    if (component.getParameter(schedulingStrategyParamModel.getName()).getValue().getRight() == null) {
+    if (component
+        .getParameter(schedulingStrategyParamModel.getFirst().getName(), schedulingStrategyParamModel.getSecond().getName())
+        .getValue().getRight() == null) {
       return of(ValidationResultItem.create(component, this, "The scheduling strategy has not been configured."));
     } else {
       return empty();
