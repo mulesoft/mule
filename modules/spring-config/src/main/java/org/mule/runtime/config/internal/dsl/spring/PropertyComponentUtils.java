@@ -58,7 +58,7 @@ public class PropertyComponentUtils {
       ComponentParameterAst refParam = propertyComponentModel.getParameter(DEFAULT_GROUP_NAME, "ref");
       String beanName = refParam != null
           ? refParam.getResolvedRawValue()
-              : null;
+          : null;
       return new Pair<>(PROPERTY_NAME_PROPERTY_ATTRIBUTE, new RuntimeBeanReference(beanName));
     }
   }

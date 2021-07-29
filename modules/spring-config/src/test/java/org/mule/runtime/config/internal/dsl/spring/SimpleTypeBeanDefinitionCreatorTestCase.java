@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -73,7 +74,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
 
     ComponentAst componentModel = mock(ComponentAst.class);
-    when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
+    when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(paramInOwnerComponent);
     when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
@@ -95,7 +96,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
 
     ComponentAst componentModel = mock(ComponentAst.class);
-    when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
+    when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(paramInOwnerComponent);
     when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
@@ -121,7 +122,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
 
     ComponentAst componentModel = mock(ComponentAst.class);
-    when(componentModel.getParameter("value")).thenReturn(paramInOwnerComponent);
+    when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(paramInOwnerComponent);
     when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, of(o -> TEST_STRING_RAW_VALUE));
@@ -147,7 +148,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
-    when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
+    when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(componentParameterAst);
     when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
@@ -170,7 +171,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
-    when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
+    when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(componentParameterAst);
     when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, empty());
@@ -197,7 +198,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     ComponentParameterAst componentParameterAst = mock(ComponentParameterAst.class);
     when(componentParameterAst.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
-    when(componentModel.getParameter("value")).thenReturn(componentParameterAst);
+    when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(componentParameterAst);
     when(createBeanDefinitionRequest.getComponent()).thenReturn(componentModel);
 
     mockComponentBuildingDefinition(createBeanDefinitionRequest, of(o -> TEST_STRING_RAW_VALUE));
