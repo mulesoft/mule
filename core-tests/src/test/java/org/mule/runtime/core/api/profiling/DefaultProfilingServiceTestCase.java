@@ -22,7 +22,7 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.profiling.ProfilerDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
@@ -67,7 +67,6 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     Map<String, Object> objects = new HashMap<>();
-    super.getStartUpRegistryObjects().putAll(objects);
     objects.put(OBJECT_NOTIFICATION_DISPATCHER, notificationManager);
     objects.put(OBJECT_NOTIFICATION_HANDLER, notificationManager);
     return objects;
@@ -95,7 +94,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Test
   @Description("The correct discovery strategy is set")
   public void correctDiscoveryStrategy() {
-    assertThat(profilingService.getDiscoveryStrategy(), instanceOf(TestProfilerDataConsumerDiscoveryStrategy.class));
+    assertThat(profilingService.getDiscoveryStrategy(), instanceOf(TestProfilingDataConsumerDiscoveryStrategy.class));
   }
 
   @Test
@@ -116,24 +115,24 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   }
 
   /**
-   * Stub {@link DefaultProfilingService} with a test {@link ProfilerDataConsumerDiscoveryStrategy}.
+   * Stub {@link DefaultProfilingService} with a test {@link ProfilingDataConsumerDiscoveryStrategy}.
    */
   private static class TestDefaultProfilingService extends DefaultProfilingService {
 
     @Override
-    public ProfilerDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return new TestProfilerDataConsumerDiscoveryStrategy();
+    public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+      return new TestProfilingDataConsumerDiscoveryStrategy();
     }
   }
 
   /**
-   * Stub for a {@link ProfilerDataConsumerDiscoveryStrategy}.
+   * Stub for a {@link ProfilingDataConsumerDiscoveryStrategy}.
    */
-  private static class TestProfilerDataConsumerDiscoveryStrategy implements ProfilerDataConsumerDiscoveryStrategy {
+  private static class TestProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
 
     @Override
-    public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
-      return (Set<S>) ImmutableSet.of(new TestProfilingDataConsumer());
+    public Set<ProfilingDataConsumer<? extends ProfilingEventContext>> discover() {
+      return ImmutableSet.of(new TestProfilingDataConsumer());
     }
   }
 
@@ -172,8 +171,8 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Override
-    public void triggerProfilingEvent(TestProfilingEventContext profilerEventContext) {
-      this.defaultProfilingService.notifyEvent(profilerEventContext, TestProfilingEventType.TEST_PROFILING_EVENT_TYPE);
+    public void triggerProfilingEvent(TestProfilingEventContext profilingEventContext) {
+      this.defaultProfilingService.notifyEvent(profilingEventContext, TestProfilingEventType.TEST_PROFILING_EVENT_TYPE);
     }
   }
 
@@ -201,7 +200,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
       }
 
       @Override
-      public String getProfilerEventTypeNamespace() {
+      public String getProfilingEventTypeNamespace() {
         return "test-namespace";
       }
 

@@ -24,9 +24,23 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.FLOW_BACK_PRESSURE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -38,6 +52,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
@@ -52,14 +67,18 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.mockito.InOrder;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
+import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
@@ -82,12 +101,13 @@ import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -128,6 +148,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
+  protected final ProfilingDataConsumer profilingDataConsumer = mock(ProfilingDataConsumer.class);
 
   protected Mode mode;
   protected static final String CPU_LIGHT = "cpuLight";
@@ -221,14 +242,21 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public SystemProperty enableProfilingServiceProperty;
 
-  public AbstractProcessingStrategyTestCase(Mode mode) {
+  public AbstractProcessingStrategyTestCase(Mode mode, boolean profiling) {
     this.mode = mode;
+    this.enableProfilingServiceProperty =
+        new SystemProperty((MuleRuntimeFeature.ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get()),
+                           Boolean.toString(profiling));
   }
 
-  @Parameterized.Parameters(name = "{0}")
-  public static Collection<Mode> modeParameters() {
-    return asList(new Mode[] {Mode.FLOW, SOURCE});
+  @Parameterized.Parameters(name = "{0} - Profiling: {1}")
+  public static List<Object[]> modeParameters() {
+    return asList(new Object[] {FLOW, false},
+                  new Object[] {FLOW, true},
+                  new Object[] {SOURCE, false});
   }
 
   @Before
@@ -279,6 +307,13 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
         .source(triggerableMessageSource)
         // Avoid logging of errors by using a null exception handler.
         .messagingExceptionHandler((exception, event) -> event);
+
+    // Profiling events mocking
+    when(profilingDataConsumer.getProfilingEventTypes())
+        .thenReturn(new HashSet<>(Arrays.asList(PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION, FLOW_EXECUTED,
+                                                PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION,
+                                                OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
+    when(profilingDataConsumer.getEventContextFilter()).thenReturn(processingStrategyProfilingEventContext -> true);
   }
 
   @Override
@@ -616,6 +651,26 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
     assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
+  }
+
+  protected void assertProcessingStrategyProfiling() {
+    if (enableProfilingServiceProperty.getValue().equals("true")) {
+      InOrder profilingDataConsumerAssertions = inOrder(profilingDataConsumer);
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(PS_SCHEDULING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(STARTING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(OPERATION_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(PS_FLOW_MESSAGE_PASSING), any(ProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(FLOW_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
+    } else {
+      verifyZeroInteractions(profilingDataConsumer);
+    }
   }
 
   protected interface TransactionAwareProcessingStrategyTestCase {

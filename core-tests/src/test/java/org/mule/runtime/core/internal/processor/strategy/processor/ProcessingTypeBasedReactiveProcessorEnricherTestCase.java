@@ -20,6 +20,20 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
+import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteAsyncNonBlockingProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBlockingProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.ProactorProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
+import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
+import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
+
+import java.util.Collection;
+import java.util.concurrent.Callable;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -31,25 +45,15 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
-import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteAsyncNonBlockingProcessingStrategyEnricher;
-import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBlockingProcessingStrategyEnricher;
-import org.mule.runtime.core.internal.processor.strategy.enricher.ProactorProcessingStrategyEnricher;
-import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
-import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
-import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
-
 import org.reactivestreams.Publisher;
-import java.util.Collection;
-import java.util.concurrent.Callable;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(ENRICHER)
 @RunWith(Parameterized.class)
 public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends AbstractEnrichedReactiveProcessorTestCase {
 
+  public static final String ARTIFACT_ID = "artifactId";
+  public static final String ARTIFACT_TYPE = "artifactType";
   private final int parallelism;
   private final ReactiveProcessor cpuLiteProcessor = p -> p;
   private final ReactiveProcessor cpuLiteAsyncReactiveProcessor = new CpuLiteAsyncReactiveProcessor();
@@ -66,6 +70,9 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
 
   @Spy
   private ImmediateScheduler cpuLiteAsyncScheduler;
+
+  @Mock
+  private ProfilingService profilingService;
 
   @Mock
   private CoreEvent coreEvent;
@@ -116,14 +123,19 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
   }
 
   private ReactiveProcessorEnricher getProcessingTypeBasedEnricher() {
+
     ReactiveProcessorEnricher proactorEnricher =
-        new ProactorProcessingStrategyEnricher(() -> proactorScheduler, identity(), parallelism, parallelism, parallelism);
+        new ProactorProcessingStrategyEnricher(() -> proactorScheduler, identity(), profilingService, ARTIFACT_ID, ARTIFACT_TYPE,
+                                               parallelism,
+                                               parallelism,
+                                               parallelism);
 
     ReactiveProcessorEnricher cpuLiteEnricher =
-        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLiteScheduler);
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLiteScheduler, profilingService, ARTIFACT_ID, ARTIFACT_TYPE);
 
     ReactiveProcessorEnricher cpuLiteAsyncEnricher =
-        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> cpuLiteAsyncScheduler, () -> cpuLiteAsyncScheduler);
+        new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> cpuLiteAsyncScheduler, () -> cpuLiteAsyncScheduler,
+                                                              profilingService, ARTIFACT_ID, ARTIFACT_TYPE);
 
     return new ProcessingTypeBasedReactiveProcessorEnricher(cpuLiteEnricher)
         .register(CPU_LITE, cpuLiteEnricher)

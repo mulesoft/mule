@@ -21,6 +21,10 @@ import reactor.test.publisher.TestPublisher;
  */
 public class AbstractEnrichedReactiveProcessorTestCase {
 
+  protected static final String ARTIFACT_ID = "artifactId";
+  protected static final String ARTIFACT_TYPE = "artifactType";
+  protected static final ReactiveProcessor reactiveProcessor = p -> p;
+
   protected void createAndExecuteEnrichedTransformer(ReactiveProcessor transform, CoreEvent coreEvent) {
     TestPublisher<CoreEvent> testPublisher = TestPublisher.create();
 

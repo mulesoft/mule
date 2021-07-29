@@ -11,7 +11,9 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Math.max;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 
@@ -31,23 +33,34 @@ public class ProactorProcessingStrategyEnricher implements ReactiveProcessorEnri
   private final int subscribers;
   private final Supplier<Scheduler> contextSchedulerSupplier;
   private final Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator;
+  private final ProfilingService profilingService;
+  private final String artifactId;
+  private final String artifactType;
 
   public ProactorProcessingStrategyEnricher(Supplier<Scheduler> contextSchedulerSupplier,
                                             Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator,
+                                            ProfilingService profilingService,
+                                            String artifactId,
+                                            String artifactType,
                                             int maxConcurrency,
                                             int parallelism,
                                             int subscribers) {
     this.schedulerDecorator = schedulerDecorator;
+    this.profilingService = profilingService;
     this.maxConcurrency = maxConcurrency;
     this.parallelism = parallelism;
     this.subscribers = subscribers;
     this.contextSchedulerSupplier = contextSchedulerSupplier;
+    this.artifactId = artifactId;
+    this.artifactType = artifactType;
+
   }
 
   @Override
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
-    return processingStrategyReactiveProcessorFrom(processor, contextSchedulerSupplier.get())
+    return processingStrategyReactiveProcessorFrom(processor, contextSchedulerSupplier.get(), artifactId, artifactType)
         .withDispatcherScheduler(schedulerDecorator.apply(contextSchedulerSupplier.get()))
+        .withProfilingService(profilingService)
         .withParallelism(getChainParallelism(processor))
         .build();
   }

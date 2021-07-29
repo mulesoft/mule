@@ -863,7 +863,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void subscriptionContextPropagation() throws Exception {
     final ProcessingStrategy processingStrategy = processingStrategyFactory.create(muleContext, "");
-    initialiseIfNeeded(processingStrategy);
+    initialiseIfNeeded(processingStrategy, muleContext);
     startIfNeeded(processingStrategy);
 
     try {
