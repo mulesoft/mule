@@ -316,7 +316,7 @@ public class DslElementModel<T> {
         fromDslGroup(pmg, element, dslGroupsAsChildrenNames, builder);
       } else {
         pmg.getParameterModels().forEach(pm -> {
-          ComponentParameterAst param = element.getParameter(pm.getName());
+          ComponentParameterAst param = element.getParameter(pmg.getName(), pm.getName());
           if (param != null && param.getValue().getValue().isPresent()) {
             handleParam(param, param.getModel().getType(), builder);
           }
@@ -341,7 +341,7 @@ public class DslElementModel<T> {
 
       AtomicBoolean paramHandled = new AtomicBoolean(false);
       pmg.getParameterModels().forEach(pm -> {
-        ComponentParameterAst param = element.getParameter(pm.getName());
+        ComponentParameterAst param = element.getParameter(pmg.getName(), pm.getName());
         if (param != null && param.getValue().getValue().isPresent()) {
           paramHandled.set(true);
           handleParam(param, param.getModel().getType(), dslElementBuilder);
