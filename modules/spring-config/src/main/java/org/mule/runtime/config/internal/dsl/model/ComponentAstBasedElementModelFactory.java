@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
@@ -104,7 +105,7 @@ class ComponentAstBasedElementModelFactory {
 
   private MetadataTypeVisitor getComponentChildVisitor(final DslElementModel.Builder typeBuilder,
                                                        final ComponentAst configuration,
-                                                       final MetadataType model, final String name,
+                                                       final MetadataType model, final String groupName, final String name,
                                                        final DslElementSyntax modelDsl, final Optional<String> defaultValue) {
 
     return new MetadataTypeVisitor() {
@@ -117,7 +118,7 @@ class ComponentAstBasedElementModelFactory {
 
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
 
-        final ComponentParameterAst param = configuration.getParameter(name);
+        final ComponentParameterAst param = configuration.getParameter(groupName, name);
         if (param != null) {
           String value = param.getRawValue();
           LOGGER.trace("getComponentChildVisitor#defaultVisit: '{}': '{}'", identifier, value);
@@ -150,7 +151,8 @@ class ComponentAstBasedElementModelFactory {
 
                 fieldComponent.directChildrenStream()
                     .filter(c -> c.getIdentifier().equals(itemIdentifier))
-                    .forEach(c -> getComponentChildVisitor(list, c, arrayType.getType(), VALUE_ATTRIBUTE_NAME, itemdsl,
+                    .forEach(c -> getComponentChildVisitor(list, c, arrayType.getType(), DEFAULT_GROUP_NAME, VALUE_ATTRIBUTE_NAME,
+                                                           itemdsl,
                                                            defaultValue));
 
               });
@@ -169,7 +171,8 @@ class ComponentAstBasedElementModelFactory {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}'", identifier.get());
         }
 
-        final ComponentAst fieldComponent = (ComponentAst) configuration.getParameter("value").getValue().getRight();
+        final ComponentAst fieldComponent =
+            (ComponentAst) configuration.getParameter(DEFAULT_GROUP_NAME, "value").getValue().getRight();
 
         if (isMap(objectType)) {
           LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.orElse(null));
@@ -178,7 +181,7 @@ class ComponentAstBasedElementModelFactory {
           return;
         }
 
-        final ComponentParameterAst param = configuration.getParameter(name);
+        final ComponentParameterAst param = configuration.getParameter(groupName, name);
         String value = param != null ? param.getRawValue() : null;
         if (!isBlank(value)) {
           typeBuilder.containing(DslElementModel.builder()
@@ -237,14 +240,15 @@ class ComponentAstBasedElementModelFactory {
 
         entry.containing(DslElementModel.builder()
             .withModel(typeLoader.load(String.class))
-            .withValue(entryConfig.getParameter(KEY_ATTRIBUTE_NAME).getRawValue())
+            .withValue(entryConfig.getParameter(DEFAULT_GROUP_NAME, KEY_ATTRIBUTE_NAME).getRawValue())
             .withDsl(entryDsl.getAttribute(KEY_ATTRIBUTE_NAME).get())
             .build());
 
-        String value = entryConfig.getParameter(VALUE_ATTRIBUTE_NAME).getRawValue();
+        String value = entryConfig.getParameter(DEFAULT_GROUP_NAME, VALUE_ATTRIBUTE_NAME).getRawValue();
         if (isBlank(value)) {
           entryType.accept(getComponentChildVisitor(entry, entryConfig, entryType,
-                                                    VALUE_ATTRIBUTE_NAME, entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME).get(),
+                                                    DEFAULT_GROUP_NAME, VALUE_ATTRIBUTE_NAME,
+                                                    entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME).get(),
                                                     empty()));
         } else {
           entry.containing(DslElementModel.builder()
@@ -277,7 +281,8 @@ class ComponentAstBasedElementModelFactory {
     // Have to keep the order of the elements consistent so the generated metadata keys are backwards compatible
     populateConnectionProviderElements(builder, configuration);
     populateParameterizedElements(model, elementDsl, builder, configuration,
-                                  paramGroupModel -> paramModel -> configuration.getParameter(paramModel.getName()));
+                                  paramGroupModel -> paramModel -> configuration.getParameter(paramGroupModel.getName(),
+                                                                                              paramModel.getName()));
     populateComposableElements(builder, configuration);
 
     if (model instanceof SourceModel) {
@@ -311,8 +316,8 @@ class ComponentAstBasedElementModelFactory {
         .filter(g -> !g.isShowInDsl())
         .forEach(g -> {
           g.getParameterModels().forEach(p -> {
-            addElementParameter(configuration, parameters, elementDsl, builder, p,
-                                paramModel -> configuration.getParameter(paramModel.getName()));
+            addElementParameter(configuration, parameters, elementDsl, builder, g, p,
+                                paramModel -> configuration.getParameter(g.getName(), paramModel.getName()));
           });
         });
   }
@@ -349,7 +354,7 @@ class ComponentAstBasedElementModelFactory {
 
       group.getParameterModels()
           .forEach(p -> addElementParameter(configuration, parameters, groupSyntax, groupElementBuilder,
-                                            p, paramFetcher));
+                                            group, p, paramFetcher));
 
       parent.containing(groupElementBuilder.build());
 
@@ -409,7 +414,8 @@ class ComponentAstBasedElementModelFactory {
 
   private void addElementParameter(ComponentAst configuration, Map<String, String> parameters,
                                    DslElementSyntax groupDsl, DslElementModel.Builder<ParameterGroupModel> groupElementBuilder,
-                                   ParameterModel paramModel, Function<ParameterModel, ComponentParameterAst> paramFetcher) {
+                                   ParameterGroupModel groupModel, ParameterModel paramModel,
+                                   Function<ParameterModel, ComponentParameterAst> paramFetcher) {
     final DslElementSyntax paramSyntax = groupDsl.getContainedElement(paramModel.getName())
         .orElseGet(() -> configuration.getGenerationInformation().getSyntax().get().getContainedElement(paramModel.getName())
             .orElse(null));
@@ -417,7 +423,7 @@ class ComponentAstBasedElementModelFactory {
       return;
     }
 
-    final ComponentParameterAst parameter = configuration.getParameter(paramModel.getName());
+    final ComponentParameterAst parameter = configuration.getParameter(groupModel.getName(), paramModel.getName());
     final Object paramValue = parameter != null ? parameter.getValue().getRight() : null;
 
     Object paramComponent;

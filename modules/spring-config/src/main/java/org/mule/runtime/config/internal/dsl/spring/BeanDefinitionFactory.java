@@ -16,6 +16,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.buildRawParamKeyForDocAttribute;
@@ -219,12 +220,7 @@ public class BeanDefinitionFactory {
 
     groupModel.getParameterModels()
         .forEach(pm -> {
-          final ComponentParameterAst param;
-          if (groupModel.isShowInDsl()) {
-            param = component.getParameter(groupModel.getName(), pm.getName());
-          } else {
-            param = component.getParameter(pm.getName());
-          }
+          final ComponentParameterAst param = component.getParameter(groupModel.getName(), pm.getName());
 
           if (param != null && param.getValue() != null && param.getValue().getValue().isPresent()) {
             groupParamsModels
@@ -648,8 +644,9 @@ public class BeanDefinitionFactory {
           .filter(childSpringComponentModel -> areMatchingTypes(MVELExpressionLanguage.class,
                                                                 childSpringComponentModel.getType()))
           .forEach(childSpringComponentModel -> expressionLanguage.set(childSpringComponentModel.getBeanDefinition()));
-      if (component.getParameter(OBJECT_SERIALIZER_REF) != null) {
-        String defaultObjectSerializer = component.getParameter(OBJECT_SERIALIZER_REF).getResolvedRawValue();
+      ComponentParameterAst objectSerializerRefParam = component.getParameter(DEFAULT_GROUP_NAME, OBJECT_SERIALIZER_REF);
+      if (objectSerializerRefParam != null) {
+        String defaultObjectSerializer = objectSerializerRefParam.getResolvedRawValue();
         if (defaultObjectSerializer != null && defaultObjectSerializer != DEFAULT_OBJECT_SERIALIZER_NAME) {
           registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
           registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
@@ -668,7 +665,8 @@ public class BeanDefinitionFactory {
         String identifier = childComponentModel.getIdentifier().getName();
         if (identifier.equals("password-encryption-strategy")
             || identifier.equals("secret-key-encryption-strategy")) {
-          registry.registerBeanDefinition(childComponentModel.getParameter(NAME_ATTRIBUTE_NAME).getResolvedRawValue(),
+          registry.registerBeanDefinition(childComponentModel.getParameter(DEFAULT_GROUP_NAME, NAME_ATTRIBUTE_NAME)
+              .getResolvedRawValue(),
                                           springComponentModels.get(childComponentModel).getBeanDefinition());
         }
       });

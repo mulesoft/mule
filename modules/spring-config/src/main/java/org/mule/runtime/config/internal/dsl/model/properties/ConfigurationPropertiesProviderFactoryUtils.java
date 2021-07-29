@@ -51,7 +51,7 @@ public final class ConfigurationPropertiesProviderFactoryUtils {
                                                                UnaryOperator<String> localResolver) {
     parameterGroup.getParameterModels()
         .forEach(pm -> {
-          ComponentParameterAst param = component.getParameter(pm.getName());
+          ComponentParameterAst param = component.getParameter(parameterGroup.getName(), pm.getName());
           if (param != null) {
             configurationParametersBuilder
                 .withSimpleParameter(pm.getName(), localResolver.apply(param.getResolvedRawValue()));

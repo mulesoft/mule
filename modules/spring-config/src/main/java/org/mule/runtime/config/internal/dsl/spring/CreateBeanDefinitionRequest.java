@@ -101,6 +101,11 @@ public abstract class CreateBeanDefinitionRequest<T> {
    * Resolve a parameter with the provided name in the scope of the param owner of this request.
    */
   public ComponentParameterAst getParameter(String parameterName) {
-    return getComponent().getParameter(parameterName);
+    // TODO MULE-19672 When decoupling from the dsl representation, properly propagate the group information to use here instead
+    // of iterating.
+    return getComponent().getParameters().stream()
+        .filter(p -> p.getModel().getName().equals(parameterName))
+        .findFirst()
+        .orElse(null);
   }
 }
