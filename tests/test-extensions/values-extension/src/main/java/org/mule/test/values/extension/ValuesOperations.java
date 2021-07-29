@@ -268,4 +268,12 @@ public class ValuesOperations {
 
   public void actingParameterWithReservedName(String type,
                                               @OfValues(WithReservedNameActingParameterValueProvider.class) String parameterWithValues) {}
+
+  public void parameterWithMultipleMultilevelFieldValueUsingSameProvider(@TypeResolver(JsonTypeResolver.class) @Content @FieldValues(
+      targetSelectors = "channel",
+      value = SimpleValueProvider.class) @FieldValues(
+          targetSelectors = {"source.location.continent", "source.location.country", "source.location.city"},
+          value = SdkMultiLevelValueProvider.class) @FieldValues(
+              targetSelectors = {"target.location.continent", "target.location.country", "target.location.city"},
+              value = SdkMultiLevelValueProvider.class) InputStream body) {}
 }

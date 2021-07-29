@@ -19,13 +19,14 @@ import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.internal.processor.AbstractProcessor;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ObjectTypeVisitorTestCase {
+public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void loadClassLoader() throws ClassNotFoundException {

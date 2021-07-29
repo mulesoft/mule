@@ -16,6 +16,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
@@ -735,14 +736,14 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
-    scatterGather.onDefaultParameterGroup()
+
+    scatterGather.onParameterGroup(OUTPUT)
         .withOptionalParameter(TARGET_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-
-    scatterGather.onDefaultParameterGroup()
+    scatterGather.onParameterGroup(OUTPUT)
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .defaultingTo(PAYLOAD)
@@ -793,14 +794,14 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
-    parallelForeach.onDefaultParameterGroup()
+
+    parallelForeach.onParameterGroup(OUTPUT)
         .withOptionalParameter(TARGET_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-
-    parallelForeach.onDefaultParameterGroup()
+    parallelForeach.onParameterGroup(OUTPUT)
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .defaultingTo(PAYLOAD)
