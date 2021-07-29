@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
@@ -30,6 +31,7 @@ import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.LayoutOrderComparator.OBJECTS_FIELDS_BY_LAYOUT_ORDER;
+import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
@@ -344,7 +346,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   private void declareComponentModel(ComponentAst component,
                                      ComponentModel model,
                                      ComponentElementDeclarer declarer) {
-    final ComponentParameterAst parameter = component.getParameter(CONFIG_ATTRIBUTE_NAME);
+    final ComponentParameterAst parameter = component.getParameter(DEFAULT_GROUP_NAME, CONFIG_ATTRIBUTE_NAME);
     if (parameter != null) {
       declarer.withConfig(parameter.getResolvedRawValue());
     }
@@ -354,7 +356,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     model.getParameterGroupModels()
         .forEach(group -> declareParameterGroup(component, model, declarer, elementDsl, group,
                                                 model.getParameterGroupModels().get(0) == group,
-                                                pm -> component.getParameter(pm.getName())));
+                                                pm -> component.getParameter(group.getName(), pm.getName())));
 
     if (model instanceof SourceModel) {
       ((SourceModel) model).getSuccessCallback()
@@ -411,7 +413,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .stream()
         .forEach(param -> elementDsl.getChild(param.getName())
             .ifPresent(paramDsl -> {
-              final Object paramValue = paramsOwner.getParameter(param.getName()).getValue().getRight();
+              final Object paramValue = paramsOwner.getParameter(group.getName(), param.getName()).getValue().getRight();
 
               if (paramValue == null) {
                 return;
@@ -520,7 +522,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           if (group.isShowInDsl()) {
             final List<ComponentParameterAst> groupParams = group.getParameterModels()
                 .stream()
-                .map(pm -> component.getParameter(pm.getName()))
+                .map(pm -> component.getParameter(group.getName(), pm.getName()))
                 .filter(p -> p != null)
                 .collect(toList());
 
@@ -621,8 +623,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                               MetadataType elementMetadataType) {
     items
         .forEach(comp -> {
-          final ComponentParameterAst keyParam = comp.getParameter(KEY_ATTRIBUTE_NAME);
-          final ComponentParameterAst valueParam = comp.getParameter(VALUE_ATTRIBUTE_NAME);
+          final ComponentParameterAst keyParam = comp.getParameter(DEFAULT_GROUP_NAME, KEY_ATTRIBUTE_NAME);
+          final ComponentParameterAst valueParam = comp.getParameter(DEFAULT_GROUP_NAME, VALUE_ATTRIBUTE_NAME);
 
           if (keyParam != null && keyParam.getRawValue() != null && valueParam != null && valueParam.getRawValue() != null) {
             objectValue.withParameter(keyParam.getRawValue(),
@@ -656,7 +658,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .filter(id -> !(id.equals("SetPayload") || id.equals("SetAttributes") || id.equals("SetVariable")))
         .ifPresent(objectValue::ofType);
 
-    final ComponentParameterAst configRefParam = component.getParameter(CONFIG_ATTRIBUTE_NAME);
+    final ComponentParameterAst configRefParam = component.getParameter(getAliasName(objectType), CONFIG_ATTRIBUTE_NAME);
     if (configRefParam != null && configRefParam.getRawValue() != null) {
       objectValue.withParameter(CONFIG_ATTRIBUTE_NAME,
                                 ParameterSimpleValue.of(configRefParam.getRawValue(), STRING));
@@ -668,7 +670,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     sort(fields, OBJECTS_FIELDS_BY_LAYOUT_ORDER);
 
     fields.forEach(fieldType -> {
-      final ComponentParameterAst param = component.getParameter(getLocalPart(fieldType));
+      final ComponentParameterAst param = component.getParameter(resolveGroupName(objectType), getLocalPart(fieldType));
       if (param != null && param.getValue().getRight() != null && param.getValue().getRight() instanceof ComponentAst) {
         fieldType.getValue().accept(getParameterDeclarerVisitor(param.getValue().getRight(),
                                                                 paramDsl
@@ -679,6 +681,16 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                                                                                    fieldValue)));
       }
     });
+  }
+
+  private String resolveGroupName(ObjectType objectType) {
+    String aliasName;
+    try {
+      aliasName = getAliasName(objectType);
+    } catch (IllegalArgumentException e) {
+      aliasName = DEFAULT_GROUP_NAME;
+    }
+    return aliasName;
   }
 
   private MetadataType getChildMetadataType(MetadataType parentMetadataType, String modelParamName) {

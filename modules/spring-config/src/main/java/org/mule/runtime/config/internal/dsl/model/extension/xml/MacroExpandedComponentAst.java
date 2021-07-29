@@ -81,6 +81,12 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
   }
 
   @Override
+  public ComponentParameterAst getParameter(String groupName, String paramName) {
+    final ComponentParameterAst parameter = super.getParameter(groupName, paramName);
+    return parameter != null ? mapIdParam(parameter) : null;
+  }
+
+  @Override
   public Collection<ComponentParameterAst> getParameters() {
     return super.getParameters()
         .stream()
