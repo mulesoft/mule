@@ -2,7 +2,7 @@
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-metadata",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }

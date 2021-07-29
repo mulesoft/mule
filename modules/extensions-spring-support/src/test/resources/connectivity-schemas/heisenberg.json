@@ -2,7 +2,7 @@
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-heisenberg",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
@@ -53,7 +53,7 @@
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-heisenberg",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
