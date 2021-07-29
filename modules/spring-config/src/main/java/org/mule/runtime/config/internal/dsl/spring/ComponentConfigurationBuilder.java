@@ -344,7 +344,7 @@ class ComponentConfigurationBuilder<T> {
           .map(ownerComponentModel -> doResolveParameter(createBeanDefinitionRequest.getParameter(parameterName)))
           .orElseGet(() -> {
             if (!ownerComponent.getModel(Object.class).isPresent()) {
-              return ownerComponent.getParameter(parameterName);
+              return ownerComponent.getParameter(DEFAULT_GROUP_NAME, parameterName);
             } else {
               return null;
             }
@@ -383,7 +383,7 @@ class ComponentConfigurationBuilder<T> {
     private ComponentParameterAst doResolveParameter(ComponentParameterAst param) {
       if (param == null && component != null) {
         // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
-        return ownerComponent.getParameter(component.getIdentifier().getName());
+        return ownerComponent.getParameter(DEFAULT_GROUP_NAME, component.getIdentifier().getName());
       }
 
       return param;
