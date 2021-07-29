@@ -16,6 +16,7 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 
 import org.mule.runtime.api.component.Component;
@@ -256,8 +257,8 @@ public class PropertiesResolverUtils {
       artifactAst.topLevelComponentsStream()
           .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
           .forEach(comp -> {
-            final String key = comp.getParameter("name").getResolvedRawValue();
-            final String rawValue = comp.getParameter("value").getRawValue();
+            final String key = comp.getParameter(DEFAULT_GROUP_NAME, "name").getResolvedRawValue();
+            final String rawValue = comp.getParameter(DEFAULT_GROUP_NAME, "value").getRawValue();
             globalProperties.put(key,
                                  new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
                                                                          comp.getMetadata().getFileName().orElse("(n/a)"),
