@@ -32,6 +32,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -135,7 +136,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     Map<String, Object> startupRegistryObjects = new HashMap<>();
-    startupRegistryObjects.put(MuleProperties.MULE_PROFILING_SERVICE_KEY, profilingService);
+    startupRegistryObjects.put(MULE_PROFILING_SERVICE_KEY, profilingService);
     return startupRegistryObjects;
   }
 
