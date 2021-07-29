@@ -728,9 +728,9 @@ public abstract class ExtensionDefinitionParser {
     if (acceptsReferences && type instanceof StringType && !allowedStereotypes.isEmpty()) {
       definitionBuilder = fromSoftReferenceSimpleParameter(name);
     } else if (acceptsReferences && expressionSupport == NOT_SUPPORTED && type instanceof ObjectType) {
-      definitionBuilder = fromSimpleReferenceParameter(name);
+      definitionBuilder = fromSimpleReferenceParameter(key);
     } else if (acceptsReferences && type instanceof ObjectType) {
-      definitionBuilder = fromSimpleReferenceParameter(name, typeConverter);
+      definitionBuilder = fromSimpleReferenceParameter(key, typeConverter);
     } else {
       definitionBuilder = fromSimpleParameter(name, typeConverter);
     }
