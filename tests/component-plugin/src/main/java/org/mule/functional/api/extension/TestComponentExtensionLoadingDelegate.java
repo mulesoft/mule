@@ -13,6 +13,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.ANY;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
@@ -41,8 +42,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
@@ -95,97 +99,6 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     declareLifecycleObject(extensionDeclarer);
     declareDependencyInjectionObject(extensionDeclarer);
     declareOnErrorCheckLog(extensionDeclarer);
-    declareCheckEquals(extensionDeclarer);
-    declareCheckStackTrace(extensionDeclarer);
-    declareMethodCall(extensionDeclarer);
-    declareCause(extensionDeclarer);
-    declareCheckSummary(extensionDeclarer);
-  }
-
-  private void declareCheckSummary(HasOperationDeclarer declarer) {
-    OperationDeclarer checkSummaryDeclarer = voidOperation(declarer, "checkSummary")
-        .describedAs("Evaluates the log summary to be logged, checking that it contains the information expected.")
-        .withStereotype(LOG_CHECKER);
-
-    NestedComponentDeclarer summaryInfoDeclarer = checkSummaryDeclarer
-        .withComponent("summaryInfo")
-        .describedAs("An element expected log summary information");
-
-    ParameterGroupDeclarer summaryInfoParams = summaryInfoDeclarer.onDefaultParameterGroup();
-    summaryInfoParams.withRequiredParameter("key")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-    summaryInfoParams.withOptionalParameter("value")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-    summaryInfoParams.withOptionalParameter("valueStartsWith")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    checkSummaryDeclarer.onDefaultParameterGroup()
-        .withOptionalParameter("exclusiveContent")
-        .describedAs("Specifies if the content to check should be the only one present(true) or it allows another information(false)")
-        .ofType(BOOLEAN_TYPE)
-        .defaultingTo(false);
-  }
-
-  private void declareCause(HasOperationDeclarer declarer) {
-    voidOperation(declarer, "cause")
-        .describedAs("An element with information about stacktraces exception causes")
-        .withStereotype(STACK_TRACE_ELEMENT)
-        .onDefaultParameterGroup()
-        .withRequiredParameter("exception")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().classValue(new ClassValueModel(singletonList("java.lang.Exception"))).build());
-  }
-
-  private void declareMethodCall(HasOperationDeclarer declarer) {
-    ParameterGroupDeclarer params = voidOperation(declarer, "methodCall")
-        .describedAs("An element with information about stacktraces method calls")
-        .withStereotype(STACK_TRACE_ELEMENT)
-        .onDefaultParameterGroup();
-
-    params.withOptionalParameter("package")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    params.withOptionalParameter("class")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().classValue(new ClassValueModel(singletonList("java.lang.Object"))).build());
-
-    params.withOptionalParameter("method")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    params.withOptionalParameter("lineNumber")
-        .ofType(INTEGER_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-  }
-
-  private void declareCheckStackTrace(HasOperationDeclarer declarer) {
-    OperationDeclarer operation = voidOperation(declarer, "checkStackTrace")
-        .describedAs("Evaluates the stacktrace to be logged, checking that it goes through expected method calls")
-        .withStereotype(LOG_CHECKER);
-
-    operation.withChain()
-        .withAllowedStereotypes(STACK_TRACE_ELEMENT)
-        .withMinOccurs(1)
-        .withMaxOccurs(null)
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
-  }
-
-  private void declareCheckEquals(HasOperationDeclarer declarer) {
-    ParameterGroupDeclarer params = voidOperation(declarer, "checkEquals")
-        .describedAs("Evaluates the expected and actual logs line by line expecting them to be equal")
-        .withStereotype(LOG_CHECKER)
-        .onDefaultParameterGroup();
-
-    params.withOptionalParameter("filterLog")
-        .describedAs("Configures whether or not to filter the logs to compare before comparison, removing delimiter lines and special characters")
-        .ofType(BOOLEAN_TYPE)
-        .defaultingTo(true);
   }
 
   private void declareOnErrorCheckLog(HasOperationDeclarer declarer) {
@@ -196,10 +109,6 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     operation.withOutput().ofType(ANY_TYPE);
     operation.withOutputAttributes().ofType(ANY_TYPE);
 
-    operation.withChain()
-        .withAllowedStereotypes(LOG_CHECKER)
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
-
     ParameterGroupDeclarer params = operation.onDefaultParameterGroup();
     params.withOptionalParameter("propagate")
         .ofType(BOOLEAN_TYPE)
@@ -207,6 +116,124 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     params.withOptionalParameter("succeedIfNoLog")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false);
+
+    ObjectTypeBuilder checkEqualsType = BASE_TYPE_BUILDER.objectType()
+        .id("CheckEquals")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    checkEqualsType.addField()
+        .key("expectedLogMessage")
+        .description("blabla")
+        .value(STRING_TYPE).required(true)
+        .with(new LayoutTypeAnnotation(LayoutModel.builder().asText().build()))
+        .build();
+    checkEqualsType.addField()
+        .key("filterLog")
+        .description("Configures whether or not to filter the logs to compare before comparison, removing delimiter lines and special characters")
+        .value(BOOLEAN_TYPE).required(false);
+
+    params.withOptionalParameter("checkEquals")
+        .ofType(checkEqualsType.build())
+        .withRole(BEHAVIOUR)
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
+    ParameterGroupDeclarer checkStackTraceGroup = operation.onParameterGroup("checkStackTrace")
+        .withDslInlineRepresentation(true);
+
+    ObjectTypeBuilder methodCallType = BASE_TYPE_BUILDER.objectType()
+        .id("MethodCall")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    methodCallType.addField()
+        .key("class")
+        .description("blabla")
+        .value(STRING_TYPE).required(false)
+        .build();
+    methodCallType.addField()
+        .key("method")
+        .description("")
+        .value(STRING_TYPE).required(false)
+        .build();
+    methodCallType.addField()
+        .key("package")
+        .description("")
+        .value(STRING_TYPE).required(false)
+        .build();
+    methodCallType.addField()
+        .key("linenumber")
+        .description("")
+        .value(INTEGER_TYPE).required(false)
+        .build();
+
+    checkStackTraceGroup.withOptionalParameter("methodCall")
+        .ofType(methodCallType.build())
+        .withRole(BEHAVIOUR)
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
+    ObjectTypeBuilder causeType = BASE_TYPE_BUILDER.objectType()
+        .id("Cause")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    causeType.addField()
+        .key("exception")
+        .description("blabla")
+        .value(STRING_TYPE).required(true)
+        .build();
+
+    checkStackTraceGroup.withOptionalParameter("cause")
+        .ofType(causeType.build())
+        .withRole(BEHAVIOUR)
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
+    ParameterGroupDeclarer checkSummaryGroup = operation.onParameterGroup("checkStackTrace")
+        .withDslInlineRepresentation(true);
+
+    ObjectTypeBuilder summaryInfoType = BASE_TYPE_BUILDER.objectType()
+        .id("Cause")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    summaryInfoType.addField()
+        .key("key")
+        .description("blabla")
+        .value(STRING_TYPE).required(true)
+        .build();
+    summaryInfoType.addField()
+        .key("value")
+        .description("blabla")
+        .value(STRING_TYPE).required(false)
+        .build();
+    summaryInfoType.addField()
+        .key("valueStartsWith")
+        .description("blabla")
+        .value(STRING_TYPE).required(true)
+        .build();
+
+    checkSummaryGroup.withOptionalParameter("summaryInfo")
+        .ofType(summaryInfoType.build())
+        .withRole(BEHAVIOUR)
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
+    checkSummaryGroup.withOptionalParameter("exclusiveContent")
+        .describedAs("Specifies if the content to check should be the only one present(true) or it allows another information(false)")
+        .ofType(BOOLEAN_TYPE)
+        .defaultingTo(false);
+
   }
 
   private void declareDependencyInjectionObject(HasConstructDeclarer declarer) {
