@@ -46,7 +46,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
 
   private FeatureFlaggingService featureFlags;
 
-  private final Set<NotificationListener<ProfilingNotification>> addedListeners = new HashSet<>();
+  private final Set<NotificationListener<ProfilingNotification<?>>> addedListeners = new HashSet<>();
 
   @Override
   public void initialise() throws InitialisationException {}
@@ -58,14 +58,16 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
     }
   }
 
-  private void registerNotificationListeners(Set<ProfilingDataConsumer<ProfilingEventContext>> profilingDataConsumers) {
+  private void registerNotificationListeners(Set<ProfilingDataConsumer<?>> profilingDataConsumers) {
     profilingDataConsumers.forEach(this::registerNotificationListener);
   }
 
-  private void registerNotificationListener(ProfilingDataConsumer<ProfilingEventContext> profilingDataConsumer) {
-    NotificationListener<ProfilingNotification> profilingNotificationListener =
+  private void registerNotificationListener(ProfilingDataConsumer<?> profilingDataConsumer) {
+    NotificationListener<ProfilingNotification<?>> profilingNotificationListener =
         new DefaultProfilingNotificationListener(profilingDataConsumer);
-    notificationManager.addListenerSubscription(profilingNotificationListener, pn -> filterByAction(profilingDataConsumer, pn));
+    notificationManager
+        .addListenerSubscription(profilingNotificationListener,
+                                 pn -> filterByAction((ProfilingDataConsumer<ProfilingEventContext>) profilingDataConsumer, pn));
     addedListeners.add(profilingNotificationListener);
   }
 
@@ -92,7 +94,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
   protected abstract ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy();
 
   public <T extends ProfilingEventContext> void notifyEvent(T profilingEventContext, ProfilingEventType<T> action) {
-    serverNotificationHandler.fireNotification(new ProfilingNotification(profilingEventContext, action));
+    serverNotificationHandler.fireNotification(new ProfilingNotification<>(profilingEventContext, action));
   }
 
   @Inject
