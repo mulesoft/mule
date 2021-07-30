@@ -1,0 +1,149 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.extension.internal.loader.parser.java;
+
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+
+import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAlias;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+
+import java.util.List;
+import java.util.Optional;
+
+public class JavaDeclaredParameterGroupModelParser implements ParameterGroupModelParser {
+
+  private final ExtensionParameter groupParameter;
+  private final Type type;
+  private final String groupName;
+  private final List<FieldElement> annotatedParameters;
+
+  public JavaDeclaredParameterGroupModelParser(ExtensionParameter groupParameter) {
+    assureValid(groupParameter);
+
+    this.groupParameter = groupParameter;
+    type = groupParameter.getType();
+    groupName = fetchGroupName();
+    annotatedParameters = type.getAnnotatedFields(Parameter.class, org.mule.sdk.api.annotation.param.Parameter.class);
+  }
+
+  @Override
+  public String getName() {
+    return groupName;
+  }
+
+  @Override
+  public String getDescription() {
+    return null;
+  }
+
+  @Override
+  public List<ParameterModelParser> getParameterParsers() {
+    return null;
+  }
+
+  @Override
+  public Optional<DisplayModel> getDisplayModel() {
+    Optional<DisplayModel> displayModel = groupParameter.getAnnotation(DisplayName.class)
+        .map(ann -> buildDisplayModel(ann.value()));
+
+    if (!displayModel.isPresent()) {
+      displayModel = groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.display.DisplayName.class)
+          .map(ann -> buildDisplayModel(ann.value()));
+    }
+
+    return displayModel;
+  }
+
+  @Override
+  public Optional<ExclusiveOptionalDescriptor> getExclusiveOptionals() {
+    return type.getAnnotation(ExclusiveOptionals.class)
+        .map(annotation ->
+            new ExclusiveOptionalDescriptor(annotatedParameters.stream()
+                .filter(f -> !f.isRequired())
+                .map(WithAlias::getAlias)
+                .collect(toSet()), annotation.isOneRequired())
+        );
+  }
+
+  @Override
+  public boolean showsInDsl() {
+    return groupParameter.getAnnotation(ParameterGroup.class)
+        .map(ParameterGroup::showInDsl)
+        .orElseGet(() -> groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class)
+            .map(org.mule.sdk.api.annotation.param.ParameterGroup::showInDsl)
+            .orElse(false));
+  }
+
+  @Override
+  public List<ModelProperty> getAdditionalModelProperties() {
+    return singletonList(new ParameterGroupModelProperty(
+        new ParameterGroupDescriptor(groupName, type, groupParameter.getType().asMetadataType(),
+            // TODO: Eliminate dependency to Annotated Elements
+            groupParameter.getDeclaringElement().orElse(null),
+            groupParameter)));
+  }
+
+  private void assureValid(ExtensionParameter groupParameter) {
+    final List<FieldElement> nestedGroups = type.getAnnotatedFields(ParameterGroup.class, org.mule.sdk.api.annotation.param.ParameterGroup.class);
+    if (!nestedGroups.isEmpty()) {
+      throw new IllegalParameterModelDefinitionException(format(
+          "Class '%s' is used as a @%s but contains fields which also hold that annotation. Nesting groups is not allowed. "
+              + "Offending fields are: [%s]",
+          type.getName(),
+          ParameterGroup.class.getSimpleName(),
+          nestedGroups.stream().map(element -> element.getName())
+              .collect(joining(","))));
+    }
+
+    if (groupParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class)) {
+      throw new IllegalParameterModelDefinitionException(format(
+          "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
+          org.mule.runtime.extension.api.annotation.param.Optional.class
+              .getSimpleName(),
+          ParameterGroup.class.getSimpleName(),
+          groupParameter.getName()));
+    }
+
+    if (groupParameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.Optional.class)) {
+      throw new IllegalParameterModelDefinitionException(format(
+          "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
+          org.mule.sdk.api.annotation.param.Optional.class
+              .getSimpleName(),
+          ParameterGroup.class.getSimpleName(),
+          groupParameter.getName()));
+    }
+  }
+
+  private String fetchGroupName() {
+    return groupParameter.getAnnotation(ParameterGroup.class)
+        .map(ParameterGroup::name)
+        .orElseGet(() -> groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class)
+            .map(org.mule.sdk.api.annotation.param.ParameterGroup::name)
+            .orElse(DEFAULT_GROUP_NAME));
+  }
+
+  private DisplayModel buildDisplayModel(String displayName) {
+    return DisplayModel.builder().displayName(displayName).build();
+  }
+}
