@@ -208,7 +208,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class))
-            .withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
+            .withSetterParameterDefinition("expectedLogMessage", fromSimpleParameter("expectedLogMessage").build())
             .withSetterParameterDefinition("shouldFilterLogMessage", fromSimpleParameter("filterLog").build()).build());
 
     componentBuildingDefinitions
