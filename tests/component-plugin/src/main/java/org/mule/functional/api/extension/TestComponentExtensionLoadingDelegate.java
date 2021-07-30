@@ -122,7 +122,6 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .with(new TypeDslAnnotation(true, false, null, null));
     checkEqualsType.addField()
         .key("expectedLogMessage")
-        .description("blabla")
         .value(STRING_TYPE).required(true)
         .with(new LayoutTypeAnnotation(LayoutModel.builder().asText().build()))
         .build();
@@ -133,6 +132,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
 
     params.withOptionalParameter("checkEquals")
         .ofType(checkEqualsType.build())
+        .describedAs("Evaluates the expected and actual logs line by line expecting them to be equal")
         .withRole(BEHAVIOUR)
         .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
         .withDsl(ParameterDslConfiguration.builder()
@@ -149,27 +149,24 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .with(new TypeDslAnnotation(true, false, null, null));
     methodCallType.addField()
         .key("class")
-        .description("blabla")
         .value(STRING_TYPE).required(false)
         .build();
     methodCallType.addField()
         .key("method")
-        .description("")
         .value(STRING_TYPE).required(false)
         .build();
     methodCallType.addField()
         .key("package")
-        .description("")
         .value(STRING_TYPE).required(false)
         .build();
     methodCallType.addField()
         .key("linenumber")
-        .description("")
         .value(INTEGER_TYPE).required(false)
         .build();
 
     checkStackTraceGroup.withOptionalParameter("methodCall")
         .ofType(methodCallType.build())
+        .describedAs("An element with information about stacktraces method calls")
         .withRole(BEHAVIOUR)
         .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
         .withDsl(ParameterDslConfiguration.builder()
@@ -183,13 +180,13 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .with(new TypeDslAnnotation(true, false, null, null));
     causeType.addField()
         .key("exception")
-        .description("blabla")
         .value(STRING_TYPE).required(true)
         .build();
 
     checkStackTraceGroup.withOptionalParameter("cause")
         .ofType(causeType.build())
         .withRole(BEHAVIOUR)
+        .describedAs("An element with information about stacktraces exception causes")
         .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
         .withDsl(ParameterDslConfiguration.builder()
             .allowsInlineDefinition(true)
@@ -205,23 +202,21 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .with(new TypeDslAnnotation(true, false, null, null));
     summaryInfoType.addField()
         .key("key")
-        .description("blabla")
         .value(STRING_TYPE).required(true)
         .build();
     summaryInfoType.addField()
         .key("value")
-        .description("blabla")
         .value(STRING_TYPE).required(false)
         .build();
     summaryInfoType.addField()
         .key("valueStartsWith")
-        .description("blabla")
         .value(STRING_TYPE).required(true)
         .build();
 
     checkSummaryGroup.withOptionalParameter("summaryInfo")
         .ofType(summaryInfoType.build())
         .withRole(BEHAVIOUR)
+        .describedAs("An element expected log summary information")
         .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
         .withDsl(ParameterDslConfiguration.builder()
             .allowsInlineDefinition(true)
