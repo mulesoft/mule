@@ -7,13 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -25,9 +27,11 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +48,7 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
     this.groupParameter = groupParameter;
     type = groupParameter.getType();
     groupName = fetchGroupName();
-    annotatedParameters = type.getAnnotatedFields(Parameter.class, org.mule.sdk.api.annotation.param.Parameter.class);
+    annotatedParameters = fetchAnnotatedParameter();
   }
 
   @Override
@@ -54,11 +58,12 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
 
   @Override
   public String getDescription() {
-    return null;
+    return groupParameter.getDescription();
   }
 
   @Override
   public List<ParameterModelParser> getParameterParsers() {
+    if (annotatedParameters.isEmpty())
     return null;
   }
 
@@ -73,6 +78,11 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
     }
 
     return displayModel;
+  }
+
+  @Override
+  public Optional<LayoutModel> getLayoutModel() {
+    return parseLayoutAnnotations(groupParameter, LayoutModel.builder());
   }
 
   @Override
@@ -97,11 +107,15 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return singletonList(new ParameterGroupModelProperty(
+    List<ModelProperty> properties = new LinkedList<>();
+    properties.add(new ParameterGroupModelProperty(
         new ParameterGroupDescriptor(groupName, type, groupParameter.getType().asMetadataType(),
             // TODO: Eliminate dependency to Annotated Elements
             groupParameter.getDeclaringElement().orElse(null),
             groupParameter)));
+    properties.add(new ExtensionParameterDescriptorModelProperty(groupParameter));
+
+    return properties;
   }
 
   private void assureValid(ExtensionParameter groupParameter) {
@@ -145,5 +159,14 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
 
   private DisplayModel buildDisplayModel(String displayName) {
     return DisplayModel.builder().displayName(displayName).build();
+  }
+
+  private List<FieldElement> fetchAnnotatedParameter() {
+    List<FieldElement> parameters = type.getAnnotatedFields(Parameter.class, org.mule.sdk.api.annotation.param.Parameter.class);
+    if (parameters.isEmpty()) {
+      parameters = getFieldsWithGetters(type);
+    }
+
+    return parameters;
   }
 }

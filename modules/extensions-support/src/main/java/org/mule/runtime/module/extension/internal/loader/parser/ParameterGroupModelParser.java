@@ -2,6 +2,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,8 @@ public interface ParameterGroupModelParser {
   List<ParameterModelParser> getParameterParsers();
 
   Optional<DisplayModel> getDisplayModel();
+
+  Optional<LayoutModel> getLayoutModel();
 
   Optional<ExclusiveOptionalDescriptor> getExclusiveOptionals();
 

@@ -78,6 +78,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -94,38 +95,33 @@ public final class ParameterModelsLoaderDelegate {
   public List<ParameterDeclarer> declare(HasParametersDeclarer component,
                                          List<ParameterGroupModelParser> groupParsers,
                                          ParameterDeclarationContext declarationContext) {
-    return declare(component, groupParsers, declarationContext, null);
-  }
 
-  public List<ParameterDeclarer> declare(HasParametersDeclarer component,
-                                         List<ParameterGroupModelParser> groupParsers,
-                                         ParameterDeclarationContext declarationContext,
-                                         ParameterGroupDeclarer parameterGroupDeclarer) {
-    List<ParameterDeclarer> declarerList = new ArrayList<>();
+    final List<ParameterDeclarer> declarerList = new LinkedList<>();
+    groupParsers.forEach(group -> {
+      ParameterGroupDeclarer groupDeclarer;
+
+      if (DEFAULT_GROUP_NAME.equals(group.getName())) {
+        groupDeclarer = component.onDefaultParameterGroup();
+      } else {
+        groupDeclarer = component.onParameterGroup(group.getName())
+            .withDslInlineRepresentation(group.showsInDsl());
+
+        group.getDisplayModel().ifPresent(groupDeclarer::withDisplayModel);
+        group.getAdditionalModelProperties().forEach(groupDeclarer::withModelProperty);
+        group.getExclusiveOptionals().ifPresent(descriptor -> groupDeclarer.withExclusiveOptionals(descriptor.getExclusiveOptionals(), descriptor.isOneRequired()));
+        groupDeclarer.getDeclaration().setDescription(group.getDescription());
+        group.getLayoutModel().ifPresent(groupDeclarer::withLayout);
+      }
+    });
 
 
     boolean supportsNestedElements = component instanceof HasNestedComponentsDeclarer;
     for (ExtensionParameter extensionParameter : parameters) {
 
-      // If the element being resolved accepts components to be declared as NestableElements, like any ComponentModel,
-      // then we will parse it as a component instead of a parameter.
-      // Both nested components and parameters are declared using the @Parameter annotation in order to simplify the API
-      if (supportsNestedElements && declaredAsNestedComponent((HasNestedComponentsDeclarer) component, extensionParameter)) {
-        continue;
-      }
 
       if (!extensionParameter.shouldBeAdvertised()) {
         continue;
       }
-
-      if (isParameterGroup(extensionParameter)) {
-        List<ParameterDeclarer> groupParams = declaredAsGroup(component, declarationContext, extensionParameter);
-        declarerList.addAll(groupParams);
-        continue;
-      }
-
-      ParameterGroupDeclarer groupDeclarer =
-          parameterGroupDeclarer != null ? parameterGroupDeclarer : component.onDefaultParameterGroup();
 
       ParameterDeclarer parameter;
       if (extensionParameter.isRequired()) {
@@ -210,108 +206,6 @@ public final class ParameterModelsLoaderDelegate {
         .ifPresent(a -> parameter.asComponentId());
   }
 
-  private List<ParameterDeclarer> declaredAsGroup(HasParametersDeclarer component,
-                                                  ParameterDeclarationContext declarationContext,
-                                                  ExtensionParameter groupParameter)
-      throws IllegalParameterModelDefinitionException {
-
-    ParameterGroup groupAnnotation = groupParameter.getAnnotation(ParameterGroup.class).orElse(null);
-    if (groupAnnotation == null) {
-      return emptyList();
-    }
-
-    final String groupName = groupAnnotation.name();
-    if (DEFAULT_GROUP_NAME.equals(groupName)) {
-      throw new IllegalParameterModelDefinitionException(
-                                                         format("%s '%s' defines parameter group of name '%s' which is the default one. "
-                                                             + "@%s cannot be used with the default group name",
-                                                                getComponentDeclarationTypeName(((Declarer) component)
-                                                                    .getDeclaration()),
-                                                                ((NamedDeclaration) ((Declarer) component).getDeclaration())
-                                                                    .getName(),
-                                                                groupName,
-                                                                ParameterGroup.class.getSimpleName()));
-    }
-
-    final Type type = groupParameter.getType();
-
-    final List<FieldElement> nestedGroups = type.getAnnotatedFields(ParameterGroup.class);
-    if (!nestedGroups.isEmpty()) {
-      throw new IllegalParameterModelDefinitionException(format(
-                                                                "Class '%s' is used as a @%s but contains fields which also hold that annotation. Nesting groups is not allowed. "
-                                                                    + "Offending fields are: [%s]",
-                                                                type.getName(),
-                                                                ParameterGroup.class.getSimpleName(),
-                                                                nestedGroups.stream().map(element -> element.getName())
-                                                                    .collect(joining(","))));
-    }
-
-    if (groupParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class)) {
-      throw new IllegalParameterModelDefinitionException(format(
-                                                                "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
-                                                                org.mule.runtime.extension.api.annotation.param.Optional.class
-                                                                    .getSimpleName(),
-                                                                ParameterGroup.class.getSimpleName(),
-                                                                groupParameter.getName()));
-    }
-
-    if (groupParameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.Optional.class)) {
-      throw new IllegalParameterModelDefinitionException(format(
-                                                                "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
-                                                                org.mule.sdk.api.annotation.param.Optional.class
-                                                                    .getSimpleName(),
-                                                                ParameterGroup.class.getSimpleName(),
-                                                                groupParameter.getName()));
-    }
-
-    ParameterGroupDeclarer declarer = component.onParameterGroup(groupName);
-    if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
-      throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
-                                                                groupName,
-                                                                getComponentDeclarationTypeName(((Declarer) component)
-                                                                    .getDeclaration()),
-                                                                ((NamedDeclaration) ((Declarer) component).getDeclaration())
-                                                                    .getName()));
-    } else {
-      declarer.withModelProperty(new ParameterGroupModelProperty(
-                                                                 new ParameterGroupDescriptor(groupName, type,
-                                                                                              groupParameter.getType()
-                                                                                                  .asMetadataType(),
-                                                                                              // TODO: Eliminate dependency to
-                                                                                              // Annotated Elements
-                                                                                              groupParameter.getDeclaringElement()
-                                                                                                  .orElse(null),
-                                                                                              groupParameter)));
-    }
-
-    final List<FieldElement> annotatedParameters = type.getAnnotatedFields(Parameter.class);
-    type.getAnnotation(ExclusiveOptionals.class).ifPresent(annotation -> {
-      Set<String> optionalParamNames = annotatedParameters.stream()
-          .filter(f -> !f.isRequired())
-          .map(WithAlias::getAlias)
-          .collect(toSet());
-
-      declarer.withExclusiveOptionals(optionalParamNames, annotation.isOneRequired());
-    });
-
-    declarer.withDslInlineRepresentation(groupAnnotation.showInDsl());
-
-    groupParameter.getAnnotation(DisplayName.class)
-        .ifPresent(displayName -> declarer.withDisplayModel(DisplayModel.builder().displayName(displayName.value()).build()));
-
-    parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
-
-    declarer.withModelProperty(new ExtensionParameterDescriptorModelProperty(groupParameter));
-
-    if (!annotatedParameters.isEmpty()) {
-      return declare(component, annotatedParameters, declarationContext, declarer);
-    } else {
-      return declare(component, getFieldsWithGetters(type), declarationContext, declarer);
-    }
-  }
-
-
-
   private void parseParameterRole(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     parameter.withRole(roleOf(extensionParameter.getAnnotation(Content.class)));
   }
@@ -321,102 +215,7 @@ public final class ParameterModelsLoaderDelegate {
         .ifPresent(expression -> parameter.withExpressionSupport(getExpressionSupport(expression)));
   }
 
-  private void parseNullSafe(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    if (extensionParameter.isAnnotatedWith(NullSafe.class)) {
-      if (extensionParameter.isAnnotatedWith(ConfigOverride.class)) {
-        throw new IllegalParameterModelDefinitionException(
-                                                           format("Parameter '%s' is annotated with '@%s' and also marked as a config override, which is redundant. "
-                                                               + "The default value for this parameter will come from the configuration parameter",
-                                                                  extensionParameter.getName(), NullSafe.class.getSimpleName()));
-      }
-      if (extensionParameter.isRequired() && !extensionParameter.isAnnotatedWith(ParameterGroup.class)) {
-        throw new IllegalParameterModelDefinitionException(
-                                                           format("Parameter '%s' is required but annotated with '@%s', which is redundant",
-                                                                  extensionParameter.getName(), NullSafe.class.getSimpleName()));
-      }
 
-      Type nullSafeAnnotationType =
-          extensionParameter.getValueFromAnnotation(NullSafe.class).get().getClassValue(NullSafe::defaultImplementingType);
-      final boolean hasDefaultOverride = !nullSafeAnnotationType.isSameType(Object.class);
-
-      MetadataType nullSafeType =
-          hasDefaultOverride ? nullSafeAnnotationType.asMetadataType() : parameter.getDeclaration().getType();
-
-      boolean isInstantiable =
-          hasDefaultOverride ? nullSafeAnnotationType.isInstantiable() : extensionParameter.getType().isInstantiable();
-
-      parameter.getDeclaration().getType().accept(new BasicTypeMetadataVisitor() {
-
-        @Override
-        protected void visitBasicType(MetadataType metadataType) {
-          throw new IllegalParameterModelDefinitionException(
-                                                             format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                                                                 + "used with complex types (Pojos, Lists, Maps)",
-                                                                    extensionParameter.getName(), NullSafe.class.getSimpleName(),
-                                                                    extensionParameter.getType().getName()));
-        }
-
-        @Override
-        public void visitArrayType(ArrayType arrayType) {
-          if (hasDefaultOverride) {
-            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of type '%s'"
-                + " but a 'defaultImplementingType' was provided."
-                + " Type override is not allowed for Collections",
-                                                                      extensionParameter.getName(),
-                                                                      NullSafe.class.getSimpleName(),
-                                                                      extensionParameter.getType().getName()));
-          }
-        }
-
-        @Override
-        public void visitObject(ObjectType objectType) {
-          if (hasDefaultOverride && isMap(objectType)) {
-            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of type '%s'"
-                + " but a 'defaultImplementingType' was provided."
-                + " Type override is not allowed for Maps",
-                                                                      extensionParameter.getName(),
-                                                                      NullSafe.class.getSimpleName(),
-                                                                      extensionParameter.getType().getName()));
-          }
-
-          if (hasDefaultOverride && extensionParameter.getType().isInstantiable()) {
-            throw new IllegalParameterModelDefinitionException(
-                                                               format("Parameter '%s' is annotated with '@%s' is of concrete type '%s',"
-                                                                   + " but a 'defaultImplementingType' was provided."
-                                                                   + " Type override is not allowed for concrete types",
-                                                                      extensionParameter.getName(),
-                                                                      NullSafe.class.getSimpleName(),
-                                                                      extensionParameter.getType().getName()));
-          }
-
-          if (!isInstantiable && !isMap(nullSafeType)) {
-            throw new IllegalParameterModelDefinitionException(
-                                                               format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                                                                   + "used with complex instantiable types (Pojos, Lists, Maps)",
-                                                                      extensionParameter.getName(),
-                                                                      NullSafe.class.getSimpleName(),
-                                                                      extensionParameter.getType().getName()));
-          }
-
-          if (hasDefaultOverride && !extensionParameter.getType().isAssignableFrom(nullSafeAnnotationType)) {
-            throw new IllegalParameterModelDefinitionException(
-                                                               format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
-                                                                   + " is not a subtype of the parameter's type",
-                                                                      extensionParameter.getName(),
-                                                                      NullSafe.class.getSimpleName(),
-                                                                      extensionParameter.getType().getName(),
-                                                                      getType(nullSafeType).getName()));
-          }
-        }
-      });
-
-      parameter.withModelProperty(new NullSafeModelProperty(nullSafeType));
-      if (hasDefaultOverride) {
-        parameter.withModelProperty(new DefaultImplementingTypeModelProperty(nullSafeType));
-
-      }
-    }
-  }
 
   private void parseLayout(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     parseLayoutAnnotations(extensionParameter, LayoutModel.builder())
