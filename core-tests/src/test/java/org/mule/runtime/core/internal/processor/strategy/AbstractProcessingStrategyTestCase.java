@@ -148,7 +148,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
-  protected final ProfilingDataConsumer profilingDataConsumer = mock(ProfilingDataConsumer.class);
+  protected final ProfilingDataConsumer<ProcessingStrategyProfilingEventContext> profilingDataConsumer = mock(ProfilingDataConsumer.class);
 
   protected Mode mode;
   protected static final String CPU_LIGHT = "cpuLight";
