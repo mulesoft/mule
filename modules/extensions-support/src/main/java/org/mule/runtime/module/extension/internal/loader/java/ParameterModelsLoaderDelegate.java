@@ -96,7 +96,7 @@ public final class ParameterModelsLoaderDelegate {
     return declare(component, parameters, declarationContext, null);
   }
 
-  public List<ParameterDeclarer> declare(HasParametersDeclarer component,
+  public List<ParameterDeclarer> zdeclare(HasParametersDeclarer component,
                                          List<? extends ExtensionParameter> parameters,
                                          ParameterDeclarationContext declarationContext,
                                          ParameterGroupDeclarer parameterGroupDeclarer) {

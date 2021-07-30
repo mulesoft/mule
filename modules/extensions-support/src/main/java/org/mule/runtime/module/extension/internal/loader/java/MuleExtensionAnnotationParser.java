@@ -214,7 +214,7 @@ public final class MuleExtensionAnnotationParser {
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 
-  static java.util.Optional<ExceptionHandlerFactory> getExceptionEnricherFactory(WithAnnotations element) {
+  public static java.util.Optional<ExceptionHandlerFactory> getExceptionEnricherFactory(WithAnnotations element) {
     if (element.isAnnotatedWith(OnException.class)) {
       Type classValue = element.getValueFromAnnotation(OnException.class).get().getClassValue(OnException::value);
       return classValue.getDeclaringClass()
