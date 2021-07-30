@@ -18,22 +18,21 @@ import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificati
  *
  * @since 4.4
  */
-public class DefaultProfilingNotificationListener implements ProfilingNotificationListener<ProfilingNotification> {
+public class DefaultProfilingNotificationListener<T extends ProfilingEventContext> implements ProfilingNotificationListener<T> {
 
-  private final ProfilingDataConsumer<ProfilingEventContext> dataConsumer;
+  private final ProfilingDataConsumer<T> dataConsumer;
 
   @Override
   public boolean isBlocking() {
     return false;
   }
 
-  public DefaultProfilingNotificationListener(ProfilingDataConsumer<ProfilingEventContext> dataConsumer) {
-    this.dataConsumer = dataConsumer;
+  @Override
+  public void onNotification(ProfilingNotification<T> notification) {
+    dataConsumer.onProfilingEvent(notification.getProfilingEventType(), (T) notification.getSource());
   }
 
-  @Override
-  public void onNotification(ProfilingNotification notification) {
-    ProfilingEventContext profilingEventContext = (ProfilingEventContext) notification.getSource();
-    dataConsumer.onProfilingEvent(notification.getProfilingEventType(), profilingEventContext);
+  public DefaultProfilingNotificationListener(ProfilingDataConsumer<T> dataConsumer) {
+    this.dataConsumer = dataConsumer;
   }
 }

@@ -62,10 +62,10 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_FLOW_MESSAGE_PASSING), PS_FLOW_MESSAGE_PASSING_ID);
   }
 
-  private final ProfilingEventType<?> profilingEventType;
+  private final ProfilingEventType<T> profilingEventType;
 
-  public <T extends ProfilingEventContext> ProfilingNotification(T profilingEventContext,
-                                                                 ProfilingEventType<T> profilingEventType) {
+  public ProfilingNotification(T profilingEventContext,
+                               ProfilingEventType<T> profilingEventType) {
     super(profilingEventContext, getActionId(getFullyQualifiedProfilingNotificationIdentifier(profilingEventType)));
     this.profilingEventType = profilingEventType;
   }
@@ -83,14 +83,14 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   /**
    * @return the {@link ProfilingEventType} for the notification.
    */
-  public ProfilingEventType<?> getProfilingEventType() {
+  public ProfilingEventType<T> getProfilingEventType() {
     return profilingEventType;
   }
 
   /**
    * @return the fully qualified profiling notification identifier considering the namespace.
    */
-  public static String getFullyQualifiedProfilingNotificationIdentifier(ProfilingEventType profilingEventType) {
+  public static String getFullyQualifiedProfilingNotificationIdentifier(ProfilingEventType<?> profilingEventType) {
     return profilingEventType.getProfilingEventTypeNamespace() + PROFILING_NAMESPACE_IDENTIFIER_SEPARATOR
         + profilingEventType
             .getProfilingEventTypeIdentifier();
