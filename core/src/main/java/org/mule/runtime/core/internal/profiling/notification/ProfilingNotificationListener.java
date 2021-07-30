@@ -7,9 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.notification;
 
-import org.mule.api.annotation.Experimental;
-import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.profiling.ProfilingEventContext;
 
 /**
  * An interface for {@link ProfilingNotification} listeners. This is implemented by the runtime to use notifications for producing
@@ -17,7 +16,7 @@ import org.mule.runtime.api.notification.NotificationListener;
  *
  * @param <T> extension of {@link ProfilingNotification}
  */
-public interface ProfilingNotificationListener<T extends ProfilingNotification>
-    extends NotificationListener<ProfilingNotification> {
+public interface ProfilingNotificationListener<T extends ProfilingEventContext>
+    extends NotificationListener<ProfilingNotification<T>> {
 
 }
