@@ -429,7 +429,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     params.withOptionalParameter("enableMessageHistory")
         .describedAs("Every message that is received by the test processor is stored and can be retrieved. If you do not want this information stored, such as if you are running millions of messages through the component, you can disable this feature to avoid a potential out of memory error.")
         .ofType(BOOLEAN_TYPE)
-        .defaultingTo(false)
+        .defaultingTo(true)
         .withExpressionSupport(NOT_SUPPORTED);
 
     params.withOptionalParameter("enableNotifications")
