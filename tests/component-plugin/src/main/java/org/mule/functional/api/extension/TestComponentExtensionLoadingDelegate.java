@@ -257,7 +257,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .withDisplayModel(DisplayModel.builder()
             .classValue(new ClassValueModel(singletonList("org.mule.runtime.api.exception.TypedException"))).build());
 
-    params.withOptionalParameter("errorType")
+    params.withOptionalParameter("error")
         .describedAs("The error to throw. If provided, the exception will be used as cause for a TypedException.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
