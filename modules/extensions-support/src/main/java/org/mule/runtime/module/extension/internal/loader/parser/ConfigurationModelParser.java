@@ -1,11 +1,12 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 
 import java.util.List;
 
-public interface ExtensionConfigurationDefinitionParser {
+public interface ConfigurationModelParser {
 
   String getName();
 
@@ -16,4 +17,8 @@ public interface ExtensionConfigurationDefinitionParser {
   boolean isForceNoExplicit();
 
   List<ExternalLibraryModel> getExternalLibraryModels();
+
+  List<ParameterGroupModelParser> getParameterGroupParsers();
+
+  List<ModelProperty> getAdditionalModelProperties();
 }

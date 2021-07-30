@@ -16,8 +16,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionConfigurationDefinitionParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionDefinitionParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 /**
@@ -33,13 +33,12 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     super(delegate);
   }
 
-  void declareConfigurations(ExtensionDeclarer declaration, ExtensionDefinitionParser extensionDefinitionParser, ExtensionLoadingContext context) {
-    extensionDefinitionParser.getConfigurationParsers().forEach(config -> declareConfiguration(declaration, ex));
+  void declareConfigurations(ExtensionDeclarer declaration, ExtensionModelParser extensionModelParser, ExtensionLoadingContext context) {
+    extensionModelParser.getConfigurationParsers().forEach(config -> declareConfiguration(declaration, ex));
   }
 
   private void declareConfiguration(ExtensionDeclarer declarer,
-                                    ExtensionConfigurationDefinitionParser configParser,
-                                    ExtensionElement extensionType,
+                                    ConfigurationModelParser configParser,
                                     ComponentElement configType,
                                     ExtensionLoadingContext loadingContext) {
 
@@ -47,17 +46,13 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
         .describedAs(configParser.getDescription())
         .withModelProperty(configParser.getConfigurationFactoryModelProperty());
 
-    ///// JAVA SPECIFIC /////
-    configurationDeclarer
-        .withModelProperty(new ImplementingTypeModelProperty(configType.getDeclaringClass().orElse(Object.class)))
-        .withModelProperty(new ExtensionTypeDescriptorModelProperty(configType));
-    ///////////////////
-
     if (configParser.isForceNoExplicit()) {
       configurationDeclarer.withModelProperty(new NoImplicitModelProperty());
     }
 
     configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
+    configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
+
     ParameterDeclarationContext context = new ParameterDeclarationContext(CONFIGURATION, configurationDeclarer.getDeclaration());
     loader.getFieldParametersLoader().declare(configurationDeclarer, configType.getParameters(), context);
 

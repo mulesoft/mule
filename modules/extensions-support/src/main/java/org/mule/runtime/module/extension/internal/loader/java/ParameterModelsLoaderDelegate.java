@@ -70,6 +70,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
@@ -91,17 +92,17 @@ public final class ParameterModelsLoaderDelegate {
   }
 
   public List<ParameterDeclarer> declare(HasParametersDeclarer component,
-                                         List<? extends ExtensionParameter> parameters,
+                                         List<ParameterGroupModelParser> groupParsers,
                                          ParameterDeclarationContext declarationContext) {
-    return declare(component, parameters, declarationContext, null);
+    return declare(component, groupParsers, declarationContext, null);
   }
 
-  public List<ParameterDeclarer> zdeclare(HasParametersDeclarer component,
-                                         List<? extends ExtensionParameter> parameters,
+  public List<ParameterDeclarer> declare(HasParametersDeclarer component,
+                                         List<ParameterGroupModelParser> groupParsers,
                                          ParameterDeclarationContext declarationContext,
                                          ParameterGroupDeclarer parameterGroupDeclarer) {
     List<ParameterDeclarer> declarerList = new ArrayList<>();
-    checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, Config.class, MetadataKeyId.class);
+
 
     boolean supportsNestedElements = component instanceof HasNestedComponentsDeclarer;
     for (ExtensionParameter extensionParameter : parameters) {
@@ -309,9 +310,7 @@ public final class ParameterModelsLoaderDelegate {
     }
   }
 
-  private boolean isParameterGroup(ExtensionParameter groupParameter) {
-    return groupParameter.getAnnotation(ParameterGroup.class).isPresent();
-  }
+
 
   private void parseParameterRole(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     parameter.withRole(roleOf(extensionParameter.getAnnotation(Content.class)));
@@ -434,19 +433,7 @@ public final class ParameterModelsLoaderDelegate {
                                                                            .build()));
   }
 
-  private void checkAnnotationsNotUsedMoreThanOnce(List<? extends ExtensionParameter> parameters,
-                                                   Class<? extends Annotation>... annotations) {
-    for (Class<? extends Annotation> annotation : annotations) {
-      final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
-      if (count > 1) {
-        throw new IllegalModelDefinitionException(
-                                                  format("The defined parameters %s from %s, uses the annotation @%s more than once",
-                                                         parameters.stream().map(p -> p.getName()).collect(toList()),
-                                                         parameters.iterator().next().getOwnerDescription(),
-                                                         annotation.getSimpleName()));
-      }
-    }
-  }
+
 
   private void addImplementingTypeModelProperty(AnnotatedElement element, ParameterDeclarer parameter) {
     parameter.withModelProperty(element instanceof Field

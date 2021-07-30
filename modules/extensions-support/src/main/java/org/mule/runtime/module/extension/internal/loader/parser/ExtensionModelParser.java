@@ -8,13 +8,14 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ExtensionDefinitionParser {
+public interface ExtensionModelParser {
 
   /**
    * @return The Extension's Name
@@ -31,7 +32,7 @@ public interface ExtensionDefinitionParser {
    */
   String getVendor();
 
-  List<ExtensionConfigurationDefinitionParser> getConfigurationParsers();
+  List<ConfigurationModelParser> getConfigurationParsers();
 
 
   LicenseModelProperty getLicenseModelProperty();
@@ -39,5 +40,7 @@ public interface ExtensionDefinitionParser {
   List<ExternalLibraryModel> getExternalLibraryModels();
 
   Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty();
+
+  List<ModelProperty> getAdditionalModelProperties();
 
 }

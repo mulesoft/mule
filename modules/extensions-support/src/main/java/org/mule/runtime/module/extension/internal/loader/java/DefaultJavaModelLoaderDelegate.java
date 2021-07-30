@@ -24,10 +24,9 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionDefinitionParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionDefinitionParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,8 +43,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   protected Class<?> extensionType;
   protected final ExtensionElement extensionElement;
-  protected final ExtensionDefinitionParser extensionDefinitionParser;
-  protected final ClassTypeLoader typeLoader;
+  protected final ExtensionModelParser extensionModelParser;
   protected final String version;
 
   private final ConfigModelLoaderDelegate configLoaderDelegate = new ConfigModelLoaderDelegate(this);
@@ -55,26 +53,18 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
 
-  private final ParameterModelsLoaderDelegate fieldParametersLoader;
-  private final ParameterModelsLoaderDelegate methodParametersLoader;
+
 
   public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
-    this.typeLoader = getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
+
     this.extensionElement = extensionElement;
-    extensionDefinitionParser = new JavaExtensionDefinitionParser(extensionElement);
+    extensionModelParser = new JavaExtensionModelParser(extensionElement);
 
-    this.fieldParametersLoader = new ParameterModelsLoaderDelegate(getParameterFieldsContributors(), typeLoader);
-    this.methodParametersLoader = new ParameterModelsLoaderDelegate(getParameterMethodsContributors(), typeLoader);
+
   }
 
-  private List<ParameterDeclarerContributor> getParameterMethodsContributors() {
-    return ImmutableList.of(defaultContributor(typeLoader));
-  }
 
-  private ImmutableList<ParameterDeclarerContributor> getParameterFieldsContributors() {
-    return ImmutableList.of(new InfrastructureFieldContributor(), defaultContributor(typeLoader));
-  }
 
   public DefaultJavaModelLoaderDelegate(Class<?> extensionType, String version) {
     this(new ExtensionTypeWrapper<>(extensionType, getDefault().createTypeLoader(extensionType.getClassLoader())), version);
@@ -88,24 +78,21 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
-            .named(extensionDefinitionParser.getName())
+            .named(extensionModelParser.getName())
             .onVersion(version)
-            .fromVendor(extensionDefinitionParser.getVendor())
-            .withCategory(extensionDefinitionParser.getCategory())
-            .withModelProperty(extensionDefinitionParser.getLicenseModelProperty());
+            .fromVendor(extensionModelParser.getVendor())
+            .withCategory(extensionModelParser.getCategory())
+            .withModelProperty(extensionModelParser.getLicenseModelProperty());
 
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
-    //TODO: extract to java specific
-    extensionElement.getDeclaringClass()
-        .ifPresent(extensionClass -> declarer.withModelProperty(new ImplementingTypeModelProperty(extensionClass)));
+    extensionModelParser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
+    extensionModelParser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
+    extensionModelParser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
-    extensionDefinitionParser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
-    extensionDefinitionParser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
-
-    configLoaderDelegate.declareConfigurations(declarer, extensionElement, context);
+    configLoaderDelegate.declareConfigurations(declarer, extensionModelParser, context);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, extensionElement);
 
     if (!isEmpty(extensionElement.getConfigurations())) {

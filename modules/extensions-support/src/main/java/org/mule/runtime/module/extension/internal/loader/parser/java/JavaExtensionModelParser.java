@@ -6,31 +6,49 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor.defaultContributor;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionDefinitionParserUtils.parseExternalLibraryModels;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.loader.java.ParameterModelsLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
+import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionConfigurationDefinitionParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionDefinitionParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class JavaExtensionDefinitionParser implements ExtensionDefinitionParser {
+public class JavaExtensionModelParser implements ExtensionModelParser {
 
   private final ExtensionElement extensionElement;
+  private final ClassTypeLoader typeLoader;
+  private final ParameterModelsLoaderDelegate fieldParametersLoader;
+  private final ParameterModelsLoaderDelegate methodParametersLoader;
 
-  public JavaExtensionDefinitionParser(ExtensionElement extensionElement) {
+  public JavaExtensionModelParser(ExtensionElement extensionElement) {
     this.extensionElement = extensionElement;
+    this.typeLoader = getDefault().createTypeLoader(currentThread().getContextClassLoader());
+    this.fieldParametersLoader = new ParameterModelsLoaderDelegate(getParameterFieldsContributors(), typeLoader);
+    this.methodParametersLoader = new ParameterModelsLoaderDelegate(getParameterMethodsContributors(), typeLoader);
   }
 
   @Override
@@ -49,13 +67,13 @@ public class JavaExtensionDefinitionParser implements ExtensionDefinitionParser 
   }
 
   @Override
-  public List<ExtensionConfigurationDefinitionParser> getConfigurationParsers() {
+  public List<ConfigurationModelParser> getConfigurationParsers() {
     List<ConfigurationElement> configurations = extensionElement.getConfigurations();
     if (configurations.isEmpty()) {
-      return singletonList(new JavaExtensionConfigurationDefinitionParser(extensionElement, extensionElement));
+      return singletonList(new JavaConfigurationModelParser(extensionElement, extensionElement));
     } else {
       return configurations.stream()
-          .map(config -> new JavaExtensionConfigurationDefinitionParser(extensionElement, config))
+          .map(config -> new JavaConfigurationModelParser(extensionElement, config))
           .collect(toList());
     }
   }
@@ -83,5 +101,20 @@ public class JavaExtensionDefinitionParser implements ExtensionDefinitionParser 
     return getExceptionEnricherFactory(extensionElement).map(ExceptionHandlerModelProperty::new);
   }
 
+  @Override
+  public List<ModelProperty> getAdditionalModelProperties() {
+    List<ModelProperty> properties = new LinkedList<>();
+    extensionElement.getDeclaringClass()
+        .ifPresent(extensionClass -> properties.add(new ImplementingTypeModelProperty(extensionClass)));
 
+    return unmodifiableList(properties);
+  }
+
+  private List<ParameterDeclarerContributor> getParameterMethodsContributors() {
+    return singletonList(defaultContributor(typeLoader));
+  }
+
+  private List<ParameterDeclarerContributor> getParameterFieldsContributors() {
+    return unmodifiableList(asList(new InfrastructureFieldContributor(), defaultContributor(typeLoader)));
+  }
 }

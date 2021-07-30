@@ -15,6 +15,8 @@ import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 
 import java.util.List;
@@ -22,7 +24,12 @@ import java.util.Optional;
 
 final class JavaExtensionDefinitionParserUtils {
 
-  public static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {
+  static boolean isParameterGroup(ExtensionParameter groupParameter) {
+    return groupParameter.getAnnotation(ParameterGroup.class).isPresent()
+        || groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class).isPresent();
+  }
+
+  static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {
     Optional<ExternalLibs> externalLibs = element.getAnnotation(ExternalLibs.class);
     if (externalLibs.isPresent()) {
       return stream(externalLibs.get().value())
@@ -33,7 +40,6 @@ final class JavaExtensionDefinitionParserUtils {
           .map(lib -> singletonList(parseExternalLib(lib)))
           .orElse(emptyList());
     }
-
   }
 
   private static ExternalLibraryModel parseExternalLib(ExternalLib externalLibAnnotation) {
