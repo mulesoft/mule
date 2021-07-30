@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -17,8 +16,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.tck.junit4.matcher.Eventually.eventually;
 import static org.mule.tck.util.CollectableReference.collectedByGc;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
@@ -39,8 +36,6 @@ import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterPr
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.util.CollectableReference;
 
-import java.util.Collection;
-
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -56,13 +51,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     extends ProactorStreamEmitterProcessingStrategyTestCase
     implements TransactionAwareProcessingStrategyTestCase {
 
-  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
-    super(mode);
-  }
-
-  @Parameterized.Parameters(name = "{0}")
-  public static Collection<Mode> parameters() {
-    return asList(FLOW, SOURCE);
+  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode, boolean profiling) {
+    super(mode, profiling);
   }
 
   @After
@@ -148,6 +138,13 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     asyncExecutor.stop();
 
     assertThat(captor.reference, is(eventually(collectedByGc())));
+  }
+
+  @Test
+  public void testTransactionProfiling() throws Exception {
+    getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
+    testProfiling();
   }
 
   public static class ThreadReferenceCaptor implements Processor {

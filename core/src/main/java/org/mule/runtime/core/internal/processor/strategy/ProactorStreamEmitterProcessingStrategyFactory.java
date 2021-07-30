@@ -11,6 +11,8 @@ import static java.lang.Math.min;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -143,6 +145,9 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     private ProactorProcessingStrategyEnricher getEnricher(Scheduler blockingScheduler) {
       return new ProactorProcessingStrategyEnricher(() -> blockingScheduler,
                                                     getSchedulerDecorator().compose(this::getRetryScheduler),
+                                                    getProfilingService(),
+                                                    getArtifactId(muleContext),
+                                                    getArtifactType(muleContext),
                                                     maxConcurrency,
                                                     getParallelism(),
                                                     subscribers);

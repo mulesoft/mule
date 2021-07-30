@@ -152,7 +152,11 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_TRANSACTION_FACTORY_LOCATOR, new TransactionFactoryLocator(), muleContext);
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
     registerObject(OBJECT_CONNECTIVITY_TESTER_FACTORY, new DefaultConnectivityTesterFactory(), muleContext);
-    registerObject(MULE_PROFILING_SERVICE_KEY, new DefaultProfilingService(), muleContext);
+
+    // This is overridden only if no other test configurator has set the profiling service.
+    if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MULE_PROFILING_SERVICE_KEY) == null) {
+      registerObject(MULE_PROFILING_SERVICE_KEY, new DefaultProfilingService(), muleContext);
+    }
 
     registerObject(ComponentInitialStateManager.SERVICE_ID, new ComponentInitialStateManager() {
 

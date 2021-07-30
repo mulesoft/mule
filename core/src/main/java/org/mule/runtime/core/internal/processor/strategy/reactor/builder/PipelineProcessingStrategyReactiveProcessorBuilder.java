@@ -9,9 +9,19 @@ package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -19,7 +29,6 @@ import org.reactivestreams.Publisher;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.UnaryOperator;
 
 /**
  * Builder for a {@link ReactiveProcessor} that enriches a pipeline {@link ReactiveProcessor} with processing strategy logic. The
@@ -31,14 +40,19 @@ import java.util.function.UnaryOperator;
  */
 public class PipelineProcessingStrategyReactiveProcessorBuilder {
 
+  private final String artifactId;
+  private final String artifactType;
   private final ReactiveProcessor pipeline;
   private final ClassLoader executionClassloader;
-  private Optional<ScheduledExecutorService> scheduler = empty();
-  private UnaryOperator<ScheduledExecutorService> schedulerDecorator = UnaryOperator.identity();
+  private ScheduledExecutorService scheduler;
+  private ProfilingService profilingService;
 
-  private PipelineProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor pipeline, ClassLoader executionClassloader) {
+  private PipelineProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor pipeline, ClassLoader executionClassloader,
+                                                             String artifactId, String artifactType) {
     this.pipeline = pipeline;
     this.executionClassloader = executionClassloader;
+    this.artifactId = artifactId;
+    this.artifactType = artifactType;
   }
 
   /**
@@ -46,28 +60,30 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
    * @param executionClassloader classloader used for pipeline execution.
    * @return the message processor chain builder
    */
-  public static PipelineProcessingStrategyReactiveProcessorBuilder pipelineProcessingStrategyReactiveProcessorFrom(ReactiveProcessor pipeline,
-                                                                                                                   ClassLoader executionClassloader) {
-    return new PipelineProcessingStrategyReactiveProcessorBuilder(pipeline, executionClassloader);
+  public static PipelineProcessingStrategyReactiveProcessorBuilder pipelineProcessingStrategyReactiveProcessorFrom(
+                                                                                                                   ReactiveProcessor pipeline,
+                                                                                                                   ClassLoader executionClassloader,
+                                                                                                                   String artifactId,
+                                                                                                                   String artifactType) {
+    return new PipelineProcessingStrategyReactiveProcessorBuilder(pipeline, executionClassloader, artifactId, artifactType);
   }
 
   /**
    * @param scheduler the {@link Scheduler} used for dispatching events to the pipeline
-   * 
    * @return the builder with {@link Scheduler}.
    */
-  public PipelineProcessingStrategyReactiveProcessorBuilder withScheduler(Scheduler scheduler) {
-    this.scheduler = ofNullable(scheduler);
+  public PipelineProcessingStrategyReactiveProcessorBuilder withScheduler(ScheduledExecutorService scheduler) {
+    this.scheduler = scheduler;
     return this;
   }
 
   /**
-   * @param schedulerDecorator the decorator for the scheduler
-   *
+   * @param profilingService the profiling service used for profiling.
    * @return the builder with decorator set.
    */
-  public PipelineProcessingStrategyReactiveProcessorBuilder withSchedulerDecorator(UnaryOperator<ScheduledExecutorService> schedulerDecorator) {
-    this.schedulerDecorator = schedulerDecorator;
+  public PipelineProcessingStrategyReactiveProcessorBuilder withProfilingService(
+                                                                                 ProfilingService profilingService) {
+    this.profilingService = profilingService;
     return this;
   }
 
@@ -75,12 +91,33 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
     return publisher -> baseProcessingStrategyPublisherBuilder(buildFlux(publisher)).build();
   }
 
-  private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyPublisherBuilder(ReactorPublisherBuilder<T> publisher) {
-    return scheduler
-        .map(sch -> publisher.publishOn(schedulerDecorator.apply(sch)))
-        .orElse(publisher)
+  private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyPublisherBuilder(
+                                                                                                  ReactorPublisherBuilder<T> publisher) {
+
+    ComponentLocation location = getLocation(pipeline);
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> psSchedulingFlowExecutionDataProducer =
+        dataProducerFromProfilingService(PS_SCHEDULING_FLOW_EXECUTION);
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> startingFlowExecutionDataproducer =
+        dataProducerFromProfilingService(STARTING_FLOW_EXECUTION);
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> flowExecutedDataProducer =
+        dataProducerFromProfilingService(FLOW_EXECUTED);
+
+    return publisher
+        .profileEvent(location, psSchedulingFlowExecutionDataProducer, artifactId, artifactType)
+        .publishOn(ofNullable(scheduler))
+        .profileEvent(location, startingFlowExecutionDataproducer, artifactId, artifactType)
         .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-        .transform(pipeline);
+        .transform(pipeline)
+        .profileEvent(location, flowExecutedDataProducer, artifactId, artifactType);
+  }
+
+  private Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducerFromProfilingService(
+                                                                                                                    ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
+    if (profilingService == null) {
+      return empty();
+    } else {
+      return of(profilingService.getProfilingDataProducer(profilingEventType));
+    }
   }
 
 }

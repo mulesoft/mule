@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
+import static java.util.Collections.singleton;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -31,7 +32,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -58,9 +61,14 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -70,12 +78,16 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyEx
 import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -100,11 +112,32 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
   private static final Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategyTestCase.class);
 
+  private final ProfilingService profilingService = new DefaultProfilingService() {
+
+    @Override
+    public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+      return (new ProfilingDataConsumerDiscoveryStrategy() {
+
+        @Override
+        public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
+          return singleton((S) profilingDataConsumer);
+        }
+      });
+    }
+  };
+
   @Rule
   public ExpectedException expectedException = none();
 
-  public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
-    super(mode);
+  public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode, boolean profiling) {
+    super(mode, profiling);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> startupRegistryObjects = new HashMap<>();
+    startupRegistryObjects.put(MULE_PROFILING_SERVICE_KEY, profilingService);
+    return startupRegistryObjects;
   }
 
   @Override
@@ -780,6 +813,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final Sink sink = ps.createSink(flow, flow);
@@ -803,6 +837,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final Sink sink = ps.createSink(flow, flow);
@@ -823,6 +858,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final Sink sink = ps.createSink(flow, flow);
@@ -849,6 +885,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withRegisteredInternalSink");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final FluxSinkRecorder<CoreEvent> fluxSinkRecorder = new FluxSinkRecorder<>();
@@ -869,6 +906,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   public void disposeWaitsForRegisteredInternalSinkCompletion() throws MuleException, InterruptedException {
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withRegisteredInternalSink");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final Latch completionLatch = new Latch();
@@ -905,6 +943,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withConfiguredInternalPublisher");
 
+    initialiseIfNeeded(ps, muleContext);
     startIfNeeded(ps);
 
     final FluxSinkRecorder<CoreEvent> fluxSinkRecorder = new FluxSinkRecorder<>();
@@ -917,6 +956,20 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     verify(cpuLight).stop();
     verify(blocking).stop();
     verify(cpuIntensive).stop();
+  }
+
+  @Test
+  public void testProfiling() throws Exception {
+    muleContext.start();
+    triggerableMessageSource = new TriggerableMessageSource(FAIL);
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(cpuLightProcessor)
+        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, MAX_VALUE))
+        .build();
+    startFlow();
+    processFlow(newEvent());
+    assertProcessingStrategyProfiling();
   }
 
   private void spySchedulers() {
