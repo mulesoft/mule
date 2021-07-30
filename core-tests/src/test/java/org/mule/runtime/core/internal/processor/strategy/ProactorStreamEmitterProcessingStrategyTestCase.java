@@ -68,7 +68,6 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -119,8 +118,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       return (new ProfilingDataConsumerDiscoveryStrategy() {
 
         @Override
-        public <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> Set<S> discover() {
-          return singleton((S) profilingDataConsumer);
+        public Set<ProfilingDataConsumer<?>> discover() {
+          return singleton(profilingDataConsumer);
         }
       });
     }

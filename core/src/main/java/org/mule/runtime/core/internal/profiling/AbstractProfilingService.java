@@ -46,7 +46,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
 
   private FeatureFlaggingService featureFlags;
 
-  private final Set<NotificationListener<ProfilingNotification>> addedListeners = new HashSet<>();
+  private final Set<NotificationListener<?>> addedListeners = new HashSet<>();
 
   @Override
   public void initialise() throws InitialisationException {}
@@ -58,25 +58,27 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
     }
   }
 
-  private void registerNotificationListeners(Set<ProfilingDataConsumer<ProfilingEventContext>> profilingDataConsumers) {
+  private <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> void registerNotificationListeners(Set<S> profilingDataConsumers) {
     profilingDataConsumers.forEach(this::registerNotificationListener);
   }
 
-  private void registerNotificationListener(ProfilingDataConsumer<ProfilingEventContext> profilingDataConsumer) {
-    NotificationListener<ProfilingNotification> profilingNotificationListener =
-        new DefaultProfilingNotificationListener(profilingDataConsumer);
-    notificationManager.addListenerSubscription(profilingNotificationListener, pn -> filterByAction(profilingDataConsumer, pn));
+  private <T extends ProfilingEventContext> void registerNotificationListener(ProfilingDataConsumer<T> profilingDataConsumer) {
+    NotificationListener<ProfilingNotification<T>> profilingNotificationListener =
+        new DefaultProfilingNotificationListener<>(profilingDataConsumer);
+    notificationManager
+        .addListenerSubscription(profilingNotificationListener,
+                                 pn -> filterByAction(profilingDataConsumer, pn));
     addedListeners.add(profilingNotificationListener);
   }
 
-  private boolean filterByAction(ProfilingDataConsumer<ProfilingEventContext> profilingDataConsumer,
-                                 ProfilingNotification profilingNotification) {
+  private <T extends ProfilingEventContext> boolean filterByAction(ProfilingDataConsumer<T> profilingDataConsumer,
+                                                                   ProfilingNotification<T> profilingNotification) {
     return profilingDataConsumer.getProfilingEventTypes().stream()
         .anyMatch(
                   eventType -> (getFullyQualifiedProfilingNotificationIdentifier(eventType))
                       .equalsIgnoreCase(profilingNotification.getActionName()))
         &&
-        profilingDataConsumer.getEventContextFilter().test(((ProfilingEventContext) profilingNotification.getSource()));
+        profilingDataConsumer.getEventContextFilter().test((T) profilingNotification.getSource());
   }
 
   @Override
@@ -92,7 +94,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
   protected abstract ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy();
 
   public <T extends ProfilingEventContext> void notifyEvent(T profilingEventContext, ProfilingEventType<T> action) {
-    serverNotificationHandler.fireNotification(new ProfilingNotification(profilingEventContext, action));
+    serverNotificationHandler.fireNotification(new ProfilingNotification<>(profilingEventContext, action));
   }
 
   @Inject
