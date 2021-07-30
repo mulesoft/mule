@@ -169,7 +169,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     }
 
     @Override
-    public Set<? extends ProfilingDataConsumer<? extends ProfilingEventContext>> discover() {
+    public Set<ProfilingDataConsumer<?>> discover() {
       return of(new TestLoggerComponentProcessingStrategyDataConsumer(logger));
     }
   }

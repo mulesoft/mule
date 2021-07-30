@@ -10,7 +10,6 @@ package org.mule.runtime.core.internal.profiling;
 import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
-import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 
 import java.util.Set;
@@ -23,7 +22,7 @@ import java.util.Set;
 public class DefaultProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
 
   @Override
-  public Set<? extends ProfilingDataConsumer<? extends ProfilingEventContext>> discover() {
+  public Set<ProfilingDataConsumer<?>> discover() {
     return ImmutableSet.of(new LoggerComponentProcessingStrategyDataConsumer());
   }
 

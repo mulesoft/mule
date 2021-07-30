@@ -118,7 +118,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       return (new ProfilingDataConsumerDiscoveryStrategy() {
 
         @Override
-        public Set<? extends ProfilingDataConsumer<? extends ProfilingEventContext>> discover() {
+        public Set<ProfilingDataConsumer<?>> discover() {
           return singleton(profilingDataConsumer);
         }
       });
