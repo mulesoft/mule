@@ -590,34 +590,6 @@
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>${assembly.verifier.version}</version>
-
-                    <configuration>
-                        <skip>${skipVerifications}</skip>
-                    </configuration>
-
-                    <!-- // @todo[question]: Given that the plugin now uses Groovy 3.0.8, should this be set here?-->
-                    <!-- ref: https://github.com/mulesoft/mule-assembly-verifier-plugin/blob/31e94d9efcf987b935191f3af17633147d7c8e43/pom.xml#L38-L42 -->
-                    <dependencies>
-                        <!--
-                            Groovy dependency is handled by Mule differently,
-                            declare the compatible one explicitly for the plugin.
-                        -->
-                        <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy</artifactId>
-                            <version>${groovyVersion}</version>
-                        </dependency>
-                    </dependencies>
-
-                    <!-- // @todo: Why is the execution configure here and not here: https://github.com/mulesoft/mule-ee-distributions/blob/e6370956039d68d2f9f2bfea00dab46bae685ad8/standalone/pom.xml#L138-->
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila</groupId>
