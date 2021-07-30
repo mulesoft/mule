@@ -90,7 +90,7 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   /**
    * @return the fully qualified profiling notification identifier considering the namespace.
    */
-  public static String getFullyQualifiedProfilingNotificationIdentifier(ProfilingEventType profilingEventType) {
+  public static String getFullyQualifiedProfilingNotificationIdentifier(ProfilingEventType<?> profilingEventType) {
     return profilingEventType.getProfilingEventTypeNamespace() + PROFILING_NAMESPACE_IDENTIFIER_SEPARATOR
         + profilingEventType
             .getProfilingEventTypeIdentifier();
