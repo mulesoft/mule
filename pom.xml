@@ -236,7 +236,7 @@
         <mulePropertiesApiVersion>1.0.0-rc1</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.4.0-rc1</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.0.0-rc1</muleConnectivityApiVersion>
-        <muleHttpPolicyApiVersion>1.4.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleHttpPolicyApiVersion>1.4.0-rc1</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.6.0-SNAPSHOT</muleMavenClientApi>
         <muleMavenClientImpl>1.6.0-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.6.0-SNAPSHOT</muleMavenClientTest>
