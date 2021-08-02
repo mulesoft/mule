@@ -369,7 +369,6 @@ public class ClassUtils {
     while (!Object.class.equals(clazz)) {
       try {
         field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
         return field;
       } catch (NoSuchFieldException e) {
         // ignore and look in superclass
@@ -396,7 +395,9 @@ public class ClassUtils {
    */
   public static <T> T getFieldValue(Object target, String fieldName, boolean recursive)
       throws IllegalAccessException, NoSuchFieldException {
-    return (T) getField(target.getClass(), fieldName, recursive).get(target);
+    Field f = getField(target.getClass(), fieldName, recursive);
+    f.setAccessible(true);
+    return (T) f.get(target);
   }
 
   /**
@@ -412,11 +413,19 @@ public class ClassUtils {
   public static <T> T getStaticFieldValue(Class<?> targetClass, String fieldName, boolean recursive)
       throws NoSuchFieldException, IllegalAccessException {
     Field field = getField(targetClass, fieldName, recursive);
+    if (!Modifier.isStatic(field.getModifiers())) {
+      throw new IllegalAccessException(String.format("The %s field of %s class is not static", fieldName, targetClass.getName()));
+    }
+    field.setAccessible(true);
     return (T) field.get(null);
   }
 
   /**
-   * Sets a field of an object with the given value
+   * Sets a field of an object with the given value. If this is a final field, there will be
+   * an attempt to update the value.
+   * Notice: If the field is final and it was initialized using a constant the value change
+   * may not be reflected in due compiler optimizations.
+   * http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.5.3
    * @param target the object that holds the target field
    * @param fieldName the name of the field
    * @param value the value to set
@@ -427,11 +436,21 @@ public class ClassUtils {
   public static void setFieldValue(Object target, String fieldName, Object value, boolean recursive)
       throws IllegalAccessException, NoSuchFieldException {
     Field field = getField(target.getClass(), fieldName, recursive);
+    field.setAccessible(true);
+    if (Modifier.isFinal(field.getModifiers())) {
+      Field modifiersField = getField(Field.class, "modifiers", false);
+      modifiersField.setAccessible(true);
+      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+    }
     field.set(target, value);
   }
 
   /**
    * Sets a static field of a given class, even if the field has the final modifier.
+   * Notice: If the field is final and it was initialized using a constant the value change
+   *         may not be reflected due compiler optimizations.
+   *         http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.5.3
+   *
    * @param targetClass the target class
    * @param fieldName the name of the field
    * @param value the value to set
@@ -444,8 +463,10 @@ public class ClassUtils {
     Field field = getField(targetClass, fieldName, recursive);
     if (Modifier.isFinal(field.getModifiers())) {
       Field modifiersField = getField(Field.class, "modifiers", false);
+      modifiersField.setAccessible(true);
       modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
     }
+    field.setAccessible(true);
     field.set(null, value);
   }
 

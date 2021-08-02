@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.AbstractFruit;
@@ -31,9 +32,13 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -207,6 +212,33 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void getField() throws Exception {
+    Field field = ClassUtils.getField(HashBlob.class, "hash", false);
+    assertNotNull(field);
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getNotExistentField() throws Exception {
+    Field field = ClassUtils.getField(HashBlob.class, "wrongField", false);
+  }
+
+  @Test
+  public void getFieldRecursive() throws Exception {
+    Field field = ClassUtils.getField(ExtendedHashBlob.class, "hash", true);
+    assertNotNull(field);
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getNotExistentFieldRecursiveFieldInSuper() throws Exception {
+    Field field = ClassUtils.getField(ExtendedHashBlob.class, "hash", false);
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getNotExistentFieldRecursive() throws Exception {
+    Field field = ClassUtils.getField(ExtendedHashBlob.class, "wrongField", true);
+  }
+
+  @Test
   public void getFieldValue() throws Exception {
     final int hash = hashCode();
     HashBlob blob = new HashBlob(hash);
@@ -214,7 +246,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test(expected = NoSuchFieldException.class)
-  public void getUnexistentFieldValue() throws Exception {
+  public void getNotExistentFieldValue() throws Exception {
     ClassUtils.getFieldValue(new HashBlob(0), "fake", false);
   }
 
@@ -227,7 +259,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test(expected = NoSuchFieldException.class)
-  public void getUnexistentFieldValueRecursive() throws Exception {
+  public void getNotExistentFieldValueRecursive() throws Exception {
     ClassUtils.getFieldValue(new ExtendedHashBlob(1), "fake", true);
   }
 
@@ -237,13 +269,77 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void getStaticFieldValue() throws Exception {
+    final List<String> hashBlobProperties = Arrays.asList(new String[] {"foo", "bar"});
+    HashBlob.setStaticHashProperties(hashBlobProperties);
+    List<String> value = ClassUtils.getStaticFieldValue(HashBlob.class, "staticHashProperties", false);
+    assertEquals(hashBlobProperties, value);
+  }
+
+  @Test
+  public void getStaticFieldValueRecursive() throws Exception {
+    final List<String> hashBlobProperties = Arrays.asList(new String[] {"foo", "bar"});
+    ExtendedHashBlob.setStaticHashProperties(hashBlobProperties);
+    List<String> value = ClassUtils.getStaticFieldValue(ExtendedHashBlob.class, "staticHashProperties", true);
+    assertEquals(hashBlobProperties, value);
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getStaticFieldValueNotExistentField() throws Exception {
+    ClassUtils.getStaticFieldValue(ExtendedHashBlob.class, "fake", false);
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getStaticFieldValueNotExistentFieldRecursive() throws Exception {
+    ClassUtils.getStaticFieldValue(ExtendedHashBlob.class, "fake", true);
+  }
+
+
+  @Test(expected = IllegalAccessException.class)
+  public void getStaticFieldValueNotStaticField() throws Exception {
+    ClassUtils.getStaticFieldValue(HashBlob.class, "hash", false);
+  }
+
+  @Test
   public void setFieldValue() throws Exception {
-    HashBlob blob = new HashBlob(0);
-    final int hash = hashCode();
+    final int originalHash = hashCode();
+    final int newHash = hashCode();
+    HashBlob blob = new HashBlob(originalHash);
+    ClassUtils.setFieldValue(blob, "hash", newHash, false);
+    assertThat(newHash, equalTo(blob.getHash()));
+  }
 
-    ClassUtils.setFieldValue(blob, "hash", hash, false);
+  @Test
+  public void setFinalFieldValue() throws Exception {
+    final int originalHash = hashCode();
+    final List<String> newFinalHashProperties = Arrays.asList(new String[] {"one", "two"});
+    HashBlob blob = new HashBlob(originalHash);
+    ClassUtils.setFieldValue(blob, "finalHashProperties", newFinalHashProperties, false);
+    assertThat(newFinalHashProperties, equalTo(blob.getFinalHashProperties()));
+  }
 
-    assertThat(hash, equalTo(blob.getHash()));
+  @Test
+  public void setFinalFieldValueRecursive() throws Exception {
+    final int originalHash = hashCode();
+    final List<String> newFinalHashProperties = Arrays.asList(new String[] {"one", "two"});
+    ExtendedHashBlob blob = new ExtendedHashBlob(originalHash);
+    ClassUtils.setFieldValue(blob, "finalHashProperties", newFinalHashProperties, true);
+    assertThat(newFinalHashProperties, equalTo(blob.getFinalHashProperties()));
+  }
+
+  @Test
+  public void setFinalStaticFieldValue() throws Exception {
+    final List<String> newFinalStaticHashProperties = Arrays.asList(new String[] {"one", "two"});
+    ClassUtils.setStaticFieldValue(HashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
+    assertThat(newFinalStaticHashProperties, equalTo(HashBlob.getFinalStaticHashProperties()));
+  }
+
+
+  @Test
+  public void setFinalStaticFieldRecursive() throws Exception {
+    final List<String> newFinalStaticHashProperties = Arrays.asList(new String[] {"one", "two"});
+    ClassUtils.setStaticFieldValue(ExtendedHashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
+    assertThat(newFinalStaticHashProperties, equalTo(ExtendedHashBlob.getFinalStaticHashProperties()));
   }
 
   @Test(expected = NoSuchFieldException.class)
@@ -324,6 +420,9 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   private static class HashBlob {
 
     private int hash;
+    private static List<String> staticHashProperties = new ArrayList<>();
+    private final List<String> finalHashProperties = Arrays.asList(new String[] {"foo", "bar"});
+    private final static List<String> finalStaticHashProperties = Arrays.asList(new String[] {"foo", "bar"});
 
     public HashBlob(int hash) {
       this.hash = hash;
@@ -331,6 +430,18 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
     private int getHash() {
       return hash;
+    }
+
+    public static void setStaticHashProperties(List<String> properties) {
+      staticHashProperties = properties;
+    }
+
+    public static List<String> getFinalStaticHashProperties() {
+      return finalStaticHashProperties;
+    }
+
+    public List<String> getFinalHashProperties() {
+      return finalHashProperties;
     }
 
     @Override
