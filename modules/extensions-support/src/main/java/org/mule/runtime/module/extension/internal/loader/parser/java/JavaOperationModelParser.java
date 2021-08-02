@@ -232,7 +232,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
               @Override
               public List<ModelProperty> getAdditionalModelProperties() {
-                List<ModelProperty> modelProperties = super.getAdditionalModelProperties();
+                List<ModelProperty> modelProperties = decoratee.getAdditionalModelProperties();
                 modelProperties.add(new FieldOperationParameterModelProperty());
 
                 return modelProperties;

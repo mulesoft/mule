@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public class ParameterModelParserDecorator implements ParameterModelParser{
 
-  private final ParameterModelParser decoratee;
+  protected final ParameterModelParser decoratee;
 
   public ParameterModelParserDecorator(ParameterModelParser decoratee) {
     this.decoratee = decoratee;
