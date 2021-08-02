@@ -151,24 +151,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     }
   }
 
-  private void processBlockingOperation(boolean supportsConfig, MethodElement operationMethod,
-                                        OperationDeclarer operation) {
-    operation.blocking(true);
-    operation.withOutputAttributes().ofType(operationMethod.getAttributesMetadataType());
-
-    final MetadataType outputType = operationMethod.getReturnMetadataType();
-
-    if (isAutoPaging(operationMethod)) {
-      operation.supportsStreaming(true).withOutput().ofType(outputType);
-      addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
-      processPagingTx(operation, operationMethod);
-    } else {
-      operation.withOutput().ofType(outputType);
-
-      handleByteStreaming(operationMethod, operation, outputType);
-    }
-  }
-
   private HasOperationDeclarer selectDeclarer(ExtensionDeclarer extensionDeclarer, Declarer declarer,
                                               MethodElement operationMethod, Optional<ExtensionParameter> configParameter,
                                               Optional<ExtensionParameter> connectionParameter) {
@@ -178,51 +160,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     return (HasOperationDeclarer) loader.selectDeclarerBasedOnConfig(extensionDeclarer, declarer, configParameter,
                                                                      connectionParameter);
-  }
-
-  static void processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod, boolean allowStreaming) {
-    List<ExtensionParameter> callbackParameters = operationMethod.getParameters().stream()
-        .filter(p -> p.getType().isSameType(CompletionCallback.class))
-        .collect(toList());
-
-    checkDefinition(!callbackParameters.isEmpty(),
-                    format("Operation '%s' does not declare a '%s' parameter. One is required for a non-blocking operation",
-                           operationMethod.getAlias(),
-                           CompletionCallback.class.getSimpleName()));
-
-    checkDefinition(callbackParameters.size() <= 1,
-                    format("Operation '%s' defines more than one %s parameters. Only one is allowed",
-                           operationMethod.getAlias(), CompletionCallback.class.getSimpleName()));
-
-    checkDefinition(isVoid(operationMethod), format("Operation '%s' has a parameter of type %s but is not void. "
-        + "Non-blocking operations have to be declared as void and the "
-        + "return type provided through the callback",
-                                                    operationMethod.getAlias(),
-                                                    CompletionCallback.class.getSimpleName()));
-
-    ExtensionParameter callbackParameter = callbackParameters.get(0);
-
-    List<MetadataType> genericTypes = callbackParameter.getType()
-        .getGenerics()
-        .stream()
-        .map(generic -> generic.getConcreteType().asMetadataType())
-        .collect(toList());
-
-    if (genericTypes.isEmpty()) {
-      // This is an invalid state, but is better to fail when executing the Extension Model Validators
-      genericTypes.add(ANY_TYPE);
-      genericTypes.add(ANY_TYPE);
-    }
-
-    operation.withOutput().ofType(genericTypes.get(0));
-    operation.withOutputAttributes().ofType(genericTypes.get(1));
-    operation.blocking(false);
-
-    if (allowStreaming) {
-      handleByteStreaming(operationMethod, operation, genericTypes.get(0));
-    } else {
-      operation.supportsStreaming(false);
-    }
   }
 
   private void addExecutionType(OperationDeclarer operationDeclarer, MethodElement operationMethod) {

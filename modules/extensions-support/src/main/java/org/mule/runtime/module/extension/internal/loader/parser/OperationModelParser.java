@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.OutputModelParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,14 @@ public interface OperationModelParser {
 
   String getDescription();
 
+  OutputModelParser getOutputType();
+
+  OutputModelParser getAttributesOutputType();
+
+  List<ParameterGroupModelParser> getParameterGroupModelParsers();
+
+  boolean isBlocking();
+
   boolean isIgnored();
 
   boolean isScope();
@@ -27,6 +36,10 @@ public interface OperationModelParser {
   boolean hasConfig();
 
   boolean isNonBlocking();
+
+  boolean supportsStreaming();
+
+  boolean isTransactional();
 
   Optional<MediaTypeModelProperty> getMediaTypeModelProperty();
 

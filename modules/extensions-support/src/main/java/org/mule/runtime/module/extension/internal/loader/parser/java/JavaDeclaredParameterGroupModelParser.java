@@ -7,9 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
@@ -31,31 +29,28 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-public class JavaDeclaredParameterGroupModelParser implements ParameterGroupModelParser {
+public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameterGroupModelParser {
 
+  private final List<ExtensionParameter> parameters;
   private final ExtensionParameter groupParameter;
-  private final ClassTypeLoader typeLoader;
-  private final ParameterDeclarationContext context;
   private final Type type;
   private final String groupName;
-  private final List<ExtensionParameter> parameters;
 
   public JavaDeclaredParameterGroupModelParser(ExtensionParameter groupParameter,
                                                ClassTypeLoader typeLoader,
-                                               ParameterDeclarationContext context) {
+                                               Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
+    super(typeLoader, parameterMutator);
     assureValid(groupParameter);
 
     this.groupParameter = groupParameter;
-    this.typeLoader = typeLoader;
-    this.context = context;
     type = groupParameter.getType();
     groupName = fetchGroupName();
     parameters = fetchAnnotatedParameter();
@@ -72,10 +67,8 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
   }
 
   @Override
-  public List<ParameterModelParser> getParameterParsers() {
-    return unmodifiableList(parameters.stream()
-        .map(p -> new JavaParameterModelParser(p, typeLoader, context))
-        .collect(toList()));
+  protected Stream<ExtensionParameter> doGetParameters() {
+    return parameters.stream();
   }
 
   @Override

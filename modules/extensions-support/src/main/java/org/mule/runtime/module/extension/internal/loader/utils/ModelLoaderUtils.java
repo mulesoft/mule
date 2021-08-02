@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -21,6 +22,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Utility class for {@link ModelLoaderDelegate model loaders}
@@ -29,7 +31,8 @@ import java.lang.reflect.Method;
  */
 public final class ModelLoaderUtils {
 
-  private ModelLoaderUtils() {}
+  private ModelLoaderUtils() {
+  }
 
   public static boolean isScope(MethodElement methodElement) {
     return methodElement.getParameters().stream().anyMatch(ModelLoaderUtils::isProcessorChain);
@@ -45,26 +48,38 @@ public final class ModelLoaderUtils {
   }
 
   public static boolean isNonBlocking(MethodElement method) {
+    return !getCompletionCallbackParameters(method).isEmpty();
+  }
+
+  public static List<ExtensionParameter> getCompletionCallbackParameters(MethodElement method) {
     return method.getParameters().stream()
-        .anyMatch(p -> p.getType().isAssignableTo(CompletionCallback.class));
+        .filter(p -> p.getType().isAssignableTo(CompletionCallback.class) ||
+            p.getType().isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class))
+        .collect(toList());
   }
 
   public static boolean isAutoPaging(MethodElement operationMethod) {
-    return operationMethod.getReturnType().isAssignableTo(PagingProvider.class);
+    return operationMethod.getReturnType().isAssignableTo(PagingProvider.class)
+        || operationMethod.getReturnType().isAssignableTo(org.mule.sdk.api.runtime.streaming.PagingProvider.class);
   }
 
   public static boolean isProcessorChain(ExtensionParameter parameter) {
-    return parameter.getType().isAssignableTo(Chain.class);
+    return parameter.getType().isAssignableTo(Chain.class)
+        || parameter.getType().isAssignableTo(org.mule.sdk.api.runtime.route.Chain.class);
   }
 
   public static void handleByteStreaming(Method method, ExecutableComponentDeclarer executableComponent,
                                          MetadataType outputType) {
-    executableComponent.supportsStreaming(isInputStream(outputType) || method.getAnnotation(Streaming.class) != null);
+    executableComponent.supportsStreaming(isInputStream(outputType)
+        || method.getAnnotation(Streaming.class) != null
+        || method.getAnnotation(org.mule.sdk.api.annotation.Streaming.class) != null);
   }
 
   public static void handleByteStreaming(MethodElement method, ExecutableComponentDeclarer executableComponent,
                                          MetadataType outputType) {
-    executableComponent.supportsStreaming(isInputStream(outputType) || method.isAnnotatedWith(Streaming.class));
+    executableComponent.supportsStreaming(isInputStream(outputType)
+        || method.isAnnotatedWith(Streaming.class)
+        || method.isAnnotatedWith(org.mule.sdk.api.annotation.Streaming.class));
   }
 
   /**

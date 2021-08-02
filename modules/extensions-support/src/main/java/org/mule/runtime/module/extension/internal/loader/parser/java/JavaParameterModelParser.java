@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
@@ -49,7 +48,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
@@ -64,13 +62,12 @@ public class JavaParameterModelParser implements ParameterModelParser {
   private final MetadataType type;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassTypeLoader typeLoader;
-  private final ParameterDeclarationContext context;
+
   private Optional<ParameterDslConfiguration> dslConfiguration;
 
-  public JavaParameterModelParser(ExtensionParameter parameter, ClassTypeLoader typeLoader, ParameterDeclarationContext context) {
+  public JavaParameterModelParser(ExtensionParameter parameter, ClassTypeLoader typeLoader) {
     this.parameter = parameter;
     this.typeLoader = typeLoader;
-    this.context = context;
     type = parameter.getType().asMetadataType();
     collectAdditionalModelProperties();
   }
@@ -149,7 +146,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return unmodifiableList(additionalModelProperties);
+    return additionalModelProperties;
   }
 
   @Override

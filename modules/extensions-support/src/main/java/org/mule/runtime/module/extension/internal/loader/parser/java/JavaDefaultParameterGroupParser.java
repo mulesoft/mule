@@ -7,9 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -17,25 +15,26 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-public class JavaDefaultParameterGroupParser implements ParameterGroupModelParser {
+public class JavaDefaultParameterGroupParser extends AbstractJavaParameterGroupModelParser {
 
   private final List<ExtensionParameter> parameters;
-  private final ClassTypeLoader typeLoader;
-  private final ParameterDeclarationContext context;
+
+  public JavaDefaultParameterGroupParser(List<ExtensionParameter> parameters, ClassTypeLoader typeLoader) {
+    this(parameters, typeLoader, null);
+  }
 
   public JavaDefaultParameterGroupParser(List<ExtensionParameter> parameters,
                                          ClassTypeLoader typeLoader,
-                                         ParameterDeclarationContext context) {
+                                         Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
+    super(typeLoader, parameterMutator);
     this.parameters = parameters;
-    this.typeLoader = typeLoader;
-    this.context = context;
   }
 
   @Override
@@ -49,10 +48,8 @@ public class JavaDefaultParameterGroupParser implements ParameterGroupModelParse
   }
 
   @Override
-  public List<ParameterModelParser> getParameterParsers() {
-    return unmodifiableList(parameters.stream()
-        .map(p -> new JavaParameterModelParser(p, typeLoader, context))
-        .collect(toList()));
+  protected Stream<ExtensionParameter> doGetParameters() {
+    return parameters.stream();
   }
 
   @Override
