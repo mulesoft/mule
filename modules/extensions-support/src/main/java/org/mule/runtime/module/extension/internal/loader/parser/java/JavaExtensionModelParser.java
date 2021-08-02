@@ -13,7 +13,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
-import static org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor.defaultContributor;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.StackableTypesModelPropertyResolver.newInstance;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionDefinitionParserUtils.parseExternalLibraryModels;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -70,10 +70,10 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
   public List<ConfigurationModelParser> getConfigurationParsers() {
     List<ConfigurationElement> configurations = extensionElement.getConfigurations();
     if (configurations.isEmpty()) {
-      return singletonList(new JavaConfigurationModelParser(extensionElement, extensionElement));
+      return singletonList(new JavaConfigurationModelParser(extensionElement, extensionElement, typeLoader));
     } else {
       return configurations.stream()
-          .map(config -> new JavaConfigurationModelParser(extensionElement, config))
+          .map(config -> new JavaConfigurationModelParser(extensionElement, config, typeLoader))
           .collect(toList());
     }
   }
@@ -111,10 +111,10 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
   }
 
   private List<ParameterDeclarerContributor> getParameterMethodsContributors() {
-    return singletonList(defaultContributor(typeLoader));
+    return singletonList(newInstance(typeLoader));
   }
 
   private List<ParameterDeclarerContributor> getParameterFieldsContributors() {
-    return unmodifiableList(asList(new InfrastructureFieldContributor(), defaultContributor(typeLoader)));
+    return unmodifiableList(asList(new InfrastructureFieldContributor(), newInstance(typeLoader)));
   }
 }

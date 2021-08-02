@@ -27,19 +27,16 @@ import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarat
  */
 final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
-  private static final String CONFIGURATION = "Configuration";
-
   ConfigModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
   }
 
-  void declareConfigurations(ExtensionDeclarer declaration, ExtensionModelParser extensionModelParser, ExtensionLoadingContext context) {
-    extensionModelParser.getConfigurationParsers().forEach(config -> declareConfiguration(declaration, ex));
+  void declareConfigurations(ExtensionDeclarer declarer, ExtensionModelParser extensionModelParser, ExtensionLoadingContext context) {
+    extensionModelParser.getConfigurationParsers().forEach(configParser -> declareConfiguration(declarer, configParser, context));
   }
 
   private void declareConfiguration(ExtensionDeclarer declarer,
                                     ConfigurationModelParser configParser,
-                                    ComponentElement configType,
                                     ExtensionLoadingContext loadingContext) {
 
     ConfigurationDeclarer configurationDeclarer = declarer.withConfig(configParser.getName())

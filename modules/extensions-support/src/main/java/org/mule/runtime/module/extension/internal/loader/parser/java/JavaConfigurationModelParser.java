@@ -14,6 +14,7 @@ import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionDefinitionParserUtils.isParameterGroup;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionDefinitionParserUtils.parseExternalLibraryModels;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -33,6 +34,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -43,11 +45,16 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
 
   private final ExtensionElement extensionElement;
   private final ComponentElement configElement;
+  private final ClassTypeLoader typeLoader;
 
-  public JavaConfigurationModelParser(ExtensionElement extensionElement, ComponentElement configElement) {
+  public JavaConfigurationModelParser(ExtensionElement extensionElement,
+                                      ComponentElement configElement,
+                                      ClassTypeLoader typeLoader) {
+    checkConfigurationIsNotAnOperation(extensionElement, configElement);
+
     this.extensionElement = extensionElement;
     this.configElement = configElement;
-    checkConfigurationIsNotAnOperation(extensionElement, configElement);
+    this.typeLoader = typeLoader;
   }
 
   @Override
@@ -74,7 +81,8 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
       }
 
       if (isParameterGroup(extensionParameter)) {
-        groups.add(new JavaDeclaredParameterGroupModelParser(extensionParameter));
+        ParameterDeclarationContext context = new ParameterDeclarationContext("Configuration", null);
+        groups.add(new JavaDeclaredParameterGroupModelParser(extensionParameter, typeLoader, context));
         continue;
       }
 

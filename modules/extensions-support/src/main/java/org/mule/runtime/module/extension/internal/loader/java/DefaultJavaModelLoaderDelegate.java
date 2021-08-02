@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
-import static org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor.defaultContributor;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -21,18 +20,13 @@ import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor
@@ -43,6 +37,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   protected Class<?> extensionType;
   protected final ExtensionElement extensionElement;
+  protected final ClassTypeLoader typeLoader;
   protected final ExtensionModelParser extensionModelParser;
   protected final String version;
 
@@ -53,17 +48,12 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
 
-
-
   public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
-
+    this.typeLoader = getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
     this.extensionElement = extensionElement;
     extensionModelParser = new JavaExtensionModelParser(extensionElement);
-
-
   }
-
 
 
   public DefaultJavaModelLoaderDelegate(Class<?> extensionType, String version) {
@@ -152,10 +142,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   ConnectionProviderModelLoaderDelegate getConnectionProviderModelLoaderDelegate() {
     return connectionProviderModelLoaderDelegate;
-  }
-
-  ClassTypeLoader getTypeLoader() {
-    return typeLoader;
   }
 
   Class<?> getExtensionType() {

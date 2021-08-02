@@ -7,12 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
@@ -30,6 +33,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -38,17 +42,23 @@ import java.util.Optional;
 public class JavaDeclaredParameterGroupModelParser implements ParameterGroupModelParser {
 
   private final ExtensionParameter groupParameter;
+  private final ClassTypeLoader typeLoader;
+  private final ParameterDeclarationContext context;
   private final Type type;
   private final String groupName;
-  private final List<FieldElement> annotatedParameters;
+  private final List<ExtensionParameter> parameters;
 
-  public JavaDeclaredParameterGroupModelParser(ExtensionParameter groupParameter) {
+  public JavaDeclaredParameterGroupModelParser(ExtensionParameter groupParameter,
+                                               ClassTypeLoader typeLoader,
+                                               ParameterDeclarationContext context) {
     assureValid(groupParameter);
 
     this.groupParameter = groupParameter;
+    this.typeLoader = typeLoader;
+    this.context = context;
     type = groupParameter.getType();
     groupName = fetchGroupName();
-    annotatedParameters = fetchAnnotatedParameter();
+    parameters = fetchAnnotatedParameter();
   }
 
   @Override
@@ -63,8 +73,7 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
 
   @Override
   public List<ParameterModelParser> getParameterParsers() {
-    if (annotatedParameters.isEmpty())
-    return null;
+    return unmodifiableList(parameters.stream().map(JavaParameterModelParser::new).collect(toList()));
   }
 
   @Override
@@ -89,7 +98,7 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
   public Optional<ExclusiveOptionalDescriptor> getExclusiveOptionals() {
     return type.getAnnotation(ExclusiveOptionals.class)
         .map(annotation ->
-            new ExclusiveOptionalDescriptor(annotatedParameters.stream()
+            new ExclusiveOptionalDescriptor(parameters.stream()
                 .filter(f -> !f.isRequired())
                 .map(WithAlias::getAlias)
                 .collect(toSet()), annotation.isOneRequired())
@@ -161,12 +170,12 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
     return DisplayModel.builder().displayName(displayName).build();
   }
 
-  private List<FieldElement> fetchAnnotatedParameter() {
-    List<FieldElement> parameters = type.getAnnotatedFields(Parameter.class, org.mule.sdk.api.annotation.param.Parameter.class);
+  private List<ExtensionParameter> fetchAnnotatedParameter() {
+    List<? extends ExtensionParameter> parameters = type.getAnnotatedFields(Parameter.class, org.mule.sdk.api.annotation.param.Parameter.class);
     if (parameters.isEmpty()) {
       parameters = getFieldsWithGetters(type);
     }
 
-    return parameters;
+    return (List<ExtensionParameter>) parameters;
   }
 }

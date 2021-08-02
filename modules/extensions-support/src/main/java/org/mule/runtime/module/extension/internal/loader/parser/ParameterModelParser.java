@@ -25,6 +25,10 @@ public interface ParameterModelParser {
 
   MetadataType getType();
 
+  boolean isRequired();
+
+  Object getDefaultValue();
+
   ParameterRole getRole();
 
   ExpressionSupport getExpressionSupport();
@@ -34,6 +38,12 @@ public interface ParameterModelParser {
   Optional<ParameterDslConfiguration> getDslConfiguration();
 
   List<StereotypeModel> getAllowedStereotypes();
+
+  boolean isExcludedFromConnectivitySchema();
+
+  boolean isConfigOverride();
+
+  boolean isComponentId();
 
   List<ModelProperty> getAdditionalModelProperties();
 }

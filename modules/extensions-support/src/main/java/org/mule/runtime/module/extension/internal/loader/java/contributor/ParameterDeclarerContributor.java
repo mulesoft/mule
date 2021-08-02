@@ -17,6 +17,7 @@ import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarat
  *
  * @since 4.0
  */
+// TODO: This class should die
 public interface ParameterDeclarerContributor {
 
   /**

@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java.contributor;
+package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -20,6 +21,7 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackableType;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
@@ -32,6 +34,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,11 +45,39 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class StackableTypesParameterContributor implements ParameterDeclarerContributor {
+class StackableTypesModelPropertyResolver {
 
+  public static StackableTypesModelPropertyResolver newInstance(ClassTypeLoader typeLoader) {
+    return StackableTypesModelPropertyResolver.builder(typeLoader)
+        .addType(StackableType
+            .builder(ParameterResolver.class)
+            .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
+            .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
+            .setExpressionBasedResolverFactory((value, expectedType,
+                                                content) -> new ExpressionBasedParameterResolverValueResolver(value, expectedType,
+                fromType(expectedType),
+                content))
+            .build())
+        .addType(StackableType
+            .builder(TypedValue.class)
+            .setStaticResolverFactory(value -> new StaticValueResolver<>(new TypedValue<>(value, DataType.fromObject(value))))
+            .setDelegateResolverFactory(valueResolver -> new TypedValueValueResolverWrapper(valueResolver))
+            .setExpressionBasedResolverFactory((expression, expectedType,
+                                                content) -> new ExpressionTypedValueValueResolver(expression,
+                expectedType, content))
+            .build())
+        .addType(StackableType
+            .builder(Literal.class)
+            .setExpressionBasedResolverFactory((expression, expectedType, content) -> new StaticLiteralValueResolver(expression,
+                expectedType))
+            .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))
+            .build())
+        .build();
+  }
+  
   private final Map<Type, StackableType> stackableTypes;
 
-  private StackableTypesParameterContributor(Map<Type, StackableType> stackableTypes) {
+  private StackableTypesModelPropertyResolver(Map<Type, StackableType> stackableTypes) {
     this.stackableTypes = stackableTypes;
   }
 
@@ -55,28 +86,29 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
    * {@link StackableType wrapper types}
    *
    * @param parameter          {@link ExtensionParameter} with introspected information of the Java parameter
-   * @param declarer           declarer to be enriched
    * @param declarationContext context of the parameter to be declared
    */
-  @Override
-  public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
-                         ParameterDeclarationContext declarationContext) {
+  public List<ModelProperty> resolveStackableProperties(ExtensionParameter parameter, ParameterDeclarationContext declarationContext) {
+    List<ModelProperty> properties = new LinkedList<>();
     LazyValue<StackedTypesModelProperty.Builder> stackedTypesModelPropertyBuilder =
         new LazyValue<>(StackedTypesModelProperty::builder);
 
-    doContribute(parameter, declarationContext, parameter.getType(), stackedTypesModelPropertyBuilder);
-    declarer.ofType(parameter.getType().asMetadataType());
-    stackedTypesModelPropertyBuilder.ifComputed(builder -> declarer.withModelProperty(builder.build()));
+    doResolve(parameter, declarationContext, parameter.getType(), stackedTypesModelPropertyBuilder);
+    stackedTypesModelPropertyBuilder.ifComputed(builder -> properties.add(builder.build()));
+
+    return properties;
   }
 
-  private void doContribute(ExtensionParameter extensionParameter, ParameterDeclarationContext declarationContext,
-                            Type resolvableType, LazyValue<StackedTypesModelProperty.Builder> builder) {
+  private void doResolve(ExtensionParameter extensionParameter,
+                         ParameterDeclarationContext declarationContext,
+                         Type resolvableType,
+                         LazyValue<StackedTypesModelProperty.Builder> builder) {
     getStackableType(resolvableType)
         .ifPresent(stackableType -> {
           List<TypeGeneric> generics = resolvableType.getGenerics();
           if (!generics.isEmpty()) {
             builder.get().addType(stackableType);
-            doContribute(extensionParameter, declarationContext, generics.get(0).getConcreteType(), builder);
+            doResolve(extensionParameter, declarationContext, generics.get(0).getConcreteType(), builder);
           } else {
             throw new IllegalParameterModelDefinitionException(
                                                                format(
@@ -90,7 +122,7 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
 
   }
 
-  Optional<StackableType> getStackableType(Type type) {
+  private Optional<StackableType> getStackableType(Type type) {
     return stackableTypes.entrySet().stream().filter(entry -> entry.getKey().isSameType(type)).map(Map.Entry::getValue)
         .findFirst();
   }
@@ -113,37 +145,8 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
       return this;
     }
 
-    public StackableTypesParameterContributor build() {
-      return new StackableTypesParameterContributor(stackableTypes);
+    public StackableTypesModelPropertyResolver build() {
+      return new StackableTypesModelPropertyResolver(stackableTypes);
     }
-  }
-
-
-  public static StackableTypesParameterContributor defaultContributor(ClassTypeLoader typeLoader) {
-    return StackableTypesParameterContributor.builder(typeLoader)
-        .addType(StackableType
-            .builder(ParameterResolver.class)
-            .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
-            .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
-            .setExpressionBasedResolverFactory((value, expectedType,
-                                                content) -> new ExpressionBasedParameterResolverValueResolver(value, expectedType,
-                                                                                                              fromType(expectedType),
-                                                                                                              content))
-            .build())
-        .addType(StackableType
-            .builder(TypedValue.class)
-            .setStaticResolverFactory(value -> new StaticValueResolver<>(new TypedValue<>(value, DataType.fromObject(value))))
-            .setDelegateResolverFactory(valueResolver -> new TypedValueValueResolverWrapper(valueResolver))
-            .setExpressionBasedResolverFactory((expression, expectedType,
-                                                content) -> new ExpressionTypedValueValueResolver(expression,
-                                                                                                  expectedType, content))
-            .build())
-        .addType(StackableType
-            .builder(Literal.class)
-            .setExpressionBasedResolverFactory((expression, expectedType, content) -> new StaticLiteralValueResolver(expression,
-                                                                                                                     expectedType))
-            .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))
-            .build())
-        .build();
   }
 }

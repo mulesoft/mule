@@ -8,10 +8,14 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
+import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor.getInfrastructureType;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -30,16 +34,22 @@ import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
+import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
@@ -50,11 +60,13 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   private final ExtensionParameter parameter;
   private final MetadataType type;
-  private final List<ModelProperty> modelProperties = new LinkedList<>();
+  private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
+  private Optional<ParameterDslConfiguration> dslConfiguration;
 
   public JavaParameterModelParser(ExtensionParameter parameter) {
     this.parameter = parameter;
     type = parameter.getType().asMetadataType();
+    collectAdditionalModelProperties();
   }
 
   @Override
@@ -70,6 +82,16 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public MetadataType getType() {
     return type;
+  }
+
+  @Override
+  public boolean isRequired() {
+    return parameter.isRequired();
+  }
+
+  @Override
+  public Object getDefaultValue() {
+    return parameter.defaultValue().orElse(null);
   }
 
   @Override
@@ -98,32 +120,69 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public Optional<ParameterDslConfiguration> getDslConfiguration() {
-    return parameter.getAnnotation(ParameterDsl.class).map(parameterDsl ->
-        ParameterDslConfiguration.builder()
-            .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
-            .allowsReferences(parameterDsl.allowReferences())
-            .build());
+    if (dslConfiguration == null) {
+      dslConfiguration = parameter.getAnnotation(ParameterDsl.class).map(parameterDsl ->
+          ParameterDslConfiguration.builder()
+              .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
+              .allowsReferences(parameterDsl.allowReferences())
+              .build());
+    }
+
+    return dslConfiguration;
+  }
+
+  @Override
+  public boolean isConfigOverride() {
+    return parameter.getAnnotation(ConfigOverride.class).isPresent();
+  }
+
+  @Override
+  public boolean isComponentId() {
+    return parameter.getAnnotation(ComponentId.class).isPresent();
   }
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    collectAdditionalModelProperties();
-    return modelProperties;
+    return unmodifiableList(additionalModelProperties);
+  }
+
+  @Override
+  public boolean isExcludedFromConnectivitySchema() {
+    return parameter.getAnnotation(ExcludeFromConnectivitySchema.class).isPresent();
   }
 
   private void collectAdditionalModelProperties() {
-    if (modelProperties.isEmpty()) {
-      collectImplementingTypeProperties();
-      collectNullSafeProperties();
+    additionalModelProperties.add(new ExtensionParameterDescriptorModelProperty(parameter));
+    collectImplementingTypeProperties();
+    collectNullSafeProperties();
+    collectInfrastructureModelProperties();
+    collectStackableTypesModelProperty();
+  }
+
+  private void collectStackableTypesModelProperty() {
+    StackableTypesModelPropertyResolver.newInstance().resolveStackableProperties(parameter, null)
+        .forEach(additionalModelProperties::add);
+  }
+
+  private void collectInfrastructureModelProperties() {
+    if (parameter instanceof FieldElement) {
+      getInfrastructureType(parameter.getType()).ifPresent(infrastructureType -> {
+        if (!isBlank(infrastructureType.getName())) {
+          additionalModelProperties.add(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
+          getQName(infrastructureType.getName()).ifPresent(additionalModelProperties::add);
+          InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName())
+              .ifPresent(dsl -> dslConfiguration = Optional.of(dsl));
+        }
+      });
     }
   }
 
   private void collectImplementingTypeProperties() {
     parameter.getDeclaringElement().ifPresent(element -> {
       if (element instanceof Field) {
-        modelProperties.add(new DeclaringMemberModelProperty(((Field) element)));
+        additionalModelProperties.add(new DeclaringMemberModelProperty(((Field) element)));
       } else {
-        modelProperties.add(new ImplementingParameterModelProperty((java.lang.reflect.Parameter) element));
+        additionalModelProperties.add(new ImplementingParameterModelProperty((java.lang.reflect.Parameter) element));
       }
     });
   }
@@ -217,9 +276,9 @@ public class JavaParameterModelParser implements ParameterModelParser {
         }
       });
 
-      modelProperties.add(new NullSafeModelProperty(nullSafeType));
+      additionalModelProperties.add(new NullSafeModelProperty(nullSafeType));
       if (hasDefaultOverride) {
-        modelProperties.add(new DefaultImplementingTypeModelProperty(nullSafeType));
+        additionalModelProperties.add(new DefaultImplementingTypeModelProperty(nullSafeType));
       }
     }
   }
