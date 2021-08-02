@@ -119,7 +119,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(Object.class))
         .withObjectFactoryType(ReturnDataObjectFactory.class)
         .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
-        .withSetterParameterDefinition("content", fromTextContent().build())
+        .withSetterParameterDefinition("content", fromSimpleParameter("content").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition
