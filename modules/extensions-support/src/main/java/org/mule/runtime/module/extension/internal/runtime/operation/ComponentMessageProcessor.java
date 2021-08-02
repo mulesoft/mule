@@ -104,6 +104,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -204,6 +205,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected final String target;
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
+  protected final MessageProcessorChain nestedChain;
 
   private final ReflectionCache reflectionCache;
   private final ResultTransformer resultTransformer;
@@ -263,6 +265,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    ResolverSet resolverSet,
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
+                                   MessageProcessorChain nestedChain,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
@@ -275,6 +278,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.targetValue = targetValue;
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
+    this.nestedChain = nestedChain;
     this.reflectionCache = reflectionCache;
     this.resultTransformer = resultTransformer;
     this.hasNestedChain = hasNestedChain(componentModel);
@@ -592,6 +596,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       componentExecutor = createComponentExecutor(componentDecoratorFactory);
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
+
+      if (nestedChain != null) {
+        initialiseIfNeeded(nestedChain, muleContext);
+      }
 
       ComponentLocation componentLocation = getLocation();
       if (componentLocation != null) {
@@ -1044,6 +1052,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public void doStart() throws MuleException {
     startIfNeeded(componentExecutor);
 
+    if (nestedChain != null) {
+      startIfNeeded(nestedChain);
+    }
+
     if (ownedProcessingStrategy) {
       LOGGER.debug("Starting own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       startIfNeeded(processingStrategy);
@@ -1060,6 +1072,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public void doStop() throws MuleException {
+    if (nestedChain != null) {
+      stopIfNeeded(nestedChain);
+    }
     stopIfNeeded(componentExecutor);
     LOGGER.debug("Stopping inner flux of component '{}'...", processorPath);
     stopInnerFlux();
@@ -1100,6 +1115,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public void doDispose() {
+    if (nestedChain != null) {
+      disposeIfNeeded(nestedChain, LOGGER);
+    }
     disposeIfNeeded(componentExecutor, LOGGER);
     if (ownedProcessingStrategy) {
       LOGGER.debug("Disposing own processing strategy ({}) of component '{}'...", ownedProcessingStrategy, processorPath);
