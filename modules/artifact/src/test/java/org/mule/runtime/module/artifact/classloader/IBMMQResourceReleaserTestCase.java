@@ -15,16 +15,10 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +26,6 @@ import java.util.logging.Level;
 
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.getAllStackTraces;
-import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -58,12 +51,9 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   private final static String THREADLOCAL_MAP_TABLE_CLASS = "java.lang.ThreadLocal$ThreadLocalMap";
 
 
-
-  private final static String IBM_MQ_MBEAN_DOMAIN = "IBM MQ";
-
   String driverFile;
   private ClassLoaderLookupPolicy testLookupPolicy;
-  private static final Logger LOGGER = LoggerFactory.getLogger(IBMMQResourceReleaserTestCase.class);
+
 
   //Parameterized
   public IBMMQResourceReleaserTestCase(String driverFile) {
@@ -124,18 +114,12 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
       //Driver loaded... should clean on dispose.
       assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(true));
 
-      //there should be two MBeans (Trace and Property Control)
-      assertThat(countMBeans(artifactClassLoader), is(2));
       //TraceController is not null
       assertThat(getTraceController(artifactClassLoader), is(notNullValue()));
 
 
       artifactClassLoader.dispose();
 
-
-      //No MBeans for this ClassLoader
-      //The mBeanServer returns null for this object in test mode.
-      //assertThat(countMBeans(artifactClassLoader), is(0));
       //JUL Known Levels
       assertThat(countJULKnownLevels(artifactClassLoader), is(0));
       //jmqiEnv of traceController should be null
@@ -159,9 +143,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     threadLocalsField.setAccessible(true);
     Field inheritableThreadLocalsField = getField(Thread.class, INHERITABLE_THREADLOCALS_FIELD, false);
 
-    if (inheritableThreadLocalsField != null) {
-      inheritableThreadLocalsField.setAccessible(true);
-    }
+    inheritableThreadLocalsField.setAccessible(true);
 
     Class<?> threadLocalMapTableClass = loadClass(THREADLOCAL_MAP_TABLE_CLASS, artifactClassLoader);
     Field threadLocalMapTableField = getField(threadLocalMapTableClass, "table", false);
@@ -230,16 +212,6 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     return traceControllerField.get(null);
   }
 
-  private int countMBeans(ClassLoader artifactClassLoader) throws Exception {
-    MBeanServer mBeanServer = getPlatformMBeanServer();
-    int counter = 0;
-    for (ObjectInstance beanInstance : mBeanServer.queryMBeans(null, null)) {
-      if (beanInstance.getClassName().startsWith("com.ibm.msg")) {
-        counter++;
-      }
-    }
-    return counter;
-  }
 
   private int countJULKnownLevels(ClassLoader artifactClassLoader) throws Exception {
     int counter = 0;
