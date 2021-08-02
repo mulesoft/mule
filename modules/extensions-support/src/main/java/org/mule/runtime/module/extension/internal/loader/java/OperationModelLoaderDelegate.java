@@ -41,6 +41,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 
@@ -72,37 +73,21 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
                          HasOperationDeclarer declarer,
-                         WithOperationContainers operationContainers,
-                         ExtensionLoadingContext loaderContext) {
-    operationContainers.getOperationContainers()
-        .forEach(operationContainer -> declareOperations(extensionDeclarer, declarer, operationContainer, loaderContext));
-  }
-
-  void declareOperations(ExtensionDeclarer extensionDeclarer,
-                         HasOperationDeclarer declarer,
-                         OperationContainerElement operationsContainer,
-                         ExtensionLoadingContext loaderContext) {
-    declareOperations(extensionDeclarer, declarer, operationsContainer,
-                      operationsContainer.getOperations(), true, loaderContext);
-  }
-
-  void declareOperations(ExtensionDeclarer extensionDeclarer,
-                         HasOperationDeclarer ownerDeclarer,
-                         OperationContainerElement methodOwnerClass,
-                         List<OperationElement> operations,
-                         boolean supportsConfig,
+                         List<OperationModelParser> operations,
                          ExtensionLoadingContext loaderContext) {
 
+    operations.stream()
+        .filter(operation -> !operation.isIgnored())
+        .forEach(parser -> {
+          if (parser.isScope()) {
+
+        });
     for (OperationElement operationMethod : operations) {
 
       if (isIgnored(operationMethod, loaderContext)) {
         continue;
       }
 
-      OperationContainerElement methodOwner = operationMethod.getEnclosingType();
-
-      OperationContainerElement enclosingType = methodOwnerClass != null ? methodOwnerClass : methodOwner;
-      checkOperationIsNotAnExtension(methodOwner);
 
       final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(operationMethod);
       final Optional<ExtensionParameter> connectionParameter = loader.getConnectionParameter(operationMethod);
@@ -244,12 +229,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     operationMethod.getAnnotation(Execution.class).ifPresent(a -> operationDeclarer.withExecutionType(a.value()));
   }
 
-  private void checkOperationIsNotAnExtension(OperationContainerElement operationType) {
-    if (operationType.isAssignableFrom(getExtensionElement()) || getExtensionElement().isAssignableFrom(operationType)) {
-      throw new IllegalOperationModelDefinitionException(
-                                                         format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
-                                                                operationType.getName(), getExtensionElement().getName()));
-    }
+
   }
 
   private void addPagedOperationModelProperty(MethodElement operationMethod, OperationDeclarer operation,

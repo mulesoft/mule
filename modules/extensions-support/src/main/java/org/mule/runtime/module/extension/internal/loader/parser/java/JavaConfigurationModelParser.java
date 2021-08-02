@@ -11,8 +11,8 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionDefinitionParserUtils.isParameterGroup;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionDefinitionParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.isParameterGroup;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -33,6 +34,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Configura
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
@@ -46,15 +48,18 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
   private final ExtensionElement extensionElement;
   private final ComponentElement configElement;
   private final ClassTypeLoader typeLoader;
+  private final ExtensionLoadingContext loadingContext;
 
   public JavaConfigurationModelParser(ExtensionElement extensionElement,
                                       ComponentElement configElement,
-                                      ClassTypeLoader typeLoader) {
+                                      ClassTypeLoader typeLoader,
+                                      ExtensionLoadingContext loadingContext) {
     checkConfigurationIsNotAnOperation(extensionElement, configElement);
 
     this.extensionElement = extensionElement;
     this.configElement = configElement;
     this.typeLoader = typeLoader;
+    this.loadingContext = loadingContext;
   }
 
   @Override
@@ -72,23 +77,37 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
   @Override
   public List<ParameterGroupModelParser> getParameterGroupParsers() {
     List<ExtensionParameter> parameters = configElement.getParameters();
-    checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, Config.class, MetadataKeyId.class);
+    checkAnnotationsNotUsedMoreThanOnce(parameters,
+        Connection.class,
+        org.mule.sdk.api.annotation.param.Connection.class,
+        Config.class,
+        org.mule.sdk.api.annotation.param.Config.class,
+        MetadataKeyId.class,
+        org.mule.sdk.api.annotation.metadata.MetadataKeyId.class);
 
     List<ParameterGroupModelParser> groups = new LinkedList<>();
+    List<ExtensionParameter> defaultGroupParams = new LinkedList<>();
+    final ParameterDeclarationContext context = new ParameterDeclarationContext("Configuration", null);
+
     for (ExtensionParameter extensionParameter : parameters) {
       if (!extensionParameter.shouldBeAdvertised()) {
         continue;
       }
 
       if (isParameterGroup(extensionParameter)) {
-        ParameterDeclarationContext context = new ParameterDeclarationContext("Configuration", null);
         groups.add(new JavaDeclaredParameterGroupModelParser(extensionParameter, typeLoader, context));
-        continue;
+      } else {
+        defaultGroupParams.add(extensionParameter);
       }
-
     }
 
+    groups.add(0, new JavaDefaultParameterGroupParser(defaultGroupParams, typeLoader, context));
     return unmodifiableList(groups);
+  }
+
+  @Override
+  public List<OperationModelParser> getOperationParsers() {
+    return JavaExtensionModelParserUtils.getOperationParsers(extensionElement, configElement, loadingContext, true);
   }
 
   @Override
@@ -96,7 +115,8 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
     Class<?> extensionClass = extensionElement.getDeclaringClass().orElse(Object.class);
     Class<?> configClass = configElement.getDeclaringClass().orElse(Object.class);
 
-    ClassLoader classLoader = extensionClass.getClassLoader() != null ? extensionClass.getClassLoader()
+    ClassLoader classLoader = extensionClass.getClassLoader() != null
+        ? extensionClass.getClassLoader()
         : Thread.currentThread().getContextClassLoader();
 
     TypeAwareConfigurationFactory typeAwareConfigurationFactory =

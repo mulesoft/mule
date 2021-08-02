@@ -7,14 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.StackableTypesModelPropertyResolver.newInstance;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionDefinitionParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.Category;
@@ -22,11 +20,9 @@ import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.java.ParameterModelsLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
@@ -41,14 +37,12 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
 
   private final ExtensionElement extensionElement;
   private final ClassTypeLoader typeLoader;
-  private final ParameterModelsLoaderDelegate fieldParametersLoader;
-  private final ParameterModelsLoaderDelegate methodParametersLoader;
+  private final ExtensionLoadingContext loadingContext;
 
-  public JavaExtensionModelParser(ExtensionElement extensionElement) {
+  public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this.extensionElement = extensionElement;
     this.typeLoader = getDefault().createTypeLoader(currentThread().getContextClassLoader());
-    this.fieldParametersLoader = new ParameterModelsLoaderDelegate(getParameterFieldsContributors(), typeLoader);
-    this.methodParametersLoader = new ParameterModelsLoaderDelegate(getParameterMethodsContributors(), typeLoader);
+    this.loadingContext = loadingContext;
   }
 
   @Override
@@ -70,10 +64,10 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
   public List<ConfigurationModelParser> getConfigurationParsers() {
     List<ConfigurationElement> configurations = extensionElement.getConfigurations();
     if (configurations.isEmpty()) {
-      return singletonList(new JavaConfigurationModelParser(extensionElement, extensionElement, typeLoader));
+      return singletonList(new JavaConfigurationModelParser(extensionElement, extensionElement, typeLoader, loadingContext));
     } else {
       return configurations.stream()
-          .map(config -> new JavaConfigurationModelParser(extensionElement, config, typeLoader))
+          .map(config -> new JavaConfigurationModelParser(extensionElement, config, typeLoader, loadingContext))
           .collect(toList());
     }
   }
@@ -108,13 +102,5 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
         .ifPresent(extensionClass -> properties.add(new ImplementingTypeModelProperty(extensionClass)));
 
     return unmodifiableList(properties);
-  }
-
-  private List<ParameterDeclarerContributor> getParameterMethodsContributors() {
-    return singletonList(newInstance(typeLoader));
-  }
-
-  private List<ParameterDeclarerContributor> getParameterFieldsContributors() {
-    return unmodifiableList(asList(new InfrastructureFieldContributor(), newInstance(typeLoader)));
   }
 }

@@ -17,6 +17,7 @@ import static org.mule.runtime.extension.internal.loader.util.InfrastructureType
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor.getInfrastructureType;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -48,6 +49,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
@@ -61,10 +63,14 @@ public class JavaParameterModelParser implements ParameterModelParser {
   private final ExtensionParameter parameter;
   private final MetadataType type;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
+  private final ClassTypeLoader typeLoader;
+  private final ParameterDeclarationContext context;
   private Optional<ParameterDslConfiguration> dslConfiguration;
 
-  public JavaParameterModelParser(ExtensionParameter parameter) {
+  public JavaParameterModelParser(ExtensionParameter parameter, ClassTypeLoader typeLoader, ParameterDeclarationContext context) {
     this.parameter = parameter;
+    this.typeLoader = typeLoader;
+    this.context = context;
     type = parameter.getType().asMetadataType();
     collectAdditionalModelProperties();
   }
@@ -160,7 +166,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   private void collectStackableTypesModelProperty() {
-    StackableTypesModelPropertyResolver.newInstance().resolveStackableProperties(parameter, null)
+    StackableTypesModelPropertyResolver.newInstance(typeLoader).resolveStackableProperties(parameter, null)
         .forEach(additionalModelProperties::add);
   }
 

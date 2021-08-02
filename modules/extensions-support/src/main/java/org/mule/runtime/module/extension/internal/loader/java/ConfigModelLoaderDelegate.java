@@ -31,7 +31,9 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     super(delegate);
   }
 
-  void declareConfigurations(ExtensionDeclarer declarer, ExtensionModelParser extensionModelParser, ExtensionLoadingContext context) {
+  void declareConfigurations(ExtensionDeclarer declarer,
+                             ExtensionModelParser extensionModelParser,
+                             ExtensionLoadingContext context) {
     extensionModelParser.getConfigurationParsers().forEach(configParser -> declareConfiguration(declarer, configParser, context));
   }
 
@@ -50,10 +52,9 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
     configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
 
-    ParameterDeclarationContext context = new ParameterDeclarationContext(CONFIGURATION, configurationDeclarer.getDeclaration());
-    loader.getFieldParametersLoader().declare(configurationDeclarer, configType.getParameters(), context);
+    loader.getParameterModelsLoaderDelegate().declare(configurationDeclarer, configParser.getParameterGroupParsers());
 
-    getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configType, loadingContext);
+    getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configParser.getOperationParsers(), loadingContext);
     getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configType, loadingContext);
     getFunctionModelLoaderDelegate().declareFunctions(declarer, configurationDeclarer, configType, loadingContext);
     getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configType);

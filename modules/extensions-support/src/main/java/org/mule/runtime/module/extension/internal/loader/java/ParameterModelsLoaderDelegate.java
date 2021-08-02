@@ -8,43 +8,18 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExclusiveParametersDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasNestedComponentsDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
-import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
-import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
-import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
-import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
-import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
-import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
-import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,8 +27,7 @@ public final class ParameterModelsLoaderDelegate {
 
 
   public List<ParameterDeclarer> declare(HasParametersDeclarer component,
-                                         List<ParameterGroupModelParser> groupParsers,
-                                         ParameterDeclarationContext declarationContext) {
+                                         List<ParameterGroupModelParser> groupParsers) {
 
     final List<ParameterDeclarer> declarerList = new LinkedList<>();
     groupParsers.forEach(group -> {
@@ -102,8 +76,6 @@ public final class ParameterModelsLoaderDelegate {
 
         extensionParameter.getDslConfiguration().ifPresent(parameter::withDsl);
         extensionParameter.getAdditionalModelProperties().forEach(parameter::withModelProperty);
-
-        contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter, declarationContext));
         declarerList.add(parameter);
       });
 

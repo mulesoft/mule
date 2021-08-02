@@ -38,7 +38,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   protected Class<?> extensionType;
   protected final ExtensionElement extensionElement;
   protected final ClassTypeLoader typeLoader;
-  protected final ExtensionModelParser extensionModelParser;
   protected final String version;
 
   private final ConfigModelLoaderDelegate configLoaderDelegate = new ConfigModelLoaderDelegate(this);
@@ -47,12 +46,12 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final SourceModelLoaderDelegate sourceModelLoaderDelegate = new SourceModelLoaderDelegate(this);
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
+  private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate = new ParameterModelsLoaderDelegate();
 
   public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
     this.typeLoader = getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
     this.extensionElement = extensionElement;
-    extensionModelParser = new JavaExtensionModelParser(extensionElement);
   }
 
 
@@ -66,6 +65,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
+    ExtensionModelParser extensionModelParser = new JavaExtensionModelParser(extensionElement, context);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
             .named(extensionModelParser.getName())
@@ -103,27 +103,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     return !supportsConfig && Stream.of(parameters).anyMatch(Optional::isPresent);
   }
 
-  Declarer selectDeclarerBasedOnConfig(ExtensionDeclarer extensionDeclarer,
-                                       Declarer declarer,
-                                       Optional<ExtensionParameter>... parameters) {
-
-    for (Optional<ExtensionParameter> parameter : parameters) {
-      if (parameter.isPresent()) {
-        return declarer;
-      }
-    }
-
-    return extensionDeclarer;
-  }
-
-  Optional<ExtensionParameter> getConfigParameter(WithParameters element) {
-    return element.getParametersAnnotatedWith(Config.class).stream().findFirst();
-  }
-
-  Optional<ExtensionParameter> getConnectionParameter(WithParameters element) {
-    return element.getParametersAnnotatedWith(Connection.class).stream().findFirst();
-  }
-
   ConfigModelLoaderDelegate getConfigLoaderDelegate() {
     return configLoaderDelegate;
   }
@@ -144,19 +123,15 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     return connectionProviderModelLoaderDelegate;
   }
 
+  public ParameterModelsLoaderDelegate getParameterModelsLoaderDelegate() {
+    return parameterModelsLoaderDelegate;
+  }
+
   Class<?> getExtensionType() {
     return extensionElement.getDeclaringClass().orElse(null);
   }
 
   ExtensionElement getExtensionElement() {
     return extensionElement;
-  }
-
-  protected ParameterModelsLoaderDelegate getFieldParametersLoader() {
-    return fieldParametersLoader;
-  }
-
-  protected ParameterModelsLoaderDelegate getMethodParametersLoader() {
-    return methodParametersLoader;
   }
 }

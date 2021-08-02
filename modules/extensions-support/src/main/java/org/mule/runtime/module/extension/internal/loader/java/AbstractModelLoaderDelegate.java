@@ -86,10 +86,6 @@ abstract class AbstractModelLoaderDelegate {
     return loader.getFunctionModelLoaderDelegate();
   }
 
-  ClassTypeLoader getTypeLoader() {
-    return loader.getTypeLoader();
-  }
-
   void processComponentConnectivity(ExecutableComponentDeclarer componentDeclarer, WithParameters component, WithAlias alias) {
     final List<ExtensionParameter> connectionParameters = component.getParametersAnnotatedWith(Connection.class);
     if (connectionParameters.isEmpty()) {

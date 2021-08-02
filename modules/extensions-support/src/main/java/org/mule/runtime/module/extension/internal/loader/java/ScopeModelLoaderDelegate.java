@@ -11,10 +11,12 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.processNonBlockingOperation;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
@@ -24,6 +26,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.OperationContainer
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
@@ -43,71 +46,53 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String SCOPE = "Scope";
 
-  private final Map<MethodElement, OperationDeclarer> operationDeclarers = new HashMap<>();
+  private final Map<OperationModelParser, OperationDeclarer> operationDeclarers = new HashMap<>();
 
   ScopeModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
   }
 
   void declareScope(ExtensionDeclarer extensionDeclarer,
-                    HasOperationDeclarer ownerDeclarer,
-                    OperationContainerElement enclosingType,
-                    OperationElement scopeMethod,
-                    Optional<ExtensionParameter> configParameter,
-                    Optional<ExtensionParameter> connectionParameter) {
+                    HasOperationDeclarer declarer,
+                    OperationModelParser parser,
+                    ExtensionLoadingContext loaderContext) {
 
-    HasOperationDeclarer actualDeclarer =
-        (HasOperationDeclarer) loader.selectDeclarerBasedOnConfig(extensionDeclarer, (Declarer) ownerDeclarer,
-                                                                  configParameter, connectionParameter);
+    HasOperationDeclarer actualDeclarer = parser.hasConfig() || parser.isConnected()
+        ? declarer
+        : extensionDeclarer;
 
-    checkDefinition(!configParameter.isPresent(),
-                    format("Scope '%s' requires a config, but that is not allowed, remove such parameter",
-                           scopeMethod.getName()));
+    checkDefinition(!parser.hasConfig(),
+        format("Scope '%s' requires a config, but that is not allowed, remove such parameter",
+            parser.getName()));
 
-    checkDefinition(!connectionParameter.isPresent(),
-                    format("Scope '%s' requires a connection, but that is not allowed, remove such parameter",
-                           scopeMethod.getName()));
+    checkDefinition(!parser.isConnected(),
+        format("Scope '%s' requires a connection, but that is not allowed, remove such parameter",
+            parser.getName()));
 
-    checkDefinition(isNonBlocking(scopeMethod),
-                    format("Scope '%s' does not declare a '%s' parameter. One is required for all operations "
-                        + "that receive and execute a Chain of other components",
-                           scopeMethod.getAlias(),
-                           CompletionCallback.class.getSimpleName()));
 
-    if (operationDeclarers.containsKey(scopeMethod)) {
-      actualDeclarer.withOperation(operationDeclarers.get(scopeMethod));
+    if (operationDeclarers.containsKey(parser)) {
+      actualDeclarer.withOperation(operationDeclarers.get(parser));
       return;
     }
 
-    final OperationDeclarer scope = actualDeclarer.withOperation(scopeMethod.getAlias());
-    scope.withModelProperty(new ExtensionOperationDescriptorModelProperty(scopeMethod));
+    final OperationDeclarer scope = actualDeclarer.withOperation(parser.getName());
+    parser.getAdditionalModelProperties().forEach(scope::withModelProperty);
 
-    Optional<Method> method = scopeMethod.getMethod();
-    Optional<Class<?>> declaringClass = enclosingType.getDeclaringClass();
-
-    if (method.isPresent() && declaringClass.isPresent()) {
-      scope.withModelProperty(new ImplementingMethodModelProperty(method.get()))
-          .withModelProperty(new CompletableComponentExecutorModelProperty(new CompletableOperationExecutorFactory(declaringClass
-              .get(),
-                                                                                                                   method
-                                                                                                                       .get())));
-    }
-
-    processMimeType(scope, scopeMethod);
+    parser.getMediaTypeModelProperty().ifPresent(scope::withModelProperty);
     processNonBlockingOperation(scope, scopeMethod, false);
 
     List<ExtensionParameter> processorChain =
         scopeMethod.getParameters().stream().filter(ModelLoaderUtils::isProcessorChain).collect(toList());
 
     checkDefinition(processorChain.size() <= 1,
-                    format("Scope '%s' declares too many parameters of type '%s', only one input of this kind is supported."
-                        + "Offending parameters are: %s",
-                           scopeMethod.getAlias(),
-                           Chain.class.getSimpleName(),
-                           processorChain.stream().map(ExtensionParameter::getName).collect(toList())));
+        format("Scope '%s' declares too many parameters of type '%s', only one input of this kind is supported."
+                + "Offending parameters are: %s",
+            scopeMethod.getAlias(),
+            Chain.class.getSimpleName(),
+            processorChain.stream().map(ExtensionParameter::getName).collect(toList())));
 
     declareParameters(scope, scopeMethod.getParameters(), scopeMethod.getEnclosingType().getParameters(),
-                      new ParameterDeclarationContext(SCOPE, scope.getDeclaration()));
+        new ParameterDeclarationContext(SCOPE, scope.getDeclaration()));
 
     loader.addExceptionEnricher(scopeMethod, scope);
 

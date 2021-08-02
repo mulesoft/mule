@@ -73,7 +73,9 @@ public class JavaDeclaredParameterGroupModelParser implements ParameterGroupMode
 
   @Override
   public List<ParameterModelParser> getParameterParsers() {
-    return unmodifiableList(parameters.stream().map(JavaParameterModelParser::new).collect(toList()));
+    return unmodifiableList(parameters.stream()
+        .map(p -> new JavaParameterModelParser(p, typeLoader, context))
+        .collect(toList()));
   }
 
   @Override

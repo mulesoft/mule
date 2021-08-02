@@ -20,5 +20,7 @@ public interface ConfigurationModelParser {
 
   List<ParameterGroupModelParser> getParameterGroupParsers();
 
+  List<OperationModelParser> getOperationParsers();
+
   List<ModelProperty> getAdditionalModelProperties();
 }
