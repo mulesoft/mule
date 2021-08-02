@@ -6,12 +6,20 @@
  */
 package org.mule.runtime.core.internal.util.splash;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.internal.util.splash.SplashScreen.CREDENTIAL_MASK;
+
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SplashScreenTestCase extends AbstractMuleContextTestCase {
 
@@ -31,6 +39,28 @@ public class SplashScreenTestCase extends AbstractMuleContextTestCase {
 
     // Only lightly validate on size because content changes, e.g. server start time-stamp
     assertEquals("Splash-screen sizes differ, ", initialStartBoilerPlate.length(), subsequentStartBoilerPlate.length());
+  }
+
+  @Test
+  public void splashScreenWithMaskedProperties() throws Exception {
+    SplashScreen serverStartupSplashScreen = new ServerStartupSplashScreen();
+    Map<String, String> properties = new HashMap<>();
+    properties.put("someProp", "someValue");
+    properties.put("someKey", "somePasswordSuperSensitive");
+    properties.put("key", "someKey");
+    properties.put("password", "password... it shouldn't be seen");
+    properties.put("anotherPassWoRD", "please, don't");
+    serverStartupSplashScreen.listItems(properties, "Mule properties");
+    String splash = serverStartupSplashScreen.toString();
+    assertThat(splash, containsString("someProp = someValue"));
+    assertThat(splash, not(containsString("someKey = somePasswordSuperSensitive")));
+    assertThat(splash, containsString("someKey = " + CREDENTIAL_MASK));
+    assertThat(splash, not(containsString("key = someKey")));
+    assertThat(splash, containsString("key = " + CREDENTIAL_MASK));
+    assertThat(splash, not(containsString("password = password... it shouldn't be seen")));
+    assertThat(splash, containsString("password = " + CREDENTIAL_MASK));
+    assertThat(splash, not(containsString("anotherPassWoRD = please, don't")));
+    assertThat(splash, containsString("anotherPassWoRD = " + CREDENTIAL_MASK));
   }
 
 }
