@@ -8,12 +8,9 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-reconnection-connection",
+    "artifactId": "mule-connector-reconnection-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -26,14 +23,16 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "reconnection",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   },
   {
@@ -45,12 +44,9 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-reconnection-connection",
+    "artifactId": "mule-connector-reconnection-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -63,14 +59,16 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "long-disconnection",
       "system": "reconnection",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   }
 ]

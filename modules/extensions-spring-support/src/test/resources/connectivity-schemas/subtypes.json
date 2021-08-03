@@ -8,12 +8,9 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-subtypesconnector-connection",
+    "artifactId": "mule-connector-subtypesconnector-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -23,13 +20,13 @@
         "Connection": {
           "mapping": {
             "abstractShape": {
-              "range": "org.mule.test.subtypes.extension.ParentShape",
+              "range": "ParentShape",
               "mandatory": true
             }
           },
           "classTerm": "connectivity.Connection"
         },
-        "org.mule.test.subtypes.extension.ParentShape": {
+        "ParentShape": {
           "mapping": {
             "area": {
               "range": "number",
@@ -39,14 +36,16 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "Subtypes",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   }
 ]

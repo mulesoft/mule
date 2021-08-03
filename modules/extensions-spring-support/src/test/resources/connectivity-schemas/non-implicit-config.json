@@ -8,12 +8,9 @@
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-non-implicit-connection",
+    "artifactId": "mule-connector-non-implicit-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -35,14 +32,16 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "Non Implicit",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   }
 ]
