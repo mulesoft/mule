@@ -2,25 +2,22 @@
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-semantic-terms",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-semantic-terms-apikeyauthenticationconnection",
+    "artifactId": "mule-connector-semantic-terms-api-key-authentication-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
         }
       },
       "nodeMappings": {
-        "org.mule.test.semantic.extension.ProxyConfiguration": {
+        "ProxyConfiguration": {
           "mapping": {
             "password": {
               "propertyTerm": "connectivity.password",
@@ -89,7 +86,7 @@
             },
             "proxyConfiguration": {
               "propertyTerm": "connectivity.proxyConfiguration",
-              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "range": "ProxyConfiguration",
               "mandatory": true
             }
           },
@@ -97,38 +94,37 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "api-key",
       "system": "Semantic Terms",
-      "type": "connectivity.ApiKeyAuthenticationConnection"
+      "type": "ApiKeyAuthenticationConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-semantic-terms",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-semantic-terms-basicauthenticationconnection",
+    "artifactId": "mule-connector-semantic-terms-basic-authentication-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
         }
       },
       "nodeMappings": {
-        "org.mule.test.semantic.extension.ProxyConfiguration": {
+        "ProxyConfiguration": {
           "mapping": {
             "password": {
               "propertyTerm": "connectivity.password",
@@ -197,7 +193,7 @@
             },
             "proxyConfiguration": {
               "propertyTerm": "connectivity.proxyConfiguration",
-              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "range": "ProxyConfiguration",
               "mandatory": true
             },
             "username": {
@@ -210,38 +206,37 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "basic-auth",
       "system": "Semantic Terms",
-      "type": "connectivity.BasicAuthenticationConnection"
+      "type": "BasicAuthenticationConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-semantic-terms",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-semantic-terms-apikeyauthenticationconnection",
+    "artifactId": "mule-connector-semantic-terms-api-key-authentication-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
         }
       },
       "nodeMappings": {
-        "org.mule.test.semantic.extension.ProxyConfiguration": {
+        "ProxyConfiguration": {
           "mapping": {
             "password": {
               "propertyTerm": "connectivity.password",
@@ -315,7 +310,7 @@
             },
             "proxyConfiguration": {
               "propertyTerm": "connectivity.proxyConfiguration",
-              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "range": "ProxyConfiguration",
               "mandatory": true
             }
           },
@@ -323,38 +318,37 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "client-secret",
       "system": "Semantic Terms",
-      "type": "connectivity.ApiKeyAuthenticationConnection"
+      "type": "ApiKeyAuthenticationConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-semantic-terms",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-semantic-terms-connection",
+    "artifactId": "mule-connector-semantic-terms-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
         }
       },
       "nodeMappings": {
-        "org.mule.test.semantic.extension.ProxyConfiguration": {
+        "ProxyConfiguration": {
           "mapping": {
             "password": {
               "propertyTerm": "connectivity.password",
@@ -453,7 +447,7 @@
             },
             "proxyConfiguration": {
               "propertyTerm": "connectivity.proxyConfiguration",
-              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "range": "ProxyConfiguration",
               "mandatory": true
             }
           },
@@ -461,38 +455,37 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "custom",
       "system": "Semantic Terms",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-semantic-terms",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-semantic-terms-digestauthenticationconnection",
+    "artifactId": "mule-connector-semantic-terms-digest-authentication-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
         }
       },
       "nodeMappings": {
-        "org.mule.test.semantic.extension.ProxyConfiguration": {
+        "ProxyConfiguration": {
           "mapping": {
             "password": {
               "propertyTerm": "connectivity.password",
@@ -556,7 +549,7 @@
             },
             "proxyConfiguration": {
               "propertyTerm": "connectivity.proxyConfiguration",
-              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "range": "ProxyConfiguration",
               "mandatory": true
             }
           },
@@ -564,38 +557,37 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "digest",
       "system": "Semantic Terms",
-      "type": "connectivity.DigestAuthenticationConnection"
+      "type": "DigestAuthenticationConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-semantic-terms",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-semantic-terms-kerberosauthenticationconnection",
+    "artifactId": "mule-connector-semantic-terms-kerberos-authentication-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
         }
       },
       "nodeMappings": {
-        "org.mule.test.semantic.extension.ProxyConfiguration": {
+        "ProxyConfiguration": {
           "mapping": {
             "password": {
               "propertyTerm": "connectivity.password",
@@ -659,7 +651,7 @@
             },
             "proxyConfiguration": {
               "propertyTerm": "connectivity.proxyConfiguration",
-              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "range": "ProxyConfiguration",
               "mandatory": true
             }
           },
@@ -667,38 +659,37 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "kerberos",
       "system": "Semantic Terms",
-      "type": "connectivity.KerberosAuthenticationConnection"
+      "type": "KerberosAuthenticationConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-semantic-terms",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-semantic-terms-unsecureconnection",
+    "artifactId": "mule-connector-semantic-terms-unsecure-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
         }
       },
       "nodeMappings": {
-        "org.mule.test.semantic.extension.ProxyConfiguration": {
+        "ProxyConfiguration": {
           "mapping": {
             "password": {
               "propertyTerm": "connectivity.password",
@@ -762,7 +753,7 @@
             },
             "proxyConfiguration": {
               "propertyTerm": "connectivity.proxyConfiguration",
-              "range": "org.mule.test.semantic.extension.ProxyConfiguration",
+              "range": "ProxyConfiguration",
               "mandatory": true
             }
           },
@@ -770,14 +761,16 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "unsecured",
       "system": "Semantic Terms",
-      "type": "connectivity.UnsecureConnection"
+      "type": "UnsecureConnection"
     }
   }
 ]
