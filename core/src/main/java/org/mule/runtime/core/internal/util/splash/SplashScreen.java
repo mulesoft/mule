@@ -7,14 +7,20 @@
 package org.mule.runtime.core.internal.util.splash;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.System.getProperty;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
+import com.google.common.collect.ImmutableList;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +42,11 @@ public abstract class SplashScreen {
   public static Logger LOGGER = LoggerFactory.getLogger(SplashScreen.class);
 
   public static final String RUNTIME_VERBOSE = SYSTEM_PROPERTY_PREFIX + "runtime.verbose";
+  public static final String CUSTOM_NAMES = SYSTEM_PROPERTY_PREFIX + "splash.masked.properties";
+
+  private static final List<String> CREDENTIAL_NAMES = ImmutableList.of("key", "password", "pswd");
+  private static final Set<String> CUSTOM_CREDENTIAL_NAMES = new HashSet<>(asList(getProperty(CUSTOM_NAMES, "").split(",")));
+  public static final String CREDENTIAL_MASK = "*****";
   /**
    * Determines whether extra information should be display.
    */
@@ -91,11 +102,24 @@ public abstract class SplashScreen {
     }
   }
 
+  private boolean isCredentialItem(String key) {
+    if (CUSTOM_CREDENTIAL_NAMES.contains(key)) {
+      return true;
+    }
+    for (String credentialName : CREDENTIAL_NAMES) {
+      if (key.toLowerCase().contains(credentialName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   protected void listItems(Map<String, String> map, String description) {
     if (!map.isEmpty()) {
       doBody(description);
       for (String key : map.keySet()) {
-        doBody(String.format(KEY_VALUE_FORMAT, key, map.get(key)));
+        String value = isCredentialItem(key) ? CREDENTIAL_MASK : map.get(key);
+        doBody(String.format(KEY_VALUE_FORMAT, key, value));
       }
     }
   }
