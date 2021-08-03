@@ -22,11 +22,15 @@ import static java.util.Optional.ofNullable;
 public class FeatureContext {
 
   private final String artifactName;
-  private final MuleVersion artifactMinMuleVersion;
+  private MuleVersion artifactMinMuleVersion;
 
   public FeatureContext(MuleVersion artifactMinMuleVersion, String artifactName) {
     this.artifactName = artifactName;
-    this.artifactMinMuleVersion = artifactMinMuleVersion;
+    // Feature flag evaluations must ignore suffixes
+    if (artifactMinMuleVersion != null) {
+      this.artifactMinMuleVersion = new MuleVersion(artifactMinMuleVersion.getMajor() + "." + artifactMinMuleVersion.getMinor()
+          + "." + artifactMinMuleVersion.getRevision());
+    }
   }
 
   public Optional<MuleVersion> getArtifactMinMuleVersion() {
