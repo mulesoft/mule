@@ -7,10 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.AnyType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
@@ -28,9 +25,6 @@ import java.util.Map;
  * @since 4.0
  */
 final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
-
-  private static final String OPERATION = "Operation";
-  private static final AnyType ANY_TYPE = BaseTypeBuilder.create(JAVA).anyType().build();
 
   private final Map<OperationModelParser, OperationDeclarer> operationDeclarers = new HashMap<>();
   private final RouterModelLoaderDelegate routersDelegate;

@@ -18,6 +18,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -36,6 +38,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 
@@ -55,96 +58,77 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String SOURCE = "Source";
 
-  private final Map<SourceElement, SourceDeclarer> sourceDeclarers = new HashMap<>();
+  private final Map<SourceModelParser, SourceDeclarer> sourceDeclarers = new HashMap<>();
 
   SourceModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
   }
 
-  void declareMessageSources(ExtensionDeclarer extensionDeclarer,
-                             HasSourceDeclarer declarer,
-                             WithMessageSources typeComponent,
-                             ExtensionLoadingContext context) {
-    // TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
-    typeComponent.getSources().forEach(source -> declareMessageSource(extensionDeclarer, declarer, source, true, context));
-  }
-
+  // TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
   void declareMessageSource(ExtensionDeclarer extensionDeclarer,
-                            HasSourceDeclarer declarer,
-                            SourceElement sourceType,
-                            boolean supportsConfig,
+                            HasSourceDeclarer ownerDeclarer,
+                            List<SourceModelParser> parsers,
                             ExtensionLoadingContext context) {
 
-    if (isIgnored(sourceType, context)) {
-      return;
-    }
+    for (SourceModelParser parser : parsers) {
 
-    // TODO: MULE-9220 - Add a syntax validator which checks that the sourceType doesn't implement
-    validateLifecycle(sourceType, Startable.class);
-    validateLifecycle(sourceType, Stoppable.class);
+      if (parser.isIgnored()) {
+        continue;
+      }
 
-    final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(sourceType);
-    final Optional<ExtensionParameter> connectionParameter = loader.getConnectionParameter(sourceType);
+      final boolean requiresConfig = parser.hasConfig() || parser.isConnected();
+      HasSourceDeclarer actualDeclarer = requiresConfig
+          ? ownerDeclarer
+          : extensionDeclarer;
 
-    if (loader.isInvalidConfigSupport(supportsConfig, configParameter, connectionParameter)) {
-      throw new IllegalSourceModelDefinitionException(
-                                                      format("Source '%s' is defined at the extension level but it requires a config parameter. "
-                                                          + "Remove such parameter or move the source to the proper config",
-                                                             sourceType.getName()));
-    }
+      if (actualDeclarer == extensionDeclarer && requiresConfig) {
+        throw new IllegalSourceModelDefinitionException(
+            format("Source '%s' is defined at the extension level but it requires a config parameter. "
+                + "Remove such parameter or move the source to the proper config", parser.getName()));
+      }
 
-    HasSourceDeclarer actualDeclarer =
-        (HasSourceDeclarer) loader.selectDeclarerBasedOnConfig(extensionDeclarer, (Declarer) declarer, configParameter,
-                                                               connectionParameter);
 
-    SourceDeclarer existingDeclarer = sourceDeclarers.get(sourceType);
-    if (existingDeclarer != null) {
-      actualDeclarer.withMessageSource(existingDeclarer);
-      return;
-    }
+      SourceDeclarer existingDeclarer = sourceDeclarers.get(parser);
+      if (existingDeclarer != null) {
+        actualDeclarer.withMessageSource(existingDeclarer);
+        return;
+      }
 
-    SourceDeclarer sourceDeclarer = actualDeclarer.withMessageSource(sourceType.getAlias());
-    sourceDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(sourceType));
-    List<Type> sourceGenerics = sourceType.getSuperClassGenerics();
+      SourceDeclarer sourceDeclarer = actualDeclarer.withMessageSource(parser.getAlias());
+      sourceDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(parser));
+      List<Type> sourceGenerics = parser.getSuperClassGenerics();
 
-    if (sourceGenerics.size() != 2) {
-      // TODO: MULE-9220: Add a syntax validator for this
-      throw new IllegalModelDefinitionException(format("Message source class '%s' was expected to have 2 generic types "
-          + "(one for the Payload type and another for the Attributes type) but %d were found",
-                                                       sourceType.getName(),
-                                                       sourceGenerics.size()));
-    }
+      if (sourceGenerics.size() != 2) {
+        // TODO: MULE-9220: Add a syntax validator for this
+        throw new IllegalModelDefinitionException(format("Message source class '%s' was expected to have 2 generic types "
+                + "(one for the Payload type and another for the Attributes type) but %d were found",
+            parser.getName(),
+            sourceGenerics.size()));
+      }
 
-    sourceDeclarer
-        .hasResponse(sourceType.isAnnotatedWith(EmitsResponse.class))
-        .requiresConnection(connectionParameter.isPresent());
+      sourceDeclarer
+          .hasResponse(parser.isAnnotatedWith(EmitsResponse.class))
+          .requiresConnection(connectionParameter.isPresent());
 
-    sourceType.getDeclaringClass()
-        .ifPresent(clazz -> sourceDeclarer
-            .withModelProperty(new SdkSourceFactoryModelProperty(new DefaultSdkSourceFactory(clazz)))
-            .withModelProperty(new ImplementingTypeModelProperty(clazz)));
+      parser.getDeclaringClass()
+          .ifPresent(clazz -> sourceDeclarer
+              .withModelProperty(new SdkSourceFactoryModelProperty(new DefaultSdkSourceFactory(clazz)))
+              .withModelProperty(new ImplementingTypeModelProperty(clazz)));
 
-    processMimeType(sourceDeclarer, sourceType);
-    processComponentConnectivity(sourceDeclarer, sourceType, sourceType);
+      processMimeType(sourceDeclarer, parser);
+      processComponentConnectivity(sourceDeclarer, parser, parser);
 
-    resolveOutputTypes(sourceDeclarer, sourceType);
+      resolveOutputTypes(sourceDeclarer, parser);
 
-    loader.addExceptionEnricher(sourceType, sourceDeclarer);
+      loader.addExceptionEnricher(parser, sourceDeclarer);
 
-    declareSourceParameters(sourceType, sourceDeclarer);
-    declareSourceCallback(sourceType, sourceDeclarer);
-    sourceDeclarers.put(sourceType, sourceDeclarer);
-  }
-
-  private void validateLifecycle(SourceElement sourceType, Class<?> lifecycleType) {
-    if (sourceType.isAssignableTo(lifecycleType)) {
-      throw new IllegalSourceModelDefinitionException(format(
-                                                             "Source class '%s' implements lifecycle interface '%s'. Sources are only not allowed to implement '%s' and '%s'",
-                                                             sourceType.getName(), lifecycleType,
-                                                             Initialisable.class.getSimpleName(),
-                                                             Disposable.class.getSimpleName()));
+      declareSourceParameters(parser, sourceDeclarer);
+      declareSourceCallback(parser, sourceDeclarer);
+      sourceDeclarers.put(parser, sourceDeclarer);
     }
   }
+
+
 
   private void resolveOutputTypes(SourceDeclarer source, SourceElement sourceType) {
     MetadataType returnMetadataType = sourceType.getReturnMetadataType();

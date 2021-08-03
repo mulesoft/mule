@@ -25,6 +25,10 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -32,6 +36,7 @@ import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
@@ -100,7 +105,11 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
   }
 
   private void parseStructure() {
-    final List<ExtensionParameter> callbackParameters = getCompletionCallbackParameters(sourceElement);
+    // TODO: MULE-9220 - Add a syntax validator which checks that the parser doesn't implement
+    validateLifecycle(sourceElement, Startable.class);
+    validateLifecycle(sourceElement, Stoppable.class);
+
+
     blocking = callbackParameters.isEmpty();
     connected = connectionParameter.isPresent();
 
@@ -340,6 +349,16 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
       return "Construct";
     }
     return "Operation";
+  }
+
+  private void validateLifecycle(SourceElement sourceType, Class<?> lifecycleType) {
+    if (sourceType.isAssignableTo(lifecycleType)) {
+      throw new IllegalSourceModelDefinitionException(format(
+          "Source class '%s' implements lifecycle interface '%s'. Sources are only not allowed to implement '%s' and '%s'",
+          sourceType.getName(), lifecycleType,
+          Initialisable.class.getSimpleName(),
+          Disposable.class.getSimpleName()));
+    }
   }
 
   @Override
