@@ -33,6 +33,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.util.context.Context;
 
 /**
@@ -41,6 +43,8 @@ import reactor.util.context.Context;
  * @since 4.0
  */
 public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcessors {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ImmutableProcessorChainExecutor.class);
 
   private final StreamingManager streamingManager;
 
@@ -142,6 +146,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
             if (error instanceof MessagingException) {
               this.handleError(error, ((MessagingException) error).getEvent());
             } else {
+              LOGGER.error("Exception in nested chain", error);
               this.handleError(error, event);
             }
           })
