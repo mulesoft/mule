@@ -84,7 +84,12 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
         parser.getExecutionType().ifPresent(operation::withExecutionType);
         parser.getAdditionalModelProperties().forEach(operation::withModelProperty);
-        parser.getExtensionHandlerModelProperty().ifPresent(operation::withModelProperty);
+        parser.getExceptionHandlerModelProperty().ifPresent(operation::withModelProperty);
+
+        parser.getNestedChainParser().ifPresent(chain -> operation.withChain(chain.getName())
+            .describedAs(chain.getDescription())
+            .setRequired(chain.isRequired()));
+
         operationDeclarers.put(parser, operation);
       }
     }

@@ -20,10 +20,8 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
-import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -32,7 +30,6 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
-import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -49,7 +46,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -63,19 +59,6 @@ import java.util.function.Function;
 final class JavaExtensionModelParserUtils {
 
   private JavaExtensionModelParserUtils() {
-  }
-
-  static boolean isScope(MethodElement methodElement) {
-    return methodElement.getParameters().stream().anyMatch(JavaExtensionModelParserUtils::isProcessorChain);
-  }
-
-  static boolean isRouter(MethodElement methodElement) {
-    return methodElement.getParameters().stream()
-        .anyMatch(JavaExtensionModelParserUtils::isRoute);
-  }
-
-  static boolean isRoute(ExtensionParameter parameter) {
-    return parameter.getType().isAssignableTo(Route.class);
   }
 
   static List<ExtensionParameter> getCompletionCallbackParameters(MethodElement method) {
@@ -93,20 +76,6 @@ final class JavaExtensionModelParserUtils {
   static boolean isProcessorChain(ExtensionParameter parameter) {
     return parameter.getType().isAssignableTo(Chain.class)
         || parameter.getType().isAssignableTo(org.mule.sdk.api.runtime.route.Chain.class);
-  }
-
-  static void handleByteStreaming(Method method, ExecutableComponentDeclarer executableComponent,
-                                         MetadataType outputType) {
-    executableComponent.supportsStreaming(isInputStream(outputType)
-        || method.getAnnotation(Streaming.class) != null
-        || method.getAnnotation(org.mule.sdk.api.annotation.Streaming.class) != null);
-  }
-
-  static void handleByteStreaming(MethodElement method, ExecutableComponentDeclarer executableComponent,
-                                         MetadataType outputType) {
-    executableComponent.supportsStreaming(isInputStream(outputType)
-        || method.isAnnotatedWith(Streaming.class)
-        || method.isAnnotatedWith(org.mule.sdk.api.annotation.Streaming.class));
   }
 
   /**
@@ -157,7 +126,7 @@ final class JavaExtensionModelParserUtils {
   }
 
   static List<ParameterGroupModelParser> getFieldParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                  ClassTypeLoader typeLoader) {
+                                                                       ClassTypeLoader typeLoader) {
     return getParameterGroupParsers(parameters, typeLoader, p -> new ParameterModelParserDecorator(p) {
 
       @Override

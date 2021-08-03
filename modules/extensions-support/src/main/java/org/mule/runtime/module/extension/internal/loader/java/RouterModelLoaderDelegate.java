@@ -39,7 +39,9 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     }
 
     final ConstructDeclarer router = actualDeclarer.withConstruct(parser.getName())
-        .describedAs(parser.getDescription());
+        .describedAs(parser.getDescription())
+        .withModelProperty(parser.getExecutorModelProperty());
+    
     parser.getMediaTypeModelProperty().ifPresent(router::withModelProperty);
     parser.getAdditionalModelProperties().forEach(router::withModelProperty);
 

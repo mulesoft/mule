@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.hash;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
@@ -50,6 +52,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
@@ -79,6 +82,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
 
+  private ExtensionParameter nestedChain;
   private boolean scope = false;
   private boolean router = false;
   private boolean autoPaging = false;
@@ -112,7 +116,8 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     final List<ExtensionParameter> callbackParameters = getCompletionCallbackParameters(operationMethod);
     blocking = callbackParameters.isEmpty();
     connected = connectionParameter.isPresent();
-    scope = operationMethod.getParameters().stream().anyMatch(JavaExtensionModelParserUtils::isProcessorChain);
+    nestedChain = fetchNestedChain();
+    scope = nestedChain != null;
     routes = getRoutes(operationMethod);
     router = !routes.isEmpty();
 
@@ -132,24 +137,28 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     }
   }
 
+  private ExtensionParameter fetchNestedChain() {
+    List<ExtensionParameter> chains =
+        operationMethod.getParameters().stream().filter(JavaExtensionModelParserUtils::isProcessorChain).collect(toList());
+
+    if (chains.size() > 1) {
+      throw new IllegalOperationModelDefinitionException(
+          format("Scope '%s' declares too many parameters of type '%s', only one input of this kind is supported."
+                  + "Offending parameters are: %s",
+              getName(),
+              Chain.class.getSimpleName(),
+              chains.stream().map(ExtensionParameter::getName).collect(toList())));
+    }
+
+    return chains.isEmpty() ? null : chains.get(0);
+  }
+
   private void parseScope() {
     if (blocking) {
       throw new IllegalOperationModelDefinitionException(format("Scope '%s' does not declare a '%s' parameter. One is required " +
               "for all operations that receive and execute a Chain of other components",
           getName(),
           CompletionCallback.class.getSimpleName()));
-    }
-
-    List<ExtensionParameter> processorChain =
-        operationMethod.getParameters().stream().filter(JavaExtensionModelParserUtils::isProcessorChain).collect(toList());
-
-    if (processorChain.size() > 1) {
-      throw new IllegalOperationModelDefinitionException(
-          format("Scope '%s' declares too many parameters of type '%s', only one input of this kind is supported."
-                  + "Offending parameters are: %s",
-              getName(),
-              Chain.class.getSimpleName(),
-              processorChain.stream().map(ExtensionParameter::getName).collect(toList())));
     }
 
     if (hasConfig()) {
@@ -321,6 +330,11 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   @Override
+  public Optional<NestedChainModelParser> getNestedChainParser() {
+    return nestedChain != null ? of(new JavaNestedChainModelParser(nestedChain)) : empty();
+  }
+
+  @Override
   public CompletableComponentExecutorModelProperty getExecutorModelProperty() {
     return new CompletableComponentExecutorModelProperty(
         new CompletableOperationExecutorFactory(enclosingType.getDeclaringClass().get(), operationMethod.getMethod().get()));
@@ -388,7 +402,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   @Override
-  public Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty() {
+  public Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty() {
     return getExceptionEnricherFactory(operationMethod).map(ExceptionHandlerModelProperty::new);
   }
 

@@ -8,16 +8,13 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.meta.model.declaration.fluent.HasNestedComponentsDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 
 import java.util.LinkedList;
@@ -90,22 +87,6 @@ public final class ParameterModelsLoaderDelegate {
       }
     });
 
-
-//    boolean supportsNestedElements = component instanceof HasNestedComponentsDeclarer;
-
-
     return declarerList;
-  }
-
-  private boolean declaredAsNestedComponent(HasNestedComponentsDeclarer component, ExtensionParameter extensionParameter) {
-    if (isProcessorChain(extensionParameter)) {
-      component.withChain(extensionParameter.getAlias())
-          .setRequired(extensionParameter.isRequired())
-          .describedAs(extensionParameter.getDescription());
-
-      return true;
-    }
-
-    return false;
   }
 }

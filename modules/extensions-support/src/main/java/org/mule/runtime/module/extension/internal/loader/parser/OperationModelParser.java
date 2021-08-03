@@ -32,6 +32,8 @@ public interface OperationModelParser {
 
   CompletableComponentExecutorModelProperty getExecutorModelProperty();
 
+  Optional<NestedChainModelParser> getNestedChainParser();
+
   boolean isBlocking();
 
   boolean isIgnored();
@@ -56,7 +58,7 @@ public interface OperationModelParser {
 
   Optional<MediaTypeModelProperty> getMediaTypeModelProperty();
 
-  Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty();
+  Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty();
 
   List<ModelProperty> getAdditionalModelProperties();
 }
