@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.OutputModelParser;
@@ -28,6 +29,8 @@ public interface OperationModelParser {
   List<ParameterGroupModelParser> getParameterGroupModelParsers();
 
   List<NestedRouteModelParser> getNestedRouteParsers();
+
+  CompletableComponentExecutorModelProperty getExecutorModelProperty();
 
   boolean isBlocking();
 

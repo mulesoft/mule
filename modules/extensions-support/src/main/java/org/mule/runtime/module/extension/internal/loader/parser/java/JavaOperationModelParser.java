@@ -321,6 +321,12 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   @Override
+  public CompletableComponentExecutorModelProperty getExecutorModelProperty() {
+    return new CompletableComponentExecutorModelProperty(
+        new CompletableOperationExecutorFactory(enclosingType.getDeclaringClass().get(), operationMethod.getMethod().get()));
+  }
+
+  @Override
   public boolean isIgnored() {
     return IntrospectionUtils.isIgnored(operationMethod, loadingContext);
   }
@@ -417,8 +423,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
     if (method.isPresent() && declaringClass.isPresent()) {
       additionalModelProperties.add(new ImplementingMethodModelProperty(method.get()));
-      additionalModelProperties.add(new CompletableComponentExecutorModelProperty(
-          new CompletableOperationExecutorFactory(declaringClass.get(), method.get())));
     }
   }
 
