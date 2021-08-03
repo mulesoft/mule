@@ -83,6 +83,7 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -138,7 +139,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     OperationMessageProcessor operationMessageProcessor =
         new TestOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-                                          cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
+                                          cursorStreamProviderFactory, new NoRetryPolicyTemplate(), null, extensionManager,
                                           mockPolicyManager, reflectionCache, null,
                                           muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
@@ -564,11 +565,13 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     public TestOperationMessageProcessor(ExtensionModel extensionModel, OperationModel operationModel,
                                          ConfigurationProvider configurationProvider, String target, String targetValue,
                                          ResolverSet resolverSet, CursorProviderFactory cursorProviderFactory,
-                                         RetryPolicyTemplate retryPolicyTemplate, ExtensionManager extensionManager,
-                                         PolicyManager policyManager, ReflectionCache reflectionCache,
-                                         ResultTransformer resultTransformer, long terminationTimeout) {
+                                         RetryPolicyTemplate retryPolicyTemplate, MessageProcessorChain nestedChain,
+                                         ExtensionManager extensionManager, PolicyManager policyManager,
+                                         ReflectionCache reflectionCache, ResultTransformer resultTransformer,
+                                         long terminationTimeout) {
       super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-            retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer, terminationTimeout);
+            retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache, resultTransformer,
+            terminationTimeout);
     }
 
     @Override
