@@ -45,7 +45,7 @@ public abstract class SplashScreen {
   public static final String CUSTOM_NAMES = SYSTEM_PROPERTY_PREFIX + "splash.masked.properties";
 
   private static final List<String> CREDENTIAL_NAMES = ImmutableList.of("key", "password", "pswd");
-  private static final Set<String> CUSTOM_CREDENTIAL_NAMES = new HashSet<>(asList(getProperty(CUSTOM_NAMES).split(",")));
+  private static final Set<String> CUSTOM_CREDENTIAL_NAMES = new HashSet<>(asList(getProperty(CUSTOM_NAMES, "").split(",")));
   public static final String CREDENTIAL_MASK = "*****";
   /**
    * Determines whether extra information should be display.
