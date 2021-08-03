@@ -2,18 +2,15 @@
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-marvel",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-marvel-connection",
+    "artifactId": "mule-connector-marvel-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -31,31 +28,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "mystic",
       "system": "Marvel",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-marvel",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-marvel-connection",
+    "artifactId": "mule-connector-marvel-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -73,31 +69,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooling-mystic",
       "system": "Marvel",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-marvel",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-marvel-connection",
+    "artifactId": "mule-connector-marvel-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -115,31 +110,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "missile",
       "system": "Marvel",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-marvel",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-marvel-connection",
+    "artifactId": "mule-connector-marvel-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -157,14 +151,16 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.4.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "odd-missile",
       "system": "Marvel",
-      "type": "connectivity.Connection"
+      "type": "Connection"
     }
   }
 ]
