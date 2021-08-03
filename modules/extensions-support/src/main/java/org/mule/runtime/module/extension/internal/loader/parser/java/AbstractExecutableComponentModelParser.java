@@ -26,7 +26,6 @@ abstract class AbstractExecutableComponentModelParser {
 
   protected OutputModelParser outputType;
   protected OutputModelParser outputAttributesType;
-  protected boolean blocking = false;
   protected final boolean supportsConfig;
   protected boolean supportsStreaming = false;
   protected boolean connected = false;

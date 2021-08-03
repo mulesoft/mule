@@ -7,17 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -25,13 +20,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAlias;
-import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -128,16 +118,4 @@ abstract class AbstractModelLoaderDelegate {
     }
     return connectionType;
   }
-
-  void declareParameters(ComponentDeclarer component,
-                         List<ParameterGroupModelParser> groupModelParsers,
-                         ParameterDeclarationContext declarationContext) {
-
-    loader.getMethodParametersLoader().declare(component, methodParameters, declarationContext);
-    loader.getFieldParametersLoader().declare(component, fieldParameters, declarationContext).forEach(p -> {
-      p.withExpressionSupport(NOT_SUPPORTED);
-      p.withModelProperty(new FieldOperationParameterModelProperty());
-    });
-  }
-
 }

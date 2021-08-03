@@ -94,57 +94,27 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
         return;
       }
 
-      SourceDeclarer sourceDeclarer = actualDeclarer.withMessageSource(parser.getAlias());
-      sourceDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(parser));
-      List<Type> sourceGenerics = parser.getSuperClassGenerics();
+      SourceDeclarer sourceDeclarer = actualDeclarer.withMessageSource(parser.getName())
+          .describedAs(parser.getDescription())
+          .hasResponse(parser.emitsResponse())
+          .requiresConnection(parser.isConnected())
+          .transactional(parser.isTransactional())
+          .supportsStreaming(parser.supportsStreaming())
+          .runsOnPrimaryNodeOnly(parser.runsOnPrimaryNodeOnly())
+          .withModelProperty(parser.getSourceFactoryModelProperty());
 
-      if (sourceGenerics.size() != 2) {
-        // TODO: MULE-9220: Add a syntax validator for this
-        throw new IllegalModelDefinitionException(format("Message source class '%s' was expected to have 2 generic types "
-                + "(one for the Payload type and another for the Attributes type) but %d were found",
-            parser.getName(),
-            sourceGenerics.size()));
-      }
+      parser.getOutputType().applyOn(sourceDeclarer.withOutput());
+      parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());
 
-      sourceDeclarer
-          .hasResponse(parser.isAnnotatedWith(EmitsResponse.class))
-          .requiresConnection(connectionParameter.isPresent());
-
-      parser.getDeclaringClass()
-          .ifPresent(clazz -> sourceDeclarer
-              .withModelProperty(new SdkSourceFactoryModelProperty(new DefaultSdkSourceFactory(clazz)))
-              .withModelProperty(new ImplementingTypeModelProperty(clazz)));
-
-      processMimeType(sourceDeclarer, parser);
-      processComponentConnectivity(sourceDeclarer, parser, parser);
-
-      resolveOutputTypes(sourceDeclarer, parser);
-
-      loader.addExceptionEnricher(parser, sourceDeclarer);
-
-      declareSourceParameters(parser, sourceDeclarer);
+      loader.getParameterModelsLoaderDelegate().declare(sourceDeclarer, parser.getParameterGroupModelParsers());
       declareSourceCallback(parser, sourceDeclarer);
+
+      parser.getMediaTypeModelProperty().ifPresent(sourceDeclarer::withModelProperty);
+      parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
+      parser.getAdditionalModelProperties().forEach(sourceDeclarer::withModelProperty);
+
       sourceDeclarers.put(parser, sourceDeclarer);
     }
-  }
-
-
-
-  private void resolveOutputTypes(SourceDeclarer source, SourceElement sourceType) {
-    MetadataType returnMetadataType = sourceType.getReturnMetadataType();
-    source.withOutput().ofType(returnMetadataType);
-    source.withOutputAttributes().ofType(sourceType.getAttributesMetadataType());
-    source.supportsStreaming(isInputStream(returnMetadataType) || sourceType.getAnnotation(Streaming.class).isPresent());
-  }
-
-  /**
-   * Declares the parameters needed to generate messages
-   */
-  private void declareSourceParameters(SourceElement sourceType, SourceDeclarer source) {
-    ParameterModelsLoaderDelegate parametersLoader = loader.getFieldParametersLoader();
-    ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(SOURCE, source.getDeclaration());
-    List<ParameterDeclarer> parameters = parametersLoader.declare(source, sourceType.getParameters(), declarationContext);
-    parameters.forEach(p -> p.withExpressionSupport(NOT_SUPPORTED));
   }
 
   private void declareSourceCallback(SourceElement sourceType, SourceDeclarer source) {

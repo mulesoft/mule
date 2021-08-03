@@ -18,7 +18,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensi
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getCompletionCallbackParameters;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getFieldParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationFieldParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.isInputStream;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getRoutes;
@@ -82,6 +82,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   private final Optional<ExtensionParameter> connectionParameter;
 
   private ExtensionParameter nestedChain;
+  private boolean blocking = false;
   private boolean scope = false;
   private boolean router = false;
   private boolean autoPaging = false;
@@ -317,7 +318,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     }
 
     List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, typeLoader);
-    parameterGroupModelParsers.addAll(getFieldParameterGroupParsers(methodOwner.getParameters(), typeLoader));
+    parameterGroupModelParsers.addAll(getOperationFieldParameterGroupParsers(methodOwner.getParameters(), typeLoader));
 
     return parameterGroupModelParsers;
   }

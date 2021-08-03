@@ -125,8 +125,19 @@ final class JavaExtensionModelParserUtils {
     return getParameterGroupParsers(parameters, typeLoader, null);
   }
 
-  static List<ParameterGroupModelParser> getFieldParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                       ClassTypeLoader typeLoader) {
+  static List<ParameterGroupModelParser> getSourceParameterGroupParsers(List<? extends ExtensionParameter> parameters,
+                                                                        ClassTypeLoader typeLoader) {
+    return getParameterGroupParsers(parameters, typeLoader, p -> new ParameterModelParserDecorator(p) {
+
+      @Override
+      public ExpressionSupport getExpressionSupport() {
+        return NOT_SUPPORTED;
+      }
+    });
+  }
+
+  static List<ParameterGroupModelParser> getOperationFieldParameterGroupParsers(List<? extends ExtensionParameter> parameters,
+                                                                                ClassTypeLoader typeLoader) {
     return getParameterGroupParsers(parameters, typeLoader, p -> new ParameterModelParserDecorator(p) {
 
       @Override
