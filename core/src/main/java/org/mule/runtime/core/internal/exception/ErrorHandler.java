@@ -202,7 +202,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
    * @return whether this is an {@link OnErrorPropagateHandler} with a matcher for "ANY"
    */
   private boolean matchesAny(MessagingExceptionHandlerAcceptor acceptor) {
-    return acceptor instanceof OnErrorPropagateHandler && ((OnErrorPropagateHandler) acceptor).acceptsErrorType(anyErrorType);
+    return acceptor instanceof OnErrorPropagateHandler && ((OnErrorPropagateHandler) acceptor).acceptsErrorType(anyErrorType)
+        && !((OnErrorPropagateHandler) acceptor).hasWhenExpression();
   }
 
   private void validateConfiguredExceptionStrategies() {
