@@ -30,6 +30,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.List;
@@ -128,15 +129,8 @@ abstract class AbstractModelLoaderDelegate {
     return connectionType;
   }
 
-  void processMimeType(HasModelProperties declarer, WithAnnotations element) {
-    element.getAnnotation(MediaType.class).ifPresent(a -> declarer.withModelProperty(
-                                                                                     new MediaTypeModelProperty(a.value(),
-                                                                                                                a.strict())));
-  }
-
   void declareParameters(ComponentDeclarer component,
-                         List<ExtensionParameter> methodParameters,
-                         List<ExtensionParameter> fieldParameters,
+                         List<ParameterGroupModelParser> groupModelParsers,
                          ParameterDeclarationContext declarationContext) {
 
     loader.getMethodParametersLoader().declare(component, methodParameters, declarationContext);

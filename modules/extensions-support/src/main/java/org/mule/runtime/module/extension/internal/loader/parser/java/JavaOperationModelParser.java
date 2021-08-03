@@ -7,29 +7,36 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.hash;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.util.NameUtils.OPERATION;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getCompletionCallbackParameters;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getCompletionCallbackParameters;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isAutoPaging;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getFieldParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.isInputStream;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.extension.api.annotation.Streaming;
+import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
+import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -38,15 +45,14 @@ import org.mule.runtime.module.extension.api.loader.java.type.OperationContainer
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
-import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
-import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -55,6 +61,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class JavaOperationModelParser extends AbstractExecutableComponentModelParser implements OperationModelParser {
+
+  private static final List<Class<?>> ROUTER_CALLBACK_PARAMETER_TYPES = asList(
+      RouterCompletionCallback.class,
+      org.mule.sdk.api.runtime.process.RouterCompletionCallback.class,
+      VoidCompletionCallback.class,
+      org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
 
   private final ExtensionElement extensionElement;
   private final OperationElement operationMethod;
@@ -68,7 +80,9 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   private final Optional<ExtensionParameter> connectionParameter;
 
   private boolean scope = false;
+  private boolean router = false;
   private boolean autoPaging = false;
+  private List<ExtensionParameter> routes = emptyList();
 
   public JavaOperationModelParser(ExtensionElement extensionElement,
                                   OperationContainerElement methodOwnerClass,
@@ -98,13 +112,20 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     final List<ExtensionParameter> callbackParameters = getCompletionCallbackParameters(operationMethod);
     blocking = callbackParameters.isEmpty();
     connected = connectionParameter.isPresent();
-    scope = operationMethod.getParameters().stream().anyMatch(ModelLoaderUtils::isProcessorChain);
+    scope = operationMethod.getParameters().stream().anyMatch(JavaExtensionModelParserUtils::isProcessorChain);
+    routes = getRoutes(operationMethod);
+    router = !routes.isEmpty();
+
+    if (scope && router) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Operation '%s' is both a Scope and a Router, which is invalid", getName()));
+    }
 
     if (scope) {
       parseScope();
-    }
-
-    if (blocking) {
+    } else if (router) {
+      parseRouter();
+    } else if (blocking) {
       parseBlockingOperation();
     } else {
       parseNonBlockingOperation(callbackParameters);
@@ -120,7 +141,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     }
 
     List<ExtensionParameter> processorChain =
-        operationMethod.getParameters().stream().filter(ModelLoaderUtils::isProcessorChain).collect(toList());
+        operationMethod.getParameters().stream().filter(JavaExtensionModelParserUtils::isProcessorChain).collect(toList());
 
     if (processorChain.size() > 1) {
       throw new IllegalOperationModelDefinitionException(
@@ -130,6 +151,64 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
               Chain.class.getSimpleName(),
               processorChain.stream().map(ExtensionParameter::getName).collect(toList())));
     }
+
+    if (hasConfig()) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Scope '%s' requires a config, but that is not allowed, remove such parameter",
+          getName()));
+    }
+
+    if (isConnected()) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Scope '%s' requires a connection, but that is not allowed, remove such parameter",
+          getName()));
+    }
+  }
+
+  private void parseRouter() {
+    if (hasConfig()) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Router '%s' requires a config, but that is not allowed, remove such parameter", getName()));
+    }
+
+    if (isConnected()) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Router '%s' requires a connection, but that is not allowed, remove such parameter", getName()));
+    }
+
+    List<ExtensionParameter> callbackParameters = operationMethod.getParameters().stream()
+        .filter(this::isRouterCallback)
+        .collect(toList());
+
+    if (callbackParameters.isEmpty()) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Router '%s' does not declare a parameter with one of the types '%s'. One is required.",
+          getName(), ROUTER_CALLBACK_PARAMETER_TYPES));
+    } else if (callbackParameters.size() > 1) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Router '%s' defines more than one CompletionCallback parameters. Only one is allowed", getName()));
+    }
+
+    List<ExtensionParameter> routes = operationMethod.getParameters().stream().filter(this::isRoute).collect(toList());
+
+    if (routes.isEmpty()) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Router '%s' does not declare a '%s' parameter. One is required.",
+          getName(), Route.class.getSimpleName()));
+    }
+
+    if (!IntrospectionUtils.isVoid(operationMethod)) {
+      throw new IllegalOperationModelDefinitionException(format(
+          "Router '%s' is not declared in a void method.", getName()));
+    }
+  }
+
+  private boolean isRouterCallback(ExtensionParameter p) {
+    return ROUTER_CALLBACK_PARAMETER_TYPES.stream().anyMatch(type -> p.getType().isSameType(type));
+  }
+
+  private boolean isRoute(ExtensionParameter parameter) {
+    return parameter.getType().isAssignableTo(Route.class);
   }
 
   private void parseBlockingOperation() {
@@ -139,7 +218,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
     processComponentConnectivity(operationMethod);
 
-    if (autoPaging = isAutoPaging(operationMethod)) {
+    if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationMethod)) {
       parseAutoPaging();
     } else {
       supportsStreaming = isInputStream(outputType.getType())
@@ -157,6 +236,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
     supportsStreaming = true;
     connected = true;
+    additionalModelProperties.add(new PagedOperationModelProperty());
     parsePagingTx();
   }
 
@@ -197,8 +277,9 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
     if (genericTypes.isEmpty()) {
       // This is an invalid state, but is better to fail when executing the Extension Model Validators
-      genericTypes.add(PRIMITIVE_TYPES.get("ANY"));
-      genericTypes.add(PRIMITIVE_TYPES.get("ANY"));
+      MetadataType anyType = PRIMITIVE_TYPES.get("ANY");
+      genericTypes.add(anyType);
+      genericTypes.add(anyType);
     }
 
     // TODO: SHould be possible to parse dynamic types right here?
@@ -218,28 +299,25 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    List<ParameterGroupModelParser> parameterGroupModelParsers =
-        JavaExtensionModelParserUtils.getParameterGroupParsers(operationMethod.getParameters(), typeLoader);
+    List<ExtensionParameter> methodParameters;
 
-    parameterGroupModelParsers.addAll(
-        JavaExtensionModelParserUtils.getParameterGroupParsers(methodOwner.getParameters(), typeLoader,
-            p -> new ParameterModelParserDecorator(p) {
+    if (isRouter()) {
+      methodParameters = operationMethod.getParameters().stream()
+          .filter(p -> !isRoute(p) && !isRouterCallback(p))
+          .collect(toList());
+    } else {
+      methodParameters = operationMethod.getParameters();
+    }
 
-              @Override
-              public ExpressionSupport getExpressionSupport() {
-                return NOT_SUPPORTED;
-              }
-
-              @Override
-              public List<ModelProperty> getAdditionalModelProperties() {
-                List<ModelProperty> modelProperties = decoratee.getAdditionalModelProperties();
-                modelProperties.add(new FieldOperationParameterModelProperty());
-
-                return modelProperties;
-              }
-            }));
+    List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, typeLoader);
+    parameterGroupModelParsers.addAll(getFieldParameterGroupParsers(methodOwner.getParameters(), typeLoader));
 
     return parameterGroupModelParsers;
+  }
+
+  @Override
+  public List<NestedRouteModelParser> getNestedRouteParsers() {
+    return routes.stream().map(r -> new JavaNestedRouteModelParser(r, typeLoader)).collect(toList());
   }
 
   @Override
@@ -268,6 +346,11 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   @Override
+  public boolean isRouter() {
+    return router;
+  }
+
+  @Override
   public boolean isConnected() {
     return connected;
   }
@@ -278,14 +361,29 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   @Override
+  public boolean isAutoPaging() {
+    return autoPaging;
+  }
+
+  @Override
+  public Optional<ExecutionType> getExecutionType() {
+    return operationMethod.getAnnotation(Execution.class).map(Execution::value);
+  }
+
+  @Override
   public boolean isNonBlocking() {
-    return ModelLoaderUtils.isNonBlocking(operationMethod);
+    return !blocking;
   }
 
   @Override
   public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
     return operationMethod.getAnnotation(MediaType.class)
         .map(a -> new MediaTypeModelProperty(a.value(), a.strict()));
+  }
+
+  @Override
+  public Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty() {
+    return getExceptionEnricherFactory(operationMethod).map(ExceptionHandlerModelProperty::new);
   }
 
   @Override
@@ -322,15 +420,16 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
       additionalModelProperties.add(new CompletableComponentExecutorModelProperty(
           new CompletableOperationExecutorFactory(declaringClass.get(), method.get())));
     }
-
-    if (autoPaging) {
-      additionalModelProperties.add(new PagedOperationModelProperty());
-    }
   }
 
   @Override
   protected String getComponentTypeName() {
-    return OPERATION;
+    if (isScope()) {
+      return "Scope";
+    } else if (isRouter()) {
+      return "Construct";
+    }
+    return "Operation";
   }
 
   @Override

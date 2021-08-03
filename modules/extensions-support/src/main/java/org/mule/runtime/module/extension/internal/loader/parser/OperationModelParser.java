@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.operation.ExecutionType;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.OutputModelParser;
 
@@ -25,11 +27,15 @@ public interface OperationModelParser {
 
   List<ParameterGroupModelParser> getParameterGroupModelParsers();
 
+  List<NestedRouteModelParser> getNestedRouteParsers();
+
   boolean isBlocking();
 
   boolean isIgnored();
 
   boolean isScope();
+
+  boolean isRouter();
 
   boolean isConnected();
 
@@ -41,7 +47,13 @@ public interface OperationModelParser {
 
   boolean isTransactional();
 
+  boolean isAutoPaging();
+
+  Optional<ExecutionType> getExecutionType();
+
   Optional<MediaTypeModelProperty> getMediaTypeModelProperty();
+
+  Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty();
 
   List<ModelProperty> getAdditionalModelProperties();
 }

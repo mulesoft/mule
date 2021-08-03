@@ -11,15 +11,11 @@ import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoad
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
@@ -87,7 +83,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
     if (!isEmpty(extensionElement.getConfigurations())) {
       operationLoaderDelegate
-          .declareOperations(declarer, declarer, null, extensionElement.getOperations(), false, context);
+          .declareOperations(declarer, declarer, null);
 
       functionModelLoaderDelegate
           .declareFunctions(declarer, declarer, null, extensionElement.getFunctions(), context);

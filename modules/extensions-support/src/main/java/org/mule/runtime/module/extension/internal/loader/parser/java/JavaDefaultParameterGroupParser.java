@@ -26,10 +26,6 @@ public class JavaDefaultParameterGroupParser extends AbstractJavaParameterGroupM
 
   private final List<ExtensionParameter> parameters;
 
-  public JavaDefaultParameterGroupParser(List<ExtensionParameter> parameters, ClassTypeLoader typeLoader) {
-    this(parameters, typeLoader, null);
-  }
-
   public JavaDefaultParameterGroupParser(List<ExtensionParameter> parameters,
                                          ClassTypeLoader typeLoader,
                                          Function<ParameterModelParser, ParameterModelParser> parameterMutator) {

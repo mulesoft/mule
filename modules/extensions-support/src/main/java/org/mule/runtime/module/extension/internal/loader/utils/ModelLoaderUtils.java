@@ -39,12 +39,18 @@ public final class ModelLoaderUtils {
   }
 
   public static boolean isRouter(MethodElement methodElement) {
+    return !getRoutes(methodElement).isEmpty();
+  }
+
+  public static List<ExtensionParameter> getRoutes(MethodElement methodElement) {
     return methodElement.getParameters().stream()
-        .anyMatch(ModelLoaderUtils::isRoute);
+        .filter(ModelLoaderUtils::isRoute)
+        .collect(toList());
   }
 
   public static boolean isRoute(ExtensionParameter parameter) {
-    return parameter.getType().isAssignableTo(Route.class);
+    return parameter.getType().isAssignableTo(Route.class)
+        || parameter.getType().isAssignableTo(org.mule.sdk.api.runtime.route.Route.class);
   }
 
   public static boolean isNonBlocking(MethodElement method) {
