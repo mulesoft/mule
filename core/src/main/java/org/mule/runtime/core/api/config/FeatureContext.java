@@ -28,8 +28,10 @@ public class FeatureContext {
     this.artifactName = artifactName;
     // Feature flag evaluations must ignore suffixes
     if (artifactMinMuleVersion != null) {
-      this.artifactMinMuleVersion = new MuleVersion(artifactMinMuleVersion.getMajor() + "." + artifactMinMuleVersion.getMinor()
-          + "." + artifactMinMuleVersion.getRevision());
+      this.artifactMinMuleVersion = new MuleVersion(artifactMinMuleVersion.getMajor() + "." + artifactMinMuleVersion.getMinor());
+      if (artifactMinMuleVersion.getRevision() != MuleVersion.NO_REVISION) {
+        this.artifactMinMuleVersion.setRevision(artifactMinMuleVersion.getRevision());
+      }
     }
   }
 
