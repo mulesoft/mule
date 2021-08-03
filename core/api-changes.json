@@ -237,6 +237,15 @@
           "methodName": "isPayloadStatisticsEnabled",
           "elementKind": "method",
           "justification": "EE-7419: Needed to verify if payload stats are enabled"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::hasWhenExpression()",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "hasWhenExpression",
+          "elementKind": "method",
+          "justification": "MULE-19684: Needed to verify if the handler has a when expression"
         }
       ]
     }
