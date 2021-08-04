@@ -45,7 +45,7 @@ public enum PetStoreFeatures implements Feature {
   }
 
   @Override
-  public String getSince() {
+  public String getEnabledByDefaultSince() {
     return since;
   }
 
