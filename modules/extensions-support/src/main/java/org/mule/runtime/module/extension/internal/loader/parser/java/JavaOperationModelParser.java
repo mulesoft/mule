@@ -71,12 +71,9 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
       VoidCompletionCallback.class,
       org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
 
-  private final ExtensionElement extensionElement;
-  private final OperationElement operationMethod;
-  private final OperationContainerElement methodOwner;
+  private final OperationElement operationElement;
+  private final OperationContainerElement operationContainer;
   private final OperationContainerElement enclosingType;
-  private final ExtensionLoadingContext loadingContext;
-  private final ClassTypeLoader typeLoader;
 
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
@@ -89,33 +86,32 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   private List<ExtensionParameter> routes = emptyList();
 
   public JavaOperationModelParser(ExtensionElement extensionElement,
-                                  OperationContainerElement methodOwnerClass,
-                                  OperationElement operationMethod,
+                                  OperationContainerElement operationContainer,
+                                  OperationElement operationElement,
                                   ClassTypeLoader typeLoader,
                                   ExtensionLoadingContext loadingContext) {
-    this.extensionElement = extensionElement;
-    this.operationMethod = operationMethod;
-    this.typeLoader = typeLoader;
-    this.loadingContext = loadingContext;
+    super(extensionElement, typeLoader, loadingContext);
 
-    methodOwner = operationMethod.getEnclosingType();
-    enclosingType = methodOwnerClass != null ? methodOwnerClass : methodOwner;
+    this.operationElement = operationElement;
+
+    this.operationContainer = operationElement.getEnclosingType();
+    enclosingType = operationContainer != null ? operationContainer : this.operationContainer;
     checkOperationIsNotAnExtension();
 
-    configParameter = getConfigParameter(operationMethod);
-    connectionParameter = getConnectionParameter(operationMethod);
+    configParameter = getConfigParameter(operationElement);
+    connectionParameter = getConnectionParameter(operationElement);
 
     parseStructure();
     collectAdditionalModelProperties();
   }
 
   private void parseStructure() {
-    final List<ExtensionParameter> callbackParameters = getCompletionCallbackParameters(operationMethod);
+    final List<ExtensionParameter> callbackParameters = getCompletionCallbackParameters(operationElement);
     blocking = callbackParameters.isEmpty();
     connected = connectionParameter.isPresent();
     nestedChain = fetchNestedChain();
     scope = nestedChain != null;
-    routes = getRoutes(operationMethod);
+    routes = getRoutes(operationElement);
     router = !routes.isEmpty();
 
     if (scope && router) {
@@ -136,7 +132,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
   private ExtensionParameter fetchNestedChain() {
     List<ExtensionParameter> chains =
-        operationMethod.getParameters().stream().filter(JavaExtensionModelParserUtils::isProcessorChain).collect(toList());
+        operationElement.getParameters().stream().filter(JavaExtensionModelParserUtils::isProcessorChain).collect(toList());
 
     if (chains.size() > 1) {
       throw new IllegalOperationModelDefinitionException(
@@ -182,7 +178,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
           "Router '%s' requires a connection, but that is not allowed, remove such parameter", getName()));
     }
 
-    List<ExtensionParameter> callbackParameters = operationMethod.getParameters().stream()
+    List<ExtensionParameter> callbackParameters = operationElement.getParameters().stream()
         .filter(this::isRouterCallback)
         .collect(toList());
 
@@ -195,7 +191,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
           "Router '%s' defines more than one CompletionCallback parameters. Only one is allowed", getName()));
     }
 
-    List<ExtensionParameter> routes = operationMethod.getParameters().stream().filter(this::isRoute).collect(toList());
+    List<ExtensionParameter> routes = operationElement.getParameters().stream().filter(this::isRoute).collect(toList());
 
     if (routes.isEmpty()) {
       throw new IllegalOperationModelDefinitionException(format(
@@ -203,7 +199,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
           getName(), Route.class.getSimpleName()));
     }
 
-    if (!IntrospectionUtils.isVoid(operationMethod)) {
+    if (!IntrospectionUtils.isVoid(operationElement)) {
       throw new IllegalOperationModelDefinitionException(format(
           "Router '%s' is not declared in a void method.", getName()));
     }
@@ -219,17 +215,17 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
   private void parseBlockingOperation() {
     //TODO: Should be possible to parse dynamic types right here
-    outputType = new DefaultOutputModelParser(operationMethod.getReturnMetadataType(), false);
-    outputAttributesType = new DefaultOutputModelParser(operationMethod.getAttributesMetadataType(), false);
+    outputType = new DefaultOutputModelParser(operationElement.getReturnMetadataType(), false);
+    outputAttributesType = new DefaultOutputModelParser(operationElement.getAttributesMetadataType(), false);
 
-    processComponentConnectivity(operationMethod);
+    processComponentConnectivity(operationElement);
 
-    if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationMethod)) {
+    if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement)) {
       parseAutoPaging();
     } else {
       supportsStreaming = isInputStream(outputType.getType())
-          || operationMethod.getAnnotation(Streaming.class).isPresent()
-          || operationMethod.getAnnotation(org.mule.sdk.api.annotation.Streaming.class).isPresent();
+          || operationElement.getAnnotation(Streaming.class).isPresent()
+          || operationElement.getAnnotation(org.mule.sdk.api.annotation.Streaming.class).isPresent();
     }
   }
 
@@ -237,7 +233,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     if (!configParameter.isPresent()) {
       throw new IllegalOperationModelDefinitionException(
           format("Paged operation '%s' is defined at the extension level but it requires a config, "
-              + "since connections are required for paging", operationMethod.getName()));
+              + "since connections are required for paging", operationElement.getName()));
     }
 
     supportsStreaming = true;
@@ -247,7 +243,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   private void parsePagingTx() {
-    Type returnTypeElement = operationMethod.getReturnType();
+    Type returnTypeElement = operationElement.getReturnType();
     List<TypeGeneric> generics = returnTypeElement.getGenerics();
 
     if (!generics.isEmpty()) {
@@ -264,7 +260,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
               getName(), CompletionCallback.class.getSimpleName()));
     }
 
-    if (isVoid(operationMethod)) {
+    if (isVoid(operationElement)) {
       throw new IllegalOperationModelDefinitionException(
           format("Operation '%s' has a parameter of type %s but is not void. "
                   + "Non-blocking operations have to be declared as void and the "
@@ -295,12 +291,12 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
   @Override
   public String getName() {
-    return operationMethod.getAlias();
+    return operationElement.getAlias();
   }
 
   @Override
   public String getDescription() {
-    return operationMethod.getDescription();
+    return operationElement.getDescription();
   }
 
   @Override
@@ -308,15 +304,15 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     List<ExtensionParameter> methodParameters;
 
     if (isRouter()) {
-      methodParameters = operationMethod.getParameters().stream()
+      methodParameters = operationElement.getParameters().stream()
           .filter(p -> !isRoute(p) && !isRouterCallback(p))
           .collect(toList());
     } else {
-      methodParameters = operationMethod.getParameters();
+      methodParameters = operationElement.getParameters();
     }
 
     List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, typeLoader);
-    parameterGroupModelParsers.addAll(getOperationFieldParameterGroupParsers(methodOwner.getParameters(), typeLoader));
+    parameterGroupModelParsers.addAll(getOperationFieldParameterGroupParsers(operationContainer.getParameters(), typeLoader));
 
     return parameterGroupModelParsers;
   }
@@ -334,12 +330,12 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   @Override
   public CompletableComponentExecutorModelProperty getExecutorModelProperty() {
     return new CompletableComponentExecutorModelProperty(
-        new CompletableOperationExecutorFactory(enclosingType.getDeclaringClass().get(), operationMethod.getMethod().get()));
+        new CompletableOperationExecutorFactory(enclosingType.getDeclaringClass().get(), operationElement.getMethod().get()));
   }
 
   @Override
   public boolean isIgnored() {
-    return IntrospectionUtils.isIgnored(operationMethod, loadingContext);
+    return IntrospectionUtils.isIgnored(operationElement, loadingContext);
   }
 
   @Override
@@ -384,7 +380,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
   @Override
   public Optional<ExecutionType> getExecutionType() {
-    return operationMethod.getAnnotation(Execution.class).map(Execution::value);
+    return operationElement.getAnnotation(Execution.class).map(Execution::value);
   }
 
   @Override
@@ -394,13 +390,13 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
   @Override
   public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
-    return operationMethod.getAnnotation(MediaType.class)
+    return operationElement.getAnnotation(MediaType.class)
         .map(a -> new MediaTypeModelProperty(a.value(), a.strict()));
   }
 
   @Override
   public Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty() {
-    return getExceptionEnricherFactory(operationMethod).map(ExceptionHandlerModelProperty::new);
+    return getExceptionEnricherFactory(operationElement).map(ExceptionHandlerModelProperty::new);
   }
 
   @Override
@@ -419,17 +415,17 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   private void checkOperationIsNotAnExtension() {
-    if (methodOwner.isAssignableFrom(extensionElement) || extensionElement.isAssignableFrom(methodOwner)) {
+    if (operationContainer.isAssignableFrom(extensionElement) || extensionElement.isAssignableFrom(operationContainer)) {
       throw new IllegalOperationModelDefinitionException(
           format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
-              methodOwner.getName(), extensionElement.getName()));
+              operationContainer.getName(), extensionElement.getName()));
     }
   }
 
   private void collectAdditionalModelProperties() {
-    additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationMethod));
+    additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement));
 
-    Optional<Method> method = operationMethod.getMethod();
+    Optional<Method> method = operationElement.getMethod();
     Optional<Class<?>> declaringClass = enclosingType.getDeclaringClass();
 
     if (method.isPresent() && declaringClass.isPresent()) {
@@ -450,7 +446,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   @Override
   public boolean equals(Object o) {
     if (o instanceof JavaOperationModelParser) {
-      return operationMethod.equals(((JavaOperationModelParser) o).operationMethod);
+      return operationElement.equals(((JavaOperationModelParser) o).operationElement);
     }
 
     return false;
@@ -458,6 +454,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
   @Override
   public int hashCode() {
-    return hash(operationMethod);
+    return hash(operationElement);
   }
 }

@@ -8,11 +8,14 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
@@ -25,12 +28,24 @@ import java.util.List;
 
 abstract class AbstractExecutableComponentModelParser {
 
+  protected final ExtensionElement extensionElement;
+  protected final ExtensionLoadingContext loadingContext;
+  protected final ClassTypeLoader typeLoader;
+
   protected OutputModelParser outputType;
   protected OutputModelParser outputAttributesType;
   protected boolean supportsStreaming = false;
   protected boolean connected = false;
   protected boolean transactional = false;
   protected final List<ModelProperty> additionalModelProperties = new LinkedList<>();
+
+  public AbstractExecutableComponentModelParser(ExtensionElement extensionElement,
+                                                ClassTypeLoader typeLoader,
+                                                ExtensionLoadingContext loadingContext) {
+    this.extensionElement = extensionElement;
+    this.typeLoader = typeLoader;
+    this.loadingContext = loadingContext;
+  }
 
   protected void processComponentConnectivity(WithParameters component) {
     List<ExtensionParameter> connectionParameters = component.getParametersAnnotatedWith(Connection.class);
@@ -72,6 +87,10 @@ abstract class AbstractExecutableComponentModelParser {
       return generics.get(0).getConcreteType();
     }
     return connectionType;
+  }
+
+  public List<ModelProperty> getAdditionalModelProperties() {
+    return additionalModelProperties;
   }
 
   protected abstract String getComponentTypeName();

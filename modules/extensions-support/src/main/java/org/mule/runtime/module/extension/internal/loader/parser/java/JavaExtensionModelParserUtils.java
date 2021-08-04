@@ -34,12 +34,14 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.FunctionContainerElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
@@ -126,6 +128,16 @@ final class JavaExtensionModelParserUtils {
     return sources.stream()
         .map(source -> new JavaSourceModelParser(source, typeLoader, loadingContext))
         .collect(toList());
+  }
+
+  static List<FunctionModelParser> getFunctionModelParsers(ExtensionElement extensionElement,
+                                                           List<FunctionContainerElement> functionContainers,
+                                                           ClassTypeLoader typeLoader,
+                                                           ExtensionLoadingContext loadingContext) {
+    return functionContainers.stream()
+        .flatMap(container -> container.getFunctions().stream()
+          .map(func -> new JavaFunctionModelParser(extensionElement, func, typeLoader, loadingContext))
+        ).collect(toList());
   }
 
   static List<ParameterGroupModelParser> getParameterGroupParsers(List<? extends ExtensionParameter> parameters,

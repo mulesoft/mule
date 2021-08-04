@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Configura
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
@@ -79,6 +80,14 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
   @Override
   public List<SourceModelParser> getSourceModelParsers() {
     return JavaExtensionModelParserUtils.getSourceParsers(configElement.getSources(), typeLoader, loadingContext);
+  }
+
+  @Override
+  public List<FunctionModelParser> getFunctionModelParsers() {
+    return JavaExtensionModelParserUtils.getFunctionModelParsers(extensionElement,
+        configElement.getFunctionContainers(),
+        typeLoader,
+        loadingContext);
   }
 
   @Override

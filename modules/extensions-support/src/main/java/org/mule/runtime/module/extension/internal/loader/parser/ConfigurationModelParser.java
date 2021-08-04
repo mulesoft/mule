@@ -24,5 +24,7 @@ public interface ConfigurationModelParser {
 
   List<SourceModelParser> getSourceModelParsers();
 
+  List<FunctionModelParser> getFunctionModelParsers();
+
   List<ModelProperty> getAdditionalModelProperties();
 }
