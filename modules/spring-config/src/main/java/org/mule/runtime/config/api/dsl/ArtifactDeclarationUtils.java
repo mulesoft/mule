@@ -7,7 +7,6 @@
 package org.mule.runtime.config.api.dsl;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -81,7 +80,7 @@ public final class ArtifactDeclarationUtils {
     for (Map.Entry<String, String> parameter : componentConfiguration.getParameters().entrySet()) {
       componentAstBuilder.withRawParameter(parameter.getKey(), parameter.getValue());
     }
-    componentConfiguration.getValue().ifPresent(value -> componentAstBuilder.withRawParameter(BODY_RAW_PARAM_NAME, value));
+    componentConfiguration.getValue().ifPresent(value -> componentAstBuilder.withBodyParameter(value));
     for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponents()) {
       convertComponentConfiguration(childComponentConfiguration, componentAstBuilder.addChildComponent());
     }

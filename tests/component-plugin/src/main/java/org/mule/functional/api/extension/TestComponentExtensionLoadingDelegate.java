@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.internal.extension;
+package org.mule.functional.api.extension;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -13,6 +13,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.ANY;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
@@ -35,14 +36,19 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
@@ -51,24 +57,16 @@ import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
  *
  * @since 4.4
  */
-class TestComponentExtensionModelDeclarer {
+public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDelegate {
 
-  private static final StereotypeModel LOG_CHECKER = newStereotype("LOG_CHECKER", "TEST")
-      .withParent(MuleStereotypes.PROCESSOR)
-      .build();
-
-  private static final StereotypeModel STACK_TRACE_ELEMENT = newStereotype("STACK_TRACE_ELEMENT", "TEST")
-      .withParent(MuleStereotypes.PROCESSOR)
-      .build();
-
-  public ExtensionDeclarer createExtensionModel() {
-    ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
+  @Override
+  public void accept(ExtensionDeclarer extensionDeclarer, ExtensionLoadingContext context) {
+    extensionDeclarer
         .named("Test Component Plugin")
         .describedAs("Test component for performing assertions")
         .onVersion(MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(COMMUNITY)
-        .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix("test")
             .setNamespace("http://www.mulesoft.org/schema/mule/test")
@@ -93,100 +91,6 @@ class TestComponentExtensionModelDeclarer {
     declareLifecycleObject(extensionDeclarer);
     declareDependencyInjectionObject(extensionDeclarer);
     declareOnErrorCheckLog(extensionDeclarer);
-    declareCheckEquals(extensionDeclarer);
-    declareCheckStackTrace(extensionDeclarer);
-    declareMethodCall(extensionDeclarer);
-    declareCause(extensionDeclarer);
-    declareCheckSummary(extensionDeclarer);
-
-    return extensionDeclarer;
-  }
-
-  private void declareCheckSummary(HasOperationDeclarer declarer) {
-    ParameterGroupDeclarer params = voidOperation(declarer, "checkSummary")
-        .describedAs("Evaluates the log summary to be logged, checking that it contains the information expected.")
-        .withStereotype(LOG_CHECKER)
-        .onDefaultParameterGroup();
-
-    ObjectTypeBuilder summaryBuilder = BASE_TYPE_BUILDER.objectType();
-    summaryBuilder.addField().key("key").value(STRING_TYPE).required();
-    summaryBuilder.addField().key("value").value(STRING_TYPE).required(false);
-    summaryBuilder.addField().key("valueStartsWith").value(STRING_TYPE).required(false);
-
-    params.withRequiredParameter("summaryInfos")
-        .describedAs("An element expected log summary information")
-        .ofType(BASE_TYPE_BUILDER.arrayType().of(summaryBuilder).build())
-        .withDsl(ParameterDslConfiguration.builder()
-            .allowsReferences(false)
-            .allowTopLevelDefinition(false)
-            .allowsInlineDefinition(true)
-            .build())
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
-
-    params.withOptionalParameter("exclusiveContent")
-        .describedAs("Specifies if the content to check should be the only one present(true) or it allows another information(false)")
-        .ofType(BOOLEAN_TYPE)
-        .defaultingTo(false);
-  }
-
-  private void declareCause(HasOperationDeclarer declarer) {
-    voidOperation(declarer, "cause")
-        .describedAs("An element with information about stacktraces exception causes")
-        .withStereotype(STACK_TRACE_ELEMENT)
-        .onDefaultParameterGroup()
-        .withRequiredParameter("exception")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().classValue(new ClassValueModel(singletonList("java.lang.Exception"))).build());
-  }
-
-  private void declareMethodCall(HasOperationDeclarer declarer) {
-    ParameterGroupDeclarer params = voidOperation(declarer, "methodCall")
-        .describedAs("An element with information about stacktraces method calls")
-        .withStereotype(STACK_TRACE_ELEMENT)
-        .onDefaultParameterGroup();
-
-    params.withOptionalParameter("package")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    params.withOptionalParameter("class")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().classValue(new ClassValueModel(singletonList("java.lang.Object"))).build());
-
-    params.withOptionalParameter("method")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    params.withOptionalParameter("lineNumber")
-        .ofType(INTEGER_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-  }
-
-  private void declareCheckStackTrace(HasOperationDeclarer declarer) {
-    OperationDeclarer operation = voidOperation(declarer, "checkStackTrace")
-        .describedAs("Evaluates the stacktrace to be logged, checking that it goes through expected method calls")
-        .withStereotype(LOG_CHECKER);
-
-    operation.withChain()
-        .withAllowedStereotypes(STACK_TRACE_ELEMENT)
-        .withMinOccurs(1)
-        .withMaxOccurs(null)
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
-  }
-
-  private void declareCheckEquals(HasOperationDeclarer declarer) {
-    ParameterGroupDeclarer params = voidOperation(declarer, "checkEquals")
-        .describedAs("Evaluates the expected and actual logs line by line expecting them to be equal")
-        .withStereotype(LOG_CHECKER)
-        .onDefaultParameterGroup();
-
-    params.withOptionalParameter("filterLog")
-        .describedAs("Configures whether or not to filter the logs to compare before comparison, removing delimiter lines and special characters")
-        .ofType(BOOLEAN_TYPE)
-        .defaultingTo(true);
   }
 
   private void declareOnErrorCheckLog(HasOperationDeclarer declarer) {
@@ -197,10 +101,6 @@ class TestComponentExtensionModelDeclarer {
     operation.withOutput().ofType(ANY_TYPE);
     operation.withOutputAttributes().ofType(ANY_TYPE);
 
-    operation.withChain()
-        .withAllowedStereotypes(LOG_CHECKER)
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
-
     ParameterGroupDeclarer params = operation.onDefaultParameterGroup();
     params.withOptionalParameter("propagate")
         .ofType(BOOLEAN_TYPE)
@@ -208,6 +108,119 @@ class TestComponentExtensionModelDeclarer {
     params.withOptionalParameter("succeedIfNoLog")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false);
+
+    ObjectTypeBuilder checkEqualsType = BASE_TYPE_BUILDER.objectType()
+        .id("CheckEquals")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    checkEqualsType.addField()
+        .key("expectedLogMessage")
+        .value(STRING_TYPE).required(true)
+        .with(new LayoutTypeAnnotation(LayoutModel.builder().asText().build()))
+        .build();
+    checkEqualsType.addField()
+        .key("filterLog")
+        .description("Configures whether or not to filter the logs to compare before comparison, removing delimiter lines and special characters")
+        .value(BOOLEAN_TYPE).required(false);
+
+    params.withOptionalParameter("checkEquals")
+        .ofType(checkEqualsType.build())
+        .describedAs("Evaluates the expected and actual logs line by line expecting them to be equal")
+        .withRole(BEHAVIOUR)
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
+    ParameterGroupDeclarer checkStackTraceGroup = operation.onParameterGroup("checkStackTrace")
+        .withDslInlineRepresentation(true);
+
+    ObjectTypeBuilder methodCallType = BASE_TYPE_BUILDER.objectType()
+        .id("MethodCall")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    methodCallType.addField()
+        .key("class")
+        .value(STRING_TYPE).required(false)
+        .build();
+    methodCallType.addField()
+        .key("method")
+        .value(STRING_TYPE).required(false)
+        .build();
+    methodCallType.addField()
+        .key("package")
+        .value(STRING_TYPE).required(false)
+        .build();
+    methodCallType.addField()
+        .key("linenumber")
+        .value(INTEGER_TYPE).required(false)
+        .build();
+
+    checkStackTraceGroup.withOptionalParameter("methodCall")
+        .ofType(methodCallType.build())
+        .describedAs("An element with information about stacktraces method calls")
+        .withRole(BEHAVIOUR)
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
+    ObjectTypeBuilder causeType = BASE_TYPE_BUILDER.objectType()
+        .id("Cause")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    causeType.addField()
+        .key("exception")
+        .value(STRING_TYPE).required(true)
+        .build();
+
+    checkStackTraceGroup.withOptionalParameter("cause")
+        .ofType(causeType.build())
+        .withRole(BEHAVIOUR)
+        .describedAs("An element with information about stacktraces exception causes")
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
+    ParameterGroupDeclarer checkSummaryGroup = operation.onParameterGroup("checkStackTrace")
+        .withDslInlineRepresentation(true);
+
+    ObjectTypeBuilder summaryInfoType = BASE_TYPE_BUILDER.objectType()
+        .id("Cause")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    summaryInfoType.addField()
+        .key("key")
+        .value(STRING_TYPE).required(true)
+        .build();
+    summaryInfoType.addField()
+        .key("value")
+        .value(STRING_TYPE).required(false)
+        .build();
+    summaryInfoType.addField()
+        .key("valueStartsWith")
+        .value(STRING_TYPE).required(true)
+        .build();
+
+    checkSummaryGroup.withOptionalParameter("summaryInfo")
+        .ofType(summaryInfoType.build())
+        .withRole(BEHAVIOUR)
+        .describedAs("An element expected log summary information")
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
+    checkSummaryGroup.withOptionalParameter("exclusiveContent")
+        .describedAs("Specifies if the content to check should be the only one present(true) or it allows another information(false)")
+        .ofType(BOOLEAN_TYPE)
+        .defaultingTo(false);
+
   }
 
   private void declareDependencyInjectionObject(HasConstructDeclarer declarer) {
@@ -258,7 +271,7 @@ class TestComponentExtensionModelDeclarer {
         .withDisplayModel(DisplayModel.builder()
             .classValue(new ClassValueModel(singletonList("org.mule.runtime.api.exception.TypedException"))).build());
 
-    params.withOptionalParameter("errorType")
+    params.withOptionalParameter("error")
         .describedAs("The error to throw. If provided, the exception will be used as cause for a TypedException.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
@@ -346,7 +359,7 @@ class TestComponentExtensionModelDeclarer {
         .describedAs("Assertion processor used to assert an expression, invocation count and thread.")
         .onDefaultParameterGroup();
 
-    params.withRequiredParameter("expression")
+    params.withOptionalParameter("expression")
         .ofType(BOOLEAN_TYPE)
         .withExpressionSupport(REQUIRED);
 
@@ -376,25 +389,44 @@ class TestComponentExtensionModelDeclarer {
     processor.withOutput().ofType(ANY_TYPE);
     processor.withOutputAttributes().ofType(ANY_TYPE);
 
-    ParameterGroupDeclarer params = processor.onParameterGroup("return-data").withDslInlineRepresentation(true);
-    params.withOptionalParameter("file")
-        .describedAs("The location of a file to load. The file can point to a resource on the classpath or on disk.")
-        .ofType(STRING_TYPE)
-        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, ANY, new String[] {})).build())
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    params = processor.onParameterGroup("callback").withDslInlineRepresentation(true);
-    params.withOptionalParameter("class")
+    NestedComponentDeclarer callbackDeclarer = processor.withOptionalComponent("callback");
+    callbackDeclarer.onDefaultParameterGroup().withOptionalParameter("class")
         .describedAs("A user-defined callback that is invoked when the test component is invoked. This can be useful for capturing information such as message counts. Use the {{class}} attribute to specify the callback class name, which must be an object that implements {{org.mule.tck.functional.EventCallback}}.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .withDisplayModel(DisplayModel.builder()
             .classValue(new ClassValueModel(singletonList("org.mule.tck.functional.EventCallback"))).build());
 
-    params = processor.onDefaultParameterGroup();
+    ParameterGroupDeclarer params = processor.onDefaultParameterGroup();
+
+    ObjectTypeBuilder returnDataType = BASE_TYPE_BUILDER.objectType()
+        .id("ReturnData")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    returnDataType.addField()
+        .key("content")
+        .value(STRING_TYPE).required(false)
+        .with(new LayoutTypeAnnotation(LayoutModel.builder().asText().build()))
+        .build();
+    returnDataType.addField()
+        .key("file")
+        .description("The location of a file to load. The file can point to a resource on the classpath or on disk.")
+        .value(STRING_TYPE).required(false);
+
+    params.withOptionalParameter("return-data")
+        .ofType(returnDataType.build())
+        .describedAs("Defines the data to return from the service once it has been invoked. The return data can be located in a file, which you specify using the {{file}} attribute (specify a resource on the classpath or on disk), or the return data can be embeddded directly in the XML.")
+        .withRole(BEHAVIOUR)
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
     params.withOptionalParameter("processingType")
         .describedAs("The kind of work this component will report to do, in order to affect the behavior of the Processing Strategy.")
         .ofType(BASE_TYPE_BUILDER.stringType().enumOf("CPU_INTENSIVE", "CPU_LITE", "BLOCKING", "IO_RW", "CPU_LITE_ASYNC").build())
+        .defaultingTo("CPU_LITE")
         .withExpressionSupport(NOT_SUPPORTED);
     params.withOptionalParameter("class")
         .describedAs("The class name of a processor to be instantiated and executed")
@@ -429,19 +461,19 @@ class TestComponentExtensionModelDeclarer {
     params.withOptionalParameter("enableMessageHistory")
         .describedAs("Every message that is received by the test processor is stored and can be retrieved. If you do not want this information stored, such as if you are running millions of messages through the component, you can disable this feature to avoid a potential out of memory error.")
         .ofType(BOOLEAN_TYPE)
-        .defaultingTo(false)
+        .defaultingTo(true)
         .withExpressionSupport(NOT_SUPPORTED);
 
     params.withOptionalParameter("enableNotifications")
         .describedAs("Whether to fire a {{FunctionalTestNotification}} when a message is received by the processor. Test cases can register to receive these notifications and make assertions on the current message.")
         .ofType(BOOLEAN_TYPE)
-        .defaultingTo(false)
+        .defaultingTo(true)
         .withExpressionSupport(NOT_SUPPORTED);
 
     params.withOptionalParameter("appendString")
         .describedAs("A string value that will be appended to every message payload that passes through the processor. Note that by setting this property you implicitly select that the message payload will be converted to a string and that a string payload will be returned.")
         .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
+        .withExpressionSupport(SUPPORTED);
 
     params.withOptionalParameter("waitTime")
         .describedAs("The time in milliseconds to wait before returning a result. All processing happens in the processor before the wait begins.")

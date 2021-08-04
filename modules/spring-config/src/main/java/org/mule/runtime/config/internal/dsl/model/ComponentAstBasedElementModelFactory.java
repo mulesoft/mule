@@ -14,7 +14,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -395,7 +394,7 @@ class ComponentAstBasedElementModelFactory {
                     getIdentifier(paramDsl)
                         .ifPresent(tagId -> groupCompAstBuilder.addChildComponent()
                             .withIdentifier(tagId)
-                            .withRawParameter(BODY_RAW_PARAM_NAME, defaultValue)
+                            .withBodyParameter(defaultValue)
                             .build());
                   } else {
                     groupCompAstBuilder.withRawParameter(defaultValue, paramDsl.getAttributeName());
