@@ -92,9 +92,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
                                   OperationContainerElement methodOwnerClass,
                                   OperationElement operationMethod,
                                   ClassTypeLoader typeLoader,
-                                  ExtensionLoadingContext loadingContext,
-                                  boolean supportsConfig) {
-    super(supportsConfig);
+                                  ExtensionLoadingContext loadingContext) {
     this.extensionElement = extensionElement;
     this.operationMethod = operationMethod;
     this.typeLoader = typeLoader;

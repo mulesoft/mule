@@ -29,6 +29,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -72,7 +73,12 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
 
   @Override
   public List<OperationModelParser> getOperationParsers() {
-    return JavaExtensionModelParserUtils.getOperationParsers(extensionElement, configElement, loadingContext, true);
+    return JavaExtensionModelParserUtils.getOperationParsers(extensionElement, configElement, typeLoader, loadingContext);
+  }
+
+  @Override
+  public List<SourceModelParser> getSourceModelParsers() {
+    return JavaExtensionModelParserUtils.getSourceParsers(configElement.getSources(), typeLoader, loadingContext);
   }
 
   @Override

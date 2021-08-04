@@ -7,42 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isIgnored;
 
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
-import org.mule.runtime.extension.api.annotation.Streaming;
-import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
-import org.mule.runtime.module.extension.api.loader.java.type.Type;
-import org.mule.runtime.module.extension.api.loader.java.type.WithMessageSources;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +29,6 @@ import java.util.function.Supplier;
  */
 final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
-  private static final String SOURCE = "Source";
-
   private final Map<SourceModelParser, SourceDeclarer> sourceDeclarers = new HashMap<>();
 
   SourceModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
@@ -65,10 +36,9 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   // TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
-  void declareMessageSource(ExtensionDeclarer extensionDeclarer,
+  void declareMessageSources(ExtensionDeclarer extensionDeclarer,
                             HasSourceDeclarer ownerDeclarer,
-                            List<SourceModelParser> parsers,
-                            ExtensionLoadingContext context) {
+                            List<SourceModelParser> parsers) {
 
     for (SourceModelParser parser : parsers) {
 
@@ -107,44 +77,25 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());
 
       loader.getParameterModelsLoaderDelegate().declare(sourceDeclarer, parser.getParameterGroupModelParsers());
-      declareSourceCallback(parser, sourceDeclarer);
 
       parser.getMediaTypeModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       parser.getAdditionalModelProperties().forEach(sourceDeclarer::withModelProperty);
 
+      // TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection
+      declareSourceCallbackParameters(parser.getOnSuccessCallbackParser(), sourceDeclarer::onSuccess);
+      declareSourceCallbackParameters(parser.getOnErrorCallbackParser(), sourceDeclarer::onError);
+      declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate);
+      declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onBackPressure);
+
       sourceDeclarers.put(parser, sourceDeclarer);
     }
   }
 
-  private void declareSourceCallback(SourceElement sourceType, SourceDeclarer source) {
-    final Optional<MethodElement> onResponseMethod = sourceType.getOnResponseMethod();
-    final Optional<MethodElement> onErrorMethod = sourceType.getOnErrorMethod();
-    final Optional<MethodElement> onTerminateMethod = sourceType.getOnTerminateMethod();
-    final Optional<MethodElement> onBackPressureMethod = sourceType.getOnBackPressureMethod();
-
-    // TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection
-    declareSourceCallbackParameters(source, onResponseMethod, source::onSuccess);
-    declareSourceCallbackParameters(source, onErrorMethod, source::onError);
-    declareSourceCallbackParameters(source, onTerminateMethod, source::onTerminate);
-    declareSourceCallbackParameters(source, onBackPressureMethod, source::onBackPressure);
-
-    source.withModelProperty(new SourceCallbackModelProperty(getMethod(onResponseMethod),
-                                                             getMethod(onErrorMethod),
-                                                             getMethod(onTerminateMethod),
-                                                             getMethod(onBackPressureMethod)));
-  }
-
-
-  private void declareSourceCallbackParameters(SourceDeclarer source, Optional<MethodElement> sourceCallback,
-                                               Supplier<ParameterizedDeclarer> callback) {
-    sourceCallback.ifPresent(method -> {
-      ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(SOURCE, source.getDeclaration());
-      loader.getMethodParametersLoader().declare(callback.get(), method.getParameters(), declarationContext);
-    });
-  }
-
-  private Optional<Method> getMethod(Optional<MethodElement> method) {
-    return method.flatMap(MethodElement::getMethod);
+  private void declareSourceCallbackParameters(Optional<SourceCallbackModelParser> parser,
+                                               Supplier<ParameterizedDeclarer> declarer) {
+    parser.ifPresent(callback ->
+        loader.getParameterModelsLoaderDelegate().declare(declarer.get(), callback.getParameterGroupModelParsers())
+    );
   }
 }

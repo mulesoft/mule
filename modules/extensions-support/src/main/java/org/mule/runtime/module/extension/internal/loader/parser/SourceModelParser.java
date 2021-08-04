@@ -25,6 +25,14 @@ public interface SourceModelParser {
 
   OutputModelParser getAttributesOutputType();
 
+  Optional<SourceCallbackModelParser> getOnSuccessCallbackParser();
+
+  Optional<SourceCallbackModelParser> getOnErrorCallbackParser();
+
+  Optional<SourceCallbackModelParser> getOnTerminateCallbackParser();
+
+  Optional<SourceCallbackModelParser> getOnBackPressureCallbackParser();
+
   List<ParameterGroupModelParser> getParameterGroupModelParsers();
 
   SdkSourceFactoryModelProperty getSourceFactoryModelProperty();
@@ -48,4 +56,10 @@ public interface SourceModelParser {
   Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty();
 
   List<ModelProperty> getAdditionalModelProperties();
+
+  interface SourceCallbackModelParser {
+
+    List<ParameterGroupModelParser> getParameterGroupModelParsers();
+
+  }
 }

@@ -26,15 +26,10 @@ abstract class AbstractExecutableComponentModelParser {
 
   protected OutputModelParser outputType;
   protected OutputModelParser outputAttributesType;
-  protected final boolean supportsConfig;
   protected boolean supportsStreaming = false;
   protected boolean connected = false;
   protected boolean transactional = false;
   protected final List<ModelProperty> additionalModelProperties = new LinkedList<>();
-
-  protected AbstractExecutableComponentModelParser(boolean supportsConfig) {
-    this.supportsConfig = supportsConfig;
-  }
 
   protected void processComponentConnectivity(WithParameters component) {
     List<ExtensionParameter> connectionParameters = component.getParametersAnnotatedWith(Connection.class);
