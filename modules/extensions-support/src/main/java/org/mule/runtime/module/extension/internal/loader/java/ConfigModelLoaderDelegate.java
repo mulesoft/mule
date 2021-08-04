@@ -31,34 +31,26 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     super(delegate);
   }
 
-  void declareConfigurations(ExtensionDeclarer declarer,
-                             ExtensionModelParser extensionModelParser,
-                             ExtensionLoadingContext context) {
-    extensionModelParser.getConfigurationParsers().forEach(configParser -> declareConfiguration(declarer, configParser, context));
-  }
+  void declareConfigurations(ExtensionDeclarer declarer, ExtensionModelParser extensionModelParser) {
+    for (ConfigurationModelParser configParser : extensionModelParser.getConfigurationParsers()) {
 
-  private void declareConfiguration(ExtensionDeclarer declarer,
-                                    ConfigurationModelParser configParser,
-                                    ExtensionLoadingContext loadingContext) {
+      ConfigurationDeclarer configurationDeclarer = declarer.withConfig(configParser.getName())
+          .describedAs(configParser.getDescription())
+          .withModelProperty(configParser.getConfigurationFactoryModelProperty());
 
-    ConfigurationDeclarer configurationDeclarer = declarer.withConfig(configParser.getName())
-        .describedAs(configParser.getDescription())
-        .withModelProperty(configParser.getConfigurationFactoryModelProperty());
+      if (configParser.isForceNoExplicit()) {
+        configurationDeclarer.withModelProperty(new NoImplicitModelProperty());
+      }
 
-    if (configParser.isForceNoExplicit()) {
-      configurationDeclarer.withModelProperty(new NoImplicitModelProperty());
+      configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
+      configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
+
+      loader.getParameterModelsLoaderDelegate().declare(configurationDeclarer, configParser.getParameterGroupParsers());
+
+      getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configParser.getOperationParsers());
+      getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configParser.getSourceModelParsers());
+      getFunctionModelLoaderDelegate().declareFunctions(declarer, configParser.getFunctionModelParsers());
+      getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configType);
     }
-
-    configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
-    configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
-
-    loader.getParameterModelsLoaderDelegate().declare(configurationDeclarer, configParser.getParameterGroupParsers());
-
-    getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configParser.getOperationParsers());
-    getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configParser.getSourceModelParsers());
-    getFunctionModelLoaderDelegate().declareFunctions(declarer, configParser.getFunctionModelParsers());
-    getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configType);
   }
-
-
 }

@@ -78,7 +78,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     extensionModelParser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     extensionModelParser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
-    configLoaderDelegate.declareConfigurations(declarer, extensionModelParser, context);
+    configLoaderDelegate.declareConfigurations(declarer, extensionModelParser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, extensionElement);
 
     if (!isEmpty(extensionElement.getConfigurations())) {
