@@ -6675,7 +6675,7 @@
         }
       ],
       "name": "dr-strange",
-      "description": "",
+      "description": "Default extension to test cursor streams and lists. Given Dr. Strange\u0027s ability to use the eye of Agamotto to reverse and advance time, he\u0027s uniquely positioned to manipulate such streams",
       "modelProperties": {
         "requiredForMetadata": {
           "requiredParameters": [
@@ -11911,7 +11911,7 @@
         }
       ],
       "name": "scopeverse",
-      "description": "",
+      "description": "\"Dr. Strange and the Multiple Stream Readers of Madness\", featuring an SDK scope. Consume the payload stream both at the beginning and the end of the provided chain.",
       "modelProperties": {},
       "kind": "operation"
     },

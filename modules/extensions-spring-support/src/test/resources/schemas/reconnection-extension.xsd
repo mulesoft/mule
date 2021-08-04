@@ -8,6 +8,9 @@
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
+          <xs:annotation>
+            <xs:documentation>This class represents an extension configuration, values set in this class are commonly used across multiple operations since they represent something core from the extension.</xs:documentation>
+          </xs:annotation>
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
@@ -33,7 +36,11 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FallibleReconnectableSourceType" substitutionGroup="mule:abstract-message-source" name="fallible-reconnectable-source"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FallibleReconnectableSourceType" substitutionGroup="mule:abstract-message-source" name="fallible-reconnectable-source">
+    <xs:annotation>
+      <xs:documentation>This class represents a Source that can fail starting repeatedly and after all reconnect successfully. Also keeps in track if multiple instances were starting at the same time.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
   <xs:complexType name="FallibleReconnectableSourceType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
@@ -54,7 +61,11 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="NonReconnectableSourceType" substitutionGroup="mule:abstract-message-source" name="non-reconnectable-source"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="NonReconnectableSourceType" substitutionGroup="mule:abstract-message-source" name="non-reconnectable-source">
+    <xs:annotation>
+      <xs:documentation>This class represents a Source that after failure never reconnects. It also keeps track of how many attempts were made.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
   <xs:complexType name="NonReconnectableSourceType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
@@ -227,7 +238,11 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SwitchConnectionType" substitutionGroup="mule:abstract-operator" name="switch-connection"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SwitchConnectionType" substitutionGroup="mule:abstract-operator" name="switch-connection">
+    <xs:annotation>
+      <xs:documentation>Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
   <xs:complexType name="SwitchConnectionType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">

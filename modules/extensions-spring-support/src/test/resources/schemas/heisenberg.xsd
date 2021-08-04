@@ -414,6 +414,9 @@
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="candidate-doors">
+              <xs:annotation>
+                <xs:documentation>Doors I might knock on but still haven't made up mind about</xs:documentation>
+              </xs:annotation>
               <xs:complexType>
                 <xs:sequence>
                   <xs:element minOccurs="0" maxOccurs="unbounded" name="candidate-door">
@@ -526,7 +529,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="wildCards"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="weaponValueMap"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors">
+            <xs:annotation>
+              <xs:documentation>Doors I might knock on but still haven't made up mind about</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
           <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
           <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
