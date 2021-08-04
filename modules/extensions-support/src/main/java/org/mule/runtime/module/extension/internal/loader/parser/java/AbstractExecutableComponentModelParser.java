@@ -18,6 +18,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 
 import java.util.LinkedList;
 import java.util.List;

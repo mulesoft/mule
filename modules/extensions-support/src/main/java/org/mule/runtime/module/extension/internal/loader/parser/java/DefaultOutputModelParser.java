@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.parser;
+package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.module.extension.internal.loader.parser.java.OutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 
 public class DefaultOutputModelParser implements OutputModelParser {
 

@@ -10,7 +10,6 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.java.OutputModelParser;
 
 import java.util.List;
 import java.util.Optional;

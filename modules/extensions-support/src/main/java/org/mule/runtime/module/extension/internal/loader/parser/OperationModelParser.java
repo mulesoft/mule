@@ -11,7 +11,6 @@ import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.java.OutputModelParser;
 
 import java.util.List;
 import java.util.Optional;
