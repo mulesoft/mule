@@ -122,11 +122,12 @@ final class JavaExtensionModelParserUtils {
         ).collect(toList());
   }
 
-  static List<SourceModelParser> getSourceParsers(List<SourceElement> sources,
+  static List<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
+                                                  List<SourceElement> sources,
                                                   ClassTypeLoader typeLoader,
                                                   ExtensionLoadingContext loadingContext) {
     return sources.stream()
-        .map(source -> new JavaSourceModelParser(source, typeLoader, loadingContext))
+        .map(source -> new JavaSourceModelParser(extensionElement, source, typeLoader, loadingContext))
         .collect(toList());
   }
 
@@ -135,9 +136,9 @@ final class JavaExtensionModelParserUtils {
                                                            ClassTypeLoader typeLoader,
                                                            ExtensionLoadingContext loadingContext) {
     return functionContainers.stream()
-        .flatMap(container -> container.getFunctions().stream()
-          .map(func -> new JavaFunctionModelParser(extensionElement, func, typeLoader, loadingContext))
-        ).collect(toList());
+        .flatMap(container -> container.getFunctions().stream())
+        .map(func -> new JavaFunctionModelParser(extensionElement, func, typeLoader, loadingContext))
+        .collect(toList());
   }
 
   static List<ParameterGroupModelParser> getParameterGroupParsers(List<? extends ExtensionParameter> parameters,

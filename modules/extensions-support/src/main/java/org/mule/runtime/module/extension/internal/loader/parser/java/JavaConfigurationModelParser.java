@@ -79,7 +79,7 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
 
   @Override
   public List<SourceModelParser> getSourceModelParsers() {
-    return JavaExtensionModelParserUtils.getSourceParsers(configElement.getSources(), typeLoader, loadingContext);
+    return JavaExtensionModelParserUtils.getSourceParsers(extensionElement, configElement.getSources(), typeLoader, loadingContext);
   }
 
   @Override

@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
@@ -51,20 +52,18 @@ import java.util.Optional;
 public class JavaSourceModelParser extends AbstractExecutableComponentModelParser implements SourceModelParser {
 
   private final SourceElement sourceElement;
-  private final ExtensionLoadingContext loadingContext;
-  private final ClassTypeLoader typeLoader;
 
   private final Class<?> sourceClass;
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
 
 
-  public JavaSourceModelParser(SourceElement sourceElement,
+  public JavaSourceModelParser(ExtensionElement extensionElement,
+                               SourceElement sourceElement,
                                ClassTypeLoader typeLoader,
                                ExtensionLoadingContext loadingContext) {
+    super(extensionElement, typeLoader, loadingContext);
     this.sourceElement = sourceElement;
-    this.typeLoader = typeLoader;
-    this.loadingContext = loadingContext;
 
     sourceClass = sourceElement.getDeclaringClass().get();
 
