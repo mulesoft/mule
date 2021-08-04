@@ -1199,7 +1199,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureSplitterExceptionHandlingFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HANDLE_SPLITTER_EXCEPTION, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.withoutSuffixes().atLeast("4.4.0")).isPresent());
   }
 
   private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
@@ -1217,13 +1217,13 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   public static void configurePropertiesResolverFeatureFlag() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.2.2")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.withoutSuffixes().newerThan("4.2.2")).isPresent());
   }
 
   private static void configureEnablePolicyIsolation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_POLICY_ISOLATION, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.withoutSuffixes().atLeast("4.4.0")).isPresent());
   }
 
   /**
@@ -1235,7 +1235,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEntityResolverFailOnFirstErrorFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.withoutSuffixes().atLeast("4.4.0")).isPresent());
   }
 
   /**
@@ -1247,7 +1247,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureSetVariableWithNullVale() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(SET_VARIABLE_WITH_NULL_VALUE, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.withoutSuffixes().atLeast("4.4.0")).isPresent());
   }
 
 }

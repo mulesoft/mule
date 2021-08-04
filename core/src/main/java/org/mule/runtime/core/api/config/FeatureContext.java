@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.api.config;
 
-import static org.mule.runtime.api.meta.MuleVersion.NO_REVISION;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.MuleVersion;
@@ -27,16 +26,7 @@ public class FeatureContext {
 
   public FeatureContext(MuleVersion artifactMinMuleVersion, String artifactName) {
     this.artifactName = artifactName;
-    // Feature flag evaluations must ignore suffixes
-    if (artifactMinMuleVersion != null) {
-      String nonSuffixedArtifactMuleVersion = artifactMinMuleVersion.getMajor() + "." + artifactMinMuleVersion.getMinor();
-      if (artifactMinMuleVersion.getRevision() != NO_REVISION) {
-        nonSuffixedArtifactMuleVersion = nonSuffixedArtifactMuleVersion + "." + artifactMinMuleVersion.getRevision();
-      }
-      this.artifactMinMuleVersion = new MuleVersion(nonSuffixedArtifactMuleVersion);
-    } else {
-      this.artifactMinMuleVersion = null;
-    }
+    this.artifactMinMuleVersion = artifactMinMuleVersion;
   }
 
   public Optional<MuleVersion> getArtifactMinMuleVersion() {

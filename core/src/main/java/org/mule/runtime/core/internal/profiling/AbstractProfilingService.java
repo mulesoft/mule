@@ -111,7 +111,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_PROFILING_SERVICE,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion
+                                                    .filter(muleVersion -> muleVersion.withoutSuffixes()
                                                         .atLeast(ENABLE_PROFILING_SERVICE.getSince()))
                                                     .isPresent());
   }
