@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionContainerElement;
@@ -41,6 +42,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
@@ -128,6 +130,16 @@ final class JavaExtensionModelParserUtils {
                                                   ExtensionLoadingContext loadingContext) {
     return sources.stream()
         .map(source -> new JavaSourceModelParser(extensionElement, source, typeLoader, loadingContext))
+        .collect(toList());
+  }
+
+  static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(
+      ExtensionElement extensionElement,
+      List<ConnectionProviderElement> connectionProviderElements,
+      ClassTypeLoader typeLoader) {
+
+    return connectionProviderElements.stream()
+        .map(cpElement -> new JavaConnectionProviderModelParser(extensionElement, cpElement, typeLoader))
         .collect(toList());
   }
 

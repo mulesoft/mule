@@ -6,19 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.String.format;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.NoImplicitModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 /**
  * Helper class for declaring configurations through a {@link DefaultJavaModelLoaderDelegate}
@@ -50,7 +42,9 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
       getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configParser.getOperationParsers());
       getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configParser.getSourceModelParsers());
       getFunctionModelLoaderDelegate().declareFunctions(declarer, configParser.getFunctionModelParsers());
-      getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configType);
+      getConnectionProviderModelLoaderDelegate().declareConnectionProviders(
+          configurationDeclarer,
+          configParser.getConnectionProviderModelParsers());
     }
   }
 }
