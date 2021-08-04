@@ -55,8 +55,8 @@ class StackableTypesModelPropertyResolver {
             .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
             .setExpressionBasedResolverFactory((value, expectedType,
                                                 content) -> new ExpressionBasedParameterResolverValueResolver(value, expectedType,
-                fromType(expectedType),
-                content))
+                                                                                                              fromType(expectedType),
+                                                                                                              content))
             .build())
         .addType(StackableType
             .builder(TypedValue.class)
@@ -64,17 +64,17 @@ class StackableTypesModelPropertyResolver {
             .setDelegateResolverFactory(valueResolver -> new TypedValueValueResolverWrapper(valueResolver))
             .setExpressionBasedResolverFactory((expression, expectedType,
                                                 content) -> new ExpressionTypedValueValueResolver(expression,
-                expectedType, content))
+                                                                                                  expectedType, content))
             .build())
         .addType(StackableType
             .builder(Literal.class)
             .setExpressionBasedResolverFactory((expression, expectedType, content) -> new StaticLiteralValueResolver(expression,
-                expectedType))
+                                                                                                                     expectedType))
             .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))
             .build())
         .build();
   }
-  
+
   private final Map<Type, StackableType> stackableTypes;
 
   private StackableTypesModelPropertyResolver(Map<Type, StackableType> stackableTypes) {
@@ -88,7 +88,8 @@ class StackableTypesModelPropertyResolver {
    * @param parameter          {@link ExtensionParameter} with introspected information of the Java parameter
    * @param declarationContext context of the parameter to be declared
    */
-  public List<ModelProperty> resolveStackableProperties(ExtensionParameter parameter, ParameterDeclarationContext declarationContext) {
+  public List<ModelProperty> resolveStackableProperties(ExtensionParameter parameter,
+                                                        ParameterDeclarationContext declarationContext) {
     List<ModelProperty> properties = new LinkedList<>();
     LazyValue<StackedTypesModelProperty.Builder> stackedTypesModelPropertyBuilder =
         new LazyValue<>(StackedTypesModelProperty::builder);

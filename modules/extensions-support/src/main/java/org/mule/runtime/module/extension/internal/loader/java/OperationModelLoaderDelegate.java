@@ -51,8 +51,9 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       if (actualDeclarer == extensionDeclarer && requiresConfig) {
         throw new IllegalOperationModelDefinitionException(format(
-            "Operation '%s' is defined at the extension level but it requires a config. "
-                + "Remove such parameter or move the operation to the proper config", parser.getName()));
+                                                                  "Operation '%s' is defined at the extension level but it requires a config. "
+                                                                      + "Remove such parameter or move the operation to the proper config",
+                                                                  parser.getName()));
       }
 
       if (operationDeclarers.containsKey(parser)) {

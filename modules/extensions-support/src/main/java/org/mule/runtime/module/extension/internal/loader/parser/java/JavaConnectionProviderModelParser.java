@@ -108,8 +108,8 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   @Override
   public ConnectionProviderFactoryModelProperty getConnectionProviderFactoryModelProperty() {
     return new ConnectionProviderFactoryModelProperty(new DefaultConnectionProviderFactory(
-        element.getDeclaringClass().get(),
-        extensionClassLoader));
+                                                                                           element.getDeclaringClass().get(),
+                                                                                           extensionClassLoader));
   }
 
   @Override
@@ -127,21 +127,21 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
     List<OAuthGrantType> grantTypes = new LinkedList<>();
     element.getAnnotation(AuthorizationCode.class).ifPresent(a -> {
       grantTypes.add(new AuthorizationCodeGrantType(a.accessTokenUrl(),
-          a.authorizationUrl(),
-          a.accessTokenExpr(),
-          a.expirationExpr(),
-          a.refreshTokenExpr(),
-          a.defaultScopes(),
-          a.credentialsPlacement(),
-          a.includeRedirectUriInRefreshTokenRequest()));
+                                                    a.authorizationUrl(),
+                                                    a.accessTokenExpr(),
+                                                    a.expirationExpr(),
+                                                    a.refreshTokenExpr(),
+                                                    a.defaultScopes(),
+                                                    a.credentialsPlacement(),
+                                                    a.includeRedirectUriInRefreshTokenRequest()));
     });
 
     element.getAnnotation(ClientCredentials.class).ifPresent(a -> {
       grantTypes.add(new ClientCredentialsGrantType(a.tokenUrl(),
-          a.accessTokenExpr(),
-          a.expirationExpr(),
-          a.defaultScopes(),
-          a.credentialsPlacement()));
+                                                    a.accessTokenExpr(),
+                                                    a.expirationExpr(),
+                                                    a.defaultScopes(),
+                                                    a.credentialsPlacement()));
 
     });
 
@@ -159,9 +159,9 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
     if (providerGenerics.size() != 1) {
       // TODO: MULE-9220: Add a syntax validator for this
       throw new IllegalConnectionProviderModelDefinitionException(
-          format("Connection provider class '%s' was expected to have 1 generic type "
-                  + "(for the connection type) but %d were found",
-              element.getName(), providerGenerics.size()));
+                                                                  format("Connection provider class '%s' was expected to have 1 generic type "
+                                                                      + "(for the connection type) but %d were found",
+                                                                         element.getName(), providerGenerics.size()));
     }
 
     additionalModelProperties.add(new ConnectionTypeModelProperty(providerGenerics.get(0)));

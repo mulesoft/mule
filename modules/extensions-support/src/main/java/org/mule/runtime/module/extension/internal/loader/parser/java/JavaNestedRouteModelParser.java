@@ -59,8 +59,8 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
     final List<FieldElement> parameters = route.getType().getAnnotatedFields(
-        Parameter.class,
-        org.mule.sdk.api.annotation.param.Parameter.class);
+                                                                             Parameter.class,
+                                                                             org.mule.sdk.api.annotation.param.Parameter.class);
 
     return getOperationFieldParameterGroupParsers(parameters, typeLoader);
   }

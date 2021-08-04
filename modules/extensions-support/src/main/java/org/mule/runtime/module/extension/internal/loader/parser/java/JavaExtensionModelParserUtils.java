@@ -64,8 +64,7 @@ import java.util.function.Function;
  */
 final class JavaExtensionModelParserUtils {
 
-  private JavaExtensionModelParserUtils() {
-  }
+  private JavaExtensionModelParserUtils() {}
 
   static List<ExtensionParameter> getCompletionCallbackParameters(MethodElement method) {
     return method.getParameters().stream()
@@ -120,8 +119,8 @@ final class JavaExtensionModelParserUtils {
                                                         ExtensionLoadingContext loadingContext) {
     return operationContainers.getOperationContainers().stream()
         .flatMap(container -> container.getOperations().stream()
-            .map(method -> new JavaOperationModelParser(extensionElement, container, method, typeLoader, loadingContext))
-        ).collect(toList());
+            .map(method -> new JavaOperationModelParser(extensionElement, container, method, typeLoader, loadingContext)))
+        .collect(toList());
   }
 
   static List<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
@@ -134,9 +133,9 @@ final class JavaExtensionModelParserUtils {
   }
 
   static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(
-      ExtensionElement extensionElement,
-      List<ConnectionProviderElement> connectionProviderElements,
-      ClassTypeLoader typeLoader) {
+                                                                               ExtensionElement extensionElement,
+                                                                               List<ConnectionProviderElement> connectionProviderElements,
+                                                                               ClassTypeLoader typeLoader) {
 
     return connectionProviderElements.stream()
         .map(cpElement -> new JavaConnectionProviderModelParser(extensionElement, cpElement, typeLoader))
@@ -192,12 +191,12 @@ final class JavaExtensionModelParserUtils {
                                                                   ClassTypeLoader typeLoader,
                                                                   Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
     checkAnnotationsNotUsedMoreThanOnce(parameters,
-        Connection.class,
-        org.mule.sdk.api.annotation.param.Connection.class,
-        Config.class,
-        org.mule.sdk.api.annotation.param.Config.class,
-        MetadataKeyId.class,
-        org.mule.sdk.api.annotation.metadata.MetadataKeyId.class);
+                                        Connection.class,
+                                        org.mule.sdk.api.annotation.param.Connection.class,
+                                        Config.class,
+                                        org.mule.sdk.api.annotation.param.Config.class,
+                                        MetadataKeyId.class,
+                                        org.mule.sdk.api.annotation.metadata.MetadataKeyId.class);
 
     List<ParameterGroupModelParser> groups = new LinkedList<>();
     List<ExtensionParameter> defaultGroupParams = new LinkedList<>();
@@ -224,10 +223,10 @@ final class JavaExtensionModelParserUtils {
       final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
       if (count > 1) {
         throw new IllegalModelDefinitionException(
-            format("The defined parameters %s from %s, uses the annotation @%s more than once",
-                parameters.stream().map(p -> p.getName()).collect(toList()),
-                parameters.iterator().next().getOwnerDescription(),
-                annotation.getSimpleName()));
+                                                  format("The defined parameters %s from %s, uses the annotation @%s more than once",
+                                                         parameters.stream().map(p -> p.getName()).collect(toList()),
+                                                         parameters.iterator().next().getOwnerDescription(),
+                                                         annotation.getSimpleName()));
       }
     }
   }
@@ -244,7 +243,8 @@ final class JavaExtensionModelParserUtils {
   static Optional<ExtensionParameter> getConnectionParameter(WithParameters element) {
     Optional<ExtensionParameter> connectionParameter = element.getParametersAnnotatedWith(Connection.class).stream().findFirst();
     if (!connectionParameter.isPresent()) {
-      connectionParameter = element.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Connection.class).stream().findFirst();
+      connectionParameter =
+          element.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Connection.class).stream().findFirst();
     }
 
     return connectionParameter;

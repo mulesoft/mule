@@ -31,8 +31,7 @@ import java.util.List;
  */
 public final class ModelLoaderUtils {
 
-  private ModelLoaderUtils() {
-  }
+  private ModelLoaderUtils() {}
 
   public static boolean isScope(MethodElement methodElement) {
     return methodElement.getParameters().stream().anyMatch(ModelLoaderUtils::isProcessorChain);

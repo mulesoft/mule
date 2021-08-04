@@ -38,7 +38,8 @@ public final class ParameterModelsLoaderDelegate {
 
         group.getDisplayModel().ifPresent(groupDeclarer::withDisplayModel);
         group.getAdditionalModelProperties().forEach(groupDeclarer::withModelProperty);
-        group.getExclusiveOptionals().ifPresent(descriptor -> groupDeclarer.withExclusiveOptionals(descriptor.getExclusiveOptionals(), descriptor.isOneRequired()));
+        group.getExclusiveOptionals().ifPresent(descriptor -> groupDeclarer
+            .withExclusiveOptionals(descriptor.getExclusiveOptionals(), descriptor.isOneRequired()));
         groupDeclarer.getDeclaration().setDescription(group.getDescription());
         group.getLayoutModel().ifPresent(groupDeclarer::withLayout);
       }

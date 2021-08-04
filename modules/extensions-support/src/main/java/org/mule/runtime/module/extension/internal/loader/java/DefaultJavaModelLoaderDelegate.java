@@ -61,35 +61,30 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    ExtensionModelParser extensionModelParser = new JavaExtensionModelParser(extensionElement, context);
+    ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, context);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
-            .named(extensionModelParser.getName())
+            .named(parser.getName())
             .onVersion(version)
-            .fromVendor(extensionModelParser.getVendor())
-            .withCategory(extensionModelParser.getCategory())
-            .withModelProperty(extensionModelParser.getLicenseModelProperty());
+            .fromVendor(parser.getVendor())
+            .withCategory(parser.getCategory())
+            .withModelProperty(parser.getLicenseModelProperty());
 
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
-    extensionModelParser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
-    extensionModelParser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
-    extensionModelParser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
+    parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
+    parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
+    parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
-    configLoaderDelegate.declareConfigurations(declarer, extensionModelParser);
-    connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, extensionElement);
+    configLoaderDelegate.declareConfigurations(declarer, parser);
+    connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
     if (!isEmpty(extensionElement.getConfigurations())) {
-      operationLoaderDelegate
-          .declareOperations(declarer, declarer, null);
-
-      functionModelLoaderDelegate
-          .declareFunctions(declarer, declarer, null, extensionElement.getFunctions(), context);
-
-      extensionElement.getSources()
-          .forEach(source -> sourceModelLoaderDelegate.declareMessageSource(declarer, declarer, source, false, context));
+      operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
+      functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
+      sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
     }
 
     return declarer;

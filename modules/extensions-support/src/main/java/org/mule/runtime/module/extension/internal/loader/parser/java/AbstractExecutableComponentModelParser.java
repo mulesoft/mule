@@ -64,11 +64,11 @@ abstract class AbstractExecutableComponentModelParser {
       additionalModelProperties.add(new ConnectivityModelProperty(connectionType));
     } else {
       throw new IllegalOperationModelDefinitionException(format(
-          "%s '%s' defines %d parameters annotated with @%s. Only one is allowed",
-          getComponentTypeName(),
-          getName(),
-          connectionParameters.size(),
-          Connection.class.getSimpleName()));
+                                                                "%s '%s' defines %d parameters annotated with @%s. Only one is allowed",
+                                                                getComponentTypeName(),
+                                                                getName(),
+                                                                connectionParameters.size(),
+                                                                Connection.class.getSimpleName()));
     }
   }
 
@@ -79,10 +79,10 @@ abstract class AbstractExecutableComponentModelParser {
       List<TypeGeneric> generics = connectionType.getGenerics();
       if (generics.size() == 0) {
         throw new IllegalOperationModelDefinitionException(format(
-            "%s '%s' defines a %s without a connection type. Please add the generic",
-            getComponentTypeName(),
-            getName(),
-            ConnectionProvider.class.getSimpleName()));
+                                                                  "%s '%s' defines a %s without a connection type. Please add the generic",
+                                                                  getComponentTypeName(),
+                                                                  getName(),
+                                                                  ConnectionProvider.class.getSimpleName()));
       }
       return generics.get(0).getConcreteType();
     }

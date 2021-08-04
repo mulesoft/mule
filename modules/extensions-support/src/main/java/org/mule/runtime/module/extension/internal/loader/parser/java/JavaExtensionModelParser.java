@@ -27,7 +27,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +74,41 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
           .map(config -> new JavaConfigurationModelParser(extensionElement, config, typeLoader, loadingContext))
           .collect(toList());
     }
+  }
+
+  @Override
+  public List<OperationModelParser> getOperationModelParsers() {
+    return JavaExtensionModelParserUtils.getOperationParsers(
+                                                             extensionElement,
+                                                             extensionElement,
+                                                             typeLoader,
+                                                             loadingContext);
+  }
+
+  @Override
+  public List<SourceModelParser> getSourceModelParsers() {
+    return JavaExtensionModelParserUtils.getSourceParsers(
+                                                          extensionElement,
+                                                          extensionElement.getSources(),
+                                                          typeLoader,
+                                                          loadingContext);
+  }
+
+  @Override
+  public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
+    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
+                                                                           extensionElement,
+                                                                           extensionElement.getConnectionProviders(),
+                                                                           typeLoader);
+  }
+
+  @Override
+  public List<FunctionModelParser> getFunctionModelParsers() {
+    return JavaExtensionModelParserUtils.getFunctionModelParsers(
+                                                                 extensionElement,
+                                                                 extensionElement.getFunctionContainers(),
+                                                                 typeLoader,
+                                                                 loadingContext);
   }
 
   @Override

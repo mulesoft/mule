@@ -37,8 +37,8 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   // TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
   void declareMessageSources(ExtensionDeclarer extensionDeclarer,
-                            HasSourceDeclarer ownerDeclarer,
-                            List<SourceModelParser> parsers) {
+                             HasSourceDeclarer ownerDeclarer,
+                             List<SourceModelParser> parsers) {
 
     for (SourceModelParser parser : parsers) {
 
@@ -53,8 +53,9 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       if (actualDeclarer == extensionDeclarer && requiresConfig) {
         throw new IllegalSourceModelDefinitionException(
-            format("Source '%s' is defined at the extension level but it requires a config parameter. "
-                + "Remove such parameter or move the source to the proper config", parser.getName()));
+                                                        format("Source '%s' is defined at the extension level but it requires a config parameter. "
+                                                            + "Remove such parameter or move the source to the proper config",
+                                                               parser.getName()));
       }
 
 
@@ -94,8 +95,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private void declareSourceCallbackParameters(Optional<SourceCallbackModelParser> parser,
                                                Supplier<ParameterizedDeclarer> declarer) {
-    parser.ifPresent(callback ->
-        loader.getParameterModelsLoaderDelegate().declare(declarer.get(), callback.getParameterGroupModelParsers())
-    );
+    parser.ifPresent(callback -> loader.getParameterModelsLoaderDelegate().declare(declarer.get(),
+                                                                                   callback.getParameterGroupModelParsers()));
   }
 }

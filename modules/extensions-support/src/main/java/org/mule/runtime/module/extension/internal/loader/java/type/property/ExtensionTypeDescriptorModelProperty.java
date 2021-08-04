@@ -16,7 +16,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
  * @since 4.1
  */
 @Deprecated
-//TODO: Class to be deleted and all its uses refactored.
+// TODO: Class to be deleted and all its uses refactored.
 public class ExtensionTypeDescriptorModelProperty implements ModelProperty {
 
   private Type type;

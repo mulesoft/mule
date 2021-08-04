@@ -48,7 +48,7 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
       parser.getAdditionalModelProperties().forEach(function::withModelProperty);
-      
+
       functionDeclarers.put(parser, function);
     }
   }

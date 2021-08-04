@@ -124,11 +124,10 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public Optional<ParameterDslConfiguration> getDslConfiguration() {
     if (dslConfiguration == null) {
-      dslConfiguration = parameter.getAnnotation(ParameterDsl.class).map(parameterDsl ->
-          ParameterDslConfiguration.builder()
-              .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
-              .allowsReferences(parameterDsl.allowReferences())
-              .build());
+      dslConfiguration = parameter.getAnnotation(ParameterDsl.class).map(parameterDsl -> ParameterDslConfiguration.builder()
+          .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
+          .allowsReferences(parameterDsl.allowReferences())
+          .build());
     }
 
     return dslConfiguration;
@@ -194,14 +193,14 @@ public class JavaParameterModelParser implements ParameterModelParser {
     if (parameter.isAnnotatedWith(NullSafe.class)) {
       if (parameter.isAnnotatedWith(ConfigOverride.class)) {
         throw new IllegalParameterModelDefinitionException(
-            format("Parameter '%s' is annotated with '@%s' and also marked as a config override, which is redundant. "
-                    + "The default value for this parameter will come from the configuration parameter",
-                parameter.getName(), NullSafe.class.getSimpleName()));
+                                                           format("Parameter '%s' is annotated with '@%s' and also marked as a config override, which is redundant. "
+                                                               + "The default value for this parameter will come from the configuration parameter",
+                                                                  parameter.getName(), NullSafe.class.getSimpleName()));
       }
       if (parameter.isRequired() && !parameter.isAnnotatedWith(ParameterGroup.class)) {
         throw new IllegalParameterModelDefinitionException(
-            format("Parameter '%s' is required but annotated with '@%s', which is redundant",
-                parameter.getName(), NullSafe.class.getSimpleName()));
+                                                           format("Parameter '%s' is required but annotated with '@%s', which is redundant",
+                                                                  parameter.getName(), NullSafe.class.getSimpleName()));
       }
 
       Type nullSafeAnnotationType =
@@ -219,21 +218,21 @@ public class JavaParameterModelParser implements ParameterModelParser {
         @Override
         protected void visitBasicType(MetadataType metadataType) {
           throw new IllegalParameterModelDefinitionException(
-              format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                      + "used with complex types (Pojos, Lists, Maps)",
-                  parameter.getName(), NullSafe.class.getSimpleName(),
-                  parameter.getType().getName()));
+                                                             format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                                                                 + "used with complex types (Pojos, Lists, Maps)",
+                                                                    parameter.getName(), NullSafe.class.getSimpleName(),
+                                                                    parameter.getType().getName()));
         }
 
         @Override
         public void visitArrayType(ArrayType arrayType) {
           if (hasDefaultOverride) {
             throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of type '%s'"
-                    + " but a 'defaultImplementingType' was provided."
-                    + " Type override is not allowed for Collections",
-                parameter.getName(),
-                NullSafe.class.getSimpleName(),
-                parameter.getType().getName()));
+                + " but a 'defaultImplementingType' was provided."
+                + " Type override is not allowed for Collections",
+                                                                      parameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      parameter.getType().getName()));
           }
         }
 
@@ -241,40 +240,40 @@ public class JavaParameterModelParser implements ParameterModelParser {
         public void visitObject(ObjectType objectType) {
           if (hasDefaultOverride && isMap(objectType)) {
             throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of type '%s'"
-                    + " but a 'defaultImplementingType' was provided."
-                    + " Type override is not allowed for Maps",
-                parameter.getName(),
-                NullSafe.class.getSimpleName(),
-                parameter.getType().getName()));
+                + " but a 'defaultImplementingType' was provided."
+                + " Type override is not allowed for Maps",
+                                                                      parameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      parameter.getType().getName()));
           }
 
           if (hasDefaultOverride && parameter.getType().isInstantiable()) {
             throw new IllegalParameterModelDefinitionException(
-                format("Parameter '%s' is annotated with '@%s' is of concrete type '%s',"
-                        + " but a 'defaultImplementingType' was provided."
-                        + " Type override is not allowed for concrete types",
-                    parameter.getName(),
-                    NullSafe.class.getSimpleName(),
-                    parameter.getType().getName()));
+                                                               format("Parameter '%s' is annotated with '@%s' is of concrete type '%s',"
+                                                                   + " but a 'defaultImplementingType' was provided."
+                                                                   + " Type override is not allowed for concrete types",
+                                                                      parameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      parameter.getType().getName()));
           }
 
           if (!isInstantiable && !isMap(nullSafeType)) {
             throw new IllegalParameterModelDefinitionException(
-                format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                        + "used with complex instantiable types (Pojos, Lists, Maps)",
-                    parameter.getName(),
-                    NullSafe.class.getSimpleName(),
-                    parameter.getType().getName()));
+                                                               format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                                                                   + "used with complex instantiable types (Pojos, Lists, Maps)",
+                                                                      parameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      parameter.getType().getName()));
           }
 
           if (hasDefaultOverride && !parameter.getType().isAssignableFrom(nullSafeAnnotationType)) {
             throw new IllegalParameterModelDefinitionException(
-                format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
-                        + " is not a subtype of the parameter's type",
-                    parameter.getName(),
-                    NullSafe.class.getSimpleName(),
-                    parameter.getType().getName(),
-                    JavaTypeUtils.getType(nullSafeType).getName()));
+                                                               format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
+                                                                   + " is not a subtype of the parameter's type",
+                                                                      parameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      parameter.getType().getName(),
+                                                                      JavaTypeUtils.getType(nullSafeType).getName()));
           }
         }
       });

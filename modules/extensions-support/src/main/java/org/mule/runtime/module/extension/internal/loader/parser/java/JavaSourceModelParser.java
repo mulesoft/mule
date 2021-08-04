@@ -121,7 +121,7 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
 
   @Override
   public boolean runsOnPrimaryNodeOnly() {
-    //TODO: This should partially replace ClusterSupportEnricher
+    // TODO: This should partially replace ClusterSupportEnricher
     return false;
   }
 
@@ -180,10 +180,10 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(sourceElement));
     additionalModelProperties.add(new ImplementingTypeModelProperty(sourceClass));
     additionalModelProperties.add(new SourceCallbackModelProperty(
-        extractJavaMethod(sourceElement.getOnResponseMethod()),
-        extractJavaMethod(sourceElement.getOnErrorMethod()),
-        extractJavaMethod(sourceElement.getOnTerminateMethod()),
-        extractJavaMethod(sourceElement.getOnTerminateMethod())));
+                                                                  extractJavaMethod(sourceElement.getOnResponseMethod()),
+                                                                  extractJavaMethod(sourceElement.getOnErrorMethod()),
+                                                                  extractJavaMethod(sourceElement.getOnTerminateMethod()),
+                                                                  extractJavaMethod(sourceElement.getOnTerminateMethod())));
   }
 
 
@@ -205,8 +205,8 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
     if (sourceGenerics.size() != 2) {
       // TODO: MULE-9220: Add a syntax validator for this
       throw new IllegalModelDefinitionException(format("Message source class '%s' was expected to have 2 generic types "
-              + "(one for the Payload type and another for the Attributes type) but %d were found",
-          getName(), sourceGenerics.size()));
+          + "(one for the Payload type and another for the Attributes type) but %d were found",
+                                                       getName(), sourceGenerics.size()));
     }
 
     resolveOutputTypes();
@@ -219,7 +219,7 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
   private void resolveOutputTypes() {
     final MetadataType returnMetadataType = sourceElement.getReturnMetadataType();
 
-    //TODO: Should be possible to parse dynamic types right here
+    // TODO: Should be possible to parse dynamic types right here
     outputType = new DefaultOutputModelParser(returnMetadataType, false);
     outputAttributesType = new DefaultOutputModelParser(sourceElement.getAttributesMetadataType(), false);
 
@@ -231,10 +231,10 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
   private void validateLifecycle(SourceElement sourceType, Class<?> lifecycleType) {
     if (sourceType.isAssignableTo(lifecycleType)) {
       throw new IllegalSourceModelDefinitionException(format(
-          "Source class '%s' implements lifecycle interface '%s'. Sources are only not allowed to implement '%s' and '%s'",
-          sourceType.getName(), lifecycleType,
-          Initialisable.class.getSimpleName(),
-          Disposable.class.getSimpleName()));
+                                                             "Source class '%s' implements lifecycle interface '%s'. Sources are only not allowed to implement '%s' and '%s'",
+                                                             sourceType.getName(), lifecycleType,
+                                                             Initialisable.class.getSimpleName(),
+                                                             Disposable.class.getSimpleName()));
     }
   }
 

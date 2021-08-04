@@ -17,7 +17,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import java.util.List;
 import java.util.Optional;
 
-public class ParameterModelParserDecorator implements ParameterModelParser{
+public class ParameterModelParserDecorator implements ParameterModelParser {
 
   protected final ParameterModelParser decoratee;
 

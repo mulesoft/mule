@@ -34,6 +34,14 @@ public interface ExtensionModelParser {
 
   List<ConfigurationModelParser> getConfigurationParsers();
 
+  List<OperationModelParser> getOperationModelParsers();
+
+  List<SourceModelParser> getSourceModelParsers();
+
+  List<ConnectionProviderModelParser> getConnectionProviderModelParsers();
+
+  List<FunctionModelParser> getFunctionModelParsers();
+
   LicenseModelProperty getLicenseModelProperty();
 
   List<ExternalLibraryModel> getExternalLibraryModels();

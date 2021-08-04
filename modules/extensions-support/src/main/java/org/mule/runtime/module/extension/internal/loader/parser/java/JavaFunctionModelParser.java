@@ -74,8 +74,8 @@ public class JavaFunctionModelParser extends AbstractExecutableComponentModelPar
   @Override
   public FunctionExecutorModelProperty getFunctionExecutorModelProperty() {
     return new FunctionExecutorModelProperty(new ReflectiveFunctionExecutorFactory<>(
-        functionElement.getDeclaringClass().get(),
-        functionElement.getMethod().get()));
+                                                                                     functionElement.getDeclaringClass().get(),
+                                                                                     functionElement.getMethod().get()));
   }
 
   @Override
@@ -103,8 +103,8 @@ public class JavaFunctionModelParser extends AbstractExecutableComponentModelPar
     final FunctionContainerElement type = functionElement.getEnclosingType();
     if (type.isAssignableFrom(extensionElement) || extensionElement.isAssignableFrom(type)) {
       throw new IllegalOperationModelDefinitionException(
-          format("Function class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
-              type.getName(), extensionElement.getName()));
+                                                         format("Function class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
+                                                                type.getName(), extensionElement.getName()));
     }
   }
 

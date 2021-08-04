@@ -80,21 +80,23 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
 
   @Override
   public List<SourceModelParser> getSourceModelParsers() {
-    return JavaExtensionModelParserUtils.getSourceParsers(extensionElement, configElement.getSources(), typeLoader, loadingContext);
+    return JavaExtensionModelParserUtils.getSourceParsers(extensionElement, configElement.getSources(), typeLoader,
+                                                          loadingContext);
   }
 
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
     return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
-        extensionElement, configElement.getConnectionProviders(), typeLoader);
+                                                                           extensionElement,
+                                                                           configElement.getConnectionProviders(), typeLoader);
   }
 
   @Override
   public List<FunctionModelParser> getFunctionModelParsers() {
     return JavaExtensionModelParserUtils.getFunctionModelParsers(extensionElement,
-        configElement.getFunctionContainers(),
-        typeLoader,
-        loadingContext);
+                                                                 configElement.getFunctionContainers(),
+                                                                 typeLoader,
+                                                                 loadingContext);
   }
 
   @Override
@@ -131,8 +133,8 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
       if (componentElement.isAssignableFrom(operationClass)
           || componentElement.isAssignableTo(operationClass)) {
         throw new IllegalConfigurationModelDefinitionException(
-            format("Configuration class '%s' cannot be the same class (nor a derivative) of any operation class '%s",
-                componentElement.getName(), operationClass.getName()));
+                                                               format("Configuration class '%s' cannot be the same class (nor a derivative) of any operation class '%s",
+                                                                      componentElement.getName(), operationClass.getName()));
       }
     }
   }
