@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-
-import java.util.Optional;
-
 /**
  * Base class for sub delegates of {@link DefaultJavaModelLoaderDelegate}
  *
@@ -22,20 +17,6 @@ abstract class AbstractModelLoaderDelegate {
 
   AbstractModelLoaderDelegate(DefaultJavaModelLoaderDelegate loader) {
     this.loader = loader;
-  }
-
-  protected ClassLoader getExtensionClassLoader() {
-    return getExtensionType()
-        .map(Class::getClassLoader)
-        .orElseGet(ExtensionModel.class::getClassLoader);
-  }
-
-  protected Optional<Class<?>> getExtensionType() {
-    return Optional.ofNullable(loader.getExtensionType());
-  }
-
-  protected ExtensionElement getExtensionElement() {
-    return loader.getExtensionElement();
   }
 
   SourceModelLoaderDelegate getSourceModelLoaderDelegate() {

@@ -9,20 +9,15 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
-
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor
@@ -33,7 +28,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   protected Class<?> extensionType;
   protected final ExtensionElement extensionElement;
-  protected final ClassTypeLoader typeLoader;
   protected final String version;
 
   private final ConfigModelLoaderDelegate configLoaderDelegate = new ConfigModelLoaderDelegate(this);
@@ -46,7 +40,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
-    this.typeLoader = getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
     this.extensionElement = extensionElement;
   }
 
@@ -90,14 +83,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     return declarer;
   }
 
-  boolean isInvalidConfigSupport(boolean supportsConfig, Optional<ExtensionParameter>... parameters) {
-    return !supportsConfig && Stream.of(parameters).anyMatch(Optional::isPresent);
-  }
-
-  ConfigModelLoaderDelegate getConfigLoaderDelegate() {
-    return configLoaderDelegate;
-  }
-
   OperationModelLoaderDelegate getOperationLoaderDelegate() {
     return operationLoaderDelegate;
   }
@@ -116,13 +101,5 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   public ParameterModelsLoaderDelegate getParameterModelsLoaderDelegate() {
     return parameterModelsLoaderDelegate;
-  }
-
-  Class<?> getExtensionType() {
-    return extensionElement.getDeclaringClass().orElse(null);
-  }
-
-  ExtensionElement getExtensionElement() {
-    return extensionElement;
   }
 }
