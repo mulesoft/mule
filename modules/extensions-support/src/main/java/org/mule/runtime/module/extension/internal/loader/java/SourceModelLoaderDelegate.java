@@ -87,7 +87,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       declareSourceCallbackParameters(parser.getOnSuccessCallbackParser(), sourceDeclarer::onSuccess);
       declareSourceCallbackParameters(parser.getOnErrorCallbackParser(), sourceDeclarer::onError);
       declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate);
-      declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onBackPressure);
+      declareSourceCallbackParameters(parser.getOnBackPressureCallbackParser(), sourceDeclarer::onBackPressure);
 
       sourceDeclarers.put(parser, sourceDeclarer);
     }

@@ -182,7 +182,7 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
                                                                   extractJavaMethod(sourceElement.getOnResponseMethod()),
                                                                   extractJavaMethod(sourceElement.getOnErrorMethod()),
                                                                   extractJavaMethod(sourceElement.getOnTerminateMethod()),
-                                                                  extractJavaMethod(sourceElement.getOnTerminateMethod())));
+                                                                  extractJavaMethod(sourceElement.getOnBackPressureMethod())));
   }
 
 
