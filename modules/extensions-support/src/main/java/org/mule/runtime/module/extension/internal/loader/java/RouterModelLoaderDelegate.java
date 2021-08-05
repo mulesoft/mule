@@ -61,7 +61,7 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .withMaxOccurs(route.getMaxOccurs().orElse(null));
 
       route.getAdditionalModelProperties().forEach(routeDeclarer::withModelProperty);
-      loader.getParameterModelsLoaderDelegate().declare(routeDeclarer, parser.getParameterGroupModelParsers());
+      loader.getParameterModelsLoaderDelegate().declare(routeDeclarer, route.getParameterGroupModelParsers());
     });
   }
 }
