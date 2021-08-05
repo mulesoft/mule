@@ -39,6 +39,7 @@ import org.mule.tck.processor.FlowAssert;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -256,5 +257,15 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    */
   public boolean disableXmlValidations() {
     return false;
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    builders.add(extensionManagerWithMuleExtModelBuilder(getExtensionModels()));
+    super.addBuilders(builders);
+  }
+
+  protected Set<ExtensionModel> getExtensionModels() {
+    return singleton(getExtensionModel());
   }
 }
