@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.util.Optional.empty;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationFieldParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forRoute;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -25,12 +25,10 @@ import java.util.Optional;
 public class JavaNestedRouteModelParser implements NestedRouteModelParser {
 
   private final ExtensionParameter route;
-  private final ClassTypeLoader typeLoader;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
 
-  public JavaNestedRouteModelParser(ExtensionParameter route, ClassTypeLoader typeLoader) {
+  public JavaNestedRouteModelParser(ExtensionParameter route) {
     this.route = route;
-    this.typeLoader = typeLoader;
 
     route.getType().getDeclaringClass()
         .ifPresent(clazz -> additionalModelProperties.add(new ImplementingTypeModelProperty(clazz)));
@@ -62,7 +60,7 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
                                                                              Parameter.class,
                                                                              org.mule.sdk.api.annotation.param.Parameter.class);
 
-    return getOperationFieldParameterGroupParsers(parameters, typeLoader);
+    return getOperationFieldParameterGroupParsers(parameters, forRoute(getName()));
   }
 
   @Override

@@ -13,7 +13,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
@@ -45,9 +44,9 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
   private final String groupName;
 
   public JavaDeclaredParameterGroupModelParser(ExtensionParameter groupParameter,
-                                               ClassTypeLoader typeLoader,
+                                               ParameterDeclarationContext context,
                                                Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
-    super(typeLoader, parameterMutator);
+    super(context, parameterMutator);
     assureValid(groupParameter);
 
     this.groupParameter = groupParameter;

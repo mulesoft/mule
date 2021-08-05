@@ -16,7 +16,6 @@ import static org.mule.runtime.extension.internal.loader.util.InfrastructureType
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor.getInfrastructureType;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -61,13 +60,13 @@ public class JavaParameterModelParser implements ParameterModelParser {
   private final ExtensionParameter parameter;
   private final MetadataType type;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
-  private final ClassTypeLoader typeLoader;
+  private final ParameterDeclarationContext context;
 
   private Optional<ParameterDslConfiguration> dslConfiguration;
 
-  public JavaParameterModelParser(ExtensionParameter parameter, ClassTypeLoader typeLoader) {
+  public JavaParameterModelParser(ExtensionParameter parameter, ParameterDeclarationContext context) {
     this.parameter = parameter;
-    this.typeLoader = typeLoader;
+    this.context = context;
     type = parameter.getType().asMetadataType();
     collectAdditionalModelProperties();
   }
@@ -162,8 +161,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   private void collectStackableTypesModelProperty() {
-    StackableTypesModelPropertyResolver.newInstance(typeLoader).resolveStackableProperties(parameter, null)
-        .forEach(additionalModelProperties::add);
+    additionalModelProperties.addAll(context.resolveStackableTypes(parameter));
   }
 
   private void collectInfrastructureModelProperties() {

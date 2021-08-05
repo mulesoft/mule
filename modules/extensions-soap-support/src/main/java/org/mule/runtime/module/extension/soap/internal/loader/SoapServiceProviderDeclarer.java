@@ -25,7 +25,7 @@ import org.mule.runtime.module.extension.internal.loader.java.contributor.Parame
 import org.mule.runtime.module.extension.internal.loader.parser.java.StackableTypesParameterContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
+import org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapServiceProviderWrapper;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 
@@ -69,6 +69,7 @@ public class SoapServiceProviderDeclarer {
         .supportsConnectivityTesting(provider.supportsConnectivityTesting());
 
     ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerDeclarer.getDeclaration());
+
     parametersLoader.declare(providerDeclarer, provider.getParameters(), context);
     if (hasCustomTransports) {
       providerDeclarer.onParameterGroup(TRANSPORT_GROUP)

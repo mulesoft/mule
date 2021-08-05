@@ -6,15 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -40,12 +37,10 @@ import java.util.Optional;
 public class JavaExtensionModelParser implements ExtensionModelParser {
 
   private final ExtensionElement extensionElement;
-  private final ClassTypeLoader typeLoader;
   private final ExtensionLoadingContext loadingContext;
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this.extensionElement = extensionElement;
-    this.typeLoader = getDefault().createTypeLoader(currentThread().getContextClassLoader());
     this.loadingContext = loadingContext;
   }
 
@@ -68,10 +63,10 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
   public List<ConfigurationModelParser> getConfigurationParsers() {
     List<ConfigurationElement> configurations = extensionElement.getConfigurations();
     if (configurations.isEmpty()) {
-      return singletonList(new JavaConfigurationModelParser(extensionElement, extensionElement, typeLoader, loadingContext));
+      return singletonList(new JavaConfigurationModelParser(extensionElement, extensionElement, loadingContext));
     } else {
       return configurations.stream()
-          .map(config -> new JavaConfigurationModelParser(extensionElement, config, typeLoader, loadingContext))
+          .map(config -> new JavaConfigurationModelParser(extensionElement, config, loadingContext))
           .collect(toList());
     }
   }
@@ -81,33 +76,26 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
     return JavaExtensionModelParserUtils.getOperationParsers(
                                                              extensionElement,
                                                              extensionElement,
-                                                             typeLoader,
                                                              loadingContext);
   }
 
   @Override
   public List<SourceModelParser> getSourceModelParsers() {
-    return JavaExtensionModelParserUtils.getSourceParsers(
-                                                          extensionElement,
+    return JavaExtensionModelParserUtils.getSourceParsers(extensionElement,
                                                           extensionElement.getSources(),
-                                                          typeLoader,
                                                           loadingContext);
   }
 
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
-    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
-                                                                           extensionElement,
-                                                                           extensionElement.getConnectionProviders(),
-                                                                           typeLoader);
+    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(extensionElement,
+                                                                           extensionElement.getConnectionProviders());
   }
 
   @Override
   public List<FunctionModelParser> getFunctionModelParsers() {
-    return JavaExtensionModelParserUtils.getFunctionModelParsers(
-                                                                 extensionElement,
+    return JavaExtensionModelParserUtils.getFunctionModelParsers(extensionElement,
                                                                  extensionElement.getFunctionContainers(),
-                                                                 typeLoader,
                                                                  loadingContext);
   }
 

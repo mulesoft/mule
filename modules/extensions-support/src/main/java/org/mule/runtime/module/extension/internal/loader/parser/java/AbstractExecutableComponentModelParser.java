@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -30,7 +29,6 @@ abstract class AbstractExecutableComponentModelParser {
 
   protected final ExtensionElement extensionElement;
   protected final ExtensionLoadingContext loadingContext;
-  protected final ClassTypeLoader typeLoader;
 
   protected OutputModelParser outputType;
   protected OutputModelParser outputAttributesType;
@@ -39,11 +37,8 @@ abstract class AbstractExecutableComponentModelParser {
   protected boolean transactional = false;
   protected final List<ModelProperty> additionalModelProperties = new LinkedList<>();
 
-  public AbstractExecutableComponentModelParser(ExtensionElement extensionElement,
-                                                ClassTypeLoader typeLoader,
-                                                ExtensionLoadingContext loadingContext) {
+  public AbstractExecutableComponentModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this.extensionElement = extensionElement;
-    this.typeLoader = typeLoader;
     this.loadingContext = loadingContext;
   }
 

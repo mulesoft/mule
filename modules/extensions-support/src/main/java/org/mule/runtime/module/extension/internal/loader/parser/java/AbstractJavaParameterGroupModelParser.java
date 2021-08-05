@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.util.stream.Collectors.toList;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
@@ -19,12 +18,12 @@ import java.util.stream.Stream;
 
 abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupModelParser {
 
-  protected final ClassTypeLoader typeLoader;
   protected final Function<ParameterModelParser, ParameterModelParser> parameterMutator;
+  private final ParameterDeclarationContext context;
 
-  public AbstractJavaParameterGroupModelParser(ClassTypeLoader typeLoader,
+  public AbstractJavaParameterGroupModelParser(ParameterDeclarationContext context,
                                                Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
-    this.typeLoader = typeLoader;
+    this.context = context;
     this.parameterMutator = parameterMutator;
   }
 
@@ -32,7 +31,7 @@ abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupMo
   public final List<ParameterModelParser> getParameterParsers() {
     return doGetParameters()
         .map(p -> {
-          ParameterModelParser parser = new JavaParameterModelParser(p, typeLoader);
+          ParameterModelParser parser = new JavaParameterModelParser(p, context);
           if (parameterMutator != null) {
             parser = parameterMutator.apply(parser);
           }

@@ -13,8 +13,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getSourceParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forSource;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -60,9 +60,8 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
 
   public JavaSourceModelParser(ExtensionElement extensionElement,
                                SourceElement sourceElement,
-                               ClassTypeLoader typeLoader,
                                ExtensionLoadingContext loadingContext) {
-    super(extensionElement, typeLoader, loadingContext);
+    super(extensionElement, loadingContext);
     this.sourceElement = sourceElement;
 
     sourceClass = sourceElement.getDeclaringClass().get();
@@ -96,7 +95,7 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    return getSourceParameterGroupParsers(sourceElement.getParameters(), typeLoader);
+    return getSourceParameterGroupParsers(sourceElement.getParameters(), forSource(getName()));
   }
 
   @Override
@@ -240,7 +239,9 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
 
   private Optional<SourceCallbackModelParser> parseSourceCallback(Optional<MethodElement> methodElement) {
     return methodElement
-        .map(method -> new JavaSourceCallbackModelParser(getParameterGroupParsers(method.getParameters(), typeLoader)));
+        .map(method -> new JavaSourceCallbackModelParser(getParameterGroupParsers(
+                                                                                  method.getParameters(),
+                                                                                  forSource(getName()))));
   }
 
   @Override

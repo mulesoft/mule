@@ -16,8 +16,8 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
@@ -52,16 +52,12 @@ import java.util.Optional;
 public class JavaConnectionProviderModelParser implements ConnectionProviderModelParser {
 
   private final ConnectionProviderElement element;
-  private final ClassTypeLoader typeLoader;
 
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
 
-  public JavaConnectionProviderModelParser(ExtensionElement extensionElement,
-                                           ConnectionProviderElement element,
-                                           ClassTypeLoader typeLoader) {
+  public JavaConnectionProviderModelParser(ExtensionElement extensionElement, ConnectionProviderElement element) {
     this.element = element;
-    this.typeLoader = typeLoader;
     extensionClassLoader = extensionElement.getDeclaringClass()
         .map(Class::getClassLoader)
         .orElse(ExtensionModel.class.getClassLoader());
@@ -85,7 +81,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    return getParameterGroupParsers(element.getParameters(), typeLoader);
+    return getParameterGroupParsers(element.getParameters(), forConnectionProvider(getName()));
   }
 
   @Override

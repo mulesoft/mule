@@ -10,7 +10,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
@@ -27,9 +26,9 @@ public class JavaDefaultParameterGroupParser extends AbstractJavaParameterGroupM
   private final List<ExtensionParameter> parameters;
 
   public JavaDefaultParameterGroupParser(List<ExtensionParameter> parameters,
-                                         ClassTypeLoader typeLoader,
+                                         ParameterDeclarationContext context,
                                          Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
-    super(typeLoader, parameterMutator);
+    super(context, parameterMutator);
     this.parameters = parameters;
   }
 

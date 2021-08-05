@@ -21,7 +21,6 @@ import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +32,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class InfrastructureFieldContributor implements ParameterDeclarerContributor {
+public class InfrastructureFieldContributor {
 
   private static final Map<Type, InfrastructureType> TYPE_MAPPING = InfrastructureTypeMapping.getMap().entrySet()
       .stream()
@@ -51,12 +50,7 @@ public class InfrastructureFieldContributor implements ParameterDeclarerContribu
         .findFirst();
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
-                         ParameterDeclarationContext declarationContext) {
+  public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer) {
     getInfrastructureType(parameter.getType()).ifPresent(infrastructureType -> {
       if (!isBlank(infrastructureType.getName())) {
         declarer.withModelProperty(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));

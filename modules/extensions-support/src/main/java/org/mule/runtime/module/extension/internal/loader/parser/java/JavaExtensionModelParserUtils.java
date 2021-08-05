@@ -15,7 +15,6 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -115,51 +114,47 @@ final class JavaExtensionModelParserUtils {
 
   static List<OperationModelParser> getOperationParsers(ExtensionElement extensionElement,
                                                         WithOperationContainers operationContainers,
-                                                        ClassTypeLoader typeLoader,
                                                         ExtensionLoadingContext loadingContext) {
     return operationContainers.getOperationContainers().stream()
         .flatMap(container -> container.getOperations().stream()
-            .map(method -> new JavaOperationModelParser(extensionElement, container, method, typeLoader, loadingContext)))
+            .map(method -> new JavaOperationModelParser(extensionElement, container, method, loadingContext)))
         .collect(toList());
   }
 
   static List<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
                                                   List<SourceElement> sources,
-                                                  ClassTypeLoader typeLoader,
                                                   ExtensionLoadingContext loadingContext) {
     return sources.stream()
-        .map(source -> new JavaSourceModelParser(extensionElement, source, typeLoader, loadingContext))
+        .map(source -> new JavaSourceModelParser(extensionElement, source, loadingContext))
         .collect(toList());
   }
 
   static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(
                                                                                ExtensionElement extensionElement,
-                                                                               List<ConnectionProviderElement> connectionProviderElements,
-                                                                               ClassTypeLoader typeLoader) {
+                                                                               List<ConnectionProviderElement> connectionProviderElements) {
 
     return connectionProviderElements.stream()
-        .map(cpElement -> new JavaConnectionProviderModelParser(extensionElement, cpElement, typeLoader))
+        .map(cpElement -> new JavaConnectionProviderModelParser(extensionElement, cpElement))
         .collect(toList());
   }
 
   static List<FunctionModelParser> getFunctionModelParsers(ExtensionElement extensionElement,
                                                            List<FunctionContainerElement> functionContainers,
-                                                           ClassTypeLoader typeLoader,
                                                            ExtensionLoadingContext loadingContext) {
     return functionContainers.stream()
         .flatMap(container -> container.getFunctions().stream())
-        .map(func -> new JavaFunctionModelParser(extensionElement, func, typeLoader, loadingContext))
+        .map(func -> new JavaFunctionModelParser(extensionElement, func, loadingContext))
         .collect(toList());
   }
 
   static List<ParameterGroupModelParser> getParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                  ClassTypeLoader typeLoader) {
-    return getParameterGroupParsers(parameters, typeLoader, null);
+                                                                  ParameterDeclarationContext context) {
+    return getParameterGroupParsers(parameters, context, null);
   }
 
   static List<ParameterGroupModelParser> getSourceParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                        ClassTypeLoader typeLoader) {
-    return getParameterGroupParsers(parameters, typeLoader, p -> new ParameterModelParserDecorator(p) {
+                                                                        ParameterDeclarationContext context) {
+    return getParameterGroupParsers(parameters, context, p -> new ParameterModelParserDecorator(p) {
 
       @Override
       public ExpressionSupport getExpressionSupport() {
@@ -169,8 +164,8 @@ final class JavaExtensionModelParserUtils {
   }
 
   static List<ParameterGroupModelParser> getOperationFieldParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                                ClassTypeLoader typeLoader) {
-    return getParameterGroupParsers(parameters, typeLoader, p -> new ParameterModelParserDecorator(p) {
+                                                                                ParameterDeclarationContext context) {
+    return getParameterGroupParsers(parameters, context, p -> new ParameterModelParserDecorator(p) {
 
       @Override
       public ExpressionSupport getExpressionSupport() {
@@ -188,7 +183,7 @@ final class JavaExtensionModelParserUtils {
   }
 
   static List<ParameterGroupModelParser> getParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                  ClassTypeLoader typeLoader,
+                                                                  ParameterDeclarationContext context,
                                                                   Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
     checkAnnotationsNotUsedMoreThanOnce(parameters,
                                         Connection.class,
@@ -207,13 +202,13 @@ final class JavaExtensionModelParserUtils {
       }
 
       if (isParameterGroup(extensionParameter)) {
-        groups.add(new JavaDeclaredParameterGroupModelParser(extensionParameter, typeLoader, parameterMutator));
+        groups.add(new JavaDeclaredParameterGroupModelParser(extensionParameter, context, parameterMutator));
       } else {
         defaultGroupParams.add(extensionParameter);
       }
     }
 
-    groups.add(0, new JavaDefaultParameterGroupParser(defaultGroupParams, typeLoader, parameterMutator));
+    groups.add(0, new JavaDefaultParameterGroupParser(defaultGroupParams, context, parameterMutator));
     return groups;
   }
 

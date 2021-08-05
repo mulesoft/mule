@@ -11,8 +11,8 @@ import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -41,18 +41,15 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
 
   private final ExtensionElement extensionElement;
   private final ComponentElement configElement;
-  private final ClassTypeLoader typeLoader;
   private final ExtensionLoadingContext loadingContext;
 
   public JavaConfigurationModelParser(ExtensionElement extensionElement,
                                       ComponentElement configElement,
-                                      ClassTypeLoader typeLoader,
                                       ExtensionLoadingContext loadingContext) {
     checkConfigurationIsNotAnOperation(extensionElement, configElement);
 
     this.extensionElement = extensionElement;
     this.configElement = configElement;
-    this.typeLoader = typeLoader;
     this.loadingContext = loadingContext;
   }
 
@@ -70,32 +67,31 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupParsers() {
-    return JavaExtensionModelParserUtils.getParameterGroupParsers(configElement.getParameters(), typeLoader);
+    return JavaExtensionModelParserUtils.getParameterGroupParsers(
+                                                                  configElement.getParameters(),
+                                                                  forConfig(configElement.getName()));
   }
 
   @Override
   public List<OperationModelParser> getOperationParsers() {
-    return JavaExtensionModelParserUtils.getOperationParsers(extensionElement, configElement, typeLoader, loadingContext);
+    return JavaExtensionModelParserUtils.getOperationParsers(extensionElement, configElement, loadingContext);
   }
 
   @Override
   public List<SourceModelParser> getSourceModelParsers() {
-    return JavaExtensionModelParserUtils.getSourceParsers(extensionElement, configElement.getSources(), typeLoader,
-                                                          loadingContext);
+    return JavaExtensionModelParserUtils.getSourceParsers(extensionElement, configElement.getSources(), loadingContext);
   }
 
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
-    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
-                                                                           extensionElement,
-                                                                           configElement.getConnectionProviders(), typeLoader);
+    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(extensionElement,
+                                                                           configElement.getConnectionProviders());
   }
 
   @Override
   public List<FunctionModelParser> getFunctionModelParsers() {
     return JavaExtensionModelParserUtils.getFunctionModelParsers(extensionElement,
                                                                  configElement.getFunctionContainers(),
-                                                                 typeLoader,
                                                                  loadingContext);
   }
 

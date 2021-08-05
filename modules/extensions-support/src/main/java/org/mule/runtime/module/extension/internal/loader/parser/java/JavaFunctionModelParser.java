@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forFunction;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -36,9 +36,8 @@ public class JavaFunctionModelParser extends AbstractExecutableComponentModelPar
 
   public JavaFunctionModelParser(ExtensionElement extensionElement,
                                  FunctionElement functionElement,
-                                 ClassTypeLoader typeLoader,
                                  ExtensionLoadingContext loadingContext) {
-    super(extensionElement, typeLoader, loadingContext);
+    super(extensionElement, loadingContext);
 
     this.functionElement = functionElement;
 
@@ -58,7 +57,7 @@ public class JavaFunctionModelParser extends AbstractExecutableComponentModelPar
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    return getParameterGroupParsers(functionElement.getParameters(), typeLoader);
+    return getParameterGroupParsers(functionElement.getParameters(), forFunction(getName()));
   }
 
   @Override

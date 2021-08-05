@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.metadata.DataType;
@@ -21,10 +20,8 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackableType;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
@@ -47,8 +44,8 @@ import java.util.Optional;
  */
 class StackableTypesModelPropertyResolver {
 
-  public static StackableTypesModelPropertyResolver newInstance(ClassTypeLoader typeLoader) {
-    return StackableTypesModelPropertyResolver.builder(typeLoader)
+  public static StackableTypesModelPropertyResolver newInstance() {
+    return StackableTypesModelPropertyResolver.builder()
         .addType(StackableType
             .builder(ParameterResolver.class)
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
@@ -116,7 +113,7 @@ class StackableTypesModelPropertyResolver {
                                                                       "The parameter [%s] from the %s [%s] doesn't specify the %s parameterized type",
                                                                       extensionParameter.getName(),
                                                                       declarationContext.getComponentType(),
-                                                                      declarationContext.getName(),
+                                                                      declarationContext.getComponentName(),
                                                                       extensionParameter.getType()));
           }
         });
@@ -128,18 +125,13 @@ class StackableTypesModelPropertyResolver {
         .findFirst();
   }
 
-  public static Builder builder(ClassTypeLoader typeLoader) {
-    return new Builder(typeLoader);
+  private static Builder builder() {
+    return new Builder();
   }
 
-  public static class Builder {
+  private static class Builder {
 
     private final Map<Type, StackableType> stackableTypes = new HashMap<>();
-    private final ClassTypeLoader typeLoader;
-
-    public Builder(ClassTypeLoader typeLoader) {
-      this.typeLoader = typeLoader;
-    }
 
     public Builder addType(StackableType stackableType) {
       stackableTypes.put(stackableType.getType(), stackableType);

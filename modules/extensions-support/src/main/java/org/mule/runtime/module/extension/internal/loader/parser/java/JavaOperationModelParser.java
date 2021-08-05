@@ -21,10 +21,10 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationFieldParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.isInputStream;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forOperation;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
@@ -88,9 +88,8 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   public JavaOperationModelParser(ExtensionElement extensionElement,
                                   OperationContainerElement operationContainer,
                                   OperationElement operationElement,
-                                  ClassTypeLoader typeLoader,
                                   ExtensionLoadingContext loadingContext) {
-    super(extensionElement, typeLoader, loadingContext);
+    super(extensionElement, loadingContext);
 
     this.operationElement = operationElement;
 
@@ -317,15 +316,17 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
       methodParameters = operationElement.getParameters();
     }
 
-    List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, typeLoader);
-    parameterGroupModelParsers.addAll(getOperationFieldParameterGroupParsers(operationContainer.getParameters(), typeLoader));
+    ParameterDeclarationContext context = forOperation(getName());
+
+    List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, context);
+    parameterGroupModelParsers.addAll(getOperationFieldParameterGroupParsers(operationContainer.getParameters(), context));
 
     return parameterGroupModelParsers;
   }
 
   @Override
   public List<NestedRouteModelParser> getNestedRouteParsers() {
-    return routes.stream().map(r -> new JavaNestedRouteModelParser(r, typeLoader)).collect(toList());
+    return routes.stream().map(r -> new JavaNestedRouteModelParser(r)).collect(toList());
   }
 
   @Override
