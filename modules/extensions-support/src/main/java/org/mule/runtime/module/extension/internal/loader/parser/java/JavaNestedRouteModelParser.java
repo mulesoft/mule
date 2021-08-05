@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationFieldParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forRoute;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -60,7 +60,7 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
                                                                              Parameter.class,
                                                                              org.mule.sdk.api.annotation.param.Parameter.class);
 
-    return getOperationFieldParameterGroupParsers(parameters, forRoute(getName()));
+    return getParameterGroupParsers(parameters, forRoute(getName()));
   }
 
   @Override

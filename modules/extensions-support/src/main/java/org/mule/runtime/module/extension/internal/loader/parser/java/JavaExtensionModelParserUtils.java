@@ -18,7 +18,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -40,7 +39,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
-import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
@@ -159,25 +157,6 @@ public final class JavaExtensionModelParserUtils {
       @Override
       public ExpressionSupport getExpressionSupport() {
         return NOT_SUPPORTED;
-      }
-    });
-  }
-
-  public static List<ParameterGroupModelParser> getOperationFieldParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                                       ParameterDeclarationContext context) {
-    return getParameterGroupParsers(parameters, context, p -> new ParameterModelParserDecorator(p) {
-
-      @Override
-      public ExpressionSupport getExpressionSupport() {
-        return NOT_SUPPORTED;
-      }
-
-      @Override
-      public List<ModelProperty> getAdditionalModelProperties() {
-        List<ModelProperty> modelProperties = decoratee.getAdditionalModelProperties();
-        modelProperties.add(new FieldOperationParameterModelProperty());
-
-        return modelProperties;
       }
     });
   }
