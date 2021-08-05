@@ -8,7 +8,7 @@ package org.mule.runtime.extension.internal.loader;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.EMPTY_SET;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,6 +19,7 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.NUMBER;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.test.allure.AllureConstants.XmlSdk.Declaration.DECLARATION_DATASENSE;
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -184,7 +186,11 @@ public class XmlExtensionLoaderWithDeclarationTestCase extends AbstractMuleTestC
     parameters.put("COMPILATION_MODE", true);
     declarationPath.ifPresent(path -> parameters.put(XmlExtensionModelLoader.RESOURCE_DECLARATION, path));
     return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(),
-                                                            getDefault(EMPTY_SET),
+                                                            getDefault(getDependencyExtensions()),
                                                             parameters);
+  }
+
+  private static Set<ExtensionModel> getDependencyExtensions() {
+    return singleton(getExtensionModel());
   }
 }
