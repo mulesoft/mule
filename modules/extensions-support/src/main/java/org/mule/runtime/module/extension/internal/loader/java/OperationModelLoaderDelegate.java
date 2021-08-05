@@ -70,7 +70,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       if (parser.isRouter()) {
         routersDelegate.declareRouter(extensionDeclarer, (HasConstructDeclarer) ownerDeclarer, parser);
-        return;
+        continue;
       }
       final OperationDeclarer operation = actualDeclarer.withOperation(parser.getName())
           .describedAs(parser.getDescription())
