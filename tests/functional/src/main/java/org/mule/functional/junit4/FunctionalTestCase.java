@@ -7,6 +7,7 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
@@ -17,6 +18,7 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.crea
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.MuleContext;
@@ -112,12 +114,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   }
 
   public static ConfigurationBuilder extensionManagerWithMuleExtModelBuilder() {
+    return extensionManagerWithMuleExtModelBuilder(singleton(getExtensionModel()));
+  }
+
+  public static ConfigurationBuilder extensionManagerWithMuleExtModelBuilder(Set<ExtensionModel> extensionModels) {
     return new AbstractConfigurationBuilder() {
 
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
         ExtensionManager extensionManager = createExtensionManager(muleContext);
-        extensionManager.registerExtension(getExtensionModel());
+        extensionModels.forEach(extensionManager::registerExtension);
       }
 
     };
