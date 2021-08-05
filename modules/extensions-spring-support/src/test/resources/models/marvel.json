@@ -7224,10 +7224,7 @@
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [
-            "MARVEL:CONNECTIVITY",
-            "MARVEL:RETRY_EXHAUSTED"
-          ],
+          "errors": [],
           "semanticTerms": [],
           "stereotype": {
             "type": "FIRE_MISSILE",
@@ -7777,10 +7774,7 @@
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [
-            "MARVEL:CONNECTIVITY",
-            "MARVEL:RETRY_EXHAUSTED"
-          ],
+          "errors": [],
           "semanticTerms": [],
           "stereotype": {
             "type": "FIRE_MISSILE_EPIC_SHOT",
@@ -8330,10 +8324,7 @@
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [
-            "MARVEL:CONNECTIVITY",
-            "MARVEL:RETRY_EXHAUSTED"
-          ],
+          "errors": [],
           "semanticTerms": [],
           "stereotype": {
             "type": "FIRE_MISSILE_MISHAP",

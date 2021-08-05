@@ -95,7 +95,7 @@ public class JavaFunctionModelParser extends AbstractExecutableComponentModelPar
           + "Remove such parameter.", getName()));
     }
 
-    outputType = new DefaultOutputModelParser(functionElement.getReturnType().asMetadataType(), false);
+    outputType = new DefaultOutputModelParser(functionElement.getReturnMetadataType(), false);
   }
 
   private void checkIsNotAnExtension() {

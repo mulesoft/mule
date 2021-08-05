@@ -8202,7 +8202,7 @@
         }
       ],
       "name": "config",
-      "description": "",
+      "description": "Default configuration",
       "modelProperties": {
         "requiredForMetadata": {
           "requiredParameters": [

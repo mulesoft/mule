@@ -922,10 +922,7 @@
             "requiresConnection": true
           },
           "nestedComponents": [],
-          "errors": [
-            "SAMPLE-DATA:RETRY_EXHAUSTED",
-            "SAMPLE-DATA:CONNECTIVITY"
-          ],
+          "errors": [],
           "semanticTerms": [],
           "stereotype": {
             "type": "NON_BLOCKING",

@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.property.NoImplicitModelProperty;
@@ -26,8 +30,9 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
   void declareConfigurations(ExtensionDeclarer declarer, ExtensionModelParser extensionModelParser) {
     for (ConfigurationModelParser configParser : extensionModelParser.getConfigurationParsers()) {
 
-      ConfigurationDeclarer configurationDeclarer = declarer.withConfig(configParser.getName())
-          .describedAs(configParser.getDescription())
+      String configName = resolveConfigName(configParser);
+      ConfigurationDeclarer configurationDeclarer = declarer.withConfig(configName)
+          .describedAs(resolveConfigDescription(configParser, configName))
           .withModelProperty(configParser.getConfigurationFactoryModelProperty());
 
       if (configParser.isForceNoExplicit()) {
@@ -46,5 +51,18 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                             configurationDeclarer,
                                                                             configParser.getConnectionProviderModelParsers());
     }
+  }
+
+  private String resolveConfigName(ConfigurationModelParser parser) {
+    return isBlank(parser.getName()) ? DEFAULT_CONFIG_NAME : parser.getName();
+  }
+
+  private String resolveConfigDescription(ConfigurationModelParser parser, String configName) {
+    String description = parser.getDescription();
+    if (isBlank(description) && DEFAULT_CONFIG_NAME.equals(configName)) {
+      description = DEFAULT_CONFIG_DESCRIPTION;
+    }
+
+    return description;
   }
 }
