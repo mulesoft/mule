@@ -22,11 +22,14 @@ import java.util.Optional;
 public class FeatureContext {
 
   private final String artifactName;
-  private final MuleVersion artifactMinMuleVersion;
+  private MuleVersion artifactMinMuleVersion;
 
   public FeatureContext(MuleVersion artifactMinMuleVersion, String artifactName) {
     this.artifactName = artifactName;
-    this.artifactMinMuleVersion = artifactMinMuleVersion;
+    // Feature flags must evaluate against non suffixed versions
+    if (artifactMinMuleVersion != null) {
+      this.artifactMinMuleVersion = artifactMinMuleVersion.withoutSuffixes();
+    }
   }
 
   public Optional<MuleVersion> getArtifactMinMuleVersion() {
