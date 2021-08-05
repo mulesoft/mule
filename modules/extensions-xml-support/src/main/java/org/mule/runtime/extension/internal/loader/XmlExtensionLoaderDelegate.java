@@ -69,6 +69,7 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -1116,7 +1117,7 @@ public final class XmlExtensionLoaderDelegate {
 
     // Add error models for error types used in raise and error mapping for completeness of the extension model.
     extensionDeclarer.ifPresent(ext -> {
-      operationModel.recursiveStream()
+      operationModel.getModel(ParameterizedModel.class).ifPresent(om -> operationModel.recursiveStream()
           .forEach(comp -> {
             if (comp.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
               final ComponentParameterAst parameter = comp.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_ATTRIBUTE);
