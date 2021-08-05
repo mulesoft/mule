@@ -26,6 +26,7 @@ import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -37,6 +38,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
@@ -44,9 +46,11 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
@@ -60,15 +64,19 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   private final ExtensionParameter parameter;
   private final MetadataType type;
+  private final Optional<ExclusiveOptionalDescriptor> exclusiveOptionals;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ParameterDeclarationContext context;
 
   private Optional<ParameterDslConfiguration> dslConfiguration;
   private ExpressionSupport expressionSupport;
 
-  public JavaParameterModelParser(ExtensionParameter parameter, ParameterDeclarationContext context) {
+  public JavaParameterModelParser(ExtensionParameter parameter,
+                                  Optional<ExclusiveOptionalDescriptor> exclusiveOptionals,
+                                  ParameterDeclarationContext context) {
     this.parameter = parameter;
     this.context = context;
+    this.exclusiveOptionals = exclusiveOptionals;
     type = parameter.getType().asMetadataType();
 
     parserStructure();
@@ -76,9 +84,8 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   private void parserStructure() {
-    expressionSupport = parameter.getAnnotation(Expression.class)
-        .map(expression -> IntrospectionUtils.getExpressionSupport(expression))
-        .orElse(SUPPORTED);
+    parseExpressionSupport();
+    parseExclusiveOptionals();
   }
 
   @Override
@@ -193,6 +200,20 @@ public class JavaParameterModelParser implements ParameterModelParser {
       } else {
         additionalModelProperties.add(new ImplementingParameterModelProperty((java.lang.reflect.Parameter) element));
       }
+    });
+  }
+
+  private void parseExpressionSupport() {
+    expressionSupport = parameter.getAnnotation(Expression.class)
+        .map(expression -> IntrospectionUtils.getExpressionSupport(expression))
+        .orElse(SUPPORTED);
+  }
+
+  private void parseExclusiveOptionals() {
+    exclusiveOptionals.ifPresent(exclusive -> {
+      ExclusiveParametersModel exclusiveParametersModel =
+          new ImmutableExclusiveParametersModel(exclusive.getExclusiveOptionals(), exclusive.isOneRequired());
+      additionalModelProperties.add(new ExclusiveOptionalModelProperty(exclusiveParametersModel));
     });
   }
 

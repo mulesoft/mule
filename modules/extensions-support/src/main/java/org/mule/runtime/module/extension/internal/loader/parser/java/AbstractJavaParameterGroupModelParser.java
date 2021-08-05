@@ -31,7 +31,7 @@ abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupMo
   public final List<ParameterModelParser> getParameterParsers() {
     return doGetParameters()
         .map(p -> {
-          ParameterModelParser parser = new JavaParameterModelParser(p, context);
+          ParameterModelParser parser = new JavaParameterModelParser(p, getExclusiveOptionals(), context);
           if (parameterMutator != null) {
             parser = parameterMutator.apply(parser);
           }

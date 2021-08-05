@@ -43,6 +43,8 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
   private final Type type;
   private final String groupName;
 
+  private Optional<ExclusiveOptionalDescriptor> exclusiveOptionalDescriptor;
+
   public JavaDeclaredParameterGroupModelParser(ExtensionParameter groupParameter,
                                                ParameterDeclarationContext context,
                                                Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
@@ -54,6 +56,11 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
     parameters = fetchAnnotatedParameter();
 
     assureValid(groupParameter, context);
+    parseStructure();
+  }
+
+  private void parseStructure() {
+    parseExclusiveOptionalDescriptor();
   }
 
   @Override
@@ -91,11 +98,7 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
 
   @Override
   public Optional<ExclusiveOptionalDescriptor> getExclusiveOptionals() {
-    return type.getAnnotation(ExclusiveOptionals.class)
-        .map(annotation -> new ExclusiveOptionalDescriptor(parameters.stream()
-            .filter(f -> !f.isRequired())
-            .map(WithAlias::getAlias)
-            .collect(toSet()), annotation.isOneRequired()));
+    return exclusiveOptionalDescriptor;
   }
 
   @Override
@@ -111,12 +114,12 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
   public List<ModelProperty> getAdditionalModelProperties() {
     List<ModelProperty> properties = new LinkedList<>();
     properties.add(new ParameterGroupModelProperty(
-                                                   new ParameterGroupDescriptor(groupName, type,
-                                                                                groupParameter.getType().asMetadataType(),
-                                                                                // TODO: Eliminate dependency to Annotated
-                                                                                // Elements
-                                                                                groupParameter.getDeclaringElement().orElse(null),
-                                                                                groupParameter)));
+        new ParameterGroupDescriptor(groupName, type,
+            groupParameter.getType().asMetadataType(),
+            // TODO: Eliminate dependency to Annotated
+            // Elements
+            groupParameter.getDeclaringElement().orElse(null),
+            groupParameter)));
     properties.add(new ExtensionParameterDescriptorModelProperty(groupParameter));
 
     return properties;
@@ -125,42 +128,42 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
   private void assureValid(ExtensionParameter groupParameter, ParameterDeclarationContext context) {
     if (DEFAULT_GROUP_NAME.equals(groupName)) {
       throw new IllegalParameterModelDefinitionException(
-                                                         format("%s '%s' defines parameter group of name '%s' which is the default one. "
-                                                             + "@%s cannot be used with the default group name",
-                                                                context.getComponentType(),
-                                                                context.getComponentName(),
-                                                                groupName,
-                                                                ParameterGroup.class.getSimpleName()));
+          format("%s '%s' defines parameter group of name '%s' which is the default one. "
+                  + "@%s cannot be used with the default group name",
+              context.getComponentType(),
+              context.getComponentName(),
+              groupName,
+              ParameterGroup.class.getSimpleName()));
     }
 
     final List<FieldElement> nestedGroups =
         type.getAnnotatedFields(ParameterGroup.class, org.mule.sdk.api.annotation.param.ParameterGroup.class);
     if (!nestedGroups.isEmpty()) {
       throw new IllegalParameterModelDefinitionException(format(
-                                                                "Class '%s' is used as a @%s but contains fields which also hold that annotation. Nesting groups is not allowed. "
-                                                                    + "Offending fields are: [%s]",
-                                                                type.getName(),
-                                                                ParameterGroup.class.getSimpleName(),
-                                                                nestedGroups.stream().map(element -> element.getName())
-                                                                    .collect(joining(","))));
+          "Class '%s' is used as a @%s but contains fields which also hold that annotation. Nesting groups is not allowed. "
+              + "Offending fields are: [%s]",
+          type.getName(),
+          ParameterGroup.class.getSimpleName(),
+          nestedGroups.stream().map(element -> element.getName())
+              .collect(joining(","))));
     }
 
     if (groupParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class)) {
       throw new IllegalParameterModelDefinitionException(format(
-                                                                "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
-                                                                org.mule.runtime.extension.api.annotation.param.Optional.class
-                                                                    .getSimpleName(),
-                                                                ParameterGroup.class.getSimpleName(),
-                                                                groupParameter.getName()));
+          "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
+          org.mule.runtime.extension.api.annotation.param.Optional.class
+              .getSimpleName(),
+          ParameterGroup.class.getSimpleName(),
+          groupParameter.getName()));
     }
 
     if (groupParameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.Optional.class)) {
       throw new IllegalParameterModelDefinitionException(format(
-                                                                "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
-                                                                org.mule.sdk.api.annotation.param.Optional.class
-                                                                    .getSimpleName(),
-                                                                ParameterGroup.class.getSimpleName(),
-                                                                groupParameter.getName()));
+          "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
+          org.mule.sdk.api.annotation.param.Optional.class
+              .getSimpleName(),
+          ParameterGroup.class.getSimpleName(),
+          groupParameter.getName()));
     }
   }
 
@@ -184,5 +187,13 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
     }
 
     return (List<ExtensionParameter>) parameters;
+  }
+
+  private void parseExclusiveOptionalDescriptor() {
+    exclusiveOptionalDescriptor = type.getAnnotation(ExclusiveOptionals.class)
+        .map(annotation -> new ExclusiveOptionalDescriptor(parameters.stream()
+            .filter(f -> !f.isRequired())
+            .map(WithAlias::getAlias)
+            .collect(toSet()), annotation.isOneRequired()));
   }
 }
