@@ -6,19 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getDslConfiguration;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
 
-import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
 import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.InfrastructureType;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
@@ -26,13 +18,11 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * {@link ParameterDeclarerContributor} implementation which given a {@link ExtensionParameter} which their type is one of the
- * considered as an Infrastructure Type ({@link InfrastructureTypeMapping}) changes the {@link ExpressionSupport} to
- * {@link ExpressionSupport#NOT_SUPPORTED} and adds {@link InfrastructureParameterModelProperty}
+ * Resolves whether a {@link Type}is one of the considered as an Infrastructure Type ({@link InfrastructureTypeMapping})
  *
- * @since 4.0
+ * @since 4.4
  */
-public class InfrastructureFieldContributor {
+public class InfrastructureTypeResolver {
 
   private static final Map<Type, InfrastructureType> TYPE_MAPPING = InfrastructureTypeMapping.getMap().entrySet()
       .stream()
@@ -48,17 +38,6 @@ public class InfrastructureFieldContributor {
         .filter(entry -> entry.getKey().isSameType(type))
         .map(Map.Entry::getValue)
         .findFirst();
-  }
-
-  public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer) {
-    getInfrastructureType(parameter.getType()).ifPresent(infrastructureType -> {
-      if (!isBlank(infrastructureType.getName())) {
-        declarer.withModelProperty(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
-        declarer.withExpressionSupport(NOT_SUPPORTED);
-        getQName(infrastructureType.getName()).ifPresent(declarer::withModelProperty);
-        getDslConfiguration(infrastructureType.getName()).ifPresent(declarer::withDsl);
-      }
-    });
   }
 }
 

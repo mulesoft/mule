@@ -34,7 +34,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(parser);
       if (providerDeclarer != null) {
         declarer.withConnectionProvider(providerDeclarer);
-        return;
+        continue;
       }
 
       providerDeclarer = declarer.withConnectionProvider(parser.getName())

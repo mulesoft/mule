@@ -62,7 +62,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       SourceDeclarer existingDeclarer = sourceDeclarers.get(parser);
       if (existingDeclarer != null) {
         actualDeclarer.withMessageSource(existingDeclarer);
-        return;
+        continue;
       }
 
       SourceDeclarer sourceDeclarer = actualDeclarer.withMessageSource(parser.getName())

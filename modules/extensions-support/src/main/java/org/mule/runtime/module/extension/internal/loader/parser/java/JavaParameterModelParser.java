@@ -8,13 +8,14 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
-import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor.getInfrastructureType;
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -63,12 +64,21 @@ public class JavaParameterModelParser implements ParameterModelParser {
   private final ParameterDeclarationContext context;
 
   private Optional<ParameterDslConfiguration> dslConfiguration;
+  private ExpressionSupport expressionSupport;
 
   public JavaParameterModelParser(ExtensionParameter parameter, ParameterDeclarationContext context) {
     this.parameter = parameter;
     this.context = context;
     type = parameter.getType().asMetadataType();
+
+    parserStructure();
     collectAdditionalModelProperties();
+  }
+
+  private void parserStructure() {
+    expressionSupport = parameter.getAnnotation(Expression.class)
+        .map(expression -> IntrospectionUtils.getExpressionSupport(expression))
+        .orElse(SUPPORTED);
   }
 
   @Override
@@ -110,9 +120,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public ExpressionSupport getExpressionSupport() {
-    return parameter.getAnnotation(Expression.class)
-        .map(expression -> IntrospectionUtils.getExpressionSupport(expression))
-        .orElse(SUPPORTED);
+    return expressionSupport;
   }
 
   @Override
@@ -169,6 +177,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
       getInfrastructureType(parameter.getType()).ifPresent(infrastructureType -> {
         if (!isBlank(infrastructureType.getName())) {
           additionalModelProperties.add(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
+          expressionSupport = NOT_SUPPORTED;
           getQName(infrastructureType.getName()).ifPresent(additionalModelProperties::add);
           InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName())
               .ifPresent(dsl -> dslConfiguration = Optional.of(dsl));
