@@ -53,14 +53,14 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       if (extensionLevelOperation && parser.isAutoPaging()) {
         throw new IllegalOperationModelDefinitionException(
             format("Paged operation '%s' is defined at the extension level but it requires a config, "
-                    + "since connections are required for paging", parser.getName()));
+                + "since connections are required for paging", parser.getName()));
       }
 
       if (actualDeclarer == extensionDeclarer && requiresConfig) {
         throw new IllegalOperationModelDefinitionException(format(
-                                                                  "Operation '%s' is defined at the extension level but it requires a config. "
-                                                                      + "Remove such parameter or move the operation to the proper config",
-                                                                  parser.getName()));
+            "Operation '%s' is defined at the extension level but it requires a config. "
+                + "Remove such parameter or move the operation to the proper config",
+            parser.getName()));
       }
 
       if (operationDeclarers.containsKey(parser)) {
@@ -70,30 +70,30 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       if (parser.isRouter()) {
         routersDelegate.declareRouter(extensionDeclarer, (HasConstructDeclarer) ownerDeclarer, parser);
-      } else {
-        final OperationDeclarer operation = actualDeclarer.withOperation(parser.getName())
-            .describedAs(parser.getDescription())
-            .supportsStreaming(parser.supportsStreaming())
-            .transactional(parser.isTransactional())
-            .requiresConnection(parser.isConnected())
-            .blocking(parser.isBlocking())
-            .withModelProperty(parser.getExecutorModelProperty());
-
-        parser.getOutputType().applyOn(operation.withOutput());
-        parser.getAttributesOutputType().applyOn(operation.withOutputAttributes());
-        parser.getMediaTypeModelProperty().ifPresent(operation::withModelProperty);
-
-        loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
-        parser.getExecutionType().ifPresent(operation::withExecutionType);
-        parser.getAdditionalModelProperties().forEach(operation::withModelProperty);
-        parser.getExceptionHandlerModelProperty().ifPresent(operation::withModelProperty);
-
-        parser.getNestedChainParser().ifPresent(chain -> operation.withChain(chain.getName())
-            .describedAs(chain.getDescription())
-            .setRequired(chain.isRequired()));
-
-        operationDeclarers.put(parser, operation);
+        return;
       }
+      final OperationDeclarer operation = actualDeclarer.withOperation(parser.getName())
+          .describedAs(parser.getDescription())
+          .supportsStreaming(parser.supportsStreaming())
+          .transactional(parser.isTransactional())
+          .requiresConnection(parser.isConnected())
+          .blocking(parser.isBlocking())
+          .withModelProperty(parser.getExecutorModelProperty());
+
+      parser.getOutputType().applyOn(operation.withOutput());
+      parser.getAttributesOutputType().applyOn(operation.withOutputAttributes());
+      parser.getMediaTypeModelProperty().ifPresent(operation::withModelProperty);
+
+      loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
+      parser.getExecutionType().ifPresent(operation::withExecutionType);
+      parser.getAdditionalModelProperties().forEach(operation::withModelProperty);
+      parser.getExceptionHandlerModelProperty().ifPresent(operation::withModelProperty);
+
+      parser.getNestedChainParser().ifPresent(chain -> operation.withChain(chain.getName())
+          .describedAs(chain.getDescription())
+          .setRequired(chain.isRequired()));
+
+      operationDeclarers.put(parser, operation);
     }
   }
 }

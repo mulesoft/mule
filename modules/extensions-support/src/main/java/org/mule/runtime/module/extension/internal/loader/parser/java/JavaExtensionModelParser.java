@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.util.Collections.singletonList;
-import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
@@ -23,6 +22,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
@@ -38,6 +38,7 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
 
   private final ExtensionElement extensionElement;
   private final ExtensionLoadingContext loadingContext;
+  private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this.extensionElement = extensionElement;
@@ -124,10 +125,10 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    List<ModelProperty> properties = new LinkedList<>();
+    additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(extensionElement));
     extensionElement.getDeclaringClass()
-        .ifPresent(extensionClass -> properties.add(new ImplementingTypeModelProperty(extensionClass)));
+        .ifPresent(extensionClass -> additionalModelProperties.add(new ImplementingTypeModelProperty(extensionClass)));
 
-    return unmodifiableList(properties);
+    return additionalModelProperties;
   }
 }
