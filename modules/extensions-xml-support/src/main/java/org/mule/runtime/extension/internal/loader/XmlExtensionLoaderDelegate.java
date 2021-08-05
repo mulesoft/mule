@@ -1149,7 +1149,7 @@ public final class XmlExtensionLoaderDelegate {
                       .withParent(ErrorModelBuilder.newError(ANY).build())
                       .build());
                 }));
-          });
+          }));
     });
   }
 
