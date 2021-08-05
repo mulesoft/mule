@@ -36,6 +36,7 @@ public final class ParameterModelsLoaderDelegate {
             .withDslInlineRepresentation(group.showsInDsl());
 
         group.getDisplayModel().ifPresent(groupDeclarer::withDisplayModel);
+        group.getLayoutModel().ifPresent(groupDeclarer::withLayout);
         group.getAdditionalModelProperties().forEach(groupDeclarer::withModelProperty);
         group.getExclusiveOptionals().ifPresent(descriptor -> groupDeclarer
             .withExclusiveOptionals(descriptor.getExclusiveOptionals(), descriptor.isOneRequired()));
@@ -71,6 +72,7 @@ public final class ParameterModelsLoaderDelegate {
           parameter.withModelProperty(new ExcludeFromConnectivitySchemaModelProperty());
         }
 
+        extensionParameter.getLayoutModel().ifPresent(parameter::withLayout);
         extensionParameter.getDslConfiguration().ifPresent(parameter::withDsl);
         extensionParameter.getAdditionalModelProperties().forEach(parameter::withModelProperty);
         declarerList.add(parameter);
