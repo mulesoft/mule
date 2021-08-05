@@ -11,6 +11,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SE
 import static org.mule.runtime.core.internal.profiling.notification.ProfilingNotification.getFullyQualifiedProfilingNotificationIdentifier;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -104,7 +105,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
   }
 
   /**
-   * Configures {@link FeatureFlaggingService} for the profiles functionality
+   * Configures the {@link MuleRuntimeFeature#ENABLE_PROFILING_SERVICE} feature flag.
    *
    * @since 4.4
    */

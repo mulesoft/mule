@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.StringMessageUtils;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -153,7 +154,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
   }
 
   /**
-   * Configures {@link FeatureFlaggingService} for MULE-19323.
+   * Configures the {@link MuleRuntimeFeature#TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS} feature flag.
    *
    * @since 4.4
    */
@@ -161,8 +162,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")
-                                                        || muleVersion.atLeast("4.3.1"))
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0"))
                                                     .isPresent());
   }
 }

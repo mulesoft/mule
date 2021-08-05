@@ -58,7 +58,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -1196,30 +1195,43 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     return getRegistry().lookupObject(OBJECT_REGISTRY);
   }
 
+  /**
+   * Configures the {@link MuleRuntimeFeature#HANDLE_SPLITTER_EXCEPTION} feature flag.
+   *
+   * @since 4.4.0
+   */
   private static void configureSplitterExceptionHandlingFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HANDLE_SPLITTER_EXCEPTION, featureContext -> featureContext
         .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 
+  /**
+   * Configures the {@link MuleRuntimeFeature#BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER} feature flag.
+   *
+   * @since 4.4.0 4.3.1
+   */
   private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, featureContext -> false);
   }
 
   /**
-   * Configures {@link FeatureFlaggingService} to revert MULE-17659 for applications with <code>minMuleVersion</code> lesser than
-   * or equal to 4.2.2, or if system property {@link MuleRuntimeFeature#HONOUR_RESERVED_PROPERTIES} is set. See MULE-17659 and
-   * MULE-19038.
+   * Configures the {@link MuleRuntimeFeature#HONOUR_RESERVED_PROPERTIES} feature flag.
    *
-   * @since 4.4.0 4.3.0
+   * @since 4.4.0 4.3.1
    */
   public static void configurePropertiesResolverFeatureFlag() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.2.2")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.3.0")).isPresent());
   }
 
+  /**
+   * Configures the {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature flag.
+   *
+   * @since 4.4.0 4.3.1
+   */
   private static void configureEnablePolicyIsolation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_POLICY_ISOLATION, featureContext -> featureContext
@@ -1227,8 +1239,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures {@link FeatureFlaggingService} to revert EE-7827 for applications with <code>minMuleVersion</code> lesser than
-   * 4.4.0, or if system property {@link MuleRuntimeFeature#ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR} is set.
+   * Configures the {@link MuleRuntimeFeature#ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR} feature flag.
    *
    * @since 4.4.0
    */
@@ -1239,8 +1250,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures {@link FeatureFlaggingService} to revert MULE-19443 for applications with <code>minMuleVersion</code> lesser than
-   * 4.4.0.
+   * Configures the {@link MuleRuntimeFeature#SET_VARIABLE_WITH_NULL_VALUE} feature flag.
    *
    * @since 4.4.0
    */
