@@ -47,12 +47,13 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
                                                ParameterDeclarationContext context,
                                                Function<ParameterModelParser, ParameterModelParser> parameterMutator) {
     super(context, parameterMutator);
-    assureValid(groupParameter);
 
     this.groupParameter = groupParameter;
     type = groupParameter.getType();
     groupName = fetchGroupName();
     parameters = fetchAnnotatedParameter();
+
+    assureValid(groupParameter);
   }
 
   @Override

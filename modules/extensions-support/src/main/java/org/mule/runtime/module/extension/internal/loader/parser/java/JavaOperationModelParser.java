@@ -265,7 +265,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
                                                                 getName(), CompletionCallback.class.getSimpleName()));
     }
 
-    if (isVoid(operationElement)) {
+    if (!isVoid(operationElement)) {
       throw new IllegalOperationModelDefinitionException(
                                                          format("Operation '%s' has a parameter of type %s but is not void. "
                                                              + "Non-blocking operations have to be declared as void and the "
