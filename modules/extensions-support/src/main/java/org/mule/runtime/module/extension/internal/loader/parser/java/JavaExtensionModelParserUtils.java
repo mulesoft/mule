@@ -195,6 +195,7 @@ public final class JavaExtensionModelParserUtils {
 
     List<ParameterGroupModelParser> groups = new LinkedList<>();
     List<ExtensionParameter> defaultGroupParams = new LinkedList<>();
+    boolean defaultGroupAdded = false;
 
     for (ExtensionParameter extensionParameter : parameters) {
       if (!extensionParameter.shouldBeAdvertised()) {
@@ -205,10 +206,13 @@ public final class JavaExtensionModelParserUtils {
         groups.add(new JavaDeclaredParameterGroupModelParser(extensionParameter, context, parameterMutator));
       } else {
         defaultGroupParams.add(extensionParameter);
+        if (!defaultGroupAdded) {
+          groups.add(new JavaDefaultParameterGroupParser(defaultGroupParams, context, parameterMutator));
+          defaultGroupAdded = true;
+        }
       }
     }
 
-    groups.add(0, new JavaDefaultParameterGroupParser(defaultGroupParams, context, parameterMutator));
     return groups;
   }
 
