@@ -157,7 +157,6 @@ public class AllStatistics {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(COMPUTE_CONNECTION_ERRORS_IN_STATS,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0"))
-                                                    .isPresent());
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }
