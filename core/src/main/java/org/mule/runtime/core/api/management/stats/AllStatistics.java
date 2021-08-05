@@ -156,6 +156,8 @@ public class AllStatistics {
 
   /**
    * Configures the {@link MuleRuntimeFeature#COMPUTE_CONNECTION_ERRORS_IN_STATS} feature flag.
+   *
+   * @since 4.4.0, 4.3.1
    */
   public static void configureComputeConnectionErrorsInStats() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();

@@ -1224,7 +1224,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   public static void configurePropertiesResolverFeatureFlag() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.3.0")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.3.1")).isPresent());
   }
 
   /**
