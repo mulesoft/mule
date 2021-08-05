@@ -49,7 +49,7 @@ public final class ParameterDeclarationContext {
     return new ParameterDeclarationContext(routeName, "Route");
   }
 
-  private ParameterDeclarationContext(String componentName, String componentType) {
+  public ParameterDeclarationContext(String componentName, String componentType) {
     this.componentName = componentName;
     this.componentType = componentType;
   }

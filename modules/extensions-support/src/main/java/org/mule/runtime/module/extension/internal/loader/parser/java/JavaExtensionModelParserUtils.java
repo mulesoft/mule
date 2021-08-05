@@ -61,23 +61,23 @@ import java.util.function.Function;
  *
  * @since 1.0
  */
-final class JavaExtensionModelParserUtils {
+public final class JavaExtensionModelParserUtils {
 
   private JavaExtensionModelParserUtils() {}
 
-  static List<ExtensionParameter> getCompletionCallbackParameters(MethodElement method) {
+  public static List<ExtensionParameter> getCompletionCallbackParameters(MethodElement method) {
     return method.getParameters().stream()
         .filter(p -> p.getType().isAssignableTo(CompletionCallback.class) ||
             p.getType().isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class))
         .collect(toList());
   }
 
-  static boolean isAutoPaging(MethodElement operationMethod) {
+  public static boolean isAutoPaging(MethodElement operationMethod) {
     return operationMethod.getReturnType().isAssignableTo(PagingProvider.class)
         || operationMethod.getReturnType().isAssignableTo(org.mule.sdk.api.runtime.streaming.PagingProvider.class);
   }
 
-  static boolean isProcessorChain(ExtensionParameter parameter) {
+  public static boolean isProcessorChain(ExtensionParameter parameter) {
     return parameter.getType().isAssignableTo(Chain.class)
         || parameter.getType().isAssignableTo(org.mule.sdk.api.runtime.route.Chain.class);
   }
@@ -86,7 +86,7 @@ final class JavaExtensionModelParserUtils {
    * @param type a {@link MetadataType}
    * @return whether the given {@code type} represents an {@link InputStream} or not
    */
-  static boolean isInputStream(MetadataType type) {
+  public static boolean isInputStream(MetadataType type) {
     return isAssignableFrom(type, InputStream.class);
   }
 
@@ -94,12 +94,12 @@ final class JavaExtensionModelParserUtils {
     return getType(metadataType).map(clazz -> type.isAssignableFrom(clazz)).orElse(false);
   }
 
-  static boolean isParameterGroup(ExtensionParameter groupParameter) {
+  public static boolean isParameterGroup(ExtensionParameter groupParameter) {
     return groupParameter.getAnnotation(ParameterGroup.class).isPresent()
         || groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class).isPresent();
   }
 
-  static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {
+  public static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {
     Optional<ExternalLibs> externalLibs = element.getAnnotation(ExternalLibs.class);
     if (externalLibs.isPresent()) {
       return stream(externalLibs.get().value())
@@ -112,48 +112,48 @@ final class JavaExtensionModelParserUtils {
     }
   }
 
-  static List<OperationModelParser> getOperationParsers(ExtensionElement extensionElement,
-                                                        WithOperationContainers operationContainers,
-                                                        ExtensionLoadingContext loadingContext) {
+  public static List<OperationModelParser> getOperationParsers(ExtensionElement extensionElement,
+                                                               WithOperationContainers operationContainers,
+                                                               ExtensionLoadingContext loadingContext) {
     return operationContainers.getOperationContainers().stream()
         .flatMap(container -> container.getOperations().stream()
             .map(method -> new JavaOperationModelParser(extensionElement, container, method, loadingContext)))
         .collect(toList());
   }
 
-  static List<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
-                                                  List<SourceElement> sources,
-                                                  ExtensionLoadingContext loadingContext) {
+  public static List<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
+                                                         List<SourceElement> sources,
+                                                         ExtensionLoadingContext loadingContext) {
     return sources.stream()
         .map(source -> new JavaSourceModelParser(extensionElement, source, loadingContext))
         .collect(toList());
   }
 
-  static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(
-                                                                               ExtensionElement extensionElement,
-                                                                               List<ConnectionProviderElement> connectionProviderElements) {
+  public static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(ExtensionElement extensionElement,
+                                                                                      List<ConnectionProviderElement> connectionProviderElements) {
 
     return connectionProviderElements.stream()
         .map(cpElement -> new JavaConnectionProviderModelParser(extensionElement, cpElement))
         .collect(toList());
   }
 
-  static List<FunctionModelParser> getFunctionModelParsers(ExtensionElement extensionElement,
-                                                           List<FunctionContainerElement> functionContainers,
-                                                           ExtensionLoadingContext loadingContext) {
+  public static List<FunctionModelParser> getFunctionModelParsers(ExtensionElement extensionElement,
+                                                                  List<FunctionContainerElement> functionContainers,
+                                                                  ExtensionLoadingContext loadingContext) {
     return functionContainers.stream()
         .flatMap(container -> container.getFunctions().stream())
         .map(func -> new JavaFunctionModelParser(extensionElement, func, loadingContext))
         .collect(toList());
   }
 
-  static List<ParameterGroupModelParser> getParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                  ParameterDeclarationContext context) {
+  public static List<ParameterGroupModelParser> getParameterGroupParsers(List<? extends ExtensionParameter> parameters,
+                                                                         ParameterDeclarationContext context) {
     return getParameterGroupParsers(parameters, context, null);
   }
 
-  static List<ParameterGroupModelParser> getSourceParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                        ParameterDeclarationContext context) {
+  public static List<ParameterGroupModelParser> getSourceParameterGroupParsers(List<? extends ExtensionParameter> parameters,
+                                                                               ParameterDeclarationContext context) {
+
     return getParameterGroupParsers(parameters, context, p -> new ParameterModelParserDecorator(p) {
 
       @Override
@@ -163,8 +163,8 @@ final class JavaExtensionModelParserUtils {
     });
   }
 
-  static List<ParameterGroupModelParser> getOperationFieldParameterGroupParsers(List<? extends ExtensionParameter> parameters,
-                                                                                ParameterDeclarationContext context) {
+  public static List<ParameterGroupModelParser> getOperationFieldParameterGroupParsers(List<? extends ExtensionParameter> parameters,
+                                                                                       ParameterDeclarationContext context) {
     return getParameterGroupParsers(parameters, context, p -> new ParameterModelParserDecorator(p) {
 
       @Override
@@ -226,7 +226,7 @@ final class JavaExtensionModelParserUtils {
     }
   }
 
-  static Optional<ExtensionParameter> getConfigParameter(WithParameters element) {
+  public static Optional<ExtensionParameter> getConfigParameter(WithParameters element) {
     Optional<ExtensionParameter> configParameter = element.getParametersAnnotatedWith(Config.class).stream().findFirst();
     if (!configParameter.isPresent()) {
       configParameter = element.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Config.class).stream().findFirst();
@@ -235,7 +235,7 @@ final class JavaExtensionModelParserUtils {
     return configParameter;
   }
 
-  static Optional<ExtensionParameter> getConnectionParameter(WithParameters element) {
+  public static Optional<ExtensionParameter> getConnectionParameter(WithParameters element) {
     Optional<ExtensionParameter> connectionParameter = element.getParametersAnnotatedWith(Connection.class).stream().findFirst();
     if (!connectionParameter.isPresent()) {
       connectionParameter =

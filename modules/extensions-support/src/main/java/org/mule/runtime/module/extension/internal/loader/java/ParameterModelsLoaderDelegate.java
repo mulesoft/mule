@@ -23,8 +23,7 @@ import java.util.List;
 public final class ParameterModelsLoaderDelegate {
 
 
-  public List<ParameterDeclarer> declare(HasParametersDeclarer component,
-                                         List<ParameterGroupModelParser> groupParsers) {
+  public List<ParameterDeclarer> declare(HasParametersDeclarer component, List<ParameterGroupModelParser> groupParsers) {
 
     final List<ParameterDeclarer> declarerList = new LinkedList<>();
     groupParsers.forEach(group -> {
