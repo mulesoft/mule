@@ -119,14 +119,17 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
                                                                 getName()));
     }
 
-    if (scope) {
-      parseScope();
-    } else if (router) {
-      parseRouter();
-    } else if (blocking) {
+    if (blocking) {
       parseBlockingOperation();
     } else {
       parseNonBlockingOperation(callbackParameters);
+    }
+
+    if (scope) {
+      validateScope();
+    }
+    if (router) {
+      parseRouter();
     }
   }
 
@@ -147,7 +150,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     return chains.isEmpty() ? null : chains.get(0);
   }
 
-  private void parseScope() {
+  private void validateScope() {
     if (blocking) {
       throw new IllegalOperationModelDefinitionException(format("Scope '%s' does not declare a '%s' parameter. One is required " +
           "for all operations that receive and execute a Chain of other components",
@@ -234,13 +237,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   private void parseAutoPaging() {
-    if (!configParameter.isPresent()) {
-      throw new IllegalOperationModelDefinitionException(
-                                                         format("Paged operation '%s' is defined at the extension level but it requires a config, "
-                                                             + "since connections are required for paging",
-                                                                operationElement.getName()));
-    }
-
     supportsStreaming = true;
     connected = true;
     additionalModelProperties.add(new PagedOperationModelProperty());

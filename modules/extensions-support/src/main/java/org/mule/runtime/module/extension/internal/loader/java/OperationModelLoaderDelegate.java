@@ -48,6 +48,13 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       HasOperationDeclarer actualDeclarer = requiresConfig
           ? ownerDeclarer
           : extensionDeclarer;
+      final boolean extensionLevelOperation = actualDeclarer == extensionDeclarer;
+
+      if (extensionLevelOperation && parser.isAutoPaging()) {
+        throw new IllegalOperationModelDefinitionException(
+            format("Paged operation '%s' is defined at the extension level but it requires a config, "
+                    + "since connections are required for paging", parser.getName()));
+      }
 
       if (actualDeclarer == extensionDeclarer && requiresConfig) {
         throw new IllegalOperationModelDefinitionException(format(
