@@ -52,15 +52,15 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       if (extensionLevelOperation && parser.isAutoPaging()) {
         throw new IllegalOperationModelDefinitionException(
-            format("Paged operation '%s' is defined at the extension level but it requires a config, "
-                + "since connections are required for paging", parser.getName()));
+                                                           format("Paged operation '%s' is defined at the extension level but it requires a config, "
+                                                               + "since connections are required for paging", parser.getName()));
       }
 
       if (actualDeclarer == extensionDeclarer && requiresConfig) {
         throw new IllegalOperationModelDefinitionException(format(
-            "Operation '%s' is defined at the extension level but it requires a config. "
-                + "Remove such parameter or move the operation to the proper config",
-            parser.getName()));
+                                                                  "Operation '%s' is defined at the extension level but it requires a config. "
+                                                                      + "Remove such parameter or move the operation to the proper config",
+                                                                  parser.getName()));
       }
 
       if (operationDeclarers.containsKey(parser)) {

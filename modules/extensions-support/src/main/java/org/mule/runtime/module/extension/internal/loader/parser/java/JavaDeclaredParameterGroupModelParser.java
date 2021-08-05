@@ -125,12 +125,12 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
   private void assureValid(ExtensionParameter groupParameter, ParameterDeclarationContext context) {
     if (DEFAULT_GROUP_NAME.equals(groupName)) {
       throw new IllegalParameterModelDefinitionException(
-          format("%s '%s' defines parameter group of name '%s' which is the default one. "
-                  + "@%s cannot be used with the default group name",
-              context.getComponentType(),
-              context.getComponentName(),
-              groupName,
-              ParameterGroup.class.getSimpleName()));
+                                                         format("%s '%s' defines parameter group of name '%s' which is the default one. "
+                                                             + "@%s cannot be used with the default group name",
+                                                                context.getComponentType(),
+                                                                context.getComponentName(),
+                                                                groupName,
+                                                                ParameterGroup.class.getSimpleName()));
     }
 
     final List<FieldElement> nestedGroups =
