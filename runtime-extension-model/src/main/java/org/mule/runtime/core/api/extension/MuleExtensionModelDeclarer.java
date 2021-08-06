@@ -83,6 +83,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -114,6 +115,7 @@ import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
+import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
@@ -134,6 +136,7 @@ import com.google.gson.reflect.TypeToken;
  */
 class MuleExtensionModelDeclarer {
 
+  static final String DEFAULT_LOG_LEVEL = "INFO";
   private static final Class<? extends ModelProperty> allowsExpressionWithoutMarkersModelPropertyClass;
   private static final ClassValueModel NOTIFICATION_CLASS_VALUE_MODEL =
       new ClassValueModel(singletonList(NotificationListener.class.getName()));
@@ -148,8 +151,6 @@ class MuleExtensionModelDeclarer {
     }
     allowsExpressionWithoutMarkersModelPropertyClass = foundClass;
   }
-
-  static final String DEFAULT_LOG_LEVEL = "INFO";
 
   final ErrorModel anyError = newError(ANY).build();
   final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
@@ -1249,7 +1250,9 @@ class MuleExtensionModelDeclarer {
 
     ObjectType securityProviderType = BaseTypeBuilder.create(JAVA).objectType()
         .with(new ClassInformationAnnotation(SecurityProvider.class))
+        .with(new TypeIdAnnotation(SecurityProvider.class.getName()))
         .with(new InfrastructureTypeAnnotation())
+        .with(new ExtensibleTypeAnnotation())
         .build();
 
     securityManagerDeclarer
@@ -1265,7 +1268,9 @@ class MuleExtensionModelDeclarer {
 
     ObjectType exceptionStrategyType = BaseTypeBuilder.create(JAVA).objectType()
         .with(new ClassInformationAnnotation(EncryptionStrategy.class))
+        .with(new TypeIdAnnotation(EncryptionStrategy.class.getName()))
         .with(new InfrastructureTypeAnnotation())
+        .with(new ExtensibleTypeAnnotation())
         .build();
 
     securityManagerDeclarer
