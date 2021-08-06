@@ -990,6 +990,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
+    declareExpressionLanguage(configuration.withOptionalComponent("expression-language"));
 
     final ParameterGroupDeclarer params = configuration.onDefaultParameterGroup();
     params
@@ -1078,6 +1079,39 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(REQUIRED)
         .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
+  }
+
+  private void declareExpressionLanguage(NestedComponentDeclarer expressionLanguageDeclarer) {
+    expressionLanguageDeclarer.describedAs("Configuration of Mule Expression Language");
+    expressionLanguageDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("autoResolveVariables")
+        .ofType(BOOLEAN_TYPE)
+        .defaultingTo(true)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    ParameterGroupDeclarer importParameters = expressionLanguageDeclarer.withOptionalComponent("import")
+        .onDefaultParameterGroup();
+    importParameters.withOptionalParameter("name")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+    importParameters.withRequiredParameter("class")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    ParameterGroupDeclarer aliasParameters = expressionLanguageDeclarer.withOptionalComponent("alias")
+        .onDefaultParameterGroup();
+    aliasParameters.withRequiredParameter("name")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+    aliasParameters.withRequiredParameter("expression")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    ParameterGroupDeclarer globalFunctionsParameters = expressionLanguageDeclarer.withOptionalComponent("global-functions")
+        .onDefaultParameterGroup();
+    globalFunctionsParameters.withOptionalParameter("file")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
   }
 
   private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer) {
