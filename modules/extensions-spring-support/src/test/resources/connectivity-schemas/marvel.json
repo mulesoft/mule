@@ -33,7 +33,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "mystic",
       "system": "Marvel",
@@ -74,7 +74,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooling-mystic",
       "system": "Marvel",
@@ -115,7 +115,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "missile",
       "system": "Marvel",
@@ -156,7 +156,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "odd-missile",
       "system": "Marvel",

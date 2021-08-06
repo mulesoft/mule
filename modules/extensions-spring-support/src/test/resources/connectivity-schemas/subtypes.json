@@ -41,7 +41,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "Subtypes",
