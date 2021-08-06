@@ -4,11 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.parser.java;
+package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 
+/**
+ * Default implementation for {@link OutputModelParser}.
+ * <p>
+ * This implementation is syntax agnostic.
+ *
+ * @since 4.5.0
+ */
 public class DefaultOutputModelParser implements OutputModelParser {
 
   private final MetadataType type;

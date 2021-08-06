@@ -10,6 +10,8 @@ import static java.lang.String.format;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
@@ -28,7 +30,14 @@ import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 import java.util.LinkedList;
 import java.util.List;
 
-abstract class AbstractExecutableComponentModelParser {
+/**
+ * Base class for model parsers which act on executable components, such as {@link OperationModel} and {@link SourceModel}.
+ * <p>
+ * Each implementor must focus on one specific type.
+ *
+ * @since 4.5.0
+ */
+abstract class AbstractJavaExecutableComponentModelParser {
 
   protected final ExtensionElement extensionElement;
   protected final ExtensionLoadingContext loadingContext;
@@ -40,12 +49,35 @@ abstract class AbstractExecutableComponentModelParser {
   protected boolean transactional = false;
   protected final List<ModelProperty> additionalModelProperties = new LinkedList<>();
 
-  public AbstractExecutableComponentModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
+  /**
+   * Creates a new instance
+   *
+   * @param extensionElement the extension's type element
+   * @param loadingContext   the loading context
+   */
+  public AbstractJavaExecutableComponentModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this.extensionElement = extensionElement;
     this.loadingContext = loadingContext;
   }
 
-  protected void processComponentConnectivity(WithParameters component) {
+  /**
+   * Returns a meaningful name which describes the type of component being parsed. Used for logging and error message generation
+   *
+   * @return the name of the parsed component type
+   */
+  protected abstract String getComponentTypeName();
+
+  /**
+   * @return The parsed compoent's name
+   */
+  protected abstract String getName();
+
+  /**
+   * Parses the {@code component}'s connectivity attributes and extract's the appropriate values
+   *
+   * @param component the connected component
+   */
+  protected void parseComponentConnectivity(WithParameters component) {
     List<ExtensionParameter> connectionParameters = component.getParametersAnnotatedWith(Connection.class);
     if (connectionParameters.isEmpty()) {
       connectionParameters = component.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Connection.class);
@@ -70,6 +102,11 @@ abstract class AbstractExecutableComponentModelParser {
     }
   }
 
+  /**
+   * Parses the {@code component}'s byte streaming attributes and extract's the appropriate values
+   *
+   * @param element the connected component
+   */
   protected void parseComponentByteStreaming(WithAnnotations element) {
     supportsStreaming = ModelLoaderUtils.isInputStream(outputType.getType())
         || element.getAnnotation(Streaming.class).isPresent()
@@ -93,11 +130,27 @@ abstract class AbstractExecutableComponentModelParser {
     return connectionType;
   }
 
+  public OutputModelParser getOutputType() {
+    return outputType;
+  }
+
+  public OutputModelParser getAttributesOutputType() {
+    return outputAttributesType;
+  }
+
+  public boolean supportsStreaming() {
+    return supportsStreaming;
+  }
+
+  public boolean isConnected() {
+    return connected;
+  }
+
+  public boolean isTransactional() {
+    return transactional;
+  }
+
   public List<ModelProperty> getAdditionalModelProperties() {
     return additionalModelProperties;
   }
-
-  protected abstract String getComponentTypeName();
-
-  protected abstract String getName();
 }

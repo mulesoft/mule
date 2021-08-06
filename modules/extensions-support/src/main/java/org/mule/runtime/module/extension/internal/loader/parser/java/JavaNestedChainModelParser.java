@@ -9,6 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 
+/**
+ * {@link NestedChainModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
 public class JavaNestedChainModelParser implements NestedChainModelParser {
 
   private final ExtensionParameter extensionParameter;

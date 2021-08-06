@@ -28,6 +28,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
 import java.util.LinkedList;
@@ -36,6 +37,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Java based implementation of {@link ParameterGroupModelParser} for non-default parameter groups explicitly defined in the
+ * extension's code.
+ *
+ * @since 4.5.0
+ */
 public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameterGroupModelParser {
 
   private final List<ExtensionParameter> parameters;

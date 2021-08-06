@@ -16,6 +16,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Base class for Java based {@link ParameterGroupModelParser} implementations
+ *
+ * @sinc 4.5.0
+ */
 abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupModelParser {
 
   protected final Function<ParameterModelParser, ParameterModelParser> parameterMutator;

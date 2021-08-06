@@ -34,6 +34,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * {@link ExtensionModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
 public class JavaExtensionModelParser implements ExtensionModelParser {
 
   private final ExtensionElement extensionElement;

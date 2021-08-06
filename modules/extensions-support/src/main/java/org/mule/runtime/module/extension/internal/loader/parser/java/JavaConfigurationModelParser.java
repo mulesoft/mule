@@ -37,6 +37,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * {@link ConfigurationModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
 public class JavaConfigurationModelParser implements ConfigurationModelParser {
 
   private final ExtensionElement extensionElement;

@@ -60,6 +60,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * {@link ParameterModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
 public class JavaParameterModelParser implements ParameterModelParser {
 
   private final ExtensionParameter parameter;

@@ -14,6 +14,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
 import java.util.List;
@@ -21,6 +22,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Java based implementation of {@link ParameterGroupModelParser} for parsing the default parameter group.
+ *
+ * @since 4.5.0
+ */
 public class JavaDefaultParameterGroupParser extends AbstractJavaParameterGroupModelParser {
 
   private final List<ExtensionParameter> parameters;

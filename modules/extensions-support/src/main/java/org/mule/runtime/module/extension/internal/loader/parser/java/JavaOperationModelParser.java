@@ -51,10 +51,10 @@ import org.mule.runtime.module.extension.internal.loader.java.property.FieldOper
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
@@ -63,7 +63,12 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import java.util.List;
 import java.util.Optional;
 
-public class JavaOperationModelParser extends AbstractExecutableComponentModelParser implements OperationModelParser {
+/**
+ * {@link OperationModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
+public class JavaOperationModelParser extends AbstractJavaExecutableComponentModelParser implements OperationModelParser {
 
   private static final List<Class<?>> ROUTER_CALLBACK_PARAMETER_TYPES = asList(
                                                                                RouterCompletionCallback.class,
@@ -119,7 +124,7 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
                                                                 getName()));
     }
 
-    processComponentConnectivity(operationElement);
+    parseComponentConnectivity(operationElement);
 
     if (blocking) {
       parseBlockingOperation();
@@ -362,21 +367,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   @Override
-  public OutputModelParser getOutputType() {
-    return outputType;
-  }
-
-  @Override
-  public OutputModelParser getAttributesOutputType() {
-    return outputAttributesType;
-  }
-
-  @Override
-  public boolean supportsStreaming() {
-    return supportsStreaming;
-  }
-
-  @Override
   public boolean isScope() {
     return scope;
   }
@@ -387,16 +377,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   }
 
   @Override
-  public boolean isConnected() {
-    return connected;
-  }
-
-  @Override
-  public boolean isTransactional() {
-    return transactional;
-  }
-
-  @Override
   public boolean isAutoPaging() {
     return autoPaging;
   }
@@ -404,11 +384,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   @Override
   public Optional<ExecutionType> getExecutionType() {
     return operationElement.getAnnotation(Execution.class).map(Execution::value);
-  }
-
-  @Override
-  public boolean isNonBlocking() {
-    return !blocking;
   }
 
   @Override
@@ -430,11 +405,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
   @Override
   public boolean hasConfig() {
     return configParameter.isPresent();
-  }
-
-  @Override
-  public List<ModelProperty> getAdditionalModelProperties() {
-    return additionalModelProperties;
   }
 
   private void checkOperationIsNotAnExtension() {

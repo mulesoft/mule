@@ -49,6 +49,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * {@link ConnectionProviderModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
 public class JavaConnectionProviderModelParser implements ConnectionProviderModelParser {
 
   private final ConnectionProviderElement element;

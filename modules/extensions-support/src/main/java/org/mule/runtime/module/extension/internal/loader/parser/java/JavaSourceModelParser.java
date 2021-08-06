@@ -20,7 +20,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -37,7 +36,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
@@ -47,7 +46,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
-public class JavaSourceModelParser extends AbstractExecutableComponentModelParser implements SourceModelParser {
+public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelParser implements SourceModelParser {
 
   private final SourceElement sourceElement;
 
@@ -128,31 +127,6 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
   }
 
   @Override
-  public OutputModelParser getOutputType() {
-    return outputType;
-  }
-
-  @Override
-  public OutputModelParser getAttributesOutputType() {
-    return outputAttributesType;
-  }
-
-  @Override
-  public boolean supportsStreaming() {
-    return supportsStreaming;
-  }
-
-  @Override
-  public boolean isConnected() {
-    return connected;
-  }
-
-  @Override
-  public boolean isTransactional() {
-    return transactional;
-  }
-
-  @Override
   public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
     return sourceElement.getAnnotation(MediaType.class)
         .map(a -> new MediaTypeModelProperty(a.value(), a.strict()));
@@ -168,11 +142,6 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
     return configParameter.isPresent();
   }
 
-  @Override
-  public List<ModelProperty> getAdditionalModelProperties() {
-    return additionalModelProperties;
-  }
-
   private void collectAdditionalModelProperties() {
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(sourceElement));
     additionalModelProperties.add(new ImplementingTypeModelProperty(sourceClass));
@@ -182,7 +151,6 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
                                                                   extractJavaMethod(sourceElement.getOnTerminateMethod()),
                                                                   extractJavaMethod(sourceElement.getOnBackPressureMethod())));
   }
-
 
   private Optional<Method> extractJavaMethod(Optional<MethodElement> method) {
     return method.flatMap(MethodElement::getMethod);
@@ -210,7 +178,7 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
     parseComponentByteStreaming(sourceElement);
 
     connected = connectionParameter.isPresent();
-    processComponentConnectivity(sourceElement);
+    parseComponentConnectivity(sourceElement);
   }
 
   private void resolveOutputTypes() {

@@ -22,6 +22,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * {@link NestedRouteModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
 public class JavaNestedRouteModelParser implements NestedRouteModelParser {
 
   private final ExtensionParameter route;

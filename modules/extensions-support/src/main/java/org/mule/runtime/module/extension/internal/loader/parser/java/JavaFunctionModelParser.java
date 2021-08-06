@@ -21,8 +21,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.FunctionContainerE
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.runtime.function.ReflectiveFunctionExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -30,7 +30,12 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import java.util.List;
 import java.util.Optional;
 
-public class JavaFunctionModelParser extends AbstractExecutableComponentModelParser implements FunctionModelParser {
+/**
+ * {@link FunctionModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
+public class JavaFunctionModelParser extends AbstractJavaExecutableComponentModelParser implements FunctionModelParser {
 
   private final FunctionElement functionElement;
 
@@ -63,11 +68,6 @@ public class JavaFunctionModelParser extends AbstractExecutableComponentModelPar
   @Override
   public boolean isIgnored() {
     return IntrospectionUtils.isIgnored(functionElement, loadingContext);
-  }
-
-  @Override
-  public OutputModelParser getOutputType() {
-    return outputType;
   }
 
   @Override
