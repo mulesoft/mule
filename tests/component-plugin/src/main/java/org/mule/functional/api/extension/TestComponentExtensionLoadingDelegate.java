@@ -186,7 +186,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
             .allowTopLevelDefinition(false)
             .build());
 
-    ParameterGroupDeclarer checkSummaryGroup = operation.onParameterGroup("checkStackTrace")
+    ParameterGroupDeclarer checkSummaryGroup = operation.onParameterGroup("checkSummary")
         .withDslInlineRepresentation(true);
 
     ObjectTypeBuilder summaryInfoType = BASE_TYPE_BUILDER.objectType()
@@ -202,7 +202,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .build();
     summaryInfoType.addField()
         .key("valueStartsWith")
-        .value(STRING_TYPE).required(true)
+        .value(STRING_TYPE).required(false)
         .build();
 
     checkSummaryGroup.withOptionalParameter("summaryInfo")
