@@ -10,6 +10,7 @@ import static java.lang.String.format;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
@@ -18,9 +19,11 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -65,6 +68,12 @@ abstract class AbstractExecutableComponentModelParser {
                                                                 connectionParameters.size(),
                                                                 Connection.class.getSimpleName()));
     }
+  }
+
+  protected void parseComponentByteStreaming(WithAnnotations element) {
+    supportsStreaming = ModelLoaderUtils.isInputStream(outputType.getType())
+        || element.getAnnotation(Streaming.class).isPresent()
+        || element.getAnnotation(org.mule.sdk.api.annotation.Streaming.class).isPresent();
   }
 
   private Type resolveConnectionType(ExtensionParameter connectionParameter) {

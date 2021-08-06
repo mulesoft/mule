@@ -20,7 +20,6 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.isInputStream;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forOperation;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
@@ -29,7 +28,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
-import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
@@ -122,11 +120,15 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     }
 
     processComponentConnectivity(operationElement);
-    
+
     if (blocking) {
       parseBlockingOperation();
     } else {
       parseNonBlockingOperation(callbackParameters);
+    }
+
+    if (!autoPaging) {
+      parseComponentByteStreaming(operationElement);
     }
 
     if (scope) {
@@ -231,10 +233,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
 
     if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement)) {
       parseAutoPaging();
-    } else {
-      supportsStreaming = isInputStream(outputType.getType())
-          || operationElement.getAnnotation(Streaming.class).isPresent()
-          || operationElement.getAnnotation(org.mule.sdk.api.annotation.Streaming.class).isPresent();
     }
   }
 

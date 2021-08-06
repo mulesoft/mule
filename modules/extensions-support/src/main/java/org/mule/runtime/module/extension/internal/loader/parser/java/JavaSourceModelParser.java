@@ -21,7 +21,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -41,7 +40,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -209,6 +207,7 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
     }
 
     resolveOutputTypes();
+    parseComponentByteStreaming(sourceElement);
 
     connected = connectionParameter.isPresent();
     processComponentConnectivity(sourceElement);
@@ -220,10 +219,6 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
     // TODO: Should be possible to parse dynamic types right here
     outputType = new DefaultOutputModelParser(returnMetadataType, false);
     outputAttributesType = new DefaultOutputModelParser(sourceElement.getAttributesMetadataType(), false);
-
-    supportsStreaming = ModelLoaderUtils.isInputStream(returnMetadataType)
-        || sourceElement.getAnnotation(Streaming.class).isPresent()
-        || sourceElement.getAnnotation(org.mule.sdk.api.annotation.Streaming.class).isPresent();
   }
 
   private void validateLifecycle(SourceElement sourceType, Class<?> lifecycleType) {
