@@ -37,10 +37,19 @@ public final class ModelLoaderUtils {
     return methodElement.getParameters().stream().anyMatch(ModelLoaderUtils::isProcessorChain);
   }
 
+  /**
+   * @param methodElement an element representing an operation
+   * @return whether the operation is a router
+   */
   public static boolean isRouter(MethodElement methodElement) {
     return !getRoutes(methodElement).isEmpty();
   }
 
+  /**
+   * @param methodElement an element representing an operation
+   * @return a list with the method parameters which represent a {@link Route}
+   * @since 4.5.0
+   */
   public static List<ExtensionParameter> getRoutes(MethodElement methodElement) {
     return methodElement.getParameters().stream()
         .filter(ModelLoaderUtils::isRoute)
@@ -56,6 +65,11 @@ public final class ModelLoaderUtils {
     return !getCompletionCallbackParameters(method).isEmpty();
   }
 
+  /**
+   * @param method an element representing an operation
+   * @return a list with the method parameters which represent a {@link CompletionCallback}
+   * @since 4.5.0
+   */
   public static List<ExtensionParameter> getCompletionCallbackParameters(MethodElement method) {
     return method.getParameters().stream()
         .filter(p -> p.getType().isAssignableTo(CompletionCallback.class) ||

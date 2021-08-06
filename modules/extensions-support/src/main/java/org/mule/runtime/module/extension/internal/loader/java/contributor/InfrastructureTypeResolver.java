@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Resolves whether a {@link Type}is one of the considered as an Infrastructure Type ({@link InfrastructureTypeMapping})
+ * Resolves whether a {@link Type} is one of the considered as an Infrastructure Type ({@link InfrastructureTypeMapping})
  *
  * @since 4.4
  */

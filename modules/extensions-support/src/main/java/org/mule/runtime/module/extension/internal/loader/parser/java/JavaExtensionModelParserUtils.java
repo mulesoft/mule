@@ -13,9 +13,7 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
@@ -47,7 +45,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,18 +75,6 @@ public final class JavaExtensionModelParserUtils {
   public static boolean isProcessorChain(ExtensionParameter parameter) {
     return parameter.getType().isAssignableTo(Chain.class)
         || parameter.getType().isAssignableTo(org.mule.sdk.api.runtime.route.Chain.class);
-  }
-
-  /**
-   * @param type a {@link MetadataType}
-   * @return whether the given {@code type} represents an {@link InputStream} or not
-   */
-  public static boolean isInputStream(MetadataType type) {
-    return isAssignableFrom(type, InputStream.class);
-  }
-
-  private static boolean isAssignableFrom(MetadataType metadataType, Class<?> type) {
-    return getType(metadataType).map(clazz -> type.isAssignableFrom(clazz)).orElse(false);
   }
 
   public static boolean isParameterGroup(ExtensionParameter groupParameter) {

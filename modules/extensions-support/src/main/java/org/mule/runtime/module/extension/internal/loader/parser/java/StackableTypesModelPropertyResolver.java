@@ -37,10 +37,11 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * {@link ParameterDeclarerContributor} implementation contributes to the parameters of type that are registered as
- * {@link StackableType wrapper types}.
+ * Resolves the {@link ModelProperty model properties} used to manage parameters defined as {@link StackableType wrapper types}.
+ * <p>
+ * This class is based on what used to be the {@code StackableTypesParameterContributor} in the 4.1 to 4.4.x version range.
  *
- * @since 4.0
+ * @since 4.5
  */
 class StackableTypesModelPropertyResolver {
 
