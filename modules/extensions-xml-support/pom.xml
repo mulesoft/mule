@@ -38,6 +38,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -165,11 +170,6 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-spring-support</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <!--TODO: MULE-10837-->
         <dependency>
