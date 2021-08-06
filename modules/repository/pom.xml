@@ -67,7 +67,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>${apacheHttpClientVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-codec</groupId>
