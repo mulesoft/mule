@@ -121,6 +121,8 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
                                                                 getName()));
     }
 
+    processComponentConnectivity(operationElement);
+    
     if (blocking) {
       parseBlockingOperation();
     } else {
@@ -226,8 +228,6 @@ public class JavaOperationModelParser extends AbstractExecutableComponentModelPa
     // TODO: Should be possible to parse dynamic types right here
     outputType = new DefaultOutputModelParser(operationElement.getReturnMetadataType(), false);
     outputAttributesType = new DefaultOutputModelParser(operationElement.getAttributesMetadataType(), false);
-
-    processComponentConnectivity(operationElement);
 
     if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement)) {
       parseAutoPaging();

@@ -212,7 +212,6 @@ public class JavaSourceModelParser extends AbstractExecutableComponentModelParse
 
     connected = connectionParameter.isPresent();
     processComponentConnectivity(sourceElement);
-
   }
 
   private void resolveOutputTypes() {
