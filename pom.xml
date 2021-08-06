@@ -156,44 +156,10 @@
 
         <activemqVersion>5.15.12</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
-        <commonsHttpClientVersion>3.1-14-MULE-001</commonsHttpClientVersion>
-        <commonsIoVersion>2.8.0</commonsIoVersion>
-        <commonsTextVersion>1.3</commonsTextVersion>
-        <commonsLangVersion>3.8.1</commonsLangVersion>
-        <commonsNetVersion>3.6</commonsNetVersion>
-        <commonsPoolVersion>1.6</commonsPoolVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
-        <dom4jVersion>2.1.3</dom4jVersion>
-        <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <hamcrestVersion>1.3</hamcrestVersion>
-        <javax.inject.version>1</javax.inject.version>
-        <javax.transaction.version>1.3</javax.transaction.version>
-        <javaMailVersion>1.6.2</javaMailVersion>
-        <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
-        <jdomVersion>1.1.3</jdomVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
-        <jgraphtVersion>1.3.1</jgraphtVersion>
-        <junitVersion>4.12</junitVersion>
-        <mockitoVersion>2.26.0</mockitoVersion>
-        <byteBuddyVersion>1.10.7</byteBuddyVersion>
-        <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <projectReactorVersion>3.2.12.RELEASE</projectReactorVersion>
-        <projectReactorExtraVersion>3.2.3.RELEASE</projectReactorExtraVersion>
-        <reflectionsVersion>0.9.10</reflectionsVersion>
-        <saxonVersion>9.9.1-1</saxonVersion>
-        <slf4jVersion>1.7.30</slf4jVersion>
-        <snakeYamlVersion>1.26</snakeYamlVersion>
-        <springVersion>5.1.6.RELEASE</springVersion>
-        <staxUtilsVersion>20080702</staxUtilsVersion>
-        <unirestVersion>1.4.9</unirestVersion>
         <weaveVersion>2.5.0-SNAPSHOT</weaveVersion>
-        <woodstoxVersion>4.4.1</woodstoxVersion>
-        <wrapperVersion>3.2.3</wrapperVersion>
-        <allureJunitVersion>2.8.1</allureJunitVersion>
-        <tikaVersion>1.24.1</tikaVersion>
-        <muleMvelVersion>2.1.9-MULE-020</muleMvelVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.5.0-SNAPSHOT</muleDslApiVersion>
@@ -254,16 +220,8 @@
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
-        <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
-             dependency with the one define in the dependency management (which is mostly in all the cases "false")
-             https://bugs.eclipse.org/bugs/show_bug.cgi?id=501019 -->
-        <aetherVersion>1.0.2.v20150114</aetherVersion>
-        <aetherProviderVersion>3.3.9</aetherProviderVersion>
         <powermockVersion>2.0.0</powermockVersion>
-        <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
         <allureReportVersion>2.8.1</allureReportVersion>
-        <plexusUtilsVersion>3.0.24</plexusUtilsVersion>
-        <semver4jVersion>3.1.0</semver4jVersion>
         <allure.maven.plugin.version>2.9</allure.maven.plugin.version>
         <jacoco.version>0.8.6</jacoco.version>
 
