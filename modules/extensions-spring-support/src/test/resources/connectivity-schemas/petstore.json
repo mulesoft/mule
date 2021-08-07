@@ -38,7 +38,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "petstore",
@@ -84,7 +84,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "invalid",
       "system": "petstore",
@@ -130,7 +130,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooled",
       "system": "petstore",
@@ -176,7 +176,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "transactional",
       "system": "petstore",
@@ -222,7 +222,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "valid",
       "system": "petstore",

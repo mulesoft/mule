@@ -101,7 +101,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "Test OAuth Extension",
@@ -210,7 +210,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "do-not-include-redirect-uri-in-refresh-token",
       "system": "Test OAuth Extension",
@@ -319,7 +319,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "scopeless",
       "system": "Test OAuth Extension",
@@ -428,7 +428,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "validated-connection",
       "system": "Test OAuth Extension",
@@ -537,7 +537,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-credentials-placement",
       "system": "Test OAuth Extension",
@@ -662,7 +662,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-params-connection",
       "system": "Test OAuth Extension",
@@ -741,7 +741,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "client-credentials",
       "system": "Test OAuth Extension",
@@ -850,7 +850,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooled",
       "system": "Test OAuth Extension",
@@ -959,7 +959,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "refresh-validation",
       "system": "Test OAuth Extension",
