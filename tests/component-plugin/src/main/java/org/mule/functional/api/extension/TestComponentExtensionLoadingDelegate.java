@@ -133,7 +133,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
             .allowTopLevelDefinition(false)
             .build());
 
-    ParameterGroupDeclarer checkStackTraceGroup = operation.onParameterGroup("checkStackTrace")
+    ParameterGroupDeclarer checkStackTraceGroup = operation.onParameterGroup("checkStacktrace")
         .withDslInlineRepresentation(true);
 
     ObjectTypeBuilder methodCallType = BASE_TYPE_BUILDER.objectType()
