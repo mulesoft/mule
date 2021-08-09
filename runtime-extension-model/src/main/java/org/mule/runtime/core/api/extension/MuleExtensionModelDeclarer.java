@@ -1137,7 +1137,6 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareNotifications(ExtensionDeclarer extensionDeclarer) {
-    // TODO MULE-17778: Complete this declaration
     ConstructDeclarer notificationsConstructDeclarer = extensionDeclarer.withConstruct("notifications")
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
