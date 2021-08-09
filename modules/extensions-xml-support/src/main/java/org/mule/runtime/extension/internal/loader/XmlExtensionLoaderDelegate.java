@@ -460,7 +460,7 @@ public final class XmlExtensionLoaderDelegate {
     final String category = getStringParameter(moduleAst, CATEGORY).orElse("COMMUNITY");
     final String vendor = getStringParameter(moduleAst, VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
-        ? getTnsXmlDslModel(artifactAst, version)
+        ? getTnsXmlDslModel(artifactAst, name, version)
         : getXmlDslModel(artifactAst, name, version);
     final String description = getDescription(moduleAst);
     final String xmlnsTnsValue = artifactAst.namespaceDefinition().getUnresovedNamespaces().getOrDefault(XMLNS_TNS, null);
@@ -656,11 +656,16 @@ public final class XmlExtensionLoaderDelegate {
         .collect(toSet()));
   }
 
-  private XmlDslModel getTnsXmlDslModel(ArtifactAst moduleAst, String version) {
+  private XmlDslModel getTnsXmlDslModel(ArtifactAst moduleAst, String name, String version) {
     final String namespace = moduleAst.namespaceDefinition().getUnresovedNamespaces().get(XMLNS_TNS);
     final String stringPrefix = TNS_PREFIX;
 
     final Map<String, String> schemaLocations = moduleAst.namespaceDefinition().getSchemaLocations();
+
+    if (!schemaLocations.containsKey(namespace)) {
+      return getXmlDslModel(moduleAst, name, version);
+    }
+
     final String[] tnsSchemaLocationParts = schemaLocations.get(namespace).split("/");
 
     return XmlDslModel.builder()
