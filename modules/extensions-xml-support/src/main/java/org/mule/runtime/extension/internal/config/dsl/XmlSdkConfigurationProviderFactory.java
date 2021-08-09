@@ -12,7 +12,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
@@ -22,8 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-class XmlSdkConfigurationProviderFactory extends AbstractExtensionObjectFactory<ConfigurationProvider>
-    implements ObjectFactory<ConfigurationProvider> {
+class XmlSdkConfigurationProviderFactory extends AbstractExtensionObjectFactory<ConfigurationProvider> {
 
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;

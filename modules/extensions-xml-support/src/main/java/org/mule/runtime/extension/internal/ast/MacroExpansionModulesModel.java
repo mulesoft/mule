@@ -14,7 +14,6 @@ import static org.apache.commons.lang3.StringUtils.repeat;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * For every occurrence that happens, it will expand the operations/configurations by working with the
  * {@link MacroExpansionModuleModel} passing through just one {@link ExtensionModel} to macro expand in the current Mule
- * Application (held by the {@link ApplicationModel}.
+ * Application (held by the {@link ArtifactAst}.
  *
  * @since 4.0
  */

@@ -30,11 +30,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-metadata-model-catalog</artifactId>
+            <artifactId>mule-extensions-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-extensions-api</artifactId>
+            <artifactId>mule-artifact-ast-xml-parser</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -46,6 +46,7 @@
             <artifactId>mule-module-properties-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-logging</artifactId>
@@ -60,6 +61,16 @@
         </dependency>
 
         <!--Test Dependencies-->
+        <dependency>
+            <!-- Needed for tests to be able to parse test config files -->
+            <!-- Also required for ApplicationModelAstPostProcessor -->
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+            <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
+            <!-- the app classpath, this needs to go into the container classloader -->
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>

@@ -42,7 +42,6 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -64,7 +63,7 @@ import java.util.Spliterator;
 import java.util.stream.Stream;
 
 /**
- * A {@link MacroExpansionModuleModel} works tightly with a {@link ApplicationModel} to go over all the registered
+ * A {@link MacroExpansionModuleModel} works tightly with an {@link ArtifactAst} to go over all the registered
  * {@link ExtensionModel}s that are XML based (see {@link XmlExtensionModelProperty}) looking for code to macro expand.
  * <p/>
  * For every occurrence that happens, it will expand the operations.
@@ -119,7 +118,7 @@ public class MacroExpansionModuleModel {
    *
    * @param applicationModel to modify given the usages of elements that belong to the {@link ExtensionModel}s contained in the
    *                         {@code extensions} map.
-   * @param extensionModel   the {@link ExtensionModel}s to macro expand in the parameterized {@link ApplicationModel}
+   * @param extensionModel   the {@link ExtensionModel}s to macro expand in the parameterized {@link ArtifactAst}
    */
   MacroExpansionModuleModel(ArtifactAst applicationModel, ExtensionModel extensionModel) {
     this.applicationModel = applicationModel;

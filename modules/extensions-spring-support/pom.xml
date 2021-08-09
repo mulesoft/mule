@@ -48,11 +48,6 @@
         <!-- Mule Dependencies -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -101,6 +96,15 @@
         </dependency>
 
         <!-- Test dependencies -->
+        <dependency>
+            <!-- Needed for tests to be able to parse test config files -->
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+            <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
+            <!-- the app classpath, this needs to go into the container classloader -->
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.runtime</groupId>

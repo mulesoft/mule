@@ -5,22 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.config.internal.dsl;
+package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static javax.xml.namespace.QName.valueOf;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
-import static org.mule.runtime.config.internal.model.ApplicationModel.DOC_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
-
-import java.util.Map.Entry;
-import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -28,11 +19,6 @@ public final class SchemaConstants {
 
   public static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
   public static final String XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
-  public static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
-  public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION =
-      "http://www.springframework.org/schema/beans/spring-beans.xsd";
-  public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
-  public static final String EE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd";
 
   public static final String MULE_TLS_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "tls");
   public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
@@ -105,15 +91,4 @@ public final class SchemaConstants {
 
   private SchemaConstants() {}
 
-  public static Optional<String> buildRawParamKeyForDocAttribute(Entry<String, String> docAttr) {
-    final QName qName = valueOf(docAttr.getKey());
-
-    if (NS_MULE_DOCUMENTATION.equals(qName.getNamespaceURI())) {
-      return of(DOC_NAMESPACE + ":" + qName.getLocalPart());
-    } else if (isEmpty(qName.getNamespaceURI())) {
-      return of(DOC_NAMESPACE + ":" + docAttr.getKey());
-    } else {
-      return empty();
-    }
-  }
 }
