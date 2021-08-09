@@ -14,6 +14,9 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
 import java.util.Optional;
 
+import org.apache.commons.pool.ObjectPool;
+import org.slf4j.Logger;
+
 /**
  * Connection handling utilities
  *
@@ -51,6 +54,12 @@ public final class ConnectionUtils {
       throw ce;
     } catch (Exception e) {
       throw new ConnectionException(e);
+    }
+  }
+
+  public static <C> void logPoolStatus(Logger logger, ObjectPool<C> pool, ConnectionProvider<C> connectionProvider) {
+    if (logger.isTraceEnabled()) {
+      logger.trace("Status of pool {} for {}: {} active connections, {} idle connections.", pool.toString(), connectionProvider.toString(), pool.getNumActive(), pool.getNumIdle());
     }
   }
 }

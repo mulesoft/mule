@@ -11,6 +11,8 @@ import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ONE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolStatus;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -80,6 +82,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   private C borrowConnection() throws Exception {
     C connection = pool.borrowObject();
     LOGGER.trace("Borrowed connection {} from the pool {}", connection.toString(), pool.toString());
+    logPoolStatus(LOGGER, pool, connectionProvider);
     try {
       poolingListener.onBorrow(connection);
     } catch (Exception e) {
@@ -99,7 +102,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   @Override
   public void close() throws MuleException {
     try {
-      logPoolStatus();
+      logPoolStatus(LOGGER, pool, connectionProvider);
       LOGGER.trace("Closing pool {}", connectionProvider.toString());
       pool.close();
     } catch (Exception e) {
@@ -119,7 +122,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     LOGGER.trace("Created pool {} for {}", pool.toString(), connectionProvider.toString());
 
     applyInitialisationPolicy(genericPool);
-    logPoolStatus();
+    logPoolStatus(LOGGER, pool, connectionProvider);
 
     return genericPool;
   }
@@ -147,7 +150,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
             + poolingProfile.getInitialisationPolicy());
     }
 
-    LOGGER.trace("Initializing pool {} with {} connections", pool.toString(), initialConnections);
+    LOGGER.trace("Initializing pool {} with {} initial connections", pool.toString(), initialConnections);
     for (int t = 0; t < initialConnections; t++) {
       try {
         pool.addObject();
@@ -186,11 +189,5 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
 
     @Override
     public void passivateObject(C connection) throws Exception {}
-  }
-
-  private void logPoolStatus() {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Status of pool {} for {}: {} active connections, {} idle connections.", pool.toString(), connectionProvider.toString(), pool.getNumActive(), pool.getNumIdle());
-    }
   }
 }

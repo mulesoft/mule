@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolStatus;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
@@ -72,6 +74,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
       poolingListener.onReturn(connection);
 
       pool.returnObject(connection);
+      logPoolStatus(LOGGER, pool, connectionProvider);
       returnAttempted = true;
     } catch (Exception e) {
       LOGGER.warn("Could not return connection to the pool. Connection will be destroyed", e);

@@ -14,7 +14,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyVararg;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -39,10 +41,18 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase {
@@ -59,6 +69,8 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   private ConnectionHandler<Object> connection1;
   private ConnectionHandler<Object> connection2;
+  private List<String> traceMessages;
+  private Logger logger;
 
   @Before
   public void before() throws Exception {
@@ -66,6 +78,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     injector = spyInjector(muleContext);
     muleContext.start();
     resetConnectionProvider();
+    logger = createMockLogger();
   }
 
   @Test
@@ -221,6 +234,13 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     verifyConnections(3);
   }
 
+  @Test
+  public void logInitialization() throws Exception {
+    poolingProfile = new PoolingProfile(5, 3, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_ALL);
+    initStrategy();
+    Logger origLogger = setLogger(strategy, "LOGGER", logger);
+  }
+
   private void resetConnectionProvider() throws ConnectionException {
     ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
@@ -235,6 +255,51 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   private void verifyConnections(int numToCreate) throws ConnectionException {
     verify(this.connectionProvider, times(numToCreate)).connect();
     verify(this.connectionProvider, times(0)).disconnect(any());
+  }
+
+  private Logger createMockLogger() {
+    Logger logger = mock(Logger.class);
+    Answer answer = new Answer() {
+
+      @Override
+      public Object answer(InvocationOnMock invocation) {
+        String message = invocation.getArgument(0, String.class);
+        Object[] messageArgs = Arrays.copyOfRange(invocation.getArguments(), 1, invocation.getArguments().length);
+        traceMessages.add(formatMessage(message, messageArgs));
+        return null;
+      }
+    };
+    doAnswer(answer).when(logger).trace(anyString(), any(), any());
+    doAnswer(answer).when(logger).trace(anyString(), (Object[]) any());
+    return logger;
+  }
+
+  private String formatMessage(String message, Object... args) {
+    String newMessage = message.replaceAll("\\{\\}", "%s");
+    return String.format(newMessage, args);
+  }
+
+  private Logger setLogger(Object object, String fieldName, Logger newLogger) throws Exception {
+    Field field = object.getClass().getDeclaredField(fieldName);
+    field.setAccessible(true);
+    Logger oldLogger;
+    try {
+      Field modifiersField = Field.class.getDeclaredField("modifiers");
+      modifiersField.setAccessible(true);
+      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+      try {
+        oldLogger = (Logger) field.get(null);
+        field.set(null, newLogger);
+      } finally {
+        // undo accessibility changes
+        modifiersField.setInt(field, field.getModifiers());
+        modifiersField.setAccessible(false);
+      }
+    } finally {
+      // undo accessibility changes
+      field.setAccessible(false);
+    }
+    return oldLogger;
   }
 
 }
