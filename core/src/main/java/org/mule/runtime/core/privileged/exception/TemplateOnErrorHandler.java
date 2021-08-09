@@ -398,7 +398,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private boolean acceptsExpression(CoreEvent event) {
-    return !when.isPresent() || when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
+    return !hasWhenExpression() || when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
+  }
+
+  public boolean hasWhenExpression() {
+    return when.isPresent();
   }
 
   protected Function<CoreEvent, CoreEvent> afterRouting() {

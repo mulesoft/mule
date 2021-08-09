@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -46,13 +47,15 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         ResolverSet resolverSet,
                                         CursorProviderFactory cursorProviderFactory,
                                         RetryPolicyTemplate retryPolicyTemplate,
+                                        MessageProcessorChain nestedChain,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ReflectionCache reflectionCache,
                                         DefaultExecutionMediator.ResultTransformer resultTransformer,
                                         long outerFluxTerminationTimeout) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer, outerFluxTerminationTimeout);
+          retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache, resultTransformer,
+          outerFluxTerminationTimeout);
   }
 
   @Override

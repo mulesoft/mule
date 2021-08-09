@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
@@ -25,10 +26,12 @@ public abstract class TestComponentMessageProcessor extends ComponentMessageProc
   public TestComponentMessageProcessor(ExtensionModel extensionModel, ComponentModel componentModel,
                                        ConfigurationProvider configurationProvider, String target, String targetValue,
                                        ResolverSet resolverSet, CursorProviderFactory cursorProviderFactory,
-                                       RetryPolicyTemplate retryPolicyTemplate, ExtensionManager extensionManager,
-                                       PolicyManager policyManager, ReflectionCache reflectionCache,
-                                       ResultTransformer resultTransformer, long terminationTimeout) {
+                                       RetryPolicyTemplate retryPolicyTemplate, MessageProcessorChain nestedChain,
+                                       ExtensionManager extensionManager, PolicyManager policyManager,
+                                       ReflectionCache reflectionCache, ResultTransformer resultTransformer,
+                                       long terminationTimeout) {
     super(extensionModel, componentModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer, terminationTimeout);
+          retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache, resultTransformer,
+          terminationTimeout);
   }
 }

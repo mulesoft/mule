@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,11 +28,13 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExportedClassNamesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.enumeration.FruitConsistency;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.vegan.extension.VeganAttributes;
@@ -42,16 +45,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.google.common.reflect.TypeToken;
-
 @RunWith(MockitoJUnitRunner.class)
-public class ExportedArtifactsCollectorTestCase extends AbstractMuleTestCase {
+public class ExportedPackagesCollectorTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
@@ -65,7 +67,7 @@ public class ExportedArtifactsCollectorTestCase extends AbstractMuleTestCase {
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
-  private ExportedArtifactsCollector collector;
+  private ExportedPackagesCollector collector;
 
   @Before
   public void setup() {
@@ -84,7 +86,7 @@ public class ExportedArtifactsCollectorTestCase extends AbstractMuleTestCase {
     withMethod(secondOperation, empty());
     when(extensionModel.getOperationModels()).thenReturn(asList(firstOperation, secondOperation));
     visitableMock(firstOperation, secondOperation);
-    collector = new ExportedArtifactsCollector(extensionModel);
+    collector = new ExportedPackagesCollector(extensionModel);
   }
 
   private void withMethod(OperationModel operationModel, Optional<Method> optionalMethod) {
@@ -101,6 +103,18 @@ public class ExportedArtifactsCollectorTestCase extends AbstractMuleTestCase {
     assertThat(exportedPackages, hasSize(6));
     assertThat(exportedPackages,
                containsInAnyOrder(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE, SEED_PACKAGE, EXCEPTION_PACKAGE));
+  }
+
+  @Test
+  public void collectFromModelProperty() {
+    when(extensionModel.getModelProperty(ExportedClassNamesModelProperty.class))
+        .thenReturn(of(new ExportedClassNamesModelProperty(singleton(FruitConsistency.class.getName()))));
+
+    Set<String> exportedPackages = collector.getExportedPackages();
+    assertThat(exportedPackages, hasSize(7));
+    assertThat(exportedPackages,
+               containsInAnyOrder(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE, SEED_PACKAGE, EXCEPTION_PACKAGE,
+                                  FruitConsistency.class.getPackage().getName()));
   }
 
   private OutputModel mockOutputModel(Type type) {
