@@ -1079,7 +1079,8 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareExpressionLanguage(NestedComponentDeclarer expressionLanguageDeclarer) {
-    expressionLanguageDeclarer.describedAs("Configuration of Mule Expression Language");
+    expressionLanguageDeclarer.describedAs("Configuration of Mule Expression Language")
+        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
     expressionLanguageDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("autoResolveVariables")
         .ofType(BOOLEAN_TYPE)
