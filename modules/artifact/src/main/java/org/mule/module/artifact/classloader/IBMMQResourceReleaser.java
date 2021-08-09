@@ -377,6 +377,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
               reference.clear();
               try {
                 Field threadLocalMapEntryValueField = getField(entry.getClass(), "value", false);
+                threadLocalMapEntryValueField.setAccessible(true);
                 threadLocalMapEntryValueField.set(entry, null);
                 ((Reference<?>) entry).clear();
               } catch (NoSuchFieldException ex) {
