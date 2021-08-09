@@ -59,14 +59,6 @@ import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
  */
 public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDelegate {
 
-  private static final StereotypeModel LOG_CHECKER = newStereotype("LOG_CHECKER", "TEST")
-      .withParent(MuleStereotypes.PROCESSOR)
-      .build();
-
-  private static final StereotypeModel STACK_TRACE_ELEMENT = newStereotype("STACK_TRACE_ELEMENT", "TEST")
-      .withParent(MuleStereotypes.PROCESSOR)
-      .build();
-
   @Override
   public void accept(ExtensionDeclarer extensionDeclarer, ExtensionLoadingContext context) {
     extensionDeclarer
@@ -405,14 +397,32 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .withDisplayModel(DisplayModel.builder()
             .classValue(new ClassValueModel(singletonList("org.mule.tck.functional.EventCallback"))).build());
 
-    ParameterGroupDeclarer params = processor.onParameterGroup("return-data").withDslInlineRepresentation(true);
-    params.withOptionalParameter("file")
-        .describedAs("The location of a file to load. The file can point to a resource on the classpath or on disk.")
-        .ofType(STRING_TYPE)
-        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, ANY, new String[] {})).build())
-        .withExpressionSupport(NOT_SUPPORTED);
+    ParameterGroupDeclarer params = processor.onDefaultParameterGroup();
 
-    params = processor.onDefaultParameterGroup();
+    ObjectTypeBuilder returnDataType = BASE_TYPE_BUILDER.objectType()
+        .id("ReturnData")
+        .with(new TypeDslAnnotation(true, false, null, null));
+    returnDataType.addField()
+        .key("content")
+        .value(STRING_TYPE).required(false)
+        .with(new LayoutTypeAnnotation(LayoutModel.builder().asText().build()))
+        .build();
+    returnDataType.addField()
+        .key("file")
+        .description("The location of a file to load. The file can point to a resource on the classpath or on disk.")
+        .value(STRING_TYPE).required(false);
+
+    params.withOptionalParameter("return-data")
+        .ofType(returnDataType.build())
+        .describedAs("Defines the data to return from the service once it has been invoked. The return data can be located in a file, which you specify using the {{file}} attribute (specify a resource on the classpath or on disk), or the return data can be embeddded directly in the XML.")
+        .withRole(BEHAVIOUR)
+        .withExpressionSupport(NOT_SUPPORTED).withLayout(LayoutModel.builder().asText().build())
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
+
     params.withOptionalParameter("processingType")
         .describedAs("The kind of work this component will report to do, in order to affect the behavior of the Processing Strategy.")
         .ofType(BASE_TYPE_BUILDER.stringType().enumOf("CPU_INTENSIVE", "CPU_LITE", "BLOCKING", "IO_RW", "CPU_LITE_ASYNC").build())
