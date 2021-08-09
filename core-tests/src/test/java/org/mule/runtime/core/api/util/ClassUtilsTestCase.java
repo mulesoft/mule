@@ -270,7 +270,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getStaticFieldValue() throws Exception {
-    final List<String> hashBlobProperties = Arrays.asList(new String[] {"foo", "bar"});
+    final List<String> hashBlobProperties = Arrays.asList(new String[] {"one", "two"});
     HashBlob.setStaticHashProperties(hashBlobProperties);
     List<String> value = ClassUtils.getStaticFieldValue(HashBlob.class, "staticHashProperties", false);
     assertEquals(hashBlobProperties, value);
@@ -278,7 +278,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getStaticFieldValueRecursive() throws Exception {
-    final List<String> hashBlobProperties = Arrays.asList(new String[] {"foo", "bar"});
+    final List<String> hashBlobProperties = Arrays.asList(new String[] {"one", "two"});
     ExtendedHashBlob.setStaticHashProperties(hashBlobProperties);
     List<String> value = ClassUtils.getStaticFieldValue(ExtendedHashBlob.class, "staticHashProperties", true);
     assertEquals(hashBlobProperties, value);
@@ -421,8 +421,8 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
     private int hash;
     private static List<String> staticHashProperties = new ArrayList<>();
-    private final List<String> finalHashProperties = Arrays.asList(new String[] {"foo", "bar"});
-    private final static List<String> finalStaticHashProperties = Arrays.asList(new String[] {"foo", "bar"});
+    private final List<String> finalHashProperties = Arrays.asList(new String[] {"one", "two"});
+    private final static List<String> finalStaticHashProperties = Arrays.asList(new String[] {"one", "two"});
 
     public HashBlob(int hash) {
       this.hash = hash;
