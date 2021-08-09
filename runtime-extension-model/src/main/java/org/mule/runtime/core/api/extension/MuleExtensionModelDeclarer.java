@@ -188,6 +188,7 @@ class MuleExtensionModelDeclarer {
     declareAsync(extensionDeclarer);
     declareForEach(extensionDeclarer, TYPE_LOADER);
     declareUntilSuccessful(extensionDeclarer);
+    declareSecurityFilter(extensionDeclarer);
 
     // operations
     declareFlowRef(extensionDeclarer);
@@ -1345,5 +1346,16 @@ class MuleExtensionModelDeclarer {
         .describedAs("The number of iterations to use.")
         .withExpressionSupport(NOT_SUPPORTED)
         .ofType(INTEGER_TYPE);
+  }
+
+  private void declareSecurityFilter(ExtensionDeclarer extensionDeclarer) {
+    ConstructDeclarer encryptionSecurityFilterDeclarer = extensionDeclarer.withConstruct("encryptionSecurityFilter")
+        .describedAs("A filter that provides password-based encyption.");
+    encryptionSecurityFilterDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("strategy-ref")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the encryption strategy to use. This should be configured using the "
+            + "'password-encryption-strategy' element, inside a 'security-manager' element at the top level.");
   }
 }
