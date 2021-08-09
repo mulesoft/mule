@@ -235,10 +235,15 @@
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <groovyVersion>3.0.7</groovyVersion>
         <assembly.verifier.version>1.4</assembly.verifier.version>
+
+        <allureJunitVersion>2.8.1</allureJunitVersion>
+        <multithreadedtcVersion>1.01</multithreadedtcVersion>
+        <tikaVersion>1.24.1</tikaVersion>
     </properties>
 
     <dependencies>
         <dependency>
+            <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
             <groupId>com.googlecode.multithreadedtc</groupId>
             <artifactId>multithreadedtc</artifactId>
             <scope>test</scope>
@@ -270,6 +275,22 @@
                 <version>${muleBomVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
+                <groupId>com.googlecode.multithreadedtc</groupId>
+                <artifactId>multithreadedtc</artifactId>
+                <version>${multithreadedtcVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-junit4</artifactId>
+                <version>${allureJunitVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${tikaVersion}</version>
             </dependency>
         </dependencies>
 
