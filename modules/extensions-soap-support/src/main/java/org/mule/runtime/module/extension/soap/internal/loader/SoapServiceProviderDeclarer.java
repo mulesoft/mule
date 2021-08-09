@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_GROUP;
 
@@ -20,18 +21,11 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.module.extension.internal.loader.java.ParameterModelsLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
+import org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapServiceProviderWrapper;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
-
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Declares a Connection Provider of {@link ForwardingSoapClient} instances given a {@link SoapServiceProvider}.
@@ -46,7 +40,7 @@ public class SoapServiceProviderDeclarer {
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   SoapServiceProviderDeclarer() {
-    parametersLoader = new ParameterModelsLoaderDelegate(getContributors(), typeLoader);
+    parametersLoader = new ParameterModelsLoaderDelegate();
   }
 
   /**
@@ -68,8 +62,9 @@ public class SoapServiceProviderDeclarer {
         .withConnectionManagementType(POOLING)
         .supportsConnectivityTesting(provider.supportsConnectivityTesting());
 
-    ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerDeclarer.getDeclaration());
-    parametersLoader.declare(providerDeclarer, provider.getParameters(), context);
+    ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", provider.getAlias());
+
+    parametersLoader.declare(providerDeclarer, getParameterGroupParsers(provider.getParameters(), context));
     if (hasCustomTransports) {
       providerDeclarer.onParameterGroup(TRANSPORT_GROUP)
           .withRequiredParameter(TRANSPORT_PARAM)
@@ -78,10 +73,5 @@ public class SoapServiceProviderDeclarer {
           .withLayout(LayoutModel.builder().order(1).tabName(TRANSPORT).build())
           .withExpressionSupport(NOT_SUPPORTED);
     }
-  }
-
-  private List<ParameterDeclarerContributor> getContributors() {
-    return ImmutableList
-        .of(new InfrastructureFieldContributor(), StackableTypesParameterContributor.defaultContributor(typeLoader));
   }
 }
