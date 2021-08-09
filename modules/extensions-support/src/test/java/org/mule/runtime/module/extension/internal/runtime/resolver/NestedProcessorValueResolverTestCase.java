@@ -57,7 +57,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   @Test
   public void yieldsNestedProcessor() throws Exception {
     ProcessorChainValueResolver resolver =
-        new ProcessorChainValueResolver(mock(StreamingManager.class), muleContext, messageProcessor);
+        new ProcessorChainValueResolver(mock(StreamingManager.class), messageProcessor);
     final CoreEvent event = testEvent();
 
     Chain nestedProcessor = resolver.resolve(ValueResolvingContext.builder(event)
@@ -81,7 +81,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   @Test
   public void alwaysGivesDifferentInstances() throws Exception {
     ProcessorChainValueResolver resolver =
-        new ProcessorChainValueResolver(mock(StreamingManager.class), muleContext, messageProcessor);
+        new ProcessorChainValueResolver(mock(StreamingManager.class), messageProcessor);
     ValueResolvingContext ctx = ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build();
     Chain resolved1 = resolver.resolve(ctx);
     Chain resolved2 = resolver.resolve(ctx);
@@ -92,7 +92,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   @Test
   public void chainIsCalledAsNonBlocking() throws Exception {
     ProcessorChainValueResolver resolver =
-        new ProcessorChainValueResolver(mock(StreamingManager.class), muleContext, messageProcessor);
+        new ProcessorChainValueResolver(mock(StreamingManager.class), messageProcessor);
 
     Chain resolve = resolver.resolve(ValueResolvingContext.builder(testEvent())
         .withExpressionManager(expressionManager)

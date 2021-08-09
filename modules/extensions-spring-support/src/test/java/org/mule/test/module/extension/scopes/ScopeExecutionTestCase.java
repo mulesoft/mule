@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -152,5 +153,12 @@ public class ScopeExecutionTestCase extends AbstractScopeExecutionTestCase {
   public void scopeUsingMuleAllowedStereotypes() throws Exception {
     String result = (String) flowRunner("scopeWithMuleAllowedStereotype").run().getMessage().getPayload().getValue();
     assertThat(result, is("Ok"));
+  }
+
+  @Test
+  @Issue("MULE-18938")
+  public void scopeChainLazilyStarted() throws Exception {
+    String result = (String) flowRunner("scopeChainLazilyStarted").run().getMessage().getPayload().getValue();
+    assertThat(result, is("newPayload"));
   }
 }
