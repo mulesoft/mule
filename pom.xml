@@ -232,6 +232,7 @@
         <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
 
+        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <groovyVersion>3.0.7</groovyVersion>
         <assembly.verifier.version>1.4</assembly.verifier.version>
     </properties>
