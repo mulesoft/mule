@@ -80,6 +80,7 @@ import org.junit.runners.Parameterized.Parameters;
 import com.google.common.collect.ImmutableSet;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
@@ -450,6 +451,29 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
     assertThat(extensionModel.getOperationModels().size(), is(12));
+  }
+
+  @Test
+  @Issue("MULE-19483")
+  public void moduleCallingOperationsWithinModuleNoTnsSchemaLocation() {
+    String modulePath = "modules/module-calling-operations-within-module-no-tns-schema-location.xml";
+
+    if (validateXml) {
+      try {
+        getExtensionModelFrom(modulePath);
+        fail("Should not have reached up to this point, the XML is invalid and the ExtensionModel should not be generated.");
+      } catch (MuleRuntimeException e) {
+        assertThat(e.getMessage(), containsString("Invalid content was found starting with element"));
+        assertThat(e.getMessage(), containsString("internal-set-payload-hardcoded-value"));
+      }
+    } else {
+      ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+      assertThat(extensionModel.getName(), is("module-calling-operations-within-module"));
+      assertThat(extensionModel.getConfigurationModels().size(), is(0));
+      assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
+      assertThat(extensionModel.getOperationModels().size(), is(12));
+    }
   }
 
   @Test
