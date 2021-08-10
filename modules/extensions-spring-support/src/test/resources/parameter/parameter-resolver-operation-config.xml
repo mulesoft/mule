@@ -12,14 +12,14 @@
     <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
 
     <heisenberg:ricin microgramsPerKilo="22" name="ricin-weapon">
-        <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+        <heisenberg:destination victim="Lidia" address="Stevia coffee shop"/>
     </heisenberg:ricin>
 
     <flow name="processWeaponAsStaticChildElement">
         <heisenberg:process-weapon>
             <heisenberg:weapon>
                 <heisenberg:ricin microgramsPerKilo="100">
-                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                    <heisenberg:destination victim="Lidia" address="Stevia coffee shop"/>
                 </heisenberg:ricin>
             </heisenberg:weapon>
         </heisenberg:process-weapon>
@@ -30,7 +30,7 @@
         <heisenberg:process-weapon>
             <heisenberg:weapon>
                 <heisenberg:ricin microgramsPerKilo="#[payload]">
-                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                    <heisenberg:destination victim="Lidia" address="Stevia coffee shop"/>
                 </heisenberg:ricin>
             </heisenberg:weapon>
         </heisenberg:process-weapon>
@@ -71,10 +71,10 @@
         <heisenberg:process-weapon-list>
             <heisenberg:weapons>
                 <heisenberg:ricin microgramsPerKilo="100">
-                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                    <heisenberg:destination victim="Lidia" address="Stevia coffee shop"/>
                 </heisenberg:ricin>
                 <heisenberg:ricin microgramsPerKilo="100">
-                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                    <heisenberg:destination victim="Lidia" address="Stevia coffee shop"/>
                 </heisenberg:ricin>
             </heisenberg:weapons>
         </heisenberg:process-weapon-list>
