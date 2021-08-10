@@ -43,6 +43,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
@@ -71,19 +72,24 @@ public final class JavaExtensionModelParserUtils {
 
   public static List<ExtensionParameter> getCompletionCallbackParameters(MethodElement method) {
     return method.getParameters().stream()
-        .filter(p -> p.getType().isAssignableTo(CompletionCallback.class) ||
-            p.getType().isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class))
+        .filter(p -> {
+          Type type = p.getType();
+          return type.isAssignableTo(CompletionCallback.class) ||
+              type.isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class);
+        })
         .collect(toList());
   }
 
   public static boolean isAutoPaging(MethodElement operationMethod) {
-    return operationMethod.getReturnType().isAssignableTo(PagingProvider.class)
-        || operationMethod.getReturnType().isAssignableTo(org.mule.sdk.api.runtime.streaming.PagingProvider.class);
+    Type returnType = operationMethod.getReturnType();
+    return returnType.isAssignableTo(PagingProvider.class)
+        || returnType.isAssignableTo(org.mule.sdk.api.runtime.streaming.PagingProvider.class);
   }
 
   public static boolean isProcessorChain(ExtensionParameter parameter) {
-    return parameter.getType().isAssignableTo(Chain.class)
-        || parameter.getType().isAssignableTo(org.mule.sdk.api.runtime.route.Chain.class);
+    Type type = parameter.getType();
+    return type.isAssignableTo(Chain.class)
+        || type.isAssignableTo(org.mule.sdk.api.runtime.route.Chain.class);
   }
 
   public static boolean isParameterGroup(ExtensionParameter groupParameter) {
@@ -192,13 +198,14 @@ public final class JavaExtensionModelParserUtils {
   private static void checkAnnotationsNotUsedMoreThanOnce(List<? extends ExtensionParameter> parameters,
                                                           Class<? extends Annotation>... annotations) {
     for (Class<? extends Annotation> annotation : annotations) {
-      final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
-      if (count > 1) {
-        throw new IllegalModelDefinitionException(
-                                                  format("The defined parameters %s from %s, uses the annotation @%s more than once",
-                                                         parameters.stream().map(p -> p.getName()).collect(toList()),
-                                                         parameters.iterator().next().getOwnerDescription(),
-                                                         annotation.getSimpleName()));
+      int usages = 0;
+      for (ExtensionParameter param : parameters) {
+        if (param.isAnnotatedWith(annotation) && ++usages > 1) {
+          throw new IllegalModelDefinitionException(format("The defined parameters %s from %s, uses the annotation @%s more than once",
+                                                           parameters.stream().map(p -> p.getName()).collect(toList()),
+                                                           parameters.iterator().next().getOwnerDescription(),
+                                                           annotation.getSimpleName()));
+        }
       }
     }
   }
