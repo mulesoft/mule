@@ -32,11 +32,11 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T> {
 
   private static final Logger logger = getLogger(DefaultArtifactDeployer.class);
-  private final Map<String, List<FlowStoppedPersistenceListener>> appsFlowStoppedListeners = new HashMap<>();
+  private final Map<String, List<FlowStoppedPersistenceListener>> appsFlowStoppedListeners = new ConcurrentHashMap<>();
 
   private final Supplier<Scheduler> artifactStartExecutor;
 
