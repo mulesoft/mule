@@ -7,9 +7,11 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
-
+import static java.util.Collections.singleton;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -111,6 +114,11 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
           builders.add(getBuilder());
         }
       }
+
+      @Override
+      protected Set<ExtensionModel> getExtensionModels() {
+        return DomainFunctionalTestCase.this.getExtensionModels();
+      }
     }
         .setContextId(this.getClass().getSimpleName())
         .setDomainConfig(getDomainConfigs());
@@ -129,6 +137,10 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
       muleContext.getInjector().inject(appInfrasturcture);
       applsInfrastructures.put(applicationConfig.applicationName, appInfrasturcture);
     }
+  }
+
+  protected Set<ExtensionModel> getExtensionModels() {
+    return singleton(getExtensionModel());
   }
 
   protected Map<String, Object> getDomainStartUpRegistryObjects() {
@@ -151,7 +163,13 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
   }
 
   private MuleContext createAppMuleContext(String[] configResource, ArtifactContext domainArtifactContext) throws Exception {
-    return new ApplicationContextBuilder()
+    return new ApplicationContextBuilder() {
+
+      @Override
+      protected Set<ExtensionModel> getExtensionModels() {
+        return DomainFunctionalTestCase.this.getExtensionModels();
+      }
+    }
         .setContextId(this.getClass().getSimpleName())
         .setDomainArtifactContext(domainArtifactContext)
         .setApplicationResources(configResource)

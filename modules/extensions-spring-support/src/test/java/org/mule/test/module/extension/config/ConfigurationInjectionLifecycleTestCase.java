@@ -6,10 +6,12 @@
  */
 package org.mule.test.module.extension.config;
 
+import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -77,7 +79,7 @@ public class ConfigurationInjectionLifecycleTestCase extends ExtensionFunctional
         muleContext.getCustomizationService().registerCustomServiceClass("lifecycleTracker", LifecycleTracker.class);
       }
     });
-    builders.add(extensionManagerWithMuleExtModelBuilder());
+    builders.add(extensionManagerWithMuleExtModelBuilder(singleton(getExtensionModel())));
     super.addBuilders(builders);
   }
 

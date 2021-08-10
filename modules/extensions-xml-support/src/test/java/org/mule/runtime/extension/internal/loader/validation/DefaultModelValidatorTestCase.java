@@ -70,13 +70,13 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void repeatedParameterNamesThrowsException() {
     exception.expectMessage("repeated-parameter");
-    getExtensionModelFrom("validation/module-repeated-parameters.xml");
+    getExtensionModelFrom("validation/module-repeated-parameters.xml", getDependencyExtensions());
   }
 
   @Test
   public void repeatedOperationNamesThrowsException() {
     exception.expectMessage("repeated-operation");
-    getExtensionModelFrom("validation/module-repeated-operations.xml");
+    getExtensionModelFrom("validation/module-repeated-operations.xml", getDependencyExtensions());
   }
 
   @Test
@@ -103,7 +103,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
                                   containsString("[operation with spaces] is not a valid one"),
                                   containsString("[parameters with spaces] is not a valid one"),
                                   containsString("[property with spaces] is not a valid one")));
-    getExtensionModelFrom("validation/module-not-xml-valid-names.xml");
+    getExtensionModelFrom("validation/module-not-xml-valid-names.xml", getDependencyExtensions());
   }
 
   @Test
@@ -119,7 +119,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
                                                         RAISE_ERROR_IDENTIFIER.toString(),
                                                         TYPE_RAISE_ERROR_ATTRIBUTE,
                                                         "fail-raise-error-nested"))));
-    getExtensionModelFrom("validation/module-using-raise-error-empty-type.xml");
+    getExtensionModelFrom("validation/module-using-raise-error-empty-type.xml", getDependencyExtensions());
   }
 
   @Test
@@ -205,7 +205,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void forbiddenConfigurationPropertiesThrowsException() {
     exception.expectMessage(format(CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE, CONFIGURATION_PROPERTIES.toString()));
-    getExtensionModelFrom("validation/module-configuration-property-file.xml");
+    getExtensionModelFrom("validation/module-configuration-property-file.xml", getDependencyExtensions());
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {

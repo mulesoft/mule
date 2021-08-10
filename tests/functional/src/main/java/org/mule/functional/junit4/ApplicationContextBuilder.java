@@ -6,10 +6,13 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.Collections.singleton;
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -21,6 +24,7 @@ import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ApplicationContextBuilder {
 
@@ -56,7 +60,7 @@ public class ApplicationContextBuilder {
     MuleContext context;
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builders = new ArrayList<>();
-    builders.add(extensionManagerWithMuleExtModelBuilder());
+    builders.add(extensionManagerWithMuleExtModelBuilder(getExtensionModels()));
     builders.add(getAppBuilder(this.applicationResources));
     builders.add(new TestPolicyProviderConfigurationBuilder());
     addBuilders(builders);
@@ -68,6 +72,10 @@ public class ApplicationContextBuilder {
     configureMuleContext(muleContextBuilder);
     context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     return context;
+  }
+
+  protected Set<ExtensionModel> getExtensionModels() {
+    return singleton(getExtensionModel());
   }
 
   // This shouldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
