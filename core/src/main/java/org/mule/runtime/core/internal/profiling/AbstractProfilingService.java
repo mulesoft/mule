@@ -11,6 +11,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SE
 import static org.mule.runtime.core.internal.profiling.notification.ProfilingNotification.getFullyQualifiedProfilingNotificationIdentifier;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,9 +28,10 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 
-import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 /**
  * A {@link AbstractProfilingService} that discovers available {@link ProfilingDataConsumer}
@@ -103,7 +105,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
   }
 
   /**
-   * Configures {@link FeatureFlaggingService} for the profiles functionality
+   * Configures the {@link MuleRuntimeFeature#ENABLE_PROFILING_SERVICE} feature flag.
    *
    * @since 4.4
    */
@@ -112,7 +114,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_PROFILING_SERVICE,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion
-                                                        .atLeast(ENABLE_PROFILING_SERVICE.getSince()))
+                                                        .atLeast(ENABLE_PROFILING_SERVICE.getEnabledByDefaultSince()))
                                                     .isPresent());
   }
 }

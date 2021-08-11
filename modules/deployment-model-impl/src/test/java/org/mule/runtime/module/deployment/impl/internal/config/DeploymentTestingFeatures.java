@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.config;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.util.Optional.ofNullable;
 
 /**
  * Features meant to be used in {@link Feature} flag related tests.
@@ -37,17 +38,17 @@ public enum DeploymentTestingFeatures implements Feature {
   public static final String OVERRIDEABLE_FEATURE_OVERRIDE = "overrideable.feature.override";
   private final String description;
   private final String issue;
-  private final String since;
+  private final String enabledByDefaultSince;
   private final String overridingSystemPropertyName;
 
-  DeploymentTestingFeatures(String description, String issue, String since) {
-    this(description, issue, since, null);
+  DeploymentTestingFeatures(String description, String issue, String enabledByDefaultSince) {
+    this(description, issue, enabledByDefaultSince, null);
   }
 
-  DeploymentTestingFeatures(String description, String issue, String since, String overridingSystemPropertyName) {
+  DeploymentTestingFeatures(String description, String issue, String enabledByDefaultSince, String overridingSystemPropertyName) {
     this.description = description;
     this.issue = issue;
-    this.since = since;
+    this.enabledByDefaultSince = enabledByDefaultSince;
     this.overridingSystemPropertyName = overridingSystemPropertyName;
   }
 
@@ -63,7 +64,12 @@ public enum DeploymentTestingFeatures implements Feature {
 
   @Override
   public String getSince() {
-    return since;
+    return getEnabledByDefaultSince();
+  }
+
+  @Override
+  public String getEnabledByDefaultSince() {
+    return enabledByDefaultSince;
   }
 
   @Override

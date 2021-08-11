@@ -16,6 +16,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATIST
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 
@@ -153,6 +154,11 @@ public class AllStatistics {
     return isEnabled() && !payloadStatisticsDisabled;
   }
 
+  /**
+   * Configures the {@link MuleRuntimeFeature#COMPUTE_CONNECTION_ERRORS_IN_STATS} feature flag.
+   *
+   * @since 4.4.0, 4.3.1
+   */
   public static void configureComputeConnectionErrorsInStats() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(COMPUTE_CONNECTION_ERRORS_IN_STATS,
