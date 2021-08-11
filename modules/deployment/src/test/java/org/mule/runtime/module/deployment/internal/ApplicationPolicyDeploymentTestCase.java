@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.reflect.Modifier.FINAL;
 import static java.util.Arrays.asList;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.emptyList;
@@ -23,6 +24,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
@@ -46,6 +48,7 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +78,7 @@ import org.mule.runtime.core.api.security.AbstractSecurityProvider;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -152,13 +156,14 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
-  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation) {
+  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation) throws NoSuchFieldException, IllegalAccessException {
     super(parallelDeployment);
     this.shareErrorTypeRepository = shareErrorType;
+    setShareErrorTypeRepository(shareErrorTypeRepository);
     this.shareErrorTypeRepoSystemProperty =
-        new SystemProperty(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY, Boolean.toString(shareErrorType));
+            new SystemProperty(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY, Boolean.toString(shareErrorType));
     this.enablePolicyIsolationSystemProperty =
-        new SystemProperty((MuleRuntimeFeature.ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
+        new SystemProperty((ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
                            Boolean.toString(enablePolicyIsolation));
   }
 
@@ -628,7 +633,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Issue("MULE-18196")
   @Description("The application declares an ErrorType that is needed by the policy and but the policy doesn't have it in its own ErrorType repository")
   public void appliesPolicyUsingErrorTypeDeclaredOnAppDependency() throws Exception {
-    if (!shareErrorTypeRepository && parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
+    if (!shareErrorTypeRepository) {
       expectPolicyRegistrationException();
     }
 
@@ -1064,6 +1069,15 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-with-error-mapping.xml"),
                                                       emptyList()));
+  }
+
+  private void setShareErrorTypeRepository(boolean value) throws NoSuchFieldException, IllegalAccessException {
+    Field field = ArtifactContextBuilder.class.getDeclaredField("SHARE_ERROR_TYPE_REPOSITORY");
+    Field modifiersField = Field.class.getDeclaredField("modifiers");
+    modifiersField.setAccessible(true);
+    modifiersField.setInt(field, field.getModifiers() & ~FINAL);
+    field.setAccessible(true);
+    field.set(null, value);
   }
 
   private boolean isIsolatedPolicy() {

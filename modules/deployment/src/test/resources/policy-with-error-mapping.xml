@@ -10,15 +10,11 @@
     <test-policy:proxy name="async-policy">
         <test-policy:operation>
             <try>
-                <simple:fail>
-                    <error-mapping sourceType="WITH-ERROR-DECLARATION:MY_DECLARED_ERROR"
-                                   targetType="MULE:ANY"/>
-                </simple:fail>
+                <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+                <test-policy:execute-next/>
                 <error-handler>
-                    <on-error-continue type="MULE:ANY">
-<!--                        <test-policy:execute-next/>-->
-                        <test-policy:custom-processor
-                                class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+                    <on-error-continue type="WITH-ERROR-DECLARATION:MY_DECLARED_ERROR">
+                        <simple:print-message/>
                     </on-error-continue>
                 </error-handler>
             </try>
