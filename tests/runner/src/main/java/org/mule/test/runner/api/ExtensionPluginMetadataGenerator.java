@@ -9,13 +9,18 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -105,14 +110,21 @@ class ExtensionPluginMetadataGenerator {
    */
   private ExtensionManager createExtensionManager() {
     DefaultExtensionManager extensionManager = new DefaultExtensionManager();
-    extensionManager.setMuleContext(new DefaultMuleContext() {
+    final DefaultMuleContext muleContext = new DefaultMuleContext() {
 
       private ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
       private ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+      private final LazyValue<SimpleRegistry> registryCreator =
+          new LazyValue<>(() -> new SimpleRegistry(this, new MuleLifecycleInterceptor()));
 
       @Override
       public MuleRegistry getRegistry() {
-        return new MuleRegistryHelper(new SimpleRegistry(this, new MuleLifecycleInterceptor()), this);
+        return new MuleRegistryHelper(registryCreator.get(), this);
+      }
+
+      @Override
+      public Injector getInjector() {
+        return registryCreator.get();
       }
 
       @Override
@@ -125,9 +137,10 @@ class ExtensionPluginMetadataGenerator {
         return errorTypeRepository;
       }
 
-    });
+    };
+    muleContext.setMuleConfiguration(new DefaultMuleConfiguration());
     try {
-      extensionManager.initialise();
+      initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {
       throw new RuntimeException("Error while initialising the extension manager", e);
     }
