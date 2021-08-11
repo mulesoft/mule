@@ -83,6 +83,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntaxBuilder;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -519,7 +520,19 @@ class DeclarationBasedElementModelFactory {
 
   private void createMapParameter(ParameterObjectValue objectValue, DslElementSyntax paramDsl, Object model, ObjectType mapType,
                                   InternalComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement) {
+    createMapParameter(objectValue, paramDsl, model, mapType, parentConfig, parentElement,
+                       isParameterWrappedByContainer(model));
+  }
 
+  private boolean isParameterWrappedByContainer(Object model) {
+    return !((model instanceof ParameterModel)
+        && ((ParameterModel) model).getModelProperty(NoWrapperModelProperty.class).isPresent());
+  }
+
+
+  private void createMapParameter(ParameterObjectValue objectValue, DslElementSyntax paramDsl, Object model, ObjectType mapType,
+                                  InternalComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
+                                  boolean isParameterWrappedByContainer) {
     InternalComponentConfiguration.Builder mapConfig = InternalComponentConfiguration.builder()
         .withIdentifier(asIdentifier(paramDsl));
 
@@ -579,14 +592,20 @@ class DeclarationBasedElementModelFactory {
               }));
 
           ComponentConfiguration entryConfig = entryConfigBuilder.build();
-          mapConfig.withNestedComponent(entryConfig);
-          mapElement.containing(entryElement.withConfig(entryConfig).build());
+          if (isParameterWrappedByContainer) {
+            mapConfig.withNestedComponent(entryConfig);
+            mapElement.containing(entryElement.withConfig(entryConfig).build());
+          } else {
+            parentConfig.withNestedComponent(entryConfig);
+            parentElement.containing(entryElement.withConfig(entryConfig).build());
+          }
         }));
 
-    ComponentConfiguration result = mapConfig.build();
-    parentConfig.withNestedComponent(result);
-
-    parentElement.containing(mapElement.withConfig(result).build());
+    if (isParameterWrappedByContainer) {
+      ComponentConfiguration result = mapConfig.build();
+      parentConfig.withNestedComponent(result);
+      parentElement.containing(mapElement.withConfig(result).build());
+    }
   }
 
   private void createComplexParameter(ParameterObjectValue objectValue, DslElementSyntax paramDsl, ParameterModel parameterModel,
@@ -801,6 +820,15 @@ class DeclarationBasedElementModelFactory {
                           ArrayType listType,
                           InternalComponentConfiguration.Builder parentConfig,
                           DslElementModel.Builder parentElement) {
+    createList(list, listDsl, model, listType, parentConfig, parentElement, isParameterWrappedByContainer(model));
+  }
+
+  private void createList(ParameterListValue list,
+                          DslElementSyntax listDsl,
+                          Object model,
+                          ArrayType listType,
+                          InternalComponentConfiguration.Builder parentConfig,
+                          DslElementModel.Builder parentElement, boolean isParameterWrappedByContainer) {
 
     final DslElementModel.Builder listElement = DslElementModel.builder()
         .withModel(model)
@@ -812,11 +840,19 @@ class DeclarationBasedElementModelFactory {
     final MetadataType itemType = listType.getType();
     listDsl.getGeneric(itemType)
         .ifPresent(itemDsl -> list.getValues()
-            .forEach(value -> createListItemConfig(itemType, value, itemDsl, listConfig, listElement)));
+            .forEach(value -> {
+              if (isParameterWrappedByContainer) {
+                createListItemConfig(itemType, value, itemDsl, listConfig, listElement);
+              } else {
+                createListItemConfig(itemType, value, itemDsl, parentConfig, parentElement);
+              }
+            }));
 
-    ComponentConfiguration result = listConfig.build();
-    parentConfig.withNestedComponent(result);
-    parentElement.containing(listElement.withConfig(result).build());
+    if (isParameterWrappedByContainer) {
+      ComponentConfiguration result = listConfig.build();
+      parentConfig.withNestedComponent(result);
+      parentElement.containing(listElement.withConfig(result).build());
+    }
   }
 
   private void createObject(ParameterObjectValue objectValue, DslElementSyntax objectDsl, Object model, ObjectType objectType,
