@@ -368,6 +368,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(flowConstruct.getName()).thenReturn(flowName);
 
     messageProcessor.setMuleContext(context);
+    context.getInjector().inject(messageProcessor);
 
     expectedException.expect(IllegalOperationException.class);
     expectedException
