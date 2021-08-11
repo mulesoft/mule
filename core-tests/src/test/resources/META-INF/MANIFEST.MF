@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Implementation-Title: Mule Core
 Build-Date: 2019-Feb-04 20:04:49
-Implementation-Version: 4.2.0-SNAPSHOT
+Implementation-Version: 4.5.0-SNAPSHOT
 Built-By: mariano.gonzalez
 Specification-Vendor: MuleSoft, Inc.
 Specification-Title: Mule Core
@@ -19,5 +19,5 @@ Vendor-Url: http://www.mulesoft.com
 Support: Get commercial support: http://www.mulesoft.com/support
 Created-By: Apache Maven 3.6.0
 Build-Jdk: 1.8.0_191
-Specification-Version: 4.2
+Specification-Version: 4.5
 Implementation-URL: https://developer.mulesoft.com/mule-core/

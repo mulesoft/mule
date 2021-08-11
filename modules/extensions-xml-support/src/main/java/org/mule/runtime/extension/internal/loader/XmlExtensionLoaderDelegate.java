@@ -69,6 +69,7 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -460,7 +461,7 @@ public final class XmlExtensionLoaderDelegate {
     final String category = getStringParameter(moduleAst, CATEGORY).orElse("COMMUNITY");
     final String vendor = getStringParameter(moduleAst, VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
-        ? getTnsXmlDslModel(artifactAst, version)
+        ? getTnsXmlDslModel(artifactAst, name, version)
         : getXmlDslModel(artifactAst, name, version);
     final String description = getDescription(moduleAst);
     final String xmlnsTnsValue = artifactAst.namespaceDefinition().getUnresovedNamespaces().getOrDefault(XMLNS_TNS, null);
@@ -656,11 +657,16 @@ public final class XmlExtensionLoaderDelegate {
         .collect(toSet()));
   }
 
-  private XmlDslModel getTnsXmlDslModel(ArtifactAst moduleAst, String version) {
+  private XmlDslModel getTnsXmlDslModel(ArtifactAst moduleAst, String name, String version) {
     final String namespace = moduleAst.namespaceDefinition().getUnresovedNamespaces().get(XMLNS_TNS);
     final String stringPrefix = TNS_PREFIX;
 
     final Map<String, String> schemaLocations = moduleAst.namespaceDefinition().getSchemaLocations();
+
+    if (!schemaLocations.containsKey(namespace)) {
+      return getXmlDslModel(moduleAst, name, version);
+    }
+
     final String[] tnsSchemaLocationParts = schemaLocations.get(namespace).split("/");
 
     return XmlDslModel.builder()
@@ -1116,7 +1122,7 @@ public final class XmlExtensionLoaderDelegate {
 
     // Add error models for error types used in raise and error mapping for completeness of the extension model.
     extensionDeclarer.ifPresent(ext -> {
-      operationModel.recursiveStream()
+      operationModel.getModel(ParameterizedModel.class).ifPresent(om -> operationModel.recursiveStream()
           .forEach(comp -> {
             if (comp.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
               final ComponentParameterAst parameter = comp.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_ATTRIBUTE);
@@ -1148,7 +1154,7 @@ public final class XmlExtensionLoaderDelegate {
                       .withParent(ErrorModelBuilder.newError(ANY).build())
                       .build());
                 }));
-          });
+          }));
     });
   }
 

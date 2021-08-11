@@ -6,39 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.String.format;
-import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
-import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
-
-import org.mule.runtime.api.connection.CachedConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
 import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
-import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
-import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
-import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
-import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
-import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
-import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
-import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
-import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
-import org.mule.runtime.module.extension.api.loader.java.type.Type;
-import org.mule.runtime.module.extension.api.loader.java.type.WithConnectionProviders;
-import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
+import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,100 +22,37 @@ import java.util.Map;
  */
 final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
-  private static final String CONNECTION_PROVIDER = "Connection Provider";
-
-  private final Map<ConnectionProviderElement, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
+  private final Map<ConnectionProviderModelParser, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
   ConnectionProviderModelLoaderDelegate(DefaultJavaModelLoaderDelegate loader) {
     super(loader);
   }
 
-  void declareConnectionProviders(HasConnectionProviderDeclarer declarer,
-                                  WithConnectionProviders withConnectionProviders) {
-    withConnectionProviders.getConnectionProviders().forEach(provider -> declareConnectionProvider(declarer, provider));
-  }
+  void declareConnectionProviders(HasConnectionProviderDeclarer declarer, List<ConnectionProviderModelParser> parsers) {
+    for (ConnectionProviderModelParser parser : parsers) {
 
-  private void declareConnectionProvider(HasConnectionProviderDeclarer declarer, ConnectionProviderElement providerType) {
-    ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerType);
-    if (providerDeclarer != null) {
-      declarer.withConnectionProvider(providerDeclarer);
-      return;
-    }
+      ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(parser);
+      if (providerDeclarer != null) {
+        declarer.withConnectionProvider(providerDeclarer);
+        continue;
+      }
 
-    String name = providerType.getAlias();
-    String description = providerType.getDescription();
+      providerDeclarer = declarer.withConnectionProvider(parser.getName())
+          .describedAs(parser.getDescription())
+          .withConnectionManagementType(parser.getConnectionManagementType())
+          .supportsConnectivityTesting(parser.supportsConnectivityTesting())
+          .withModelProperty(parser.getConnectionProviderFactoryModelProperty());
 
-    if (providerType.getName().equals(providerType.getAlias())) {
-      name = DEFAULT_CONNECTION_PROVIDER_NAME;
-    }
+      if (parser.isExcludedFromConnectivitySchema()) {
+        providerDeclarer.withModelProperty(new ExcludeFromConnectivitySchemaModelProperty());
+      }
 
-    List<Type> providerGenerics = providerType.getSuperTypeGenerics(ConnectionProvider.class);
+      parser.getExternalLibraryModels().forEach(providerDeclarer::withExternalLibrary);
+      parser.getOAuthModelProperty().ifPresent(providerDeclarer::withModelProperty);
 
-    if (providerGenerics.size() != 1) {
-      // TODO: MULE-9220: Add a syntax validator for this
-      throw new IllegalConnectionProviderModelDefinitionException(
-                                                                  format("Connection provider class '%s' was expected to have 1 generic type "
-                                                                      + "(for the connection type) but %d were found",
-                                                                         providerType.getName(), providerGenerics.size()));
-    }
-
-    providerDeclarer = declarer.withConnectionProvider(name).describedAs(description);
-    ConnectionProviderDeclarer finalProviderDeclarer = providerDeclarer;
-    providerType.getDeclaringClass().ifPresent(clazz -> finalProviderDeclarer
-        .withModelProperty(new ConnectionProviderFactoryModelProperty(new DefaultConnectionProviderFactory<>(clazz,
-                                                                                                             getExtensionClassLoader())))
-        .withModelProperty(new ImplementingTypeModelProperty(clazz)));
-
-    providerDeclarer
-        .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0)))
-        .withModelProperty(new ExtensionTypeDescriptorModelProperty(providerType));
-
-    if (providerType.isAnnotatedWith(ExcludeFromConnectivitySchema.class)) {
-      providerDeclarer.withModelProperty(new ExcludeFromConnectivitySchemaModelProperty());
-    }
-
-    loader.parseExternalLibs(providerType, providerDeclarer);
-
-    ConnectionManagementType managementType = NONE;
-    if (providerType.isAssignableTo(PoolingConnectionProvider.class)) {
-      managementType = POOLING;
-    } else if (providerType.isAssignableTo(CachedConnectionProvider.class)) {
-      managementType = CACHED;
-    }
-
-    parseOAuthGrantType(providerType, providerDeclarer);
-
-    providerDeclarer.withConnectionManagementType(managementType);
-    providerDeclarer.supportsConnectivityTesting(!providerType.isAssignableTo(NoConnectivityTest.class));
-    connectionProviderDeclarers.put(providerType, providerDeclarer);
-    ParameterDeclarationContext context = new ParameterDeclarationContext(CONNECTION_PROVIDER, providerDeclarer.getDeclaration());
-    loader.getFieldParametersLoader().declare(providerDeclarer, providerType.getParameters(), context);
-  }
-
-  private void parseOAuthGrantType(ConnectionProviderElement providerType, ConnectionProviderDeclarer providerDeclarer) {
-    List<OAuthGrantType> grantTypes = new LinkedList<>();
-    providerType.getAnnotation(AuthorizationCode.class).ifPresent(a -> {
-      grantTypes.add(new AuthorizationCodeGrantType(a.accessTokenUrl(),
-                                                    a.authorizationUrl(),
-                                                    a.accessTokenExpr(),
-                                                    a.expirationExpr(),
-                                                    a.refreshTokenExpr(),
-                                                    a.defaultScopes(),
-                                                    a.credentialsPlacement(),
-                                                    a.includeRedirectUriInRefreshTokenRequest()));
-    });
-
-    providerType.getAnnotation(ClientCredentials.class).ifPresent(a -> {
-      grantTypes.add(new ClientCredentialsGrantType(a.tokenUrl(),
-                                                    a.accessTokenExpr(),
-                                                    a.expirationExpr(),
-                                                    a.defaultScopes(),
-                                                    a.credentialsPlacement()));
-
-    });
-
-    if (!grantTypes.isEmpty()) {
-      providerDeclarer.withModelProperty(new OAuthModelProperty(grantTypes));
+      loader.getParameterModelsLoaderDelegate().declare(providerDeclarer, parser.getParameterGroupModelParsers());
+      parser.getAdditionalModelProperties().forEach(providerDeclarer::withModelProperty);
+      connectionProviderDeclarers.put(parser, providerDeclarer);
     }
   }
 }

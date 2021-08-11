@@ -37,15 +37,8 @@
             <artifactId>mule-extensions-api</artifactId>
         </dependency>
         <dependency>
-            <!-- TODO(fernandezlautaro): MULE-11009 needed dependency as we heavily rely  org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory to generate an ExtensionModel from a Describer -->
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <!-- TODO(fernandezlautaro): MULE-9646 + MULE-9637 needed dependency as we heavily rely on org.mule.runtime.config.api.dsl.model.ComponentModel and org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser to make templating work -->
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -177,11 +170,6 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-spring-support</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <!--TODO: MULE-10837-->
         <dependency>

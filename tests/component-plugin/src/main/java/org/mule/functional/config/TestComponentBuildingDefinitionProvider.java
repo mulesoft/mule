@@ -119,7 +119,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(Object.class))
         .withObjectFactoryType(ReturnDataObjectFactory.class)
         .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
-        .withSetterParameterDefinition("content", fromTextContent().build())
+        .withSetterParameterDefinition("content", fromSimpleParameter("content").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition
@@ -208,7 +208,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class))
-            .withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
+            .withSetterParameterDefinition("expectedLogMessage", fromSimpleParameter("expectedLogMessage").build())
             .withSetterParameterDefinition("shouldFilterLogMessage", fromSimpleParameter("filterLog").build()).build());
 
     componentBuildingDefinitions

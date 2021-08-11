@@ -15,7 +15,6 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
-import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
@@ -342,13 +341,7 @@ class ComponentConfigurationBuilder<T> {
     private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
       ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
           .map(ownerComponentModel -> doResolveParameter(createBeanDefinitionRequest.getParameter(parameterName)))
-          .orElseGet(() -> {
-            if (!ownerComponent.getModel(Object.class).isPresent()) {
-              return ownerComponent.getParameter(DEFAULT_GROUP_NAME, parameterName);
-            } else {
-              return null;
-            }
-          });
+          .orElse(null);
 
       Object parameterValue;
       if (parameter == null) {
@@ -474,14 +467,8 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onValueFromTextContent() {
-      if (component != null) {
-        // TODO MULE-18782 migrate this
-        this.value = ofNullable(component.getParameter(DEFAULT_GROUP_NAME, BODY_RAW_PARAM_NAME))
-            .map(ComponentParameterAst::getResolvedRawValue).orElse(null);
-      } else {
-        getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
-            .ifPresent(v -> this.value = v);
-      }
+      getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
+          .ifPresent(v -> this.value = v);
     }
 
     @Override

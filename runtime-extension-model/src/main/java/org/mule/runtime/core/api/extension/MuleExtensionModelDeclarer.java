@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import static com.google.common.collect.ImmutableSet.of;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
@@ -81,7 +82,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -107,14 +107,11 @@ import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
-import org.mule.runtime.core.api.security.EncryptionStrategy;
-import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
-import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
@@ -122,10 +119,9 @@ import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
-import java.util.Map;
-
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.reflect.TypeToken;
+
+import java.util.Map;
 
 /**
  * An {@link ExtensionDeclarer} for Mule's Core Runtime
@@ -192,6 +188,7 @@ class MuleExtensionModelDeclarer {
     declareAsync(extensionDeclarer);
     declareForEach(extensionDeclarer, TYPE_LOADER);
     declareUntilSuccessful(extensionDeclarer);
+    declareSecurityFilter(extensionDeclarer);
 
     // operations
     declareFlowRef(extensionDeclarer);
@@ -246,7 +243,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Creates an instance of the class provided as argument.");
 
     object.onDefaultParameterGroup()
-        .withExclusiveOptionals(ImmutableSet.of("ref", "class"), true);
+        .withExclusiveOptionals(of("ref", "class"), true);
 
     object.onDefaultParameterGroup().withOptionalParameter("property")
         .ofType(BaseTypeBuilder.create(JAVA).objectType()
@@ -990,6 +987,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
+    declareExpressionLanguage(configuration.withOptionalComponent("expression-language"));
 
     final ParameterGroupDeclarer params = configuration.onDefaultParameterGroup();
     params
@@ -1080,6 +1078,40 @@ class MuleExtensionModelDeclarer {
         .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
   }
 
+  private void declareExpressionLanguage(NestedComponentDeclarer expressionLanguageDeclarer) {
+    expressionLanguageDeclarer.describedAs("Configuration of Mule Expression Language")
+        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
+    expressionLanguageDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("autoResolveVariables")
+        .ofType(BOOLEAN_TYPE)
+        .defaultingTo(true)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    ParameterGroupDeclarer importParameters = expressionLanguageDeclarer.withOptionalComponent("import")
+        .onDefaultParameterGroup();
+    importParameters.withOptionalParameter("name")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+    importParameters.withRequiredParameter("class")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    ParameterGroupDeclarer aliasParameters = expressionLanguageDeclarer.withOptionalComponent("alias")
+        .onDefaultParameterGroup();
+    aliasParameters.withRequiredParameter("name")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+    aliasParameters.withRequiredParameter("expression")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    ParameterGroupDeclarer globalFunctionsParameters = expressionLanguageDeclarer.withOptionalComponent("global-functions")
+        .onDefaultParameterGroup();
+    globalFunctionsParameters.withOptionalParameter("file")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+  }
+
   private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configurationProperties")
         .allowingTopLevelDefinition()
@@ -1107,7 +1139,6 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareNotifications(ExtensionDeclarer extensionDeclarer) {
-    // TODO MULE-17778: Complete this declaration
     ConstructDeclarer notificationsConstructDeclarer = extensionDeclarer.withConstruct("notifications")
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
@@ -1245,38 +1276,87 @@ class MuleExtensionModelDeclarer {
   private void declareSecurityManager(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer securityManagerDeclarer = extensionDeclarer.withConstruct("securityManager")
         .allowingTopLevelDefinition()
-        .describedAs("The default security manager provides basic support for security functions. Other modules (PGP, Spring) provide more advanced functionality.");
+        .describedAs("The default security manager provides basic support for security functions. Other modules (PGP, "
+            + "Spring) provide more advanced functionality.");
 
-    ObjectType securityProviderType = BaseTypeBuilder.create(JAVA).objectType()
-        .with(new ClassInformationAnnotation(SecurityProvider.class))
-        .with(new InfrastructureTypeAnnotation())
-        .build();
+    ParameterGroupDeclarer customSecurityProviderParameterGroup = securityManagerDeclarer
+        .withOptionalComponent("customSecurityProvider")
+        .describedAs("A custom implementation of SecurityProvider.")
+        .onDefaultParameterGroup();
+    customSecurityProviderParameterGroup.withRequiredParameter("name")
+        .describedAs("A security provider is a source of specific security-related functionality.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
+    customSecurityProviderParameterGroup.withRequiredParameter("provider-ref")
+        .describedAs("The name of the security provider to use.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
 
-    securityManagerDeclarer
-        .onDefaultParameterGroup()
-        .withOptionalParameter("providers")
-        .ofType(BaseTypeBuilder.create(JAVA)
-            .arrayType()
-            .of(securityProviderType)
-            .build())
-        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
-            .allowsReferences(false).build())
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+    ParameterGroupDeclarer customEncryptionStrategyParameterGroup = securityManagerDeclarer
+        .withOptionalComponent("customEncryptionStrategy")
+        .describedAs("A custom implementation of EncryptionStrategy.")
+        .onDefaultParameterGroup();
+    customEncryptionStrategyParameterGroup.withRequiredParameter("name")
+        .describedAs("An encryption strategy provides support for a specific encryption algorithm.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
+    customEncryptionStrategyParameterGroup.withRequiredParameter("strategy-ref")
+        .describedAs("A reference to the encryption strategy (which may be a Spring bean that implements the "
+            + "EncryptionStrategy interface).")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
 
-    ObjectType exceptionStrategyType = BaseTypeBuilder.create(JAVA).objectType()
-        .with(new ClassInformationAnnotation(EncryptionStrategy.class))
-        .with(new InfrastructureTypeAnnotation())
-        .build();
+    ParameterGroupDeclarer secretKeyEncryptionStrategyParameterGroup = securityManagerDeclarer
+        .withOptionalComponent("secretKeyEncryptionStrategy")
+        .describedAs("Provides secret key-based encryption using JCE.")
+        .onDefaultParameterGroup();
+    secretKeyEncryptionStrategyParameterGroup.withRequiredParameter("name")
+        .describedAs("An encryption strategy provides support for a specific encryption algorithm.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
+    secretKeyEncryptionStrategyParameterGroup.withOptionalParameter("key")
+        .describedAs("The key to use. This and the 'keyFactory-ref' attribute are mutually exclusive.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
+    secretKeyEncryptionStrategyParameterGroup.withOptionalParameter("keyFactory-ref")
+        .describedAs("The name of the key factory to use. This should implement the ObjectFactory interface and "
+            + "return a byte array. This and the 'key' attribute are mutually exclusive.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
+    secretKeyEncryptionStrategyParameterGroup.withExclusiveOptionals(of("key", "keyFactory-ref"), true);
 
-    securityManagerDeclarer
-        .onDefaultParameterGroup()
-        .withOptionalParameter("encryptionStrategies")
-        .ofType(BaseTypeBuilder.create(JAVA)
-            .arrayType()
-            .of(exceptionStrategyType)
-            .build())
-        .withDsl(ParameterDslConfiguration.builder().allowsInlineDefinition(true)
-            .allowsReferences(false).build())
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+    ParameterGroupDeclarer passwordEncryptionStrategyParameterGroup = securityManagerDeclarer
+        .withOptionalComponent("passwordEncryptionStrategy")
+        .describedAs("Provides password-based encryption using JCE. Users must specify a password and"
+            + "optionally a salt and iteration count as well. The default algorithm is"
+            + "PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.")
+        .onDefaultParameterGroup();
+    passwordEncryptionStrategyParameterGroup.withRequiredParameter("name")
+        .describedAs("An encryption strategy provides support for a specific encryption algorithm.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
+    passwordEncryptionStrategyParameterGroup.withRequiredParameter("password")
+        .describedAs("The password to use.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
+    passwordEncryptionStrategyParameterGroup.withOptionalParameter("salt")
+        .describedAs("The salt to use (this helps prevent dictionary attacks).")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(STRING_TYPE);
+    passwordEncryptionStrategyParameterGroup.withOptionalParameter("iterationCount")
+        .describedAs("The number of iterations to use.")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .ofType(INTEGER_TYPE);
+  }
+
+  private void declareSecurityFilter(ExtensionDeclarer extensionDeclarer) {
+    ConstructDeclarer encryptionSecurityFilterDeclarer = extensionDeclarer.withConstruct("encryptionSecurityFilter")
+        .describedAs("A filter that provides password-based encyption.");
+    encryptionSecurityFilterDeclarer.onDefaultParameterGroup()
+        .withOptionalParameter("strategy-ref")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the encryption strategy to use. This should be configured using the "
+            + "'password-encryption-strategy' element, inside a 'security-manager' element at the top level.");
   }
 }

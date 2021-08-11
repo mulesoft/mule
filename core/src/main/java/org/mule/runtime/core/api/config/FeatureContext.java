@@ -7,11 +7,11 @@
 
 package org.mule.runtime.core.api.config;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.meta.MuleVersion;
 
 import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
 
 /**
  * Decoupled {@link org.mule.runtime.core.api.MuleContext} metadata, used to evaluate {@link org.mule.runtime.api.config.Feature}
@@ -22,11 +22,14 @@ import static java.util.Optional.ofNullable;
 public class FeatureContext {
 
   private final String artifactName;
-  private final MuleVersion artifactMinMuleVersion;
+  private MuleVersion artifactMinMuleVersion;
 
   public FeatureContext(MuleVersion artifactMinMuleVersion, String artifactName) {
     this.artifactName = artifactName;
-    this.artifactMinMuleVersion = artifactMinMuleVersion;
+    // Feature flags must evaluate against non suffixed versions
+    if (artifactMinMuleVersion != null) {
+      this.artifactMinMuleVersion = artifactMinMuleVersion.withoutSuffixes();
+    }
   }
 
   public Optional<MuleVersion> getArtifactMinMuleVersion() {

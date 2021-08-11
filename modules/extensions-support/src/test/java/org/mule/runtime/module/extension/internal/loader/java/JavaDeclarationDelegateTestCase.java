@@ -781,7 +781,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertTransactional(operation, false);
   }
 
-  private void assertTestModuleConnectionProviders(ExtensionDeclaration extensionDeclaration) throws Exception {
+  private void assertTestModuleConnectionProviders(ExtensionDeclaration extensionDeclaration) {
     assertThat(extensionDeclaration.getConnectionProviders(), hasSize(2));
     ConnectionProviderDeclaration connectionProvider = extensionDeclaration.getConnectionProviders().get(0);
     assertThat(connectionProvider.getName(), is(DEFAULT_CONNECTION_PROVIDER_NAME));

@@ -2,18 +2,15 @@
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-authorization-code-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -99,31 +96,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "connection",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthAuthorizationCodeConnection"
+      "type": "OAuthAuthorizationCodeConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-authorization-code-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -209,31 +205,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "do-not-include-redirect-uri-in-refresh-token",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthAuthorizationCodeConnection"
+      "type": "OAuthAuthorizationCodeConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-authorization-code-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -319,31 +314,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "scopeless",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthAuthorizationCodeConnection"
+      "type": "OAuthAuthorizationCodeConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-authorization-code-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -429,31 +423,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "validated-connection",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthAuthorizationCodeConnection"
+      "type": "OAuthAuthorizationCodeConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-authorization-code-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -539,31 +532,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-credentials-placement",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthAuthorizationCodeConnection"
+      "type": "OAuthAuthorizationCodeConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-authorization-code-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -665,31 +657,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "with-params-connection",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthAuthorizationCodeConnection"
+      "type": "OAuthAuthorizationCodeConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthclientcredentialsconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-client-credentials-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -745,31 +736,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "client-credentials",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthClientCredentialsConnection"
+      "type": "OAuthClientCredentialsConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-authorization-code-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -855,31 +845,30 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "pooled",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthAuthorizationCodeConnection"
+      "type": "OAuthAuthorizationCodeConnection"
     }
   },
   {
     "assets": [
       {
-        "assetId": "mule-connectivity-schema-test",
+        "assetId": "mule-connector-test-oauth-extension",
         "groupId": "org.mule.runtime.test.extension",
         "version": "1.0.0"
       }
     ],
     "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-test-oauth-extension-oauthauthorizationcodeconnection",
+    "artifactId": "mule-connector-test-oauth-extension-oauth-authorization-code-connection",
     "definition": {
-      "external": {
-        "core": "anypoint://semantics/core",
-        "apiContract": "anypoint://semantics/api-contract"
-      },
+      "external": {},
       "documents": {
         "root": {
           "encodes": "Connection"
@@ -965,14 +954,16 @@
         }
       },
       "uses": {
-        "connectivity": "anypoint://semantics/connectivity"
+        "core": "anypoint://vocabulary/core.yaml",
+        "connectivity": "anypoint://vocabulary/connectivity.yaml",
+        "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
       "connectionProvider": "refresh-validation",
       "system": "Test OAuth Extension",
-      "type": "connectivity.OAuthAuthorizationCodeConnection"
+      "type": "OAuthAuthorizationCodeConnection"
     }
   }
 ]
