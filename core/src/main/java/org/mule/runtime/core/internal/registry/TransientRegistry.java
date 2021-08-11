@@ -71,9 +71,9 @@ public abstract class TransientRegistry extends AbstractRegistry {
       // Initial feature flagging service setup
       FeatureFlaggingRegistry ffRegistry = getInstance();
       FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
-              .context(muleContext)
-              .configurations(ffRegistry.getFeatureConfigurations())
-              .build();
+          .context(muleContext)
+          .configurations(ffRegistry.getFeatureConfigurations())
+          .build();
       processors.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
     }
 

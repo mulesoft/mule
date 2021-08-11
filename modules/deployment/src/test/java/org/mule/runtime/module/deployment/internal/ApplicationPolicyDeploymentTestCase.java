@@ -156,12 +156,13 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
-  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation) throws NoSuchFieldException, IllegalAccessException {
+  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation)
+      throws NoSuchFieldException, IllegalAccessException {
     super(parallelDeployment);
     this.shareErrorTypeRepository = shareErrorType;
     setShareErrorTypeRepository(shareErrorTypeRepository);
     this.shareErrorTypeRepoSystemProperty =
-            new SystemProperty(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY, Boolean.toString(shareErrorType));
+        new SystemProperty(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY, Boolean.toString(shareErrorType));
     this.enablePolicyIsolationSystemProperty =
         new SystemProperty((ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
                            Boolean.toString(enablePolicyIsolation));
