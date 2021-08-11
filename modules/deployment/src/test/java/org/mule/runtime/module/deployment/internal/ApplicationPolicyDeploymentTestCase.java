@@ -28,6 +28,7 @@ import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
+import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
@@ -627,10 +628,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Issue("MULE-18196")
   @Description("The application declares an ErrorType that is needed by the policy and but the policy doesn't have it in its own ErrorType repository")
   public void appliesPolicyUsingErrorTypeDeclaredOnAppDependency() throws Exception {
-    if (!shareErrorTypeRepository) {
-      // TODO MULE-19203 revert the change in the following 2 lines
-      return;
-      // expectPolicyRegistrationException();
+    if (!shareErrorTypeRepository && parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
+      expectPolicyRegistrationException();
     }
 
     configureAppWithErrorDeclarationAndPolicyWithErrorMapping();

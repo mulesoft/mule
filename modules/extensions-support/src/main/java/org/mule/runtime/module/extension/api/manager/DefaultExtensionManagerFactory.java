@@ -31,7 +31,7 @@ public final class DefaultExtensionManagerFactory implements ExtensionManagerFac
     ExtensionManager extensionManager = new DefaultExtensionManager();
     muleContext.setExtensionManager(extensionManager);
     try {
-      initialiseIfNeeded(extensionManager, false, muleContext);
+      initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(createStaticMessage("Could not initialise extension manager"), e);
     }

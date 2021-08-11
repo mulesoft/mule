@@ -8,8 +8,10 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
@@ -17,15 +19,19 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy.createLifecycleFilterProxy;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.policy.Policy;
@@ -39,7 +45,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
@@ -47,8 +52,10 @@ import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Default implementation of {@link ApplicationPolicyInstance} that depends on a {@link PolicyTemplate} artifact.
@@ -108,7 +115,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
             .setServiceRepository(serviceRepository)
             .setClassLoaderRepository(classLoaderRepository)
-            .setArtifactPlugins(getFeatureFlaggedArtifactPlugins(template.getDescriptor()))
+            .setArtifactPlugins(getFeatureFlaggedArtifactPlugins())
             .setParentArtifact(application)
             .setExtensionManagerFactory(getFeatureFlaggedExtensionManagerFactory())
             .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider)
@@ -146,8 +153,9 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    *
    * @return The policy artifact plugins.
    */
-  private List<ArtifactPlugin> getFeatureFlaggedArtifactPlugins(ArtifactDescriptor policyArtifactDescriptor) {
-    if (isFeatureEnabled(ENABLE_POLICY_ISOLATION, policyArtifactDescriptor)) {
+  private List<ArtifactPlugin> getFeatureFlaggedArtifactPlugins() {
+    // In 4.2.x, the policy isolation feature will always be disabled by default, so no need to check the feature flagging service
+    if (Boolean.getBoolean(MuleSystemProperties.ENABLE_POLICY_ISOLATION_PROPERTY)) {
       // Returns all the artifact plugins that the policy depends on.
       return template.getOwnArtifactPlugins();
     } else {
@@ -166,23 +174,39 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     return muleContext -> {
       try {
         FeatureFlaggingService featureFlaggingService =
-                ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(FeatureFlaggingService.class);
+            ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(FeatureFlaggingService.class);
         if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
           // The policy will not share extension models and configuration providers with the application that is being applied to.
           ArtifactExtensionManagerFactory artifactExtensionManagerFactory =
-                  new ArtifactExtensionManagerFactory(template.getOwnArtifactPlugins(), extensionModelLoaderRepository,
-                          new DefaultExtensionManagerFactory());
+              new ArtifactExtensionManagerFactory(template.getOwnArtifactPlugins(), extensionModelLoaderRepository,
+                                                  new DefaultExtensionManagerFactory());
           return artifactExtensionManagerFactory.create(muleContext, getInheritedExtensionModels());
         } else {
           // The policy will share extension models and configuration providers with the application that is being applied to.
           return new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
-                  template.getOwnArtifactPlugins(),
-                  new DefaultExtensionManagerFactory()).create(muleContext);
+                                                              template.getOwnArtifactPlugins(),
+                                                              new DefaultExtensionManagerFactory()).create(muleContext);
         }
       } catch (Exception e) {
         throw new MuleRuntimeException(e);
       }
     };
+  }
+
+  /**
+   * HTTP and Sockets extension models must be added if found in the parent artifact extensions (backward compatibility for API
+   * Gateway).
+   *
+   * @return Set containing the parent artifact HTTP and Sockets extension models (if present).
+   */
+  private Set<ExtensionModel> getInheritedExtensionModels() {
+    Set<ExtensionModel> inheritedExtensionModels = new HashSet<>(2);
+    ExtensionManager extensionManager = application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get();
+    extensionManager.getExtension("HTTP")
+        .ifPresent(inheritedExtensionModels::add);
+    extensionManager.getExtension("Sockets")
+        .ifPresent(inheritedExtensionModels::add);
+    return inheritedExtensionModels;
   }
 
   private void enableNotificationListeners(List<NotificationListener> notificationListeners) {

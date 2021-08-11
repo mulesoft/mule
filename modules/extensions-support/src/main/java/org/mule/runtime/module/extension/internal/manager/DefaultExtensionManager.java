@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigurationForComponent;
@@ -31,6 +32,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -77,6 +79,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   @Inject
   private ExpressionManager expressionManager;
 
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
+
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
   private ConfigurationExpirationMonitor configurationExpirationMonitor;
@@ -91,6 +96,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
         new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(),
                                       ((PrivilegedMuleContext) muleContext).getErrorTypeLocator());
     extensionActivator = new ExtensionActivator(extensionErrorsRegistrant, muleContext);
+    initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
   }
 
   /**
@@ -178,9 +184,10 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                                                        componentModel));
     if (configurationModel.isPresent()) {
       createImplicitConfiguration(extensionModel, configurationModel.get(), muleEvent);
-      return of(getConfiguration(getImplicitConfigurationProviderName(extensionModel, configurationModel.get(), muleContext.getArtifactType(),
-              muleContext.getId(),
-              featureFlaggingService),
+      return of(getConfiguration(getImplicitConfigurationProviderName(extensionModel, configurationModel.get(),
+                                                                      muleContext.getArtifactType(),
+                                                                      muleContext.getId(),
+                                                                      featureFlaggingService),
                                  muleEvent));
     }
 
@@ -214,8 +221,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   private void createImplicitConfiguration(ExtensionModel extensionModel, ConfigurationModel implicitConfigurationModel,
                                            CoreEvent muleEvent) {
     String implicitConfigurationProviderName =
-            getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel, muleContext.getArtifactType(),
-                    muleContext.getId(), featureFlaggingService);
+        getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel, muleContext.getArtifactType(),
+                                             muleContext.getId(), featureFlaggingService);
 
     if (!extensionRegistry
         .getConfigurationProvider(implicitConfigurationProviderName)
@@ -229,8 +236,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                                                                                  implicitConfigurationModel,
                                                                                                                  muleEvent,
                                                                                                                  getReflectionCache(),
-                                                                                                                 expressionManager,
-                                                                                                                 muleContext));
+                                                                                                                 expressionManager));
         }
       }
     }
