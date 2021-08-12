@@ -273,6 +273,10 @@
         <values:parameter-with-two-field-with-same-values/>
     </flow>
 
+    <flow name="parameterWithMultipleMultiLevelFieldValuesWithSameVP">
+        <values:parameter-with-multiple-multilevel-field-value-using-same-provider/>
+    </flow>
+
     <flow name="actingParameterWithReservedName">
         <values:acting-parameter-with-reserved-name type="typeValue"/>
     </flow>

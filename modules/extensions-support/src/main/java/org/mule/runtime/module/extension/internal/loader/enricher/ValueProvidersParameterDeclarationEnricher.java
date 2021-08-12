@@ -7,12 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.loader.utils.FieldValueProviderNameUtils.getFieldValueProviderName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderId;
@@ -248,6 +251,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
           .ifPresent(field -> requiresConfiguration.set(true));
 
       int partOrder = 1;
+      String providerName = getFieldValueProviderName(name, fieldValues.targetSelectors());
       for (String targetSelector : fieldValues.targetSelectors()) {
         ValueProviderFactoryModelProperty valueProviderFactoryModelProperty = propertyBuilder.build();
         valueProviderFactoryModelProperties.put(targetSelector, valueProviderFactoryModelProperty);
@@ -256,7 +260,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                                       bindingsMap),
                                              requiresConfiguration.get(), requiresConnection.get(), fieldValues.open(),
                                              partOrder,
-                                             name, getValueProviderId(fieldValues.value()), targetSelector));
+                                             providerName, getValueProviderId(fieldValues.value()), targetSelector));
         partOrder++;
       }
       paramDeclaration.setFieldValueProviderModels(fieldValueProviderModels);
