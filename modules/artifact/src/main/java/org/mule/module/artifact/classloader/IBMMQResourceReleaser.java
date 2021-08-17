@@ -111,6 +111,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
    * The two known mbeans are * TraceControl * PropertyStoreControl
    *
    */
+  // TODO MULE-19714 Promote IBM ResourceReleaser features as Generic Features
   public void removeMBeans() {
 
     LOGGER.debug("Removing registered MBeans of the IBM MQ Driver (if present)");
@@ -158,6 +159,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
    * are references left from outside the application context. So, it retains instances and leaks the application ClassLoader.
    * This method removes the knownLevels registered by the Classes Loaded by the driver ClassLoader.
    */
+  // TODO MULE-19714 Promote IBM ResourceReleaser features as Generic Features
   public void cleanJULKnownLevels() {
 
     LOGGER.debug("Cleaning Java Util Logging references");
@@ -266,6 +268,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
    * threads that do not belong to the application being disposed. This references leads to a ClassLoader leak. This method
    * removes the thread local references to instances of classes loaded by the driver classloader.
    */
+  // TODO MULE-19714 Promote IBM ResourceReleaser features as Generic Features
   public void removeThreadLocals() {
 
     LOGGER.debug("Removing ThreadLocals");
