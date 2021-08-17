@@ -13,6 +13,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.FunctionE
 import org.mule.runtime.module.extension.internal.runtime.function.FunctionExecutor;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Parses the syntactic definition of a {@link FunctionModel} so that the semantics reflected in it can be extracted in a uniform
@@ -50,7 +51,7 @@ public interface FunctionModelParser {
    * @return the {@link FunctionExecutorModelProperty} used to create the {@link FunctionExecutor} which brings the function to
    *         life
    */
-  FunctionExecutorModelProperty getFunctionExecutorModelProperty();
+  Optional<FunctionExecutorModelProperty> getFunctionExecutorModelProperty();
 
   /**
    * @return whether this function should be ignored and excluded from the resulting {@link ExtensionModel}

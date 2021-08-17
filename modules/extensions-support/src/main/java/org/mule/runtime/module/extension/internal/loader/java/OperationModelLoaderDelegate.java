@@ -77,9 +77,9 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .supportsStreaming(parser.supportsStreaming())
           .transactional(parser.isTransactional())
           .requiresConnection(parser.isConnected())
-          .blocking(parser.isBlocking())
-          .withModelProperty(parser.getExecutorModelProperty());
+          .blocking(parser.isBlocking());
 
+      parser.getExecutorModelProperty().ifPresent(operation::withModelProperty);
       parser.getOutputType().applyOn(operation.withOutput());
       parser.getAttributesOutputType().applyOn(operation.withOutputAttributes());
       parser.getMediaTypeModelProperty().ifPresent(operation::withModelProperty);

@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static java.util.Objects.hash;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
@@ -61,7 +63,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     super(extensionElement, loadingContext);
     this.sourceElement = sourceElement;
 
-    sourceClass = sourceElement.getDeclaringClass().get();
+    sourceClass = sourceElement.getDeclaringClass().orElse(null);
 
     configParameter = getConfigParameter(sourceElement);
     connectionParameter = getConnectionParameter(sourceElement);
@@ -86,8 +88,12 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public SdkSourceFactoryModelProperty getSourceFactoryModelProperty() {
-    return new SdkSourceFactoryModelProperty(new DefaultSdkSourceFactory(sourceClass));
+  public Optional<SdkSourceFactoryModelProperty> getSourceFactoryModelProperty() {
+    if (sourceClass == null) {
+      return empty();
+    } else {
+      return of(new SdkSourceFactoryModelProperty(new DefaultSdkSourceFactory(sourceClass)));
+    }
   }
 
   @Override
@@ -144,7 +150,9 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   private void collectAdditionalModelProperties() {
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(sourceElement));
-    additionalModelProperties.add(new ImplementingTypeModelProperty(sourceClass));
+    if (sourceClass != null) {
+      additionalModelProperties.add(new ImplementingTypeModelProperty(sourceClass));
+    }
     additionalModelProperties.add(new SourceCallbackModelProperty(
                                                                   extractJavaMethod(sourceElement.getOnResponseMethod()),
                                                                   extractJavaMethod(sourceElement.getOnErrorMethod()),

@@ -42,8 +42,9 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
       }
 
       final FunctionDeclarer function = extensionDeclarer.withFunction(parser.getName())
-          .describedAs(parser.getDescription())
-          .withModelProperty(parser.getFunctionExecutorModelProperty());
+          .describedAs(parser.getDescription());
+
+      parser.getFunctionExecutorModelProperty().ifPresent(function::withModelProperty);
 
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
