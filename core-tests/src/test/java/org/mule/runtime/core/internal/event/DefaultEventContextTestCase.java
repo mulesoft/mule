@@ -37,6 +37,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.EventContextFactory;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -83,6 +84,7 @@ import reactor.core.publisher.Mono;
 public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
+  private static final String TEST_CORRELATION_ID = "Gracia al fulbo";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -693,6 +695,14 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     eventContext.error(new NullPointerException());
 
     assertThat(callbacks, contains("onResponse", "onComplete", "onTerminated"));
+  }
+
+  @Test
+  public void rootIdIsCorrelationId() {
+    EventContext context = EventContextFactory.create("someId", "theServer", null, TEST_CORRELATION_ID, empty());
+    assertThat(context.getId(), is("someId"));
+    assertThat(context.getCorrelationId(), is(TEST_CORRELATION_ID));
+    assertThat(context.getRootId(), is(TEST_CORRELATION_ID));
   }
 
   private void assertParent(Matcher<Object> eventMatcher, Matcher<Object> errorMatcher, boolean complete, boolean terminated) {

@@ -117,7 +117,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   @Override
   public String getRootId() {
-    return getRootContext().getId();
+    return getRootContext().getCorrelationId();
   }
 
   @Override
