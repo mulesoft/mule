@@ -99,29 +99,12 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
 
   private EventContext createCorrelationIdContext(String correlationId) {
     BaseEventContext newContext = child(oldContext, ofNullable(location), correlationId);
-    Reference<Boolean> oldFinished = new Reference<>(false);
-    Reference<Boolean> newFinised = new Reference<>(false);
     newContext.onComplete((ev, t) -> {
-      if (newFinised.get()) {
-        return;
-      }
       if (ev != null) {
         oldContext.success(ev);
       } else {
         oldContext.error(t);
       }
-      newFinised.set(true);
-    });
-    oldContext.onComplete((ev, t) -> {
-      if (oldFinished.get()) {
-        return;
-      }
-      if (ev != null) {
-        newContext.success(ev);
-      } else {
-        newContext.error(t);
-      }
-      oldFinished.set(true);
     });
 
     return newContext;
