@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -194,9 +195,9 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     Object a = new HashBlob(1);
     Object b = new HashBlob(2);
     assertThat(ClassUtils.hash(new Object[] {a, b, a, b}), is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
-    assertThat(ClassUtils.hash(new Object[] {a, b, a}), is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
-    assertThat(ClassUtils.hash(new Object[] {a, b, a, a}), is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
-    assertThat(ClassUtils.hash(new Object[] {b, a, b, a}), is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
+    assertThat(ClassUtils.hash(new Object[] {a, b, a}), is(not(equalTo(ClassUtils.hash(new Object[] {a, b, a, b})))));
+    assertThat(ClassUtils.hash(new Object[] {a, b, a, a}), is(not(equalTo(ClassUtils.hash(new Object[] {a, b, a, b})))));
+    assertThat(ClassUtils.hash(new Object[] {b, a, b, a}), is(not(equalTo(ClassUtils.hash(new Object[] {a, b, a, b})))));
   }
 
   @Test
