@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
@@ -104,6 +105,26 @@ public class JavaXmlDeclarationEnricherTestCase extends AbstractMuleTestCase {
                                                               String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION)))));
   }
 
+  @Test
+  public void enrichWithCustomValuesWithSdkAnnotation() {
+    extensionDeclarer.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
+    XmlDslModel dslModel = enrich(XmlSupportUsingSdkApi.class);
+
+    assertThat(dslModel, is(notNullValue()));
+    assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
+    assertThat(dslModel.getPrefix(), is(NAMESPACE));
+    assertThat(dslModel.getNamespace(), is(NAMESPACE_LOCATION));
+    assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
+    assertThat(dslModel.getSchemaLocation(),
+               is(String.format(DEFAULT_SCHEMA_LOCATION_MASK, NAMESPACE_LOCATION, String.format(XSD_FILENAME_MASK, NAMESPACE))));
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void enrichWithSdkXmlAndLegacyXmlAnnotation() {
+    extensionDeclarer.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
+    enrich(InvalidXmlSupport.class);
+  }
+
   private XmlDslModel enrich(Class<?> type) {
     extensionDeclarer.withModelProperty(new ImplementingTypeModelProperty(type));
     declarationEnricher
@@ -127,6 +148,17 @@ public class JavaXmlDeclarationEnricherTestCase extends AbstractMuleTestCase {
   }
 
   private static class NoXmlSupport {
+
+  }
+
+  @org.mule.sdk.api.annotation.dsl.xml.Xml(prefix = NAMESPACE, namespace = NAMESPACE_LOCATION)
+  private static class XmlSupportUsingSdkApi {
+
+  }
+
+  @Xml(prefix = NAMESPACE, namespace = NAMESPACE_LOCATION)
+  @org.mule.sdk.api.annotation.dsl.xml.Xml(prefix = NAMESPACE, namespace = NAMESPACE_LOCATION)
+  private static class InvalidXmlSupport {
 
   }
 }

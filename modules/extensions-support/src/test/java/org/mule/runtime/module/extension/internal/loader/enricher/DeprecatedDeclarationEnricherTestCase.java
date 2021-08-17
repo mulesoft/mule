@@ -227,6 +227,108 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertThat(connectionProviderDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
   }
 
+  @Test
+  public void sdkDeprecatedOperationTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    OperationDeclaration operationDeclaration =
+        (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "sdkDeprecatedOperation");
+    assertTrue(operationDeclaration.getDeprecation().isPresent());
+    assertThat(operationDeclaration.getDeprecation().get().getMessage(), is("Use sdkNonDeprecatedOperation instead."));
+    assertThat(operationDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.2.0"));
+    assertFalse(operationDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+  }
+
+  @Test
+  public void sdkDeprecatedSourceTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    SourceDeclaration sourceDeclaration =
+        (SourceDeclaration) getNamedDeclaration(extensionDeclaration.getMessageSources(), "SdkDeprecatedSource");
+    assertTrue(sourceDeclaration.getDeprecation().isPresent());
+    assertThat(sourceDeclaration.getDeprecation().get().getMessage(), is("Use SdkNonDeprecatedSource instead"));
+    assertThat(sourceDeclaration.getDeprecation().get().getDeprecatedSince(), is("2.4.0"));
+    assertTrue(sourceDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+    assertThat(sourceDeclaration.getDeprecation().get().getToRemoveIn().get(), is("3.0.0"));
+  }
+
+  @Test
+  public void sdkDeprecatedParameterTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    OperationDeclaration operationDeclaration =
+        (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "sdkNonDeprecatedOperation");
+    ParameterDeclaration parameterDeclaration =
+        (ParameterDeclaration) getNamedDeclaration(operationDeclaration.getAllParameters(), "badParameter");
+    assertTrue(parameterDeclaration.getDeprecation().isPresent());
+    assertThat(parameterDeclaration.getDeprecation().get().getMessage(), is("This parameter was made redundant"));
+    assertThat(parameterDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.1.0"));
+    assertFalse(parameterDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+  }
+
+  @Test
+  public void sdkDeprecatedScopeTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    OperationDeclaration operationDeclaration =
+        (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "sdkDeprecatedScope");
+    assertTrue(operationDeclaration.getDeprecation().isPresent());
+    assertThat(operationDeclaration.getDeprecation().get().getMessage(), is("Use sdkNonDeprecatedScope instead."));
+    assertThat(operationDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.7.0"));
+    assertFalse(operationDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+  }
+
+  @Test
+  public void sdkDeprecatedRouterTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ConstructDeclaration constructDeclaration =
+        (ConstructDeclaration) getNamedDeclaration(extensionDeclaration.getConstructs(), "sdkDeprecatedRouter");
+    assertTrue(constructDeclaration.getDeprecation().isPresent());
+    assertThat(constructDeclaration.getDeprecation().get().getMessage(), is("Use sdkNonDeprecatedRouter instead."));
+    assertThat(constructDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
+    assertTrue(constructDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+    assertThat(constructDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
+  }
+
+  @Test
+  public void sdkDeprecatedFunctionTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    FunctionDeclaration functionDeclaration =
+        (FunctionDeclaration) getNamedDeclaration(extensionDeclaration.getFunctions(), "sdkDeprecatedFunction");
+    assertTrue(functionDeclaration.getDeprecation().isPresent());
+    assertThat(functionDeclaration.getDeprecation().get().getMessage(), is("Use sdkNonDeprecatedFunction instead."));
+    assertThat(functionDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
+    assertFalse(functionDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+  }
+
+  @Test
+  public void sdkDeprecatedExtensionTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    assertTrue(extensionDeclaration.getDeprecation().isPresent());
+    assertThat(extensionDeclaration.getDeprecation().get().getMessage(), is("This extension is deprecated"));
+    assertThat(extensionDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.2.0"));
+    assertFalse(extensionDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+  }
+
+  @Test
+  public void sdkDeprecatedConfigurationTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(0);
+    assertTrue(configurationDeclaration.getDeprecation().isPresent());
+    assertThat(configurationDeclaration.getDeprecation().get().getMessage(), is("This configuration is deprecated."));
+    assertThat(configurationDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.3.0"));
+    assertFalse(configurationDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+  }
+
+  @Test
+  public void sdkDeprecatedConnectionProviderTestCase() {
+    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(1);
+    ConnectionProviderDeclaration connectionProviderDeclaration = configurationDeclaration.getConnectionProviders().get(0);
+    assertTrue(connectionProviderDeclaration.getDeprecation().isPresent());
+    assertThat(connectionProviderDeclaration.getDeprecation().get().getMessage(),
+               is("You should use the new connection provider"));
+    assertThat(connectionProviderDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
+    assertTrue(connectionProviderDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+    assertThat(connectionProviderDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
+  }
+
   private ExtensionDeclaration getEnrichedExtensionDeclaration(Class<?> extensionClass) {
     ExtensionDeclarer declarer = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev")
         .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
@@ -384,6 +486,99 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
   @Extension(name = "Not Deprecated")
   public static class NonDeprecatedExtension {
 
+  }
+
+  @org.mule.sdk.api.annotation.deprecated.Deprecated(message = "This extension is deprecated", since = "1.2.0")
+  @Extension(name = "Deprecated")
+  @ExpressionFunctions(SdkDeprecatedExtensionFunctions.class)
+  @Configurations({SdkDeprecatedConfiguration.class, SdkNonDeprecatedConfiguration.class})
+  public static class SdkDeprecatedExtension {
+
+  }
+
+  @Configuration
+  @Sources(NonDeprecatedSource.class)
+  @Operations({SdkDeprecatedExtensionOperations.class})
+  @org.mule.sdk.api.annotation.deprecated.Deprecated(message = "This configuration is deprecated.", since = "1.3.0")
+  public static class SdkDeprecatedConfiguration {
+  }
+
+  @Configuration
+  @Sources({SdkDeprecatedSource.class})
+  @ConnectionProviders({SdkDeprecatedConnectionProvider.class, NonDeprecatedConnectionProvider.class})
+  public static class SdkNonDeprecatedConfiguration {
+
+  }
+
+  @org.mule.sdk.api.annotation.deprecated.Deprecated(message = "You should use the new connection provider", since = "1.4.0",
+      toRemoveIn = "2.0.0")
+  public static class SdkDeprecatedConnectionProvider implements ConnectionProvider<Connection> {
+
+    @Override
+    public Connection connect() throws ConnectionException {
+      return new Connection("Your house");
+    }
+
+    @Override
+    public void disconnect(Connection connection) {
+      // No-op
+    }
+
+    @Override
+    public ConnectionValidationResult validate(Connection connection) {
+      return null;
+    }
+  }
+
+  public static class SdkDeprecatedExtensionOperations {
+
+    @org.mule.sdk.api.annotation.deprecated.Deprecated(message = "Use sdkNonDeprecatedOperation instead.", since = "1.2.0")
+    public String sdkDeprecatedOperation(String echo) {
+      return echo;
+    }
+
+    public String sdkNonDeprecatedOperation(String echo,
+                                            @Deprecated(message = "This parameter was made redundant",
+                                                since = "1.1.0") String badParameter) {
+      return echo;
+    }
+
+    @org.mule.sdk.api.annotation.deprecated.Deprecated(message = "Use sdkNonDeprecatedScope instead.", since = "1.7.0")
+    public void sdkDeprecatedScope(Chain chain, CompletionCallback<Void, Void> cb) {}
+
+    public void sdkNonDeprecatedScope(Chain chain, CompletionCallback<Void, Void> cb) {}
+
+    @org.mule.sdk.api.annotation.deprecated.Deprecated(message = "Use sdkNonDeprecatedRouter instead.", since = "1.4.0",
+        toRemoveIn = "2.0.0")
+    public void sdkDeprecatedRouter(Route route, RouterCompletionCallback callback) {}
+
+    public void sdkNonDeprecatedRouter(Route route, RouterCompletionCallback callback) {}
+
+  }
+
+  public static class SdkDeprecatedExtensionFunctions {
+
+    @org.mule.sdk.api.annotation.deprecated.Deprecated(message = "Use sdkNonDeprecatedFunction instead.", since = "1.4.0")
+    public String sdkDeprecatedFunction(String echo) {
+      return echo;
+    }
+
+    public String sdkNonDeprecatedFunction(String echo,
+                                           @Deprecated(message = "This parameter was made redundant",
+                                               since = "1.8.0") String badParameter) {
+      return echo;
+    }
+
+  }
+
+  @Deprecated(message = "Use SdkNonDeprecatedSource instead", since = "2.4.0", toRemoveIn = "3.0.0")
+  public static class SdkDeprecatedSource extends Source<String, String> {
+
+    @Override
+    public void onStart(SourceCallback<String, String> sourceCallback) throws MuleException {}
+
+    @Override
+    public void onStop() {}
   }
 
 }

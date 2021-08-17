@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
@@ -39,16 +41,60 @@ public final class JavaXmlDeclarationEnricher extends AbstractAnnotatedDeclarati
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    Xml xml = extractAnnotation(extensionLoadingContext.getExtensionDeclarer().getDeclaration(), Xml.class);
+    XmlInformation xmlInformation = getXmlInformation(extensionLoadingContext);
     ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
-    declarer.withXmlDsl(getXmlLanguageModel(xml, extensionDeclaration));
+    declarer.withXmlDsl(getXmlLanguageModel(xmlInformation, extensionDeclaration));
   }
 
-  private XmlDslModel getXmlLanguageModel(Xml xml, ExtensionDeclaration extensionDeclaration) {
-    final Optional<String> extensionNamespace = xml != null ? ofNullable(xml.prefix()) : empty();
-    final Optional<String> extensionNamespaceLocation = xml != null ? ofNullable(xml.namespace()) : empty();
+  private XmlDslModel getXmlLanguageModel(XmlInformation xmlInformation, ExtensionDeclaration extensionDeclaration) {
+    final Optional<String> extensionNamespace = xmlInformation != null ? ofNullable(xmlInformation.getPrefix()) : empty();
+    final Optional<String> extensionNamespaceLocation =
+        xmlInformation != null ? ofNullable(xmlInformation.getNamespace()) : empty();
     return createXmlLanguageModel(extensionNamespace, extensionNamespaceLocation, extensionDeclaration.getName(),
                                   extensionDeclaration.getVersion());
+  }
+
+  private XmlInformation getXmlInformation(ExtensionLoadingContext extensionLoadingContext) {
+    Xml legacyXmlAnnotation = extractAnnotation(extensionLoadingContext.getExtensionDeclarer().getDeclaration(), Xml.class);
+    org.mule.sdk.api.annotation.dsl.xml.Xml sdkXmlAnnotation =
+        extractAnnotation(extensionLoadingContext.getExtensionDeclarer().getDeclaration(),
+                          org.mule.sdk.api.annotation.dsl.xml.Xml.class);
+
+    if (legacyXmlAnnotation != null && sdkXmlAnnotation != null) {
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on the extension",
+                                                       Xml.class.getName(),
+                                                       org.mule.sdk.api.annotation.dsl.xml.Xml.class.getName()));
+    } else if (legacyXmlAnnotation != null) {
+      return new XmlInformation(legacyXmlAnnotation);
+    } else if (sdkXmlAnnotation != null) {
+      return new XmlInformation(sdkXmlAnnotation);
+    } else {
+      return null;
+    }
+  }
+
+  private static class XmlInformation {
+
+    String prefix;
+    String namespace;
+
+    public XmlInformation(Xml xml) {
+      this.prefix = xml.prefix();
+      this.namespace = xml.namespace();
+    }
+
+    public XmlInformation(org.mule.sdk.api.annotation.dsl.xml.Xml xml) {
+      this.prefix = xml.prefix();
+      this.namespace = xml.namespace();
+    }
+
+    public String getPrefix() {
+      return prefix;
+    }
+
+    public String getNamespace() {
+      return namespace;
+    }
   }
 }

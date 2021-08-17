@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
