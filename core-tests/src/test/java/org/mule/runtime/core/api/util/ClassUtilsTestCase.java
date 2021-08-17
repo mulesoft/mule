@@ -9,17 +9,18 @@ package org.mule.runtime.core.api.util;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
+import static org.mule.runtime.core.api.util.ClassUtils.isConcrete;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -31,9 +32,12 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -47,12 +51,12 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testIsConcrete() throws Exception {
-    assertTrue(ClassUtils.isConcrete(Orange.class));
-    assertTrue(!ClassUtils.isConcrete(Fruit.class));
-    assertTrue(!ClassUtils.isConcrete(AbstractFruit.class));
+    assertThat(isConcrete(Orange.class), is(true));
+    assertThat(isConcrete(Fruit.class), is(false));
+    assertThat(isConcrete(AbstractFruit.class), is(false));
 
     try {
-      ClassUtils.isConcrete(null);
+      isConcrete(null);
       fail("Class cannot be null, exception should be thrown");
     } catch (RuntimeException e) {
       // expected
@@ -61,13 +65,12 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testLoadClass() throws Exception {
-    Class clazz = ClassUtils.loadClass("java.lang.String", getClass());
-    assertNotNull(clazz);
-
-    assertEquals(clazz.getName(), "java.lang.String");
+    Class clazz = loadClass("java.lang.String", getClass());
+    assertThat(clazz, is(notNullValue()));
+    assertThat(clazz.getName(), is("java.lang.String"));
 
     try {
-      ClassUtils.loadClass("java.lang.Bing", getClass());
+      loadClass("java.lang.Bing", getClass());
       fail("ClassNotFoundException should be thrown");
     } catch (ClassNotFoundException e) {
       // expected
@@ -77,26 +80,26 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testLoadPrimitiveClass() throws Exception {
-    assertSame(ClassUtils.loadClass("boolean", getClass()), Boolean.TYPE);
-    assertSame(ClassUtils.loadClass("byte", getClass()), Byte.TYPE);
-    assertSame(ClassUtils.loadClass("char", getClass()), Character.TYPE);
-    assertSame(ClassUtils.loadClass("double", getClass()), Double.TYPE);
-    assertSame(ClassUtils.loadClass("float", getClass()), Float.TYPE);
-    assertSame(ClassUtils.loadClass("int", getClass()), Integer.TYPE);
-    assertSame(ClassUtils.loadClass("long", getClass()), Long.TYPE);
-    assertSame(ClassUtils.loadClass("short", getClass()), Short.TYPE);
+    assertThat(loadClass("boolean", getClass()), sameInstance(Boolean.TYPE));
+    assertThat(loadClass("byte", getClass()), sameInstance(Byte.TYPE));
+    assertThat(loadClass("char", getClass()), sameInstance(Character.TYPE));
+    assertThat(loadClass("double", getClass()), sameInstance(Double.TYPE));
+    assertThat(loadClass("float", getClass()), sameInstance(Float.TYPE));
+    assertThat(loadClass("int", getClass()), sameInstance(Integer.TYPE));
+    assertThat(loadClass("long", getClass()), sameInstance(Long.TYPE));
+    assertThat(loadClass("short", getClass()), sameInstance(Short.TYPE));
   }
 
   @Test
   public void testLoadClassOfType() throws Exception {
 
-    Class<? extends Exception> clazz = ClassUtils.loadClass("java.lang.IllegalArgumentException", getClass(), Exception.class);
-    assertNotNull(clazz);
+    Class<? extends Exception> clazz = loadClass("java.lang.IllegalArgumentException", getClass(), Exception.class);
+    assertThat(clazz, is(notNullValue()));
 
-    assertEquals(clazz.getName(), "java.lang.IllegalArgumentException");
+    assertThat(clazz.getName(), is("java.lang.IllegalArgumentException"));
 
     try {
-      ClassUtils.loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);
+      loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);
       fail("IllegalArgumentException should be thrown since class is not of expected type");
     } catch (IllegalArgumentException e) {
       // expected
@@ -106,21 +109,21 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testInstanciateClass() throws Exception {
-    Object object = ClassUtils.instantiateClass("org.mule.tck.testmodels.fruit.Orange");
-    assertNotNull(object);
-    assertTrue(object instanceof Orange);
+    Object object = instantiateClass("org.mule.tck.testmodels.fruit.Orange");
+    assertThat(object, is(notNullValue()));
+    assertThat(object, is(instanceOf(Orange.class)));
 
-    object = ClassUtils.instantiateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
-    assertNotNull(object);
-    assertTrue(object instanceof FruitBowl);
+    object = instantiateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
+    assertThat(object, is(notNullValue()));
+    assertThat(object, is(instanceOf(FruitBowl.class)));
 
     FruitBowl bowl = (FruitBowl) object;
 
-    assertTrue(bowl.hasApple());
-    assertTrue(bowl.hasBanana());
+    assertThat(bowl.hasApple(), is(true));
+    assertThat(bowl.hasBanana(), is(true));
 
     try {
-      ClassUtils.instantiateClass("java.lang.Bing");
+      instantiateClass("java.lang.Bing");
       fail("Class does not exist, ClassNotFoundException should have been thrown");
     } catch (ClassNotFoundException e) {
       // expected
@@ -133,33 +136,34 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     FruitBowl bowl = new FruitBowl();
 
     Class[] classes = ClassUtils.getParameterTypes(bowl, "apple");
-    assertNotNull(classes);
-    assertEquals(1, classes.length);
-    assertEquals(Apple.class, classes[0]);
+    assertThat(classes, is(notNullValue()));
+    assertThat(classes.length, is(equalTo(1)));
+    assertThat(classes[0], is(equalTo(Apple.class)));
+
 
     classes = ClassUtils.getParameterTypes(bowl, "invalid");
-    assertNotNull(classes);
-    assertEquals(0, classes.length);
+    assertThat(classes, is(notNullValue()));
+    assertThat(classes.length, is(equalTo(0)));
   }
 
   @Test
   public void testLoadingResources() throws Exception {
     URL resource = ClassUtils.getResource("log4j2-test.xml", getClass());
-    assertNotNull(resource);
+    assertThat(resource, is(notNullValue()));
 
     resource = ClassUtils.getResource("does-not-exist.properties", getClass());
-    assertNull(resource);
+    assertThat(resource, is(nullValue()));
   }
 
   @Test
   public void testLoadingResourceEnumeration() throws Exception {
     Enumeration enumeration = ClassUtils.getResources("log4j2-test.xml", getClass());
-    assertNotNull(enumeration);
-    assertTrue(enumeration.hasMoreElements());
+    assertThat(enumeration, is(notNullValue()));
+    assertThat(enumeration.hasMoreElements(), is(true));
 
     enumeration = ClassUtils.getResources("does-not-exist.properties", getClass());
-    assertNotNull(enumeration);
-    assertTrue(!enumeration.hasMoreElements());
+    assertThat(enumeration, is(notNullValue()));
+    assertThat(enumeration.hasMoreElements(), is(false));
   }
 
   @Test
@@ -175,47 +179,76 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     Object a1 = new HashBlob(1);
     Object a2 = new HashBlob(1);
     Object b = new HashBlob(2);
-    assertTrue(ClassUtils.equal(a1, a2));
-    assertTrue(ClassUtils.equal(b, b));
-    assertTrue(ClassUtils.equal(null, null));
-    assertFalse(ClassUtils.equal(a1, b));
-    assertFalse(ClassUtils.equal(a2, b));
-    assertFalse(ClassUtils.equal(null, b));
-    assertFalse(ClassUtils.equal(b, a1));
-    assertFalse(ClassUtils.equal(b, a2));
-    assertFalse(ClassUtils.equal(b, null));
+    assertThat(ClassUtils.equal(a1, a2), is(true));
+    assertThat(ClassUtils.equal(b, b), is(true));
+    assertThat(ClassUtils.equal(null, null), is(true));
+    assertThat(ClassUtils.equal(a1, b), is(false));
+    assertThat(ClassUtils.equal(a2, b), is(false));
+    assertThat(ClassUtils.equal(null, b), is(false));
+    assertThat(ClassUtils.equal(b, a1), is(false));
+    assertThat(ClassUtils.equal(b, a2), is(false));
+    assertThat(ClassUtils.equal(b, null), is(false));
   }
 
   @Test
   public void testHash() {
     Object a = new HashBlob(1);
     Object b = new HashBlob(2);
-    assertTrue(ClassUtils.hash(new Object[] {a, b, a, b}) == ClassUtils.hash(new Object[] {a, b, a, b}));
-    assertFalse(ClassUtils.hash(new Object[] {a, b, a}) == ClassUtils.hash(new Object[] {a, b, a, b}));
-    assertFalse(ClassUtils.hash(new Object[] {a, b, a, a}) == ClassUtils.hash(new Object[] {a, b, a, b}));
-    assertFalse(ClassUtils.hash(new Object[] {b, a, b, a}) == ClassUtils.hash(new Object[] {a, b, a, b}));
+    assertThat(ClassUtils.hash(new Object[] {a, b, a, b}), is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
+    assertThat(ClassUtils.hash(new Object[] {a, b, a}), is(not(equalTo(ClassUtils.hash(new Object[] {a, b, a, b})))));
+    assertThat(ClassUtils.hash(new Object[] {a, b, a, a}), is(not(equalTo(ClassUtils.hash(new Object[] {a, b, a, b})))));
+    assertThat(ClassUtils.hash(new Object[] {b, a, b, a}), is(not(equalTo(ClassUtils.hash(new Object[] {a, b, a, b})))));
   }
 
   @Test
   public void testClassTypesWithNullInArray() {
     Object[] array = new Object[] {"hello", null, "world"};
     Class<?>[] classTypes = ClassUtils.getClassTypes(array);
-    assertEquals(3, classTypes.length);
-    assertEquals(String.class, classTypes[0]);
-    assertEquals(null, classTypes[1]);
-    assertEquals(String.class, classTypes[2]);
+    assertThat(classTypes.length, is(equalTo(3)));
+    assertThat(classTypes[0], is(equalTo(String.class)));
+    assertThat(classTypes[1], is(nullValue()));
+    assertThat(classTypes[2], is(equalTo(String.class)));
+  }
+
+
+  @Test
+  public void getField() throws Exception {
+    Field field = ClassUtils.getField(HashBlob.class, "hash", false);
+    assertThat(field, is(notNullValue()));
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getNotExistentField() throws Exception {
+    Field field = ClassUtils.getField(HashBlob.class, "wrongField", false);
+  }
+
+  @Test
+  public void getFieldRecursive() throws Exception {
+    Field field = ClassUtils.getField(ExtendedHashBlob.class, "hash", true);
+    assertThat(field, is(notNullValue()));
+  }
+
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getNotExistentFieldRecursiveFieldInSuper() throws Exception {
+    Field field = ClassUtils.getField(ExtendedHashBlob.class, "hash", false);
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getNotExistentFieldRecursive() throws Exception {
+    Field field = ClassUtils.getField(ExtendedHashBlob.class, "wrongField", true);
   }
 
   @Test
   public void getFieldValue() throws Exception {
     final int hash = hashCode();
     HashBlob blob = new HashBlob(hash);
-    assertThat(hash, equalTo(ClassUtils.getFieldValue(blob, "hash", false)));
+    assertThat(hash, is(equalTo(ClassUtils.getFieldValue(blob, "hash", false))));
   }
 
   @Test(expected = NoSuchFieldException.class)
-  public void getUnexistentFieldValue() throws Exception {
-    ClassUtils.getFieldValue(new HashBlob(0), "fake", false);
+  public void getNotExistentFieldValue() throws Exception {
+    ClassUtils.getFieldValue(new HashBlob(0), "wrongField", false);
   }
 
   @Test
@@ -223,11 +256,11 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     final int hash = hashCode();
     HashBlob blob = new ExtendedHashBlob(hash);
 
-    assertThat(hash, equalTo(ClassUtils.getFieldValue(blob, "hash", true)));
+    assertThat(hash, is(equalTo(ClassUtils.getFieldValue(blob, "hash", true))));
   }
 
   @Test(expected = NoSuchFieldException.class)
-  public void getUnexistentFieldValueRecursive() throws Exception {
+  public void getNotExistentFieldValueRecursive() throws Exception {
     ClassUtils.getFieldValue(new ExtendedHashBlob(1), "fake", true);
   }
 
@@ -236,14 +269,71 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     ClassUtils.getFieldValue(new ExtendedHashBlob(1), "hash", false);
   }
 
+
+  @Test
+  public void getStaticFieldValueRecursive() throws Exception {
+    final List<String> hashBlobProperties = asList("one", "two");
+    ExtendedHashBlob.setStaticHashProperties(hashBlobProperties);
+    List<String> value = ClassUtils.getStaticFieldValue(ExtendedHashBlob.class, "staticHashProperties", true);
+    assertThat(value, equalTo(hashBlobProperties));
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getStaticFieldValueNotExistentField() throws Exception {
+    ClassUtils.getStaticFieldValue(ExtendedHashBlob.class, "fake", false);
+  }
+
+  @Test(expected = NoSuchFieldException.class)
+  public void getStaticFieldValueNotExistentFieldRecursive() throws Exception {
+    ClassUtils.getStaticFieldValue(ExtendedHashBlob.class, "fake", true);
+  }
+
+
+  @Test(expected = IllegalAccessException.class)
+  public void getStaticFieldValueNotStaticField() throws Exception {
+    ClassUtils.getStaticFieldValue(HashBlob.class, "hash", false);
+  }
+
   @Test
   public void setFieldValue() throws Exception {
     HashBlob blob = new HashBlob(0);
     final int hash = hashCode();
 
     ClassUtils.setFieldValue(blob, "hash", hash, false);
+    assertThat(hash, is(equalTo(blob.getHash())));
+  }
 
-    assertThat(hash, equalTo(blob.getHash()));
+  @Test
+  public void setFinalFieldValue() throws Exception {
+    final int originalHash = hashCode();
+    final List<String> newFinalHashProperties = asList("one", "two");
+    HashBlob blob = new HashBlob(originalHash);
+    ClassUtils.setFieldValue(blob, "finalHashProperties", newFinalHashProperties, false);
+    assertThat(newFinalHashProperties, equalTo(blob.getFinalHashProperties()));
+  }
+
+
+  @Test
+  public void setFinalFieldValueRecursive() throws Exception {
+    final int originalHash = hashCode();
+    final List<String> newFinalHashProperties = asList("one", "two");
+    ExtendedHashBlob blob = new ExtendedHashBlob(originalHash);
+    ClassUtils.setFieldValue(blob, "finalHashProperties", newFinalHashProperties, true);
+    assertThat(newFinalHashProperties, equalTo(blob.getFinalHashProperties()));
+  }
+
+  @Test
+  public void setFinalStaticFieldValue() throws Exception {
+    final List<String> newFinalStaticHashProperties = asList("one", "two");
+    ClassUtils.setStaticFieldValue(HashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
+    assertThat(newFinalStaticHashProperties, equalTo(HashBlob.getFinalStaticHashProperties()));
+  }
+
+  @Test
+  public void setFinalStaticFieldRecursive() throws Exception {
+    final List<String> newFinalStaticHashProperties = asList("one", "two");
+    ClassUtils.setStaticFieldValue(ExtendedHashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
+    assertThat(newFinalStaticHashProperties, equalTo(ExtendedHashBlob.getFinalStaticHashProperties()));
   }
 
   @Test(expected = NoSuchFieldException.class)
@@ -318,12 +408,16 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private void simpleNameHelper(String target, Class clazz) {
-    assertEquals(target, ClassUtils.getSimpleName(clazz));
+    assertThat(ClassUtils.getSimpleName(clazz), is(equalTo(target)));
   }
 
   private static class HashBlob {
 
     private int hash;
+    private static List<String> staticHashProperties = new ArrayList<>();
+    private final List<String> finalHashProperties = asList("one", "two");
+    private final static List<String> finalStaticHashProperties = asList("one", "two");
+
 
     public HashBlob(int hash) {
       this.hash = hash;
@@ -332,6 +426,19 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     private int getHash() {
       return hash;
     }
+
+    public static void setStaticHashProperties(List<String> properties) {
+      staticHashProperties = properties;
+    }
+
+    public static List<String> getFinalStaticHashProperties() {
+      return finalStaticHashProperties;
+    }
+
+    public List<String> getFinalHashProperties() {
+      return finalHashProperties;
+    }
+
 
     @Override
     public int hashCode() {
