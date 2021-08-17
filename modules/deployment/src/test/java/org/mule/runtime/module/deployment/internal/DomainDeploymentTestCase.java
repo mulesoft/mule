@@ -237,6 +237,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         .definedBy("app-shared-lib-precedence-config.xml")
         .dependingOnSharedLibrary(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
         .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -259,6 +260,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
             .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
             .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+            .dependingOn(callbackExtensionPlugin)
             .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -285,7 +287,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
-            .dependingOn(pluginFileBuilder).dependingOn(domainFileBuilder);
+            .dependingOn(callbackExtensionPlugin)
+            .dependingOn(pluginFileBuilder)
+            .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -732,7 +736,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
-            .dependingOn(pluginFileBuilder).dependingOn(domainFileBuilder);
+            .dependingOn(callbackExtensionPlugin)
+            .dependingOn(pluginFileBuilder)
+            .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -758,6 +764,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
+        .dependingOn(callbackExtensionPlugin)
         .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class")
         .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
@@ -1799,6 +1806,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
         .definedBy("app-with-forbidden-java-echo-plugin-config.xml")
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -1828,6 +1836,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
         .definedBy("app-with-forbidden-mule-echo-plugin-config.xml")
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -1857,6 +1866,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
         .definedBy("app-with-forbidden-mule3rd-echo-plugin-config.xml")
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
