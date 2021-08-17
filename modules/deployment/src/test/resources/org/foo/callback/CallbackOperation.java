@@ -36,4 +36,9 @@ public class CallbackOperation {
       throw new MuleRuntimeException(e);
     }
   }
+
+  @MediaType(value = TEXT_PLAIN, strict = false)
+  public void throwException(@Alias("exceptionClassName") String exceptionClassName, @Alias("error") String error) throws Exception {
+    throw (Exception) instantiateClass(exceptionClassName);
+  }
 }

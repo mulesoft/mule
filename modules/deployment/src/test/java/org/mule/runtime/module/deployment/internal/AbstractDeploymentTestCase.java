@@ -264,6 +264,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File loadClassExtensionJarFile;
   protected static File callbackExtensionJarFile;
   protected static File callbackExtensionPomFile;
+  protected static File customExceptionClassFile;
   protected static File usingObjectStoreJarFile;
 
   protected static File goodbyeExtensionV1JarFile;
@@ -347,6 +348,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .compile("mule-module-callback-1.0.0.jar", "1.0.0");
     callbackExtensionPomFile = new JarFileBuilder("callbackExtension", callbackExtensionJarFile)
         .getArtifactPomFile();
+    customExceptionClassFile =
+        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/exception/CustomException.java"));
 
     oracleExtensionJarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/oracle/OracleExtension.java"),
