@@ -13,6 +13,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -98,13 +99,31 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
 
   private EventContext createCorrelationIdContext(String correlationId) {
     BaseEventContext newContext = child(oldContext, ofNullable(location), correlationId);
+    Reference<Boolean> oldFinished = new Reference<>(false);
+    Reference<Boolean> newFinised = new Reference<>(false);
     newContext.onComplete((ev, t) -> {
+      if (newFinised.get()) {
+        return;
+      }
       if (ev != null) {
         oldContext.success(ev);
       } else {
         oldContext.error(t);
       }
+      newFinised.set(true);
     });
+    oldContext.onComplete((ev, t) -> {
+      if (oldFinished.get()) {
+        return;
+      }
+      if (ev != null) {
+        newContext.success(ev);
+      } else {
+        newContext.error(t);
+      }
+      oldFinished.set(true);
+    });
+
     return newContext;
   }
 
@@ -121,8 +140,10 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
                             LOGGER.debug("Event with correlationId '{}' going back to '{}' (successful execution) in location {}",
                                          correlationId,
                                          originalEvent.getCorrelationId(), location.getLocation());
+                            ((BaseEventContext) eventWithCorrelationId.getContext()).success(eventWithCorrelationId);
                             onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result));
                           }, (t, res) -> {
+                            ((BaseEventContext) eventWithCorrelationId.getContext()).error(t);
                             if (t instanceof MessagingException) {
                               t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()), t);
                             }
