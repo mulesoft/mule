@@ -81,7 +81,7 @@ public interface SourceModelParser {
    *
    * @return a {@link SdkSourceFactoryModelProperty}
    */
-  SdkSourceFactoryModelProperty getSourceFactoryModelProperty();
+  Optional<SdkSourceFactoryModelProperty> getSourceFactoryModelProperty();
 
   /**
    * @return whether this source emits responses

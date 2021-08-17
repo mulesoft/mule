@@ -56,7 +56,7 @@ public interface ConnectionProviderModelParser {
   /**
    * @return the {@link ConnectionProviderFactoryModelProperty} used to create instances of this provider
    */
-  ConnectionProviderFactoryModelProperty getConnectionProviderFactoryModelProperty();
+  Optional<ConnectionProviderFactoryModelProperty> getConnectionProviderFactoryModelProperty();
 
   /**
    * @return whether this provider supports connectivity testing or not.

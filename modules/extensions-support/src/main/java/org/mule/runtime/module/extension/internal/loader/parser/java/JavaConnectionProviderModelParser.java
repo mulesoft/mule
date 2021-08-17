@@ -107,10 +107,11 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   }
 
   @Override
-  public ConnectionProviderFactoryModelProperty getConnectionProviderFactoryModelProperty() {
-    return new ConnectionProviderFactoryModelProperty(new DefaultConnectionProviderFactory(
-                                                                                           element.getDeclaringClass().get(),
-                                                                                           extensionClassLoader));
+  public Optional<ConnectionProviderFactoryModelProperty> getConnectionProviderFactoryModelProperty() {
+    return element.getDeclaringClass()
+        .map(declaringClass -> new ConnectionProviderFactoryModelProperty(new DefaultConnectionProviderFactory(
+                                                                                                               declaringClass,
+                                                                                                               extensionClassLoader)));
   }
 
   @Override

@@ -40,8 +40,9 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       providerDeclarer = declarer.withConnectionProvider(parser.getName())
           .describedAs(parser.getDescription())
           .withConnectionManagementType(parser.getConnectionManagementType())
-          .supportsConnectivityTesting(parser.supportsConnectivityTesting())
-          .withModelProperty(parser.getConnectionProviderFactoryModelProperty());
+          .supportsConnectivityTesting(parser.supportsConnectivityTesting());
+
+      parser.getConnectionProviderFactoryModelProperty().ifPresent(providerDeclarer::withModelProperty);
 
       if (parser.isExcludedFromConnectivitySchema()) {
         providerDeclarer.withModelProperty(new ExcludeFromConnectivitySchemaModelProperty());

@@ -72,7 +72,7 @@ public interface OperationModelParser {
    *
    * @return a {@link CompletableComponentExecutorModelProperty}
    */
-  CompletableComponentExecutorModelProperty getExecutorModelProperty();
+  Optional<CompletableComponentExecutorModelProperty> getExecutorModelProperty();
 
   /**
    * Returns an {@link NestedChainModelParser} if the operation defined one.
