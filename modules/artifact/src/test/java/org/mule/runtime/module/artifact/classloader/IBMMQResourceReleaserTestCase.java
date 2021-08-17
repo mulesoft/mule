@@ -6,10 +6,17 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.model.BundleDependency;
+import org.mule.maven.client.api.model.BundleDescriptor;
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -23,22 +30,29 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.getAllStackTraces;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.util.ClassUtils.getField;
 import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
-
+@Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)
+@Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
 public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   static final String KNOWN_DRIVER_CLASS_NAME = "com.ibm.mq.jms.MQConnectionFactory";
@@ -50,15 +64,16 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   private final static String THREADLOCALS_FIELD = "threadLocals";
   private final static String INHERITABLE_THREADLOCALS_FIELD = "inheritableThreadLocals";
   private final static String THREADLOCAL_MAP_TABLE_CLASS = "java.lang.ThreadLocal$ThreadLocalMap";
+  private final static String DRIVER_GROUP_ID = "com.ibm.mq";
+  private final static String DRIVER_ARTIFACT_ID = "com.ibm.mq.allclient";
 
-
-  String driverFile;
+  String driverVersion;
   private ClassLoaderLookupPolicy testLookupPolicy;
 
 
-  //Parameterized
-  public IBMMQResourceReleaserTestCase(String driverFile) {
-    this.driverFile = driverFile;
+  // Parameterized
+  public IBMMQResourceReleaserTestCase(String driverVersion) {
+    this.driverVersion = driverVersion;
     this.testLookupPolicy = new ClassLoaderLookupPolicy() {
 
       @Override
@@ -87,20 +102,39 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameters(name = "Testing Driver {0}")
   public static String[] data() throws NoSuchFieldException, IllegalAccessException {
     return new String[] {
-        "ibm/mq/com.ibm.mq.allclient-9.2.3.0.jar",
-        "ibm/mq/com.ibm.mq.allclient-9.2.2.0.jar",
-        "ibm/mq/com.ibm.mq.allclient-9.1.1.0.jar"
+        "9.2.3.0",
+        "9.2.2.0",
+        "9.1.1.0"
     };
   }
 
   @Test
+  @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed on redeployment")
   public void cleanUpTest() throws Exception {
+
+    URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
+    final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
+
+    final Supplier<File> localMavenRepository =
+        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
+
+    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
+        newMavenConfigurationBuilder().globalSettingsLocation(toFile(settingsUrl));
+
+    MavenClient mavenClient = mavenClientProvider
+        .createMavenClient(mavenConfigurationBuilder.localMavenRepositoryLocation(localMavenRepository.get()).build());
+
+    BundleDescriptor bundleDescriptor = new BundleDescriptor.Builder().setGroupId(DRIVER_GROUP_ID)
+        .setArtifactId(DRIVER_ARTIFACT_ID).setVersion(driverVersion).build();
+
+    BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
+
     try (MuleArtifactClassLoader artifactClassLoader =
         new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
-                                    new URL[] {ClassUtils.getResource(driverFile, this.getClass())},
+                                    new URL[] {dependency.getBundleUri().toURL()},
                                     currentThread().getContextClassLoader(), testLookupPolicy)) {
 
-      //Driver not loaded yet. Should not cleanup on dispose.
+      // Driver not loaded yet. Should not cleanup on dispose.
       Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
       shouldReleaseIbmMQResourcesField.setAccessible(true);
 
@@ -111,26 +145,26 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
       Object connectionFactory = connectionFactoryClass.newInstance();
       Class<?> traceClass = Class.forName("com.ibm.msg.client.commonservices.trace.Trace", true, artifactClassLoader);
 
-      //Driver loaded... should clean on dispose.
+      // Driver loaded... should clean on dispose.
       assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(true));
 
-      //TraceController is not null
+      // TraceController is not null
       assertThat(getTraceController(artifactClassLoader), is(notNullValue()));
 
 
       artifactClassLoader.dispose();
 
-      //JUL Known Levels
+      // JUL Known Levels
       assertThat(countJULKnownLevels(artifactClassLoader), is(0));
-      //jmqiEnv of traceController should be null
+      // jmqiEnv of traceController should be null
       assertThat(getJmqiEnv(artifactClassLoader), is(nullValue()));
-      //defaultMQCxManager of MQEnvironment should be null
+      // defaultMQCxManager of MQEnvironment should be null
       assertThat(getDefaultMQCxManager(artifactClassLoader), is(nullValue()));
-      //myInstance field of JmsTls should be null
+      // myInstance field of JmsTls should be null
       assertThat(getMyInstanceFromJmsTls(artifactClassLoader), is(nullValue()));
-      //TraceController should be null
+      // TraceController should be null
       assertThat(getTraceController(artifactClassLoader), is(nullValue()));
-      //no thread locals of current classLoader
+      // no thread locals of current classLoader
       assertThat(countThreadLocals(artifactClassLoader), is(0));
 
     }

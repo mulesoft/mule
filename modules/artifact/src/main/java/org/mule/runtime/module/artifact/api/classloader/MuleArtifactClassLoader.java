@@ -122,7 +122,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
-
     this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
     this.scalaClassValueReleaserInstance = new ScalaClassValueReleaser();
   }

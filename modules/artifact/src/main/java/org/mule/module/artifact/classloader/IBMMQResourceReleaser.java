@@ -35,8 +35,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.setStaticFieldValue;
 
 /**
- * A Utility class for releasing all the known references that may lead to
- * a ClassLoader leak.
+ * A Utility class for releasing all the known references that may lead to a ClassLoader leak.
  */
 public class IBMMQResourceReleaser implements ResourceReleaser {
 
@@ -81,16 +80,14 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     cleanPrivateStaticFieldForClass(IBM_MQ_ENVIRONMENT_CLASS, "defaultMQCxManager");
 
     /*
-     * The JmsTls class keep several references in a private static final field
-     * This references avoid the proper ClassLoader disposal.
-     * This method performs the JmsTls Class cleanup.
+     * The JmsTls class keep several references in a private static final field This references avoid the proper ClassLoader
+     * disposal. This method performs the JmsTls Class cleanup.
      */
     cleanPrivateStaticFieldForClass(IBM_MQ_JMS_TLS_CLASS, "myInstance");
 
     /*
-     * The TraceController classes keep several references in private static final field
-     * This references avoid the proper ClassLoader disposal.
-     * This method performs the TraceController cleanup.
+     * The TraceController classes keep several references in private static final field This references avoid the proper
+     * ClassLoader disposal. This method performs the TraceController cleanup.
      */
     cleanPrivateStaticFieldForClass(IBM_MQ_TRACE_CLASS, "traceController");
 
@@ -100,6 +97,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
   /**
    * Creates a new Instance of IBMMQResourceReleaser
+   * 
    * @param classLoader ClassLoader which loaded the IBM MQ Driver.
    */
   public IBMMQResourceReleaser(ClassLoader classLoader) {
@@ -107,14 +105,10 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * The IBM MQ Driver registers two MBeans for management.
-   * When disposing the application / domain, this beans keep references
-   * to classes loaded by this ClassLoader. When the application is removed,
-   * the ClassLoader is leaked due this references.
+   * The IBM MQ Driver registers two MBeans for management. When disposing the application / domain, this beans keep references to
+   * classes loaded by this ClassLoader. When the application is removed, the ClassLoader is leaked due this references.
    *
-   * The two known mbeans are
-   *  * TraceControl
-   *  * PropertyStoreControl
+   * The two known mbeans are * TraceControl * PropertyStoreControl
    *
    */
   public void removeMBeans() {
@@ -128,7 +122,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
           .forEach(x -> LOGGER.debug("MBean Found: Class Name: {} // Object Name: {}", x.getClassName(), x.getObjectName()));
     }
 
-    //Object Name::type=CommonServices,name=TraceControl
+    // Object Name::type=CommonServices,name=TraceControl
     final Hashtable<String, String> keys = new Hashtable<>();
     keys.put("type", "CommonServices");
     keys.put("name", "TraceControl");
@@ -143,7 +137,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
       LOGGER.warn("Caught exception unregistering the IBM MQ TraceControl MBean: {}", e.getMessage(), e);
     }
 
-    //IBM WebSphere MQ:type=CommonServices,name=PropertyStoreControl
+    // IBM WebSphere MQ:type=CommonServices,name=PropertyStoreControl
     keys.put("type", "CommonServices");
     keys.put("name", "PropertyStoreControl");
     try {
@@ -160,11 +154,9 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   *  The IBM MQ Driver registers custom Java Util Logging (JUL) Levels.
-   *  the JUL Classes are loaded by system Classloader. So there are references left
-   *  from outside the application context. So, it retains instances and leaks the application
-   *  ClassLoader.
-   *  This method removes the knownLevels registered by the Classes Loaded by the driver ClassLoader.
+   * The IBM MQ Driver registers custom Java Util Logging (JUL) Levels. the JUL Classes are loaded by system Classloader. So there
+   * are references left from outside the application context. So, it retains instances and leaks the application ClassLoader.
+   * This method removes the knownLevels registered by the Classes Loaded by the driver ClassLoader.
    */
   public void cleanJULKnownLevels() {
 
@@ -220,8 +212,9 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
   /**
    * Processes and removes the Java Util Logging KnownLevels references
+   * 
    * @param levelObjectField Field to access internal property.
-   * @param levelsMaps Map which contains references
+   * @param levelsMaps       Map which contains references
    * @return Removed KnownLevels
    * @throws Exception
    */
@@ -248,6 +241,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
   /**
    * Sets the the private static field of class to null.
+   * 
    * @param className the target class name.
    * @param fieldName the target field name.
    */
@@ -268,10 +262,9 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * While analyzing the HeapDumps looking for the ClassLoader Leak causes,
-   * there were ThreadLocal references to driver classes in threads that do not belong to
-   * the application being disposed. This references leads to a ClassLoader leak.
-   * This method removes the thread local references to instances of classes loaded by the driver classloader.
+   * While analyzing the HeapDumps looking for the ClassLoader Leak causes, there were ThreadLocal references to driver classes in
+   * threads that do not belong to the application being disposed. This references leads to a ClassLoader leak. This method
+   * removes the thread local references to instances of classes loaded by the driver classloader.
    */
   public void removeThreadLocals() {
 
@@ -338,6 +331,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
   /**
    * Removes the threadLocal variables related to classes Loaded by this classloader.
+   * 
    * @param threadLocalMap Map containing ThreadLocal values
    */
   private void processThreadLocalMap(Field threadLocalMapTableField, Object threadLocalMap) {

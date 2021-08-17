@@ -356,9 +356,10 @@ public class ClassUtils {
 
   /**
    * Gets the field with the given fieldName of the TargetClass making it accessible.
+   * 
    * @param targetClass class to get the field from.
-   * @param fieldName the name of the field.
-   * @param recursive flag to lookup in subclasses or not
+   * @param fieldName   the name of the field.
+   * @param recursive   flag to lookup in subclasses or not
    * @return the Field object
    * @throws NoSuchFieldException when the request field does not exists.
    */
@@ -380,61 +381,132 @@ public class ClassUtils {
       }
     }
     throw new NoSuchFieldException(String.format("Could not find field '%s' in class %s", fieldName,
-        targetClass.getName()));
+                                                 targetClass.getName()));
   }
 
 
 
-
-
+  /**
+   * Gets a field value of a given object
+   * 
+   * @param target    object to get the field value from
+   * @param fieldName then name of the field
+   * @param recursive flag to lookup in subclasses
+   * @param <T>       The expected type of the field.
+   * @return the value of the field for the target object
+   * @throws IllegalAccessException when the field is not reachable
+   * @throws NoSuchFieldException   when the field does not exists
+   */
   public static <T> T getFieldValue(Object target, String fieldName, boolean recursive)
-      throws IllegalAccessException, NoSuchFieldException {
-    Class<?> clazz = target.getClass();
-    Field field;
-    while (!Object.class.equals(clazz)) {
-      try {
-        field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return (T) field.get(target);
-      } catch (NoSuchFieldException e) {
-        // ignore and look in superclass
-        if (recursive) {
-          clazz = clazz.getSuperclass();
-        } else {
-          break;
-        }
-      }
-    }
 
-    throw new NoSuchFieldException(String.format("Could not find field '%s' in class %s", fieldName,
-                                                 target.getClass().getName()));
+      throws IllegalAccessException, NoSuchFieldException {
+
+    Field f = getField(target.getClass(), fieldName, recursive);
+    boolean isAccessible = f.isAccessible();
+    try {
+      f.setAccessible(true);
+      return (T) f.get(target);
+    } finally {
+      f.setAccessible(isAccessible);
+    }
   }
 
+  /**
+   * Gets a static field value of a given class
+   * 
+   * @param targetClass the class that holds the requested static field.
+   * @param fieldName   the name of the field
+   * @param recursive   flag to lookup for the field in subclasses or not
+   * @param <T>         the type of the field
+   * @return the value of the field
+   * @throws NoSuchFieldException   when the field is not found
+   * @throws IllegalAccessException when the field is not reachable.
+   */
+  public static <T> T getStaticFieldValue(Class<?> targetClass, String fieldName, boolean recursive)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field field = getField(targetClass, fieldName, recursive);
+    boolean isAccessible = field.isAccessible();
+    if (!Modifier.isStatic(field.getModifiers())) {
+      throw new IllegalAccessException(String.format("The %s field of %s class is not static", fieldName, targetClass.getName()));
+    }
+    try {
+      field.setAccessible(true);
+      return (T) field.get(null);
+    } finally {
+      field.setAccessible(isAccessible);
+    }
+  }
+
+  /**
+   * Sets a field of an object with the given value. If this is a final field, there will be an attempt to update the value.
+   * Notice: If the field is final and it was initialized using a constant the value change may not be reflected in due compiler
+   * optimizations. http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.5.3
+   * 
+   * @param target    the object that holds the target field
+   * @param fieldName the name of the field
+   * @param value     the value to set
+   * @param recursive flags to lookup the field in subclasses of the target object
+   * @throws IllegalAccessException the field is not reachable
+   * @throws NoSuchFieldException   the field does not exists.
+   */
   public static void setFieldValue(Object target, String fieldName, Object value, boolean recursive)
       throws IllegalAccessException, NoSuchFieldException {
-    Class<?> clazz = target.getClass();
-    Field field;
-    while (!Object.class.equals(clazz)) {
-      try {
-        field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(target, value);
+    Field field = getField(target.getClass(), fieldName, recursive);
+    boolean isAccessible = field.isAccessible();
 
-        return;
-      } catch (NoSuchFieldException e) {
-        // ignore and look in superclass
-        if (recursive) {
-          clazz = clazz.getSuperclass();
-        } else {
-          break;
-        }
+    if (Modifier.isFinal(field.getModifiers())) {
+
+      Field modifiersField = getField(Field.class, "modifiers", false);
+      boolean isModifiersFieldAccessible = modifiersField.isAccessible();
+      try {
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+      } finally {
+        modifiersField.setAccessible(isModifiersFieldAccessible);
       }
     }
-
-    throw new NoSuchFieldException(String.format("Could not find field '%s' in class %s", fieldName,
-                                                 target.getClass().getName()));
+    try {
+      field.setAccessible(true);
+      field.set(target, value);
+    } finally {
+      field.setAccessible(isAccessible);
+    }
   }
 
+  /**
+   * Sets a static field of a given class, even if the field has the final modifier. Notice: If the field is final and it was
+   * initialized using a constant the value change may not be reflected due compiler optimizations.
+   * http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.5.3
+   *
+   * @param targetClass the target class
+   * @param fieldName   the name of the field
+   * @param value       the value to set
+   * @param recursive   flags to lookup the field in subclasses or not
+   * @throws NoSuchFieldException   when the field does not exists
+   * @throws IllegalAccessException when the field is not reachable
+   */
+  public static void setStaticFieldValue(Class<?> targetClass, String fieldName, Object value, boolean recursive)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field field = getField(targetClass, fieldName, recursive);
+    boolean isAccessible = field.isAccessible();
+
+    if (Modifier.isFinal(field.getModifiers())) {
+      Field modifiersField = getField(Field.class, "modifiers", false);
+      boolean isModifiersFieldAccessible = modifiersField.isAccessible();
+      try {
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+      } finally {
+        modifiersField.setAccessible(isModifiersFieldAccessible);
+      }
+    }
+    try {
+      field.setAccessible(true);
+      field.set(null, value);
+    } finally {
+      field.setAccessible(isAccessible);
+    }
+  }
 
   /**
    * Ensure that the given class is properly initialized when the argument is passed in as .class literal. This method can never
