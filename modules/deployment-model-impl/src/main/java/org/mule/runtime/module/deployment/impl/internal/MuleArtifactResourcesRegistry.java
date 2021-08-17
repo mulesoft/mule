@@ -9,6 +9,8 @@ package org.mule.runtime.module.deployment.impl.internal;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import org.mule.runtime.container.api.ModuleRepository;
@@ -27,8 +29,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFac
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -137,7 +137,7 @@ public class MuleArtifactResourcesRegistry {
 
     domainManager = new DefaultDomainManager();
     this.domainClassLoaderFactory =
-        trackDeployableArtifactClassLoaderFactory(new DomainClassLoaderFactory(name -> getAppDataFolder(name)));
+        trackDeployableArtifactClassLoaderFactory(domainClassLoaderFactory(name -> getAppDataFolder(name)));
 
     this.artifactPluginClassLoaderFactory =
         trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
@@ -154,7 +154,7 @@ public class MuleArtifactResourcesRegistry {
                                                                     artifactDescriptorValidatorBuilder);
 
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
-        trackDeployableArtifactClassLoaderFactory(new MuleApplicationClassLoaderFactory(name -> getAppDataFolder(name)));
+        trackDeployableArtifactClassLoaderFactory(applicationClassLoaderFactory(name -> getAppDataFolder(name)));
     pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactPluginClassLoaderFactory, moduleRepository);
     applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, pluginClassLoadersFactory);

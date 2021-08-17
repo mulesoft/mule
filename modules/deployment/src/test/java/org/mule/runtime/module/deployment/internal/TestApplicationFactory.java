@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import org.mule.runtime.api.service.ServiceRepository;
@@ -17,7 +18,6 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
@@ -84,7 +84,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     PluginDependenciesResolver pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
-        new ApplicationClassLoaderBuilderFactory(new MuleApplicationClassLoaderFactory(name -> getAppDataFolder(name)),
+        new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory(name -> getAppDataFolder(name)),
                                                  new DefaultRegionPluginClassLoadersFactory(new ArtifactPluginClassLoaderFactory(),
                                                                                             moduleRepository));
 

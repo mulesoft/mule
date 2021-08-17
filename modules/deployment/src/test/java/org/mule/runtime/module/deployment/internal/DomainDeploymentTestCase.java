@@ -46,10 +46,12 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.TestDomainFactory.createDomainFactory;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -62,7 +64,6 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -1243,10 +1244,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   public void undeploysDomainCompletelyEvenOnStoppingException() throws Exception {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-    TestDomainFactory testDomainFactory =
-        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(name -> getAppDataFolder(name)),
-                                              containerClassLoader, serviceManager, moduleRepository,
-                                              createDescriptorLoaderRepository());
+    TestDomainFactory testDomainFactory = createDomainFactory(domainClassLoaderFactory(name -> getAppDataFolder(name)),
+                                                              containerClassLoader, serviceManager, moduleRepository,
+                                                              createDescriptorLoaderRepository());
     testDomainFactory.setFailOnStopApplication();
 
     deploymentService.setDomainFactory(testDomainFactory);
@@ -1265,10 +1265,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   public void undeploysDomainCompletelyEvenOnDisposingException() throws Exception {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-    TestDomainFactory testDomainFactory =
-        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(name -> getAppDataFolder(name)),
-                                              containerClassLoader, serviceManager, moduleRepository,
-                                              createDescriptorLoaderRepository());
+    TestDomainFactory testDomainFactory = createDomainFactory(domainClassLoaderFactory(name -> getAppDataFolder(name)),
+                                                              containerClassLoader, serviceManager, moduleRepository,
+                                                              createDescriptorLoaderRepository());
     testDomainFactory.setFailOnDisposeApplication();
     deploymentService.setDomainFactory(testDomainFactory);
     startDeployment();

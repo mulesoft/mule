@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -48,8 +50,8 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
   private final ArtifactClassLoader parentArtifactClassLoader = mock(ArtifactClassLoader.class);
   private final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-  private final MuleApplicationClassLoaderFactory classLoaderFactory =
-      new MuleApplicationClassLoaderFactory(name -> {
+  private final DeployableArtifactClassLoaderFactory<ApplicationDescriptor> classLoaderFactory =
+      applicationClassLoaderFactory(name -> {
         try {
           return createTempDirectory(name).toFile();
         } catch (IOException e) {
@@ -89,7 +91,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
   @Test
   public void createsClassLoader() throws Exception {
-
     final MuleApplicationClassLoader artifactClassLoader =
         (MuleApplicationClassLoader) classLoaderFactory.create(APP_ID, parentArtifactClassLoader, descriptor, emptyList());
 
