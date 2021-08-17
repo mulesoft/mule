@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.internal.plugin;
+package org.mule.runtime.deployment.model.api.plugin.resolver;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +14,8 @@ import java.util.Map;
  * Thrown to indicate that more than one artifact is exporting a given package.
  */
 public class DuplicateExportedPackageException extends PluginResolutionError {
+
+  private static final long serialVersionUID = 1705370167352289806L;
 
   /**
    * {@inheritDoc}

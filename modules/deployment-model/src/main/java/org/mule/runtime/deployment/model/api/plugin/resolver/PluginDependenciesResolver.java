@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.internal.plugin;
+package org.mule.runtime.deployment.model.api.plugin.resolver;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Resolves resolves plugin dependencies to obtain a proper initialization order.
+ * Resolves plugin dependencies to obtain a proper initialization order.
  */
 public interface PluginDependenciesResolver {
 
@@ -22,10 +22,12 @@ public interface PluginDependenciesResolver {
    *
    * @param providedPluginDescriptors plugins descriptors provided by a parent Mule artifact if it exists.
    * @param descriptors               plugins descriptors to resolve.
-   * @param isDomain
+   * @param isDomain                  {@code true} if {@code providedPluginDescriptors} come from a {@code domain}, false
+   *                                  otherwise.
    * @return a non null list containing the plugins in resolved order.
    * @throws PluginResolutionError if at least a plugin cannot be resolved.
    */
   List<ArtifactPluginDescriptor> resolve(Set<ArtifactPluginDescriptor> providedPluginDescriptors,
-                                         List<ArtifactPluginDescriptor> descriptors, boolean isDomain);
+                                         List<ArtifactPluginDescriptor> descriptors, boolean isDomain)
+      throws PluginResolutionError;
 }

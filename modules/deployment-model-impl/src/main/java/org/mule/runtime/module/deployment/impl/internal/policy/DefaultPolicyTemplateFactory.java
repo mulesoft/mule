@@ -19,9 +19,9 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
