@@ -354,6 +354,39 @@ public class ClassUtils {
     return clazz;
   }
 
+  /**
+   * Gets the field with the given fieldName of the TargetClass making it accessible.
+   * @param targetClass class to get the field from.
+   * @param fieldName the name of the field.
+   * @param recursive flag to lookup in subclasses or not
+   * @return the Field object
+   * @throws NoSuchFieldException when the request field does not exists.
+   */
+  public static Field getField(Class<?> targetClass, String fieldName, boolean recursive)
+      throws NoSuchFieldException {
+    Class<?> clazz = targetClass;
+    Field field;
+    while (!Object.class.equals(clazz)) {
+      try {
+        field = clazz.getDeclaredField(fieldName);
+        return field;
+      } catch (NoSuchFieldException e) {
+        // ignore and look in superclass
+        if (recursive) {
+          clazz = clazz.getSuperclass();
+        } else {
+          break;
+        }
+      }
+    }
+    throw new NoSuchFieldException(String.format("Could not find field '%s' in class %s", fieldName,
+        targetClass.getName()));
+  }
+
+
+
+
+
   public static <T> T getFieldValue(Object target, String fieldName, boolean recursive)
       throws IllegalAccessException, NoSuchFieldException {
     Class<?> clazz = target.getClass();
