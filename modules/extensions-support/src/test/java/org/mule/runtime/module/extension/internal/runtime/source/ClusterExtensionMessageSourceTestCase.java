@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
+import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.verifyLogMessage;
 
 import org.junit.Test;
 import org.mule.runtime.api.cluster.ClusterService;
@@ -57,6 +58,24 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
         .fireNotification(new ClusterNodeNotification("you're up", PRIMARY_CLUSTER_NODE_SELECTED));
     verify(sourceAdapter, atLeastOnce()).initialise();
     verify(sourceAdapter, times(1)).start();
+  }
+
+  @Test
+  public void dontStartIfNotPrimaryNodeLogMessage() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+    verifyLogMessage(debugMessages,
+                     "Message source 'source' on flow 'appleFlow' cannot initialize. This Message source can only run on the primary node of the cluster");
+  }
+
+  @Test
+  public void startWhenPrimaryNodeLogMessage() throws Exception {
+    dontStartIfNotPrimaryNode();
+
+    muleContext.getNotificationManager()
+        .fireNotification(new ClusterNodeNotification("you're up", PRIMARY_CLUSTER_NODE_SELECTED));
+    verifyLogMessage(debugMessages,
+                     "Message source 'source' on flow 'appleFlow' is initializing because the node became cluster's primary.");
   }
 
   private static class TestClusterService implements ClusterService {
