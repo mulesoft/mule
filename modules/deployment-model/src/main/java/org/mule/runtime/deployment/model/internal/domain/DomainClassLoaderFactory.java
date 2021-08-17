@@ -18,6 +18,7 @@ import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookup
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,22 +43,28 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
 
   protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
 
-  private final ClassLoader containerClassLoader;
   private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
-  private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
+  private final Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
 
   /**
    * Creates a new instance
    *
-   * @param containerClassLoader       parent classLoader of the created instance. Can be null.
    * @param nativeLibraryFinderFactory creates {@link NativeLibraryFinder} for the created module
    *
    */
-  public DomainClassLoaderFactory(ClassLoader containerClassLoader, NativeLibraryFinderFactory nativeLibraryFinderFactory) {
-    checkArgument(containerClassLoader != null, "parentClassLoader cannot be null");
+  public DomainClassLoaderFactory(NativeLibraryFinderFactory nativeLibraryFinderFactory) {
     checkArgument(nativeLibraryFinderFactory != null, "nativeLibraryFinderFactory cannot be null");
-    this.containerClassLoader = containerClassLoader;
     this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
+  }
+
+  /**
+   * Creates a new factory
+   *
+   * @param nativeLibsTempFolderChildFunction a function to determine the location of a temp dir to copy the native libs of the
+   *                                          artifact to, based on the deployment name.
+   */
+  public DomainClassLoaderFactory(Function<String, File> nativeLibsTempFolderChildFunction) {
+    this.nativeLibraryFinderFactory = new DefaultNativeLibraryFinderFactory(nativeLibsTempFolderChildFunction);
   }
 
   /**

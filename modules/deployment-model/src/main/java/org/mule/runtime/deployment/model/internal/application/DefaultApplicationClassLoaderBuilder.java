@@ -12,13 +12,13 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import org.mule.runtime.api.util.collection.SmallMap;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilder;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -35,10 +35,11 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<ApplicationClassLoaderBuilder> {
+public class DefaultApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<DefaultApplicationClassLoaderBuilder>
+    implements ApplicationClassLoaderBuilder {
 
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
-  private Domain domain;
+  private ArtifactClassLoader domainArtifactClassLoader;
 
   /**
    * Creates a new builder for creating {@link Application} artifacts.
@@ -49,22 +50,23 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
    * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the application's region. Non null
    */
-  public ApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
-                                       RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+  public DefaultApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
+                                              RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
     super(pluginClassLoadersFactory);
 
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }
 
   /**
-   * Creates a new {@code ArtifactClassLoader} using the provided configuration. It will create the proper class loader hierarchy
-   * and filters so application classes, resources, plugins and it's domain resources are resolve correctly.
+   * Creates a new {@code MuleDeployableArtifactClassLoader} using the provided configuration. It will create the proper class
+   * loader hierarchy and filters so application classes, resources, plugins and it's domain resources are resolve correctly.
    *
    * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
    * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  public MuleDeployableArtifactClassLoader build() throws IOException {
-    checkState(domain != null, "Domain cannot be null");
+  @Override
+  public MuleDeployableArtifactClassLoader build() {
+    checkState(domainArtifactClassLoader != null, "Domain cannot be null");
 
     return (MuleDeployableArtifactClassLoader) super.build();
   }
@@ -76,7 +78,7 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
 
   @Override
   protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
-    return getApplicationId(domain.getArtifactId(), artifactDescriptor.getName());
+    return getApplicationId(domainArtifactClassLoader.getArtifactId(), artifactDescriptor.getName());
   }
 
   /**
@@ -84,19 +86,16 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    */
   @Override
   protected ArtifactClassLoader getParentClassLoader() {
-    return (ArtifactClassLoader) this.domain.getArtifactClassLoader().getClassLoader().getParent();
-  }
-
-  protected DomainDescriptor getDomainDescriptor() {
-    return this.domain.getArtifactClassLoader().getArtifactDescriptor();
+    return this.domainArtifactClassLoader;
   }
 
   /**
    * @param domain the domain artifact to which the application that is going to use this classloader belongs.
    * @return the builder
    */
-  public ApplicationClassLoaderBuilder setDomain(Domain domain) {
-    this.domain = domain;
+  @Override
+  public DefaultApplicationClassLoaderBuilder setDomainParentClassLoader(ArtifactClassLoader domainArtifactClassLoader) {
+    this.domainArtifactClassLoader = domainArtifactClassLoader;
     return this;
   }
 
@@ -116,12 +115,14 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
   protected ClassLoaderLookupPolicy getParentLookupPolicy(ArtifactClassLoader parentClassLoader) {
     Map<String, LookupStrategy> lookupStrategies = new SmallMap<>();
 
-    DomainDescriptor descriptor = parentClassLoader.getArtifactDescriptor();
+    ArtifactDescriptor descriptor = parentClassLoader.getArtifactDescriptor();
     descriptor.getClassLoaderModel().getExportedPackages().forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
 
-    for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
-      artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
-          .forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
+    if (descriptor instanceof DeployableArtifactDescriptor) {
+      for (ArtifactPluginDescriptor artifactPluginDescriptor : ((DeployableArtifactDescriptor) descriptor).getPlugins()) {
+        artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
+            .forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
+      }
     }
 
     return parentClassLoader.getClassLoaderLookupPolicy().extend(lookupStrategies);

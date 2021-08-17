@@ -27,7 +27,6 @@ import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactCl
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,21 +67,17 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     final List<ArtifactPluginDescriptor> ownResolvedPluginDescriptors =
         pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(descriptor.getPlugins()), false);
 
-    try {
-      ownPolicyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
-          .addArtifactPluginDescriptors(ownResolvedPluginDescriptors
-              .toArray(new ArtifactPluginDescriptor[ownResolvedPluginDescriptors.size()]))
-          .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
+    ownPolicyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
+        .addArtifactPluginDescriptors(ownResolvedPluginDescriptors
+            .toArray(new ArtifactPluginDescriptor[ownResolvedPluginDescriptors.size()]))
+        .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
 
-      // This classloader needs to be created after ownPolicyClassLoader so its inner classloaders override the entries in the
-      // ClassLoaderRepository for the application
-      policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
-          .addArtifactPluginDescriptors(resolvedPolicyPluginsDescriptors
-              .toArray(new ArtifactPluginDescriptor[resolvedPolicyPluginsDescriptors.size()]))
-          .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
-    } catch (IOException e) {
-      throw new PolicyTemplateCreationException(createPolicyTemplateCreationErrorMessage(descriptor.getName()), e);
-    }
+    // This classloader needs to be created after ownPolicyClassLoader so its inner classloaders override the entries in the
+    // ClassLoaderRepository for the application
+    policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
+        .addArtifactPluginDescriptors(resolvedPolicyPluginsDescriptors
+            .toArray(new ArtifactPluginDescriptor[resolvedPolicyPluginsDescriptors.size()]))
+        .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
 
     application.getRegionClassLoader().addClassLoader(policyClassLoader, NULL_CLASSLOADER_FILTER);
 

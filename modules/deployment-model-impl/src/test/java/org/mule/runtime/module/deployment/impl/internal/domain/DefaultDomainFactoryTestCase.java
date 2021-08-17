@@ -22,12 +22,13 @@ import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRu
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
+import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
@@ -71,7 +72,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
     DomainClassLoaderBuilder domainClassLoaderBuilderMock = mock(DomainClassLoaderBuilder.class);
     when(domainClassLoaderBuilderMock.setArtifactDescriptor(any())).thenReturn(domainClassLoaderBuilderMock);
-    when(domainClassLoaderBuilderMock.setArtifactId(any())).thenReturn(domainClassLoaderBuilderMock);
     when(domainClassLoaderBuilderMock.addArtifactPluginDescriptors(new ArtifactPluginDescriptor[0]))
         .thenReturn(domainClassLoaderBuilderMock);
     when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
@@ -96,7 +96,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     DomainClassLoaderBuilder domainClassLoaderBuilderMock = mock(DomainClassLoaderBuilder.class);
     when(domainClassLoaderBuilderMock.setArtifactDescriptor(any()))
         .thenReturn(domainClassLoaderBuilderMock);
-    when(domainClassLoaderBuilderMock.setArtifactId(any())).thenReturn(domainClassLoaderBuilderMock);
     when(domainClassLoaderBuilderMock
         .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0])))
             .thenReturn(domainClassLoaderBuilderMock);

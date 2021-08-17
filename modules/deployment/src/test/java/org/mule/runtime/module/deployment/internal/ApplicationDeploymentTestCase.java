@@ -75,8 +75,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
@@ -961,8 +959,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
     appFactory.setFailOnStopApplication(true);
 
@@ -985,8 +982,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploymentFailureWhenDomainNotFound() throws Exception {
     final DefaultDomainManager emptyDomainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
@@ -1006,8 +1002,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploymentSuccessWhenUsingDefaultDomain() throws Exception {
     final DefaultDomainManager domainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
@@ -1028,8 +1023,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
     appFactory.setFailOnDisposeApplication(true);
     deploymentService.setAppFactory(appFactory);
@@ -1158,8 +1152,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
 
     deploymentService.setAppFactory(appFactory);
@@ -1181,8 +1174,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
 
     deploymentService.setAppFactory(appFactory);
@@ -1224,8 +1216,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
 
     deploymentService.setAppFactory(appFactory);
@@ -1268,8 +1259,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
 
     deploymentService.setAppFactory(appFactory);

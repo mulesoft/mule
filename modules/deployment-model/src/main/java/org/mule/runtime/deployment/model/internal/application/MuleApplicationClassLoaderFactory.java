@@ -8,8 +8,10 @@ package org.mule.runtime.deployment.model.internal.application;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -17,10 +19,12 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Creates {@link MuleApplicationClassLoader} instances based on the application descriptor.
@@ -38,6 +42,16 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
 
     checkArgument(nativeLibraryFinderFactory != null, "nativeLibraryFinderFactory cannot be null");
     this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
+  }
+
+  /**
+   * Creates a new factory
+   *
+   * @param nativeLibsTempFolderChildFunction a function to determine the location of a temp dir to copy the native libs of the
+   *                                          artifact to, based on the deployment name.
+   */
+  public MuleApplicationClassLoaderFactory(Function<String, File> nativeLibsTempFolderChildFunction) {
+    this.nativeLibraryFinderFactory = new DefaultNativeLibraryFinderFactory(nativeLibsTempFolderChildFunction);
   }
 
   @Override

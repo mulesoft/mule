@@ -36,6 +36,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
@@ -62,8 +63,6 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -1245,8 +1244,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     TestDomainFactory testDomainFactory =
-        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader(),
-                                                                           getNativeLibraryFinderFactory()),
+        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(name -> getAppDataFolder(name)),
                                               containerClassLoader, serviceManager, moduleRepository,
                                               createDescriptorLoaderRepository());
     testDomainFactory.setFailOnStopApplication();
@@ -1268,8 +1266,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     TestDomainFactory testDomainFactory =
-        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader(),
-                                                                           getNativeLibraryFinderFactory()),
+        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(name -> getAppDataFolder(name)),
                                               containerClassLoader, serviceManager, moduleRepository,
                                               createDescriptorLoaderRepository());
     testDomainFactory.setFailOnDisposeApplication();
@@ -2170,10 +2167,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     } else {
       deploymentService.redeployDomain(id, deploymentProperties);
     }
-  }
-
-  private NativeLibraryFinderFactory getNativeLibraryFinderFactory() {
-    return new DefaultNativeLibraryFinderFactory();
   }
 
 }

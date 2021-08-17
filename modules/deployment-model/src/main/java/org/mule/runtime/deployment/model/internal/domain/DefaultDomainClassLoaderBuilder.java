@@ -8,24 +8,25 @@ package org.mule.runtime.deployment.model.internal.domain;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import java.io.IOException;
-
 /**
  * {@link ArtifactClassLoader} builder for class loaders required by {@link Domain} artifacts
  *
  * @since 4.0
  */
-public class DomainClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<DomainClassLoaderBuilder> {
+public class DefaultDomainClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<DefaultDomainClassLoaderBuilder>
+    implements DomainClassLoaderBuilder {
 
   private final ArtifactClassLoader parentClassLoader;
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
@@ -37,9 +38,9 @@ public class DomainClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
    * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the domain's region. Non null
    */
-  public DomainClassLoaderBuilder(ArtifactClassLoader parentClassLoader,
-                                  DeployableArtifactClassLoaderFactory<DomainDescriptor> artifactClassLoaderFactory,
-                                  RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+  public DefaultDomainClassLoaderBuilder(ArtifactClassLoader parentClassLoader,
+                                         DeployableArtifactClassLoaderFactory<DomainDescriptor> artifactClassLoaderFactory,
+                                         RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
     super(pluginClassLoadersFactory);
     this.parentClassLoader = parentClassLoader;
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
@@ -50,9 +51,9 @@ public class DomainClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder
    * and filters so domain classes, resources and plugins are resolve correctly.
    *
    * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
-   * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  public MuleDeployableArtifactClassLoader build() throws IOException {
+  @Override
+  public MuleDeployableArtifactClassLoader build() {
     return (MuleDeployableArtifactClassLoader) super.build();
   }
 

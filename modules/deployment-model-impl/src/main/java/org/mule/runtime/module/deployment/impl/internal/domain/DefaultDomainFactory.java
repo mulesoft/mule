@@ -19,11 +19,12 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
+import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -153,7 +154,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
         artifactClassLoaderBuilder
             .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors
                 .toArray(new ArtifactPluginDescriptor[resolvedArtifactPluginDescriptors.size()]))
-            .setArtifactId(domainDescriptor.getName()).setArtifactDescriptor(domainDescriptor).build();
+            .setArtifactDescriptor(domainDescriptor).build();
 
     List<ArtifactPlugin> artifactPlugins =
         createArtifactPluginList(domainClassLoader, resolvedArtifactPluginDescriptors);

@@ -5,15 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.domain;
+package org.mule.runtime.deployment.model.api.builder;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.domain.DefaultDomainClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 
+/**
+ * Factory to create instances of {@code DomainClassLoaderBuilder}.
+ *
+ * @since 4.5
+ */
 public class DomainClassLoaderBuilderFactory {
 
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
@@ -42,7 +47,7 @@ public class DomainClassLoaderBuilderFactory {
    * @return a {@code DomainClassLoaderBuilder} instance.
    */
   public DomainClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new DomainClassLoaderBuilder(parentClassLoader, domainClassLoaderFactory, pluginClassLoadersFactory);
+    return new DefaultDomainClassLoaderBuilder(parentClassLoader, domainClassLoaderFactory, pluginClassLoadersFactory);
   }
 
 }

@@ -19,11 +19,13 @@ import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilder;
+import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -140,9 +142,9 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
         applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
     MuleDeployableArtifactClassLoader applicationClassLoader =
         artifactClassLoaderBuilder
-            .setDomain(domain)
+            .setDomainParentClassLoader((ArtifactClassLoader) domain.getArtifactClassLoader().getClassLoader().getParent())
             .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
-            .setArtifactId(descriptor.getName()).setArtifactDescriptor(descriptor).build();
+            .setArtifactDescriptor(descriptor).build();
 
 
     List<ArtifactPlugin> artifactPlugins =
