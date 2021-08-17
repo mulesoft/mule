@@ -223,11 +223,6 @@ public class PollingSourceWrapperTestCase {
     setFieldValue(pollingSourceWrapper, "componentLocation", componentLocationMock, false);
   }
 
-  private String formatMessage(String message, Object... args) {
-    String newMessage = message.replaceAll("\\{\\}", "%s");
-    return String.format(newMessage, args);
-  }
-
   private void startSourcePollWithMockedLogger() throws Exception {
     Logger origLogger = setLogger(pollingSourceWrapper, "LOGGER", logger);
     try {
