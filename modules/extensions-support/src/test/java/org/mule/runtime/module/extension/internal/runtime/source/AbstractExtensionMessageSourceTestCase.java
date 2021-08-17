@@ -25,6 +25,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_M
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.setLogger;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
@@ -85,16 +87,20 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.slf4j.Logger;
 
 public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
 
+  private static final String LOGGER_FIELD_NAME = "LOGGER";
   protected static final String CONFIG_NAME = "myConfig";
   protected static final String ERROR_MESSAGE = "ERROR";
   protected static final String SOURCE_NAME = "source";
@@ -102,6 +108,10 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected final SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
   protected final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
+
+  protected Logger logger;
+  private Logger oldLogger;
+  protected List<String> debugMessages;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -284,6 +294,19 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .build();
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
+  }
+
+
+  @Before
+  public void setUpLogger() throws Exception {
+    debugMessages = new ArrayList<>();
+    logger = createMockLogger(debugMessages, new ArrayList<>());
+    oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, logger);
+  }
+
+  @After
+  public void restoreLogger() throws Exception {
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @After
