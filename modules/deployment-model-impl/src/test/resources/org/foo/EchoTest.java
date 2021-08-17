@@ -7,7 +7,10 @@
 
 package org.foo;
 
-public class EchoTest {
+import org.mule.runtime.module.deployment.api.EventCallback;
+
+public class EchoTest implements EventCallback {
+
   public EchoTest() {
   }
 
