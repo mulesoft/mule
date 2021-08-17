@@ -7,6 +7,9 @@
 package org.mule.runtime.core.api.util;
 
 import static java.lang.Boolean.getBoolean;
+import static java.lang.reflect.Modifier.isAbstract;
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isStatic;
 import static org.apache.commons.collections.MapUtils.getObject;
 import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -97,7 +100,7 @@ public class ClassUtils {
     if (clazz == null) {
       throw new IllegalArgumentException("clazz may not be null");
     }
-    return !(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()));
+    return !(clazz.isInterface() || isAbstract(clazz.getModifiers()));
   }
 
   /**
@@ -426,7 +429,7 @@ public class ClassUtils {
       throws NoSuchFieldException, IllegalAccessException {
     Field field = getField(targetClass, fieldName, recursive);
     boolean isAccessible = field.isAccessible();
-    if (!Modifier.isStatic(field.getModifiers())) {
+    if (!isStatic(field.getModifiers())) {
       throw new IllegalAccessException(String.format("The %s field of %s class is not static", fieldName, targetClass.getName()));
     }
     try {
@@ -454,7 +457,7 @@ public class ClassUtils {
     Field field = getField(target.getClass(), fieldName, recursive);
     boolean isAccessible = field.isAccessible();
 
-    if (Modifier.isFinal(field.getModifiers())) {
+    if (isFinal(field.getModifiers())) {
 
       Field modifiersField = getField(Field.class, "modifiers", false);
       boolean isModifiersFieldAccessible = modifiersField.isAccessible();
@@ -490,7 +493,7 @@ public class ClassUtils {
     Field field = getField(targetClass, fieldName, recursive);
     boolean isAccessible = field.isAccessible();
 
-    if (Modifier.isFinal(field.getModifiers())) {
+    if (isFinal(field.getModifiers())) {
       Field modifiersField = getField(Field.class, "modifiers", false);
       boolean isModifiersFieldAccessible = modifiersField.isAccessible();
       try {

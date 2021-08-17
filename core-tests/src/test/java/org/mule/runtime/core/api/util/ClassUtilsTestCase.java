@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.util;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -16,6 +17,9 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
+import static org.mule.runtime.core.api.util.ClassUtils.isConcrete;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -46,12 +50,12 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testIsConcrete() throws Exception {
-    assertThat(ClassUtils.isConcrete(Orange.class),is(true));
-    assertThat(ClassUtils.isConcrete(Fruit.class),is(false));
-    assertThat(ClassUtils.isConcrete(AbstractFruit.class),is(false));
+    assertThat(isConcrete(Orange.class),is(true));
+    assertThat(isConcrete(Fruit.class),is(false));
+    assertThat(isConcrete(AbstractFruit.class),is(false));
 
     try {
-      ClassUtils.isConcrete(null);
+      isConcrete(null);
       fail("Class cannot be null, exception should be thrown");
     } catch (RuntimeException e) {
       // expected
@@ -60,12 +64,12 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testLoadClass() throws Exception {
-    Class clazz = ClassUtils.loadClass("java.lang.String", getClass());
+    Class clazz = loadClass("java.lang.String", getClass());
     assertThat(clazz,is(notNullValue()));
     assertThat(clazz.getName(),is( "java.lang.String"));
 
     try {
-      ClassUtils.loadClass("java.lang.Bing", getClass());
+      loadClass("java.lang.Bing", getClass());
       fail("ClassNotFoundException should be thrown");
     } catch (ClassNotFoundException e) {
       // expected
@@ -75,26 +79,26 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testLoadPrimitiveClass() throws Exception {
-    assertThat(ClassUtils.loadClass("boolean", getClass()),sameInstance(Boolean.TYPE));
-    assertThat(ClassUtils.loadClass("byte", getClass()), sameInstance(Byte.TYPE));
-    assertThat(ClassUtils.loadClass("char", getClass()), sameInstance(Character.TYPE));
-    assertThat(ClassUtils.loadClass("double", getClass()), sameInstance(Double.TYPE));
-    assertThat(ClassUtils.loadClass("float", getClass()), sameInstance(Float.TYPE));
-    assertThat(ClassUtils.loadClass("int", getClass()), sameInstance(Integer.TYPE));
-    assertThat(ClassUtils.loadClass("long", getClass()), sameInstance(Long.TYPE));
-    assertThat(ClassUtils.loadClass("short", getClass()), sameInstance(Short.TYPE));
+    assertThat(loadClass("boolean", getClass()),sameInstance(Boolean.TYPE));
+    assertThat(loadClass("byte", getClass()), sameInstance(Byte.TYPE));
+    assertThat(loadClass("char", getClass()), sameInstance(Character.TYPE));
+    assertThat(loadClass("double", getClass()), sameInstance(Double.TYPE));
+    assertThat(loadClass("float", getClass()), sameInstance(Float.TYPE));
+    assertThat(loadClass("int", getClass()), sameInstance(Integer.TYPE));
+    assertThat(loadClass("long", getClass()), sameInstance(Long.TYPE));
+    assertThat(loadClass("short", getClass()), sameInstance(Short.TYPE));
   }
 
   @Test
   public void testLoadClassOfType() throws Exception {
 
-    Class<? extends Exception> clazz = ClassUtils.loadClass("java.lang.IllegalArgumentException", getClass(), Exception.class);
+    Class<? extends Exception> clazz = loadClass("java.lang.IllegalArgumentException", getClass(), Exception.class);
     assertThat(clazz,is(notNullValue()));
 
     assertThat(clazz.getName(),is( "java.lang.IllegalArgumentException"));
 
     try {
-      ClassUtils.loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);
+      loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);
       fail("IllegalArgumentException should be thrown since class is not of expected type");
     } catch (IllegalArgumentException e) {
       // expected
@@ -104,13 +108,13 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testInstanciateClass() throws Exception {
-    Object object = ClassUtils.instantiateClass("org.mule.tck.testmodels.fruit.Orange");
+    Object object = instantiateClass("org.mule.tck.testmodels.fruit.Orange");
     assertThat(object,is(notNullValue()));
-    assertThat(object instanceof Orange,is(true));
+    assertThat(object,is(instanceOf(Orange.class)));
 
-    object = ClassUtils.instantiateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
+    object = instantiateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
     assertThat(object,is(notNullValue()));
-    assertThat(object instanceof FruitBowl,is(true));;
+    assertThat(object,is(instanceOf(FruitBowl.class)));
 
     FruitBowl bowl = (FruitBowl) object;
 
@@ -118,7 +122,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     assertThat(bowl.hasBanana(),is(true));
 
     try {
-      ClassUtils.instantiateClass("java.lang.Bing");
+      instantiateClass("java.lang.Bing");
       fail("Class does not exist, ClassNotFoundException should have been thrown");
     } catch (ClassNotFoundException e) {
       // expected
@@ -189,10 +193,10 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   public void testHash() {
     Object a = new HashBlob(1);
     Object b = new HashBlob(2);
-    assertThat(ClassUtils.hash(new Object[] {a, b, a, b}) == ClassUtils.hash(new Object[] {a, b, a, b}),is(true));
-    assertThat(ClassUtils.hash(new Object[] {a, b, a}) == ClassUtils.hash(new Object[] {a, b, a, b}),is(false));
-    assertThat(ClassUtils.hash(new Object[] {a, b, a, a}) == ClassUtils.hash(new Object[] {a, b, a, b}),is(false));
-    assertThat(ClassUtils.hash(new Object[] {b, a, b, a}) == ClassUtils.hash(new Object[] {a, b, a, b}),is(false));
+    assertThat(ClassUtils.hash(new Object[] {a, b, a, b}),is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
+    assertThat(ClassUtils.hash(new Object[] {a, b, a}),is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
+    assertThat(ClassUtils.hash(new Object[] {a, b, a, a}),is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
+    assertThat(ClassUtils.hash(new Object[] {b, a, b, a}),is(equalTo(ClassUtils.hash(new Object[] {a, b, a, b}))));
   }
 
   @Test
