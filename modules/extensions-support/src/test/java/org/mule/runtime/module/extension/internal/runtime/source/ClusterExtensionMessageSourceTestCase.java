@@ -12,16 +12,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 
 import org.junit.Test;
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.notification.ClusterNodeNotification;
-import org.mule.runtime.core.internal.connector.SchedulerController;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {

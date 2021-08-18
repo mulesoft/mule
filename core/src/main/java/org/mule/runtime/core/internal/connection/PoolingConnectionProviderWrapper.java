@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connection;
 
 import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public final class PoolingConnectionProviderWrapper<C> extends ReconnectableConnectionProviderWrapper<C> {
 
   private final PoolingProfile poolingProfile;
+  private final String ownerConfigName;
 
   /**
    * Creates a new instance
@@ -32,9 +34,11 @@ public final class PoolingConnectionProviderWrapper<C> extends ReconnectableConn
    */
   public PoolingConnectionProviderWrapper(ConnectionProvider<C> delegate,
                                           PoolingProfile poolingProfile,
-                                          ReconnectionConfig reconnectionConfig) {
+                                          ReconnectionConfig reconnectionConfig,
+                                          String ownerConfigName) {
     super(delegate, reconnectionConfig);
     this.poolingProfile = poolingProfile;
+    this.ownerConfigName = ownerConfigName;
   }
 
   /**
@@ -43,5 +47,13 @@ public final class PoolingConnectionProviderWrapper<C> extends ReconnectableConn
   @Override
   public Optional<PoolingProfile> getPoolingProfile() {
     return ofNullable(poolingProfile);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<String> getOwnerConfigName() {
+    return ofNullable(ownerConfigName);
   }
 }

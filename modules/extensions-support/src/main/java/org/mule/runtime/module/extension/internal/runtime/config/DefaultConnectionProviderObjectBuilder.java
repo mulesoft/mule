@@ -91,7 +91,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   private ConnectionProvider<C> applyConnectionManagement(ConnectionProvider<C> provider) {
     final ConnectionManagementType connectionManagementType = providerModel.getConnectionManagementType();
     if (connectionManagementType == POOLING) {
-      provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, reconnectionConfig);
+      provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, reconnectionConfig, ownerConfigName);
     } else {
       provider = new ReconnectableConnectionProviderWrapper<>(provider, reconnectionConfig);
     }

@@ -25,8 +25,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_M
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.setLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;

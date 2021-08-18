@@ -20,7 +20,7 @@ import org.mule.runtime.core.internal.retry.HasReconnectionConfig;
  * @since 4.3.0
  */
 public interface ConnectionProviderWrapper<C>
-    extends ConnectionProvider<C>, HasPoolingProfile, HasReconnectionConfig, HasDelegate<C>, Lifecycle {
+    extends ConnectionProvider<C>, HasPoolingProfile, HasReconnectionConfig, HasDelegate<C>, HasOwnerConfigName, Lifecycle {
 
   RetryPolicyTemplate getRetryPolicyTemplate();
 

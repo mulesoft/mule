@@ -23,8 +23,8 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
-import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.slf4j.Logger;
@@ -41,7 +41,8 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
 
   private final PoolingProfile poolingProfile;
-  private final ObjectPool<C> pool;
+  private final GenericObjectPool<C> pool;
+  private final String poolId;
   private final PoolingListener<C> poolingListener;
 
   /**
@@ -53,11 +54,12 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
    * @param muleContext        the application's {@link MuleContext}
    */
   PoolingConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, PoolingProfile poolingProfile,
-                                      PoolingListener<C> poolingListener, MuleContext muleContext) {
+                                      PoolingListener<C> poolingListener, MuleContext muleContext, String ownerConfigName) {
     super(connectionProvider, muleContext);
     this.poolingProfile = poolingProfile;
     this.poolingListener = poolingListener;
-    pool = createPool();
+    this.poolId = ownerConfigName.concat("-").concat(generateId());
+    this.pool = createPool(ownerConfigName);
   }
 
   /**
@@ -69,7 +71,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   @Override
   public ConnectionHandler<C> getConnectionHandler() throws ConnectionException {
     try {
-      return new PoolingConnectionHandler<>(borrowConnection(), pool, poolingListener, connectionProvider);
+      return new PoolingConnectionHandler<>(borrowConnection(), pool, poolId, poolingListener, connectionProvider);
     } catch (ConnectionException e) {
       throw e;
     } catch (NoSuchElementException e) {
@@ -81,8 +83,8 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
 
   private C borrowConnection() throws Exception {
     C connection = pool.borrowObject();
-    LOGGER.trace("Borrowed connection {} from the pool {}", connection.toString(), pool.toString());
-    logPoolStatus(LOGGER, pool, connectionProvider);
+    LOGGER.trace("Borrowed connection {} from the pool {}", connection.toString(), poolId);
+    logPoolStatus(LOGGER, pool, poolId);
     try {
       poolingListener.onBorrow(connection);
     } catch (Exception e) {
@@ -102,15 +104,15 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   @Override
   public void close() throws MuleException {
     try {
-      logPoolStatus(LOGGER, pool, connectionProvider);
-      LOGGER.trace("Closing pool {}", connectionProvider.toString());
+      logPoolStatus(LOGGER, pool, poolId);
+      LOGGER.trace("Closing pool {}", poolId);
       pool.close();
     } catch (Exception e) {
       throw new DefaultMuleException(createStaticMessage("Could not close connection pool"), e);
     }
   }
 
-  private ObjectPool<C> createPool() {
+  private GenericObjectPool<C> createPool(String ownerConfigName) {
     GenericObjectPool.Config config = new GenericObjectPool.Config();
     config.maxIdle = poolingProfile.getMaxIdle();
     config.maxActive = poolingProfile.getMaxActive();
@@ -119,10 +121,10 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     config.minEvictableIdleTimeMillis = poolingProfile.getMinEvictionMillis();
     config.timeBetweenEvictionRunsMillis = poolingProfile.getEvictionCheckIntervalMillis();
     GenericObjectPool genericPool = new GenericObjectPool(new ObjectFactoryAdapter(), config);
-    LOGGER.trace("Created pool {} for {}", pool.toString(), connectionProvider.toString());
+    LOGGER.trace("Creating pool with ID {} for config {}", poolId, ownerConfigName);
 
     applyInitialisationPolicy(genericPool);
-    logPoolStatus(LOGGER, pool, connectionProvider);
+    logPoolStatus(LOGGER, genericPool, poolId);
 
     return genericPool;
   }
@@ -150,7 +152,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
             + poolingProfile.getInitialisationPolicy());
     }
 
-    LOGGER.trace("Initializing pool {} with {} initial connections", pool.toString(), initialConnections);
+    LOGGER.trace("Initializing pool {} with {} initial connections", poolId, initialConnections);
     for (int t = 0; t < initialConnections; t++) {
       try {
         pool.addObject();
@@ -190,4 +192,9 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     @Override
     public void passivateObject(C connection) throws Exception {}
   }
+
+  private String generateId() {
+    return UUID.randomUUID().toString();
+  }
+
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.oc
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -387,6 +388,14 @@ public class PlatformManagedOAuthConnectionProvider<C>
     } else {
       return new PoolingListener<C>() {};
     }
+  }
+
+  @Override
+  public Optional<String> getOwnerConfigName() {
+    if (delegate instanceof ConnectionProviderWrapper) {
+      return ((ConnectionProviderWrapper<C>) delegate).getOwnerConfigName();
+    }
+    return empty();
   }
 
 }
