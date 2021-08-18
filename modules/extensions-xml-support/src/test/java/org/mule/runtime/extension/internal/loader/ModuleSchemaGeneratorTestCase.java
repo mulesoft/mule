@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
-import static java.io.File.separator;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreAttributeOrder;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
 import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.XSD_SUFFIX;
 
@@ -30,6 +31,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.custommonkey.xmlunit.DetailedDiff;
@@ -89,7 +91,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
       // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
       parameters.put("COMPILATION_MODE", true);
       ExtensionModel extensionModel =
-          new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, getDefault(emptySet()), parameters);
+          new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, getDefault(getDependencies()), parameters);
 
       try {
         return new Object[] {extensionModel,
@@ -100,6 +102,10 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
       }
     };
     return extensions.stream().map(stringFunction).collect(toList());
+  }
+
+  private static Set<ExtensionModel> getDependencies() {
+    return singleton(getExtensionModel());
   }
 
   @Before
