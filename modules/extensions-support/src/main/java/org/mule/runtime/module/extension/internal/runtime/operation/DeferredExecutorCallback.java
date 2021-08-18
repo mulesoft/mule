@@ -82,7 +82,8 @@ class DeferredExecutorCallback implements ExecutorCallback, AutoCloseable {
     }
   }
 
-  public synchronized void close() {
+  @Override
+  public synchronized void close() throws Exception {
     isEnabled = true;
 
     if (!isErrorCalled && !isCompleteCalled) {
