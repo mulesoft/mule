@@ -1131,6 +1131,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         componentModel,
                                         createInterceptorChain(),
                                         errorTypeRepository,
+                                        muleContext.getExecutionClassLoader(),
                                         resultTransformer);
   }
 
