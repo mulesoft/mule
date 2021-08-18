@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -134,6 +135,23 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     assertThat(errorEvent.get().getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(processor.correlationID, is(TEST_CORRELATION_ID));
     assertThat(errorEvent.get().getCorrelationId(), is(coreEvent.getCorrelationId()));
+  }
+
+  @Test
+  public void contextFinished() throws InterruptedException {
+    Reference<Boolean> finished = new Reference<>(false);
+    ((BaseEventContext) coreEvent.getContext()).onComplete((ev, t) -> {
+      if (ev != null) {
+        finished.set(true);
+      }
+    });
+    ImmutableProcessorChildContextChainExecutor chainExecutor =
+        new ImmutableProcessorChildContextChainExecutor(mock(StreamingManager.class), coreEvent, chain);
+
+    doProcessAndWait(chainExecutor, TEST_CORRELATION_ID, r -> {
+    }, (t, r) -> {
+    });
+    assertThat(finished.get(), is(true));
   }
 
 
