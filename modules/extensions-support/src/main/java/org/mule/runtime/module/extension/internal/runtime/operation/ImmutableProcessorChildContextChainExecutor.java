@@ -121,11 +121,14 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
                             LOGGER.debug("Event with correlationId '{}' going back to '{}' (successful execution) in location {}",
                                          correlationId,
                                          originalEvent.getCorrelationId(), location.getLocation());
+                            ((BaseEventContext) eventWithCorrelationId.getContext()).success(eventWithCorrelationId);
                             onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result));
                           }, (t, res) -> {
                             if (t instanceof MessagingException) {
-                              t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()), t);
+                              t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()),
+                                                         t.getCause());
                             }
+                            ((BaseEventContext) eventWithCorrelationId.getContext()).error(t);
                             LOGGER
                                 .debug("Event with correlationId '{}' going back to '{}' (unsuccessful execution) in location {}",
                                        correlationId, originalEvent.getCorrelationId(), location.getLocation());
