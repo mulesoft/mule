@@ -1501,7 +1501,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                               new MuleArtifactLoaderDescriptor(MULE_LOADER_ID,
                                                                                emptyMap()))
         .build())
-        .dependingOn(exceptionThrowingPlugin);
+        .dependingOn(callbackExtensionPlugin);
   }
 
   private ArtifactPluginFileBuilder createByeXmlPluginFileBuilder() {

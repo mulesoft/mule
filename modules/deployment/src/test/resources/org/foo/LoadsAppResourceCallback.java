@@ -30,7 +30,7 @@ public class LoadsAppResourceCallback implements EventCallback {
       throw new AssertionError("Couldn't load exported class", e);
     }
     try {
-      tccl.loadClass("org.foo.EchoTest");
+      tccl.loadClass("org.foo.echo.Plugin2Echo");
       throw new AssertionError("Could load not exported class");
     } catch (ClassNotFoundException e) {
       // expected
