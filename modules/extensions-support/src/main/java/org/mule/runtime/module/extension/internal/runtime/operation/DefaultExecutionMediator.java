@@ -16,6 +16,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -37,6 +38,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.slf4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -65,6 +67,8 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ResultTransformer resultTransformer;
   private final ClassLoader executionClassLoader;
   private final ComponentModel operationModel;
+
+  private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
 
   @FunctionalInterface
   public interface ResultTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
@@ -230,12 +234,16 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
-  private Throwable handleError(Throwable e, ExecutionContextAdapter context) {
-    e = exceptionEnricherManager.process(e);
-    e = moduleExceptionHandler.processException(e);
-    e = interceptorChain.onError(context, e);
-
-    return e;
+  private Throwable handleError(Throwable original, ExecutionContextAdapter context) {
+    try {
+      Throwable handled = exceptionEnricherManager.process(original);
+      handled = moduleExceptionHandler.processException(handled);
+      return interceptorChain.onError(context, handled);
+    } catch (Exception handlingException) {
+      // Exceptions will be logged as warnings and suppressed
+      LOGGER.warn("An exception has been thrown during the operation error handling", handlingException);
+      return original;
+    }
   }
 
   Throwable applyBeforeInterceptors(ExecutionContextAdapter context) {
