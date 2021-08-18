@@ -262,6 +262,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static File helloExtensionV1JarFile;
   protected static File loadClassExtensionJarFile;
+  protected static File callbackExtensionJarFile;
+  protected static File callbackExtensionPomFile;
+  protected static File customExceptionClassFile;
   protected static File usingObjectStoreJarFile;
 
   protected static File goodbyeExtensionV1JarFile;
@@ -287,7 +290,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                .getArtifactFile();
 
     barUtils2ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar2/BarUtils.java"));
-    barUtils2_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
+    barUtils2_0JarFile =
+        new JarFileBuilder("barUtils2",
+                           new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar"))
+                               .getArtifactFile();
 
     barUtilsJavaxClassFile = new SingleClassCompiler().compile(getResourceFile("/javax/annotation/BarUtils.java"));
     barUtilsJavaxJarFile =
@@ -335,6 +341,15 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .including(getResourceFile("/org/foo/classloading/registry-bootstrap.properties"),
                    "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-classloading-1.0.0.jar", "1.0.0");
+
+    callbackExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/callback/CallbackExtension.java"),
+                   getResourceFile("/org/foo/callback/CallbackOperation.java"))
+        .compile("mule-module-callback-1.0.0.jar", "1.0.0");
+    callbackExtensionPomFile = new JarFileBuilder("callbackExtension", callbackExtensionJarFile)
+        .getArtifactPomFile();
+    customExceptionClassFile =
+        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/exception/CustomException.java"));
 
     oracleExtensionJarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/oracle/OracleExtension.java"),
@@ -413,6 +428,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
   protected final ArtifactPluginFileBuilder oracleExtensionPlugin = createOracleExtensionPluginFileBuilder();
   protected final ArtifactPluginFileBuilder loadClassExtensionPlugin = createLoadClassExtensionPluginFileBuilder();
+  protected final ArtifactPluginFileBuilder callbackExtensionPlugin = createCallbackExtensionPluginFileBuilder();
   protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
   protected final ArtifactPluginFileBuilder byeXmlExtensionPlugin = createByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
@@ -430,6 +446,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
   protected final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
       .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
+      .dependingOn(callbackExtensionPlugin)
       .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
 
   // Domain file builders
@@ -1484,7 +1501,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                               new MuleArtifactLoaderDescriptor(MULE_LOADER_ID,
                                                                                emptyMap()))
         .build())
-        .dependingOn(exceptionThrowingPlugin);
+        .dependingOn(callbackExtensionPlugin);
   }
 
   private ArtifactPluginFileBuilder createByeXmlPluginFileBuilder() {
@@ -1602,6 +1619,21 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("loadClassExtensionPlugin-1.0.0")
         .dependingOn(new JarFileBuilder("loadClassExtension", loadClassExtensionJarFile))
+        .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private ArtifactPluginFileBuilder createCallbackExtensionPluginFileBuilder() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("callbackExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("callbackExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.callback.CallbackExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("callbackExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("callbackExtension", callbackExtensionJarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
 

@@ -35,7 +35,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void deploysDomainBundle() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .dependingOn(dummyDomainFileBuilder);
+        .dependingOn(callbackExtensionPlugin).dependingOn(dummyDomainFileBuilder);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 
@@ -86,8 +86,8 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void redeploysDomainBundle() throws Exception {
-    ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).dependingOn(dummyDomainFileBuilder);
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
+        .dependingOn(dummyDomainFileBuilder).dependingOn(callbackExtensionPlugin);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 
@@ -113,9 +113,9 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void redeploysDomainBundleCausesUndeployOfRemovedApps() throws Exception {
     ApplicationFileBuilder applicationFileBuilder1 = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .dependingOn(dummyDomainFileBuilder);
-    ApplicationFileBuilder applicationFileBuilder2 =
-        new ApplicationFileBuilder(emptyAppFileBuilder).dependingOn(dummyDomainFileBuilder);
+        .dependingOn(callbackExtensionPlugin).dependingOn(dummyDomainFileBuilder);
+    ApplicationFileBuilder applicationFileBuilder2 = new ApplicationFileBuilder(emptyAppFileBuilder)
+        .dependingOn(callbackExtensionPlugin).dependingOn(dummyDomainFileBuilder);
 
     DomainBundleFileBuilder domainBundleFileBuilder = new DomainBundleFileBuilder(dummyDomainFileBuilder)
         .containing(applicationFileBuilder1).containing(applicationFileBuilder2);
@@ -145,7 +145,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void redeploysDomainBundleWithBrokenDomain() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .dependingOn(dummyDomainFileBuilder);
+        .dependingOn(callbackExtensionPlugin).dependingOn(dummyDomainFileBuilder);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 

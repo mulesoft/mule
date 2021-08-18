@@ -4,15 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+package org.mule.runtime.module.deployment.api;
 
-package org.foo;
+public interface EventCallback {
 
-public class EchoTest {
-
-  public EchoTest() {
-  }
-
-  public String echo(String data) {
-    return "Received: " + data;
-  }
+  void eventReceived(String payload) throws Exception;
 }
