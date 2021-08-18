@@ -71,8 +71,9 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .requiresConnection(parser.isConnected())
           .transactional(parser.isTransactional())
           .supportsStreaming(parser.supportsStreaming())
-          .runsOnPrimaryNodeOnly(parser.runsOnPrimaryNodeOnly())
-          .withModelProperty(parser.getSourceFactoryModelProperty());
+          .runsOnPrimaryNodeOnly(parser.runsOnPrimaryNodeOnly());
+
+      parser.getSourceFactoryModelProperty().ifPresent(sourceDeclarer::withModelProperty);
 
       parser.getOutputType().applyOn(sourceDeclarer.withOutput());
       parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());

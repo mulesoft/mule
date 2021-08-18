@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static java.util.Objects.hash;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forFunction;
@@ -71,10 +73,15 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
   }
 
   @Override
-  public FunctionExecutorModelProperty getFunctionExecutorModelProperty() {
-    return new FunctionExecutorModelProperty(new ReflectiveFunctionExecutorFactory<>(
-                                                                                     functionElement.getDeclaringClass().get(),
-                                                                                     functionElement.getMethod().get()));
+  public Optional<FunctionExecutorModelProperty> getFunctionExecutorModelProperty() {
+    if (functionElement.getMethod().isPresent()) {
+      return of(new FunctionExecutorModelProperty(new ReflectiveFunctionExecutorFactory<>(
+                                                                                          functionElement.getDeclaringClass()
+                                                                                              .get(),
+                                                                                          functionElement.getMethod().get())));
+    } else {
+      return empty();
+    }
   }
 
   @Override
@@ -83,7 +90,8 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
   }
 
   private void collectAdditionalModelProperties() {
-    additionalModelProperties.add(new ImplementingMethodModelProperty(functionElement.getMethod().get()));
+    functionElement.getMethod().map(method -> new ImplementingMethodModelProperty(method))
+        .ifPresent(additionalModelProperties::add);
   }
 
   private void parseStructure() {

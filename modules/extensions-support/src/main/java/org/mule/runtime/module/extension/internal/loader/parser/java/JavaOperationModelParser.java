@@ -355,10 +355,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public CompletableComponentExecutorModelProperty getExecutorModelProperty() {
-    return new CompletableComponentExecutorModelProperty(
-                                                         new CompletableOperationExecutorFactory(enclosingType.getDeclaringClass()
-                                                             .get(), operationElement.getMethod().get()));
+  public Optional<CompletableComponentExecutorModelProperty> getExecutorModelProperty() {
+    return operationElement.getMethod().map(method -> new CompletableComponentExecutorModelProperty(
+                                                                                                    new CompletableOperationExecutorFactory(enclosingType
+                                                                                                        .getDeclaringClass()
+                                                                                                        .get(), method)));
   }
 
   @Override
@@ -417,7 +418,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private void collectAdditionalModelProperties() {
     additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement));
-    additionalModelProperties.add(new ImplementingMethodModelProperty(operationElement.getMethod().get()));
+    operationElement.getMethod().ifPresent(method -> additionalModelProperties.add(new ImplementingMethodModelProperty(method)));
   }
 
   @Override
