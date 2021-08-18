@@ -7,25 +7,34 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class DomainContextBuilder {
 
@@ -49,7 +58,7 @@ public class DomainContextBuilder {
   public ArtifactContext build() throws Exception {
     List<ConfigurationBuilder> builders = new ArrayList<>(3);
     ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
-    builders.add(extensionManagerWithMuleExtModelBuilder());
+    builders.add(extensionManagerWithMuleExtModelBuilder(getExtensionModels()));
     builders.add(new TestPolicyProviderConfigurationBuilder());
     builders.add(cfgBuilder);
     testServicesConfigBuilder = new TestServicesConfigurationBuilder();
@@ -81,5 +90,9 @@ public class DomainContextBuilder {
 
   private ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
     return createConfigurationBuilder(configResources, emptyMap(), DOMAIN, false, false);
+  }
+
+  protected Set<ExtensionModel> getExtensionModels() {
+    return singleton(getExtensionModel());
   }
 }
