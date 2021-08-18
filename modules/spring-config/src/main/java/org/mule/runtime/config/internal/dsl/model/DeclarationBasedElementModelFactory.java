@@ -178,6 +178,12 @@ class DeclarationBasedElementModelFactory {
     return ofNullable(elementModel.get());
   }
 
+  public <T> Optional<DslElementModel<T>> create(ComponentModel parentModel, ComponentElementDeclaration childDeclaration) {
+    return parentModel.getNestedComponents().stream()
+        .filter(nestedComponent -> nestedComponent.getName().equals(childDeclaration.getName())).findFirst()
+        .map(nestedComponentModel -> (DslElementModel<T>) createComponentElement(nestedComponentModel, childDeclaration));
+  }
+
   private <T> Optional<DslElementModel<T>> createFromType(TopLevelParameterDeclaration declaration) {
     return context.getTypeCatalog()
         .getType(declaration.getValue().getTypeId())
@@ -240,11 +246,12 @@ class DeclarationBasedElementModelFactory {
         }
 
       } else {
-        create(nestedComponentDeclaration)
-            .ifPresent(nestedComponentElement -> {
-              nestedComponentElement.getConfiguration().ifPresent(configuration::withNestedComponent);
-              componentElement.containing(nestedComponentElement);
-            });
+        DslElementModel<Object> nestedComponentElement =
+            create(nestedComponentDeclaration).orElseGet(() -> create(model, nestedComponentDeclaration).get());
+        if (nestedComponentElement != null) {
+          nestedComponentElement.getConfiguration().ifPresent(configuration::withNestedComponent);
+          componentElement.containing(nestedComponentElement);
+        }
       }
       currentExtension = componentsOwner;
       dsl = componentsDslResolver;
