@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.lang.System.getProperty;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assume.assumeThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
@@ -36,7 +33,7 @@ import org.junit.rules.ExpectedException;
 public class SpringXmlConfigurationBuilderTestCase {
 
   public static final String SCHEMA_VALIDATION_ERROR =
-    "Can't resolve http://www.mulesoft.org/schema/mule/invalid-namespace/current/invalid-schema.xsd, A dependency or plugin might be missing";
+      "Can't resolve http://www.mulesoft.org/schema/mule/invalid-namespace/current/invalid-schema.xsd, A dependency or plugin might be missing";
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
@@ -54,7 +51,8 @@ public class SpringXmlConfigurationBuilderTestCase {
     configurationBuilderWithUsedInvalidSchema =
         new SpringXmlConfigurationBuilder(new String[] {"invalid-schema.xml"}, new HashMap<>(), ArtifactType.APP, false, false);
     configurationBuilderWitUnusedInvalidSchema =
-      new SpringXmlConfigurationBuilder(new String[] {"invalid-schema-not-used.xml"}, new HashMap<>(), ArtifactType.APP, false, false);
+        new SpringXmlConfigurationBuilder(new String[] {"invalid-schema-not-used.xml"}, new HashMap<>(), ArtifactType.APP, false,
+                                          false);
   }
 
   @Test
