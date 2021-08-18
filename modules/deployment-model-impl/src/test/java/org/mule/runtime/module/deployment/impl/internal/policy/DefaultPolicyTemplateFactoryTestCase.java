@@ -23,7 +23,6 @@ import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactCl
 import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory.createPolicyTemplateCreationErrorMessage;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
-import io.qameta.allure.Issue;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -40,13 +39,14 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
@@ -120,7 +120,7 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
     PolicyTemplateClassLoaderBuilder policyTemplateClassLoaderBuilder = createPolicyTemplateClassLoaderBuilder(regionClassLoader);
 
     final String errorMessage = "Error";
-    final IOException exceptionCause = new IOException(errorMessage);
+    final Exception exceptionCause = new RuntimeException(errorMessage);
     when(policyTemplateClassLoaderBuilder.build()).thenThrow(exceptionCause);
     when(classLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(policyTemplateClassLoaderBuilder);
 
