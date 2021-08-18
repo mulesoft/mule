@@ -47,6 +47,7 @@ class TestPolicyExtensionModelDeclarer {
 
     declareProxy(extensionDeclarer);
     declareExecuteNext(extensionDeclarer);
+    declareCustomProcessor(extensionDeclarer);
 
     return extensionDeclarer;
   }
@@ -87,4 +88,14 @@ class TestPolicyExtensionModelDeclarer {
     executeNext.withOutputAttributes().ofType(ANY_TYPE);
   }
 
+  private void declareCustomProcessor(ExtensionDeclarer extensionDeclarer) {
+    OperationDeclarer executeNext = extensionDeclarer
+        .withOperation("customProcessor")
+        .withModelProperty(new NoErrorMappingModelProperty());
+
+    executeNext.withOutput().ofType(ANY_TYPE);
+    executeNext.withOutputAttributes().ofType(ANY_TYPE);
+
+    executeNext.onDefaultParameterGroup().withRequiredParameter("class").ofType(STRING_TYPE);
+  }
 }

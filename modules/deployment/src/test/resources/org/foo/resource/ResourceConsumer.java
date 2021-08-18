@@ -7,16 +7,13 @@
 
 package org.foo.resource;
 
-import org.mule.functional.api.component.EventCallback;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.deployment.api.EventCallback;
 
 import java.net.URL;
 
-public class ResourceConsumer extends AbstractComponent implements EventCallback {
+public class ResourceConsumer implements EventCallback {
 
-  public void eventReceived(CoreEvent event, Object component, MuleContext muleContext) throws Exception {
+  public void eventReceived(String payload) throws Exception {
     URL resource = this.getClass().getResource("/META-INF/app-resource.txt");
 
     if (resource == null) {

@@ -134,6 +134,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
+        .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
@@ -142,6 +143,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
         .withMinMuleVersion("4.3.0") // MULE-19127
         .definedBy("dummy-app-with-stopped-flow-config.xml")
+        .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
 
@@ -228,6 +230,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final ApplicationFileBuilder dummyAppDescriptorFileBuilderWithUpperCaseInExtension =
         appFileBuilder("dummy-app", true)
             .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
+            .dependingOn(callbackExtensionPlugin)
             .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
 
     deployAfterStartUp(dummyAppDescriptorFileBuilderWithUpperCaseInExtension);
@@ -1103,7 +1106,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipWithPlugin() throws Exception {
     final ApplicationFileBuilder echoPluginAppFileBuilder =
-        appFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").dependingOn(echoPlugin);
+        appFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml")
+            .dependingOn(callbackExtensionPlugin)
+            .dependingOn(echoPlugin);
 
     addPackedAppFromBuilder(echoPluginAppFileBuilder);
 
@@ -1206,6 +1211,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .describedBy(builder.build())
         .containingResource("module-using-javaSource.xml", moduleDestination)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile))
         .describedBy(builder.build());
 
