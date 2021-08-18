@@ -13,7 +13,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -106,7 +105,6 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
         oldContext.error(t);
       }
     });
-
     return newContext;
   }
 
