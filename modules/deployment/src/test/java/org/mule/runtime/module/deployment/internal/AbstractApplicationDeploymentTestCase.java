@@ -98,8 +98,7 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .containingClass(echoTestClassFile,
-                         "org/foo/EchoTest.class");
+        .dependingOn(callbackExtensionPlugin.containingClass(echoTestClassFile, "org/foo/EchoTest.class"));
 
     // Application plugin artifact builders
     echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
