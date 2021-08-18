@@ -57,6 +57,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -293,6 +294,14 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           return declarer.getDeclaration();
         })
         .ifPresent(declarationConsumer::accept);
+
+    component.getModel(NestedComponentModel.class)
+        .map(model -> {
+          final ConstructElementDeclarer declarer = extensionElementsDeclarer.newConstruct(model.getName());
+          declareComponentModel(component, model, declarer);
+          return declarer.getDeclaration();
+        })
+        .ifPresent(declarationConsumer::accept);
   }
 
   private MetadataType getGroupParameterType(Optional<ParameterGroupModel> messageParameterGroup, String paramName) {
@@ -503,6 +512,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           return routeDeclarer.getDeclaration();
         });
   }
+
 
   private void declareParameterizedComponent(ParameterizedModel model, DslElementSyntax elementDsl,
                                              ParameterizedElementDeclarer declarer,
