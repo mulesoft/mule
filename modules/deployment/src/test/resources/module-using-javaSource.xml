@@ -2,19 +2,15 @@
 <module name="module-using-java"
         namespace="http://www.mulesoft.org/schema/mule/module-using-java"
         xmlns="http://www.mulesoft.org/schema/mule/module"
-        xmlns:test="http://www.mulesoft.org/schema/mule/test"
-        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:callback="http://www.mulesoft.org/schema/mule/callback"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
-           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+           http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/current/mule-callback.xsd">
 
     <operation name="execute-java-class">
         <body>
-            <test:processor>
-                <test:callback class="org.foo.EchoTest"/>
-            </test:processor>
+            <callback:callback class="org.foo.EchoTest"/>
         </body>
         <output type="string"/>
     </operation>
