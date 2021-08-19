@@ -82,6 +82,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -119,9 +120,9 @@ import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
-import com.google.gson.reflect.TypeToken;
-
 import java.util.Map;
+
+import com.google.gson.reflect.TypeToken;
 
 /**
  * An {@link ExtensionDeclarer} for Mule's Core Runtime
@@ -130,6 +131,7 @@ import java.util.Map;
  */
 class MuleExtensionModelDeclarer {
 
+  static final String DEFAULT_LOG_LEVEL = "INFO";
   private static final Class<? extends ModelProperty> allowsExpressionWithoutMarkersModelPropertyClass;
   private static final ClassValueModel NOTIFICATION_CLASS_VALUE_MODEL =
       new ClassValueModel(singletonList(NotificationListener.class.getName()));
@@ -144,8 +146,6 @@ class MuleExtensionModelDeclarer {
     }
     allowsExpressionWithoutMarkersModelPropertyClass = foundClass;
   }
-
-  static final String DEFAULT_LOG_LEVEL = "INFO";
 
   final ErrorModel anyError = newError(ANY).build();
   final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
@@ -572,7 +572,8 @@ class MuleExtensionModelDeclarer {
         .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
             + " generating a message for each element.");
 
-    forEach.withChain();
+    forEach.withChain()
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
 
     ParameterDeclarer collectionParam = forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
@@ -644,7 +645,7 @@ class MuleExtensionModelDeclarer {
         .withErrorModel(routingError);
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
-    when.withChain();
+    when.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
     ParameterDeclarer expressionParam = when.onDefaultParameterGroup()
         .withRequiredParameter("expression")
         .ofType(BOOLEAN_TYPE);
@@ -659,7 +660,7 @@ class MuleExtensionModelDeclarer {
     }
 
     expressionParam.describedAs("The expression to evaluate.");
-    choice.withRoute("otherwise").withMaxOccurs(1).withChain();
+    choice.withRoute("otherwise").withMaxOccurs(1).withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer) {
@@ -679,7 +680,10 @@ class MuleExtensionModelDeclarer {
 
     flow.withOptionalComponent("source")
         .withAllowedStereotypes(MuleStereotypes.SOURCE);
-    flow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
+    flow.withChain()
+        .setRequired(true)
+        .withAllowedStereotypes(PROCESSOR)
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
     flow.withComponent("errorHandler")
         .withAllowedStereotypes(ERROR_HANDLER);
 
@@ -694,14 +698,19 @@ class MuleExtensionModelDeclarer {
         .withRequiredParameter("name")
         .asComponentId()
         .ofType(STRING_TYPE);
-    subFlow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
+    subFlow.withChain()
+        .setRequired(true)
+        .withAllowedStereotypes(PROCESSOR)
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 
   private void declareFirstSuccessful(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer firstSuccessful = extensionDeclarer.withConstruct("firstSuccessful")
         .describedAs("Sends a message to a list of message processors until one processes it successfully.");
 
-    firstSuccessful.withRoute("route").withChain();
+    firstSuccessful.withRoute("route")
+        .withChain()
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
@@ -711,7 +720,8 @@ class MuleExtensionModelDeclarer {
     roundRobin.withRoute("route")
         // it doesn't make sense for it to have less than two routes, but the XSD allows for just one.
         .withMinOccurs(1)
-        .withChain();
+        .withChain()
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -719,7 +729,10 @@ class MuleExtensionModelDeclarer {
         .describedAs("Sends the same message to multiple message processors in parallel.")
         .withErrorModel(compositeRoutingError);
 
-    scatterGather.withRoute("route").withMinOccurs(2).withChain();
+    scatterGather.withRoute("route")
+        .withMinOccurs(2)
+        .withChain()
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
 
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
