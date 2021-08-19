@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -99,8 +99,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     // then the default execution ClassLoader which may depend on the execution context.
     // This is important for cases where the extension does not belong to the region of the operation, see MULE-18159.
     final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
-    if (!executionClassLoader.equals(extensionClassLoader)) {
-      this.executionClassLoader = CompositeClassLoader.from(extensionClassLoader, executionClassLoader);
+    executionClassLoader = getExecutionRegionClassLoader(executionClassLoader);
+    if (executionClassLoader != null && !executionClassLoader.equals(extensionClassLoader)) {
+      this.executionClassLoader = from(extensionClassLoader, executionClassLoader);
     } else {
       this.executionClassLoader = extensionClassLoader;
     }
@@ -296,6 +297,17 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return ((ExecutionTemplate<T>) defaultExecutionTemplate)
           .execute(callback);
     }
+  }
+
+  private static ClassLoader getExecutionRegionClassLoader(ClassLoader classLoader) {
+    // TODO: this logic mimics what is done by the AbstractMessageProcessorChain in order to get the RegionClassLoader
+    // from an ApplicationClassLoader. This is necessary so that lookup policies are applied.
+    // In other branches this has been done "better". See MULE-19716.
+    if (ApplicationClassLoader.class.isAssignableFrom(classLoader.getClass())) {
+      return classLoader.getParent();
+    }
+
+    return null;
   }
 
   private static class TransformingExecutionCallbackDecorator<M extends ComponentModel> implements ExecutorCallback {
