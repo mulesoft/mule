@@ -418,13 +418,16 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   @Test
   @Issue("MULE-19707")
   public void testInvalidEnrichment() throws Throwable {
+    final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     expectedException.expect(ModuleException.class);
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     stubFailingComponentExecutor(operationExecutor, new ModuleException(ERROR, TestErrorTypes.UNREGISTERED_ERROR_TYPE));
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository());
+                                            muleContext.getErrorTypeRepository(),
+                                            muleContext.getExecutionClassLoader(),
+                                            failingTransformer);
     execute();
     verify(executorCallback, times(1)).error(any(ModuleException.class));
   }
