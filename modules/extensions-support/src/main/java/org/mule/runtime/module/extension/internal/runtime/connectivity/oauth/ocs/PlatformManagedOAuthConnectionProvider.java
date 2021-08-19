@@ -390,12 +390,4 @@ public class PlatformManagedOAuthConnectionProvider<C>
     }
   }
 
-  @Override
-  public Optional<String> getOwnerConfigName() {
-    if (delegate instanceof ConnectionProviderWrapper) {
-      return ((ConnectionProviderWrapper<C>) delegate).getOwnerConfigName();
-    }
-    return empty();
-  }
-
 }

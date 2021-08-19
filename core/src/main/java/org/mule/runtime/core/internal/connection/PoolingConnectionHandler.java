@@ -97,7 +97,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   @Override
   public void invalidate() {
     try {
-      LOGGER.trace("Invalidating connection {}", connection.toString());
+      LOGGER.trace("Invalidating connection {} from pool {}", connection.toString(), poolId);
       pool.invalidateObject(connection);
       logPoolStatus(LOGGER, pool, poolId);
     } catch (Exception e) {

@@ -143,6 +143,6 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void logInvalidateConnection() {
     managedConnection.invalidate();
-    verifyLogRegex(traceMessages, "Invalidating connection (.*)");
+    verifyLogRegex(traceMessages, "Invalidating connection (.*) from pool {}", poolId);
   }
 }
