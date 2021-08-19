@@ -42,11 +42,11 @@ import org.mule.tck.size.SmallTest;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.qameta.allure.Issue;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import io.qameta.allure.Issue;
 
 @SmallTest
 public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {

@@ -7,12 +7,11 @@
 package org.mule.runtime.deployment.model.api.builder;
 
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import java.io.IOException;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders required by {@link Application} artifacts
@@ -22,13 +21,14 @@ import java.io.IOException;
 public interface ApplicationClassLoaderBuilder {
 
   /**
-   * @param domain the domain artifact to which the application that is going to use this classloader belongs.
+   * @param domainArtifactClassLoader the {@link ArtifactClassLoader} of the {@link Domain} to which the application that is going
+   *                                  to use the target classloader belongs.
    * @return the builder
    */
   ApplicationClassLoaderBuilder setDomainParentClassLoader(ArtifactClassLoader domainArtifactClassLoader);
 
   /**
-   * @param artifactPluginDescriptors set of plugins descriptors that will be used by the application.
+   * @param artifactPluginDescriptors plugin descriptors that will be used by the application.
    * @return the builder
    */
   ApplicationClassLoaderBuilder addArtifactPluginDescriptors(ArtifactPluginDescriptor... artifactPluginDescriptors);
@@ -41,11 +41,10 @@ public interface ApplicationClassLoaderBuilder {
 
   /**
    * Creates a new {@code MuleDeployableArtifactClassLoader} using the provided configuration. It will create the proper class
-   * loader hierarchy and filters so application classes, resources, plugins and it's domain resources are resolve correctly.
+   * loader hierarchy and filters so that application classes, resources, plugins and its domain resources are resolve correctly.
    *
    * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
-   * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  MuleDeployableArtifactClassLoader build() throws IOException;
+  MuleDeployableArtifactClassLoader build();
 
 }

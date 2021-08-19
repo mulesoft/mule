@@ -14,8 +14,6 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
  */
 public class PolicyTemplateCreationException extends RuntimeException {
 
-  private static final long serialVersionUID = 290125840011127492L;
-
   /**
    * {@inheritDoc}
    */

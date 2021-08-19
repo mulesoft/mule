@@ -15,8 +15,6 @@ import java.util.Map;
  */
 public class DuplicateExportedPackageException extends PluginResolutionError {
 
-  private static final long serialVersionUID = 1705370167352289806L;
-
   /**
    * {@inheritDoc}
    * 

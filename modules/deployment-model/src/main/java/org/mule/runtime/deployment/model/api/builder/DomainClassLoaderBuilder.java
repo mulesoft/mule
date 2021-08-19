@@ -20,7 +20,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 public interface DomainClassLoaderBuilder {
 
   /**
-   * @param artifactPluginDescriptors set of plugins descriptors that will be used by the application.
+   * @param artifactPluginDescriptors plugin descriptors that will be used by the application.
    * @return the builder
    */
   DomainClassLoaderBuilder addArtifactPluginDescriptors(ArtifactPluginDescriptor... artifactPluginDescriptors);
