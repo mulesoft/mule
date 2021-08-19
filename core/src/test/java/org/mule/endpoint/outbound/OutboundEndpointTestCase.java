@@ -21,6 +21,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import static org.mule.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
+import static org.mule.api.transaction.TransactionConfig.ACTION_NONE;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.RequestContext;
@@ -39,6 +42,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.SecurityFilter;
+import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -54,6 +58,7 @@ import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.simple.OutboundAppendTransformer;
 import org.mule.transformer.simple.ResponseAppendTransformer;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -335,17 +340,77 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     }
 
     @Test(expected = DefaultMuleException.class)
-    public void testOutboundEndpointWithNotTransactedConnector() throws Exception
+    public void testOutboundEndpointWithTx() throws Exception
     {
         DefaultOutboundEndpoint outboundEndpoint = mock(DefaultOutboundEndpoint.class);
         MuleEvent event = mock(MuleEvent.class);
         MessageProcessor messageProcessor = mock(MessageProcessor.class);
+        TransactionConfig transactionConfig = mock(TransactionConfig.class);
 
         when(outboundEndpoint.getMessageProcessorChain(any(FlowConstruct.class))).thenReturn(messageProcessor);
         when(messageProcessor.process(any(MuleEvent.class))).thenReturn(event);
         when(outboundEndpoint.getConnector()).thenReturn(new NotTransactedTestConnector(muleContext));
         when(outboundEndpoint.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
         when(outboundEndpoint.process(any(MuleEvent.class))).thenCallRealMethod();
+        when(outboundEndpoint.getTransactionConfig()).thenReturn(transactionConfig);
+        when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_BEGIN);
+
+        outboundEndpoint.process(event);
+    }
+
+    @Test(expected = DefaultMuleException.class)
+    public void testOutboundEndpointWithJoinTx() throws Exception
+    {
+        DefaultOutboundEndpoint outboundEndpoint = mock(DefaultOutboundEndpoint.class);
+        MuleEvent event = mock(MuleEvent.class);
+        MessageProcessor messageProcessor = mock(MessageProcessor.class);
+        TransactionConfig transactionConfig = mock(TransactionConfig.class);
+
+        when(outboundEndpoint.getMessageProcessorChain(any(FlowConstruct.class))).thenReturn(messageProcessor);
+        when(messageProcessor.process(any(MuleEvent.class))).thenReturn(event);
+        when(outboundEndpoint.getConnector()).thenReturn(new NotTransactedTestConnector(muleContext));
+        when(outboundEndpoint.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
+        when(outboundEndpoint.process(any(MuleEvent.class))).thenCallRealMethod();
+        when(outboundEndpoint.getTransactionConfig()).thenReturn(transactionConfig);
+        when(transactionConfig.getAction()).thenReturn(ACTION_JOIN_IF_POSSIBLE);
+        TransactionCoordination.getInstance().bindTransaction(mock(Transaction.class));
+        outboundEndpoint.process(event);
+    }
+
+    @Test
+    public void testOutboundEndpointWithNotTransactedConnectorAndNoTx() throws Exception
+    {
+        DefaultOutboundEndpoint outboundEndpoint = mock(DefaultOutboundEndpoint.class);
+        MuleEvent event = mock(MuleEvent.class);
+        MessageProcessor messageProcessor = mock(MessageProcessor.class);
+        TransactionConfig transactionConfig = mock(TransactionConfig.class);
+
+        when(outboundEndpoint.getMessageProcessorChain(any(FlowConstruct.class))).thenReturn(messageProcessor);
+        when(messageProcessor.process(any(MuleEvent.class))).thenReturn(event);
+        when(outboundEndpoint.getConnector()).thenReturn(new NotTransactedTestConnector(muleContext));
+        when(outboundEndpoint.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
+        when(outboundEndpoint.process(any(MuleEvent.class))).thenCallRealMethod();
+        when(outboundEndpoint.getTransactionConfig()).thenReturn(transactionConfig);
+        when(transactionConfig.getAction()).thenReturn(ACTION_NONE);
+
+        outboundEndpoint.process(event);
+    }
+
+    @Test
+    public void testOutboundEndpointWithNotTransactedConnectorAndJoinTx() throws Exception
+    {
+        DefaultOutboundEndpoint outboundEndpoint = mock(DefaultOutboundEndpoint.class);
+        MuleEvent event = mock(MuleEvent.class);
+        MessageProcessor messageProcessor = mock(MessageProcessor.class);
+        TransactionConfig transactionConfig = mock(TransactionConfig.class);
+
+        when(outboundEndpoint.getMessageProcessorChain(any(FlowConstruct.class))).thenReturn(messageProcessor);
+        when(messageProcessor.process(any(MuleEvent.class))).thenReturn(event);
+        when(outboundEndpoint.getConnector()).thenReturn(new NotTransactedTestConnector(muleContext));
+        when(outboundEndpoint.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
+        when(outboundEndpoint.process(any(MuleEvent.class))).thenCallRealMethod();
+        when(outboundEndpoint.getTransactionConfig()).thenReturn(transactionConfig);
+        when(transactionConfig.getAction()).thenReturn(ACTION_JOIN_IF_POSSIBLE);
 
         outboundEndpoint.process(event);
     }
