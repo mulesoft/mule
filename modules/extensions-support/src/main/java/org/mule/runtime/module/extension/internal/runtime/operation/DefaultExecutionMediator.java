@@ -63,7 +63,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final ResultTransformer resultTransformer;
-  private final ClassLoader executionClassLoader;
+  private final ClassLoader extensionClassLoader;
   private final ComponentModel operationModel;
 
   @FunctionalInterface
@@ -74,32 +74,21 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   M operationModel,
                                   InterceptorChain interceptorChain,
-                                  ErrorTypeRepository typeRepository,
-                                  ClassLoader executionClassLoader) {
-    this(extensionModel, operationModel, interceptorChain, typeRepository, executionClassLoader, null);
+                                  ErrorTypeRepository typeRepository) {
+    this(extensionModel, operationModel, interceptorChain, typeRepository, null);
   }
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   M operationModel,
                                   InterceptorChain interceptorChain,
                                   ErrorTypeRepository typeRepository,
-                                  ClassLoader executionClassLoader,
                                   ResultTransformer resultTransformer) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
-
-    // The effective execution ClassLoader will be a composition with the extension ClassLoader being used first and
-    // then the default execution ClassLoader which may depend on the execution context.
-    // This is important for cases where the extension does not belong to the region of the operation, see MULE-18159.
-    final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
-    if (!executionClassLoader.equals(extensionClassLoader)) {
-      this.executionClassLoader = CompositeClassLoader.from(extensionClassLoader, executionClassLoader);
-    } else {
-      this.executionClassLoader = extensionClassLoader;
-    }
+    extensionClassLoader = getClassLoader(extensionModel);
   }
 
   /**
@@ -221,11 +210,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       }
       final Thread currentThread = Thread.currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      setContextClassLoader(currentThread, currentClassLoader, executionClassLoader);
+      final CompositeClassLoader compositeClassLoader = from(extensionClassLoader, currentClassLoader);
+      setContextClassLoader(currentThread, currentClassLoader, compositeClassLoader);
       try {
         executor.execute(context, callback);
       } finally {
-        setContextClassLoader(currentThread, executionClassLoader, currentClassLoader);
+        setContextClassLoader(currentThread, compositeClassLoader, currentClassLoader);
       }
     }
   }
