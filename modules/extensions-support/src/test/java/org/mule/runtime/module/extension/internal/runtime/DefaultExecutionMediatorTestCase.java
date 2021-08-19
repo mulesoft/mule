@@ -46,7 +46,6 @@ import io.qameta.allure.Issue;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -417,19 +416,20 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Test
   @Issue("MULE-19707")
-  public void testInvalidEnrichment() throws Throwable {
+  public void invalidEnrichment() throws Throwable {
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
+    ModuleException moduleException = new ModuleException(ERROR, TestErrorTypes.UNREGISTERED_ERROR_TYPE);
     expectedException.expect(ModuleException.class);
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
-    stubFailingComponentExecutor(operationExecutor, new ModuleException(ERROR, TestErrorTypes.UNREGISTERED_ERROR_TYPE));
-    mediator = new DefaultExecutionMediator(extensionModel,
-                                            operationModel,
-                                            interceptorChain,
-                                            muleContext.getErrorTypeRepository(),
-                                            muleContext.getExecutionClassLoader(),
-                                            failingTransformer);
+    stubFailingComponentExecutor(operationExecutor, moduleException);
+    mediator = new DefaultExecutionMediator<>(extensionModel,
+                                              operationModel,
+                                              interceptorChain,
+                                              muleContext.getErrorTypeRepository(),
+                                              muleContext.getExecutionClassLoader(),
+                                              failingTransformer);
     execute();
-    verify(executorCallback, times(1)).error(any(ModuleException.class));
+    verify(executorCallback, times(1)).error(moduleException);
   }
 
   @Test
