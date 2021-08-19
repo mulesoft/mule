@@ -72,7 +72,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   private ConnectionHandler<Object> connection1;
   private ConnectionHandler<Object> connection2;
-  private List<String> traceMessages;
+  private List<String> debugMessages;
   protected Logger logger;
   private Logger oldLogger;
 
@@ -83,8 +83,8 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     injector = spyInjector(muleContext);
     muleContext.start();
     resetConnectionProvider();
-    traceMessages = new ArrayList<>();
-    logger = createMockLogger(new ArrayList<>(), traceMessages);
+    debugMessages = new ArrayList<>();
+    logger = createMockLogger(debugMessages, new ArrayList<>());
     oldLogger = setLogger(PoolingConnectionManagementStrategy.class, LOGGER_FIELD_NAME, logger);
   }
 
@@ -253,10 +253,10 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
         new PoolingProfile(DEFAULT_MAX_POOL_ACTIVE, DEFAULT_MAX_POOL_IDLE, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION,
                            DEFAULT_POOL_INITIALISATION_POLICY);
     initStrategy();
-    verifyLogRegex(traceMessages, "Creating pool with ID (.*) for config {}", ownerConfigName);
-    verifyLogRegex(traceMessages, "Initializing pool (.*) with {} initial connections", DEFAULT_POOL_INITIALISATION_POLICY);
-    verifyLogRegex(traceMessages, "Created connection (.*)");
-    verifyLogRegex(traceMessages,
+    verifyLogRegex(debugMessages, "Creating pool with ID (.*) for config {}", ownerConfigName);
+    verifyLogRegex(debugMessages, "Initializing pool (.*) with {} initial connections", DEFAULT_POOL_INITIALISATION_POLICY);
+    verifyLogRegex(debugMessages, "Created connection (.*)");
+    verifyLogRegex(debugMessages,
                    "Status for pool (.*): 0 connections are active out of {} max active, {} connections are idle out of {} max idle",
                    DEFAULT_MAX_POOL_ACTIVE, DEFAULT_POOL_INITIALISATION_POLICY, DEFAULT_MAX_POOL_IDLE);
   }
@@ -268,7 +268,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
                            DEFAULT_POOL_INITIALISATION_POLICY);
     initStrategy();
     connection1 = strategy.getConnectionHandler();
-    verifyLogRegex(traceMessages, "Borrowed connection (.*) from the pool (.*)");
+    verifyLogRegex(debugMessages, "Borrowed connection (.*) from the pool (.*)");
   }
 
   @Test
@@ -279,7 +279,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     initStrategy();
     connection1 = strategy.getConnectionHandler();
     connection1.invalidate();
-    verifyLogRegex(traceMessages, "Disconnecting connection (.*)");
+    verifyLogRegex(debugMessages, "Disconnecting connection (.*)");
   }
 
   @Test
@@ -289,7 +289,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
                            DEFAULT_POOL_INITIALISATION_POLICY);
     initStrategy();
     strategy.close();
-    verifyLogRegex(traceMessages, "Closing pool (.*)");
+    verifyLogRegex(debugMessages, "Closing pool (.*)");
   }
 
   @Test
@@ -297,7 +297,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     poolingProfile =
         new PoolingProfile(-1, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, DEFAULT_POOL_INITIALISATION_POLICY);
     initStrategy();
-    verifyLogRegex(traceMessages,
+    verifyLogRegex(debugMessages,
                    "Status for pool (.*): 0 connections are active out of unlimited max active, {} connections are idle out of unlimited max idle",
                    DEFAULT_POOL_INITIALISATION_POLICY);
   }

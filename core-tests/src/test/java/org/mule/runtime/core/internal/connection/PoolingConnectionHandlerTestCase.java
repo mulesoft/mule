@@ -45,7 +45,7 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   private static final String poolId = "SomeConfigName-123";
   private static final String LOGGER_FIELD_NAME = "LOGGER";
 
-  private List<String> traceMessages;
+  private List<String> debugMessages;
   protected Logger logger;
   private Logger oldLogger;
 
@@ -69,8 +69,8 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     managedConnection = new PoolingConnectionHandler<>(connection, pool, poolId, poolingListener, connectionProvider);
-    traceMessages = new ArrayList<>();
-    logger = createMockLogger(new ArrayList<>(), traceMessages);
+    debugMessages = new ArrayList<>();
+    logger = createMockLogger(debugMessages, new ArrayList<>());
     oldLogger = setLogger(PoolingConnectionHandler.class, LOGGER_FIELD_NAME, logger);
   }
 
@@ -137,12 +137,12 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void logReleaseConnection() {
     managedConnection.release();
-    verifyLogRegex(traceMessages, "Returning connection (.*) to pool {}", poolId);
+    verifyLogRegex(debugMessages, "Returning connection (.*) to pool {}", poolId);
   }
 
   @Test
   public void logInvalidateConnection() {
     managedConnection.invalidate();
-    verifyLogRegex(traceMessages, "Invalidating connection (.*) from pool {}", poolId);
+    verifyLogRegex(debugMessages, "Invalidating connection (.*) from pool {}", poolId);
   }
 }

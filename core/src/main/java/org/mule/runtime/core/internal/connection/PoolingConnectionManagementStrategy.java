@@ -83,7 +83,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
 
   private C borrowConnection() throws Exception {
     C connection = pool.borrowObject();
-    LOGGER.trace("Borrowed connection {} from the pool {}", connection.toString(), poolId);
+    LOGGER.debug("Borrowed connection {} from the pool {}", connection.toString(), poolId);
     logPoolStatus(LOGGER, pool, poolId);
     try {
       poolingListener.onBorrow(connection);
@@ -105,7 +105,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   public void close() throws MuleException {
     try {
       logPoolStatus(LOGGER, pool, poolId);
-      LOGGER.trace("Closing pool {}", poolId);
+      LOGGER.debug("Closing pool {}", poolId);
       pool.close();
     } catch (Exception e) {
       throw new DefaultMuleException(createStaticMessage("Could not close connection pool"), e);
@@ -121,7 +121,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     config.minEvictableIdleTimeMillis = poolingProfile.getMinEvictionMillis();
     config.timeBetweenEvictionRunsMillis = poolingProfile.getEvictionCheckIntervalMillis();
     GenericObjectPool genericPool = new GenericObjectPool(new ObjectFactoryAdapter(), config);
-    LOGGER.trace("Creating pool with ID {} for config {}", poolId, ownerConfigName);
+    LOGGER.debug("Creating pool with ID {} for config {}", poolId, ownerConfigName);
 
     applyInitialisationPolicy(genericPool);
     logPoolStatus(LOGGER, genericPool, poolId);
@@ -152,7 +152,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
             + poolingProfile.getInitialisationPolicy());
     }
 
-    LOGGER.trace("Initializing pool {} with {} initial connections", poolId, initialConnections);
+    LOGGER.debug("Initializing pool {} with {} initial connections", poolId, initialConnections);
     for (int t = 0; t < initialConnections; t++) {
       try {
         pool.addObject();
@@ -171,13 +171,13 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     @Override
     public C makeObject() throws Exception {
       C connection = connectionProvider.connect();
-      LOGGER.trace("Created connection {}", connection.toString());
+      LOGGER.debug("Created connection {}", connection.toString());
       return connection;
     }
 
     @Override
     public void destroyObject(C connection) throws Exception {
-      LOGGER.trace("Disconnecting connection {}", connection.toString());
+      LOGGER.debug("Disconnecting connection {}", connection.toString());
       connectionProvider.disconnect(connection);
     }
 

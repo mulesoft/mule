@@ -72,7 +72,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
     boolean returnAttempted = false;
     try {
-      LOGGER.trace("Returning connection {} to pool {}", connection.toString(), poolId);
+      LOGGER.debug("Returning connection {} to pool {}", connection.toString(), poolId);
       poolingListener.onReturn(connection);
 
       pool.returnObject(connection);
@@ -97,7 +97,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   @Override
   public void invalidate() {
     try {
-      LOGGER.trace("Invalidating connection {} from pool {}", connection.toString(), poolId);
+      LOGGER.debug("Invalidating connection {} from pool {}", connection.toString(), poolId);
       pool.invalidateObject(connection);
       logPoolStatus(LOGGER, pool, poolId);
     } catch (Exception e) {

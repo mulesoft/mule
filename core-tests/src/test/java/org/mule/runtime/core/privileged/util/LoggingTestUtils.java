@@ -42,6 +42,7 @@ public class LoggingTestUtils {
       }
       return null;
     };
+    doAnswer(answer).when(logger).debug(anyString());
     doAnswer(answer).when(logger).debug(anyString(), (Object) any());
     doAnswer(answer).when(logger).debug(anyString(), any(), any());
     doAnswer(answer).when(logger).debug(anyString(), (Object[]) any());
