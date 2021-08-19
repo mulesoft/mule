@@ -236,6 +236,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       Throwable handled = exceptionEnricherManager.process(original);
       handled = moduleExceptionHandler.processException(handled);
       return interceptorChain.onError(context, handled);
+      // TODO: MULE-19723
     } catch (Exception handlingException) {
       // Errors will be logged and suppressed from the execution (a different error is already being handled)
       LOGGER.error("An exception has been thrown during the operation error handling", handlingException);
