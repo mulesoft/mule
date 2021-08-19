@@ -10,12 +10,12 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -37,6 +37,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.slf4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -66,6 +67,8 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ClassLoader extensionClassLoader;
   private final ComponentModel operationModel;
 
+  private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
+
   @FunctionalInterface
   public interface ResultTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
 
@@ -92,12 +95,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   }
 
   /**
-   * Executes the operation per the specification in this classes' javadoc
+   * Executes the operation per the specification in these classes javadoc
    *
    * @param executor an {@link CompletableComponentExecutor}
    * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
-   * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
+   * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invocation fails
    */
   @Override
   public void execute(CompletableComponentExecutor<M> executor,
@@ -130,8 +133,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
       @Override
       public void complete(Object value) {
-        // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
-        // Race conditions appear otherwise, specially in connection pooling scenarios.
         if (stats != null) {
           if (!isConnectedStreamingOperation(operationModel)) {
             stats.discountActiveComponent();
@@ -220,12 +221,17 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
-  private Throwable handleError(Throwable e, ExecutionContextAdapter context) {
-    e = exceptionEnricherManager.process(e);
-    e = moduleExceptionHandler.processException(e);
-    e = interceptorChain.onError(context, e);
-
-    return e;
+  private Throwable handleError(Throwable original, ExecutionContextAdapter context) {
+    try {
+      Throwable handled = exceptionEnricherManager.process(original);
+      handled = moduleExceptionHandler.processException(handled);
+      return interceptorChain.onError(context, handled);
+      // TODO: MULE-19723
+    } catch (Exception handlingException) {
+      // Errors will be logged and suppressed from the execution (a different error is already being handled)
+      LOGGER.error("An exception has been thrown during the operation error handling", handlingException);
+      return original;
+    }
   }
 
   Throwable applyBeforeInterceptors(ExecutionContextAdapter context) {
