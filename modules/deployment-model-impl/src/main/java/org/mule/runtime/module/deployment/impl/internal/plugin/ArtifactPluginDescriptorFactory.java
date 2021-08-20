@@ -13,12 +13,13 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
@@ -27,7 +28,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class ArtifactPluginDescriptorFactory
    * Creates a default factory
    */
   public ArtifactPluginDescriptorFactory() {
-    this(new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+    this(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
          ArtifactDescriptorValidatorBuilder.builder());
   }
 

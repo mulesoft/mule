@@ -28,7 +28,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -44,10 +43,12 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  // TODO MULE-19688 make the Maven client optional
   public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient) {
     super(mavenClient);
   }
 
+  // TODO MULE-19688 make the Maven client optional
   public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
     super(mavenClient, jarExplorerFactory);
   }
