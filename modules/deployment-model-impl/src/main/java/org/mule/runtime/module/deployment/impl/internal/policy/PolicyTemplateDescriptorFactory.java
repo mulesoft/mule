@@ -10,12 +10,13 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
@@ -24,7 +25,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
@@ -48,7 +48,7 @@ public class PolicyTemplateDescriptorFactory
   @SuppressWarnings({"unused"})
   public PolicyTemplateDescriptorFactory() {
     this(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-         new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+         new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
          ArtifactDescriptorValidatorBuilder.builder());
   }
 

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.artifact;
+package org.mule.runtime.deployment.model.internal.artifact;
 
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,8 +16,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository.noRegisteredLoaderError;
+import static org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository.noRegisteredLoaderError;
+
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;

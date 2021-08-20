@@ -40,16 +40,17 @@ import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLo
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
+
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -64,6 +65,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   private static final String JAR = "jar";
   private static final String POM = "pom";
 
+  // TODO MULE-19688 make the Maven client optional
   public PluginMavenClassLoaderModelLoader(MavenClient mavenClient) {
     super(mavenClient);
   }
