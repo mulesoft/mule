@@ -180,7 +180,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -193,7 +193,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -521,7 +521,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -534,7 +534,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -795,7 +795,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -808,7 +808,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -1069,7 +1069,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -1082,7 +1082,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -1382,7 +1382,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -1395,7 +1395,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -1696,7 +1696,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -1709,7 +1709,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -2021,7 +2021,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -2034,7 +2034,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -2343,7 +2343,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -2356,7 +2356,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -2696,7 +2696,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -2709,7 +2709,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {

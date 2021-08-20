@@ -126,7 +126,7 @@
                     "genericTypes": [],
                     "isMap": false
                   },
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -576,7 +576,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -589,7 +589,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -708,14 +708,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -788,7 +788,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -1149,7 +1149,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -1162,7 +1162,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -1553,7 +1553,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -1566,7 +1566,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -1685,14 +1685,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -1765,7 +1765,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -2125,7 +2125,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -2138,7 +2138,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -2257,14 +2257,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -2337,7 +2337,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -2680,7 +2680,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -2693,7 +2693,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -2812,14 +2812,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -2892,7 +2892,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -3286,7 +3286,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -3299,7 +3299,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -3418,14 +3418,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -3498,7 +3498,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -3928,7 +3928,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -3941,7 +3941,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -4060,14 +4060,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -4140,7 +4140,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -4517,14 +4517,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ObjectStreamingStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "repeatable-in-memory-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -4591,7 +4591,7 @@
                               "prefix": "ee"
                             }
                           },
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -4642,7 +4642,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "non-repeatable-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                          "infrastructureType": {},
                           "description": {
                             "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
                           }
@@ -4789,7 +4789,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -4802,7 +4802,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -4921,14 +4921,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -5001,7 +5001,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -5356,7 +5356,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -5369,7 +5369,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -5488,14 +5488,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -5568,7 +5568,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -5829,7 +5829,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -5842,7 +5842,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -5961,14 +5961,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -6041,7 +6041,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -6328,7 +6328,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -6341,7 +6341,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -6737,7 +6737,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -6750,7 +6750,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -6869,14 +6869,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -6949,7 +6949,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -7240,7 +7240,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -7267,14 +7267,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -7347,7 +7347,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -8154,7 +8154,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -8181,14 +8181,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -8261,7 +8261,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -9151,7 +9151,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -9178,14 +9178,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -9258,7 +9258,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -10063,7 +10063,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -10090,14 +10090,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -10170,7 +10170,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -10977,7 +10977,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -11004,14 +11004,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -11084,7 +11084,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -12005,7 +12005,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -12032,14 +12032,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -12112,7 +12112,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -12885,7 +12885,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "RedeliveryPolicy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -13053,14 +13053,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -13133,7 +13133,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -13422,7 +13422,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "RedeliveryPolicy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -13590,14 +13590,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -13670,7 +13670,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -13849,7 +13849,7 @@
                     "genericTypes": [],
                     "isMap": false
                   },
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -14299,7 +14299,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -14312,7 +14312,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -14431,14 +14431,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -14511,7 +14511,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -14929,7 +14929,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -14942,7 +14942,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -15061,14 +15061,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -15141,7 +15141,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -15501,7 +15501,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -15514,7 +15514,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -15633,14 +15633,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -15713,7 +15713,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -16056,7 +16056,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -16069,7 +16069,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -16188,14 +16188,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -16268,7 +16268,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -16662,7 +16662,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -16675,7 +16675,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -16794,14 +16794,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -16874,7 +16874,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -17304,7 +17304,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -17317,7 +17317,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -17436,14 +17436,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -17516,7 +17516,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -17893,14 +17893,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ObjectStreamingStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "repeatable-in-memory-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -17967,7 +17967,7 @@
                               "prefix": "ee"
                             }
                           },
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -18018,7 +18018,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "non-repeatable-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                          "infrastructureType": {},
                           "description": {
                             "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
                           }
@@ -18165,7 +18165,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -18178,7 +18178,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -18297,14 +18297,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -18377,7 +18377,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -18732,7 +18732,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -18745,7 +18745,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -18864,14 +18864,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -18944,7 +18944,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -19205,7 +19205,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -19218,7 +19218,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -19337,14 +19337,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -19417,7 +19417,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -19704,7 +19704,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -19717,7 +19717,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -20113,7 +20113,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -20126,7 +20126,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -20245,14 +20245,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -20325,7 +20325,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -20695,7 +20695,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -20722,14 +20722,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -20802,7 +20802,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -21296,7 +21296,7 @@
                     "genericTypes": [],
                     "isMap": false
                   },
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -21746,7 +21746,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -21759,7 +21759,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -21878,14 +21878,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -21958,7 +21958,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -22376,7 +22376,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -22389,7 +22389,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -22508,14 +22508,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -22588,7 +22588,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -22948,7 +22948,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -22961,7 +22961,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -23080,14 +23080,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -23160,7 +23160,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -23503,7 +23503,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -23516,7 +23516,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -23635,14 +23635,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -23715,7 +23715,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -24109,7 +24109,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -24122,7 +24122,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -24241,14 +24241,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -24321,7 +24321,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -24751,7 +24751,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -24764,7 +24764,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -24883,14 +24883,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -24963,7 +24963,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -25340,14 +25340,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ObjectStreamingStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "repeatable-in-memory-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -25414,7 +25414,7 @@
                               "prefix": "ee"
                             }
                           },
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -25465,7 +25465,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "non-repeatable-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                          "infrastructureType": {},
                           "description": {
                             "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
                           }
@@ -25612,7 +25612,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -25625,7 +25625,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -25744,14 +25744,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -25824,7 +25824,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -26179,7 +26179,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -26192,7 +26192,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -26311,14 +26311,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -26391,7 +26391,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -26652,7 +26652,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -26665,7 +26665,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -26784,14 +26784,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -26864,7 +26864,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -27151,7 +27151,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -27164,7 +27164,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -27560,7 +27560,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -27573,7 +27573,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -27692,14 +27692,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -27772,7 +27772,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -28142,7 +28142,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -28169,14 +28169,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -28249,7 +28249,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -28767,7 +28767,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -28794,14 +28794,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -28874,7 +28874,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -29657,7 +29657,7 @@
                     "genericTypes": [],
                     "isMap": false
                   },
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -30107,7 +30107,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -30120,7 +30120,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -30239,14 +30239,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -30319,7 +30319,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -30737,7 +30737,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -30750,7 +30750,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -30869,14 +30869,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -30949,7 +30949,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -31309,7 +31309,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -31322,7 +31322,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -31441,14 +31441,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -31521,7 +31521,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -31864,7 +31864,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -31877,7 +31877,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -31996,14 +31996,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -32076,7 +32076,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -32470,7 +32470,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -32483,7 +32483,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -32602,14 +32602,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -32682,7 +32682,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -33112,7 +33112,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -33125,7 +33125,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -33244,14 +33244,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -33324,7 +33324,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -33701,14 +33701,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ObjectStreamingStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "repeatable-in-memory-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -33775,7 +33775,7 @@
                               "prefix": "ee"
                             }
                           },
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -33826,7 +33826,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "non-repeatable-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                          "infrastructureType": {},
                           "description": {
                             "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
                           }
@@ -33973,7 +33973,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -33986,7 +33986,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -34105,14 +34105,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -34185,7 +34185,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -34540,7 +34540,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -34553,7 +34553,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -34672,14 +34672,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -34752,7 +34752,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -35013,7 +35013,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -35026,7 +35026,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -35145,14 +35145,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -35225,7 +35225,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -35512,7 +35512,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -35525,7 +35525,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -35921,7 +35921,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -35934,7 +35934,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -36053,14 +36053,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -36133,7 +36133,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -36509,7 +36509,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -36536,14 +36536,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -36616,7 +36616,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -36723,7 +36723,7 @@
                       "description": {
                         "value": "A pooling profile is used to configure the pooling behaviour of Mule components. Each component can have its own pooling profile."
                       },
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "typeAlias": {
                         "value": "pooling-profile"
                       }
@@ -37528,7 +37528,7 @@
                     "genericTypes": [],
                     "isMap": false
                   },
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -37978,7 +37978,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -37991,7 +37991,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -38110,14 +38110,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -38190,7 +38190,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -38608,7 +38608,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -38621,7 +38621,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -38740,14 +38740,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -38820,7 +38820,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -39180,7 +39180,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -39193,7 +39193,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -39312,14 +39312,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -39392,7 +39392,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -39735,7 +39735,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -39748,7 +39748,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -39867,14 +39867,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -39947,7 +39947,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -40341,7 +40341,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -40354,7 +40354,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -40473,14 +40473,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -40553,7 +40553,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -40983,7 +40983,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -40996,7 +40996,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -41115,14 +41115,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -41195,7 +41195,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -41572,14 +41572,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ObjectStreamingStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "repeatable-in-memory-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -41646,7 +41646,7 @@
                               "prefix": "ee"
                             }
                           },
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -41697,7 +41697,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "non-repeatable-iterable",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                          "infrastructureType": {},
                           "description": {
                             "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
                           }
@@ -41844,7 +41844,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -41857,7 +41857,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -41976,14 +41976,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -42056,7 +42056,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -42411,7 +42411,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -42424,7 +42424,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -42543,14 +42543,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -42623,7 +42623,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -42884,7 +42884,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -42897,7 +42897,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -43016,14 +43016,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -43096,7 +43096,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -43383,7 +43383,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -43396,7 +43396,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -43792,7 +43792,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -43805,7 +43805,7 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "errorMapping",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -43924,14 +43924,14 @@
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -44004,7 +44004,7 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "reconnect-forever",
-                          "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -44380,7 +44380,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -44407,14 +44407,14 @@
                           "type": "Union",
                           "annotations": {
                             "typeId": "ReconnectionStrategy",
-                            "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -44487,7 +44487,7 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "reconnect-forever",
-                                "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -45226,14 +45226,14 @@
                 "type": "Union",
                 "annotations": {
                   "typeId": "ByteStreamingStrategy",
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                  "infrastructureType": {}
                 },
                 "of": [
                   {
                     "type": "Object",
                     "annotations": {
                       "typeId": "repeatable-in-memory-stream",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -45325,7 +45325,7 @@
                           "prefix": "ee"
                         }
                       },
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -45376,7 +45376,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "non-repeatable-stream",
-                      "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                      "infrastructureType": {},
                       "description": {
                         "value": "This configuration allows the input stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
                       }
@@ -45523,7 +45523,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -45536,7 +45536,7 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "errorMapping",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
