@@ -45,11 +45,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
+
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a

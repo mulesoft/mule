@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Supplier;
 
-import com.google.common.base.Objects;
-
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
  * {@link ClassLoaderModel}
@@ -71,7 +69,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
     long stamp = lock.readLock();
     try {
       MavenConfiguration updatedMavenConfiguration = getMavenConfig();
-      if (mavenRuntimeConfig == null || !Objects.equal(mavenRuntimeConfig, updatedMavenConfiguration)) {
+      if (!updatedMavenConfiguration.equals(mavenRuntimeConfig)) {
         long writeStamp = lock.tryConvertToWriteLock(stamp);
         if (writeStamp == 0L) {
           lock.unlockRead(stamp);
@@ -79,7 +77,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
         } else {
           stamp = writeStamp;
         }
-        if (mavenRuntimeConfig == null || !Objects.equal(mavenRuntimeConfig, updatedMavenConfiguration)) {
+        if (!updatedMavenConfiguration.equals(mavenRuntimeConfig)) {
           mavenRuntimeConfig = updatedMavenConfiguration;
           createClassLoaderModelLoaders();
         }

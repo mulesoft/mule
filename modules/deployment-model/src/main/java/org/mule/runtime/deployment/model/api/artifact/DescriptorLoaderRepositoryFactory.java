@@ -17,12 +17,12 @@ import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepositor
  */
 public class DescriptorLoaderRepositoryFactory {
 
-  private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
+  private static final SpiServiceRegistry SERVICE_REGISTRY = new SpiServiceRegistry();
 
   /**
    * @return a newly created {@link DescriptorLoaderRepository} instance.
    */
   public DescriptorLoaderRepository createDescriptorLoaderRepository() {
-    return new ServiceRegistryDescriptorLoaderRepository(serviceRegistry);
+    return new ServiceRegistryDescriptorLoaderRepository(SERVICE_REGISTRY);
   }
 }
