@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
@@ -26,6 +27,7 @@ import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderMod
 
 import java.io.File;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Supplier;
 
@@ -72,7 +74,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   }
 
   private void createClassLoaderModelLoaders() {
-    MavenClient mavenClient = mavenClientProvider.get().createMavenClient(mavenRuntimeConfig);
+    Optional<MavenClient> mavenClient = ofNullable(mavenClientProvider.get().createMavenClient(mavenRuntimeConfig));
 
     deployableMavenClassLoaderModelLoader = new DeployableMavenClassLoaderModelLoader(mavenClient);
     pluginMavenClassLoaderModelLoader = new PluginMavenClassLoaderModelLoader(mavenClient);
