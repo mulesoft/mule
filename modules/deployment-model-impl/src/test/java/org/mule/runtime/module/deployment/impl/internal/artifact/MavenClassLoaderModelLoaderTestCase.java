@@ -7,10 +7,12 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.File;
 import java.net.URISyntaxException;
 
-public class MavenClassLoaderModelLoaderTestCase {
+public abstract class MavenClassLoaderModelLoaderTestCase extends AbstractMuleTestCase {
 
   protected MavenClassLoaderModelLoader mavenClassLoaderModelLoader = new MavenClassLoaderModelLoader();
 

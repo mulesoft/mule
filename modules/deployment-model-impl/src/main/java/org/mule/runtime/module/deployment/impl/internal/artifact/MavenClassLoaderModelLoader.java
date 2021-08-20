@@ -49,6 +49,28 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   private final StampedLock lock = new StampedLock();
 
+  private void refresh() {
+    long stamp = lock.readLock();
+    try {
+      MavenConfiguration updatedMavenConfiguration = getMavenConfig();
+      if (!updatedMavenConfiguration.equals(mavenRuntimeConfig)) {
+        long writeStamp = lock.tryConvertToWriteLock(stamp);
+        if (writeStamp == 0L) {
+          lock.unlockRead(stamp);
+          stamp = lock.writeLock();
+        } else {
+          stamp = writeStamp;
+        }
+        if (!updatedMavenConfiguration.equals(mavenRuntimeConfig)) {
+          mavenRuntimeConfig = updatedMavenConfiguration;
+          createClassLoaderModelLoaders();
+        }
+      }
+    } finally {
+      lock.unlock(stamp);
+    }
+  }
+
   private void createClassLoaderModelLoaders() {
     MavenClient mavenClient = mavenClientProvider.get().createMavenClient(mavenRuntimeConfig);
 
@@ -66,39 +88,23 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   @Override
   public ClassLoaderModel load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    long stamp = lock.readLock();
-    try {
-      MavenConfiguration updatedMavenConfiguration = getMavenConfig();
-      if (!updatedMavenConfiguration.equals(mavenRuntimeConfig)) {
-        long writeStamp = lock.tryConvertToWriteLock(stamp);
-        if (writeStamp == 0L) {
-          lock.unlockRead(stamp);
-          stamp = lock.writeLock();
-        } else {
-          stamp = writeStamp;
-        }
-        if (!updatedMavenConfiguration.equals(mavenRuntimeConfig)) {
-          mavenRuntimeConfig = updatedMavenConfiguration;
-          createClassLoaderModelLoaders();
-        }
-      }
+    refresh();
 
-      if (deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
-        return deployableMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
-      } else if (pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
-        return pluginMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
-      } else if (libFolderClassLoaderModelLoader.supportsArtifactType(artifactType)) {
-        return libFolderClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
-      } else {
-        throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
-      }
-    } finally {
-      lock.unlock(stamp);
+    if (deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
+      return deployableMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+    } else if (pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
+      return pluginMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+    } else if (libFolderClassLoaderModelLoader.supportsArtifactType(artifactType)) {
+      return libFolderClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+    } else {
+      throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
     }
   }
 
   @Override
   public boolean supportsArtifactType(ArtifactType artifactType) {
+    refresh();
+
     return deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)
         || pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)
         || libFolderClassLoaderModelLoader.supportsArtifactType(artifactType);
