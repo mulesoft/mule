@@ -22,6 +22,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
+import org.mule.runtime.core.internal.connection.ConfigNameResolverConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
@@ -71,6 +72,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     provider = applyConnectionProviderClassLoaderProxy(provider);
     provider = applyConnectionManagement(provider);
     provider = applyErrorHandling(provider);
+    provider = applyOwnerConfigNameResolver(provider);
 
     return new Pair<>(provider, result);
   }
@@ -88,10 +90,14 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
                                                            muleContext.getErrorTypeRepository());
   }
 
+  private ConnectionProvider<C> applyOwnerConfigNameResolver(ConnectionProvider<C> provider) {
+    return new ConfigNameResolverConnectionProviderWrapper<>(provider, ownerConfigName);
+  }
+
   private ConnectionProvider<C> applyConnectionManagement(ConnectionProvider<C> provider) {
     final ConnectionManagementType connectionManagementType = providerModel.getConnectionManagementType();
     if (connectionManagementType == POOLING) {
-      provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, reconnectionConfig, ownerConfigName);
+      provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, reconnectionConfig);
     } else {
       provider = new ReconnectableConnectionProviderWrapper<>(provider, reconnectionConfig);
     }
