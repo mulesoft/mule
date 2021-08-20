@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Arrays.asList;
-import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.instanceOf;
