@@ -452,6 +452,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -463,7 +464,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation": {}
                   },
                   "fields": [
                     {
