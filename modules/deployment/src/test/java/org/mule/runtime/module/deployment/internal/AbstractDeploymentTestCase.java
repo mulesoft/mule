@@ -46,6 +46,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -59,6 +60,7 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -107,8 +109,6 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -1126,15 +1126,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected DefaultMuleDomain createDefaultDomain() {
     DomainDescriptor descriptor = new DomainDescriptor(DEFAULT_DOMAIN_NAME);
     return new DefaultMuleDomain(descriptor,
-                                 new DomainClassLoaderFactory(getClass().getClassLoader(),
-                                                              new DefaultNativeLibraryFinderFactory())
-                                                                  .create("domain/" + DEFAULT_DOMAIN_NAME,
-                                                                          new RegionClassLoader("domainRegion", descriptor,
-                                                                                                containerClassLoader
-                                                                                                    .getClassLoader(),
-                                                                                                new MuleClassLoaderLookupPolicy(emptyMap(),
-                                                                                                                                emptySet())),
-                                                                          new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
+                                 domainClassLoaderFactory(name -> getAppDataFolder(name))
+                                     .create("domain/" + DEFAULT_DOMAIN_NAME,
+                                             new RegionClassLoader("domainRegion", descriptor,
+                                                                   containerClassLoader
+                                                                       .getClassLoader(),
+                                                                   new MuleClassLoaderLookupPolicy(emptyMap(),
+                                                                                                   emptySet())),
+                                             new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
                                  getRuntimeLockFactory());
   }

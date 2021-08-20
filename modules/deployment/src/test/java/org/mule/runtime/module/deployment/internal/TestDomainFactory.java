@@ -11,20 +11,21 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
+import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
-import org.mule.runtime.module.deployment.impl.internal.domain.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.TestDomainWrapper;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
@@ -48,8 +49,7 @@ public class TestDomainFactory extends DefaultDomainFactory {
   private boolean failOnStop;
   private boolean failOnDispose;
 
-  public static TestDomainFactory createDomainFactory(
-                                                      DomainClassLoaderFactory domainClassLoaderFactory,
+  public static TestDomainFactory createDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> deployableArtifactClassLoaderFactory,
                                                       ArtifactClassLoader containerClassLoader,
                                                       ServiceRepository serviceRepository,
                                                       ModuleRepository moduleRepository,
@@ -65,7 +65,7 @@ public class TestDomainFactory extends DefaultDomainFactory {
     PluginDependenciesResolver pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
     DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory =
-        new DomainClassLoaderBuilderFactory(containerClassLoader, domainClassLoaderFactory,
+        new DomainClassLoaderBuilderFactory(containerClassLoader, deployableArtifactClassLoaderFactory,
                                             new DefaultRegionPluginClassLoadersFactory(new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
                                                                                                                                 new ArtifactPluginClassLoaderFactory()),
                                                                                        moduleRepository));

@@ -11,11 +11,12 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
+
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -61,7 +62,8 @@ public class ToolingDomainClassLoaderBuilder extends AbstractArtifactClassLoader
    * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
    * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  public ToolingArtifactClassLoader build() throws IOException {
+  @Override
+  public ToolingArtifactClassLoader build() {
     ArtifactClassLoader domainClassLoader = super.build();
 
     ClassLoader parent = domainClassLoader.getClassLoader().getParent();

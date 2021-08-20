@@ -9,15 +9,14 @@ package org.mule.runtime.deployment.model.internal.policy;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import java.io.IOException;
 
 /**
  * Builds the class loader to use on a {@link org.mule.runtime.deployment.model.api.policy.PolicyTemplate}
@@ -52,7 +51,7 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
   }
 
   @Override
-  public MuleDeployableArtifactClassLoader build() throws IOException {
+  public MuleDeployableArtifactClassLoader build() {
     return (MuleDeployableArtifactClassLoader) super.build();
   }
 

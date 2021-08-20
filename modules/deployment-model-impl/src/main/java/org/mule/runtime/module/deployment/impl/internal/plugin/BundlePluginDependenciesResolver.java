@@ -16,9 +16,9 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUt
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesBlacklist.isBlacklisted;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.plugin.DuplicateExportedPackageException;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
+import org.mule.runtime.deployment.model.api.plugin.resolver.DuplicateExportedPackageException;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginResolutionError;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -67,9 +67,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   }
 
   @Override
-  public List<ArtifactPluginDescriptor> resolve(
-                                                Set<ArtifactPluginDescriptor> providedPluginDescriptors,
-                                                List<ArtifactPluginDescriptor> descriptors, boolean isDomain) {
+  public List<ArtifactPluginDescriptor> resolve(Set<ArtifactPluginDescriptor> providedPluginDescriptors,
+                                                List<ArtifactPluginDescriptor> descriptors, boolean isDomain)
+      throws PluginResolutionError {
 
     List<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
 

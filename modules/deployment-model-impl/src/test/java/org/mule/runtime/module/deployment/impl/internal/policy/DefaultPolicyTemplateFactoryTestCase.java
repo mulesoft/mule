@@ -23,15 +23,14 @@ import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactCl
 import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory.createPolicyTemplateCreationErrorMessage;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
-import io.qameta.allure.Issue;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -40,9 +39,10 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.qameta.allure.Issue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -120,7 +120,7 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
     PolicyTemplateClassLoaderBuilder policyTemplateClassLoaderBuilder = createPolicyTemplateClassLoaderBuilder(regionClassLoader);
 
     final String errorMessage = "Error";
-    final IOException exceptionCause = new IOException(errorMessage);
+    final Exception exceptionCause = new RuntimeException(errorMessage);
     when(policyTemplateClassLoaderBuilder.build()).thenThrow(exceptionCause);
     when(classLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(policyTemplateClassLoaderBuilder);
 

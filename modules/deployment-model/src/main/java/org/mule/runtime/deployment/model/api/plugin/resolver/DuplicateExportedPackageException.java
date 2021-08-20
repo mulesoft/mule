@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.internal.plugin;
+package org.mule.runtime.deployment.model.api.plugin.resolver;
 
 import java.util.List;
 import java.util.Map;

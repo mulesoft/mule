@@ -12,13 +12,14 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginResolutionError;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -26,11 +27,10 @@ import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import com.google.common.collect.ImmutableList;
-
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Given an {@link ArtifactPluginDescriptor} as a starting point, it will generate a {@link ArtifactClassLoader} capable of
@@ -48,7 +48,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
 
   private static final String TOOLING_EXTENSION_MODEL = "tooling-extension-model";
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
-  private ArtifactPluginDescriptor artifactPluginDescriptor;
+  private final ArtifactPluginDescriptor artifactPluginDescriptor;
   private final PluginDependenciesResolver pluginDependenciesResolver;
 
   private ArtifactClassLoader parentClassLoader;
@@ -99,7 +99,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
   }
 
   @Override
-  public ToolingArtifactClassLoader build() throws IOException {
+  public ToolingArtifactClassLoader build() {
     setArtifactDescriptor(new ArtifactDescriptor(TOOLING_EXTENSION_MODEL));
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver

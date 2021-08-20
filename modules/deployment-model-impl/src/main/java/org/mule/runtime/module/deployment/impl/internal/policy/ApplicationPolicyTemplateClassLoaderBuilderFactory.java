@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 

@@ -25,13 +25,14 @@ import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilder;
+import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -113,10 +114,9 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     when(applicationArtifactClassLoader.getArtifactId()).thenReturn(APP_ID);
 
     ApplicationClassLoaderBuilder applicationClassLoaderBuilderMock = mock(ApplicationClassLoaderBuilder.class);
-    when(applicationClassLoaderBuilderMock.setDomain(any())).thenReturn(applicationClassLoaderBuilderMock);
+    when(applicationClassLoaderBuilderMock.setDomainParentClassLoader(any())).thenReturn(applicationClassLoaderBuilderMock);
     when(applicationClassLoaderBuilderMock.setArtifactDescriptor(any()))
         .thenReturn(applicationClassLoaderBuilderMock);
-    when(applicationClassLoaderBuilderMock.setArtifactId(any())).thenReturn(applicationClassLoaderBuilderMock);
     when(applicationClassLoaderBuilderMock
         .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0])))
             .thenReturn(applicationClassLoaderBuilderMock);
@@ -138,11 +138,11 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
     verify(domainRepository, times(1)).getCompatibleDomain(any());
     verify(domainRepository, times(1)).getDomain(any());
-    verify(applicationClassLoaderBuilderMock).setDomain(domain);
+    verify(applicationClassLoaderBuilderMock)
+        .setDomainParentClassLoader((ArtifactClassLoader) domain.getArtifactClassLoader().getClassLoader().getParent());
     verify(applicationClassLoaderBuilderMock)
         .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]));
     verify(applicationClassLoaderBuilderMock).setArtifactDescriptor(descriptor);
-    verify(applicationClassLoaderBuilderMock).setArtifactId(APP_NAME);
   }
 
   private ClassLoaderModel createClassLoaderModelWithDomain() {

@@ -13,14 +13,15 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -71,7 +72,8 @@ public class ToolingApplicationClassLoaderBuilder
    * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
    * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  public ToolingArtifactClassLoader build() throws IOException {
+  @Override
+  public ToolingArtifactClassLoader build() {
     ArtifactClassLoader ownerArtifactClassLoader = super.build();
     ClassLoader parent = ownerArtifactClassLoader.getClassLoader().getParent();
     if (!(parent instanceof RegionClassLoader)) {
