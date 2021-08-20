@@ -217,7 +217,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository());
+                                            muleContext.getErrorTypeRepository(),
+                                            muleContext.getExecutionClassLoader());
 
     final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
         new ReconnectableConnectionProviderWrapper<>(null,
@@ -317,7 +318,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository());
+                                            muleContext.getErrorTypeRepository(),
+                                            muleContext.getExecutionClassLoader());
     execute();
   }
 
@@ -330,7 +332,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository());
+                                            muleContext.getErrorTypeRepository(),
+                                            muleContext.getExecutionClassLoader());
     execute();
   }
 
@@ -347,7 +350,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository(), failingTransformer);
+                                            muleContext.getErrorTypeRepository(),
+                                            muleContext.getExecutionClassLoader(),
+                                            failingTransformer);
     execute();
   }
 
@@ -364,7 +369,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            errorTypeRepository, failingTransformer);
+                                            errorTypeRepository,
+                                            muleContext.getExecutionClassLoader(),
+                                            failingTransformer);
     execute();
   }
 
@@ -380,7 +387,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository(), failingTransformer);
+                                            muleContext.getErrorTypeRepository(),
+                                            muleContext.getExecutionClassLoader(),
+                                            failingTransformer);
 
     execute();
   }
@@ -399,7 +408,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            errorTypeRepository, failingTransformer);
+                                            errorTypeRepository,
+                                            muleContext.getExecutionClassLoader(),
+                                            failingTransformer);
     execute();
   }
 
@@ -434,6 +445,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             operationModel,
                                             interceptorChain,
                                             mockErrorModel(),
+                                            muleContext.getExecutionClassLoader(),
                                             failingTransformer);
 
     try {

@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -65,7 +65,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final ResultTransformer resultTransformer;
-  private final ClassLoader extensionClassLoader;
+  private final ClassLoader executionClassLoader;
   private final ComponentModel operationModel;
 
   private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
@@ -78,21 +78,33 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   M operationModel,
                                   InterceptorChain interceptorChain,
-                                  ErrorTypeRepository typeRepository) {
-    this(extensionModel, operationModel, interceptorChain, typeRepository, null);
+                                  ErrorTypeRepository typeRepository,
+                                  ClassLoader executionClassLoader) {
+    this(extensionModel, operationModel, interceptorChain, typeRepository, executionClassLoader, null);
   }
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   M operationModel,
                                   InterceptorChain interceptorChain,
                                   ErrorTypeRepository typeRepository,
+                                  ClassLoader executionClassLoader,
                                   ResultTransformer resultTransformer) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
-    extensionClassLoader = getClassLoader(extensionModel);
+
+    // The effective execution ClassLoader will be a composition with the extension ClassLoader being used first and
+    // then the default execution ClassLoader which may depend on the execution context.
+    // This is important for cases where the extension does not belong to the region of the operation, see MULE-18159.
+    final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    executionClassLoader = getExecutionRegionClassLoader(executionClassLoader);
+    if (executionClassLoader != null && !executionClassLoader.equals(extensionClassLoader)) {
+      this.executionClassLoader = from(extensionClassLoader, executionClassLoader);
+    } else {
+      this.executionClassLoader = extensionClassLoader;
+    }
   }
 
   /**
@@ -212,12 +224,11 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       }
       final Thread currentThread = Thread.currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      final CompositeClassLoader compositeClassLoader = from(extensionClassLoader, currentClassLoader);
-      setContextClassLoader(currentThread, currentClassLoader, compositeClassLoader);
+      setContextClassLoader(currentThread, currentClassLoader, executionClassLoader);
       try {
         executor.execute(context, callback);
       } finally {
-        setContextClassLoader(currentThread, compositeClassLoader, currentClassLoader);
+        setContextClassLoader(currentThread, executionClassLoader, currentClassLoader);
       }
     }
   }
@@ -286,6 +297,17 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return ((ExecutionTemplate<T>) defaultExecutionTemplate)
           .execute(callback);
     }
+  }
+
+  private static ClassLoader getExecutionRegionClassLoader(ClassLoader classLoader) {
+    // TODO: this logic mimics what is done by the AbstractMessageProcessorChain in order to get the RegionClassLoader
+    // from an ApplicationClassLoader. This is necessary so that lookup policies are applied.
+    // In other branches this has been done "better". See MULE-19716.
+    if (ApplicationClassLoader.class.isAssignableFrom(classLoader.getClass())) {
+      return classLoader.getParent();
+    }
+
+    return null;
   }
 
   private static class TransformingExecutionCallbackDecorator<M extends ComponentModel> implements ExecutorCallback {
