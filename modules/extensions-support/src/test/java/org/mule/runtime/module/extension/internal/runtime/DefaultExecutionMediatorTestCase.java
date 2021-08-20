@@ -426,6 +426,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                               operationModel,
                                               interceptorChain,
                                               muleContext.getErrorTypeRepository(),
+                                              muleContext.getExecutionClassLoader(),
                                               failingTransformer);
     execute();
     verify(executorCallback, times(1)).error(moduleException);
