@@ -1,4 +1,18 @@
 {
+  "4.3.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.module.artifact.api.classloader.RegionClassLoader org.mule.runtime.module.artifact.api.classloader.RegionClassLoader::getNearestRegion(java.lang.ClassLoader)",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "RegionClassLoader",
+          "elementKind": "method",
+          "justification": "This method has logic necessary for a performance improvement. It only extends the API but doesn't break it. See MULE-19716."
+        }
+      ]
+    }
+  },
   "4.2.0": {
     "revapi": {
       "ignore": [

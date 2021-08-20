@@ -187,6 +187,20 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     }
   }
 
+  /**
+   * Retrieves the nearest {@link RegionClassLoader} in the ancestors chain of the given class loader (including itself).
+   * 
+   * @param classLoader A class loader.
+   * @return The nearest {@link RegionClassLoader} in the ancestors chain of the given class loader. Will be null if not found.
+   */
+  public static RegionClassLoader getNearestRegion(ClassLoader classLoader) {
+    while (classLoader != null && !(classLoader instanceof RegionClassLoader)) {
+      classLoader = classLoader.getParent();
+    }
+
+    return (RegionClassLoader) classLoader;
+  }
+
   static String illegalPackageMappingError(String p, LookupStrategy packageLookupStrategy) {
     return format("Attempt to map package '%s' which was already defined on the region lookup policy with '%s'",
                   p, packageLookupStrategy.getClass().getName());
