@@ -1,6 +1,6 @@
 {
   "name": "reconnection",
-  "description": "This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.",
+  "description": "",
   "version": "4.5.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
@@ -2746,7 +2746,7 @@
             }
           ],
           "name": "connection",
-          "description": "This class (as it\u0027s name implies) provides connection instances and the funcionality to disconnect and validate those connections. All connection related parameters (values required in order to create a connection) must be declared in the connection providers. This particular example is a PoolingConnectionProvider which declares that connections resolved by this provider will be pooled and reused. There are other implementations like CachedConnectionProvider which lazily creates and caches connections or simply ConnectionProvider if you want a new connection each time something requires one.",
+          "description": "",
           "modelProperties": {}
         }
       ],
@@ -3238,7 +3238,7 @@
             }
           ],
           "name": "FallibleReconnectableSource",
-          "description": "This class represents a Source that can fail starting repeatedly and after all reconnect successfully. Also keeps in track if multiple instances were starting at the same time.",
+          "description": "",
           "modelProperties": {},
           "kind": "source"
         },
@@ -3729,7 +3729,7 @@
             }
           ],
           "name": "NonReconnectableSource",
-          "description": "This class represents a Source that after failure never reconnects. It also keeps track of how many attempts were made.",
+          "description": "",
           "modelProperties": {},
           "kind": "source"
         },
@@ -4226,7 +4226,7 @@
         }
       ],
       "name": "config",
-      "description": "This class represents an extension configuration, values set in this class are commonly used across multiple operations since they represent something core from the extension.",
+      "description": "Default configuration",
       "modelProperties": {
         "requiredForMetadata": {
           "requiredParameters": [
@@ -5481,7 +5481,7 @@
         }
       ],
       "name": "switchConnection",
-      "description": "Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.",
+      "description": "",
       "modelProperties": {},
       "kind": "operation"
     }

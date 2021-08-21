@@ -754,7 +754,7 @@
               ],
               "semanticTerms": [],
               "name": "candidateDoors",
-              "description": "Doors I might knock on but still haven\u0027t made up mind about",
+              "description": "",
               "modelProperties": {}
             },
             {
