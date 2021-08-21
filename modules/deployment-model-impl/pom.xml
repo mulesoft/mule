@@ -46,16 +46,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-maven-client-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-maven-client-impl</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <!--for the extensions configuration builder-->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
@@ -81,16 +71,31 @@
             <artifactId>mule-module-reboot</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <version>${aetherProviderVersion}</version>
-        </dependency>
+
+        <!-- Maven support dependencies -->
         <dependency>
             <groupId>org.mule.tools.maven</groupId>
             <artifactId>mule-classloader-model</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-impl</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-util</artifactId>
+            <version>${aetherVersion}</version>
+            <!-- provided by mule-maven-client-impl, needed to compile -->
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>

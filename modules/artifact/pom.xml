@@ -29,11 +29,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-util</artifactId>
-            <version>${aetherVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-api</artifactId>
         </dependency>
         <dependency>
