@@ -250,7 +250,17 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   private int countJULKnownLevels(ClassLoader artifactClassLoader) throws Exception {
     int counter = 0;
     Class<?> knownLevelClass = loadClass(JUL_KNOWN_LEVEL_CLASS, artifactClassLoader);
-    Field levelObjectField = getField(knownLevelClass, "levelObject", false);
+    Field levelObjectField = null;
+    try {
+      levelObjectField = getField(knownLevelClass, "levelObject", false);
+    } catch (NoSuchFieldException ex) {
+      // JDK 11+ the field is not present.
+      double version = Double.parseDouble(System.getProperty("java.specification.version"));
+      if (version >= 1.11) {
+        return 0;
+      }
+      throw ex;
+    }
     levelObjectField.setAccessible(true);
     Map<?, List> nameToLevels = getStaticFieldValue(knownLevelClass, "nameToLevels", false);
     Map<?, List> intToLevels = getStaticFieldValue(knownLevelClass, "intToLevels", false);
