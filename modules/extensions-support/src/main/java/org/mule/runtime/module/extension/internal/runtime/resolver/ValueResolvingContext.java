@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -139,6 +140,7 @@ public class ValueResolvingContext implements AutoCloseable {
     private Map<String, Object> properties = new HashMap<>();
     private ExpressionManager manager;
     private boolean resolveCursors = true;
+    private ComponentLocation location;
 
     public Builder withEvent(CoreEvent event) {
       this.event = event;
@@ -157,6 +159,11 @@ public class ValueResolvingContext implements AutoCloseable {
 
     public Builder withExpressionManager(ExpressionManager manager) {
       this.manager = manager;
+      return this;
+    }
+
+    public Builder withLocation(ComponentLocation location) {
+      this.location = location;
       return this;
     }
 
@@ -182,9 +189,12 @@ public class ValueResolvingContext implements AutoCloseable {
         return new ValueResolvingContext(null, null, null, true, properties);
       } else if (manager == null) {
         return new ValueResolvingContext(event, null, config.orElse(null), resolveCursors, properties);
-      } else {
+      } else if (location == null) {
         return new ValueResolvingContext(event, manager.openSession(event.asBindingContext()), config.orElse(null),
-                                         resolveCursors, properties);
+                resolveCursors, properties);
+      } else {
+        return new ValueResolvingContext(event, manager.openSession(location, null, event.asBindingContext()),
+                config.orElse(null), resolveCursors, properties);
       }
     }
   }
