@@ -1,4 +1,34 @@
 {
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "class org.mule.maven.client.api.model.BundleDependency",
+          "classSimpleName": "BundleDependency",
+          "package": "org.mule.maven.client.api.model",
+          "elementKind": "class",
+          "justification": "MULE-19688: Need a way to allow lib clients to pass a fully build MavenClient through the MavenClientProvider."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "class org.mule.maven.client.api.model.BundleDescriptor",
+          "classSimpleName": "BundleDescriptor",
+          "package": "org.mule.maven.client.api.model",
+          "elementKind": "class",
+          "justification": "MULE-19688: Need a way to allow lib clients to pass a fully build MavenClient through the MavenClientProvider."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "enum org.mule.maven.client.api.model.BundleScope",
+          "classSimpleName": "BundleScope",
+          "package": "org.mule.maven.client.api.model",
+          "elementKind": "enum",
+          "justification": "MULE-19688: Need a way to allow lib clients to pass a fully build MavenClient through the MavenClientProvider."
+        }
+      ]
+    }
+  },
   "4.2.0": {
     "revapi": {
       "ignore": [
