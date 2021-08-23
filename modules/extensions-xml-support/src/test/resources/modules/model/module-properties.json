@@ -193,6 +193,7 @@
                     "genericTypes": [],
                     "isMap": false
                   },
+                  "infrastructureType": {},
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -523,6 +524,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -534,7 +536,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -854,6 +857,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -865,7 +869,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -1155,6 +1160,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -1166,7 +1172,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -1456,6 +1463,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -1467,7 +1475,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -1757,6 +1766,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -1768,7 +1778,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -2058,6 +2069,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -2069,7 +2081,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -2359,6 +2372,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -2370,7 +2384,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -2660,6 +2675,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -2671,7 +2687,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -2961,6 +2978,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -2972,7 +2990,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -3262,6 +3281,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -3273,7 +3293,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -3593,6 +3614,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -3604,7 +3626,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
