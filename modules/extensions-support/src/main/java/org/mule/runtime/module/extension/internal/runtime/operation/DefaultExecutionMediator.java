@@ -307,7 +307,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return classLoader.getParent();
     }
 
-    return null;
+    return classLoader;
   }
 
   private static class TransformingExecutionCallbackDecorator<M extends ComponentModel> implements ExecutorCallback {
