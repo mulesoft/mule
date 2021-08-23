@@ -8,14 +8,12 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenClientProvider;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 
 import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -29,7 +27,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.StampedLock;
-import java.util.function.Supplier;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -39,9 +36,6 @@ import java.util.function.Supplier;
  */
 // TODO MULE-11878 - consolidate with other aether usages in mule.
 public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
-
-  private static Supplier<MavenClientProvider> mavenClientProvider =
-      new LazyValue<>(() -> discoverProvider(MavenClientProvider.class.getClassLoader()));
 
   private DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader;
   private PluginMavenClassLoaderModelLoader pluginMavenClassLoaderModelLoader;
@@ -73,7 +67,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   }
 
   private void createClassLoaderModelLoaders() {
-    Optional<MavenClient> mavenClient = ofNullable(mavenClientProvider.get().createMavenClient(mavenRuntimeConfig));
+    Optional<MavenClient> mavenClient = ofNullable(getMavenClientProvider().createMavenClient(mavenRuntimeConfig));
 
     deployableMavenClassLoaderModelLoader = new DeployableMavenClassLoaderModelLoader(mavenClient);
     pluginMavenClassLoaderModelLoader = new PluginMavenClassLoaderModelLoader(mavenClient);
@@ -111,7 +105,4 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
         || libFolderClassLoaderModelLoader.supportsArtifactType(artifactType);
   }
 
-  public static void setMavenClientProvider(Supplier<MavenClientProvider> mavenClientProvider) {
-    MavenClassLoaderModelLoader.mavenClientProvider = mavenClientProvider;
-  }
 }

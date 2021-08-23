@@ -10,11 +10,13 @@ import static com.typesafe.config.ConfigFactory.invalidateCaches;
 import static com.typesafe.config.ConfigSyntax.JSON;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.globalconfig.internal.ClusterConfigBuilder.defaultClusterConfig;
 import static org.mule.runtime.globalconfig.internal.MavenConfigBuilder.defaultMavenConfig;
 
+import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.globalconfig.api.cluster.ClusterConfig;
@@ -28,6 +30,12 @@ import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigParseOptions;
+import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigResolveOptions;
+
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -35,12 +43,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigParseOptions;
-import com.typesafe.config.ConfigRenderOptions;
-import com.typesafe.config.ConfigResolveOptions;
 
 /**
  * Mule Runtime global configuration loader.
@@ -58,6 +60,9 @@ public class GlobalConfigLoader {
   private static Logger LOGGER = LoggerFactory.getLogger(GlobalConfigLoader.class);
   private static MavenConfiguration mavenConfig;
   private static ClusterConfig clusterConfig;
+
+  private static Supplier<MavenClientProvider> mavenClientProvider =
+      new LazyValue<>(() -> discoverProvider(MavenClientProvider.class.getClassLoader()));
 
   private static StampedLock lock = new StampedLock();
 
@@ -149,10 +154,14 @@ public class GlobalConfigLoader {
   }
 
   /**
-   * @return the maven configuration to use for the runtime.
+   * @return the Maven configuration to use for the runtime.
    */
   public static MavenConfiguration getMavenConfig() {
     return safelyGetConfig(() -> mavenConfig);
+  }
+
+  public static void setMavenConfig(MavenConfiguration mavenConfig) {
+    GlobalConfigLoader.mavenConfig = mavenConfig;
   }
 
   /**
@@ -181,6 +190,14 @@ public class GlobalConfigLoader {
     } finally {
       lock.unlock(stamp);
     }
+  }
+
+  public static MavenClientProvider getMavenClientProvider() {
+    return mavenClientProvider.get();
+  }
+
+  public static void setMavenClientProvider(Supplier<MavenClientProvider> mavenClientProvider) {
+    GlobalConfigLoader.mavenClientProvider = mavenClientProvider;
   }
 
 }
