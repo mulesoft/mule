@@ -9,8 +9,8 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenClientProvider;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
+import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.MavenConfiguration;
@@ -67,7 +67,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   }
 
   private void createClassLoaderModelLoaders() {
-    Optional<MavenClient> mavenClient = ofNullable(getMavenClientProvider().createMavenClient(mavenRuntimeConfig));
+    Optional<MavenClient> mavenClient = ofNullable(createMavenClient(mavenRuntimeConfig));
 
     deployableMavenClassLoaderModelLoader = new DeployableMavenClassLoaderModelLoader(mavenClient);
     pluginMavenClassLoaderModelLoader = new PluginMavenClassLoaderModelLoader(mavenClient);
