@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,10 +37,11 @@ import java.util.logging.Level;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.getAllStackTraces;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
@@ -68,7 +70,8 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   private final static String DRIVER_ARTIFACT_ID = "com.ibm.mq.allclient";
 
   String driverVersion;
-  private ClassLoaderLookupPolicy testLookupPolicy;
+  private final ClassLoaderLookupPolicy testLookupPolicy;
+  MuleArtifactClassLoader artifactClassLoader = null;
 
 
   // Parameterized
@@ -108,9 +111,9 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     };
   }
 
-  @Test
-  @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed on redeployment")
-  public void cleanUpTest() throws Exception {
+
+  @Before
+  public void setup() throws Exception {
 
     URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
     final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
@@ -129,45 +132,59 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
 
-    try (MuleArtifactClassLoader artifactClassLoader =
-        new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
-                                    new URL[] {dependency.getBundleUri().toURL()},
-                                    currentThread().getContextClassLoader(), testLookupPolicy)) {
+    artifactClassLoader = new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
+                                                      new URL[] {dependency.getBundleUri().toURL()},
+                                                      currentThread().getContextClassLoader(), testLookupPolicy);
 
-      // Driver not loaded yet. Should not cleanup on dispose.
-      Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
-      shouldReleaseIbmMQResourcesField.setAccessible(true);
+    // Force to load a Driver class so the resource releaser is flagged to run on dispose
+    Class<?> connectionFactoryClass = Class.forName(KNOWN_DRIVER_CLASS_NAME, true, artifactClassLoader);
+    Object connectionFactory = connectionFactoryClass.newInstance();
 
-      assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
+    artifactClassLoader.dispose();
 
-      // Force to load a Driver class so the resource releaser is flagged to run on dispose
-      Class<?> connectionFactoryClass = Class.forName(KNOWN_DRIVER_CLASS_NAME, true, artifactClassLoader);
-      Object connectionFactory = connectionFactoryClass.newInstance();
-      Class<?> traceClass = Class.forName("com.ibm.msg.client.commonservices.trace.Trace", true, artifactClassLoader);
+  }
 
-      // Driver loaded... should clean on dispose.
-      assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(true));
+  @Test
+  @Description("When removing an application using the IBM MQ Driver, if JDK8, the KnownLevels references should be properly cleaned up")
+  public void julKnownLevelsCleanupTest() throws Exception {
+    /*
+     * This only applies to JDK8. https://bugs.openjdk.java.net/browse/JDK-6543126
+     * https://github.com/JetBrains/jdk8u_jdk/blob/master/src/share/classes/java/util/logging/Level.java#L534
+     * https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.logging/share/classes/java/util/logging/Level.java#L563
+     */
+    assumeThat(System.getProperty("java.specification.version"), is(equalTo("1.8")));
+    assertThat(countJULKnownLevels(artifactClassLoader), is(0));
 
-      // TraceController is not null
-      assertThat(getTraceController(artifactClassLoader), is(notNullValue()));
+  }
 
+  @Test
+  @Description("When removing an application using the IBM MQ Driver, the JmquiEnv reference from traceController should be properly cleaned up.")
+  public void jmqiEnvCleanupTest() throws Exception {
+    assertThat(getJmqiEnv(artifactClassLoader), is(nullValue()));
+  }
 
-      artifactClassLoader.dispose();
+  @Test
+  @Description("When removing an application using the IBM MQ Driver, the JmsTlsClass should be properly cleaned up")
+  public void mqCxManagerCleanupTest() throws Exception {
+    assertThat(getDefaultMQCxManager(artifactClassLoader), is(nullValue()));
+  }
 
-      // JUL Known Levels
-      assertThat(countJULKnownLevels(artifactClassLoader), is(0));
-      // jmqiEnv of traceController should be null
-      assertThat(getJmqiEnv(artifactClassLoader), is(nullValue()));
-      // defaultMQCxManager of MQEnvironment should be null
-      assertThat(getDefaultMQCxManager(artifactClassLoader), is(nullValue()));
-      // myInstance field of JmsTls should be null
-      assertThat(getMyInstanceFromJmsTls(artifactClassLoader), is(nullValue()));
-      // TraceController should be null
-      assertThat(getTraceController(artifactClassLoader), is(nullValue()));
-      // no thread locals of current classLoader
-      assertThat(countThreadLocals(artifactClassLoader), is(0));
+  @Test
+  @Description("When removing an application using the IBM MQ Driver, the JmsTls Class should be properly cleaned up.")
+  public void jmsTlsCleanupTest() throws Exception {
+    assertThat(getMyInstanceFromJmsTls(artifactClassLoader), is(nullValue()));
+  }
 
-    }
+  @Test
+  @Description("When removing an application which contains the IBM MQ Driver, the TracesController bean should be removed")
+  public void traceControllerTest() throws Exception {
+    assertThat(getTraceController(artifactClassLoader), is(nullValue()));
+  }
+
+  @Test
+  @Description("When removing an application which contains the IBM MQ Driver, there should not be threadLocal references left")
+  public void threadLocalsTest() throws Exception {
+    assertThat(countThreadLocals(artifactClassLoader), is(0));
   }
 
   private int countThreadLocals(ClassLoader artifactClassLoader) throws Exception {
@@ -219,7 +236,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
 
   private Object getMyInstanceFromJmsTls(ClassLoader artifactClassLoader) throws Exception {
-    Class jmsTlsClass = loadClass(IBM_MQ_JMS_TLS_CLASS, artifactClassLoader);
+    Class<?> jmsTlsClass = loadClass(IBM_MQ_JMS_TLS_CLASS, artifactClassLoader);
     Field myInstanceField = getField(jmsTlsClass, "myInstance", false);
     myInstanceField.setAccessible(true);
     return myInstanceField.get(null);
@@ -254,11 +271,6 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     try {
       levelObjectField = getField(knownLevelClass, "levelObject", false);
     } catch (NoSuchFieldException ex) {
-      // JDK 11+ the field is not present.
-      double version = Double.parseDouble(System.getProperty("java.specification.version"));
-      if (version >= 1.11) {
-        return 0;
-      }
       throw ex;
     }
     levelObjectField.setAccessible(true);
