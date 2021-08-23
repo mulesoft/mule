@@ -317,6 +317,7 @@
                     "genericTypes": [],
                     "isMap": false
                   },
+                  "infrastructureType": {},
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -644,6 +645,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -655,7 +657,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -1007,6 +1010,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -1018,7 +1022,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -1664,6 +1669,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -1675,7 +1681,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -1918,13 +1925,15 @@
                 "format": "java",
                 "type": "Union",
                 "annotations": {
-                  "typeId": "ByteStreamingStrategy"
+                  "typeId": "ByteStreamingStrategy",
+                  "infrastructureType": {}
                 },
                 "of": [
                   {
                     "type": "Object",
                     "annotations": {
-                      "typeId": "repeatable-in-memory-stream"
+                      "typeId": "repeatable-in-memory-stream",
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -2015,7 +2024,8 @@
                           "localPart": "repeatable-file-store-stream",
                           "prefix": "ee"
                         }
-                      }
+                      },
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -2066,6 +2076,7 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "non-repeatable-stream",
+                      "infrastructureType": {},
                       "description": {
                         "value": "This configuration allows the input stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
                       }
@@ -2212,6 +2223,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -2223,7 +2235,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -2553,6 +2566,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -2564,7 +2578,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -2870,6 +2885,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -2881,7 +2897,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -3214,6 +3231,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -3225,7 +3243,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -3558,6 +3577,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -3569,7 +3589,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -3860,6 +3881,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -3871,7 +3893,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -4238,6 +4261,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -4249,7 +4273,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -4616,6 +4641,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -4627,7 +4653,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -5002,6 +5029,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -5013,7 +5041,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -5346,6 +5375,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -5357,7 +5387,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -5655,6 +5686,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -5666,7 +5698,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -5942,7 +5975,8 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "RedeliveryPolicy"
+                  "typeId": "RedeliveryPolicy",
+                  "infrastructureType": {}
                 },
                 "fields": [
                   {
