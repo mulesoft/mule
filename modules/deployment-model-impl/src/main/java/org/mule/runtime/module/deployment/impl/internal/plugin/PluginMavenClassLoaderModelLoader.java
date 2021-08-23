@@ -63,7 +63,6 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   private static final String JAR = "jar";
   private static final String POM = "pom";
 
-  // TODO MULE-19688 make the Maven client optional
   public PluginMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient) {
     super(mavenClient);
   }
@@ -89,7 +88,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
         }
       }
     }
-    // TODO Auto-generated method stub
+
     return super.createLightPackageClassLoaderModel(artifactFile, attributes, artifactType, mavenClient);
   }
 

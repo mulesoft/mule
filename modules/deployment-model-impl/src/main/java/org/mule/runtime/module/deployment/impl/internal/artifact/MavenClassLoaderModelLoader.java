@@ -38,7 +38,6 @@ import java.util.function.Supplier;
  * @since 4.0
  */
 // TODO MULE-11878 - consolidate with other aether usages in mule.
-// TODO MULE-19688 make the Maven client optional
 public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   private static Supplier<MavenClientProvider> mavenClientProvider =
