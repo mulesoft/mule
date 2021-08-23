@@ -191,10 +191,10 @@ public class ValueResolvingContext implements AutoCloseable {
         return new ValueResolvingContext(event, null, config.orElse(null), resolveCursors, properties);
       } else if (location == null) {
         return new ValueResolvingContext(event, manager.openSession(event.asBindingContext()), config.orElse(null),
-                resolveCursors, properties);
+                                         resolveCursors, properties);
       } else {
         return new ValueResolvingContext(event, manager.openSession(location, null, event.asBindingContext()),
-                config.orElse(null), resolveCursors, properties);
+                                         config.orElse(null), resolveCursors, properties);
       }
     }
   }
