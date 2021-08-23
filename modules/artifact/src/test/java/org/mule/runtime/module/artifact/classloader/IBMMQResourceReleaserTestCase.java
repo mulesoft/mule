@@ -149,7 +149,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   public void julKnownLevelsCleanupTest() throws Exception {
     /*
      * This only applies to JDK8. https://bugs.openjdk.java.net/browse/JDK-6543126
-     * https://github.com/JetBrains/jdk8u_jdk/blob/master/src/share/classes/java/util/logging/Level.java#L534
+     * https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/logging/Level.java#L534 *
      * https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.logging/share/classes/java/util/logging/Level.java#L563
      */
     assumeThat(System.getProperty("java.specification.version"), is(equalTo("1.8")));
