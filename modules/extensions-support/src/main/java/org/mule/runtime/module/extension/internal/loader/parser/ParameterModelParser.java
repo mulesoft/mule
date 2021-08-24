@@ -10,6 +10,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
@@ -99,4 +100,9 @@ public interface ParameterModelParser {
    * @return a list with {@link ModelProperty} instances.
    */
   List<ModelProperty> getAdditionalModelProperties();
+
+  /**
+   * @return the parameter's {@link DeprecationModel} if one was defined
+   */
+  Optional<DeprecationModel> getDeprecationModel();
 }

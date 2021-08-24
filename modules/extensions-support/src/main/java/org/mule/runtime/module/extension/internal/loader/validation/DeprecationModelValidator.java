@@ -101,7 +101,7 @@ public class DeprecationModelValidator implements ExtensionModelValidator {
         reportInvalidVersion(deprecationModel.getDeprecatedSince(), deprecableModel, problemsReporter, "since");
       }
       try {
-        toRemoveIn = deprecationModel.getToRemoveIn().map(toRemoveInString -> new MuleVersion(toRemoveInString)).orElse(null);
+        toRemoveIn = deprecationModel.getToRemoveIn().map(MuleVersion::new).orElse(null);
       } catch (IllegalArgumentException e) {
         deprecationModel.getToRemoveIn()
             .ifPresent(toRemoveInString -> reportInvalidVersion(toRemoveInString, deprecableModel, problemsReporter,

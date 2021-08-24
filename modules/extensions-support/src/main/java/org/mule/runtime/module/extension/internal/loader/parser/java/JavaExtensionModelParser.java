@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -135,5 +136,10 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
         .ifPresent(extensionClass -> additionalModelProperties.add(new ImplementingTypeModelProperty(extensionClass)));
 
     return additionalModelProperties;
+  }
+
+  @Override
+  public Optional<DeprecationModel> getDeprecationModel() {
+    return JavaExtensionModelParserUtils.getDeprecationModel(extensionElement);
   }
 }

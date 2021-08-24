@@ -39,6 +39,7 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
         configurationDeclarer.withModelProperty(new NoImplicitModelProperty());
       }
 
+      configParser.getDeprecationModel().ifPresent(dm -> configurationDeclarer.getDeclaration().withDeprecation(dm));
       configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
       configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
 

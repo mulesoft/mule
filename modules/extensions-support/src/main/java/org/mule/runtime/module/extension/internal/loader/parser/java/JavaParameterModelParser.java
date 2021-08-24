@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -26,11 +27,13 @@ import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -39,6 +42,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
@@ -60,6 +64,8 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * {@link ParameterModelParser} for Java based syntax
@@ -172,6 +178,38 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   @Override
+  public Optional<DeprecationModel> getDeprecationModel() {
+    Optional<Deprecated> legacyAnnotation = parameter.getAnnotation(Deprecated.class);
+    Optional<org.mule.sdk.api.annotation.deprecated.Deprecated> sdkAnnotation =
+        parameter.getAnnotation(org.mule.sdk.api.annotation.deprecated.Deprecated.class);
+
+    Optional<DeprecationModel> deprecationModel;
+    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
+      throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                parameter.getName(),
+                                                                Deprecated.class.getName(),
+                                                                org.mule.sdk.api.annotation.deprecated.Deprecated.class
+                                                                    .getName()));
+    } else if (legacyAnnotation.isPresent()) {
+      deprecationModel = legacyAnnotation
+          .map(deprecated -> {
+            String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
+            return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
+          });
+    } else if (sdkAnnotation.isPresent()) {
+      deprecationModel = sdkAnnotation
+          .map(deprecated -> {
+            String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
+            return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
+          });
+    } else {
+      deprecationModel = empty();
+    }
+
+    return deprecationModel;
+  }
+
+  @Override
   public boolean isConfigOverride() {
     return parameter.getAnnotation(ConfigOverride.class).isPresent();
   }
@@ -211,7 +249,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
           expressionSupport = NOT_SUPPORTED;
           getQName(infrastructureType.getName()).ifPresent(additionalModelProperties::add);
           InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName())
-              .ifPresent(dsl -> dslConfiguration = Optional.of(dsl));
+              .ifPresent(dsl -> dslConfiguration = of(dsl));
         }
       });
     }

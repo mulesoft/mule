@@ -10,6 +10,7 @@ import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
@@ -103,4 +104,8 @@ public interface ExtensionModelParser {
    */
   List<ModelProperty> getAdditionalModelProperties();
 
+  /**
+   * @return the extension's {@link DeprecationModel} if one was defined
+   */
+  Optional<DeprecationModel> getDeprecationModel();
 }

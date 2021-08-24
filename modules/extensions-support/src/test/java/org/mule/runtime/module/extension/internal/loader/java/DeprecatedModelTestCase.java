@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.enricher;
+package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,20 +43,17 @@ import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
 
 import org.junit.Test;
 
-public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase {
-
-  private DeprecationModelDeclarationEnricher enricher = new DeprecationModelDeclarationEnricher();
+public class DeprecatedModelTestCase extends AbstractMuleTestCase {
 
   @Test
   public void nonDeprecatedOperationTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "nonDeprecatedOperation");
     assertFalse(operationDeclaration.getDeprecation().isPresent());
@@ -64,7 +61,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void deprecatedOperationTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "deprecatedOperation");
     assertTrue(operationDeclaration.getDeprecation().isPresent());
@@ -75,7 +72,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nonDeprecatedSourceTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     SourceDeclaration sourceDeclaration =
         (SourceDeclaration) getNamedDeclaration(extensionDeclaration.getMessageSources(), "NonDeprecatedSource");
     assertFalse(sourceDeclaration.getDeprecation().isPresent());
@@ -83,7 +80,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void deprecatedSourceTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     SourceDeclaration sourceDeclaration =
         (SourceDeclaration) getNamedDeclaration(extensionDeclaration.getMessageSources(), "DeprecatedSource");
     assertTrue(sourceDeclaration.getDeprecation().isPresent());
@@ -95,7 +92,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nonDeprecatedParameterTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "nonDeprecatedOperation");
     ParameterDeclaration parameterDeclaration =
@@ -105,7 +102,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void deprecatedParameterTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "nonDeprecatedOperation");
     ParameterDeclaration parameterDeclaration =
@@ -118,7 +115,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nonDeprecatedScopeTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "nonDeprecatedScope");
     assertFalse(operationDeclaration.getDeprecation().isPresent());
@@ -126,7 +123,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void deprecatedScopeTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "deprecatedScope");
     assertTrue(operationDeclaration.getDeprecation().isPresent());
@@ -137,7 +134,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nonDeprecatedRouterTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     ConstructDeclaration constructDeclaration =
         (ConstructDeclaration) getNamedDeclaration(extensionDeclaration.getConstructs(), "nonDeprecatedRouter");
     assertFalse(constructDeclaration.getDeprecation().isPresent());
@@ -145,7 +142,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void deprecatedRouterTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     ConstructDeclaration constructDeclaration =
         (ConstructDeclaration) getNamedDeclaration(extensionDeclaration.getConstructs(), "deprecatedRouter");
     assertTrue(constructDeclaration.getDeprecation().isPresent());
@@ -157,7 +154,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nonDeprecatedFunctionTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     FunctionDeclaration functionDeclaration =
         (FunctionDeclaration) getNamedDeclaration(extensionDeclaration.getFunctions(), "nonDeprecatedFunction");
     assertFalse(functionDeclaration.getDeprecation().isPresent());
@@ -165,7 +162,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void deprecatedFunctionTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     FunctionDeclaration functionDeclaration =
         (FunctionDeclaration) getNamedDeclaration(extensionDeclaration.getFunctions(), "deprecatedFunction");
     assertTrue(functionDeclaration.getDeprecation().isPresent());
@@ -176,13 +173,13 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nonDeprecatedExtensionTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(NonDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(NonDeprecatedExtension.class);
     assertFalse(extensionDeclaration.getDeprecation().isPresent());
   }
 
   @Test
   public void deprecatedExtensionTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     assertTrue(extensionDeclaration.getDeprecation().isPresent());
     assertThat(extensionDeclaration.getDeprecation().get().getMessage(), is("This extension is deprecated"));
     assertThat(extensionDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.2.0"));
@@ -191,14 +188,14 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nonDeprecatedConfigurationTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(1);
     assertFalse(configurationDeclaration.getDeprecation().isPresent());
   }
 
   @Test
   public void deprecatedConfigurationTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertTrue(configurationDeclaration.getDeprecation().isPresent());
     assertThat(configurationDeclaration.getDeprecation().get().getMessage(), is("This configuration is deprecated."));
@@ -208,7 +205,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nonDeprecatedConnectionProviderTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(1);
     ConnectionProviderDeclaration connectionProviderDeclaration = configurationDeclaration.getConnectionProviders().get(1);
     assertFalse(connectionProviderDeclaration.getDeprecation().isPresent());
@@ -216,7 +213,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void deprecatedConnectionProviderTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(DeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
     ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(1);
     ConnectionProviderDeclaration connectionProviderDeclaration = configurationDeclaration.getConnectionProviders().get(0);
     assertTrue(connectionProviderDeclaration.getDeprecation().isPresent());
@@ -229,7 +226,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedOperationTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "sdkDeprecatedOperation");
     assertTrue(operationDeclaration.getDeprecation().isPresent());
@@ -240,7 +237,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedSourceTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     SourceDeclaration sourceDeclaration =
         (SourceDeclaration) getNamedDeclaration(extensionDeclaration.getMessageSources(), "SdkDeprecatedSource");
     assertTrue(sourceDeclaration.getDeprecation().isPresent());
@@ -252,7 +249,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedParameterTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "sdkNonDeprecatedOperation");
     ParameterDeclaration parameterDeclaration =
@@ -265,7 +262,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedScopeTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     OperationDeclaration operationDeclaration =
         (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "sdkDeprecatedScope");
     assertTrue(operationDeclaration.getDeprecation().isPresent());
@@ -276,7 +273,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedRouterTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     ConstructDeclaration constructDeclaration =
         (ConstructDeclaration) getNamedDeclaration(extensionDeclaration.getConstructs(), "sdkDeprecatedRouter");
     assertTrue(constructDeclaration.getDeprecation().isPresent());
@@ -288,7 +285,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedFunctionTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     FunctionDeclaration functionDeclaration =
         (FunctionDeclaration) getNamedDeclaration(extensionDeclaration.getFunctions(), "sdkDeprecatedFunction");
     assertTrue(functionDeclaration.getDeprecation().isPresent());
@@ -299,7 +296,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedExtensionTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     assertTrue(extensionDeclaration.getDeprecation().isPresent());
     assertThat(extensionDeclaration.getDeprecation().get().getMessage(), is("This extension is deprecated"));
     assertThat(extensionDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.2.0"));
@@ -308,7 +305,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedConfigurationTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertTrue(configurationDeclaration.getDeprecation().isPresent());
     assertThat(configurationDeclaration.getDeprecation().get().getMessage(), is("This configuration is deprecated."));
@@ -318,7 +315,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   @Test
   public void sdkDeprecatedConnectionProviderTestCase() {
-    ExtensionDeclaration extensionDeclaration = getEnrichedExtensionDeclaration(SdkDeprecatedExtension.class);
+    ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
     ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(1);
     ConnectionProviderDeclaration connectionProviderDeclaration = configurationDeclaration.getConnectionProviders().get(0);
     assertTrue(connectionProviderDeclaration.getDeprecation().isPresent());
@@ -329,10 +326,9 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertThat(connectionProviderDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
   }
 
-  private ExtensionDeclaration getEnrichedExtensionDeclaration(Class<?> extensionClass) {
+  private ExtensionDeclaration getExtensionDeclaration(Class<?> extensionClass) {
     ExtensionDeclarer declarer = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev")
         .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
-    enricher.enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));
     return declarer.getDeclaration();
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
 import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
@@ -41,6 +42,9 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
           .describedAs(parser.getDescription())
           .withConnectionManagementType(parser.getConnectionManagementType())
           .supportsConnectivityTesting(parser.supportsConnectivityTesting());
+
+      ConnectionProviderDeclaration ConnectionProviderDeclaration = providerDeclarer.getDeclaration();
+      parser.getDeprecationModel().ifPresent(ConnectionProviderDeclaration::withDeprecation);
 
       parser.getConnectionProviderFactoryModelProperty().ifPresent(providerDeclarer::withModelProperty);
 
