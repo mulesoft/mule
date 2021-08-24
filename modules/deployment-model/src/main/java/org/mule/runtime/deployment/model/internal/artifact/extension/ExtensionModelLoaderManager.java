@@ -5,10 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.extension.internal.loader;
+package org.mule.runtime.deployment.model.internal.artifact.extension;
 
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 
 /**
  * Manages the lifecycle of the {@link org.mule.runtime.extension.api.loader.ExtensionModelLoader} available in the

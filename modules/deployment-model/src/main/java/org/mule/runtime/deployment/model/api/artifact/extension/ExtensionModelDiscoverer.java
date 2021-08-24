@@ -5,30 +5,30 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.artifact;
+package org.mule.runtime.deployment.model.api.artifact.extension;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Discover the {@link ExtensionModel} based on the {@link ExtensionModelLoader} type.

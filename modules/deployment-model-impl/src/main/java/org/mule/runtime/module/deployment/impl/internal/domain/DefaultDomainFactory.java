@@ -26,11 +26,11 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;

@@ -47,6 +47,7 @@ import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -58,7 +59,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainMuleContext
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.File;
 import java.util.ArrayList;

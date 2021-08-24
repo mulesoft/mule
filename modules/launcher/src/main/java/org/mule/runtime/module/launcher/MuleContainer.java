@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
+import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
@@ -37,7 +38,6 @@ import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInit
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;

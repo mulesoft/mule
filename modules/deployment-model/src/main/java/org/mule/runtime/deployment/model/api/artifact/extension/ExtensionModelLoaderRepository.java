@@ -5,20 +5,31 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.extension.internal.loader;
+package org.mule.runtime.deployment.model.api.artifact.extension;
 
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
+import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.util.Optional;
 
 /**
  * Provides access to the {@link ExtensionModelLoader} available in the container.
  *
- * @since 4.0
+ * @since 4.0, moved to api in 4.5
  */
 @FunctionalInterface
 public interface ExtensionModelLoaderRepository {
+
+  /**
+   * @return a repository that manages the lifecycle of the {@link ExtensionModelLoader} available in the
+   *         {@link ExtensionModelLoaderRepository}.
+   * @since 4.5
+   */
+  public static ExtensionModelLoaderRepository getExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader) {
+    return new MuleExtensionModelLoaderManager(containerClassLoader);
+  }
 
   /**
    * Retrieves the {@link ExtensionModelLoader} for the given {@link LoaderDescriber}.

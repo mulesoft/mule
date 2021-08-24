@@ -15,6 +15,7 @@ import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
@@ -32,7 +33,6 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.File;
 import java.io.IOException;

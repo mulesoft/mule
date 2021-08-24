@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.plugin;
+package org.mule.runtime.deployment.model.internal.artifact.extension;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 
 import java.util.Collection;
 import java.util.Map;
