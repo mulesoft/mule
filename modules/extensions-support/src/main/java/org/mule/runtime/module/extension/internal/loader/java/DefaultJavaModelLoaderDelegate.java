@@ -61,7 +61,8 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .onVersion(version)
             .fromVendor(parser.getVendor())
             .withCategory(parser.getCategory())
-            .withModelProperty(parser.getLicenseModelProperty());
+            .withModelProperty(parser.getLicenseModelProperty())
+            .withXmlDsl(parser.getXmlDslModel());
 
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")

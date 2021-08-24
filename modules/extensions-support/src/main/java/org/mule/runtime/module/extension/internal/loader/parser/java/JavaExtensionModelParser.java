@@ -6,17 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
 
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -141,5 +149,34 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
     return JavaExtensionModelParserUtils.getDeprecationModel(extensionElement);
+  }
+
+  @Override
+  public XmlDslModel getXmlDslModel() {
+    String extensionName = extensionElement.getName();
+    String extensionVersion = loadingContext.getExtensionDeclarer().getDeclaration().getVersion();
+    Optional<String> prefix;
+    Optional<String> namespace;
+
+    Optional<Xml> legacyXmlAnnotation = extensionElement.getAnnotation(Xml.class);
+    Optional<org.mule.sdk.api.annotation.dsl.xml.Xml> sdkXmlAnnotation =
+        extensionElement.getAnnotation(org.mule.sdk.api.annotation.dsl.xml.Xml.class);
+
+    if (legacyXmlAnnotation.isPresent() && sdkXmlAnnotation.isPresent()) {
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on the extension",
+                                                       Xml.class.getName(),
+                                                       org.mule.sdk.api.annotation.dsl.xml.Xml.class.getName()));
+    } else if (legacyXmlAnnotation.isPresent()) {
+      prefix = of(legacyXmlAnnotation.get().prefix());
+      namespace = of(legacyXmlAnnotation.get().namespace());
+    } else if (sdkXmlAnnotation.isPresent()) {
+      prefix = of(sdkXmlAnnotation.get().prefix());
+      namespace = of(sdkXmlAnnotation.get().namespace());
+    } else {
+      prefix = empty();
+      namespace = empty();
+    }
+
+    return createXmlLanguageModel(prefix, namespace, extensionName, extensionVersion);
   }
 }
