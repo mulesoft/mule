@@ -19,6 +19,7 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidBundleDescriptorLoaderIdError;
@@ -38,6 +39,7 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
@@ -73,7 +75,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   private final ClassLoaderFilterFactory classLoaderFilterFactory = mock(ClassLoaderFilterFactory.class);
   private final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
-  private ArtifactPluginDescriptorFactory descriptorFactory;
+  private AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> descriptorFactory;
   private final MavenClientProvider mavenClientProvider =
       MavenClientProvider.discoverProvider(ArtifactPluginDescriptorFactoryTestCase.class.getClassLoader());
 
@@ -102,7 +104,8 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
 
     descriptorFactory =
-        new ArtifactPluginDescriptorFactory(descriptorLoaderRepository, ArtifactDescriptorValidatorBuilder.builder());
+        artifactDescriptorFactoryProvider()
+            .createArtifactPluginDescriptorFactory(descriptorLoaderRepository, ArtifactDescriptorValidatorBuilder.builder());
   }
 
   @Test

@@ -37,6 +37,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -148,7 +150,8 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     latestEchoPlugin.setBundleDescriptor(LATEST_ECHO_BUNDLE_DESCRIPTOR);
 
     artifactDescriptorFactory = mock(ArtifactDescriptorFactory.class);
-    dependenciesResolver = new BundlePluginDependenciesResolver(artifactDescriptorFactory);
+    dependenciesResolver =
+        new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactDescriptorFactory);
   }
 
   private static ArtifactPluginDescriptor newArtifactPluginDescriptor(String name) {

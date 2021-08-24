@@ -9,6 +9,7 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
+import static org.mule.runtime.container.api.ContainerClassLoaderFactoryProvider.createContainerClassLoader;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -169,9 +169,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   @Override
   protected ClassLoader getExecutionClassLoader() {
     if (!isDisposeContextPerClass() || executionClassLoader == null) {
-      executionClassLoader =
-          new ContainerClassLoaderFactory(new FunctionalTestModuleRepository())
-              .createContainerClassLoader(getClass().getClassLoader());
+      executionClassLoader = createContainerClassLoader(new FunctionalTestModuleRepository(), getClass().getClassLoader());
     }
 
     return executionClassLoader.getClassLoader();
