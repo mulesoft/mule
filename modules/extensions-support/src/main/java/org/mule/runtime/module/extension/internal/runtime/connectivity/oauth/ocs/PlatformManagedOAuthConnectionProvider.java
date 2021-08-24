@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.oc
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -337,6 +338,11 @@ public class PlatformManagedOAuthConnectionProvider<C>
   @Override
   public Optional<ReconnectionConfig> getReconnectionConfig() {
     return ofNullable(reconnectionConfig);
+  }
+
+  @Override
+  public Optional<String> getOwnerConfigName() {
+    return ofNullable(this.oauthConfig.getOwnerConfigName());
   }
 
   @Override

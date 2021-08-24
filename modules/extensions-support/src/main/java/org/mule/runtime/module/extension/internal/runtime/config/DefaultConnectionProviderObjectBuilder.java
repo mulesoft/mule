@@ -69,10 +69,10 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     ConnectionProvider<C> provider = doBuild(result);
 
     muleContext.getInjector().inject(provider);
-    provider = applyOwnerConfigNameResolver(provider);
     provider = applyConnectionProviderClassLoaderProxy(provider);
     provider = applyConnectionManagement(provider);
     provider = applyErrorHandling(provider);
+    provider = applyOwnerConfigNameResolver(provider);
 
     return new Pair<>(provider, result);
   }
@@ -91,7 +91,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   }
 
   private ConnectionProvider<C> applyOwnerConfigNameResolver(ConnectionProvider<C> provider) {
-    return new ConfigNameResolverConnectionProviderWrapper<>(provider, ownerConfigName);
+    return new ConfigNameResolverConnectionProviderWrapper<>(provider, reconnectionConfig, ownerConfigName);
   }
 
   private ConnectionProvider<C> applyConnectionManagement(ConnectionProvider<C> provider) {
