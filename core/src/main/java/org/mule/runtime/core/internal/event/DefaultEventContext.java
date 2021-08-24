@@ -19,6 +19,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
@@ -324,7 +325,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private transient BaseEventContext root;
     private final BaseEventContext parent;
     private final ComponentLocation componentLocation;
-    private final String id;
+    private final LazyValue<String> id;
     private final String correlationId;
     private final String rootId;
 
@@ -335,9 +336,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.root = parent.getRootContext();
       this.parent = parent;
       this.componentLocation = componentLocation;
-      this.id = parent.getId() != null
+      this.id = new LazyValue<>(() -> parent.getId() != null
           ? parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)))
-          : Integer.toString(identityHashCode(this));
+          : Integer.toString(identityHashCode(this)));
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
     }
@@ -349,7 +350,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public String getId() {
-      return id;
+      return id.get();
     }
 
     @Override

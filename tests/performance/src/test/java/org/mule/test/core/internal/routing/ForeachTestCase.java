@@ -8,11 +8,16 @@ package org.mule.test.core.internal.routing;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.mule.AbstractBenchmarkAssertionTestCase;
 import org.mule.runtime.core.internal.routing.ForeachBenchmark;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 public class ForeachTestCase extends AbstractBenchmarkAssertionTestCase {
+
+  @Rule
+  public SystemProperty perfMode = new SystemProperty("enablePerformanceTests", "true");
 
   @Test
   public void singleForeach() {
