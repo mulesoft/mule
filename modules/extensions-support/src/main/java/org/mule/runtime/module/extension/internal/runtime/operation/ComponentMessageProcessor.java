@@ -1243,7 +1243,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
         .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, componentDecoratorFactory)
-        .withConfig(configuration).build()) {
+        .withConfig(configuration)
+        .withLocation(getLocation()).build()) {
       return resolverSet.resolve(context).asMap();
     }
   }
