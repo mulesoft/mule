@@ -163,6 +163,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
+    initialiseIfNeeded(processingStrategy, muleContext);
     startIfNeeded(processingStrategy);
     startIfNeeded(delegate);
 
