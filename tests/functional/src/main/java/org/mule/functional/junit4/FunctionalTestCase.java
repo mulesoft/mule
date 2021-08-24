@@ -9,7 +9,7 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
-import static org.mule.runtime.container.api.ContainerClassLoaderFactoryProvider.createContainerClassLoader;
+import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;

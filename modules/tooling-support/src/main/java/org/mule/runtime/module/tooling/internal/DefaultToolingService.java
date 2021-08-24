@@ -206,7 +206,6 @@ public class DefaultToolingService implements ToolingService {
     return builder;
   }
 
-
   /**
    * {@inheritDoc}
    */

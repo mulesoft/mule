@@ -16,18 +16,33 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import java.io.File;
 
 /**
- * 
+ * Provides a way to create {@link ArtifactClassLoader} for a Mule Runtime container.
  * 
  * @since 4.5
  */
-public class ContainerClassLoaderFactoryProvider {
+public class ContainerClassLoaderProvider {
 
+  /**
+   * Creates a ModuleRepository based on the modules available on the provided {@code classloader}.
+   * 
+   * @param classLoader     where to look for modules.
+   * @param temporaryFolder
+   * @return
+   */
   public static ModuleRepository createModuleRepository(ClassLoader classLoader, File temporaryFolder) {
     return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
                                                                      new ClasspathModuleDiscoverer(classLoader,
                                                                                                    temporaryFolder)));
   }
 
+  /**
+   * Creates the classLoader to represent the Mule container.
+   *
+   * @param moduleRepository  provides access to the modules available on the container. Non null.
+   * @param parentClassLoader parent classLoader. Can be null.
+   * @return a non null {@link ArtifactClassLoader} containing container code that can be used as parent classloader for other
+   *         mule artifacts.
+   */
   public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassloader) {
     return new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(parentClassloader);
 

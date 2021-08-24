@@ -21,6 +21,11 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver;
 
+/**
+ * Implementation of {@link ArtifactDescriptorFactoryProvider} discoverable through SPI.
+ * 
+ * @since 4.5
+ */
 public class DefaultArtifactDescriptorFactoryProvider implements ArtifactDescriptorFactoryProvider {
 
   @Override
