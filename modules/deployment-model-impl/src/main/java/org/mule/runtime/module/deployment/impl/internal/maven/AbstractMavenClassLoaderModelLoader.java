@@ -144,7 +144,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     } else {
       return createLightPackageClassLoaderModel(artifactFile, attributes, artifactType,
                                                 mavenClient
-                                                    .orElseThrow(() -> new UnsupportedOperationException("A MavenClient must be provided in order to handle lighweight packages.")));
+                                                    .orElseThrow(() -> new UnsupportedOperationException("A MavenClient must be provided in order to handle lightweight packages.")));
     }
   }
 
