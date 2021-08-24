@@ -13,6 +13,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.contains;
@@ -69,7 +70,9 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import io.qameta.allure.Description;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -463,7 +466,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
                                                  Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
     DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mockMavenClient, supplier);
+        new DeployableMavenClassLoaderModelLoader(of(mockMavenClient), supplier);
 
     Map<String, Object> mergedAttributes =
         ImmutableMap.<String, Object>builder()
@@ -483,7 +486,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   public ClassLoaderModel buildPluginClassLoaderModel(File pluginLocation, Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
     PluginMavenClassLoaderModelLoader pluginMavenClassLoaderModelLoader =
-        new PluginMavenClassLoaderModelLoader(mockMavenClient);
+        new PluginMavenClassLoaderModelLoader(of(mockMavenClient));
 
     return pluginMavenClassLoaderModelLoader.load(pluginLocation, attributes, PLUGIN);
 

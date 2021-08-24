@@ -28,6 +28,12 @@ import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigParseOptions;
+import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigResolveOptions;
+
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -35,12 +41,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigParseOptions;
-import com.typesafe.config.ConfigRenderOptions;
-import com.typesafe.config.ConfigResolveOptions;
 
 /**
  * Mule Runtime global configuration loader.
@@ -149,10 +149,14 @@ public class GlobalConfigLoader {
   }
 
   /**
-   * @return the maven configuration to use for the runtime.
+   * @return the Maven configuration to use for the runtime.
    */
   public static MavenConfiguration getMavenConfig() {
     return safelyGetConfig(() -> mavenConfig);
+  }
+
+  public static void setMavenConfig(MavenConfiguration mavenConfig) {
+    GlobalConfigLoader.mavenConfig = mavenConfig;
   }
 
   /**
