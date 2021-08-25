@@ -37,7 +37,7 @@ public class MacroExpansionAstPostProcessor implements ApplicationModelAstPostPr
    *                        expanded.
    */
   @Override
-  public ArtifactAst doXmlSdk1MacroExpansion(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
+  public ArtifactAst postProcessAst(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
     return new MacroExpansionModulesModel(ast, extensionModels).expand();
   }
 

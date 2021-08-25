@@ -154,7 +154,7 @@ public abstract class ApplicationModel {
 
     for (ApplicationModelAstPostProcessor next : ServiceLoader.load(ApplicationModelAstPostProcessor.class,
                                                                     ApplicationModelAstPostProcessor.class.getClassLoader())) {
-      ast = next.doXmlSdk1MacroExpansion(ast, extensionModels);
+      ast = next.postProcessAst(ast, extensionModels);
     }
 
     return ast;
