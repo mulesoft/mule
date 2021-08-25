@@ -29,12 +29,14 @@ import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SER
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
+import static org.mule.runtime.config.internal.LazySampleDataService.NON_LAZY_SAMPLE_DATA_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
@@ -69,6 +71,7 @@ import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistr
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
@@ -82,6 +85,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -185,6 +189,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                         .get(), muleContext::getConfigurationComponentLocator));
     customizationService.registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
                                                     MuleValueProviderService.class);
+    customizationService.overrideDefaultServiceImpl(SAMPLE_DATA_SERVICE_KEY,
+                                                    new LazySampleDataService(this, () -> getRegistry()
+                                                        .<SampleDataService>lookupByName(NON_LAZY_SAMPLE_DATA_SERVICE).get()));
+    customizationService.registerCustomServiceClass(NON_LAZY_SAMPLE_DATA_SERVICE,
+                                                    MuleSampleDataService.class);
 
     customizationService.overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
 
