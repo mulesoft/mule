@@ -9,14 +9,12 @@ package org.mule.runtime.config.internal;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.newSetFromMap;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -26,7 +24,6 @@ import static org.mule.runtime.ast.api.util.MuleAstUtils.validate;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.model.ApplicationModel.findComponentDefinitionModel;
 import static org.mule.runtime.config.internal.model.ApplicationModel.prepareAstForRuntime;
@@ -57,7 +54,6 @@ import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -71,6 +67,7 @@ import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
@@ -96,20 +93,18 @@ import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.dsl.api.ConfigResource;
-import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -414,7 +409,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     List<Pair<String, ComponentAst>> createdComponentModels = new ArrayList<>();
 
-    final Set<ComponentAst> rootComponents = resolveRootComponents(applicationModel);
+    Set<ComponentAst> rootComponents = resolveRootComponents(applicationModel);
 
     recursiveStreamWithHierarchy(applicationModel, BOTTOM_UP, true)
         // Create component if must not be root is mandatory or component is a root component or component is child of a root
@@ -476,29 +471,17 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return createdComponentModels;
   }
 
-  protected boolean isIgnored(ComponentAst componentAst) {
-    return beanDefinitionFactory.isComponentIgnored(componentAst.getIdentifier());
+  protected Set<ComponentAst> resolveRootComponents(ArtifactAst applicationModel) {
+    Set<ComponentAst> rootComponents = new HashSet<>(applicationModel.topLevelComponents());
+    for (ApplicationModelAstPostProcessor next : ServiceLoader.load(ApplicationModelAstPostProcessor.class,
+                                                                    ApplicationModelAstPostProcessor.class.getClassLoader())) {
+      rootComponents = next.resolveRootComponents(rootComponents, extensionManager.getExtensions());
+    }
+    return rootComponents;
   }
 
-  private Set<ComponentAst> resolveRootComponents(ArtifactAst applicationModel) {
-    final Set<ConfigurationModel> xmlSdk1ConfigModels = newSetFromMap(new IdentityHashMap<>());
-    extensionManager.getExtensions()
-        .stream()
-        .flatMap(extension -> extension.getModelProperty(XmlExtensionModelProperty.class)
-            .map(mp -> extension.getConfigurationModels().stream())
-            .orElse(Stream.empty()))
-        .forEach(xmlSdk1ConfigModels::add);
-
-    // Handle specific case for nested configs/topLevelElements generated by XmlSdk1 macroexpansion
-    return concat(applicationModel.topLevelComponentsStream(),
-                  applicationModel.topLevelComponentsStream()
-                      .flatMap(root -> root.recursiveStream()
-                          .filter(comp -> comp.getModel(ConfigurationModel.class)
-                              .map(xmlSdk1ConfigModels::contains)
-                              .orElse(comp.getIdentifier().getName().equals(DEFAULT_GLOBAL_ELEMENTS)))
-                          .flatMap(ComponentAst::directChildrenStream)))
-                              .filter(comp -> !comp.getIdentifier().getName().equals(DEFAULT_GLOBAL_ELEMENTS))
-                              .collect(toSet());
+  protected boolean isIgnored(ComponentAst componentAst) {
+    return beanDefinitionFactory.isComponentIgnored(componentAst.getIdentifier());
   }
 
   private void registerRootSpringBean(DefaultListableBeanFactory beanFactory,
