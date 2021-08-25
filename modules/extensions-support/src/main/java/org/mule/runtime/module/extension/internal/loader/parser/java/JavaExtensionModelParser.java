@@ -152,11 +152,8 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
   }
 
   @Override
-  public XmlDslModel getXmlDslModel() {
-    String extensionName = extensionElement.getName();
-    String extensionVersion = loadingContext.getExtensionDeclarer().getDeclaration().getVersion();
-    Optional<String> prefix;
-    Optional<String> namespace;
+  public Optional<XmlDslAnnotationConfiguration> getXmlDslConfiguration() {
+    Optional<XmlDslAnnotationConfiguration> xmlDslAnnotationConfiguration;
 
     Optional<Xml> legacyXmlAnnotation = extensionElement.getAnnotation(Xml.class);
     Optional<org.mule.sdk.api.annotation.dsl.xml.Xml> sdkXmlAnnotation =
@@ -167,16 +164,15 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
                                                        Xml.class.getName(),
                                                        org.mule.sdk.api.annotation.dsl.xml.Xml.class.getName()));
     } else if (legacyXmlAnnotation.isPresent()) {
-      prefix = of(legacyXmlAnnotation.get().prefix());
-      namespace = of(legacyXmlAnnotation.get().namespace());
+      xmlDslAnnotationConfiguration =
+          of(new XmlDslAnnotationConfiguration(legacyXmlAnnotation.get().prefix(), legacyXmlAnnotation.get().namespace()));
     } else if (sdkXmlAnnotation.isPresent()) {
-      prefix = of(sdkXmlAnnotation.get().prefix());
-      namespace = of(sdkXmlAnnotation.get().namespace());
+      xmlDslAnnotationConfiguration =
+          of(new XmlDslAnnotationConfiguration(sdkXmlAnnotation.get().prefix(), sdkXmlAnnotation.get().namespace()));
     } else {
-      prefix = empty();
-      namespace = empty();
+      xmlDslAnnotationConfiguration = empty();
     }
 
-    return createXmlLanguageModel(prefix, namespace, extensionName, extensionVersion);
+    return xmlDslAnnotationConfiguration;
   }
 }

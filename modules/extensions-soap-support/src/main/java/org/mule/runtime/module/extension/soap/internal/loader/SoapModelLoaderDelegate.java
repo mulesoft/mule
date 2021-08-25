@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.module.extension.soap.internal.loader;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionTypeFactory.getSoapExtensionType;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -32,12 +36,15 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.XmlDslAnnotationConfiguration;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.MessageDispatcherProviderTypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
 import org.mule.runtime.soap.api.exception.error.SoapErrors;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -71,7 +78,7 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
     final SoapExtensionTypeWrapper<?> extension = getSoapExtensionType(this.extensionType, typeLoader);
     List<MessageDispatcherProviderTypeWrapper> customTransportProviders = extension.getDispatcherProviders();
     ExtensionDeclarer extensionDeclarer = getExtensionDeclarer(context);
-    extensionDeclarer.withXmlDsl(parser.getXmlDslModel());
+    extensionDeclarer.withXmlDsl(JavaModelLoaderUtils.getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
     declareSubtypes(extensionDeclarer, customTransportProviders);
     Set<ErrorModel> soapErrors = getSoapErrors(extensionDeclarer);
     soapErrors.forEach(extensionDeclarer::withErrorModel);
