@@ -16,6 +16,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
@@ -27,19 +28,17 @@ import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepositor
  */
 public interface ArtifactDescriptorFactoryProvider {
 
-  final LazyValue<ArtifactDescriptorFactoryProvider> INSTANCE =
+  LazyValue<ArtifactDescriptorFactoryProvider> INSTANCE =
       new LazyValue<>(() -> load(ArtifactDescriptorFactoryProvider.class,
                                  ArtifactDescriptorFactoryProvider.class.getClassLoader())
                                      .iterator().next());
 
-  public static ArtifactDescriptorFactoryProvider artifactDescriptorFactoryProvider() {
+  static ArtifactDescriptorFactoryProvider artifactDescriptorFactoryProvider() {
     return INSTANCE.get();
   }
 
   /**
-   * Assembly the complete list of artifacts, while sorting them in a lexicographic order by name to then resolve sanitize the
-   * exported packages and resource by the plugin's dependencies (avoids exporting elements that are already exported by other
-   * plugin).
+   * Creates a resolver that is used to determine the correct initialization order of the mule-plugin dependencies of an artifact.
    *
    * @param artifactPluginDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency
    *                                        to resolve
@@ -47,11 +46,13 @@ public interface ArtifactDescriptorFactoryProvider {
   PluginDependenciesResolver createBundlePluginDependenciesResolver(ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactPluginDescriptorFactory);
 
   /**
-   * Creates a descriptor factory for describing mule applications.
+   * Creates a factory of descriptors for describing mule applications.
    * 
    * @param artifactPluginDescriptorFactory    {@link ArtifactDescriptorFactory} to create the descriptor for plugins.
    * @param descriptorLoaderRepository         {@link DescriptorLoaderRepository} to get the descriptor loader implementation.
-   * @param artifactDescriptorValidatorBuilder
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
+   *                                           {@link ArtifactDescriptorValidator} in order to check the state of the descriptor
+   *                                           once loaded.
    * @return a factory to create {@link ApplicationDescriptor}s.
    */
   AbstractArtifactDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> createApplicationDescriptorFactory(ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactPluginDescriptorFactory,
@@ -59,7 +60,7 @@ public interface ArtifactDescriptorFactoryProvider {
                                                                                                                     ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder);
 
   /**
-   * Creates a descriptor factory for describing mule artifact plugins.
+   * Creates a factory of descriptors for describing mule artifact plugins.
    * 
    * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
    *                                           null
