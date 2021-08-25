@@ -36,12 +36,21 @@ class ForeachInternalContextManager {
   }
 
   public static void removeContext(CoreEvent event) {
-    from(event).map(ctx -> ctx.remove(event));
+    from(event).ifPresent(ctx -> ctx.remove(event));
   }
 
   static class ForeachInternalContext implements EventInternalContext<ForeachInternalContext> {
 
-    private Map<String, ForeachContext> contexts = new HashMap<>();
+    private Map<String, ForeachContext> contexts;
+
+    ForeachInternalContext() {
+      this.contexts = new HashMap<>();
+    }
+
+    // Is this a copy constructor as in CPP? Posclaro
+    ForeachInternalContext(ForeachInternalContext other) {
+      this.contexts = new HashMap<>(other.contexts);
+    }
 
     public ForeachContext get(CoreEvent event) {
       return contexts.get(event.getContext().getId());
@@ -57,9 +66,7 @@ class ForeachInternalContextManager {
 
     @Override
     public ForeachInternalContext copy() {
-      ForeachInternalContext other = new ForeachInternalContext();
-      other.contexts.putAll(this.contexts);
-      return other;
+      return new ForeachInternalContext(this);
     }
   }
 }
