@@ -65,17 +65,6 @@ public class ConfigNameResolverConnectionProviderWrapper<C> extends AbstractConn
    * {@inheritDoc}
    */
   @Override
-  public Optional<PoolingProfile> getPoolingProfile() {
-    ConnectionProvider<C> delegate = getDelegate();
-    return delegate instanceof ConnectionProviderWrapper
-        ? ((ConnectionProviderWrapper) delegate).getPoolingProfile()
-        : empty();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public Optional<ReconnectionConfig> getReconnectionConfig() {
     final ConnectionProvider<C> delegate = getDelegate();
     return delegate instanceof ConnectionProviderWrapper

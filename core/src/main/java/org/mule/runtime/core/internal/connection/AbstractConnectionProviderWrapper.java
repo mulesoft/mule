@@ -133,6 +133,9 @@ public abstract class AbstractConnectionProviderWrapper<C> implements Connection
 
   @Override
   public Optional<PoolingProfile> getPoolingProfile() {
-    return empty();
+    ConnectionProvider<C> delegate = getDelegate();
+    return delegate instanceof ConnectionProviderWrapper
+        ? ((ConnectionProviderWrapper) delegate).getPoolingProfile()
+        : empty();
   }
 }
