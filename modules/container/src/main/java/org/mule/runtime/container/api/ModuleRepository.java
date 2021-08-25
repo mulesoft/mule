@@ -21,7 +21,7 @@ import java.util.List;
 public interface ModuleRepository {
 
   /**
-   * Creates a ModuleRepository based on the modules available on the provided {@code classloader}.
+   * Creates a ModuleRepository based on the modules available on the provided {@code classLoader}.
    * 
    * @param classLoader     where to look for modules.
    * @param temporaryFolder
