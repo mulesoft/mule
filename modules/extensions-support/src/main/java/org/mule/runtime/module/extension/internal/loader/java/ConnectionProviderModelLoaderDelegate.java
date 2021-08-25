@@ -43,8 +43,8 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
           .withConnectionManagementType(parser.getConnectionManagementType())
           .supportsConnectivityTesting(parser.supportsConnectivityTesting());
 
-      ConnectionProviderDeclaration ConnectionProviderDeclaration = providerDeclarer.getDeclaration();
-      parser.getDeprecationModel().ifPresent(ConnectionProviderDeclaration::withDeprecation);
+      ConnectionProviderDeclaration connectionProviderDeclaration = providerDeclarer.getDeclaration();
+      parser.getDeprecationModel().ifPresent(connectionProviderDeclaration::withDeprecation);
 
       parser.getConnectionProviderFactoryModelProperty().ifPresent(providerDeclarer::withModelProperty);
 

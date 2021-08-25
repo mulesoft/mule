@@ -123,32 +123,7 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
-    Optional<Method> method = functionElement.getMethod();
-    if (method.isPresent()) {
-      Deprecated legacyAnnotation = method.get().getAnnotation(Deprecated.class);
-      org.mule.sdk.api.annotation.deprecated.Deprecated sdkAnnotation =
-          method.get().getAnnotation(org.mule.sdk.api.annotation.deprecated.Deprecated.class);
-
-      Optional<DeprecationModel> deprecationModel;
-      if (legacyAnnotation != null && sdkAnnotation != null) {
-        throw new IllegalParameterModelDefinitionException(format("Function '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                  method.get().getName(),
-                                                                  Deprecated.class.getName(),
-                                                                  org.mule.sdk.api.annotation.deprecated.Deprecated.class
-                                                                      .getName()));
-      } else if (legacyAnnotation != null) {
-        String toRemoveIn = isBlank(legacyAnnotation.toRemoveIn()) ? null : legacyAnnotation.toRemoveIn();
-        deprecationModel = of(new ImmutableDeprecationModel(legacyAnnotation.message(), legacyAnnotation.since(), toRemoveIn));
-      } else if (sdkAnnotation != null) {
-        String toRemoveIn = isBlank(sdkAnnotation.toRemoveIn()) ? null : sdkAnnotation.toRemoveIn();
-        deprecationModel = of(new ImmutableDeprecationModel(sdkAnnotation.message(), sdkAnnotation.since(), toRemoveIn));
-      } else {
-        deprecationModel = empty();
-      }
-
-      return deprecationModel;
-    }
-    return empty();
+    return JavaExtensionModelParserUtils.getDeprecationModel(functionElement);
   }
 
   @Override

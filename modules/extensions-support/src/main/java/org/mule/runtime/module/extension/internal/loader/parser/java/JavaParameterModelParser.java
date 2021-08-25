@@ -179,34 +179,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
-    Optional<Deprecated> legacyAnnotation = parameter.getAnnotation(Deprecated.class);
-    Optional<org.mule.sdk.api.annotation.deprecated.Deprecated> sdkAnnotation =
-        parameter.getAnnotation(org.mule.sdk.api.annotation.deprecated.Deprecated.class);
-
-    Optional<DeprecationModel> deprecationModel;
-    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
-      throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                parameter.getName(),
-                                                                Deprecated.class.getName(),
-                                                                org.mule.sdk.api.annotation.deprecated.Deprecated.class
-                                                                    .getName()));
-    } else if (legacyAnnotation.isPresent()) {
-      deprecationModel = legacyAnnotation
-          .map(deprecated -> {
-            String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
-            return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
-          });
-    } else if (sdkAnnotation.isPresent()) {
-      deprecationModel = sdkAnnotation
-          .map(deprecated -> {
-            String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
-            return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
-          });
-    } else {
-      deprecationModel = empty();
-    }
-
-    return deprecationModel;
+    return JavaExtensionModelParserUtils.getDeprecationModel(parameter);
   }
 
   @Override
