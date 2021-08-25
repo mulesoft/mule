@@ -24,8 +24,8 @@ public class ContainerClassLoaderProvider {
    * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classLoader for other Mule
    *         artifacts.
    */
-  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassloader) {
-    return new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(parentClassloader);
+  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassLoader) {
+    return new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(parentClassLoader);
 
   }
 }
