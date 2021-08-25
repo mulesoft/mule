@@ -7,17 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -25,10 +19,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.CompileTi
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.XmlDslAnnotationConfiguration;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
-
-import java.util.Optional;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor

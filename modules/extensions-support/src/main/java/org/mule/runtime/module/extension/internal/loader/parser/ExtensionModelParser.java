@@ -15,7 +15,6 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.java.XmlDslAnnotationConfiguration;
 
 import java.util.List;
 import java.util.Optional;
@@ -115,5 +114,5 @@ public interface ExtensionModelParser {
   /**
    * @return the extension's {@link XmlDslModel}
    */
-  Optional<XmlDslAnnotationConfiguration> getXmlDslConfiguration();
+  Optional<XmlDslConfiguration> getXmlDslConfiguration();
 }

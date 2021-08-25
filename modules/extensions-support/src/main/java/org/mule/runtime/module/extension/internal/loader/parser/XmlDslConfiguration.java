@@ -5,18 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.extension.internal.loader.parser.java;
+package org.mule.runtime.module.extension.internal.loader.parser;
 
 /**
- * Contains the configuration of {@link org.mule.runtime.extension.api.annotation.dsl.xml.Xml} or
- * {@link org.mule.sdk.api.annotation.dsl.xml.Xml}
+ * Contains the configuration of the schema attributes
  */
-public class XmlDslAnnotationConfiguration {
+public class XmlDslConfiguration {
 
   String prefix;
   String namespace;
 
-  public XmlDslAnnotationConfiguration(String prefix, String namespace) {
+  public XmlDslConfiguration(String prefix, String namespace) {
     this.prefix = prefix;
     this.namespace = namespace;
   }

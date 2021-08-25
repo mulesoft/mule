@@ -13,14 +13,14 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguag
 
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.parser.java.XmlDslAnnotationConfiguration;
+import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
 import java.util.Optional;
 
 public class JavaModelLoaderUtils {
 
   /**
-   * Utility method to obtain the {@link XmlDslModel} of a given {@link XmlDslAnnotationConfiguration}
+   * Utility method to obtain the {@link XmlDslModel} of a given {@link XmlDslConfiguration}
    *
    * @param extensionElement              the extension element
    * @param version                       version of the extension
@@ -29,7 +29,7 @@ public class JavaModelLoaderUtils {
    * @return the {@link XmlDslModel}
    */
   public static XmlDslModel getXmlDslModel(ExtensionElement extensionElement, String version,
-                                           Optional<XmlDslAnnotationConfiguration> xmlDslAnnotationConfiguration) {
+                                           Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration) {
     String extensionName = extensionElement.getName();
     Optional<String> prefix = empty();
     Optional<String> namespace = empty();
