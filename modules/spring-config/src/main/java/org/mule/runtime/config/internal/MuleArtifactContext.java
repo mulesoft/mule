@@ -27,6 +27,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDE
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.model.ApplicationModel.findComponentDefinitionModel;
 import static org.mule.runtime.config.internal.model.ApplicationModel.prepareAstForRuntime;
+import static org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor.AST_POST_PROCESSORS;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createConfigurationAttributeResolver;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -102,7 +103,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -473,9 +473,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected Set<ComponentAst> resolveRootComponents(ArtifactAst applicationModel) {
     Set<ComponentAst> rootComponents = new HashSet<>(applicationModel.topLevelComponents());
-    for (ApplicationModelAstPostProcessor next : ServiceLoader.load(ApplicationModelAstPostProcessor.class,
-                                                                    ApplicationModelAstPostProcessor.class.getClassLoader())) {
-      rootComponents = next.resolveRootComponents(rootComponents, extensionManager.getExtensions());
+    for (ApplicationModelAstPostProcessor astPostProcessor : AST_POST_PROCESSORS.get()) {
+      rootComponents = astPostProcessor.resolveRootComponents(rootComponents, extensionManager.getExtensions());
     }
     return rootComponents;
   }

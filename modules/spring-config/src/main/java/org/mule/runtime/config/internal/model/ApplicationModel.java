@@ -12,6 +12,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor.AST_POST_PROCESSORS;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
@@ -47,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -152,9 +152,8 @@ public abstract class ApplicationModel {
   public static ArtifactAst prepareAstForRuntime(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
     ast = processSourcesRedeliveryPolicy(ast);
 
-    for (ApplicationModelAstPostProcessor next : ServiceLoader.load(ApplicationModelAstPostProcessor.class,
-                                                                    ApplicationModelAstPostProcessor.class.getClassLoader())) {
-      ast = next.postProcessAst(ast, extensionModels);
+    for (ApplicationModelAstPostProcessor astPostProcessor : AST_POST_PROCESSORS.get()) {
+      ast = astPostProcessor.postProcessAst(ast, extensionModels);
     }
 
     return ast;

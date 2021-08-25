@@ -7,10 +7,12 @@
 package org.mule.runtime.config.internal.model;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 
 import java.util.Collection;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 /**
@@ -19,6 +21,10 @@ import java.util.Set;
  * @since 4.5
  */
 public interface ApplicationModelAstPostProcessor {
+
+  public LazyValue<Iterable<ApplicationModelAstPostProcessor>> AST_POST_PROCESSORS =
+      new LazyValue<>(() -> ServiceLoader.load(ApplicationModelAstPostProcessor.class,
+                                               ApplicationModelAstPostProcessor.class.getClassLoader()));
 
   /**
    * Create a new {@link ArtifactAst} based on the provided one, with any required changes applied.

@@ -29,9 +29,9 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
+import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;

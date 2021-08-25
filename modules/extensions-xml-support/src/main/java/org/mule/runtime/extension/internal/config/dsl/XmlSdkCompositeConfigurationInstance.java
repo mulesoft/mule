@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.extension.internal.config.dsl;
 
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
+import org.mule.runtime.extension.internal.ast.property.TestConnectionGlobalElementModelProperty;
 
 import java.util.Optional;
 

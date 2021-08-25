@@ -33,12 +33,12 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -86,11 +86,6 @@ import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesCo
 import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -99,6 +94,11 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
 import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel;
+import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
+import org.mule.runtime.extension.internal.ast.property.PrivateOperationsModelProperty;
+import org.mule.runtime.extension.internal.ast.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
 import org.mule.runtime.extension.internal.loader.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;

@@ -8,8 +8,6 @@ package org.mule.runtime.extension.internal.config.dsl;
 
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
@@ -18,6 +16,8 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -28,7 +28,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
@@ -41,6 +40,7 @@ import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.internal.ast.property.PrivateOperationsModelProperty;
 import org.mule.runtime.extension.internal.factories.ModuleOperationMessageProcessorFactoryBean;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 

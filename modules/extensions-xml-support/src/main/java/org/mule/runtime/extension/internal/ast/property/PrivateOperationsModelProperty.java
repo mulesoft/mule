@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model.extension.xml.property;
+package org.mule.runtime.extension.internal.ast.property;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;

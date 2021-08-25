@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
+import org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;

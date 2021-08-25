@@ -11,11 +11,11 @@ import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoes
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 
 import java.util.HashMap;
 import java.util.Map;
