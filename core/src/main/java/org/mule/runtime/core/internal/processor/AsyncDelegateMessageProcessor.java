@@ -149,6 +149,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     backpressureHandler = new QueueBackpressureHandler(schedulerService, () -> muleContext.getSchedulerBaseConfig(),
                                                        this::dispatchEvent, name != null ? name : getLocation().getLocation());
 
+    initialiseIfNeeded(processingStrategy, muleContext);
     super.initialise();
   }
 
@@ -200,6 +201,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public void dispose() {
     super.dispose();
     disposeIfNeeded(delegate, logger);
+    disposeIfNeeded(processingStrategy, logger);
   }
 
   @Override
