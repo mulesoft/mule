@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model.extension.xml;
+package org.mule.runtime.extension.internal.ast;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -42,14 +42,14 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 
 import java.util.ArrayList;
 import java.util.Collection;

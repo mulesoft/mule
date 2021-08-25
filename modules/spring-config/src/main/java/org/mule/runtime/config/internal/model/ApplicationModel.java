@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.config.internal.model;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor.AST_POST_PROCESSORS;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
@@ -40,12 +39,10 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_EL
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -154,21 +151,12 @@ public abstract class ApplicationModel {
    */
   public static ArtifactAst prepareAstForRuntime(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
     ast = processSourcesRedeliveryPolicy(ast);
-    ast = doXmlSdk1MacroExpansion(ast, extensionModels);
-    return ast;
-  }
 
-  /**
-   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModulesModel} as
-   * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
-   * message processors
-   *
-   * @param ast
-   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
-   *                        expanded.
-   */
-  private static ArtifactAst doXmlSdk1MacroExpansion(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
-    return new MacroExpansionModulesModel(ast, extensionModels).expand();
+    for (ApplicationModelAstPostProcessor astPostProcessor : AST_POST_PROCESSORS.get()) {
+      ast = astPostProcessor.postProcessAst(ast, extensionModels);
+    }
+
+    return ast;
   }
 
   /**

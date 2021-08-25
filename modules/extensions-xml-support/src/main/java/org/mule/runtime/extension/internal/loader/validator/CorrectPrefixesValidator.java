@@ -24,13 +24,13 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.CoreDslConstants;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 
 import java.util.Optional;
 
