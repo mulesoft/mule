@@ -7,12 +7,31 @@
 
 package org.mule.runtime.container.api;
 
+import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
+import org.mule.runtime.container.internal.CompositeModuleDiscoverer;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.internal.JreModuleDiscoverer;
+
+import java.io.File;
 import java.util.List;
 
 /**
  * Provides access to all Mule modules available on the container.
  */
 public interface ModuleRepository {
+
+  /**
+   * Creates a ModuleRepository based on the modules available on the provided {@code classLoader}.
+   * 
+   * @param classLoader     where to look for modules.
+   * @param temporaryFolder
+   * @return
+   */
+  public static ModuleRepository createModuleRepository(ClassLoader classLoader, File temporaryFolder) {
+    return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
+                                                                     new ClasspathModuleDiscoverer(classLoader,
+                                                                                                   temporaryFolder)));
+  }
 
   /**
    * @return a non null list of {@link MuleModule}

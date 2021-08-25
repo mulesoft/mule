@@ -20,8 +20,8 @@ import static org.mule.runtime.module.launcher.MuleContainer.APP_COMMAND_LINE_OP
 import static org.mule.runtime.module.launcher.MuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.api.DeploymentService;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;

@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.deployment.model.api.builder;
 
+import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 
 import java.io.File;
 import java.util.function.Function;
@@ -40,5 +44,14 @@ public class DeployableArtifactClassLoaderFactoryProvider {
    */
   public static DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory(Function<String, File> nativeLibsTempFolderChildFunction) {
     return new DomainClassLoaderFactory(nativeLibsTempFolderChildFunction);
+  }
+
+  /**
+   * Creates a new factory for {@link RegionClassLoader}s of Mule Plugins.
+   *
+   * @param moduleRepository provides access to the modules available on the container. Non null.
+   */
+  public static RegionPluginClassLoadersFactory regionPluginClassLoadersFactory(ModuleRepository moduleRepository) {
+    return new DefaultRegionPluginClassLoadersFactory(new ArtifactPluginClassLoaderFactory(), moduleRepository);
   }
 }

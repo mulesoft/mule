@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-
 import com.google.common.collect.ImmutableMap;
+
+import org.slf4j.Logger;
 
 /**
  * Base class to create artifact descriptors
@@ -79,13 +79,13 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     return createArtifact(artifactFolder, deploymentProperties, artifactModel);
   }
 
-  protected T createArtifact(File artifactFolder, Optional<Properties> deploymentProperties, M artifactModel) {
+  public T createArtifact(File artifactFolder, Optional<Properties> deploymentProperties, M artifactModel) {
     T artifactDescriptor =
         loadFromJsonDescriptor(artifactFolder, artifactModel, deploymentProperties);
     return artifactDescriptor;
   }
 
-  protected M createArtifactModel(File artifactFolder) {
+  public M createArtifactModel(File artifactFolder) {
     final File artifactJsonFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + getDescriptorFileName());
     if (!artifactJsonFile.exists()) {
       throw new ArtifactDescriptorCreateException(ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR + artifactJsonFile);

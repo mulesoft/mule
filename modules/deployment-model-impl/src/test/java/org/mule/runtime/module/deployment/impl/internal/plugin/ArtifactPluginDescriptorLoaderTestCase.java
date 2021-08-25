@@ -9,20 +9,18 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 import static java.util.Optional.empty;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.api.util.FileUtils.createFile;
 import static org.mule.tck.ZipUtils.compress;
+
 import org.mule.tck.ZipUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-
 
 public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase {
 
@@ -32,32 +30,13 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = mock(ArtifactPluginDescriptorFactory.class);
+  private final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = mock(ArtifactPluginDescriptorFactory.class);
 
   private ArtifactPluginDescriptorLoader pluginDescriptorLoader;
 
   @Before
   public void createClasUnderTest() {
     pluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
-  }
-
-  @Test
-  public void nullPluginZip() throws IOException {
-    expectedException.expect(IllegalArgumentException.class);
-    pluginDescriptorLoader.load(null);
-  }
-
-  @Test
-  public void nullUnpackDestination() throws IOException {
-    expectedException.expect(IllegalArgumentException.class);
-    pluginDescriptorLoader.load(pluginsFolder.getRoot());
-  }
-
-  @Test
-  public void loadAFileNonZipFile() throws IOException {
-    expectedException.expect(IllegalArgumentException.class);
-    File nonZipFile = createFile(new File(pluginsFolder.getRoot(), "test").getAbsolutePath());
-    pluginDescriptorLoader.load(nonZipFile);
   }
 
   @Test

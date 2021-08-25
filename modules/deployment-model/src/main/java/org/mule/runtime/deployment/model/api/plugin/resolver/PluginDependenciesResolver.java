@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.deployment.model.api.plugin.resolver;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -14,6 +13,8 @@ import java.util.Set;
 
 /**
  * Resolves plugin dependencies to obtain a proper initialization order.
+ * 
+ * @since 4.5
  */
 public interface PluginDependenciesResolver {
 

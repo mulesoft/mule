@@ -8,19 +8,23 @@ package org.mule.runtime.module.deployment.impl.internal;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
+import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
@@ -31,29 +35,29 @@ import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesR
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
+import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.TrackingDeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver;
-import org.mule.runtime.module.deployment.impl.internal.plugin.MuleExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
@@ -87,7 +91,7 @@ public class MuleArtifactResourcesRegistry {
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ServiceRegistryDescriptorLoaderRepository descriptorLoaderRepository;
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
-  private final ToolingApplicationDescriptorFactory toolingApplicationDescriptorFactory;
+  private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
   private final ServerLockFactory runtimeLockFactory;
 
   /**
@@ -130,8 +134,7 @@ public class MuleArtifactResourcesRegistry {
   private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) {
     runtimeLockFactory = new ServerLockFactory();
 
-    containerClassLoader =
-        new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(getClass().getClassLoader());
+    containerClassLoader = createContainerClassLoader(moduleRepository, getClass().getClassLoader());
     artifactClassLoaderManager = new DefaultClassLoaderManager();
     LicenseValidator licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
 
@@ -141,8 +144,10 @@ public class MuleArtifactResourcesRegistry {
 
     this.artifactPluginClassLoaderFactory =
         trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
-    final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
-        new ArtifactPluginDescriptorFactory();
+    final AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> artifactPluginDescriptorFactory =
+        artifactDescriptorFactoryProvider()
+            .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
+                                                   ArtifactDescriptorValidatorBuilder.builder());
     artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     descriptorLoaderRepository = new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
 
@@ -170,7 +175,8 @@ public class MuleArtifactResourcesRegistry {
                                                            new ReflectionServiceResolver(new ServiceRegistry())));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
 
-    pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
+    pluginDependenciesResolver =
+        new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
     domainFactory = new DefaultDomainFactory(domainDescriptorFactory, domainManager,
                                              artifactClassLoaderManager, serviceManager,
                                              pluginDependenciesResolver, domainClassLoaderBuilderFactory,
@@ -191,8 +197,8 @@ public class MuleArtifactResourcesRegistry {
                                                        licenseValidator,
                                                        runtimeLockFactory);
     toolingApplicationDescriptorFactory =
-        new ToolingApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
-                                                artifactDescriptorValidatorBuilder);
+        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                         artifactDescriptorValidatorBuilder);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {
@@ -282,9 +288,9 @@ public class MuleArtifactResourcesRegistry {
   }
 
   /**
-   * @return the {@link ToolingApplicationDescriptorFactory}.
+   * @return the {@link AbstractDeployableDescriptorFactory}.
    */
-  public ToolingApplicationDescriptorFactory getToolingApplicationDescriptorFactory() {
+  public AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> getToolingApplicationDescriptorFactory() {
     return toolingApplicationDescriptorFactory;
   }
 
