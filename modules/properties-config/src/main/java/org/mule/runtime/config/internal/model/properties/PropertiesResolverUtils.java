@@ -17,7 +17,6 @@ import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMEN
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -54,6 +53,8 @@ import javax.xml.namespace.QName;
  *
  */
 public class PropertiesResolverUtils {
+
+  public static final String GLOBAL_PROPERTY = "global-property";
 
   private PropertiesResolverUtils() {
     // Nothing to do
@@ -310,8 +311,16 @@ public class PropertiesResolverUtils {
       providerFactoriesMap.put(componentIdentifier, service);
     });
 
-    ServiceLoader<org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory> providerFactoriesOld =
-        load(org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory.class);
+    Class<?> providerFactoryIfaceOld;
+    try {
+      providerFactoryIfaceOld =
+          Class.forName("org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory");
+    } catch (ClassNotFoundException e) {
+      throw new MuleRuntimeException(e);
+    }
+
+    ServiceLoader<? extends ConfigurationPropertiesProviderFactory> providerFactoriesOld =
+        (ServiceLoader<? extends ConfigurationPropertiesProviderFactory>) load(providerFactoryIfaceOld);
     providerFactoriesOld.forEach(service -> {
       ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
       if (providerFactoriesMap.containsKey(componentIdentifier)) {
