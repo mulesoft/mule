@@ -21,7 +21,7 @@ public class ContainerClassLoaderProvider {
    *
    * @param moduleRepository  provides access to the modules available on the container. Non null.
    * @param parentClassLoader parent classLoader. Can be null.
-   * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classloader for other Mule
+   * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classLoader for other Mule
    *         artifacts.
    */
   public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassloader) {
