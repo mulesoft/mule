@@ -44,6 +44,8 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
       final FunctionDeclarer function = extensionDeclarer.withFunction(parser.getName())
           .describedAs(parser.getDescription());
 
+      parser.getDeprecationModel().ifPresent(function::withDeprecation);
+
       parser.getFunctionExecutorModelProperty().ifPresent(function::withModelProperty);
 
       parser.getOutputType().applyOn(function.withOutput());

@@ -25,6 +25,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -167,6 +168,11 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
     additionalModelProperties.add(new ConnectionTypeModelProperty(providerGenerics.get(0)));
     element.getDeclaringClass().ifPresent(clazz -> additionalModelProperties.add(new ImplementingTypeModelProperty(clazz)));
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(element));
+  }
+
+  @Override
+  public Optional<DeprecationModel> getDeprecationModel() {
+    return JavaExtensionModelParserUtils.getDeprecationModel(element);
   }
 
   @Override

@@ -10,29 +10,38 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionContainerElement;
+import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
@@ -211,6 +220,66 @@ public final class JavaExtensionModelParserUtils {
     }
 
     return connectionParameter;
+  }
+
+  public static Optional<DeprecationModel> getDeprecationModel(ExtensionParameter extensionParameter) {
+    return getDeprecationModel(extensionParameter, "Parameter", extensionParameter.getName());
+  }
+
+  public static Optional<DeprecationModel> getDeprecationModel(FunctionElement functionElement) {
+    return getDeprecationModel(functionElement, "Function", functionElement.getName());
+  }
+
+  public static Optional<DeprecationModel> getDeprecationModel(OperationElement operationElement) {
+    return getDeprecationModel(operationElement, "Operation", operationElement.getName());
+  }
+
+  public static Optional<DeprecationModel> getDeprecationModel(SourceElement sourceElement) {
+    return getDeprecationModel(sourceElement, "Source", sourceElement.getName());
+  }
+
+  public static Optional<DeprecationModel> getDeprecationModel(ConnectionProviderElement connectionProviderElement) {
+    return getDeprecationModel(connectionProviderElement, "Connection provider", connectionProviderElement.getName());
+  }
+
+  public static Optional<DeprecationModel> getDeprecationModel(ComponentElement componentElement) {
+    return getDeprecationModel(componentElement, "Component", componentElement.getName());
+  }
+
+  public static Optional<DeprecationModel> getDeprecationModel(ExtensionElement extensionElement) {
+    return getDeprecationModel(extensionElement, "Extension", extensionElement.getName());
+  }
+
+  private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
+    Optional<Deprecated> legacyAnnotation = element.getAnnotation(Deprecated.class);
+    Optional<org.mule.sdk.api.annotation.deprecated.Deprecated> sdkAnnotation =
+        element.getAnnotation(org.mule.sdk.api.annotation.deprecated.Deprecated.class);
+
+    Optional<DeprecationModel> deprecationModel;
+    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
+      throw new IllegalParameterModelDefinitionException(format("%s '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                elementType,
+                                                                elementName,
+                                                                Deprecated.class.getName(),
+                                                                org.mule.sdk.api.annotation.deprecated.Deprecated.class
+                                                                    .getName()));
+    } else if (legacyAnnotation.isPresent()) {
+      deprecationModel = legacyAnnotation
+          .map(deprecated -> {
+            String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
+            return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
+          });
+    } else if (sdkAnnotation.isPresent()) {
+      deprecationModel = sdkAnnotation
+          .map(deprecated -> {
+            String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
+            return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
+          });
+    } else {
+      deprecationModel = empty();
+    }
+
+    return deprecationModel;
   }
 
   private static ExternalLibraryModel parseExternalLib(ExternalLib externalLibAnnotation) {

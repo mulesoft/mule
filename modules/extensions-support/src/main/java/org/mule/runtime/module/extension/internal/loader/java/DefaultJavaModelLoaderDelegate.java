@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 
@@ -18,6 +19,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.CompileTi
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor
@@ -61,12 +63,14 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .onVersion(version)
             .fromVendor(parser.getVendor())
             .withCategory(parser.getCategory())
-            .withModelProperty(parser.getLicenseModelProperty());
+            .withModelProperty(parser.getLicenseModelProperty())
+            .withXmlDsl(JavaModelLoaderUtils.getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
 
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
+    parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);

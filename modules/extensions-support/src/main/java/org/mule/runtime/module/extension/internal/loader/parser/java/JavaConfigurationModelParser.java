@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Para
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
@@ -36,6 +37,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParse
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link ConfigurationModelParser} for Java based syntax
@@ -147,5 +149,11 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
     properties.add(new ExtensionTypeDescriptorModelProperty(configElement));
 
     return unmodifiableList(properties);
+  }
+
+
+  @Override
+  public Optional<DeprecationModel> getDeprecationModel() {
+    return JavaExtensionModelParserUtils.getDeprecationModel(configElement);
   }
 }

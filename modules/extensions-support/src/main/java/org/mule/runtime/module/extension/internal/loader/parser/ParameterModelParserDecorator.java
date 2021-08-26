@@ -10,6 +10,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
@@ -76,6 +77,11 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   @Override
   public Optional<ParameterDslConfiguration> getDslConfiguration() {
     return decoratee.getDslConfiguration();
+  }
+
+  @Override
+  public Optional<DeprecationModel> getDeprecationModel() {
+    return decoratee.getDeprecationModel();
   }
 
   @Override

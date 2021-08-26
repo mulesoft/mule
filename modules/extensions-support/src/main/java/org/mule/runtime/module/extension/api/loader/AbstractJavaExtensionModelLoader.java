@@ -32,7 +32,6 @@ import org.mule.runtime.module.extension.internal.loader.enricher.BackPressureDe
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ClusterSupportEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.DeprecationModelDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricher;
@@ -43,7 +42,6 @@ import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurat
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaExportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaPrivilegedExportedTypesDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.NotificationsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ObjectStoreParameterDeclarationEnricher;
@@ -121,12 +119,10 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new IgnoredExtensionParameterModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
-                                                                                               new JavaXmlDeclarationEnricher(),
                                                                                                new BooleanParameterDeclarationEnricher(),
                                                                                                new RefNameDeclarationEnricher(),
                                                                                                new DefaultEncodingDeclarationEnricher(),
                                                                                                new RuntimeVersionDeclarationEnricher(),
-                                                                                               new DeprecationModelDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
                                                                                                new NotificationsDeclarationEnricher(),
                                                                                                new JavaExportedTypesDeclarationEnricher(),

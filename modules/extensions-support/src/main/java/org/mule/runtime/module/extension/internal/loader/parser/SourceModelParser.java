@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
@@ -135,6 +136,11 @@ public interface SourceModelParser {
    * @return a list with {@link ModelProperty} instances.
    */
   List<ModelProperty> getAdditionalModelProperties();
+
+  /**
+   * @return the source's {@link DeprecationModel} if one was defined
+   */
+  Optional<DeprecationModel> getDeprecationModel();
 
   /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a

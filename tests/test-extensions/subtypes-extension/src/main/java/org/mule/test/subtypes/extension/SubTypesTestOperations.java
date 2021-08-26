@@ -6,14 +6,14 @@
  */
 package org.mule.test.subtypes.extension;
 
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
-import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
+
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.sdk.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.test.vegan.extension.VeganCookBook;
 
 import java.util.List;

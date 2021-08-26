@@ -7,10 +7,7 @@
 package org.mule.runtime.module.extension.internal;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
@@ -21,11 +18,8 @@ import static org.mule.runtime.module.extension.internal.resources.BaseExtension
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
 import org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -59,11 +53,6 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
   }
 
   protected static Collection<Object[]> createExtensionModels(List<? extends ExtensionUnitTest> extensions) {
-    final ClassLoader classLoader = ParameterizedExtensionModelTestCase.class.getClassLoader();
-    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
-    when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
-        .thenReturn(singletonList(new JavaXmlDeclarationEnricher()));
-
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
 

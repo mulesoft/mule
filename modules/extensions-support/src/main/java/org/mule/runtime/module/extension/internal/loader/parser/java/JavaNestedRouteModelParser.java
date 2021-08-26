@@ -11,6 +11,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forRoute;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
@@ -71,5 +72,10 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
     return additionalModelProperties;
+  }
+
+  @Override
+  public Optional<DeprecationModel> getDeprecationModel() {
+    return JavaExtensionModelParserUtils.getDeprecationModel(route);
   }
 }

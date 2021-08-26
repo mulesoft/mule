@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -25,11 +27,13 @@ import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -38,6 +42,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
@@ -59,6 +64,8 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * {@link ParameterModelParser} for Java based syntax
@@ -143,13 +150,36 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public Optional<ParameterDslConfiguration> getDslConfiguration() {
     if (dslConfiguration == null) {
-      dslConfiguration = parameter.getAnnotation(ParameterDsl.class).map(parameterDsl -> ParameterDslConfiguration.builder()
-          .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
-          .allowsReferences(parameterDsl.allowReferences())
-          .build());
+      Optional<ParameterDsl> legacyAnnotation = parameter.getAnnotation(ParameterDsl.class);
+      Optional<org.mule.sdk.api.annotation.dsl.xml.ParameterDsl> sdkAnnotation =
+          parameter.getAnnotation(org.mule.sdk.api.annotation.dsl.xml.ParameterDsl.class);
+      if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
+        throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                  parameter.getName(),
+                                                                  ParameterDsl.class.getName(),
+                                                                  org.mule.sdk.api.annotation.dsl.xml.ParameterDsl.class
+                                                                      .getName()));
+      } else if (legacyAnnotation.isPresent()) {
+        dslConfiguration = legacyAnnotation.map(parameterDsl -> ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
+            .allowsReferences(parameterDsl.allowReferences())
+            .build());
+      } else if (sdkAnnotation.isPresent()) {
+        dslConfiguration = sdkAnnotation.map(parameterDsl -> ParameterDslConfiguration.builder()
+            .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
+            .allowsReferences(parameterDsl.allowReferences())
+            .build());
+      } else {
+        dslConfiguration = empty();
+      }
     }
 
     return dslConfiguration;
+  }
+
+  @Override
+  public Optional<DeprecationModel> getDeprecationModel() {
+    return JavaExtensionModelParserUtils.getDeprecationModel(parameter);
   }
 
   @Override
@@ -192,7 +222,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
           expressionSupport = NOT_SUPPORTED;
           getQName(infrastructureType.getName()).ifPresent(additionalModelProperties::add);
           InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName())
-              .ifPresent(dsl -> dslConfiguration = Optional.of(dsl));
+              .ifPresent(dsl -> dslConfiguration = of(dsl));
         }
       });
     }

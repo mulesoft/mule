@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.function.FunctionExecutor;
@@ -65,4 +66,9 @@ public interface FunctionModelParser {
    * @return a list with {@link ModelProperty} instances.
    */
   List<ModelProperty> getAdditionalModelProperties();
+
+  /**
+   * @return the function's {@link DeprecationModel} if one was defined
+   */
+  Optional<DeprecationModel> getDeprecationModel();
 }

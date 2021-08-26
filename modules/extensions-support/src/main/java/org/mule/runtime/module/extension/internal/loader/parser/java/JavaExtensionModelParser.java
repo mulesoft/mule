@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
@@ -14,8 +17,11 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -29,6 +35,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -135,5 +142,35 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
         .ifPresent(extensionClass -> additionalModelProperties.add(new ImplementingTypeModelProperty(extensionClass)));
 
     return additionalModelProperties;
+  }
+
+  @Override
+  public Optional<DeprecationModel> getDeprecationModel() {
+    return JavaExtensionModelParserUtils.getDeprecationModel(extensionElement);
+  }
+
+  @Override
+  public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
+    Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration;
+
+    Optional<Xml> legacyXmlAnnotation = extensionElement.getAnnotation(Xml.class);
+    Optional<org.mule.sdk.api.annotation.dsl.xml.Xml> sdkXmlAnnotation =
+        extensionElement.getAnnotation(org.mule.sdk.api.annotation.dsl.xml.Xml.class);
+
+    if (legacyXmlAnnotation.isPresent() && sdkXmlAnnotation.isPresent()) {
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on the extension",
+                                                       Xml.class.getName(),
+                                                       org.mule.sdk.api.annotation.dsl.xml.Xml.class.getName()));
+    } else if (legacyXmlAnnotation.isPresent()) {
+      xmlDslAnnotationConfiguration =
+          of(new XmlDslConfiguration(legacyXmlAnnotation.get().prefix(), legacyXmlAnnotation.get().namespace()));
+    } else if (sdkXmlAnnotation.isPresent()) {
+      xmlDslAnnotationConfiguration =
+          of(new XmlDslConfiguration(sdkXmlAnnotation.get().prefix(), sdkXmlAnnotation.get().namespace()));
+    } else {
+      xmlDslAnnotationConfiguration = empty();
+    }
+
+    return xmlDslAnnotationConfiguration;
   }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
@@ -102,7 +101,7 @@ public class DeprecationModelValidator implements ExtensionModelValidator {
         reportInvalidVersion(deprecationModel.getDeprecatedSince(), deprecableModel, problemsReporter, "since");
       }
       try {
-        toRemoveIn = deprecationModel.getToRemoveIn().map(toRemoveInString -> new MuleVersion(toRemoveInString)).orElse(null);
+        toRemoveIn = deprecationModel.getToRemoveIn().map(MuleVersion::new).orElse(null);
       } catch (IllegalArgumentException e) {
         deprecationModel.getToRemoveIn()
             .ifPresent(toRemoveInString -> reportInvalidVersion(toRemoveInString, deprecableModel, problemsReporter,

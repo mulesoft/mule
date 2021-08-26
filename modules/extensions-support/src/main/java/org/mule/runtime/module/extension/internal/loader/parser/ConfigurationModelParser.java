@@ -9,9 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Parses the syntactic definition of a {@link ConfigurationModel} so that the semantics reflected in it can be extracted in a
@@ -94,4 +96,9 @@ public interface ConfigurationModelParser {
    * @return a list with {@link ModelProperty} instances.
    */
   List<ModelProperty> getAdditionalModelProperties();
+
+  /**
+   * @return the configuration's {@link DeprecationModel} if one was defined
+   */
+  Optional<DeprecationModel> getDeprecationModel();
 }
