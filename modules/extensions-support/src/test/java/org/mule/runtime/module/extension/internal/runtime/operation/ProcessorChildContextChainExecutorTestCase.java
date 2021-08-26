@@ -142,10 +142,13 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
   public void contextFinished() throws InterruptedException {
     Reference<Boolean> parentFinished = new Reference<>(false);
     Reference<Boolean> newFinished = new Reference<>(false);
+    Reference<Boolean> correctCompletionOrder = new Reference<>(false);
 
+    processor.setConsumer((ev, t) -> correctCompletionOrder.set(!newFinished.get()));
     ((BaseEventContext) coreEvent.getContext()).onComplete((ev, t) -> {
       parentFinished.set(true);
     });
+
     ImmutableProcessorChildContextChainExecutor chainExecutor =
         new ImmutableProcessorChildContextChainExecutor(mock(StreamingManager.class), coreEvent, chain);
 
@@ -153,11 +156,13 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
       newFinished.set(true);
     }, (t, r) -> {
     });
-    // The original context shouldn't be finished
+    // The original context shouldn't be finished (MULE-19772)
     assertThat(parentFinished.get(), is(false));
     // But the created one must be finished
     assertThat(newFinished.get(), is(true));
     assertThat(processor.context.isComplete(), is(true));
+    // The created context is called before the onSuccess callback (MULE-19694)
+    assertThat(correctCompletionOrder.get(), is(true));
   }
 
 
@@ -174,10 +179,15 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     public String correlationID = null;
     public String rootId = null;
     public BaseEventContext context = null;
+    private BiConsumer<CoreEvent, Throwable> consumer = null;
     private boolean throwError = false;
 
     public void throwError() {
       this.throwError = true;
+    }
+
+    public void setConsumer(BiConsumer<CoreEvent, Throwable> consumer) {
+      this.consumer = consumer;
     }
 
     @Override
@@ -185,6 +195,10 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
       context = (BaseEventContext) event.getContext();
       correlationID = event.getCorrelationId();
       rootId = event.getContext().getRootId();
+
+      if (consumer != null) {
+        context.onComplete(consumer);
+      }
 
       if (throwError) {
         throw new MessagingException(createStaticMessage("some exception"), event);
