@@ -140,21 +140,23 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
   @Test
   public void contextFinished() throws InterruptedException {
-    Reference<Boolean> finished = new Reference<>(false);
+    Reference<Boolean> parentFinished = new Reference<>(false);
+    Reference<Boolean> newFinished = new Reference<>(false);
+
     ((BaseEventContext) coreEvent.getContext()).onComplete((ev, t) -> {
-      if (ev != null) {
-        finished.set(true);
-      }
+      parentFinished.set(true);
     });
     ImmutableProcessorChildContextChainExecutor chainExecutor =
         new ImmutableProcessorChildContextChainExecutor(mock(StreamingManager.class), coreEvent, chain);
 
     doProcessAndWait(chainExecutor, TEST_CORRELATION_ID, r -> {
+      newFinished.set(true);
     }, (t, r) -> {
     });
     // The original context shouldn't be finished
-    assertThat(finished.get(), is(false));
+    assertThat(parentFinished.get(), is(false));
     // But the created one must be finished
+    assertThat(newFinished.get(), is(true));
     assertThat(processor.context.isComplete(), is(true));
   }
 
