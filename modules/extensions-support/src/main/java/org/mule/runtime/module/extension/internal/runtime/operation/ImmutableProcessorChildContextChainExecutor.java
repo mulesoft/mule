@@ -88,12 +88,6 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     }
   }
 
-  private void removeSdkInternalContextValues(CoreEvent event) {
-    final String eventId = event.getContext().getId();
-    SdkInternalContext sdkInternalContext = SdkInternalContext.from(event);
-    sdkInternalContext.removeContext(location, eventId);
-  }
-
   private CoreEvent withPreviousCorrelationid(CoreEvent event) {
     return CoreEvent.builder(originalEvent).variables(event.getVariables()).message(event.getMessage()).build();
   }
