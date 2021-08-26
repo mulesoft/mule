@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
@@ -22,8 +21,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.config.api.dsl.CoreDslConstants;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
@@ -34,9 +31,8 @@ import java.util.Optional;
 
 /**
  * {@link ExtensionModelValidator} which applies to {@link ExtensionModel}s which are XML based, as those that contain usages of
- * {@link CoreDslConstants#RAISE_ERROR_IDENTIFIER} or {@link ApplicationModel#ERROR_MAPPING_IDENTIFIER} within an
- * {@link OperationModel}, where each prefix must either match {@code MULE} or the current namespace of the <module/> (which maps
- * to the {@link XmlDslModel#getPrefix()}).
+ * {@link #RAISE_ERROR_IDENTIFIER} or {@link #ERROR_MAPPING_IDENTIFIER} within an {@link OperationModel}, where each prefix must
+ * either match {@code MULE} or the current namespace of the <module/> (which maps to the {@link XmlDslModel#getPrefix()}).
  *
  * @since 4.0
  */
@@ -46,8 +42,12 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
   public static final String CORE_ERROR_NS = CORE_PREFIX.toUpperCase();
 
   public static final String ERROR_MAPPING = "error-mapping";
+  public static final String RAISE_ERROR = "raise-error";
+
   public static final ComponentIdentifier ERROR_MAPPING_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_MAPPING).build();
+  public static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
 
   private static final String SEPARATOR = ":";
   public static final String TYPE_RAISE_ERROR_ATTRIBUTE = "type";
@@ -73,8 +73,8 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
 
   /**
    * Goes over the complete set of message processors inside the <body/> declaration, checking if any of those is a
-   * {@link CoreDslConstants#RAISE_ERROR_IDENTIFIER} or {@link ApplicationModel#ERROR_MAPPING_IDENTIFIER} If it is, then asserts
-   * the correct namespace of it (as XML <module/>s can throw exceptions of the the same namespace).
+   * {@link #RAISE_ERROR_IDENTIFIER} or {@link #ERROR_MAPPING_IDENTIFIER} If it is, then asserts the correct namespace of it (as
+   * XML <module/>s can throw exceptions of the the same namespace).
    *
    * @param namespace        namespace of the <module/>
    * @param operationModel   current operation of the <module/>
