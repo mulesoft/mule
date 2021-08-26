@@ -90,7 +90,6 @@
         <dependency>
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-util</artifactId>
-            <version>${aetherVersion}</version>
             <!-- provided by mule-maven-client-impl, needed to compile -->
             <scope>provided</scope>
         </dependency>
