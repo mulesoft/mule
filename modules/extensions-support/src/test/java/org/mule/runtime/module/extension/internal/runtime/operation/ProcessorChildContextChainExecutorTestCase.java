@@ -21,6 +21,7 @@ import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.Correlat
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -151,7 +152,10 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     doProcessAndWait(chainExecutor, TEST_CORRELATION_ID, r -> {
     }, (t, r) -> {
     });
-    assertThat(finished.get(), is(true));
+    // The original context shouldn't be finished
+    assertThat(finished.get(), is(false));
+    // But the created one must be finished
+    assertThat(processor.context.isComplete(), is(true));
   }
 
 
@@ -167,6 +171,7 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
     public String correlationID = null;
     public String rootId = null;
+    public BaseEventContext context = null;
     private boolean throwError = false;
 
     public void throwError() {
@@ -175,6 +180,7 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
+      context = (BaseEventContext) event.getContext();
       correlationID = event.getCorrelationId();
       rootId = event.getContext().getRootId();
 

@@ -88,6 +88,12 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     }
   }
 
+  private void removeSdkInternalContextValues(CoreEvent event) {
+    final String eventId = event.getContext().getId();
+    SdkInternalContext sdkInternalContext = SdkInternalContext.from(event);
+    sdkInternalContext.removeContext(location, eventId);
+  }
+
   private CoreEvent withPreviousCorrelationid(CoreEvent event) {
     return CoreEvent.builder(originalEvent).variables(event.getVariables()).message(event.getMessage()).build();
   }
@@ -99,9 +105,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
   private EventContext createCorrelationIdContext(String correlationId) {
     BaseEventContext newContext = child(oldContext, ofNullable(location), correlationId);
     newContext.onComplete((ev, t) -> {
-      if (ev != null) {
-        oldContext.success(ev);
-      } else {
+      if (t != null) {
         oldContext.error(t);
       }
     });
