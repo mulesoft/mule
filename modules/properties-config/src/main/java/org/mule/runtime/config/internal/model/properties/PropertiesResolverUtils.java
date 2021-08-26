@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.model.properties;
 
+import static java.lang.Class.forName;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -17,6 +18,7 @@ import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMEN
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -48,11 +50,15 @@ import java.util.ServiceLoader;
 
 import javax.xml.namespace.QName;
 
+import org.slf4j.Logger;
+
 /**
  * Provides a common set of utilities for handling property resolvers for Mule artifacts.
  *
  */
 public class PropertiesResolverUtils {
+
+  private static final Logger LOGGER = getLogger(PropertiesResolverUtils.class);
 
   public static final String GLOBAL_PROPERTY = "global-property";
 
@@ -311,24 +317,27 @@ public class PropertiesResolverUtils {
       providerFactoriesMap.put(componentIdentifier, service);
     });
 
-    Class<?> providerFactoryIfaceOld;
+    // Support of the old deprecated interface only if it is available in the classpath.
+    // This may happen only on environments where the runtime modules are uses as libs in some tool, but not when inside the
+    // Runtime.
     try {
-      providerFactoryIfaceOld =
-          Class.forName("org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory");
-    } catch (ClassNotFoundException e) {
-      throw new MuleRuntimeException(e);
-    }
+      Class<?> providerFactoryIfaceOld =
+          forName("org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory");
 
-    ServiceLoader<? extends ConfigurationPropertiesProviderFactory> providerFactoriesOld =
-        (ServiceLoader<? extends ConfigurationPropertiesProviderFactory>) load(providerFactoryIfaceOld);
-    providerFactoriesOld.forEach(service -> {
-      ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
-      if (providerFactoriesMap.containsKey(componentIdentifier)) {
-        throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
-            + componentIdentifier));
-      }
-      providerFactoriesMap.put(componentIdentifier, service);
-    });
+      ServiceLoader<? extends ConfigurationPropertiesProviderFactory> providerFactoriesOld =
+          (ServiceLoader<? extends ConfigurationPropertiesProviderFactory>) load(providerFactoryIfaceOld);
+      providerFactoriesOld.forEach(service -> {
+        ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
+        if (providerFactoriesMap.containsKey(componentIdentifier)) {
+          throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
+              + componentIdentifier));
+        }
+        providerFactoriesMap.put(componentIdentifier, service);
+      });
+    } catch (ClassNotFoundException e) {
+      LOGGER
+          .debug("Interface 'org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory' not available in classpath, skipping its processing.");
+    }
 
     return providerFactoriesMap;
   }
