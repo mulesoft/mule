@@ -23,7 +23,6 @@
         <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
-            <version>${typesafeConfigVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -41,7 +40,6 @@
         <dependency>
             <groupId>org.everit.json</groupId>
             <artifactId>org.everit.json.schema</artifactId>
-            <version>${everitJsonSchemaVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-validator</groupId>

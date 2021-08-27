@@ -33,7 +33,6 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>${caffeineVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
