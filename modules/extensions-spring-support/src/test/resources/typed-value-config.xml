@@ -98,8 +98,7 @@
     <flow name="typedValueForContentOnNullSafePojoWithDefaultValue">
         <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-pojo-with-nullsafe-and-content >
-            <!-- TODO MULE-19677: Uncomment this line -->
-            <!--<typed-value:param/>-->
+            <typed-value:param/>
         </typed-value:typed-value-operation-pojo-with-nullsafe-and-content>
     </flow>
 
