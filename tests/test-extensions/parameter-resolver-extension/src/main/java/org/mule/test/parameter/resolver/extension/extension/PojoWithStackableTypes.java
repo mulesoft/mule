@@ -9,8 +9,8 @@ package org.mule.test.parameter.resolver.extension.extension;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
+import org.mule.sdk.api.runtime.parameter.Literal;
 
 import java.util.Objects;
 

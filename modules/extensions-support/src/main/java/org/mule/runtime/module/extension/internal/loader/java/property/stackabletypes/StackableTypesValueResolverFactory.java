@@ -92,7 +92,7 @@ public class StackableTypesValueResolverFactory {
   public Optional<ValueResolver> getStaticValueResolver(Object value, Class clazz) {
     Stack<StackableType> stackableTypes = types.get();
     StackableType stackableType = stackableTypes.get(stackableTypes.size() - 1);
-    if (stackableType.getType().isSameType(clazz)) {
+    if (stackableType.getType().isAssignableTo(clazz)) {
       return of(getStaticValueResolver(value));
     }
     return empty();

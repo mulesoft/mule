@@ -17,6 +17,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
@@ -50,11 +51,16 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
         .process(state, null, r -> callback.success(), (e, r) -> callback.error(e));
   }
 
+  public void sdkVoidRouter(WhenRoute when, org.mule.sdk.api.runtime.process.VoidCompletionCallback callback) {
+    when.getChain()
+        .process(state, null, r -> callback.success(), (e, r) -> callback.error(e));
+  }
+
   @Parameter
   @Optional(defaultValue = "0")
   private int fieldParam;
 
-  public void concurrentRouteExecutor(WhenRoute when, RouterCompletionCallback callback) {
+  public void concurrentRouteExecutor(WhenRoute when, org.mule.sdk.api.runtime.process.RouterCompletionCallback callback) {
     Consumer<Chain> processor = (chain) -> {
       final Latch latch = new Latch();
       chain.process((result -> latch.release()), (error, result) -> latch.release());
@@ -75,7 +81,7 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
     } catch (Exception e) {
       callback.error(e);
     }
-    callback.success(Result.builder().output("SUCCESS").build());
+    callback.success(org.mule.sdk.api.runtime.operation.Result.builder().output("SUCCESS").build());
   }
 
   @Deprecated(message = "Simple routers are too simple, we will no longer suport them.", since = "1.2.2")
@@ -103,12 +109,16 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
 
   public void stereotypedRoutes(KillingRoute killingRoute,
                                 @Optional DrugKillingRoute drugKillingRoute,
-                                RouterCompletionCallback callback) {
+                                org.mule.sdk.api.runtime.process.RouterCompletionCallback callback) {
     killingRoute.getChain().process(result -> {
       if (drugKillingRoute != null) {
-        drugKillingRoute.getChain().process(result, callback::success, (e, r) -> callback.error(e));
+        drugKillingRoute.getChain().process(result,
+                                            r -> callback.success(org.mule.sdk.api.runtime.operation.Result.builder()
+                                                .output(r.getOutput()).attributes(r.getAttributes()).build()),
+                                            (e, r) -> callback.error(e));
       } else {
-        callback.success(result);
+        callback.success(org.mule.sdk.api.runtime.operation.Result.builder().output(result.getOutput())
+            .attributes(result.getAttributes()).build());
       }
     }, (e, r) -> callback.error(e));
   }

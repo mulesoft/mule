@@ -23,7 +23,7 @@ public class TestSingleConfigExtensionProvider implements ConnectionProvider<Str
   @Parameter
   private String connectionParam1;
 
-  @ParameterGroup(name = "Connection Group")
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "Connection Group")
   private SingleConfigParameterGroup group;
 
   @Override

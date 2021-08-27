@@ -57,15 +57,15 @@ public class StackableTypesTestCase extends AbstractParameterResolverTestCase {
     assertThat(expression.get(), is("#[output application/json --- {key : 'a nice looking json'}]"));
     assertThat(stringValue, is("{\n  \"key\": \"a nice looking json\"\n}"));
 
-    ParameterResolver<ParameterResolver<ParameterResolver<ParameterResolver<TypedValue<InputStream>>>>> nestedParameter =
+    ParameterResolver<ParameterResolver<org.mule.sdk.api.runtime.parameter.ParameterResolver<ParameterResolver<TypedValue<InputStream>>>>> nestedParameter =
         config.getNestedParameter();
     TypedValue<InputStream> nestedTypedValue = nestedParameter.resolve().resolve().resolve().resolve();
     InputStream nestedValue = nestedTypedValue.getValue();
     String nestedString = IOUtils.toString(nestedValue);
     assertThat(nestedString, is("{\n  \"key\": \"pretty nested\"\n}"));
 
-    ParameterResolver<Literal<String>> resolverOfLiteral = config.getResolverOfLiteral();
-    Literal<String> stringLiteral = resolverOfLiteral.resolve();
+    ParameterResolver<org.mule.sdk.api.runtime.parameter.Literal<String>> resolverOfLiteral = config.getResolverOfLiteral();
+    org.mule.sdk.api.runtime.parameter.Literal<String> stringLiteral = resolverOfLiteral.resolve();
     Optional<String> literalValue = stringLiteral.getLiteralValue();
     assertThat(literalValue, is(not(empty())));
     assertThat(literalValue.get(), is("#['this doesn't make sense']"));
@@ -86,8 +86,8 @@ public class StackableTypesTestCase extends AbstractParameterResolverTestCase {
     assertThat(expression, is(empty()));
     assertThat(resolve.getValue(), is("a nice looking string"));
 
-    ParameterResolver<Literal<String>> resolverOfLiteral = config.getResolverOfLiteral();
-    Literal<String> stringLiteral = resolverOfLiteral.resolve();
+    ParameterResolver<org.mule.sdk.api.runtime.parameter.Literal<String>> resolverOfLiteral = config.getResolverOfLiteral();
+    org.mule.sdk.api.runtime.parameter.Literal<String> stringLiteral = resolverOfLiteral.resolve();
     Optional<String> literalValue = stringLiteral.getLiteralValue();
     assertThat(literalValue, is(not(empty())));
     assertThat(literalValue.get(), is("this doesn't make sense"));

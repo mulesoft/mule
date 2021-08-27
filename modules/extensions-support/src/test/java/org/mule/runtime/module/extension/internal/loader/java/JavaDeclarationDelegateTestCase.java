@@ -509,7 +509,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(60));
+    assertThat(extensionDeclaration.getOperations(), hasSize(62));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(25));
@@ -958,7 +958,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   @Operations({HeisenbergExtension.class})
   public static class HeisenbergWithParameterGroupDefaultName {
 
-    @ParameterGroup(name = DEFAULT_GROUP_NAME)
+    @org.mule.sdk.api.annotation.param.ParameterGroup(name = DEFAULT_GROUP_NAME)
     private PersonalInfo personalInfo;
   }
 

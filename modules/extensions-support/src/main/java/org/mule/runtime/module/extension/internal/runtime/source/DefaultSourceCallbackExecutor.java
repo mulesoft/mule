@@ -105,7 +105,8 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }
-    async = Stream.of(method.getParameterTypes()).anyMatch(p -> SourceCompletionCallback.class.equals(p));
+    async = Stream.of(method.getParameterTypes()).anyMatch(p -> SourceCompletionCallback.class.equals(p)
+        || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(p));
   }
 
   /**

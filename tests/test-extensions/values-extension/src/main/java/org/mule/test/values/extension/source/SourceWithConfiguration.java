@@ -21,7 +21,7 @@ public class SourceWithConfiguration extends AbstractSource {
   @Parameter
   String channel;
 
-  @Config
+  @org.mule.sdk.api.annotation.param.Config
   SimpleConfig simpleConfig;
 
 }

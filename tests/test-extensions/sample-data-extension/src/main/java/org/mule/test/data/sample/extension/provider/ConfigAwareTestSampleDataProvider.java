@@ -16,7 +16,7 @@ import org.mule.test.data.sample.extension.SampleDataOperations;
 
 public class ConfigAwareTestSampleDataProvider extends ConnectedTestSampleDataProvider {
 
-  @Config
+  @org.mule.sdk.api.annotation.param.Config
   private SampleDataExtension config;
 
   @Override

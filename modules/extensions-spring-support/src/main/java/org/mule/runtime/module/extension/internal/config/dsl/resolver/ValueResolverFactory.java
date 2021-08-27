@@ -140,7 +140,8 @@ public class ValueResolverFactory {
 
     if (optionalStackedTypeModelProperty.isPresent()) {
       StackedTypesModelProperty property = optionalStackedTypeModelProperty.get();
-      Optional<ValueResolver> optionalResolver = property.getValueResolverFactory().getStaticValueResolver(value, Literal.class);
+      Optional<ValueResolver> optionalResolver =
+          property.getValueResolverFactory().getStaticValueResolver(value, org.mule.sdk.api.runtime.parameter.Literal.class);
       if (optionalResolver.isPresent()) {
         return optionalResolver.get();
       }

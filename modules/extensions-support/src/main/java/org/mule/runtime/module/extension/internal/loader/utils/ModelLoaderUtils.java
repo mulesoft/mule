@@ -46,7 +46,8 @@ public final class ModelLoaderUtils {
 
   public static boolean isNonBlocking(MethodElement method) {
     return method.getParameters().stream()
-        .anyMatch(p -> p.getType().isAssignableTo(CompletionCallback.class));
+        .anyMatch(p -> p.getType().isAssignableTo(CompletionCallback.class)
+            || p.getType().isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class));
   }
 
   public static boolean isAutoPaging(MethodElement operationMethod) {
