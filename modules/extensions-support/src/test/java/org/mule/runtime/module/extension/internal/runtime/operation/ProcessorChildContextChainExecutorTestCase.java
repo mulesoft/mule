@@ -21,6 +21,7 @@ import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.Correlat
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -139,19 +140,29 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
   @Test
   public void contextFinished() throws InterruptedException {
-    Reference<Boolean> finished = new Reference<>(false);
+    Reference<Boolean> parentFinished = new Reference<>(false);
+    Reference<Boolean> newFinished = new Reference<>(false);
+    Reference<Boolean> correctCompletionOrder = new Reference<>(false);
+
+    processor.setConsumer((ev, t) -> correctCompletionOrder.set(!newFinished.get()));
     ((BaseEventContext) coreEvent.getContext()).onComplete((ev, t) -> {
-      if (ev != null) {
-        finished.set(true);
-      }
+      parentFinished.set(true);
     });
+
     ImmutableProcessorChildContextChainExecutor chainExecutor =
         new ImmutableProcessorChildContextChainExecutor(mock(StreamingManager.class), coreEvent, chain);
 
     doProcessAndWait(chainExecutor, TEST_CORRELATION_ID, r -> {
+      newFinished.set(true);
     }, (t, r) -> {
     });
-    assertThat(finished.get(), is(true));
+    // The original context shouldn't be finished (MULE-19772)
+    assertThat(parentFinished.get(), is(false));
+    // But the created one must be finished
+    assertThat(newFinished.get(), is(true));
+    assertThat(processor.context.isComplete(), is(true));
+    // The created context is called before the onSuccess callback (MULE-19694)
+    assertThat(correctCompletionOrder.get(), is(true));
   }
 
 
@@ -167,16 +178,27 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
     public String correlationID = null;
     public String rootId = null;
+    public BaseEventContext context = null;
+    private BiConsumer<CoreEvent, Throwable> consumer = null;
     private boolean throwError = false;
 
     public void throwError() {
       this.throwError = true;
     }
 
+    public void setConsumer(BiConsumer<CoreEvent, Throwable> consumer) {
+      this.consumer = consumer;
+    }
+
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
+      context = (BaseEventContext) event.getContext();
       correlationID = event.getCorrelationId();
       rootId = event.getContext().getRootId();
+
+      if (consumer != null) {
+        context.onComplete(consumer);
+      }
 
       if (throwError) {
         throw new MessagingException(createStaticMessage("some exception"), event);
