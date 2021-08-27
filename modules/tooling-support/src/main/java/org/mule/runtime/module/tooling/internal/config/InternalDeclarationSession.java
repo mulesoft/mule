@@ -13,6 +13,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -80,6 +81,7 @@ public class InternalDeclarationSession implements DeclarationSession {
   private ExpressionManager expressionManager;
 
   @Inject
+  @Named(SAMPLE_DATA_SERVICE_KEY)
   private SampleDataService sampleDataService;
 
   @Inject

@@ -10,6 +10,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager;
@@ -90,5 +91,10 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
   @Override
   public ValueProviderService getValueProviderService() {
     return getDelegate().getValueProviderService();
+  }
+
+  @Override
+  public SampleDataService getSampleDataService() {
+    return getDelegate().getSampleDataService();
   }
 }
