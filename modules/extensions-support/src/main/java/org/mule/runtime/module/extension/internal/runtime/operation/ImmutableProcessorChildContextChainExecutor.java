@@ -99,9 +99,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
   private EventContext createCorrelationIdContext(String correlationId) {
     BaseEventContext newContext = child(oldContext, ofNullable(location), correlationId);
     newContext.onComplete((ev, t) -> {
-      if (ev != null) {
-        oldContext.success(ev);
-      } else {
+      if (t != null) {
         oldContext.error(t);
       }
     });
