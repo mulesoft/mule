@@ -3474,40 +3474,6 @@
                   "name": "endpoint",
                   "description": "",
                   "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "@ref:org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain"
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 8
-                  },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "NTLM_DOMAIN",
-                      "namespace": "SEMANTIC-TERMS"
-                    }
-                  ],
-                  "semanticTerms": [],
-                  "name": "ntlmDomain",
-                  "description": "",
-                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -3715,7 +3681,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 9,
+                    "order": 8,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3760,8 +3726,7 @@
                 "domain",
                 "urlPath",
                 "proxyConfiguration",
-                "endpoint",
-                "ntlmDomain"
+                "endpoint"
               ]
             }
           }
@@ -8541,40 +8506,6 @@
               "name": "endpoint",
               "description": "",
               "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "@ref:org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 8
-              },
-              "allowedStereotypeModels": [
-                {
-                  "type": "NTLM_DOMAIN",
-                  "namespace": "SEMANTIC-TERMS"
-                }
-              ],
-              "semanticTerms": [],
-              "name": "ntlmDomain",
-              "description": "",
-              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -8782,7 +8713,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 9,
+                "order": 8,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -8827,8 +8758,7 @@
             "domain",
             "urlPath",
             "proxyConfiguration",
-            "endpoint",
-            "ntlmDomain"
+            "endpoint"
           ]
         }
       }
@@ -9648,39 +9578,6 @@
   ],
   "modelProperties": {},
   "types": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain",
-        "classInformation": {
-          "classname": "org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain",
-          "hasDefaultConstructor": false,
-          "isInterface": true,
-          "isInstantiable": false,
-          "isAbstract": true,
-          "isFinal": false,
-          "implementedInterfaces": [
-            "java.lang.annotation.Annotation"
-          ],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeAlias": {
-          "value": "NtlmDomain"
-        },
-        "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "NTLM_DOMAIN",
-              "namespace": "SEMANTIC-TERMS"
-            }
-          ]
-        }
-      },
-      "fields": []
-    },
     {
       "format": "java",
       "type": "Object",

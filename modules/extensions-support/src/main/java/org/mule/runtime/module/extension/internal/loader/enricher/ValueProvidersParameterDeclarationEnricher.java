@@ -278,7 +278,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    */
   private Optional<Field> enrichWithConnection(ValueProviderFactoryModelPropertyBuilder modelPropertyBuilder,
                                                ParameterizableTypeWrapper parameterizableComponent) {
-    List<FieldElement> connectionFields = parameterizableComponent.getAnnotatedFields(Connection.class);
+    List<FieldElement> connectionFields =
+        parameterizableComponent.getAnnotatedFields(Connection.class, org.mule.sdk.api.annotation.param.Connection.class);
     if (!connectionFields.isEmpty()) {
       Field field = connectionFields.get(0).getField().get();
       modelPropertyBuilder.withConnection(field);
@@ -297,7 +298,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    */
   private Optional<Field> enrichWithConfiguration(ValueProviderFactoryModelPropertyBuilder modelPropertyBuilder,
                                                   ParameterizableTypeWrapper parameterizableComponent) {
-    List<FieldElement> configFields = parameterizableComponent.getAnnotatedFields(Config.class);
+    List<FieldElement> configFields =
+        parameterizableComponent.getAnnotatedFields(Config.class, org.mule.sdk.api.annotation.param.Config.class);
     if (!configFields.isEmpty()) {
       Field field = configFields.get(0).getField().get();
       modelPropertyBuilder.withConfig(field);

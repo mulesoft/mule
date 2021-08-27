@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
+
+    <vegan:banana-config name="banana"/>
+
+    <flow name="listenAndByteBanana">
+        <vegan:sdk-get-lunch config-ref="banana" />
+        <set-payload value="#[java!org::mule::test::module::extension::operation::FlowListenerOperationExecutionTestCase::bite(payload)]"/>
+    </flow>
+
+    <flow name="listenAndEatMeat">
+        <vegan:sdk-get-lunch config-ref="banana"/>
+        <set-payload value="pork beef" />
+    </flow>
+
+    <flow name="listenAndFail">
+        <vegan:sdk-get-lunch config-ref="banana"/>
+        <set-payload value="#[!null.a]"/>
+    </flow>
+                  
+</mule>

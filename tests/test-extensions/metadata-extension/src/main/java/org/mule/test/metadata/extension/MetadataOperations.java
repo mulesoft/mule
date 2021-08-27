@@ -89,7 +89,7 @@ public class MetadataOperations {
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
   @MediaType(value = ANY, strict = false)
-  public Object metadataKeyOptional(@Connection MetadataConnection connection,
+  public Object metadataKeyOptional(@org.mule.sdk.api.annotation.param.Connection MetadataConnection connection,
                                     @Optional @MetadataKeyId(TestOutputResolverWithKeyResolver.class) String type,
                                     @Optional @Content Object content) {
     return type;
@@ -131,13 +131,13 @@ public class MetadataOperations {
     return type;
   }
 
-  public void contentOnlyIgnoresOutput(@Connection MetadataConnection connection,
+  public void contentOnlyIgnoresOutput(@org.mule.sdk.api.annotation.param.Connection MetadataConnection connection,
                                        @MetadataKeyId(TestInputAndOutputResolverWithKeyResolver.class) String type,
                                        @Content @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object content) {}
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
   @MediaType(value = ANY, strict = false)
-  public Object contentMetadataWithoutKeyId(@Connection MetadataConnection connection,
+  public Object contentMetadataWithoutKeyId(@org.mule.sdk.api.annotation.param.Connection MetadataConnection connection,
                                             @Content @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
     return null;
   }
@@ -203,7 +203,8 @@ public class MetadataOperations {
     return dessertOrder;
   }
 
-  public Dessert inputHasExclusiveOptionalParameterGroup(@ParameterGroup(name = "dessert") Dessert dessert) {
+  public Dessert inputHasExclusiveOptionalParameterGroup(@org.mule.sdk.api.annotation.param.ParameterGroup(
+      name = "dessert") Dessert dessert) {
     return dessert;
   }
 
@@ -315,7 +316,7 @@ public class MetadataOperations {
     };
   }
 
-  public LocationKey partialMultiLevelKeyShowInDslResolver(@Connection MetadataConnection connection,
+  public LocationKey partialMultiLevelKeyShowInDslResolver(@org.mule.sdk.api.annotation.param.Connection MetadataConnection connection,
                                                            @ParameterGroup(name = "keyShowInDsl",
                                                                showInDsl = true) @MetadataKeyId(TestPartialMultiLevelKeyResolver.class) LocationKey locationKeyShowInDslParam,
                                                            @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {

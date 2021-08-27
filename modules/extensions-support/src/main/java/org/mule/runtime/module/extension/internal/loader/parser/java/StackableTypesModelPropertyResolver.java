@@ -143,4 +143,47 @@ class StackableTypesModelPropertyResolver {
       return new StackableTypesModelPropertyResolver(stackableTypes);
     }
   }
+
+  public static StackableTypesParameterContributor defaultContributor(ClassTypeLoader typeLoader) {
+    return StackableTypesParameterContributor.builder(typeLoader)
+        .addType(StackableType
+            .builder(ParameterResolver.class)
+            .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
+            .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
+            .setExpressionBasedResolverFactory((value, expectedType,
+                                                content) -> new ExpressionBasedParameterResolverValueResolver(value, expectedType,
+                                                                                                              fromType(expectedType),
+                                                                                                              content))
+            .build())
+        .addType(StackableType
+            .builder(TypedValue.class)
+            .setStaticResolverFactory(value -> new StaticValueResolver<>(new TypedValue<>(value, DataType.fromObject(value))))
+            .setDelegateResolverFactory(valueResolver -> new TypedValueValueResolverWrapper(valueResolver))
+            .setExpressionBasedResolverFactory((expression, expectedType,
+                                                content) -> new ExpressionTypedValueValueResolver(expression,
+                                                                                                  expectedType, content))
+            .build())
+        .addType(StackableType
+            .builder(Literal.class)
+            .setExpressionBasedResolverFactory((expression, expectedType, content) -> new StaticLiteralValueResolver(expression,
+                                                                                                                     expectedType))
+            .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))
+            .build())
+        .addType(StackableType
+            .builder(org.mule.sdk.api.runtime.parameter.ParameterResolver.class)
+            .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
+            .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
+            .setExpressionBasedResolverFactory((value, expectedType,
+                                                content) -> new ExpressionBasedParameterResolverValueResolver(value, expectedType,
+                                                                                                              fromType(expectedType),
+                                                                                                              content))
+            .build())
+        .addType(StackableType
+            .builder(org.mule.sdk.api.runtime.parameter.Literal.class)
+            .setExpressionBasedResolverFactory((expression, expectedType, content) -> new StaticLiteralValueResolver(expression,
+                                                                                                                     expectedType))
+            .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))
+            .build())
+        .build();
+  }
 }

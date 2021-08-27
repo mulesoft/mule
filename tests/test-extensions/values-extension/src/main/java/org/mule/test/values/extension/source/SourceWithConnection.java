@@ -22,7 +22,7 @@ public class SourceWithConnection extends AbstractSource {
   @Parameter
   String channel;
 
-  @Connection
+  @org.mule.sdk.api.annotation.param.Connection
   ConnectionProvider<ValuesConnection> connection;
 
 }

@@ -23,7 +23,7 @@ public class FruitOperationsWithConfigOverride {
     return timeToPeel;
   }
 
-  public long getTimeToPeelLong(@Config EasyToEatConfig config,
+  public long getTimeToPeelLong(@org.mule.sdk.api.annotation.param.Config EasyToEatConfig config,
                                 @ConfigOverride long timeToPeel) {
     return timeToPeel;
   }
@@ -33,7 +33,7 @@ public class FruitOperationsWithConfigOverride {
     return timeToPeelEnum;
   }
 
-  public List<String> getProducers(@Config EasyToEatConfig config,
+  public List<String> getProducers(@org.mule.sdk.api.annotation.param.Config EasyToEatConfig config,
                                    @ConfigOverride List<String> mainProducers) {
     return mainProducers;
   }

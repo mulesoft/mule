@@ -31,4 +31,21 @@ public class FlowListenerBananaOperations {
     return banana;
   }
 
+  @OutputResolver(output = FruitMetadataResolver.class)
+  public Fruit SdkGetLunch(@Config BananaConfig config, org.mule.sdk.api.runtime.operation.FlowListener listener) {
+    final Banana banana = new Banana();
+    listener.onSuccess(message -> {
+      if (message.getPayload().getValue() instanceof Banana) {
+        config.onBanana();
+      } else {
+        config.onNotBanana();
+      }
+    });
+
+    listener.onError(exception -> config.onException());
+    listener.onComplete(() -> banana.peel());
+
+    return banana;
+  }
+
 }

@@ -51,7 +51,7 @@ public class MoneyLaunderingOperation {
 
   private long totalLaunderedAmount = 0;
 
-  public synchronized Long launder(@Config HeisenbergExtension config, long amount) {
+  public synchronized Long launder(@org.mule.sdk.api.annotation.param.Config HeisenbergExtension config, long amount) {
     config.setMoney(config.getMoney().subtract(BigDecimal.valueOf(amount)));
     totalLaunderedAmount += amount;
     return totalLaunderedAmount;

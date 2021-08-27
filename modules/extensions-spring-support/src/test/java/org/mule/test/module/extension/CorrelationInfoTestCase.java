@@ -6,21 +6,40 @@
  */
 package org.mule.test.module.extension;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.ItemSequenceInfo.of;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
+import org.mule.test.runner.RunnerDelegateTo;
+
+import java.util.Collection;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
+@RunnerDelegateTo(Parameterized.class)
 public class CorrelationInfoTestCase extends AbstractExtensionFunctionalTestCase {
 
+  @Parameterized.Parameter(0)
+  public String parameterizationName;
+
+  @Parameterized.Parameter(1)
+  public String configName;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        {"Using Extensions API", "correlation-info-config.xml"},
+        {"Using SDK API", "sdk-correlation-info-config.xml"},
+    });
+  }
 
   @Override
   protected String getConfigFile() {
-    return "correlation-info-config.xml";
+    return configName;
   }
 
   @Test

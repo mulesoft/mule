@@ -62,6 +62,7 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.sdk.api.annotation.deprecated.Deprecated;
+import org.mule.sdk.api.future.SecretSdkFutureFeature;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -104,6 +105,8 @@ import com.google.common.collect.ImmutableMap;
 
 @Stereotype(EmpireStereotype.class)
 public class HeisenbergOperations implements Disposable {
+
+  public static SecretSdkFutureFeature secretSdkFutureFeature = null;
 
   public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
   public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
@@ -206,7 +209,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   public PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>> getPagedCursorProviderBlacklist(@Config HeisenbergExtension config,
-                                                                                                              StreamingHelper streamingHelper) {
+                                                                                                              org.mule.sdk.api.runtime.streaming.StreamingHelper streamingHelper) {
 
     return new PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>>() {
 
@@ -276,7 +279,7 @@ public class HeisenbergOperations implements Disposable {
     return config.getPersonalInfo().getName();
   }
 
-  public void die(@Config HeisenbergExtension config) {
+  public void die(@org.mule.sdk.api.annotation.param.Config HeisenbergExtension config) {
     config.setEndingHealth(HealthStatus.DEAD);
   }
 
@@ -335,8 +338,30 @@ public class HeisenbergOperations implements Disposable {
     return mapParameters.toString();
   }
 
+  @MediaType(TEXT_PLAIN)
+  public String sdkExecuteForeingOrders(String extensionName, String operationName, @Optional String configName,
+                                        org.mule.sdk.api.client.ExtensionsClient extensionsClient,
+                                        Map<String, Object> operationParameters)
+      throws MuleException {
+    Object output =
+        extensionsClient.execute(extensionName, operationName, createSdkOperationParameters(configName, operationParameters))
+            .getOutput();
+    return output instanceof TypedValue ? (String) ((TypedValue) output).getValue() : (String) output;
+  }
+
   private OperationParameters createOperationParameters(String configName, Map<String, Object> operationParameters) {
     DefaultOperationParametersBuilder builder = DefaultOperationParameters.builder();
+    if (configName != null) {
+      builder.configName(configName);
+    }
+    operationParameters.forEach((key, value) -> builder.addParameter(key, value));
+    return builder.build();
+  }
+
+  private org.mule.sdk.api.client.OperationParameters createSdkOperationParameters(String configName,
+                                                                                   Map<String, Object> operationParameters) {
+    org.mule.sdk.api.client.DefaultOperationParametersBuilder builder =
+        org.mule.sdk.api.client.DefaultOperationParameters.builder();
     if (configName != null) {
       builder.configName(configName);
     }
@@ -372,7 +397,7 @@ public class HeisenbergOperations implements Disposable {
 
   @MediaType(TEXT_PLAIN)
   @Fires(KnockNotificationProvider.class)
-  public String knock(KnockeableDoor knockedDoor, NotificationEmitter notificationEmitter) {
+  public String knock(KnockeableDoor knockedDoor, org.mule.sdk.api.notification.NotificationEmitter notificationEmitter) {
     TypedValue<SimpleKnockeableDoor> door = of(new SimpleKnockeableDoor(knockedDoor));
     notificationEmitter.fire(KNOCKING_DOOR, door);
     String knock = knockedDoor.knock();
@@ -387,7 +412,7 @@ public class HeisenbergOperations implements Disposable {
 
   @MediaType(TEXT_PLAIN)
   public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting,
-                      @ParameterGroup(name = "Personal Info") PersonalInfo info) {
+                      @org.mule.sdk.api.annotation.param.ParameterGroup(name = "Personal Info") PersonalInfo info) {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
   }
 
@@ -415,7 +440,8 @@ public class HeisenbergOperations implements Disposable {
   }
 
   public void disguice(@ParameterGroup(name = "currentLook") @DisplayName("Look") BarberPreferences currentLook,
-                       @ParameterGroup(name = "disguise", showInDsl = true) @DisplayName("Look") BarberPreferences disguise) {
+                       @org.mule.sdk.api.annotation.param.ParameterGroup(name = "disguise",
+                           showInDsl = true) @DisplayName("Look") BarberPreferences disguise) {
 
   }
 
@@ -434,7 +460,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
-  public void callGusFringNonBlocking(CompletionCallback<Void, Void> callback) {
+  public void callGusFringNonBlocking(org.mule.sdk.api.runtime.process.CompletionCallback<Void, Void> callback) {
     executor.get().execute(() -> {
       callback.error(new HeisenbergException(CALL_GUS_MESSAGE));
     });
@@ -476,7 +502,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
-  public String literalEcho(Literal<String> literalExpression) {
+  public String literalEcho(org.mule.sdk.api.runtime.parameter.Literal<String> literalExpression) {
     return literalExpression.getLiteralValue().orElse(null);
   }
 
@@ -489,12 +515,12 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @OutputResolver(output = HeisenbergOutputResolver.class)
-  public ParameterResolver<Weapon> processWeapon(@Optional ParameterResolver<Weapon> weapon) {
+  public org.mule.sdk.api.runtime.parameter.ParameterResolver<Weapon> processWeapon(@Optional org.mule.sdk.api.runtime.parameter.ParameterResolver<Weapon> weapon) {
     return weapon;
   }
 
   @OutputResolver(output = HeisenbergOutputResolver.class)
-  public ParameterResolver<List<Weapon>> processWeaponList(@Optional ParameterResolver<List<Weapon>> weapons) {
+  public org.mule.sdk.api.runtime.parameter.ParameterResolver<List<Weapon>> processWeaponList(@Optional org.mule.sdk.api.runtime.parameter.ParameterResolver<List<Weapon>> weapons) {
     return weapons;
   }
 
@@ -649,4 +675,9 @@ public class HeisenbergOperations implements Disposable {
       }
     };
   }
+
+  public void futureSdkImplicitHandling(SecretSdkFutureFeature secretSdkFutureFeature) {
+    HeisenbergOperations.secretSdkFutureFeature = secretSdkFutureFeature;
+  }
+
 }

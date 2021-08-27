@@ -29,7 +29,7 @@ public class ParameterResolverConfig extends ParameterResolverExtension {
 
   @Parameter
   @Optional
-  private ParameterResolver<KnockeableDoor> doorResolver;
+  private org.mule.sdk.api.runtime.parameter.ParameterResolver<KnockeableDoor> doorResolver;
 
   @Parameter
   @Optional
@@ -41,7 +41,7 @@ public class ParameterResolverConfig extends ParameterResolverExtension {
 
   @Parameter
   @Optional
-  private ParameterResolver<ParameterResolver<ParameterResolver<ParameterResolver<TypedValue<InputStream>>>>> nestedParameter;
+  private org.mule.sdk.api.runtime.parameter.ParameterResolver<ParameterResolver<ParameterResolver<org.mule.sdk.api.runtime.parameter.ParameterResolver<TypedValue<InputStream>>>>> nestedParameter;
 
   @Parameter
   @Optional
@@ -55,7 +55,7 @@ public class ParameterResolverConfig extends ParameterResolverExtension {
     this.stringResolver = stringResolver;
   }
 
-  public ParameterResolver<KnockeableDoor> getDoorResolver() {
+  public org.mule.sdk.api.runtime.parameter.ParameterResolver<KnockeableDoor> getDoorResolver() {
     return doorResolver;
   }
 

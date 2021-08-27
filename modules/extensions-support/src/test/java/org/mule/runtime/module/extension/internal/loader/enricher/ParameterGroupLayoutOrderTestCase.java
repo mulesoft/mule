@@ -147,7 +147,7 @@ public class ParameterGroupLayoutOrderTestCase {
   @Configuration(name = "GroupImplicitOrderConfig")
   public static class ParameterGroupImplicitOrder {
 
-    @ParameterGroup(name = GROUP_NAME)
+    @org.mule.sdk.api.annotation.param.ParameterGroup(name = GROUP_NAME)
     GroupImplicitOrder groupOne;
 
     @Parameter
@@ -192,7 +192,7 @@ public class ParameterGroupLayoutOrderTestCase {
   public static class ParameterGroupNoGeneral {
 
     @Placement(order = 1)
-    @ParameterGroup(name = GROUP_NAME)
+    @org.mule.sdk.api.annotation.param.ParameterGroup(name = GROUP_NAME)
     GroupImplicitOrder groupOne;
   }
 

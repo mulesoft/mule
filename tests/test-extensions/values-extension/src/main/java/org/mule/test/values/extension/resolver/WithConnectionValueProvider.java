@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class WithConnectionValueProvider implements ValueProvider {
 
-  @Connection
+  @org.mule.sdk.api.annotation.param.Connection
   ValuesConnection connection;
 
   @Override

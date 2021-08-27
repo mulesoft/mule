@@ -72,6 +72,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         routersDelegate.declareRouter(extensionDeclarer, (HasConstructDeclarer) ownerDeclarer, parser);
         continue;
       }
+      
       final OperationDeclarer operation = actualDeclarer.withOperation(parser.getName())
           .describedAs(parser.getDescription())
           .supportsStreaming(parser.supportsStreaming())

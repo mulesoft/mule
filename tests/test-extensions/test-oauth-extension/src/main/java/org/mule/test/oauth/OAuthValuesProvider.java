@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class OAuthValuesProvider implements ValueProvider {
 
-  @Connection
+  @org.mule.sdk.api.annotation.param.Connection
   private TestOAuthConnection testOAuthConnection;
 
   @Override
