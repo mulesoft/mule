@@ -65,7 +65,7 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
             if (desiredField.isPresent()) {
               return getFieldValue(parameterGroup, parameterName, reflectionCache);
             }
-            if (parameterGroupModel.isShowInDsl() && parameterGroupModel.getName().equals(parameterName)) {
+            if (parameterGroupModel.getName().equals(parameterName)) {
               returnValue = parameterGroup;
             }
           }
