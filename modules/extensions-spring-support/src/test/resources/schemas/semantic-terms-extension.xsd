@@ -195,6 +195,7 @@
           <xs:attribute type="mule:expressionString" use="required" name="urlPath"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="proxyConfiguration"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="required" name="endpoint"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="ntlmDomain"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
