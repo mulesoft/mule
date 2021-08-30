@@ -93,7 +93,7 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
                                            OperationModel operationModel, ExtensionModel extensionModel) {
     operationMethod.getParameters().stream()
         .filter(extensionParameter -> extensionParameter.getType().isSameType(CompletionCallback.class)
-            || p.getType().isSameType(org.mule.sdk.api.runtime.process.CompletionCallback.class))
+            || extensionParameter.getType().isSameType(org.mule.sdk.api.runtime.process.CompletionCallback.class))
         .findFirst().ifPresent(extensionParameter -> {
           List<TypeGeneric> generics = extensionParameter.getType().getGenerics();
           if (generics.isEmpty()) {
