@@ -72,7 +72,6 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
-import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.sdk.api.annotation.deprecated.Deprecated;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.Source;
