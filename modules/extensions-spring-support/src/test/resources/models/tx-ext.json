@@ -3816,6 +3816,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -3827,7 +3828,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -3894,7 +3896,7 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": false,
+                    "allowsInlineDefinition": true,
                     "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
@@ -3913,7 +3915,7 @@
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "error-mapping",
+                        "localPart": "error-mappings",
                         "prefix": "mule"
                       }
                     },
@@ -3945,13 +3947,15 @@
                     "format": "java",
                     "type": "Union",
                     "annotations": {
-                      "typeId": "ReconnectionStrategy"
+                      "typeId": "ReconnectionStrategy",
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect"
+                          "typeId": "reconnect",
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -4023,7 +4027,8 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect-forever"
+                          "typeId": "reconnect-forever",
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
