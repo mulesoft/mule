@@ -298,7 +298,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
         new PoolingProfile(-1, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, DEFAULT_POOL_INITIALISATION_POLICY);
     initStrategy();
     verifyLogRegex(debugMessages,
-                   "Status for pool (.*): 0 connections are active out of unlimited max active, {} connections are idle out of unlimited max idle",
+                   "Status for pool (.*): 0 connections are active out of unlimited max active limit, {} connections are idle out of unlimited max idle limit",
                    DEFAULT_POOL_INITIALISATION_POLICY);
   }
 
