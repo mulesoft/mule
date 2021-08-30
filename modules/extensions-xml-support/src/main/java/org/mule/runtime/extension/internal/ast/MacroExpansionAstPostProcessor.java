@@ -15,7 +15,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
@@ -27,15 +26,6 @@ import java.util.stream.Stream;
 
 public class MacroExpansionAstPostProcessor implements ApplicationModelAstPostProcessor {
 
-  /**
-   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModulesModel} as
-   * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
-   * message processors
-   *
-   * @param ast
-   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
-   *                        expanded.
-   */
   @Override
   public ArtifactAst postProcessAst(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
     return new MacroExpansionModulesModel(ast, extensionModels).expand();

@@ -9,11 +9,12 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.util.Optional.empty;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getFirstImplicit;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_CONNECTION_PROVIDER_ELEMENT;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;

@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.internal.processor.ModuleOperationMessageProcessor;
 
 import java.util.List;
@@ -24,10 +25,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.springframework.beans.factory.FactoryBean;
-
 public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponent
-    implements FactoryBean<ModuleOperationMessageProcessor> {
+    implements ObjectFactory<ModuleOperationMessageProcessor> {
 
   private Map<String, Object> parameters = emptyMap();
 
@@ -46,11 +45,6 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
 
   @Inject
   protected ConfigurationComponentLocator locator;
-
-  @Override
-  public Class getObjectType() {
-    return ModuleOperationMessageProcessor.class;
-  }
 
   @Override
   public ModuleOperationMessageProcessor getObject() throws Exception {

@@ -22,24 +22,6 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.NameUtils.sanitizeName;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EE_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TRANSACTION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.PRIVATE_OBJECT_STORE_ELEMENT;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SCHEDULING_STRATEGY_ELEMENT;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.STRING;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_OPTIONAL;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_REQUIRED;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.XML_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -49,10 +31,26 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentH
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_PROPERTY_PLACEHOLDER_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_TRANSACTION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.PRIVATE_OBJECT_STORE_ELEMENT;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SCHEDULING_STRATEGY_ELEMENT;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.STRING;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.USE_OPTIONAL;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.USE_REQUIRED;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.XML_NAMESPACE;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -77,7 +75,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.tx.TransactionType;
-import org.mule.runtime.config.internal.dsl.SchemaConstants;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.SubstitutionGroup;
@@ -128,6 +125,12 @@ import javax.xml.namespace.QName;
  * @since 3.7.0
  */
 public final class SchemaBuilder {
+
+  public String EE_SCHEMA_LOCATION = format("%s/%s/%s.xsd", EE_NAMESPACE, "current", EE_PREFIX);
+
+  public static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
+  public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION =
+      "http://www.springframework.org/schema/beans/spring-beans.xsd";
 
   private static final String GLOBAL_ABSTRACT_ELEMENT_MASK = "global-%s";
   private static final String AUTOGENERATED_TYPEID_MASK = "AUTOGENERATED_%s_";
@@ -241,7 +244,7 @@ public final class SchemaBuilder {
   private Import createMuleImport() {
     Import muleSchemaImport = new Import();
     muleSchemaImport.setNamespace(CORE_NAMESPACE);
-    muleSchemaImport.setSchemaLocation(MULE_SCHEMA_LOCATION);
+    muleSchemaImport.setSchemaLocation(CORE_SCHEMA_LOCATION);
     return muleSchemaImport;
   }
 
@@ -335,7 +338,7 @@ public final class SchemaBuilder {
     TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
 
     Optional<String> enumTypeId = getOrCreateEnumTypeId(enumType);
-    enumSimpleType.setName(sanitizeName(enumTypeId) + SchemaConstants.ENUM_TYPE_SUFFIX);
+    enumSimpleType.setName(sanitizeName(enumTypeId) + ENUM_TYPE_SUFFIX);
 
     Union union = new Union();
     union.getSimpleType().add(createEnumSimpleType(enumAnnotation));
@@ -349,7 +352,7 @@ public final class SchemaBuilder {
     LocalSimpleType expression = new LocalSimpleType();
     Restriction restriction = new Restriction();
     expression.setRestriction(restriction);
-    restriction.setBase(SchemaConstants.MULE_PROPERTY_PLACEHOLDER_TYPE);
+    restriction.setBase(MULE_PROPERTY_PLACEHOLDER_TYPE);
 
     return expression;
   }

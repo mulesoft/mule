@@ -8,20 +8,21 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_VALIDATOR;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_VALIDATOR;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.UNBOUNDED;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
