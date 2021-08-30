@@ -79,7 +79,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
       logPoolStatus(LOGGER, pool, poolId);
       returnAttempted = true;
     } catch (Exception e) {
-      LOGGER.warn("Could not return connection to the pool. Connection will be destroyed", e);
+      LOGGER.warn("Could not return connection to the pool. Connection will be terminated", e);
     } finally {
       try {
         if (!returnAttempted) {
@@ -101,7 +101,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
       pool.invalidateObject(connection);
       logPoolStatus(LOGGER, pool, poolId);
     } catch (Exception e) {
-      LOGGER.warn("Exception was found trying to invalidate connection of type " + connection.getClass().getName(), e);
+      LOGGER.warn("Exception was thrown trying to invalidate connection of type " + connection.getClass().getName(), e);
     } finally {
       connection = null;
     }

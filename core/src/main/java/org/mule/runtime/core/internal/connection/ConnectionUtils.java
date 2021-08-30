@@ -62,7 +62,7 @@ public final class ConnectionUtils {
       String maxActive = pool.getMaxActive() < 0 ? "unlimited" : String.valueOf(pool.getMaxActive());
       String maxIdle = pool.getMaxIdle() < 0 ? "unlimited" : String.valueOf(pool.getMaxIdle());
       logger
-          .debug("Status for pool {}: {} connections are active out of {} max active, {} connections are idle out of {} max idle",
+          .debug("Status for pool {}: {} connections are active out of {} max active limit, {} connections are idle out of {} max idle limit",
                  poolId, pool.getNumActive(), maxActive, pool.getNumIdle(), maxIdle);
     }
   }
