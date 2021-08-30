@@ -159,7 +159,7 @@
         <derbyVersion>10.14.2.0</derbyVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-	<junitVersion>4.12</junitVersion>
+        <junitVersion>4.12</junitVersion>
         <weaveVersion>2.5.0-SNAPSHOT</weaveVersion>
 
         <!-- Mule Snapshot Dependencies -->
