@@ -1557,6 +1557,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
   public void whenDeploymentFailsDoNotPersistFlows() throws Exception {
     addPackedAppFromBuilder(dummyFlowErrorAppDescriptorFileBuilder);
 

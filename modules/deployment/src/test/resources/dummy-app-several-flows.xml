@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/current/mule-callback.xsd">
 
-    <description>Empty Mule Application</description>
+    <description>Failing Mule Application</description>
 
     <object class="org.mule.runtime.module.deployment.internal.ApplicationDeploymentTestCase.FailingProcessorTest" name="FailingProcessor">
     </object>
