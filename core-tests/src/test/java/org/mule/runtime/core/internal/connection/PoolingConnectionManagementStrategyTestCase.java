@@ -257,7 +257,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     verifyLogRegex(debugMessages, "Initializing pool (.*) with {} initial connections", DEFAULT_POOL_INITIALISATION_POLICY);
     verifyLogRegex(debugMessages, "Created connection (.*)");
     verifyLogRegex(debugMessages,
-                   "Status for pool (.*): 0 connections are active out of {} max active, {} connections are idle out of {} max idle",
+                   "Status for pool (.*): 0 connections are active out of {} max active limit, {} connections are idle out of {} max idle limit",
                    DEFAULT_MAX_POOL_ACTIVE, DEFAULT_POOL_INITIALISATION_POLICY, DEFAULT_MAX_POOL_IDLE);
   }
 
