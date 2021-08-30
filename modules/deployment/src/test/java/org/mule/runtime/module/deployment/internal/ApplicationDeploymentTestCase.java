@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -50,8 +51,10 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
@@ -69,9 +72,12 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -893,6 +899,21 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Issue("MULE-19127")
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
+  public void redeploysAppWithNotStoppedFlowAndStartsItOnDeploy() throws Exception {
+    deployApplication(dummyAppDescriptorFileBuilder);
+
+    reset(applicationDeploymentListener);
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    assertIfFlowsHaveStarted(app_2, true);
+  }
+
+  @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
   public void stopsAndStartsAppWithStoppedFlowAndDoesNotStartIt() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
     for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
@@ -1533,6 +1554,38 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
+  public void whenDeploymentFailsDoNotPersistFlows() throws Exception {
+    addPackedAppFromBuilder(dummyFlowErrorAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentFailure(applicationDeploymentListener, dummyFlowErrorAppDescriptorFileBuilder.getId());
+
+    Properties flowDeploymentProperties =
+        resolveFlowDeploymentProperties(dummyFlowErrorAppDescriptorFileBuilder.getId(), empty());
+    assertThat(flowDeploymentProperties, is(notNullValue()));
+    for (int i = 1; i < 4; i++) {
+      Object mustStartFlow = flowDeploymentProperties.get("test" + i + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY);
+      if (mustStartFlow != null) {
+        assertThat(mustStartFlow, is("true"));
+      }
+    }
+  }
+
+  public static class FailingProcessorTest implements Processor, Startable {
+
+    @Override
+    public void start() throws MuleException {
+      throw new RuntimeException("Failing processor error");
+    }
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      return event;
+    }
   }
 
   private void testTempFileOnRedeployment(CheckedRunnable deployApp, CheckedRunnable redeployApp) throws Exception {

@@ -249,6 +249,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File barUtilsForbiddenMuleThirdPartyJarFile;
 
   protected static File echoTestClassFile;
+  protected static File echoErrorTestClassFile;
   protected static File echoTestJarFile;
 
   protected static File oracleExtensionJarFile;
@@ -316,6 +317,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
             .compile("bar-muleThirdPartyForbidden.jar");
 
     echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
+    echoErrorTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoErrorTest.java"));
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 
     defaulServiceEchoJarFile = new JarCompiler()
@@ -448,6 +450,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
       .dependingOn(callbackExtensionPlugin)
       .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+  protected final ApplicationFileBuilder dummyFlowErrorAppDescriptorFileBuilder =
+      new ApplicationFileBuilder("dummy-error-flow-app")
+          .definedBy("dummy-app-several-flows.xml").configuredWith("myCustomProp", "someValue")
+          .dependingOn(callbackExtensionPlugin)
+          .containingClass(echoErrorTestClassFile, "org/foo/EchoErrorTest.class")
+          .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
 
   // Domain file builders
   protected DomainFileBuilder dummyDomainFileBuilder =
