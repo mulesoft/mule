@@ -3474,6 +3474,37 @@
                   "name": "endpoint",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 8
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.ntlmDomain"
+                  ],
+                  "name": "ntlmDomain",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -3681,7 +3712,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 8,
+                    "order": 9,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3726,7 +3757,8 @@
                 "domain",
                 "urlPath",
                 "proxyConfiguration",
-                "endpoint"
+                "endpoint",
+                "ntlmDomain"
               ]
             }
           }
@@ -8506,6 +8538,37 @@
               "name": "endpoint",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 8
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [
+                "connectivity.ntlmDomain"
+              ],
+              "name": "ntlmDomain",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -8713,7 +8776,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 8,
+                "order": 9,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -8758,7 +8821,8 @@
             "domain",
             "urlPath",
             "proxyConfiguration",
-            "endpoint"
+            "endpoint",
+            "ntlmDomain"
           ]
         }
       }

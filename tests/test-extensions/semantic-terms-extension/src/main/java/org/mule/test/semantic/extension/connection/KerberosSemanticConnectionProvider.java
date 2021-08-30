@@ -16,6 +16,7 @@ import org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain;
 public class KerberosSemanticConnectionProvider extends SemanticTermsConnectionProvider {
 
   @Parameter
-  private NtlmDomain ntlmDomain;
+  @NtlmDomain
+  private String ntlmDomain;
 }
 
