@@ -54,6 +54,12 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
   @Override
   public final void stop() {
+    if (getArtifactContext() != null && getArtifactContext().getRegistry() != null) {
+      for (Flow flow : getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+        ((DefaultFlowBuilder.DefaultFlow) flow).doNotPersist();
+      }
+    }
+
     if (this.artifactContext == null
         || !this.artifactContext.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
       // domain never started, maybe due to a previous error
@@ -61,12 +67,6 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
         LOGGER.info(format("Stopping %s '%s' with no mule context", shortArtifactType, getArtifactName()));
       }
       return;
-    }
-
-    if (getArtifactContext() != null && getArtifactContext().getRegistry() != null) {
-      for (Flow flow : getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
-        ((DefaultFlowBuilder.DefaultFlow) flow).doNotPersist();
-      }
     }
 
     artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
