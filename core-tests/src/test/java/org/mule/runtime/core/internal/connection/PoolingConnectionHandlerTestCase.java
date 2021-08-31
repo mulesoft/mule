@@ -137,7 +137,7 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void logReleaseConnection() {
     managedConnection.release();
-    verifyLogRegex(debugMessages, "Returning connection (.*) to pool {}", poolId);
+    verifyLogRegex(debugMessages, "Returning back connection (.*) to pool {}", poolId);
   }
 
   @Test

@@ -83,7 +83,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
 
   private C borrowConnection() throws Exception {
     C connection = pool.borrowObject();
-    LOGGER.debug("Borrowed connection {} from the pool {}", connection.toString(), poolId);
+    LOGGER.debug("Acquiring connection {} from the pool {}", connection.toString(), poolId);
     logPoolStatus(LOGGER, pool, poolId);
     try {
       poolingListener.onBorrow(connection);

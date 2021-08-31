@@ -268,7 +268,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
                            DEFAULT_POOL_INITIALISATION_POLICY);
     initStrategy();
     connection1 = strategy.getConnectionHandler();
-    verifyLogRegex(debugMessages, "Borrowed connection (.*) from the pool (.*)");
+    verifyLogRegex(debugMessages, "Acquiring connection (.*) from the pool (.*)");
   }
 
   @Test

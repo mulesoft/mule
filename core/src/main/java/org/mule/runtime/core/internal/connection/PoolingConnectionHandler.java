@@ -72,7 +72,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
     boolean returnAttempted = false;
     try {
-      LOGGER.debug("Returning connection {} to pool {}", connection.toString(), poolId);
+      LOGGER.debug("Returning back connection {} to pool {}", connection.toString(), poolId);
       poolingListener.onReturn(connection);
 
       pool.returnObject(connection);
