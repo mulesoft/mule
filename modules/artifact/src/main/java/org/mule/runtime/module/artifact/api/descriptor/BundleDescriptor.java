@@ -7,10 +7,10 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.util.Optional;
 
@@ -27,6 +27,8 @@ public final class BundleDescriptor {
   private String type = "jar";
   private Optional<String> classifier = empty();
   private volatile String artifactFileName;
+
+  private Object metadata;
 
   private BundleDescriptor() {}
 
@@ -56,6 +58,15 @@ public final class BundleDescriptor {
 
   public boolean isPlugin() {
     return classifier.map(classifier -> classifier.equals("mule-plugin")).orElse(false);
+  }
+
+  /**
+   * @return any metadata associated the bundle.
+   * 
+   * @since 4.5
+   */
+  public Object getMetadata() {
+    return metadata;
   }
 
   @Override
@@ -144,7 +155,7 @@ public final class BundleDescriptor {
     private static final String CLASSIFIER = "classifier";
     private static final String REQUIRED_FIELD_NOT_FOUND_TEMPLATE = "bundle cannot be created with null or empty %s";
 
-    private BundleDescriptor bundleDependency = new BundleDescriptor();
+    private final BundleDescriptor bundleDependency = new BundleDescriptor();
 
     /**
      * @param groupId the group id of the bundle. Cannot be null or empty.
@@ -214,6 +225,17 @@ public final class BundleDescriptor {
     }
 
     /**
+     * Sets the metadata associated the bundle.
+     *
+     * @param metadata metadata associated the bundle. Can by null
+     * @return the builder
+     */
+    public BundleDescriptor.Builder setMetadata(Object metadata) {
+      bundleDependency.metadata = metadata;
+      return this;
+    }
+
+    /**
      * @return a {@code BundleDescriptor} with the previous provided parameters to the builder.
      */
     public BundleDescriptor build() {
@@ -229,7 +251,7 @@ public final class BundleDescriptor {
     }
 
     private void validateIsNotEmpty(String value, String fieldId) {
-      checkState(!isEmpty(value), getNullFieldMessage(fieldId));
+      checkArgument(!isEmpty(value), () -> getNullFieldMessage(fieldId));
     }
 
     private static boolean isEmpty(String value) {

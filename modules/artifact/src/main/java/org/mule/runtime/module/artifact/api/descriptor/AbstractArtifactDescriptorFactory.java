@@ -215,8 +215,10 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
                                                               MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
                                                               BundleDescriptor bundleDescriptor) {
     // Adding BundleDescriptor to avoid resolving it again while loading the class loader model
-    return ImmutableMap.<String, Object>builder().putAll(classLoaderModelLoaderDescriptor.getAttributes())
-        .put(BundleDescriptor.class.getName(), bundleDescriptor).build();
+    return ImmutableMap.<String, Object>builder()
+        .putAll(classLoaderModelLoaderDescriptor.getAttributes())
+        .put(BundleDescriptor.class.getName(), bundleDescriptor)
+        .build();
   }
 
   protected BundleDescriptor getBundleDescriptor(File appFolder, M artifactModel, Optional<Properties> deploymentProperties) {
