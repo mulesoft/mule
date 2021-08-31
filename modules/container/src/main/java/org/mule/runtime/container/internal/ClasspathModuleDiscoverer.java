@@ -9,12 +9,14 @@ package org.mule.runtime.container.internal;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.createTempFile;
+import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.cleanDirectory;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
@@ -125,7 +127,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     if (!isEmpty(privilegedExportedPackagesProperty)) {
       exportedServices = getServicesFromProperty(privilegedExportedPackagesProperty);
     } else {
-      exportedServices = new ArrayList<>();
+      exportedServices = emptyList();
     }
     return exportedServices;
   }
@@ -133,14 +135,16 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   private List<ExportedService> getServicesFromProperty(String privilegedExportedPackagesProperty) {
     List<ExportedService> exportedServices = new ArrayList<>();
 
-    for (String exportedServiceDefinition : privilegedExportedPackagesProperty.split(",")) {
+    int pos = 0, end;
+    while ((end = privilegedExportedPackagesProperty.indexOf(' ', pos)) >= 0) {
+      String exportedServiceDefinition = privilegedExportedPackagesProperty.substring(pos, end);
       String[] split = exportedServiceDefinition.split(":");
       String serviceInterface = split[0];
       String serviceImplementation = split[1];
       URL resource;
       try {
         File serviceFile = createTempFile(temporaryFolder.toPath(), serviceInterface, "tmp").toFile();
-        serviceFile.deleteOnExit();
+        // serviceFile.deleteOnExit();
 
         stringToFile(serviceFile.getAbsolutePath(), serviceImplementation);
         resource = serviceFile.toURI().toURL();
@@ -148,7 +152,26 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
         throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
       }
       exportedServices.add(new ExportedService(serviceInterface, resource));
+
+      pos = end + 1;
     }
+
+    // for (String exportedServiceDefinition : privilegedExportedPackagesProperty.split(",")) {
+    // String[] split = exportedServiceDefinition.split(":");
+    // String serviceInterface = split[0];
+    // String serviceImplementation = split[1];
+    // URL resource;
+    // try {
+    // File serviceFile = createTempFile(temporaryFolder.toPath(), serviceInterface, "tmp").toFile();
+    // serviceFile.deleteOnExit();
+    //
+    // stringToFile(serviceFile.getAbsolutePath(), serviceImplementation);
+    // resource = serviceFile.toURI().toURL();
+    // } catch (IOException e) {
+    // throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
+    // }
+    // exportedServices.add(new ExportedService(serviceInterface, resource));
+    // }
 
     return exportedServices;
   }
@@ -158,11 +181,21 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     final String privilegedArtifactsProperty = (String) moduleProperties.get(PRIVILEGED_ARTIFACTS_PROPERTY);
     Set<String> artifactsIds = new HashSet<>();
     if (!isEmpty(privilegedArtifactsProperty)) {
-      for (String artifactName : privilegedArtifactsProperty.split(",")) {
+
+      int pos = 0, end;
+      while ((end = privilegedArtifactsProperty.indexOf(' ', pos)) >= 0) {
+        String artifactName = privilegedArtifactsProperty.substring(pos, end);
         if (!isEmpty(artifactName.trim())) {
           artifactsIds.add(artifactName);
         }
+        pos = end + 1;
       }
+
+      // for (String artifactName : privilegedArtifactsProperty.split(",")) {
+      // if (!isEmpty(artifactName.trim())) {
+      // artifactsIds.add(artifactName);
+      // }
+      // }
     }
     privilegedArtifacts = artifactsIds;
     return privilegedArtifacts;
@@ -183,26 +216,48 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     Set<String> paths = new HashSet<>();
     final String exportedResourcesProperty = (String) moduleProperties.get(EXPORTED_RESOURCE_PROPERTY);
     if (!isEmpty(exportedResourcesProperty)) {
-      for (String path : exportedResourcesProperty.split(",")) {
+      int pos = 0, end;
+      while ((end = exportedResourcesProperty.indexOf(' ', pos)) >= 0) {
+        String path = exportedResourcesProperty.substring(pos, end);
         if (!isEmpty(path.trim())) {
           if (path.startsWith("/")) {
             path = path.substring(1);
           }
           paths.add(path);
         }
+        pos = end + 1;
       }
+
+      // for (String path : exportedResourcesProperty.split(",")) {
+      // if (!isEmpty(path.trim())) {
+      // if (path.startsWith("/")) {
+      // path = path.substring(1);
+      // }
+      // paths.add(path);
+      // }
+      // }
     }
     return paths;
   }
 
   private Set<String> getPackagesFromProperty(String privilegedExportedPackagesProperty) {
     Set<String> packages = new HashSet<>();
-    for (String packageName : privilegedExportedPackagesProperty.split(",")) {
-      packageName = packageName.trim();
+
+    int pos = 0, end;
+    while ((end = privilegedExportedPackagesProperty.indexOf(' ', pos)) >= 0) {
+      String packageName = privilegedExportedPackagesProperty.substring(pos, end);
       if (!isEmpty(packageName)) {
         packages.add(packageName);
       }
+      pos = end + 1;
     }
+
+    // for (String packageName : privilegedExportedPackagesProperty.split(",")) {
+    // packageName = packageName.trim();
+    // if (!isEmpty(packageName)) {
+    // packages.add(packageName);
+    // }
+    // }
     return packages;
   }
 }
