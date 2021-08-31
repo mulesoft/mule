@@ -6,11 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static java.lang.Long.MAX_VALUE;
 import static java.lang.System.getProperty;
-import static java.nio.channels.Channels.newChannel;
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-import static java.nio.file.StandardOpenOption.WRITE;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
@@ -164,10 +160,16 @@ public class FileUtils {
   // TODO Document me!
   public static synchronized File stringToFile(String filename, String data, boolean append, boolean newLine) throws IOException {
     File f = createFile(filename);
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(f, append))) {
+    BufferedWriter writer = null;
+    try {
+      writer = new BufferedWriter(new FileWriter(f, append));
       writer.write(data);
       if (newLine) {
         writer.newLine();
+      }
+    } finally {
+      if (writer != null) {
+        writer.close();
       }
     }
     return f;
@@ -388,21 +390,9 @@ public class FileUtils {
             throw new IOException("Unable to create folders for zip entry: " + entry.getName());
           }
 
-          try (FileChannel outChannel = FileChannel.open(file.toPath(), WRITE, CREATE_NEW
-          // , StandardOpenOption.SPARSE
-          )) {
-
-            // }
-            //
-            // try (FileOutputStream fos = new FileOutputStream(file)) {
-            // FileChannel outChannel = fos.getChannel();
-            outChannel.transferFrom(newChannel(zis), 0, MAX_VALUE);
-            //
-            //
-            // OutputStream os = new BufferedOutputStream(fos);
-            // copy(zis, os);
-            // IOUtils.closeQuietly(os);
-          }
+          OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+          copy(zis, os);
+          IOUtils.closeQuietly(os);
           createdFiles.add(file);
         }
       }
