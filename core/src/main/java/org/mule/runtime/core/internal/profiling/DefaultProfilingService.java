@@ -23,10 +23,12 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
+import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -42,7 +44,7 @@ import javax.inject.Inject;
 public class DefaultProfilingService extends AbstractProfilingService {
 
   @Inject
-  private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> discoveryStrategies;
+  private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies;
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
@@ -68,7 +70,9 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   @Override
   public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-    return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies.orElse(Collections.emptySet()));
+    Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies = new HashSet<>(Collections.singleton(new DefaultProfilingDataConsumerDiscoveryStrategy()));
+    this.profilingDataConsumerDiscoveryStrategies.map(discoveryStrategies::addAll);
+    return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies);
   }
 
   @Override
