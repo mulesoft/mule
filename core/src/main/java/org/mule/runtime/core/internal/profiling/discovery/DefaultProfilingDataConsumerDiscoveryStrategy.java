@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.profiling;
+package org.mule.runtime.core.internal.profiling.discovery;
 
 import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;

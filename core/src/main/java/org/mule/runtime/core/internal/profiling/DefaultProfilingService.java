@@ -22,10 +22,15 @@ import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
 
+import javax.inject.Inject;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Default diagnostic service for the runtime.
@@ -35,6 +40,9 @@ import java.util.Map;
  * @since 4.4
  */
 public class DefaultProfilingService extends AbstractProfilingService {
+
+  @Inject()
+  private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> discoveryStrategies;
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
@@ -62,7 +70,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   @Override
   public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-    return new DefaultProfilingDataConsumerDiscoveryStrategy();
+    return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies.orElse(Collections.emptySet()));
   }
 
   @Override
