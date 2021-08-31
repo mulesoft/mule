@@ -48,6 +48,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
+
         {
           put(FLOW_EXECUTED,
               new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
@@ -70,7 +71,8 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   @Override
   public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-    Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies = new HashSet<>(Collections.singleton(new DefaultProfilingDataConsumerDiscoveryStrategy()));
+    Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies =
+        new HashSet<>(Collections.singleton(new DefaultProfilingDataConsumerDiscoveryStrategy()));
     this.profilingDataConsumerDiscoveryStrategies.map(discoveryStrategies::addAll);
     return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies);
   }
