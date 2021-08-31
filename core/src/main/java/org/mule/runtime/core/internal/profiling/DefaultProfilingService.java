@@ -26,7 +26,6 @@ import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingData
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -71,8 +70,8 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   @Override
   public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-    Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies =
-        new HashSet<>(Collections.singleton(new DefaultProfilingDataConsumerDiscoveryStrategy()));
+    Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies = new HashSet<>();
+    discoveryStrategies.add(new DefaultProfilingDataConsumerDiscoveryStrategy());
     this.profilingDataConsumerDiscoveryStrategies.map(discoveryStrategies::addAll);
     return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies);
   }
