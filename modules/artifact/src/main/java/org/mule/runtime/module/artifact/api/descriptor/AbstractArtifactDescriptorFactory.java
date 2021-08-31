@@ -22,6 +22,7 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.IOUtils;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -177,7 +178,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
       LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
     }
 
-    try (InputStream stream = new FileInputStream(jsonFile)) {
+    try (InputStream stream = new BufferedInputStream(new FileInputStream(jsonFile))) {
       return IOUtils.toString(stream);
     } catch (IOException e) {
       throw new IllegalArgumentException(format("Could not read extension describer on artifact '%s'",

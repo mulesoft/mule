@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
@@ -68,7 +69,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
     // if is heavyweight
     if (classLoaderModelDescriptor.exists()) {
       org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
-      if (ArtifactType.APP.equals(artifactType) || ArtifactType.DOMAIN.equals(artifactType)) {
+      if (APP.equals(artifactType) || DOMAIN.equals(artifactType) || POLICY.equals(artifactType)) {
         packagerClassLoaderModel = AppClassLoaderModelJsonSerializer.deserialize(classLoaderModelDescriptor);
       } else {
         packagerClassLoaderModel = deserialize(classLoaderModelDescriptor);

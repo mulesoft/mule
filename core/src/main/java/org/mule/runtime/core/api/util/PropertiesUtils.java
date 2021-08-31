@@ -8,11 +8,13 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.OrderedProperties;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -20,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -176,8 +177,8 @@ public final class PropertiesUtils {
   public static Map removeNamespaces(Map properties) {
     HashMap props = new HashMap(properties.size());
     Map.Entry entry;
-    for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
-      entry = (Map.Entry) iter.next();
+    for (Object element : properties.entrySet()) {
+      entry = (Map.Entry) element;
       props.put(removeNamespacePrefix((String) entry.getKey()), entry.getValue());
 
     }
@@ -197,8 +198,8 @@ public final class PropertiesUtils {
       return;
     }
 
-    for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-      Map.Entry entry = (Map.Entry) iterator.next();
+    for (Object element : props.entrySet()) {
+      Map.Entry entry = (Map.Entry) element;
       Object key = entry.getKey();
       if (key.toString().startsWith(prefix)) {
         newProps.put(key, entry.getValue());
@@ -296,7 +297,7 @@ public final class PropertiesUtils {
       }
       Properties properties = new OrderedProperties();
 
-      try (InputStream resourceStream = propertiesResource.openStream()) {
+      try (InputStream resourceStream = new BufferedInputStream(propertiesResource.openStream())) {
         properties.load(resourceStream);
       }
 

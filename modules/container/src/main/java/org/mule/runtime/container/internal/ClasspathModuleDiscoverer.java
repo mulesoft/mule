@@ -9,12 +9,14 @@ package org.mule.runtime.container.internal;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.createTempFile;
+import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.cleanDirectory;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
@@ -125,7 +127,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     if (!isEmpty(privilegedExportedPackagesProperty)) {
       exportedServices = getServicesFromProperty(privilegedExportedPackagesProperty);
     } else {
-      exportedServices = new ArrayList<>();
+      exportedServices = emptyList();
     }
     return exportedServices;
   }
