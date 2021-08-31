@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.internal.profiling;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
@@ -16,6 +15,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static java.lang.String.format;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
@@ -25,12 +25,12 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.inject.Inject;
 
 /**
  * Default diagnostic service for the runtime.
@@ -41,13 +41,11 @@ import java.util.Set;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
-  @Inject()
+  @Inject
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> discoveryStrategies;
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
-
-        // TODO MULE-19596 replace this map when the discovery strategy based on server plugins is implemented.
         {
           put(FLOW_EXECUTED,
               new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
