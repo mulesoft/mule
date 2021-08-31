@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.min;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ONE;
+import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_GROW;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolStatus;
 
@@ -18,15 +20,19 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,14 +119,29 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   }
 
   private GenericObjectPool<C> createPool(String ownerConfigName) {
-    GenericObjectPool.Config config = new GenericObjectPool.Config();
-    config.maxIdle = poolingProfile.getMaxIdle();
-    config.maxActive = poolingProfile.getMaxActive();
-    config.maxWait = poolingProfile.getMaxWait();
-    config.whenExhaustedAction = (byte) poolingProfile.getExhaustedAction();
-    config.minEvictableIdleTimeMillis = poolingProfile.getMinEvictionMillis();
-    config.timeBetweenEvictionRunsMillis = poolingProfile.getEvictionCheckIntervalMillis();
-    GenericObjectPool genericPool = new GenericObjectPool(new ObjectFactoryAdapter(), config);
+    GenericObjectPoolConfig<C> config = new GenericObjectPoolConfig<>();
+
+    config.setMaxIdle(poolingProfile.getMaxIdle());
+
+    switch (poolingProfile.getExhaustedAction()) {
+      case WHEN_EXHAUSTED_GROW:
+        config.setMaxTotal(MAX_VALUE);
+        config.setBlockWhenExhausted(false);
+        break;
+      case PoolingProfile.WHEN_EXHAUSTED_FAIL:
+        config.setMaxTotal(poolingProfile.getMaxActive());
+        config.setBlockWhenExhausted(false);
+        break;
+      case PoolingProfile.WHEN_EXHAUSTED_WAIT:
+        config.setMaxTotal(poolingProfile.getMaxActive());
+        config.setBlockWhenExhausted(true);
+        break;
+    }
+
+    config.setMaxWaitMillis(poolingProfile.getMaxWait());
+    config.setMinEvictableIdleTimeMillis(poolingProfile.getMinEvictionMillis());
+    config.setTimeBetweenEvictionRunsMillis(poolingProfile.getEvictionCheckIntervalMillis());
+    GenericObjectPool<C> genericPool = new GenericObjectPool<>(new ObjectFactoryAdapter(), config);
     LOGGER.debug("Creating pool with ID {} for config {}", poolId, ownerConfigName);
 
     applyInitialisationPolicy(genericPool);
@@ -166,31 +187,31 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     return poolingProfile;
   }
 
-  private class ObjectFactoryAdapter implements PoolableObjectFactory<C> {
+  private class ObjectFactoryAdapter extends BasePooledObjectFactory<C> {
 
     @Override
-    public C makeObject() throws Exception {
+    public PooledObject<C> wrap(C obj) {
+      return new DefaultPooledObject<>(obj);
+    }
+
+    @Override
+    public C create() throws Exception {
       C connection = connectionProvider.connect();
       LOGGER.debug("Created connection {}", connection.toString());
       return connection;
     }
 
     @Override
-    public void destroyObject(C connection) throws Exception {
-      LOGGER.debug("Disconnecting connection {}", connection.toString());
-      connectionProvider.disconnect(connection);
+    public void destroyObject(final PooledObject<C> connection) throws Exception {
+      LOGGER.debug("Disconnecting connection {}", connection.getObject().toString());
+      connectionProvider.disconnect(connection.getObject());
     }
 
     @Override
-    public boolean validateObject(C obj) {
+    public boolean validateObject(final PooledObject<C> obj) {
       return false;
     }
 
-    @Override
-    public void activateObject(C connection) throws Exception {}
-
-    @Override
-    public void passivateObject(C connection) throws Exception {}
   }
 
   private String generateId() {
