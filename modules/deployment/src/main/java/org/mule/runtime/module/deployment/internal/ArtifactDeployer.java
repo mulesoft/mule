@@ -58,14 +58,4 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
    */
   void doNotPersistArtifactStop(T artifact);
 
-  /**
-   * Cancels the persistence of a flow of an app.
-   * <p>
-   * A stop of a certain flow must only be persisted when it was stopped by the external users. In case of undeployment, it should
-   * not be persisted.
-   *
-   * @param artifactName name of the artifact to be undeployed
-   */
-  void doNotPersistFlowsStop(String artifactName);
-
 }

@@ -574,8 +574,4 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     deployer.doNotPersistArtifactStop(artifact);
   }
 
-  @Override
-  public void doNotPersistFlowsStop(String artifactName) {
-    deployer.doNotPersistFlowsStop(artifactName);
-  }
 }
