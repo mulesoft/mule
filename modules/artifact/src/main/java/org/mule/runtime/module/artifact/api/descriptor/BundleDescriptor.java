@@ -7,10 +7,10 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.util.Optional;
 
@@ -251,7 +251,7 @@ public final class BundleDescriptor {
     }
 
     private void validateIsNotEmpty(String value, String fieldId) {
-      checkArgument(!isEmpty(value), () -> getNullFieldMessage(fieldId));
+      checkState(!isEmpty(value), getNullFieldMessage(fieldId));
     }
 
     private static boolean isEmpty(String value) {

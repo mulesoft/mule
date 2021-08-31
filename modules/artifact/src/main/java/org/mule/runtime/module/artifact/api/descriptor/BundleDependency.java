@@ -8,7 +8,6 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
 
 import java.net.URI;
@@ -209,7 +208,7 @@ public final class BundleDependency {
     }
 
     private void validateIsNotNull(Object value, String fieldId) {
-      checkArgument(value != null, () -> getNullFieldMessage(fieldId));
+      checkState(value != null, getNullFieldMessage(fieldId));
     }
   }
 }
