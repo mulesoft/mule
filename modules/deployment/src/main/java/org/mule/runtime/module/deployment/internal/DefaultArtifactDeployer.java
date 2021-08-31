@@ -138,7 +138,6 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   @Override
   public void undeploy(T artifact) {
     try {
-      doNotPersistFlowsStop(artifact.getArtifactName());
       doNotPersistArtifactStop(artifact);
       tryToStopArtifact(artifact);
       tryToDisposeArtifact(artifact);
