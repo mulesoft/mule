@@ -21,7 +21,6 @@ import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.Correlat
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -120,6 +119,9 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
   public void testDoProcessOnErrorGenericException() throws InterruptedException {
     ImmutableProcessorChildContextChainExecutor chainExecutor =
         new ImmutableProcessorChildContextChainExecutor(mock(StreamingManager.class), coreEvent, chain);
+
+    Reference<Boolean> parentIsFinished = new Reference<>(false);
+    ((BaseEventContext) coreEvent.getContext()).onComplete((ev, t) -> parentIsFinished.set(true));
     processor.throwError();
 
     AtomicInteger successCalls = new AtomicInteger(0);
@@ -136,6 +138,7 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     assertThat(errorEvent.get().getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(processor.correlationID, is(TEST_CORRELATION_ID));
     assertThat(errorEvent.get().getCorrelationId(), is(coreEvent.getCorrelationId()));
+    assertThat(parentIsFinished.get(), is(false));
   }
 
   @Test
@@ -145,9 +148,7 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     Reference<Boolean> correctCompletionOrder = new Reference<>(false);
 
     processor.setConsumer((ev, t) -> correctCompletionOrder.set(!newFinished.get()));
-    ((BaseEventContext) coreEvent.getContext()).onComplete((ev, t) -> {
-      parentFinished.set(true);
-    });
+    ((BaseEventContext) coreEvent.getContext()).onComplete((ev, t) -> parentFinished.set(true));
 
     ImmutableProcessorChildContextChainExecutor chainExecutor =
         new ImmutableProcessorChildContextChainExecutor(mock(StreamingManager.class), coreEvent, chain);
