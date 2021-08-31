@@ -30,6 +30,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.St
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -83,7 +84,9 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
       MetadataType baseMetadataType = baseType.asMetadataType();
       Map<Type, MetadataType> subTypesMetadataTypes = mapping.getClassArrayValue(SubTypeMapping::subTypes)
           .stream()
-          .collect(toMap(identity(), Type::asMetadataType));
+          .collect(toMap(identity(), Type::asMetadataType, (u, v) -> {
+            throw new IllegalStateException(format("Duplicate key %s", u));
+          }, LinkedHashMap::new));
 
       declarer.withSubTypes(baseMetadataType, subTypesMetadataTypes.values());
 
