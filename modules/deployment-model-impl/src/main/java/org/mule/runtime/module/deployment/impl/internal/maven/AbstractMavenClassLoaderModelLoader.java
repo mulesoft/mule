@@ -598,8 +598,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   private List<String> getAttribute(Map<String, Object> attributes, String attribute) {
     final Object attributeObject = attributes.getOrDefault(attribute, new ArrayList<String>());
-    checkArgument(attributeObject instanceof List, () -> format("The '%s' attribute must be of '%s', found '%s'", attribute,
-                                                                List.class.getName(), attributeObject.getClass().getName()));
+    checkArgument(attributeObject instanceof List, format("The '%s' attribute must be of '%s', found '%s'", attribute,
+                                                          List.class.getName(), attributeObject.getClass().getName()));
     return (List<String>) attributeObject;
   }
 
