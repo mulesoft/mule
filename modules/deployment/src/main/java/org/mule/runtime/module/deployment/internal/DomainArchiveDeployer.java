@@ -139,8 +139,4 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
     domainDeployer.doNotPersistArtifactStop(artifact);
   }
 
-  @Override
-  public void doNotPersistFlowsStop(String artifactName) {
-    domainDeployer.doNotPersistFlowsStop(artifactName);
-  }
 }
