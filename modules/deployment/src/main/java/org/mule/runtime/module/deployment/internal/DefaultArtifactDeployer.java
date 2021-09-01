@@ -192,12 +192,4 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     }
   }
 
-  @Override
-  public void doNotPersistFlowsStop(String artifactName) {
-    if (appsFlowStoppedListeners.containsKey(artifactName)) {
-      appsFlowStoppedListeners.get(artifactName)
-          .forEach(FlowStoppedPersistenceListener::doNotPersist);
-    }
-  }
-
 }
