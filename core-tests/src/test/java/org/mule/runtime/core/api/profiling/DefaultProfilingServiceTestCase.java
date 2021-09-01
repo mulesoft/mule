@@ -86,7 +86,8 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   public void configureProfilingService() throws MuleException {
     profilingService = new DefaultProfilingService();
     initialiseIfNeeded(profilingService, muleContext);
-    profilingService.setProfilingDataConsumerDiscoveryStrategies(Optional.of(Collections.singleton(new TestProfilingDataConsumerDiscoveryStrategy())));
+    profilingService.setProfilingDataConsumerDiscoveryStrategies(Optional
+        .of(Collections.singleton(new TestProfilingDataConsumerDiscoveryStrategy())));
     when(featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_PROFILING_SERVICE)).thenReturn(true);
     profilingService.setFeatureFlags(featureFlaggingService);
     startIfNeeded(profilingService);
