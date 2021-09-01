@@ -173,6 +173,12 @@
             <artifactId>vibur-object-pool</artifactId>
             <version>23.0</version>
         </dependency>
+        <!-- not to be confused with lmax diusruptor (used by log4j2), this one provides queue impls used by vibur -->
+        <dependency>
+            <groupId>com.conversantmedia</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>1.2.10</version>
+        </dependency>
         <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
         <dependency>
             <groupId>javax.jms</groupId>
