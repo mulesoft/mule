@@ -15,6 +15,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static java.util.Optional.empty;
 import static java.lang.String.format;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.inject.Inject;
 
 /**
@@ -42,7 +44,7 @@ import javax.inject.Inject;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
-  private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = Optional.empty();
+  private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {

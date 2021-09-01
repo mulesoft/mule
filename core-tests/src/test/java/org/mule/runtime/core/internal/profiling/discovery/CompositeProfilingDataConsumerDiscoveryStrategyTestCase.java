@@ -6,24 +6,31 @@
  */
 package org.mule.runtime.core.internal.profiling.discovery;
 
+import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
-public class CompositeProfilingDataConsumerDiscoveryStrategyTestCase {
+@Feature(PROFILING)
+@Story(DEFAULT_PROFILING_SERVICE)
+public class CompositeProfilingDataConsumerDiscoveryStrategyTestCase extends AbstractMuleTestCase {
 
   private final ProfilingDataConsumer<?> profilingDataConsumerOne = mock(ProfilingDataConsumer.class);
   private final ProfilingDataConsumer<?> profilingDataConsumerTwo = mock(ProfilingDataConsumer.class);
@@ -40,8 +47,8 @@ public class CompositeProfilingDataConsumerDiscoveryStrategyTestCase {
 
   @Before
   public void setUp() {
-    when(discoveryStrategyOne.discover()).thenAnswer(invocation -> Collections.singleton(profilingDataConsumerOne));
-    when(discoveryStrategyTwo.discover()).thenAnswer(invocation -> Collections.singleton(profilingDataConsumerTwo));
+    when(discoveryStrategyOne.discover()).thenAnswer(invocation -> singleton(profilingDataConsumerOne));
+    when(discoveryStrategyTwo.discover()).thenAnswer(invocation -> singleton(profilingDataConsumerTwo));
   }
 
   @Test

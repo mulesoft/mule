@@ -87,8 +87,6 @@ import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.util.Optional;
-
 /**
  * Configures defaults required by Mule. This configuration builder is used to configure mule with these defaults when no other
  * ConfigurationBuilder that sets these is being used. This is used by both AbstractMuleTestCase and MuleClient. <br>

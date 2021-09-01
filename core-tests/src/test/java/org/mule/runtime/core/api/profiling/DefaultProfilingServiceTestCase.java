@@ -64,7 +64,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-  private static final TestProfilingDataConsumer testProfilingDataConsumer = new TestProfilingDataConsumer();
+  private final TestProfilingDataConsumer testProfilingDataConsumer = new TestProfilingDataConsumer();
 
   @Mock
   private ServerNotificationManager notificationManager;
@@ -135,7 +135,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   /**
    * Stub for a {@link ProfilingDataConsumerDiscoveryStrategy}.
    */
-  private static class TestProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
+  private class TestProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
 
     @Override
     public Set<ProfilingDataConsumer<?>> discover() {
