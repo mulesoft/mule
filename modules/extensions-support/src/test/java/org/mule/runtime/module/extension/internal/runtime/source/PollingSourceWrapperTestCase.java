@@ -21,9 +21,9 @@ import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_
 import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.setLogger;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.sdk.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
 import static org.mule.sdk.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
 import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;

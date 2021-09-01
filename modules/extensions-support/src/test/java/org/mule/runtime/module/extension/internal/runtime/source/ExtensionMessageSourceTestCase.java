@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Arrays.asList;
-import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -19,7 +18,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -30,9 +28,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.setLogger;
-import static org.mule.runtime.module.extension.internal.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 
@@ -54,12 +50,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
@@ -67,15 +58,10 @@ import javax.resource.spi.work.Work;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {

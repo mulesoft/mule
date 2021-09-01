@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.util;
+package org.mule.runtime.core.privileged.util;
 
 import static java.util.Arrays.copyOfRange;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,6 +20,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 
@@ -40,9 +42,13 @@ public class LoggingTestUtils {
       }
       return null;
     };
+    doAnswer(answer).when(logger).debug(anyString());
     doAnswer(answer).when(logger).debug(anyString(), (Object) any());
     doAnswer(answer).when(logger).debug(anyString(), any(), any());
     doAnswer(answer).when(logger).debug(anyString(), (Object[]) any());
+
+    doAnswer(answer).when(logger).trace(anyString());
+    doAnswer(answer).when(logger).trace(anyString(), (Object) any());
     doAnswer(answer).when(logger).trace(anyString(), any(), any());
     doAnswer(answer).when(logger).trace(anyString(), (Object[]) any());
     when(logger.isDebugEnabled()).thenReturn(true);
@@ -56,7 +62,11 @@ public class LoggingTestUtils {
   }
 
   public static Logger setLogger(Object object, String fieldName, Logger newLogger) throws Exception {
-    Field field = object.getClass().getDeclaredField(fieldName);
+    return setLogger(object.getClass(), fieldName, newLogger);
+  }
+
+  public static Logger setLogger(Class clazz, String fieldName, Logger newLogger) throws Exception {
+    Field field = clazz.getDeclaredField(fieldName);
     field.setAccessible(true);
     Logger oldLogger;
     try {
@@ -80,6 +90,29 @@ public class LoggingTestUtils {
 
   public static void verifyLogMessage(List<String> messages, String expectedMessage, Object... arguments) {
     assertThat(messages, hasItem(formatMessage(expectedMessage, arguments)));
+  }
+
+  public static void verifyLogRegex(List<String> messages, String expectedRegex, Object... arguments) {
+    assertThat(messages, hasItem(new RegexMatcher(formatMessage(expectedRegex, arguments))));
+  }
+
+  private static class RegexMatcher extends TypeSafeMatcher<String> {
+
+    private final String regex;
+
+    public RegexMatcher(final String regex) {
+      this.regex = regex;
+    }
+
+    @Override
+    public void describeTo(final Description description) {
+      description.appendText("matches regex=`" + regex + "`");
+    }
+
+    @Override
+    public boolean matchesSafely(final String string) {
+      return string.matches(regex);
+    }
   }
 
 }
