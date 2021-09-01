@@ -14,7 +14,7 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
 import java.util.Optional;
 
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 
 /**
@@ -59,7 +59,7 @@ public final class ConnectionUtils {
 
   public static <C> void logPoolStatus(Logger logger, GenericObjectPool<C> pool, String poolId) {
     if (logger.isDebugEnabled()) {
-      String maxActive = pool.getMaxActive() < 0 ? "unlimited" : String.valueOf(pool.getMaxActive());
+      String maxActive = pool.getMaxTotal() < 0 ? "unlimited" : String.valueOf(pool.getMaxTotal());
       String maxIdle = pool.getMaxIdle() < 0 ? "unlimited" : String.valueOf(pool.getMaxIdle());
       logger
           .debug("Status for pool {}: {} connections are active out of {} max active limit, {} connections are idle out of {} max idle limit",

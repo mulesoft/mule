@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

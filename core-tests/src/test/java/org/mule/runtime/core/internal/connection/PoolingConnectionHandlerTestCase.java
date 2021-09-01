@@ -28,7 +28,8 @@ import org.mule.tck.size.SmallTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.slf4j.Logger;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +39,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.slf4j.Logger;
 
 @SmallTest
 public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
@@ -50,9 +50,6 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   private List<String> debugMessages;
   protected Logger logger;
   private Logger oldLogger;
-
-  @Rule
-  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
