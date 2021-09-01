@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
@@ -82,7 +83,8 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setBaseVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
           .setType(packagerClassLoaderModel.getArtifactCoordinates().getType())
           .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
-          .setMetadata(packagerClassLoaderModel)
+          .setMetadata(singletonMap(org.mule.tools.api.classloader.model.ClassLoaderModel.class.getName(),
+                                    packagerClassLoaderModel))
           .build();
     } else {
       if (attributes instanceof PluginExtendedBundleDescriptorAttributes) {

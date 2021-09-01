@@ -140,7 +140,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                           ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
 
-    org.mule.tools.api.classloader.model.ClassLoaderModel bundleDescriptorMetadata = getBundleDescriptorMetadata(attributes);
+    org.mule.tools.api.classloader.model.ClassLoaderModel bundleDescriptorMetadata =
+        getBundleDescriptorClassLoaderModelMetadata(attributes);
     if (bundleDescriptorMetadata != null) {
       // Avoid parsing the classLoaderModel from JSON again if that is already available from a previous process.
       return createHeavyPackageClassLoaderModel(artifactFile, attributes,
@@ -155,19 +156,15 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     }
   }
 
-  private org.mule.tools.api.classloader.model.ClassLoaderModel getBundleDescriptorMetadata(Map<String, Object> attributes) {
+  private org.mule.tools.api.classloader.model.ClassLoaderModel getBundleDescriptorClassLoaderModelMetadata(Map<String, Object> attributes) {
     BundleDescriptor bundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
 
     if (bundleDescriptor == null) {
       return null;
     }
 
-    if (bundleDescriptor.getMetadata() != null
-        && bundleDescriptor.getMetadata() instanceof org.mule.tools.api.classloader.model.ClassLoaderModel) {
-      return (org.mule.tools.api.classloader.model.ClassLoaderModel) bundleDescriptor.getMetadata();
-    } else {
-      return null;
-    }
+    return (org.mule.tools.api.classloader.model.ClassLoaderModel) bundleDescriptor.getMetadata()
+        .get(org.mule.tools.api.classloader.model.ClassLoaderModel.class.getName());
   }
 
   private ClassLoaderModel createHeavyPackageClassLoaderModel(File artifactFile, File classLoaderModelDescriptor,

@@ -9,9 +9,12 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,7 +31,7 @@ public final class BundleDescriptor {
   private Optional<String> classifier = empty();
   private volatile String artifactFileName;
 
-  private Object metadata;
+  private Map<String, Object> metadata = emptyMap();
 
   private BundleDescriptor() {}
 
@@ -65,7 +68,7 @@ public final class BundleDescriptor {
    * 
    * @since 4.5
    */
-  public Object getMetadata() {
+  public Map<String, Object> getMetadata() {
     return metadata;
   }
 
@@ -227,11 +230,11 @@ public final class BundleDescriptor {
     /**
      * Sets the metadata associated the bundle.
      *
-     * @param metadata metadata associated the bundle. Can by null
+     * @param metadata metadata associated the bundle. Cannot be null
      * @return the builder
      */
-    public BundleDescriptor.Builder setMetadata(Object metadata) {
-      bundleDependency.metadata = metadata;
+    public BundleDescriptor.Builder setMetadata(Map<String, Object> metadata) {
+      bundleDependency.metadata = requireNonNull(metadata);
       return this;
     }
 
