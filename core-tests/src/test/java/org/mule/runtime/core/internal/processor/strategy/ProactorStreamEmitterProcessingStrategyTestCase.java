@@ -115,13 +115,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     @Override
     public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return (new ProfilingDataConsumerDiscoveryStrategy() {
-
-        @Override
-        public Set<ProfilingDataConsumer<?>> discover() {
-          return singleton(profilingDataConsumer);
-        }
-      });
+      return (() -> singleton(profilingDataConsumer));
     }
   };
 

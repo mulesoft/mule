@@ -42,7 +42,6 @@ import javax.inject.Inject;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
-  @Inject
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies;
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
@@ -69,6 +68,22 @@ public class DefaultProfilingService extends AbstractProfilingService {
       };
 
   @Override
+  public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
+                                                                              ProfilingDataProducer<T> profilingDataProducer) {
+    profilingDataProducers.put(profilingEventType, profilingDataProducer);
+  }
+
+  @Override
+  public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(
+          ProfilingEventType<T> profilingEventType) {
+    if (!profilingDataProducers.containsKey(profilingEventType)) {
+      throw new MuleRuntimeException((createStaticMessage(format("Profiling event type not registered: %s",
+              profilingEventType))));
+    }
+    return (ProfilingDataProducer<T>) profilingDataProducers.get(profilingEventType);
+  }
+
+  @Override
   public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
     Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies = new HashSet<>();
     discoveryStrategies.add(new DefaultProfilingDataConsumerDiscoveryStrategy());
@@ -76,19 +91,8 @@ public class DefaultProfilingService extends AbstractProfilingService {
     return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies);
   }
 
-  @Override
-  public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(
-                                                                                             ProfilingEventType<T> profilingEventType) {
-    if (!profilingDataProducers.containsKey(profilingEventType)) {
-      throw new MuleRuntimeException((createStaticMessage(format("Profiling event type not registered: %s",
-                                                                 profilingEventType))));
-    }
-    return (ProfilingDataProducer<T>) profilingDataProducers.get(profilingEventType);
-  }
-
-  @Override
-  public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
-                                                                              ProfilingDataProducer<T> profilingDataProducer) {
-    profilingDataProducers.put(profilingEventType, profilingDataProducer);
+  @Inject
+  public void setProfilingDataConsumerDiscoveryStrategies(Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies) {
+    this.profilingDataConsumerDiscoveryStrategies = profilingDataConsumerDiscoveryStrategies;
   }
 }

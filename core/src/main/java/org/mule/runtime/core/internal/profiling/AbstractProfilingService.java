@@ -60,7 +60,7 @@ public abstract class AbstractProfilingService implements ProfilingService, Init
     }
   }
 
-  private <S extends ProfilingDataConsumer<T>, T extends ProfilingEventContext> void registerNotificationListeners(Set<S> profilingDataConsumers) {
+  private void registerNotificationListeners(Set<ProfilingDataConsumer<? extends ProfilingEventContext>> profilingDataConsumers) {
     profilingDataConsumers.forEach(this::registerNotificationListener);
   }
 

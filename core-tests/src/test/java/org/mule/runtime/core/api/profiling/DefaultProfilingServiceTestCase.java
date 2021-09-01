@@ -7,9 +7,13 @@
 
 package org.mule.runtime.core.api.profiling;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
@@ -30,11 +34,15 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingNotificationListener;
+import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -56,6 +64,8 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
+  private static final TestProfilingDataConsumer testProfilingDataConsumer = new TestProfilingDataConsumer();
+
   @Mock
   private ServerNotificationManager notificationManager;
 
@@ -74,14 +84,17 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
 
   @Before
   public void configureProfilingService() throws MuleException {
-    profilingService = new TestDefaultProfilingService();
+    profilingService = new DefaultProfilingService();
     initialiseIfNeeded(profilingService, muleContext);
+    profilingService.setProfilingDataConsumerDiscoveryStrategies(Optional.of(Collections.singleton(new TestProfilingDataConsumerDiscoveryStrategy())));
     when(featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_PROFILING_SERVICE)).thenReturn(true);
     profilingService.setFeatureFlags(featureFlaggingService);
     startIfNeeded(profilingService);
     profilingService.registerProfilingDataProducer(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE,
                                                    new TestProfilingDataProducer(profilingService));
   }
+
+
 
   @Test
   @Description("When profiling data consumers are obtained, the correct data producers are returned")
@@ -94,13 +107,17 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Test
   @Description("The correct discovery strategy is set")
   public void correctDiscoveryStrategy() {
-    assertThat(profilingService.getDiscoveryStrategy(), instanceOf(TestProfilingDataConsumerDiscoveryStrategy.class));
+    assertThat(profilingService.getDiscoveryStrategy(), instanceOf(CompositeProfilingDataConsumerDiscoveryStrategy.class));
+    Set<ProfilingDataConsumer<?>> profilingDataConsumers = profilingService.getDiscoveryStrategy().discover();
+    assertThat(profilingDataConsumers, hasSize(2));
+    assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentProcessingStrategyDataConsumer.class))));
+    assertThat(profilingDataConsumers, hasItem(testProfilingDataConsumer));
   }
 
   @Test
   @Description("The notification listener is correctly set so that the notifications are managed")
   public void correctNotificationListenerSet() {
-    verify(notificationManager).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
+    verify(notificationManager, times(2)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
   }
 
   @Test
@@ -115,24 +132,13 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   }
 
   /**
-   * Stub {@link DefaultProfilingService} with a test {@link ProfilingDataConsumerDiscoveryStrategy}.
-   */
-  private static class TestDefaultProfilingService extends DefaultProfilingService {
-
-    @Override
-    public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return new TestProfilingDataConsumerDiscoveryStrategy();
-    }
-  }
-
-  /**
    * Stub for a {@link ProfilingDataConsumerDiscoveryStrategy}.
    */
   private static class TestProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
 
     @Override
     public Set<ProfilingDataConsumer<?>> discover() {
-      return ImmutableSet.of(new TestProfilingDataConsumer());
+      return ImmutableSet.of(testProfilingDataConsumer);
     }
   }
 
