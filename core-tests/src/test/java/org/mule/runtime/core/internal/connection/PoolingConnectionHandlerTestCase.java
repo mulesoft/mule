@@ -16,27 +16,41 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.apache.commons.pool.ObjectPool;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
 
   private static int DELAY = 1000;
+  private static final String poolId = "SomeConfigName-123";
+  private static final String LOGGER_FIELD_NAME = "LOGGER";
+
+  private List<String> debugMessages;
+  protected Logger logger;
+  private Logger oldLogger;
 
   @Mock
-  private ObjectPool<Object> pool;
+  private GenericObjectPool<Object> pool;
 
   @Mock
   private Object config;
@@ -53,8 +67,16 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   private PoolingConnectionHandler<Object> managedConnection;
 
   @Before
-  public void before() {
-    managedConnection = new PoolingConnectionHandler<>(connection, pool, poolingListener, connectionProvider);
+  public void before() throws Exception {
+    managedConnection = new PoolingConnectionHandler<>(connection, pool, poolId, poolingListener, connectionProvider);
+    debugMessages = new ArrayList<>();
+    logger = createMockLogger(debugMessages, new ArrayList<>());
+    oldLogger = setLogger(PoolingConnectionHandler.class, LOGGER_FIELD_NAME, logger);
+  }
+
+  @After
+  public void restoreLogger() throws Exception {
+    setLogger(PoolingConnectionHandler.class, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test
@@ -110,5 +132,17 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void getConnectionProvider() {
     assertThat(managedConnection.getConnectionProvider(), is(sameInstance(connectionProvider)));
+  }
+
+  @Test
+  public void logReleaseConnection() {
+    managedConnection.release();
+    verifyLogRegex(debugMessages, "Returning back connection (.*) to pool {}", poolId);
+  }
+
+  @Test
+  public void logInvalidateConnection() {
+    managedConnection.invalidate();
+    verifyLogRegex(debugMessages, "Invalidating connection (.*) from pool {}", poolId);
   }
 }

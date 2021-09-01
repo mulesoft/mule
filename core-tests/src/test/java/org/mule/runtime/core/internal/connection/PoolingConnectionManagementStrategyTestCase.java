@@ -21,6 +21,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
@@ -28,6 +30,9 @@ import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -35,19 +40,27 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingListener;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase {
 
   private static final int MAX_ACTIVE = 2;
+  private static final String ownerConfigName = "SomeConfigName";
+  private static final String LOGGER_FIELD_NAME = "LOGGER";
 
   private ConnectionProvider<Object> connectionProvider;
 
@@ -59,6 +72,10 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   private ConnectionHandler<Object> connection1;
   private ConnectionHandler<Object> connection2;
+  private List<String> debugMessages;
+  protected Logger logger;
+  private Logger oldLogger;
+
 
   @Before
   public void before() throws Exception {
@@ -66,6 +83,14 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     injector = spyInjector(muleContext);
     muleContext.start();
     resetConnectionProvider();
+    debugMessages = new ArrayList<>();
+    logger = createMockLogger(debugMessages, new ArrayList<>());
+    oldLogger = setLogger(PoolingConnectionManagementStrategy.class, LOGGER_FIELD_NAME, logger);
+  }
+
+  @After
+  public void restoreLogger() throws Exception {
+    setLogger(PoolingConnectionManagementStrategy.class, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test
@@ -206,7 +231,8 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void initializationPolicyInitialiseNone() throws ConnectionException {
-    poolingProfile = new PoolingProfile(5, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_NONE);
+    poolingProfile =
+        new PoolingProfile(DEFAULT_MAX_POOL_ACTIVE, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_NONE);
     initStrategy();
     verifyConnections(0);
   }
@@ -221,6 +247,61 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     verifyConnections(3);
   }
 
+  @Test
+  public void logInitialization() {
+    poolingProfile =
+        new PoolingProfile(DEFAULT_MAX_POOL_ACTIVE, DEFAULT_MAX_POOL_IDLE, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION,
+                           DEFAULT_POOL_INITIALISATION_POLICY);
+    initStrategy();
+    verifyLogRegex(debugMessages, "Creating pool with ID (.*) for config {}", ownerConfigName);
+    verifyLogRegex(debugMessages, "Initializing pool (.*) with {} initial connections", DEFAULT_POOL_INITIALISATION_POLICY);
+    verifyLogRegex(debugMessages, "Created connection (.*)");
+    verifyLogRegex(debugMessages,
+                   "Status for pool (.*): 0 connections are active out of {} max active limit, {} connections are idle out of {} max idle limit",
+                   DEFAULT_MAX_POOL_ACTIVE, DEFAULT_POOL_INITIALISATION_POLICY, DEFAULT_MAX_POOL_IDLE);
+  }
+
+  @Test
+  public void logBorrowConnection() throws ConnectionException {
+    poolingProfile =
+        new PoolingProfile(DEFAULT_MAX_POOL_ACTIVE, DEFAULT_MAX_POOL_IDLE, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION,
+                           DEFAULT_POOL_INITIALISATION_POLICY);
+    initStrategy();
+    connection1 = strategy.getConnectionHandler();
+    verifyLogRegex(debugMessages, "Acquiring connection (.*) from the pool (.*)");
+  }
+
+  @Test
+  public void logDestroyConnection() throws ConnectionException {
+    poolingProfile =
+        new PoolingProfile(DEFAULT_MAX_POOL_ACTIVE, DEFAULT_MAX_POOL_IDLE, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION,
+                           DEFAULT_POOL_INITIALISATION_POLICY);
+    initStrategy();
+    connection1 = strategy.getConnectionHandler();
+    connection1.invalidate();
+    verifyLogRegex(debugMessages, "Disconnecting connection (.*)");
+  }
+
+  @Test
+  public void logClosePool() throws MuleException {
+    poolingProfile =
+        new PoolingProfile(DEFAULT_MAX_POOL_ACTIVE, DEFAULT_MAX_POOL_IDLE, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION,
+                           DEFAULT_POOL_INITIALISATION_POLICY);
+    initStrategy();
+    strategy.close();
+    verifyLogRegex(debugMessages, "Closing pool (.*)");
+  }
+
+  @Test
+  public void logPoolStatusUnlimited() throws ConnectionException {
+    poolingProfile =
+        new PoolingProfile(-1, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, DEFAULT_POOL_INITIALISATION_POLICY);
+    initStrategy();
+    verifyLogRegex(debugMessages,
+                   "Status for pool (.*): 0 connections are active out of unlimited max active limit, {} connections are idle out of unlimited max idle limit",
+                   DEFAULT_POOL_INITIALISATION_POLICY);
+  }
+
   private void resetConnectionProvider() throws ConnectionException {
     ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
@@ -229,12 +310,12 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   }
 
   private void initStrategy() {
-    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext);
+    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
+                                                         ownerConfigName);
   }
 
   private void verifyConnections(int numToCreate) throws ConnectionException {
     verify(this.connectionProvider, times(numToCreate)).connect();
     verify(this.connectionProvider, times(0)).disconnect(any());
   }
-
 }

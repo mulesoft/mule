@@ -115,17 +115,6 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Abstract
         : ofNullable(reconnectionConfig);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Optional<PoolingProfile> getPoolingProfile() {
-    ConnectionProvider<C> delegate = getDelegate();
-    return delegate instanceof ConnectionProviderWrapper
-        ? ((ConnectionProviderWrapper) delegate).getPoolingProfile()
-        : empty();
-  }
-
   private Optional<ErrorType> getErrorType(Throwable exception) {
     if (exception instanceof ModuleException) {
       return getErrorType(((ModuleException) exception).getType());
