@@ -56,5 +56,4 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   void doNotPersistArtifactStop(T artifact);
 
-  void doNotPersistFlowsStop(String artifactName);
 }
