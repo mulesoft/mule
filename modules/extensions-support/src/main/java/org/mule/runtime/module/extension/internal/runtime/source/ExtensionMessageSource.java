@@ -22,7 +22,6 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
-import org.reactivestreams.Publisher;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
@@ -75,7 +74,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
-import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -98,6 +96,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
+import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 

@@ -70,16 +70,18 @@ final class ConnectionManagementStrategyFactory {
   }
 
   private <C> ConnectionManagementStrategy<C> pooling(ConnectionProvider<C> connectionProvider) {
+    String ownerConfigName = "";
     PoolingProfile poolingProfile = defaultPoolingProfile;
     if (connectionProvider instanceof ConnectionProviderWrapper) {
       poolingProfile = ((ConnectionProviderWrapper) connectionProvider).getPoolingProfile().orElse(poolingProfile);
+      ownerConfigName = ((ConnectionProviderWrapper<C>) connectionProvider).getOwnerConfigName().orElse("");
     }
 
     return poolingProfile.isDisabled() ? withoutManagement(connectionProvider)
         : new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile,
                                                     (PoolingListener<C>) unwrapProviderWrapper(connectionProvider,
                                                                                                PoolingConnectionProvider.class),
-                                                    muleContext);
+                                                    muleContext, ownerConfigName);
   }
 
   private <C> ConnectionManagementType getManagementType(ConnectionProvider<C> connectionProvider) {
