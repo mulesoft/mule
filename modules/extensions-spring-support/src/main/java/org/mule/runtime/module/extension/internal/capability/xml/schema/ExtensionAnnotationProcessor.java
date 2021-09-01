@@ -13,6 +13,8 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.module.extension.internal.capability.xml.XmlUtils.getParameterGroups;
+import static org.mule.runtime.module.extension.internal.capability.xml.XmlUtils.isParameterGroupAnnotation;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocReader.parseJavaDoc;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -167,8 +169,7 @@ public final class ExtensionAnnotationProcessor {
         DeclaredType annotationType = compound.getAnnotationType();
         if (annotationType != null) {
           Class annotationClass = classFor((TypeElement) compound.getAnnotationType().asElement(), env).get();
-          if (ParameterGroup.class.isAssignableFrom(annotationClass)
-              || org.mule.sdk.api.annotation.param.ParameterGroup.class.isAssignableFrom(annotationClass)) {
+          if (isParameterGroupAnnotation(annotationClass)) {
             try {
               getOperationParameterGroupDocumentation((TypeElement) env.getTypeUtils().asElement(variable.asType()), docs, env);
             } catch (Exception e) {
@@ -193,9 +194,7 @@ public final class ExtensionAnnotationProcessor {
     getFieldsAnnotatedWith(groupElement, Parameter.class)
         .forEach((key, value) -> parameterDocs.put(key, getJavaDocSummary(processingEnvironment, value)));
 
-    Map<String, VariableElement> parameterGroupAnnotatedFields =
-        new HashMap<>(getFieldsAnnotatedWith(groupElement, org.mule.sdk.api.annotation.param.ParameterGroup.class));
-    parameterGroupAnnotatedFields.putAll(getFieldsAnnotatedWith(groupElement, ParameterGroup.class));
+    Map<String, VariableElement> parameterGroupAnnotatedFields = getParameterGroups(groupElement, this);
 
     parameterGroupAnnotatedFields.values()
         .forEach(field -> getOperationParameterGroupDocumentation((TypeElement) processingEnvironment.getTypeUtils()

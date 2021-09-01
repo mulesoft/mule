@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.api.loader.java.type;
 import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.List;
@@ -29,8 +29,7 @@ public interface OperationElement extends MethodElement<OperationContainerElemen
     Type returnType;
     if (isNonBlocking(this)) {
       returnType = getParameters().stream()
-          .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)
-              || p.getType().isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class))
+          .filter(JavaExtensionModelParserUtils::isCompletionCallbackParameter)
           .findAny()
           .get()
           .getType();

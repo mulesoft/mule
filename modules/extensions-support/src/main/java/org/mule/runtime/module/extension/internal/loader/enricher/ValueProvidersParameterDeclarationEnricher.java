@@ -16,6 +16,8 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.utils.FieldValueProviderNameUtils.getFieldValueProviderName;
+import static org.mule.runtime.module.extension.internal.loader.utils.ParameterUtils.getConfigFields;
+import static org.mule.runtime.module.extension.internal.loader.utils.ParameterUtils.getConnectionFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderId;
@@ -278,8 +280,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    */
   private Optional<Field> enrichWithConnection(ValueProviderFactoryModelPropertyBuilder modelPropertyBuilder,
                                                ParameterizableTypeWrapper parameterizableComponent) {
-    List<FieldElement> connectionFields =
-        parameterizableComponent.getAnnotatedFields(Connection.class, org.mule.sdk.api.annotation.param.Connection.class);
+    List<FieldElement> connectionFields = getConnectionFields(parameterizableComponent);
     if (!connectionFields.isEmpty()) {
       Field field = connectionFields.get(0).getField().get();
       modelPropertyBuilder.withConnection(field);
@@ -298,8 +299,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    */
   private Optional<Field> enrichWithConfiguration(ValueProviderFactoryModelPropertyBuilder modelPropertyBuilder,
                                                   ParameterizableTypeWrapper parameterizableComponent) {
-    List<FieldElement> configFields =
-        parameterizableComponent.getAnnotatedFields(Config.class, org.mule.sdk.api.annotation.param.Config.class);
+    List<FieldElement> configFields = getConfigFields(parameterizableComponent);
     if (!configFields.isEmpty()) {
       Field field = configFields.get(0).getField().get();
       modelPropertyBuilder.withConfig(field);

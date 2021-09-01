@@ -8,14 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
-import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
-import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.getParameterGroupInfo;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
@@ -24,6 +16,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+
 import java.util.LinkedList;
 import java.util.List;
 

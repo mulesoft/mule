@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
+import static org.mule.runtime.module.extension.internal.capability.xml.XmlUtils.getParameterGroups;
+import static org.mule.runtime.module.extension.internal.capability.xml.XmlUtils.getParameters;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.module.extension.internal.capability.xml.XmlUtils;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
 
 import java.util.HashMap;
@@ -45,8 +49,7 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
 
     if (method instanceof ExecutableElement) {
       ((ExecutableElement) method).getParameters().stream()
-          .filter(e -> e.getAnnotation(ParameterGroup.class) != null
-              || e.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class) != null)
+          .filter(XmlUtils::isParameterGroup)
           .forEach(group -> {
             TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(group.asType());
             document(parameterized, typeElement);
@@ -58,10 +61,7 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
     TypeElement traversingElement = element;
     while (traversingElement != null && !Object.class.getName().equals(traversingElement.getQualifiedName().toString())) {
 
-      Map<String, VariableElement> parameterFields = new HashMap<>(processor.getFieldsAnnotatedWith(element, Parameter.class));
-      parameterFields.putAll(processor.getFieldsAnnotatedWith(element, org.mule.sdk.api.annotation.param.Parameter.class));
-
-      final Map<String, VariableElement> variableElements = parameterFields
+      final Map<String, VariableElement> variableElements = getParameters(element, processor)
           .entrySet()
           .stream()
           .collect(Collectors.toMap(entry -> getNameOrAlias(entry.getValue()),
@@ -76,12 +76,7 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
       traversingElement = (TypeElement) processingEnv.getTypeUtils().asElement(traversingElement.getSuperclass());
     }
 
-    Map<String, VariableElement> parameterGroupFields =
-        new HashMap<>(processor.getFieldsAnnotatedWith(element, ParameterGroup.class));
-    parameterGroupFields
-        .putAll(processor.getFieldsAnnotatedWith(element, org.mule.sdk.api.annotation.param.ParameterGroup.class));
-
-    for (VariableElement variableElement : parameterGroupFields.values()) {
+    for (VariableElement variableElement : getParameterGroups(element, processor).values()) {
       TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(variableElement.asType());
       document(parameterized, typeElement);
     }

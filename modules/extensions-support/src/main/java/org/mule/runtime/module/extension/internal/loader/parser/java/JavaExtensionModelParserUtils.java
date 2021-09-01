@@ -25,6 +25,7 @@ import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -80,6 +81,11 @@ public final class JavaExtensionModelParserUtils {
         .collect(toList());
   }
 
+  public static boolean isCompletionCallbackParameter(ExtensionParameter extensionParameter) {
+    return extensionParameter.getType().isAssignableTo(CompletionCallback.class) ||
+        extensionParameter.getType().isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class);
+  }
+
   public static boolean isAutoPaging(MethodElement operationMethod) {
     Type returnType = operationMethod.getReturnType();
     return returnType.isAssignableTo(PagingProvider.class)
@@ -95,6 +101,11 @@ public final class JavaExtensionModelParserUtils {
   public static boolean isParameterGroup(ExtensionParameter groupParameter) {
     return groupParameter.getAnnotation(ParameterGroup.class).isPresent()
         || groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class).isPresent();
+  }
+
+  public static boolean isParameter(ExtensionParameter parameter) {
+    return parameter.getAnnotation(Parameter.class).isPresent()
+        || parameter.getAnnotation(org.mule.sdk.api.annotation.param.Parameter.class).isPresent();
   }
 
   public static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {
