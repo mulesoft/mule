@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.lang.Integer.MAX_VALUE;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
@@ -59,7 +61,8 @@ public final class ConnectionUtils {
 
   public static <C> void logPoolStatus(Logger logger, GenericObjectPool<C> pool, String poolId) {
     if (logger.isDebugEnabled()) {
-      String maxActive = pool.getMaxTotal() < 0 ? "unlimited" : String.valueOf(pool.getMaxTotal());
+      String maxActive =
+          pool.getMaxTotal() < 0 || pool.getMaxTotal() == MAX_VALUE ? "unlimited" : String.valueOf(pool.getMaxTotal());
       String maxIdle = pool.getMaxIdle() < 0 ? "unlimited" : String.valueOf(pool.getMaxIdle());
       logger
           .debug("Status for pool {}: {} connections are active out of {} max active limit, {} connections are idle out of {} max idle limit",
