@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_DESCRIPTIONS_FILE_NAME_MASK;
+
 import org.mule.runtime.extension.internal.GenericXmlSerializer;
 
 /**
@@ -17,7 +18,9 @@ import org.mule.runtime.extension.internal.GenericXmlSerializer;
  */
 public class ExtensionDescriptionsSerializer extends GenericXmlSerializer<XmlExtensionDocumentation> {
 
-  public ExtensionDescriptionsSerializer() {
+  public static final ExtensionDescriptionsSerializer SERIALIZER = new ExtensionDescriptionsSerializer();
+
+  private ExtensionDescriptionsSerializer() {
     super(XmlExtensionDocumentation.class);
   }
 

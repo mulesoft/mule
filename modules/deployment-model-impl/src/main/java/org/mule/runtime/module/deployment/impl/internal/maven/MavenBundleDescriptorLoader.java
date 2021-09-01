@@ -7,9 +7,11 @@
 
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
@@ -29,6 +31,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedBundleDescriptorAttributes;
+import org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer;
 
 import java.io.File;
 import java.util.Map;
@@ -63,10 +66,15 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
   @Override
   public BundleDescriptor load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    if (isHeavyPackage(artifactFile)) {
-      File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
-
-      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel = deserialize(classLoaderModelDescriptor);
+    File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
+    // if is heavyweight
+    if (classLoaderModelDescriptor.exists()) {
+      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
+      if (APP.equals(artifactType) || DOMAIN.equals(artifactType) || POLICY.equals(artifactType)) {
+        packagerClassLoaderModel = AppClassLoaderModelJsonSerializer.deserialize(classLoaderModelDescriptor);
+      } else {
+        packagerClassLoaderModel = deserialize(classLoaderModelDescriptor);
+      }
 
       return new BundleDescriptor.Builder()
           .setArtifactId(packagerClassLoaderModel.getArtifactCoordinates().getArtifactId())
@@ -75,6 +83,8 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setBaseVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
           .setType(packagerClassLoaderModel.getArtifactCoordinates().getType())
           .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
+          .setMetadata(singletonMap(org.mule.tools.api.classloader.model.ClassLoaderModel.class.getName(),
+                                    packagerClassLoaderModel))
           .build();
     } else {
       if (attributes instanceof PluginExtendedBundleDescriptorAttributes) {
@@ -120,10 +130,6 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setClassifier(artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
           .build();
     }
-  }
-
-  private boolean isHeavyPackage(File artifactFile) {
-    return getClassLoaderModelDescriptor(artifactFile).exists();
   }
 
   protected File getClassLoaderModelDescriptor(File artifactFile) {

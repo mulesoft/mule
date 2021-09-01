@@ -9,9 +9,12 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -27,6 +30,8 @@ public final class BundleDescriptor {
   private String type = "jar";
   private Optional<String> classifier = empty();
   private volatile String artifactFileName;
+
+  private Map<String, Object> metadata = emptyMap();
 
   private BundleDescriptor() {}
 
@@ -56,6 +61,15 @@ public final class BundleDescriptor {
 
   public boolean isPlugin() {
     return classifier.map(classifier -> classifier.equals("mule-plugin")).orElse(false);
+  }
+
+  /**
+   * @return any metadata associated the bundle.
+   * 
+   * @since 4.5
+   */
+  public Map<String, Object> getMetadata() {
+    return metadata;
   }
 
   @Override
@@ -144,7 +158,7 @@ public final class BundleDescriptor {
     private static final String CLASSIFIER = "classifier";
     private static final String REQUIRED_FIELD_NOT_FOUND_TEMPLATE = "bundle cannot be created with null or empty %s";
 
-    private BundleDescriptor bundleDependency = new BundleDescriptor();
+    private final BundleDescriptor bundleDependency = new BundleDescriptor();
 
     /**
      * @param groupId the group id of the bundle. Cannot be null or empty.
@@ -210,6 +224,17 @@ public final class BundleDescriptor {
      */
     public BundleDescriptor.Builder setClassifier(String classifier) {
       bundleDependency.classifier = ofNullable(classifier);
+      return this;
+    }
+
+    /**
+     * Sets the metadata associated the bundle.
+     *
+     * @param metadata metadata associated the bundle. Cannot be null
+     * @return the builder
+     */
+    public BundleDescriptor.Builder setMetadata(Map<String, Object> metadata) {
+      bundleDependency.metadata = requireNonNull(metadata);
       return this;
     }
 

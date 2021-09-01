@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -20,15 +21,12 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer;
 import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionDocumentation;
 import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * Declarer that adds descriptions to a {@link ExtensionDeclaration} by using the SDK generated
@@ -43,7 +41,6 @@ import org.apache.commons.io.IOUtils;
  */
 public final class ExtensionDescriptionsEnricher implements DeclarationEnricher {
 
-  private static final ExtensionDescriptionsSerializer serializer = new ExtensionDescriptionsSerializer();
 
   /**
    * {@inheritDoc}
@@ -52,13 +49,13 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
   public void enrich(ExtensionLoadingContext loadingContext) {
     String name = loadingContext.getExtensionDeclarer().getDeclaration().getName();
     ClassLoader classLoader = loadingContext.getExtensionClassLoader();
-    try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + serializer.getFileName(name))) {
+    try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + SERIALIZER.getFileName(name))) {
       if (resource != null) {
         XmlExtensionDocumentation documenter = withContextClassLoader(
                                                                       ExtensionDescriptionsEnricher.class
                                                                           .getClassLoader(),
-                                                                      () -> serializer
-                                                                          .deserialize(IOUtils.toString(resource)));
+                                                                      () -> SERIALIZER
+                                                                          .deserialize(resource));
         document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter);
       }
     } catch (IOException e) {

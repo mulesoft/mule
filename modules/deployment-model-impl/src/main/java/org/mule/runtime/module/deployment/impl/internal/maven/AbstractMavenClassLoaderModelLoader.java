@@ -139,13 +139,32 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   protected final ClassLoaderModel createClassLoaderModel(File artifactFile, Map<String, Object> attributes,
                                                           ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    if (isHeavyPackage(artifactFile, attributes)) {
+
+    org.mule.tools.api.classloader.model.ClassLoaderModel bundleDescriptorMetadata =
+        getBundleDescriptorClassLoaderModelMetadata(attributes);
+    if (bundleDescriptorMetadata != null) {
+      // Avoid parsing the classLoaderModel from JSON again if that is already available from a previous process.
+      return createHeavyPackageClassLoaderModel(artifactFile, attributes,
+                                                of(getDeployableArtifactRepositoryFolder(artifactFile)),
+                                                bundleDescriptorMetadata);
+    } else if (isHeavyPackage(artifactFile, attributes)) {
       return createHeavyPackageClassLoaderModel(artifactFile, getClassLoaderModelDescriptor(artifactFile), attributes);
     } else {
       return createLightPackageClassLoaderModel(artifactFile, attributes, artifactType,
                                                 mavenClient
                                                     .orElseThrow(() -> new UnsupportedOperationException("A MavenClient must be provided in order to handle lightweight packages.")));
     }
+  }
+
+  private org.mule.tools.api.classloader.model.ClassLoaderModel getBundleDescriptorClassLoaderModelMetadata(Map<String, Object> attributes) {
+    BundleDescriptor bundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
+
+    if (bundleDescriptor == null) {
+      return null;
+    }
+
+    return (org.mule.tools.api.classloader.model.ClassLoaderModel) bundleDescriptor.getMetadata()
+        .get(org.mule.tools.api.classloader.model.ClassLoaderModel.class.getName());
   }
 
   private ClassLoaderModel createHeavyPackageClassLoaderModel(File artifactFile, File classLoaderModelDescriptor,
@@ -157,9 +176,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   protected ClassLoaderModel createHeavyPackageClassLoaderModel(File artifactFile, File classLoaderModelDescriptor,
                                                                 Map<String, Object> attributes,
                                                                 Optional<File> deployableArtifactRepositoryFolder) {
-    org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
-        getPackagerClassLoaderModel(classLoaderModelDescriptor);
+    return createHeavyPackageClassLoaderModel(artifactFile, attributes, deployableArtifactRepositoryFolder,
+                                              getPackagerClassLoaderModel(classLoaderModelDescriptor));
+  }
 
+  protected ClassLoaderModel createHeavyPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes,
+                                                                Optional<File> deployableArtifactRepositoryFolder,
+                                                                org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
     BundleDescriptor artifactBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
     final ArtifactClassLoaderModelBuilder classLoaderModelBuilder =
         newHeavyWeightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor,
