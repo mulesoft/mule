@@ -42,7 +42,7 @@ import javax.inject.Inject;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
-  private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies;
+  private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = Optional.empty();
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
