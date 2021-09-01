@@ -94,8 +94,8 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
-        <!-- UUID generator, only called directly by mule-core -->
         <dependency>
+            <!-- UUID generator, only called directly by mule-core -->
             <groupId>org.mule.com.github.stephenc.eaio-uuid</groupId>
             <artifactId>uuid</artifactId>
         </dependency>
@@ -173,14 +173,14 @@
             <artifactId>vibur-object-pool</artifactId>
             <version>23.0</version>
         </dependency>
-        <!-- not to be confused with lmax diusruptor (used by log4j2), this one provides queue impls used by vibur -->
         <dependency>
+            <!-- not to be confused with lmax diusruptor (used by log4j2), this one provides queue impls used by vibur -->
             <groupId>com.conversantmedia</groupId>
             <artifactId>disruptor</artifactId>
             <version>1.2.10</version>
         </dependency>
-        <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
         <dependency>
+            <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
             <groupId>javax.jms</groupId>
             <artifactId>javax.jms-api</artifactId>
         </dependency>
