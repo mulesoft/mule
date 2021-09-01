@@ -78,12 +78,4 @@ public class DefaultConnectionProviderWrapper<C> extends AbstractConnectionProvi
 
     return of(ReconnectionConfig.getDefault());
   }
-
-  @Override
-  public Optional<PoolingProfile> getPoolingProfile() {
-    ConnectionProvider<C> delegate = getDelegate();
-    return delegate instanceof ConnectionProviderWrapper
-        ? ((ConnectionProviderWrapper) delegate).getPoolingProfile()
-        : empty();
-  }
 }
