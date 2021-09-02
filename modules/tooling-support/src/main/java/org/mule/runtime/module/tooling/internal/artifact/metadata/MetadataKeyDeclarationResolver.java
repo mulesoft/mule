@@ -193,6 +193,10 @@ public class MetadataKeyDeclarationResolver {
             throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
                                                              parameterName));
           }
+          if (parametersMap.containsKey(parameterName)) {
+            throw new MuleRuntimeException(createStaticMessage("Parameter '%s' for MetadataKey is duplicated in declaration, can't decide which one to use",
+                                                               parameterName));
+          }
           parametersMap.put(parameterName, value);
         }
       }
