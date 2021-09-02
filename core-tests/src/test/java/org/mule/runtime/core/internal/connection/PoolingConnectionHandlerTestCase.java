@@ -28,17 +28,19 @@ import org.mule.tck.size.SmallTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.pool.impl.GenericObjectPool;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
 
   private static int DELAY = 1000;
@@ -48,6 +50,9 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   private List<String> debugMessages;
   protected Logger logger;
   private Logger oldLogger;
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Mock
   private GenericObjectPool<Object> pool;

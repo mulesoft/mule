@@ -88,34 +88,14 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-dsl-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-http-policy-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-metadata-model-xml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-metadata-model-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-message-metadata-model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-metadata-model-json</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
-        <!-- UUID generator, only called directly by mule-core -->
         <dependency>
+            <!-- UUID generator, only called directly by mule-core -->
             <groupId>org.mule.com.github.stephenc.eaio-uuid</groupId>
             <artifactId>uuid</artifactId>
         </dependency>
@@ -140,22 +120,10 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>javax.transaction-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.mule.mvel</groupId>
             <artifactId>mule-mvel2</artifactId>
@@ -192,15 +160,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>it.unimi.dsi</groupId>
-            <artifactId>fastutil</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
@@ -215,12 +174,13 @@
             <version>23.0</version>
         </dependency>
         <dependency>
+            <!-- not to be confused with LMAX Disruptor (used by log4j2), this one provides queue impls used by Vibur -->
             <groupId>com.conversantmedia</groupId>
             <artifactId>disruptor</artifactId>
             <version>1.2.10</version>
         </dependency>
-        <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
         <dependency>
+            <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
             <groupId>javax.jms</groupId>
             <artifactId>javax.jms-api</artifactId>
         </dependency>

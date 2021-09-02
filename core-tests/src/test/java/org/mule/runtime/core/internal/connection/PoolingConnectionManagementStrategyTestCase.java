@@ -34,6 +34,7 @@ import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockL
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -41,21 +42,23 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.Injector;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase {
 
   private static final int MAX_ACTIVE = 2;
@@ -76,6 +79,8 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   protected Logger logger;
   private Logger oldLogger;
 
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Before
   public void before() throws Exception {
@@ -250,7 +255,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   @Test
   public void logInitialization() {
     poolingProfile =
-        new PoolingProfile(DEFAULT_MAX_POOL_ACTIVE, DEFAULT_MAX_POOL_IDLE, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION,
+        new PoolingProfile(DEFAULT_MAX_POOL_ACTIVE, DEFAULT_MAX_POOL_IDLE, DEFAULT_MAX_POOL_WAIT, WHEN_EXHAUSTED_FAIL,
                            DEFAULT_POOL_INITIALISATION_POLICY);
     initStrategy();
     verifyLogRegex(debugMessages, "Creating pool with ID (.*) for config {}", ownerConfigName);
