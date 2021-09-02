@@ -54,8 +54,8 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
   @Override
   public final void stop() {
-    if (getArtifactContext() != null && getArtifactContext().getRegistry() != null) {
-      for (Flow flow : getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+    if (getRegistry() != null) {
+      for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
         ((DefaultFlowBuilder.DefaultFlow) flow).doNotPersist();
       }
     }
@@ -150,8 +150,4 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
     }
   }
 
-  @Override
-  public ArtifactContext getArtifactContext() {
-    return artifactContext;
-  }
 }
