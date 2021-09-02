@@ -23,7 +23,7 @@ public class CompositeProfilingDataConsumerDiscoveryStrategy implements Profilin
   /**
    * Discovery strategies whose sets of discovered {@link ProfilingDataConsumer} will be returned by {@link #discover()}.
    */
-  Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies;
+  private final Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies;
 
   /**
    * @param discoveryStrategies Discovery strategies whose sets of discovered {@link ProfilingDataConsumer} will be returned by
