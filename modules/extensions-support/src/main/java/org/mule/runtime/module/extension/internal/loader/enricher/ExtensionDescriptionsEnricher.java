@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.lang.System.getProperty;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
 
@@ -41,12 +43,24 @@ import java.util.List;
  */
 public final class ExtensionDescriptionsEnricher implements DeclarationEnricher {
 
+  /**
+   * Setting this property is useful in environments where the descriptions are not required (like automated tools) to avoid the
+   * overhead of parsing the xml file with those descriptions.
+   * 
+   * @since 4.5
+   */
+  public static final String DISABLE_EXTENSIONS_DESCRIPTOR_ENRICHER =
+      SYSTEM_PROPERTY_PREFIX + ExtensionDescriptionsEnricher.class.getSimpleName() + ".disable";
 
   /**
    * {@inheritDoc}
    */
   @Override
   public void enrich(ExtensionLoadingContext loadingContext) {
+    if (getProperty(DISABLE_EXTENSIONS_DESCRIPTOR_ENRICHER) != null) {
+      return;
+    }
+
     String name = loadingContext.getExtensionDeclarer().getDeclaration().getName();
     ClassLoader classLoader = loadingContext.getExtensionClassLoader();
     try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + SERIALIZER.getFileName(name))) {
