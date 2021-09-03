@@ -345,7 +345,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     after();
     messageProcessor = createOperationMessageProcessor();
 
-    // registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
     registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
                             new WeaveDefaultExpressionLanguageFactoryService(null));
     doReturn(new DefaultExpressionManager()).when(context).getExpressionManager();
@@ -371,7 +370,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     after();
     messageProcessor = createOperationMessageProcessor();
 
-    // registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
     registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
                             new WeaveDefaultExpressionLanguageFactoryService(null));
     doReturn(new DefaultExpressionManager()).when(context)
