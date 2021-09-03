@@ -46,7 +46,6 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.util.OneTimeWarning;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.util.TemplateParser;
@@ -95,8 +94,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
             .orElse(null);
 
     if (isMelDefault() || registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent()) {
-      MVELExpressionLanguage mvelExpressionLanguage =
-          registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
+      ExtendedExpressionLanguageAdaptor mvelExpressionLanguage =
+          registry.<ExtendedExpressionLanguageAdaptor>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
 
       ExtendedExpressionLanguageAdaptor exprLangAdaptorHandler = dwExpressionLanguage != null
           ? new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage)

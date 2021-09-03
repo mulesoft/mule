@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,50 +17,34 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.DataType.fromFunction;
-import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.api.metadata.MediaType.XML;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
-import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.FunctionParameter;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayInputStream;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -73,15 +55,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
-public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCase {
+public class DefaultExpressionManagerMelDefaultTestCase extends AbstractMuleContextTestCase {
 
   private static final String MY_VAR = "myVar";
+
+  @Rule
+  public SystemProperty melDefault = new SystemProperty(MULE_MEL_AS_DEFAULT, TRUE.toString());
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
@@ -89,10 +73,15 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  @Mock
-  private StreamingManager streamingManager;
-
   private ExtendedExpressionManager expressionManager;
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> objects = new HashMap<>();
+    objects.putAll(super.getStartUpRegistryObjects());
+    objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
+    return objects;
+  }
 
   @Before
   public void configureExpressionManager() throws MuleException {
@@ -100,44 +89,9 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     initialiseIfNeeded(expressionManager, muleContext);
   }
 
-  @Test
-  @Description("Verifies that global bindings can be added.")
-  public void globals() {
-    DataType integerType = fromType(Integer.class);
-
-    ExpressionFunction multiply = new ExpressionFunction() {
-
-      @Override
-      public Object call(Object[] objects, BindingContext bindingContext) {
-        return ((Integer) objects[0]) * ((Integer) objects[1]);
-      }
-
-      @Override
-      public Optional<DataType> returnType() {
-        return of(integerType);
-      }
-
-      @Override
-      public List<FunctionParameter> parameters() {
-        return asList(new FunctionParameter("x", integerType),
-                      new FunctionParameter("y", integerType));
-      }
-    };
-
-    BindingContext globalContext = builder()
-        .addBinding("aNum", new TypedValue<>(4, fromType(Integer.class)))
-        .addBinding("times", new TypedValue<>(multiply, fromFunction(multiply)))
-        .build();
-
-    expressionManager.addGlobalBindings(globalContext);
-
-    TypedValue result = expressionManager.evaluate("aNum times 5");
-    assertThat(result.getValue(), is(20));
-
-    expressionManager.addGlobalBindings(builder().addBinding("otherNum", new TypedValue(3, integerType)).build());
-
-    result = expressionManager.evaluate("(times(7, 3) + otherNum) / aNum");
-    assertThat(result.getValue(), is(6));
+  @Override
+  protected boolean mockExprExecutorService() {
+    return true;
   }
 
   @Test
@@ -196,7 +150,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Description("Verifies that flowVars work, returning null for non existent ones and it's value for those that do.")
   public void flowVars() throws MuleException {
     CoreEvent.Builder eventBuilder = CoreEvent.builder(testEvent());
-    String flowVars = "vars.myVar";
+    String flowVars = "flowVars.myVar";
     assertThat(expressionManager.evaluate(flowVars, eventBuilder.build()).getValue(), nullValue());
     String value = "Leda";
     eventBuilder.addVariable(MY_VAR, value);
@@ -204,12 +158,12 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  @Description("Verifies that a simple transformation works.")
+  @Description("Verifies that a simple transformation works. MVEL ignores expectedDataType")
   public void transformation() throws MuleException {
     String expression = "payload";
     TypedValue result = expressionManager.evaluate(expression, BYTE_ARRAY, builder().build(), testEvent());
-    assertThat(result.getValue(), is(TEST_PAYLOAD.getBytes()));
-    assertThat(result.getDataType(), is(BYTE_ARRAY));
+    assertThat(result.getValue(), is(TEST_PAYLOAD));
+    assertThat(result.getDataType(), is(STRING));
   }
 
   @Test
@@ -222,12 +176,20 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
+  public void mvelWithNullBinding() throws MuleException {
+    String expression = "#[mel: 2+2 ==4]";
+    TypedValue result = expressionManager
+        .evaluate(expression, BOOLEAN, builder().addBinding("payload", new TypedValue(null, OBJECT)).build(),
+                  testEvent());
+    assertThat(result.getValue(), is(true));
+    assertThat(result.getDataType(), is(BOOLEAN));
+  }
+
+  @Test
   @Description("Verifies that parsing works with inner expressions in MVEL but only with regular ones in DW.")
   public void parseCompatibility() throws MuleException {
-    assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), TEST_CONNECTOR_LOCATION),
+    assertThat(expressionManager.parse("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION),
                is(format("this is %s", TEST_PAYLOAD)));
-    expectedException.expect(RuntimeException.class);
-    expressionManager.parse("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION);
   }
 
   @Test
@@ -240,62 +202,17 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Test
   @Description("Verifies that parsing works for log template scenarios for both DW and MVEL.")
   public void parseLog() throws MuleException {
-    assertThat(expressionManager.parseLogTemplate("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION,
+    assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]", testEvent(), TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
                is(format("this is %s", TEST_PAYLOAD)));
-  }
-
-  @Test
-  @Description("Verifies that parsing works for log template scenarios for both DW and MVEL using the message.")
-  public void parseLogMessage() throws MuleException {
-    String expectedOutput =
-        "current message is \norg.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n{"
-            + "\n  payload=test\n  mediaType=*/*\n  attributes=<not set>\n  attributesMediaType=*/*\n}";
-    assertThat(expressionManager.parseLogTemplate("current message is #[message]", testEvent(), TEST_CONNECTOR_LOCATION,
-                                                  NULL_BINDING_CONTEXT),
-               is(equalToIgnoringLineBreaks(expectedOutput)));
-  }
-
-  @Test
-  @Description("Verifies that XML content can be used for logging in DW.")
-  public void parseLogXml() throws MuleException {
-    CoreEvent event = getEventBuilder().message(Message.builder().value("<?xml version='1.0' encoding='US-ASCII'?>\n"
-        + "<wsc_fields>\n"
-        + "  <operation>echo</operation>\n"
-        + "  <body_test>test</body_test>\n"
-        + "</wsc_fields>")
-        .mediaType(XML)
-        .build())
-        .build();
-    assertThat(expressionManager.parseLogTemplate("this is #[payload.wsc_fields.operation]", event, TEST_CONNECTOR_LOCATION,
-                                                  NULL_BINDING_CONTEXT),
-               is("this is \"echo\""));
-  }
-
-  @Test
-  @Description("Verifies that JSON content can be used for logging in DW.")
-  public void parseLogJsonWithEscapedStrings() throws MuleException {
-    System.out.println("{\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}");
-
-    CoreEvent event = getEventBuilder().message(Message.builder()
-        .value("{\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}")
-        .mediaType(MediaType.JSON)
-        .build())
-        .build();
-    assertThat(expressionManager.parseLogTemplate("this is #[payload]", event, TEST_CONNECTOR_LOCATION,
-                                                  NULL_BINDING_CONTEXT),
-               is("this is {\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}"));
   }
 
   @Test
   @Description("Verifies that streams are logged in DW but not in MVEL.")
   public void parseLogStream() throws MuleException {
     ByteArrayInputStream stream = new ByteArrayInputStream("hello".getBytes());
-    CoreEvent event = getEventBuilder().message(Message.of(stream)).build();
+    CoreEvent event = getEventBuilder().message(of(stream)).build();
     assertThat(expressionManager.parseLogTemplate("this is #[payload]", event, TEST_CONNECTOR_LOCATION,
-                                                  NULL_BINDING_CONTEXT),
-               is("this is hello"));
-    assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]", event, TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
                both(startsWith("this is ")).and(containsString(stream.getClass().getSimpleName())));
   }
@@ -319,37 +236,14 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     assertThat(expressionManager.isExpression("${var}"), is(false));
   }
 
-  protected void disableMel() throws InitialisationException {
-    Registry registry = mock(Registry.class);
-    when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class))
-        .thenReturn(of(new WeaveDefaultExpressionLanguageFactoryService(null)));
-    when(registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED)).thenReturn(empty());
-
-    final MuleContextWithRegistry mockMuleContext = mockMuleContext();
-    MuleConfiguration config = mockMuleContext.getConfiguration();
-    doReturn(true).when(config).isValidateExpressions();
-
-    expressionManager = new DefaultExpressionManager();
-    ((DefaultExpressionManager) expressionManager).setRegistry(registry);
-    ((DefaultExpressionManager) expressionManager).setMuleContext(mockMuleContext);
-    initialiseIfNeeded(expressionManager, false, mockMuleContext);
-  }
-
   @Test
-  public void melPrefixIsValidDw() throws MuleException {
-    disableMel();
-
-    assertThat(expressionManager.isValid("#[mel:1]"), is(true));
-    expressionManager.evaluate("#[mel:1]");
-  }
-
-  @Test
-  public void session() throws MuleException {
-    Object object = new Object();
-    BindingContext context = builder().addBinding(MY_VAR, new TypedValue(object, OBJECT)).build();
-
-    ExpressionManagerSession session = expressionManager.openSession(context);
-
-    assertThat(session.evaluate("#[myVar]").getValue(), equalTo(object));
+  @Description("Verifies that parsing works for log template scenarios for both DW and MVEL.")
+  public void parseLogValueWithExpressionMarkers() throws MuleException {
+    String payloadWithExprMarkers = "#[hola]";
+    assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]",
+                                                  getEventBuilder().message(of(payloadWithExprMarkers)).build(),
+                                                  TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is(format("this is %s", payloadWithExprMarkers)));
   }
 }

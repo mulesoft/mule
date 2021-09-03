@@ -37,7 +37,6 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENS
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -56,6 +55,7 @@ import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
@@ -80,7 +80,6 @@ import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
@@ -102,8 +101,6 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import com.google.common.reflect.TypeToken;
-
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
@@ -113,12 +110,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.common.reflect.TypeToken;
+
+import org.slf4j.MDC;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.slf4j.MDC;
 
 @SmallTest
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
@@ -344,7 +345,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     after();
     messageProcessor = createOperationMessageProcessor();
 
-    registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
+    // registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
     registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
                             new WeaveDefaultExpressionLanguageFactoryService(null));
     doReturn(new DefaultExpressionManager()).when(context).getExpressionManager();
@@ -370,7 +371,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     after();
     messageProcessor = createOperationMessageProcessor();
 
-    registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
+    // registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
     registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
                             new WeaveDefaultExpressionLanguageFactoryService(null));
     doReturn(new DefaultExpressionManager()).when(context)
