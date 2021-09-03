@@ -11,7 +11,7 @@
 
     <test-policy:proxy name="policy">
         <test-policy:operation>
-            <logger level="INFO" message="#[mel:new org.foo.EchoTest()]"/>
+            <logger level="INFO" message="#[java!org::foo::EchoTest::new()]"/>
 
             <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
 
