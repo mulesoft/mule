@@ -138,7 +138,6 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   @Override
   public void undeploy(T artifact) {
     try {
-      doNotPersistFlowsStop(artifact.getArtifactName());
       doNotPersistArtifactStop(artifact);
       tryToStopArtifact(artifact);
       tryToDisposeArtifact(artifact);
@@ -193,14 +192,6 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
           artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
       optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
-    }
-  }
-
-  @Override
-  public void doNotPersistFlowsStop(String artifactName) {
-    if (appsFlowStoppedListeners.containsKey(artifactName)) {
-      appsFlowStoppedListeners.get(artifactName)
-          .forEach(FlowStoppedPersistenceListener::doNotPersist);
     }
   }
 

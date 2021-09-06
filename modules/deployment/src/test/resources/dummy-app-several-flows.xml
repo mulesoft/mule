@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <description>Failing Mule Application</description>
+
+    <object class="org.mule.runtime.module.deployment.internal.ApplicationDeploymentTestCase.FailingProcessorTest" name="FailingProcessor">
+    </object>
+
+    <flow name="test1">
+        <test:callback class="org.foo.EchoTest"/>
+    </flow>
+
+    <flow name="test2" >
+        <flow-ref name="FailingProcessor"/>
+    </flow>
+
+    <flow name="test3">
+        <test:callback class="org.foo.EchoTest"/>
+    </flow>
+
+</mule>
