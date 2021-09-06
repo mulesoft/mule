@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.lang.System.getProperty;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -30,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 /**
  * Declarer that adds descriptions to a {@link ExtensionDeclaration} by using the SDK generated
  * <strong>extensions-descriptions.xml</strong> file which persists the descriptions for each element (Configurations, Providers,
@@ -44,20 +45,32 @@ import java.util.List;
 public final class ExtensionDescriptionsEnricher implements DeclarationEnricher {
 
   /**
-   * Setting this property is useful in environments where the descriptions are not required (like automated tools) to avoid the
+   * Determining this is useful in environments where the descriptions are not required (like automated tools) to avoid the
    * overhead of parsing the xml file with those descriptions.
    * 
    * @since 4.5
    */
-  public static final String DISABLE_EXTENSIONS_DESCRIPTOR_ENRICHER =
-      SYSTEM_PROPERTY_PREFIX + ExtensionDescriptionsEnricher.class.getSimpleName() + ".disable";
+  private static boolean DISABLE_EXTENSIONS_DESCRIPTOR_ENRICHER;
+
+  static {
+    try {
+      ExtensionDescriptionsEnricher.class.getClassLoader().loadClass("org.mule.apache.xml.serialize.XMLSerializer");
+    } catch (ClassNotFoundException e1) {
+      DISABLE_EXTENSIONS_DESCRIPTOR_ENRICHER = true;
+    }
+    DISABLE_EXTENSIONS_DESCRIPTOR_ENRICHER = false;
+  }
+
+  private static final Logger LOGGER = getLogger(ExtensionDescriptionsEnricher.class);
 
   /**
    * {@inheritDoc}
    */
   @Override
   public void enrich(ExtensionLoadingContext loadingContext) {
-    if (getProperty(DISABLE_EXTENSIONS_DESCRIPTOR_ENRICHER) != null) {
+    if (DISABLE_EXTENSIONS_DESCRIPTOR_ENRICHER) {
+      LOGGER
+          .debug("Skipping ExtensionDescriptionsEnricher because the required jaxb implementation is not available in the classpath...");
       return;
     }
 
