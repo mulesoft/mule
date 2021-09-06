@@ -11,7 +11,7 @@ import org.mule.sdk.api.security.Credentials;
 /**
  *
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkCredentialsAdapter implements Credentials {
 

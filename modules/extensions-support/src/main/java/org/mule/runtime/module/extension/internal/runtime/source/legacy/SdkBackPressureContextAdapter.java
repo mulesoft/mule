@@ -16,7 +16,7 @@ import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 /**
  * Adapts a legacy {@link org.mule.runtime.extension.api.runtime.source.BackPressureContext} into a {@link BackPressureContext}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkBackPressureContextAdapter implements BackPressureContext {
 

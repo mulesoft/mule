@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Adapts a {@link org.mule.sdk.api.security.Authentication} into a {@link Authentication}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class MuleAuthenticationAdapter implements Authentication {
 

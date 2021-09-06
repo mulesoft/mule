@@ -23,7 +23,7 @@ import java.util.Set;
  * Utils class for handling cases where either {@link ParameterGroup} or {@link org.mule.sdk.api.annotation.param.ParameterGroup}
  * could be used
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class ParameterGroupUtils {
 

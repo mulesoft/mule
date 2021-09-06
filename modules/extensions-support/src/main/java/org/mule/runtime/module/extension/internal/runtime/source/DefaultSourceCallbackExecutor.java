@@ -35,6 +35,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedMethodComponentExecutor;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.lang.reflect.Method;
@@ -105,8 +106,7 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }
-    async = Stream.of(method.getParameterTypes()).anyMatch(p -> SourceCompletionCallback.class.equals(p)
-        || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(p));
+    async = Stream.of(method.getParameterTypes()).anyMatch(MuleExtensionUtils::isSourceCompletionCallbackType);
   }
 
   /**

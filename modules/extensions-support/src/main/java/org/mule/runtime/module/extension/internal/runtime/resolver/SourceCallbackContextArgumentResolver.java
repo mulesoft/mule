@@ -20,7 +20,7 @@ import org.mule.sdk.api.runtime.source.SourceCallbackContext;
  * <p>
  * If no such variable exists, then it returns {@code null}
  *
- * @since 4.4.0
+ * @since 4.0
  */
 public class SourceCallbackContextArgumentResolver implements ArgumentResolver<SourceCallbackContext> {
 

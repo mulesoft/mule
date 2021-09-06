@@ -21,7 +21,7 @@ import java.util.Optional;
 /**
  * Adapts a legacy {@link org.mule.runtime.extension.api.security.AuthenticationHandler} into a {@link AuthenticationHandler}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkAuthenticationHandlerAdapter implements AuthenticationHandler {
 

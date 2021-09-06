@@ -14,7 +14,7 @@ import org.mule.sdk.api.runtime.process.VoidCompletionCallback;;
  * {@link ArgumentResolver} which resolves to a {@link VoidCompletionCallback} by delegating into a
  * {@link VoidCallbackArgumentResolver} and adapting the result.
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public final class SdkVoidCallbackArgumentResolver implements ArgumentResolver<VoidCompletionCallback> {
 

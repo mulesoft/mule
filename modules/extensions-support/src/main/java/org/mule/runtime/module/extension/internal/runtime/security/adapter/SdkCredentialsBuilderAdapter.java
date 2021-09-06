@@ -13,7 +13,7 @@ import org.mule.sdk.api.security.CredentialsBuilder;
 /**
  * Adapts a {@link org.mule.runtime.api.security.CredentialsBuilder} into a {@link CredentialsBuilder}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkCredentialsBuilderAdapter implements CredentialsBuilder {
 

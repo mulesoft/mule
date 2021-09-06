@@ -11,7 +11,7 @@ import org.mule.runtime.api.security.Credentials;
 /**
  * Adapts a {@link org.mule.sdk.api.security.Credentials} into a {@link Credentials}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class MuleCredentialsAdapter implements Credentials {
 

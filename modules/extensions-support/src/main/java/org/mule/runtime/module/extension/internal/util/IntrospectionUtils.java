@@ -36,6 +36,8 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIg
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.reflections.ReflectionUtils.getAllFields;
+import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.ReflectionUtils.withAnnotations;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.ResolvableType.NONE;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
@@ -88,6 +90,8 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -158,6 +162,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
@@ -1748,4 +1753,47 @@ public final class IntrospectionUtils {
     }
     throw new NoSuchFieldException();
   }
+
+  /**
+   * ADD JDOC
+   *
+   * @param object
+   * @return
+   *
+   * @since 4.5
+   */
+  public static Optional<Field> fetchConfigFieldFromSourceObject(Object object) {
+    return fetchFieldFromSourceObject(object, Config.class, org.mule.sdk.api.annotation.param.Config.class);
+  }
+
+  /**
+   * ADD JDOC
+   *
+   * @param object
+   * @return
+   *
+   * @since 4.5
+   */
+  public static Optional<Field> fetchConnectionFieldFromSourceObject(Object object) {
+    return fetchFieldFromSourceObject(object, Connection.class, org.mule.sdk.api.annotation.param.Connection.class);
+  }
+
+  private static Optional<Field> fetchFieldFromSourceObject(Object object, Class<? extends Annotation>... annotations) {
+    Set<Field> fields = getAllFields(object.getClass(), withAnnotations(annotations));
+    if (CollectionUtils.isEmpty(fields)) {
+      return empty();
+    }
+
+    if (fields.size() > 1) {
+      // TODO: MULE-9220 Move this to a syntax validator
+      throw new IllegalModelDefinitionException(
+        format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
+            + "Only one field in the class can bare such annotation",
+          object.getClass().getName(),
+          annotations[0].getClass().getSimpleName()));
+    }
+
+    return of(fields.iterator().next());
+  }
+
 }
