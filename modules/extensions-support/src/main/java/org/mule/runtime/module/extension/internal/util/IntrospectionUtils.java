@@ -1755,10 +1755,10 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * ADD JDOC
+   * Given a Source object, fetches the Config field from the object if any.
    *
-   * @param object
-   * @return
+   * @param object the source object
+   * @return an Optional containing the config field if any
    *
    * @since 4.5
    */
@@ -1767,10 +1767,10 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * ADD JDOC
+   * Given a Source object, fetches the Connection field from the object if any.
    *
-   * @param object
-   * @return
+   * @param object the source object
+   * @return an Optional containing the connection field if any
    *
    * @since 4.5
    */

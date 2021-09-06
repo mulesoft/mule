@@ -18,32 +18,19 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
 /**
- * ADD JDOC
+ * Helper class used by the documenter to introspect properties of the extension source code.
  *
  * @since 4.5
  */
-public class XmlUtils {
+public class DocumenterUtils {
 
-  private XmlUtils() {}
+  private DocumenterUtils() {}
 
-  /**
-   * ADD JDOC
-   *
-   * @param variableElement
-   * @return
-   */
   public static boolean isParameterGroup(VariableElement variableElement) {
     return variableElement.getAnnotation(ParameterGroup.class) != null
         || variableElement.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class) != null;
   }
 
-  /**
-   * ADD JDOC
-   *
-   * @param typeElement
-   * @param extensionAnnotationProcessor
-   * @return
-   */
   public static Map<String, VariableElement> getParameters(TypeElement typeElement,
                                                            ExtensionAnnotationProcessor extensionAnnotationProcessor) {
     Map<String, VariableElement> parameterFields =
@@ -53,13 +40,6 @@ public class XmlUtils {
     return parameterFields;
   }
 
-  /**
-   * ADD JDOC
-   *
-   * @param typeElement
-   * @param extensionAnnotationProcessor
-   * @return
-   */
   public static Map<String, VariableElement> getParameterGroups(TypeElement typeElement,
                                                                 ExtensionAnnotationProcessor extensionAnnotationProcessor) {
     Map<String, VariableElement> parameterGroupFields =
@@ -69,23 +49,11 @@ public class XmlUtils {
     return parameterGroupFields;
   }
 
-  /**
-   * ADD JDOC
-   *
-   * @param clazz
-   * @return
-   */
   public static boolean isParameterGroupAnnotation(Class clazz) {
     return ParameterGroup.class.isAssignableFrom(clazz)
         || org.mule.sdk.api.annotation.param.ParameterGroup.class.isAssignableFrom(clazz);
   }
 
-  /**
-   * ADD JDOC
-   *
-   * @param typeName
-   * @return
-   */
   public static boolean isOperationTransactionalActionType(String typeName) {
     return OperationTransactionalAction.class.getName().equals(typeName)
         || org.mule.sdk.api.tx.OperationTransactionalAction.class.getName().equals(typeName);

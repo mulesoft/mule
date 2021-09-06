@@ -6,16 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
-import static org.mule.runtime.module.extension.internal.capability.xml.XmlUtils.getParameterGroups;
-import static org.mule.runtime.module.extension.internal.capability.xml.XmlUtils.getParameters;
+import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.getParameterGroups;
+import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.getParameters;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.module.extension.internal.capability.xml.XmlUtils;
+import org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -49,7 +46,7 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
 
     if (method instanceof ExecutableElement) {
       ((ExecutableElement) method).getParameters().stream()
-          .filter(XmlUtils::isParameterGroup)
+          .filter(DocumenterUtils::isParameterGroup)
           .forEach(group -> {
             TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(group.asType());
             document(parameterized, typeElement);

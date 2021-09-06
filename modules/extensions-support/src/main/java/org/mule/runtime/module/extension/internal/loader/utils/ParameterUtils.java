@@ -16,12 +16,10 @@ import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTyp
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Map;
 
 /**
- * ADD JDOC
+ * Helper class for introspecting parameter types.
  *
  * @since 4.5
  */

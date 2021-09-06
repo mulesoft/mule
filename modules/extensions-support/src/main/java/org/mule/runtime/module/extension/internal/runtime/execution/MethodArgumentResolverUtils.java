@@ -19,7 +19,8 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 /**
- * ADD JDOC
+ * Helper class for the {@link MethodArgumentResolverDelegate} that has the logic of the relation between the mule-extensions-api
+ * and the mule-sdk-api.
  * 
  * @since 4.5
  */

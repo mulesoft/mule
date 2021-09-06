@@ -743,10 +743,10 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * ADD JDOC
+   * Checks if the given type correspondes to a source complition callback
    *
-   * @param clazz
-   * @return
+   * @param clazz the type to check
+   * @return whether the type is a source completion callback or not
    *
    * @since 4.5
    */

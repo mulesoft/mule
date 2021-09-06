@@ -13,8 +13,8 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.module.extension.internal.capability.xml.XmlUtils.getParameterGroups;
-import static org.mule.runtime.module.extension.internal.capability.xml.XmlUtils.isParameterGroupAnnotation;
+import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.getParameterGroups;
+import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.isParameterGroupAnnotation;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocReader.parseJavaDoc;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -35,7 +35,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
