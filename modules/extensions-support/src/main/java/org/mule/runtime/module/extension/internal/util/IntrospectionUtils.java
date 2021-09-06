@@ -1779,7 +1779,10 @@ public final class IntrospectionUtils {
   }
 
   private static Optional<Field> fetchFieldFromSourceObject(Object object, Class<? extends Annotation>... annotations) {
-    Set<Field> fields = getAllFields(object.getClass(), withAnnotations(annotations));
+    Set<Field> fields = new HashSet<>();
+    for (Class<? extends Annotation> annotation : annotations) {
+      fields.addAll(getAllFields(object.getClass(), withAnnotation(annotation)));
+    }
     if (CollectionUtils.isEmpty(fields)) {
       return empty();
     }
