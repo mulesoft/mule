@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 /**
  * Adapts a legacy {@link org.mule.runtime.extension.api.runtime.operation.FlowListener} into a {@link FlowListener}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkFlowListenerAdapter implements FlowListener {
 

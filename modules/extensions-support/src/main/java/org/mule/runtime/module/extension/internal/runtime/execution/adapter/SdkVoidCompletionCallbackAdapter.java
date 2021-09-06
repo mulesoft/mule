@@ -12,7 +12,7 @@ import org.mule.sdk.api.runtime.process.VoidCompletionCallback;
  * Adapts a legacy {@link org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback} into a
  * {@link VoidCompletionCallback}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkVoidCompletionCallbackAdapter implements VoidCompletionCallback {
 

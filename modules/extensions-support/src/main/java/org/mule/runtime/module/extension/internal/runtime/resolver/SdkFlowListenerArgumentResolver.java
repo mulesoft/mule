@@ -14,7 +14,7 @@ import org.mule.sdk.api.runtime.operation.FlowListener;
  * {@link ArgumentResolver} which resolves to a {@link FlowListener} by delegating into a {@link FlowListenerArgumentResolver} and
  * adapting the result.
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkFlowListenerArgumentResolver implements ArgumentResolver<FlowListener> {
 

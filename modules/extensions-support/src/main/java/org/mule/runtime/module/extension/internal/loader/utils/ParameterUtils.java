@@ -10,11 +10,15 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
+import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ADD JDOC
@@ -45,4 +49,9 @@ public class ParameterUtils {
     return parameterFields;
   }
 
+  public static List<ExtensionParameter> getParameterGroups(WithParameters withParameters) {
+    List<ExtensionParameter> parameterGroups = withParameters.getParametersAnnotatedWith(ParameterGroup.class);
+    parameterGroups.addAll(withParameters.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.ParameterGroup.class));
+    return parameterGroups;
+  }
 }

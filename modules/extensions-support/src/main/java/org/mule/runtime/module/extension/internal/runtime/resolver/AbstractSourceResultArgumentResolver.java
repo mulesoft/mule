@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * Abstract {@link ArgumentResolver} which holds the logic to resolve Source Results.
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public abstract class AbstractSourceResultArgumentResolver<T> implements ArgumentResolver<T> {
 

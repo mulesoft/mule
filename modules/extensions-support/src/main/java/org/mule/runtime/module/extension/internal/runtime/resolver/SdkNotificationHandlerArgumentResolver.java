@@ -14,7 +14,7 @@ import org.mule.sdk.api.notification.NotificationEmitter;
 /**
  * {@link ArgumentResolver} implementation for {@link NotificationEmitter} parameters.
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkNotificationHandlerArgumentResolver implements ArgumentResolver<NotificationEmitter> {
 

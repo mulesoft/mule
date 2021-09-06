@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * Adapts a {@link org.mule.sdk.api.client.OperationParameters} into a legacy {@link OperationParameters}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class LegacyOperationParametersAdapter implements OperationParameters {
 

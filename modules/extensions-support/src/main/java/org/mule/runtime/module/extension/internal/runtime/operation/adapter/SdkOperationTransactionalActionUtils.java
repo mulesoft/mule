@@ -12,7 +12,7 @@ import org.mule.sdk.api.tx.OperationTransactionalAction;
 /**
  * Utils class for handling {@link OperationTransactionalAction}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public final class SdkOperationTransactionalActionUtils {
 

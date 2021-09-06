@@ -13,7 +13,7 @@ import org.mule.sdk.api.runtime.process.RouterCompletionCallback;
 /**
  * {@link ArgumentResolver} which returns a {@link RouterCompletionCallback}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public final class SdkRouterCallbackArgumentResolver implements ArgumentResolver<RouterCompletionCallback> {
 

@@ -17,7 +17,7 @@ import org.mule.sdk.api.runtime.process.CompletionCallback;
  * @param <T> The generic type of the operation's output value
  * @param <A> The generic type of the operation's output attributes
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkCompletionCallbackAdapter<T, A> implements CompletionCallback<T, A> {
 

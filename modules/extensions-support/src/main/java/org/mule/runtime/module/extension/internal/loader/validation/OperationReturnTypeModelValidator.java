@@ -26,6 +26,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -92,8 +93,7 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
   private void validateNonBlockingCallback(MethodElement<? extends Type> operationMethod, ProblemsReporter problemsReporter,
                                            OperationModel operationModel, ExtensionModel extensionModel) {
     operationMethod.getParameters().stream()
-        .filter(extensionParameter -> extensionParameter.getType().isSameType(CompletionCallback.class)
-            || extensionParameter.getType().isSameType(org.mule.sdk.api.runtime.process.CompletionCallback.class))
+        .filter(JavaExtensionModelParserUtils::isCompletionCallbackParameter)
         .findFirst().ifPresent(extensionParameter -> {
           List<TypeGeneric> generics = extensionParameter.getType().getGenerics();
           if (generics.isEmpty()) {

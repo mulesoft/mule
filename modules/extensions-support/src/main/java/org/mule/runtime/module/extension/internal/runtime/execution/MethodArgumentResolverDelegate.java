@@ -13,6 +13,14 @@ import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponen
 import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInput;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isConfigParameter;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isConnectionParameter;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isCorrelationInfoType;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isDefaultEncoding;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isLiteralType;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isParameterResolverType;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isSourceCompletionCallbackType;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isStreamingHelperType;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
@@ -223,13 +231,11 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
       ArgumentResolver<?> argumentResolver;
 
-      if (annotations.containsKey(Config.class) || annotations.containsKey(org.mule.sdk.api.annotation.param.Config.class)) {
+      if (isConfigParameter(annotations)) {
         argumentResolver = CONFIGURATION_ARGUMENT_RESOLVER;
-      } else if (annotations.containsKey(Connection.class)
-          || annotations.containsKey(org.mule.sdk.api.annotation.param.Connection.class)) {
+      } else if (isConnectionParameter(annotations)) {
         argumentResolver = CONNECTOR_ARGUMENT_RESOLVER;
-      } else if (annotations.containsKey(DefaultEncoding.class)
-          || annotations.containsKey(org.mule.sdk.api.annotation.param.DefaultEncoding.class)) {
+      } else if (isDefaultEncoding(annotations)) {
         argumentResolver = DEFAULT_ENCODING_ARGUMENT_RESOLVER;
       } else if (Error.class.isAssignableFrom(parameterType)) {
         argumentResolver = ERROR_ARGUMENT_RESOLVER;
@@ -240,12 +246,11 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (hasParameterGroupAnnotation(annotations.keySet()) && !isParameterGroupShowInDsl(annotations).get()
           && isParameterContainer(annotations.keySet(), typeLoader.load(parameterType))) {
         argumentResolver = parameterGroupResolvers.get(parameter);
-      } else if (ParameterResolver.class.equals(parameterType)
-          || org.mule.sdk.api.runtime.parameter.ParameterResolver.class.equals(parameterType)) {
+      } else if (isParameterResolverType(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
       } else if (TypedValue.class.equals(parameterType)) {
         argumentResolver = new TypedValueArgumentResolver<>(paramNames.get(i));
-      } else if (Literal.class.equals(parameterType) || org.mule.sdk.api.runtime.parameter.Literal.class.equals(parameterType)) {
+      } else if (isLiteralType(parameterType)) {
         argumentResolver = new LiteralArgumentResolver<>(paramNames.get(i), parameterType);
       } else if (CompletionCallback.class.equals(parameterType)) {
         argumentResolver = LEGACY_NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
@@ -274,8 +279,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = LEGACY_FLOW_LISTENER_ARGUMENT_RESOLVER;
       } else if (org.mule.sdk.api.runtime.operation.FlowListener.class.equals(parameterType)) {
         argumentResolver = FLOW_LISTENER_ARGUMENT_RESOLVER;
-      } else if (StreamingHelper.class.equals(parameterType)
-          || org.mule.sdk.api.runtime.streaming.StreamingHelper.class.equals(parameterType)) {
+      } else if (isStreamingHelperType(parameterType)) {
         argumentResolver = new StreamingHelperArgumentResolver();
       } else if (SourceResult.class.equals(parameterType)) {
         argumentResolver = LEGACY_SOURCE_RESULT_ARGUMENT_RESOLVER;
@@ -285,8 +289,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = LEGACY_BACK_PRESSURE_CONTEXT_ARGUMENT_RESOLVER;
       } else if (org.mule.sdk.api.runtime.source.BackPressureContext.class.equals(parameterType)) {
         argumentResolver = BACK_PRESSURE_CONTEXT_ARGUMENT_RESOLVER;
-      } else if (SourceCompletionCallback.class.equals(parameterType)
-          || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(parameterType)) {
+      } else if (isSourceCompletionCallbackType(parameterType)) {
         argumentResolver = ASYNC_SOURCE_COMPLETION_CALLBACK_ARGUMENT_RESOLVER;
       } else if (ComponentLocation.class.equals(parameterType)) {
         argumentResolver = COMPONENT_LOCATION_ARGUMENT_RESOLVER;
@@ -294,8 +297,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = LEGACY_OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER;
       } else if (org.mule.sdk.api.tx.OperationTransactionalAction.class.equals(parameterType)) {
         argumentResolver = OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER;
-      } else if (CorrelationInfo.class.equals(parameterType)
-          || org.mule.sdk.api.runtime.parameter.CorrelationInfo.class.equals(parameterType)) {
+      } else if (isCorrelationInfoType(parameterType)) {
         argumentResolver = CORRELATION_INFO_ARGUMENT_RESOLVER;
       } else if (NotificationEmitter.class.equals(parameterType)) {
         argumentResolver = LEGACY_NOTIFICATION_HANDLER_ARGUMENT_RESOLVER;

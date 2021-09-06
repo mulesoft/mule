@@ -18,7 +18,7 @@ import org.mule.sdk.api.runtime.process.CompletionCallback;
  * variable
  * {@link org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties#COMPLETION_CALLBACK_CONTEXT_PARAM}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public final class SdkCompletionCallbackArgumentResolver implements ArgumentResolver<CompletionCallback> {
 

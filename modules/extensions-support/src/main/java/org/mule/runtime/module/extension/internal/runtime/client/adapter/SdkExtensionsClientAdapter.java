@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Adapts a legacy {@link org.mule.runtime.extension.api.client.ExtensionsClient} into a {@link ExtensionsClient}
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkExtensionsClientAdapter implements ExtensionsClient {
 

@@ -16,7 +16,7 @@ import org.mule.sdk.api.tx.OperationTransactionalAction;
  * {@link ArgumentResolver} implementation for {@link OperationTransactionalAction} parameters which delegates to a
  * {@link OperationTransactionalActionArgumentResolver} and adapts the result.
  *
- * @since 4.0
+ * @since 4.5
  */
 public class SdkOperationTransactionalActionArgumentResolver implements ArgumentResolver<OperationTransactionalAction> {
 

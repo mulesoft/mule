@@ -14,7 +14,7 @@ import org.mule.sdk.api.client.ExtensionsClient;
  * {@link ArgumentResolver} which resolves to a {@link ExtensionsClient} by delegating into a
  * {@link ExtensionsClientArgumentResolver} and adapting the result.
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkExtensionsClientArgumentResolver implements ArgumentResolver<ExtensionsClient> {
 

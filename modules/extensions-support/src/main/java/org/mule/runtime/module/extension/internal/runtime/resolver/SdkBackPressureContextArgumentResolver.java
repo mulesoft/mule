@@ -14,7 +14,7 @@ import org.mule.sdk.api.runtime.source.BackPressureContext;
  * {@link ArgumentResolver} which resolves to a {@link BackPressureContext} by delegating into a
  * {@link BackPressureContextArgumentResolver} and adapting the result.
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class SdkBackPressureContextArgumentResolver implements ArgumentResolver<BackPressureContext> {
 

@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.internal.loader.utils;
 
 /**
- * Class that models the information of a parameter group annotation
+ * Class that models information of a parameter group
  *
- * @since 4.4.0
+ * @since 4.5.0
  */
 public class ParameterGroupInfo {
 
