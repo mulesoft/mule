@@ -752,6 +752,6 @@ public class MuleExtensionUtils {
    */
   public static boolean isSourceCompletionCallbackType(Class<?> clazz) {
     return SourceCompletionCallback.class.equals(clazz)
-      || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(clazz);
+        || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(clazz);
   }
 }

@@ -1787,10 +1787,10 @@ public final class IntrospectionUtils {
     if (fields.size() > 1) {
       // TODO: MULE-9220 Move this to a syntax validator
       throw new IllegalModelDefinitionException(
-        format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
-            + "Only one field in the class can bare such annotation",
-          object.getClass().getName(),
-          annotations[0].getClass().getSimpleName()));
+                                                format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
+                                                    + "Only one field in the class can bare such annotation",
+                                                       object.getClass().getName(),
+                                                       annotations[0].getClass().getSimpleName()));
     }
 
     return of(fields.iterator().next());
