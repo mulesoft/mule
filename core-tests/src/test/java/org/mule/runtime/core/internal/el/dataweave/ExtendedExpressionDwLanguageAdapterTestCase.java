@@ -65,7 +65,7 @@ public class ExtendedExpressionDwLanguageAdapterTestCase extends AbstractWeaveEx
   }
 
   @Test
-  @Description("Verifies that global binding context only work for DW.")
+  @Description("Verifies that global binding context only works for DW.")
   public void globalContext() throws Exception {
     ExpressionFunction expressionFunction = new ExpressionFunction() {
 
