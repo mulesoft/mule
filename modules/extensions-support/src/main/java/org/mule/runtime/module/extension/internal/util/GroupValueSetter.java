@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.springframework.util.ReflectionUtils.setField;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -19,11 +18,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
-import com.google.common.collect.ImmutableList;
-
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Supplier;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * An implementation of {@link ValueSetter} for parameter groups. Parameter groups are a set of parameters defined inside a Pojo
@@ -87,6 +86,11 @@ public final class GroupValueSetter implements ValueSetter {
     ParameterGroupObjectBuilder<?> parameterGroupObjectBuilder = new ParameterGroupObjectBuilder<>(groupDescriptor,
                                                                                                    reflectionCache.get(),
                                                                                                    expressionManager.get());
-    setField(container, target, parameterGroupObjectBuilder.build(result));
+    Object value = parameterGroupObjectBuilder.build(result);
+    try {
+      container.set(target, value);
+    } catch (IllegalAccessException ex) {
+      throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+    }
   }
 }

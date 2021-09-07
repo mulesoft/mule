@@ -7,10 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.ClassUtils.isPrimitiveWrapper;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
-import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
@@ -67,7 +68,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
   private void validateParameterType(ParameterModel parameter, ProblemsReporter problemsReporter) {
     parameter.getType().accept(new MetadataTypeVisitor() {
 
-      private Set<MetadataType> visitedTypes = new HashSet<>();
+      private final Set<MetadataType> visitedTypes = new HashSet<>();
 
       @Override
       public void visitUnion(UnionType unionType) {
