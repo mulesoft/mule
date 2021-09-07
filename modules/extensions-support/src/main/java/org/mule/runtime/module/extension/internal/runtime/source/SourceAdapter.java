@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
@@ -24,6 +25,8 @@ import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConfigFieldFromSourceObject;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConnectionFieldFromSourceObject;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -484,11 +487,13 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   private <T> Optional<FieldSetter<Object, T>> fetchConfigurationField() {
-    return fetchField(Config.class).map(FieldSetter::new);
+    Optional<Field> configurationField = fetchConfigFieldFromSourceObject(sourceInvokationTarget.get());
+    return configurationField.map(FieldSetter::new);
   }
 
   private <T> Optional<FieldSetter<Object, T>> fetchConnectionProviderField() {
-    return fetchField(Connection.class).map(field -> {
+    Optional<Field> connectionField = fetchConnectionFieldFromSourceObject(sourceInvokationTarget.get());
+    return connectionField.map(field -> {
       if (!ConnectionProvider.class.equals(field.getType())) {
         throw new IllegalModelDefinitionException(format(
                                                          "Message Source defined on class '%s' has field '%s' of type '%s' annotated with @%s. That annotation can only be "
@@ -501,24 +506,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
       return new FieldSetter<>(field);
     });
-  }
-
-  private Optional<Field> fetchField(Class<? extends Annotation> annotation) {
-    Set<Field> fields = getAllFields(sourceInvokationTarget.get().getClass(), withAnnotation(annotation));
-    if (CollectionUtils.isEmpty(fields)) {
-      return empty();
-    }
-
-    if (fields.size() > 1) {
-      // TODO: MULE-9220 Move this to a syntax validator
-      throw new IllegalModelDefinitionException(
-                                                format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
-                                                    + "Only one field in the class can bare such annotation",
-                                                       sourceInvokationTarget.get().getClass().getName(),
-                                                       annotation.getSimpleName()));
-    }
-
-    return of(fields.iterator().next());
   }
 
   public String getName() {

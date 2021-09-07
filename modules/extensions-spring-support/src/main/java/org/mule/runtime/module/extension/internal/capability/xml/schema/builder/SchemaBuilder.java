@@ -35,6 +35,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.isOperationTransactionalActionType;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
@@ -82,7 +83,6 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
-import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.util.ParameterModelComparator;
@@ -413,7 +413,7 @@ public final class SchemaBuilder {
         attribute.setName(name);
 
         String typeName = getOrCreateEnumTypeId(enumType).get();
-        if (OperationTransactionalAction.class.getName().equals(typeName)) {
+        if (isOperationTransactionalActionType(typeName)) {
           attribute.setType(MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE);
         } else if (TransactionType.class.getName().equals(typeName)) {
           attribute.setType(MULE_TRANSACTION_TYPE);

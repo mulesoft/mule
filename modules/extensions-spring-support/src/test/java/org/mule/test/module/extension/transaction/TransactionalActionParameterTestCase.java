@@ -46,6 +46,22 @@ public class TransactionalActionParameterTestCase extends AbstractExtensionFunct
     assertThat(value, is(NOT_SUPPORTED));
   }
 
+  @Test
+  public void sdkInjectDefaultOperationTransactionalAction() throws Exception {
+    org.mule.sdk.api.tx.OperationTransactionalAction value =
+        (org.mule.sdk.api.tx.OperationTransactionalAction) flowRunner("sdkInjectInOperationDefaultValue").run().getMessage()
+            .getPayload().getValue();
+    assertThat(value, is(org.mule.sdk.api.tx.OperationTransactionalAction.JOIN_IF_POSSIBLE));
+  }
+
+  @Test
+  public void sdkInjectInOperationJoinNotSupported() throws Exception {
+    org.mule.sdk.api.tx.OperationTransactionalAction value =
+        (org.mule.sdk.api.tx.OperationTransactionalAction) flowRunner("sdkInjectInOperationJoinNotSupported").run().getMessage()
+            .getPayload().getValue();
+    assertThat(value, is(org.mule.sdk.api.tx.OperationTransactionalAction.NOT_SUPPORTED));
+  }
+
   private void assertSourceTransactionalAction(String flowName, SourceTransactionalAction transactionalAction) throws Exception {
     Reference<SourceTransactionalAction> sourceTransactionalAction = new Reference<>();
     TransactionalSourceWithTXParameters.responseCallback = tx -> sourceTransactionalAction.set((SourceTransactionalAction) tx);

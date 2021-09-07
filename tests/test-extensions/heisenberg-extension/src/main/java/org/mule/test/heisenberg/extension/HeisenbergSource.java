@@ -59,11 +59,11 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
+import org.mule.sdk.api.runtime.source.BackPressureContext;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -113,7 +113,7 @@ public class HeisenbergSource extends Source<String, Object> {
   @Config
   private HeisenbergExtension heisenberg;
 
-  @Connection
+  @org.mule.sdk.api.annotation.param.Connection
   private ConnectionProvider<HeisenbergConnection> connectionProvider;
 
   @Parameter
@@ -202,7 +202,9 @@ public class HeisenbergSource extends Source<String, Object> {
   @OnError
   public synchronized void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine,
                                    @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
-                                   @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
+
+                                   @org.mule.sdk.api.annotation.param.ParameterGroup(name = "Error Info",
+                                       showInDsl = true) PersonalInfo infoError,
                                    @org.mule.sdk.api.annotation.param.Optional boolean propagateError,
                                    NotificationEmitter notificationEmitter) {
     gatheredMoney = -1;
@@ -238,7 +240,7 @@ public class HeisenbergSource extends Source<String, Object> {
   }
 
   @OnBackPressure
-  public void onBackPressure(BackPressureContext ctx, NotificationEmitter notificationEmitter) {
+  public void onBackPressure(BackPressureContext ctx, org.mule.sdk.api.notification.NotificationEmitter notificationEmitter) {
     notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
                                  fromType(Integer.class));
     heisenberg.onBackPressure(ctx);

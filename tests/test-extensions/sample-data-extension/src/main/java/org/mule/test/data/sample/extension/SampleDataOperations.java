@@ -66,7 +66,7 @@ public class SampleDataOperations {
 
   @SampleData(ConnectedTestSampleDataProvider.class)
   @MediaType(TEXT_PLAIN)
-  public Result<String, String> useConnection(@Connection SampleDataConnection connection,
+  public Result<String, String> useConnection(@org.mule.sdk.api.annotation.param.Connection SampleDataConnection connection,
                                               String payload,
                                               @Optional String attributes) {
     return connection.getResult(payload, attributes);
@@ -92,7 +92,7 @@ public class SampleDataOperations {
 
   @SampleData(GroupTestSampleDataProvider.class)
   @MediaType(TEXT_PLAIN)
-  public Result<String, String> parameterGroup(@Connection SampleDataConnection connection,
+  public Result<String, String> parameterGroup(@org.mule.sdk.api.annotation.param.Connection SampleDataConnection connection,
                                                @ParameterGroup(name = "group") SampleDataParameterGroup group) {
     return useConnection(connection, group.getGroupParameter(), group.getOptionalParameter());
   }
@@ -107,8 +107,9 @@ public class SampleDataOperations {
 
   @SampleData(ParameterizedTestSampleDataProvider.class)
   @MediaType(TEXT_PLAIN)
-  public Result<String, String> aliasedGroup(@Connection SampleDataConnection connection,
-                                             @ParameterGroup(name = "group") SampleDataAliasedParameterGroup group) {
+  public Result<String, String> aliasedGroup(@org.mule.sdk.api.annotation.param.Connection SampleDataConnection connection,
+                                             @org.mule.sdk.api.annotation.param.ParameterGroup(
+                                                 name = "group") SampleDataAliasedParameterGroup group) {
     return useConnection(connection, group.getPayload(), group.getAttributes());
   }
 

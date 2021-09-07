@@ -8,7 +8,8 @@ package org.mule.test.module.extension.parameter.resolver;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
+
+import org.mule.sdk.api.runtime.parameter.ParameterResolver;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.hamcrest.Matcher;

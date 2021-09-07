@@ -54,7 +54,7 @@ public class HarvestApplesSource extends Source<Apple, HarvestApplesAttributes> 
   @Optional
   private String flowName;
 
-  @ParameterGroup(name = "As Group Inline", showInDsl = true)
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "As Group Inline", showInDsl = true)
   private GroupedFood inlineGroupedFood;
 
   @Parameter

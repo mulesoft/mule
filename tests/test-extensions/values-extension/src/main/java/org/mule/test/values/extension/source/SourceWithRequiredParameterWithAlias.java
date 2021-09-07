@@ -14,6 +14,6 @@ import org.mule.test.values.extension.WithRequiredParameterWithAliasGroup;
 @MediaType(TEXT_PLAIN)
 public class SourceWithRequiredParameterWithAlias extends AbstractSdkSource {
 
-  @ParameterGroup(name = "someGroup")
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "someGroup")
   WithRequiredParameterWithAliasGroup group;
 }

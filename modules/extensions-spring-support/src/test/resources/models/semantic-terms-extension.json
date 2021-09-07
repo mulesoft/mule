@@ -3478,7 +3478,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "@ref:org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain"
+                    "type": "String"
                   },
                   "hasDynamicType": false,
                   "required": true,
@@ -3489,7 +3489,7 @@
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
-                    "allowsReferences": true,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -3498,13 +3498,10 @@
                     "query": false,
                     "order": 8
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "NTLM_DOMAIN",
-                      "namespace": "SEMANTIC-TERMS"
-                    }
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.ntlmDomain"
                   ],
-                  "semanticTerms": [],
                   "name": "ntlmDomain",
                   "description": "",
                   "modelProperties": {}
@@ -8545,7 +8542,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain"
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": true,
@@ -8556,7 +8553,7 @@
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
-                "allowsReferences": true,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -8565,13 +8562,10 @@
                 "query": false,
                 "order": 8
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "NTLM_DOMAIN",
-                  "namespace": "SEMANTIC-TERMS"
-                }
+              "allowedStereotypeModels": [],
+              "semanticTerms": [
+                "connectivity.ntlmDomain"
               ],
-              "semanticTerms": [],
               "name": "ntlmDomain",
               "description": "",
               "modelProperties": {}
@@ -9648,39 +9642,6 @@
   ],
   "modelProperties": {},
   "types": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain",
-        "classInformation": {
-          "classname": "org.mule.sdk.api.annotation.semantics.connectivity.NtlmDomain",
-          "hasDefaultConstructor": false,
-          "isInterface": true,
-          "isInstantiable": false,
-          "isAbstract": true,
-          "isFinal": false,
-          "implementedInterfaces": [
-            "java.lang.annotation.Annotation"
-          ],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeAlias": {
-          "value": "NtlmDomain"
-        },
-        "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "NTLM_DOMAIN",
-              "namespace": "SEMANTIC-TERMS"
-            }
-          ]
-        }
-      },
-      "fields": []
-    },
     {
       "format": "java",
       "type": "Object",

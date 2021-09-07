@@ -14,7 +14,7 @@ import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfi
 
 public class NonImplicitOperations {
 
-  public NonImplicitConfigExtension getConfig(@Config NonImplicitConfigExtension config) {
+  public NonImplicitConfigExtension getConfig(@org.mule.sdk.api.annotation.param.Config NonImplicitConfigExtension config) {
     return config;
   }
 

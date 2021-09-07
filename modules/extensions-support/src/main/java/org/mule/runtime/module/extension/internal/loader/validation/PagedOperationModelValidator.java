@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -32,8 +33,7 @@ public class PagedOperationModelValidator implements ExtensionModelValidator {
       @Override
       protected void onOperation(OperationModel operationModel) {
         boolean hasConnectionParameter = operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-            .map(property -> property.getOperationElement()
-                .getParametersAnnotatedWith(Connection.class).size() > 0)
+            .map(property -> getConnectionParameter(property.getOperationElement()).isPresent())
             .orElse(false);
         if (hasConnectionParameter && operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           problemsReporter.addError(new Problem(operationModel, format(

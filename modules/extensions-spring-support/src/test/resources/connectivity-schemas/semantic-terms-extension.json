@@ -624,6 +624,11 @@
               "range": "string",
               "mandatory": true
             },
+            "ntlmDomain": {
+              "propertyTerm": "connectivity.ntlmDomain",
+              "range": "string",
+              "mandatory": true
+            },
             "port": {
               "propertyTerm": "connectivity.port",
               "range": "number",

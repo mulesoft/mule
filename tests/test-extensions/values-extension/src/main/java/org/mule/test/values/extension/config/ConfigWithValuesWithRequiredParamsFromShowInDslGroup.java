@@ -23,6 +23,6 @@ public class ConfigWithValuesWithRequiredParamsFromShowInDslGroup {
   @OfValues(WithRequiredParameterFromGroupValueProvider.class)
   String valueParam;
 
-  @ParameterGroup(name = "someGroup", showInDsl = true)
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "someGroup", showInDsl = true)
   GroupWithValuesParameter paramGroup;
 }

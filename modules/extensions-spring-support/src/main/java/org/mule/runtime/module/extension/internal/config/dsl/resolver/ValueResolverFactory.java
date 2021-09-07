@@ -21,7 +21,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
@@ -34,6 +33,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.sdk.api.runtime.parameter.Literal;
 
 import java.util.Optional;
 import java.util.Set;
@@ -140,7 +140,8 @@ public class ValueResolverFactory {
 
     if (optionalStackedTypeModelProperty.isPresent()) {
       StackedTypesModelProperty property = optionalStackedTypeModelProperty.get();
-      Optional<ValueResolver> optionalResolver = property.getValueResolverFactory().getStaticValueResolver(value, Literal.class);
+      Optional<ValueResolver> optionalResolver =
+          property.getValueResolverFactory().getStaticValueResolver(value, Literal.class);
       if (optionalResolver.isPresent()) {
         return optionalResolver.get();
       }

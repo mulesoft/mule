@@ -83,6 +83,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
+import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
@@ -739,5 +740,18 @@ public class MuleExtensionUtils {
     } else {
       return parameters.keySet().stream().map(name -> aliasedParameterNames.getOrDefault(name, name)).collect(Collectors.toSet());
     }
+  }
+
+  /**
+   * Checks if the given type correspondes to a source complition callback
+   *
+   * @param clazz the type to check
+   * @return whether the type is a source completion callback or not
+   *
+   * @since 4.5
+   */
+  public static boolean isSourceCompletionCallbackType(Class<?> clazz) {
+    return SourceCompletionCallback.class.equals(clazz)
+        || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(clazz);
   }
 }

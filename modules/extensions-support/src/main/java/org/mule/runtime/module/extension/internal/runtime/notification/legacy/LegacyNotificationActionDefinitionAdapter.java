@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
  *
  * @since 4.4.0
  */
-public class LegacyNotificationActionDefinitionAdapter implements NotificationActionDefinition {
+public class LegacyNotificationActionDefinitionAdapter<E extends Enum<E>> implements NotificationActionDefinition<E> {
 
   private final org.mule.sdk.api.notification.NotificationActionDefinition delegate;
 

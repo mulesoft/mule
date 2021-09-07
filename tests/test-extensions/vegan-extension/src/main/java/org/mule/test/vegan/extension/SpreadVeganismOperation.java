@@ -95,7 +95,8 @@ public class SpreadVeganismOperation implements Initialisable, Startable, Stoppa
     return products;
   }
 
-  public void convinceAnimalKiller(@ParameterGroup(name = "arguments") @Placement(tab = ARGUMENTS_TAB) VeganArguments arguments) {
+  public void convinceAnimalKiller(@org.mule.sdk.api.annotation.param.ParameterGroup(name = "arguments") @Placement(
+      tab = ARGUMENTS_TAB) VeganArguments arguments) {
 
   }
 

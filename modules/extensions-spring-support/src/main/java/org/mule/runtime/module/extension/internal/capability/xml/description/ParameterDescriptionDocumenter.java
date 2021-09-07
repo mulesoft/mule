@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
+import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.getParameterGroups;
+import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.getParameters;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
 
 import java.util.Map;
@@ -44,7 +46,7 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
 
     if (method instanceof ExecutableElement) {
       ((ExecutableElement) method).getParameters().stream()
-          .filter(e -> e.getAnnotation(ParameterGroup.class) != null)
+          .filter(DocumenterUtils::isParameterGroup)
           .forEach(group -> {
             TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(group.asType());
             document(parameterized, typeElement);
@@ -55,7 +57,8 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
   void document(ParameterizedDeclaration<?> parameterized, final TypeElement element) {
     TypeElement traversingElement = element;
     while (traversingElement != null && !Object.class.getName().equals(traversingElement.getQualifiedName().toString())) {
-      final Map<String, VariableElement> variableElements = processor.getFieldsAnnotatedWith(traversingElement, Parameter.class)
+
+      final Map<String, VariableElement> variableElements = getParameters(element, processor)
           .entrySet()
           .stream()
           .collect(Collectors.toMap(entry -> getNameOrAlias(entry.getValue()),
@@ -70,8 +73,7 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
       traversingElement = (TypeElement) processingEnv.getTypeUtils().asElement(traversingElement.getSuperclass());
     }
 
-    for (VariableElement variableElement : processor.getFieldsAnnotatedWith(element, ParameterGroup.class)
-        .values()) {
+    for (VariableElement variableElement : getParameterGroups(element, processor).values()) {
       TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(variableElement.asType());
       document(parameterized, typeElement);
     }
