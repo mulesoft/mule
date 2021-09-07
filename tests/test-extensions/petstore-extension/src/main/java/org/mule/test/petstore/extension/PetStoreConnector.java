@@ -30,8 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
     PooledPetStoreConnectionProviderWithValidConnection.class})
 @ErrorTypes(PetstoreErrorTypeDefinition.class)
 @Sources({PetStoreSource.class, FailingPetStoreSource.class, SentientSource.class, PetAdoptionSource.class,
-    PetStoreStreamSource.class, PartialPetAdoptionSource.class, ConnectedPetAdoptionSource.class, PetFailingPollingSource.class,
-    PetFilterPollingSource.class})
+    PetAdoptionSchedulerInParamSource.class, PetStoreStreamSource.class, PartialPetAdoptionSource.class,
+    ConnectedPetAdoptionSource.class, PetFailingPollingSource.class, PetFilterPollingSource.class})
 @org.mule.sdk.api.annotation.Sources({NumberPetAdoptionSource.class, WatermarkingPetAdoptionSource.class,
     PetStoreListSource.class, PetAdoptionLimitingSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
