@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.internal.profiling;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
@@ -16,16 +15,25 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static java.util.Optional.empty;
+import static java.lang.String.format;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
+import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
 
 /**
  * Default diagnostic service for the runtime.
@@ -36,10 +44,11 @@ import java.util.Map;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
+  private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
+
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
 
-        // TODO MULE-19596 replace this map when the discovery strategy based on server plugins is implemented.
         {
           put(FLOW_EXECUTED,
               new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
@@ -61,8 +70,9 @@ public class DefaultProfilingService extends AbstractProfilingService {
       };
 
   @Override
-  public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-    return new DefaultProfilingDataConsumerDiscoveryStrategy();
+  public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
+                                                                              ProfilingDataProducer<T> profilingDataProducer) {
+    profilingDataProducers.put(profilingEventType, profilingDataProducer);
   }
 
   @Override
@@ -76,8 +86,15 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Override
-  public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
-                                                                              ProfilingDataProducer<T> profilingDataProducer) {
-    profilingDataProducers.put(profilingEventType, profilingDataProducer);
+  public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+    Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies = new HashSet<>();
+    discoveryStrategies.add(new DefaultProfilingDataConsumerDiscoveryStrategy());
+    this.profilingDataConsumerDiscoveryStrategies.map(discoveryStrategies::addAll);
+    return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies);
+  }
+
+  @Inject
+  public void setProfilingDataConsumerDiscoveryStrategies(Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies) {
+    this.profilingDataConsumerDiscoveryStrategies = profilingDataConsumerDiscoveryStrategies;
   }
 }
