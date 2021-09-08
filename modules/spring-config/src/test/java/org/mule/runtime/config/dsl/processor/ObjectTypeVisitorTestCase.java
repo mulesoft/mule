@@ -7,6 +7,7 @@
 
 package org.mule.runtime.config.dsl.processor;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +19,7 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfiguratio
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.metadata.api.model.StringType;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -25,8 +27,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.core.internal.processor.AbstractProcessor;
-import org.mule.runtime.core.internal.processor.ReferenceProcessor;
+import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -34,16 +35,19 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.Mock;
 
 public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
+
+  private static final String LOGGER_PROCESSOR_FQCN = "org.mule.runtime.core.internal.processor.LoggerMessageProcessor";
 
   @Mock(lenient = true)
   private StringType stringType;
 
   @BeforeClass
   public static void loadClassLoader() throws ClassNotFoundException {
-    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.internal.processor.ReferenceProcessor");
+    currentThread().getContextClassLoader().loadClass(LOGGER_PROCESSOR_FQCN);
   }
 
   @Rule
@@ -62,31 +66,31 @@ public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
   @Test
   public void typeIsInstanceOfGivenClassFromAttribute() throws ClassNotFoundException {
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
-        .withRawParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor").build());
+        .withRawParameter("type", LOGGER_PROCESSOR_FQCN).build());
     TypeDefinition typeDefinition = fromConfigurationAttribute("type");
     typeDefinition.visit(visitor);
-    assertTrue(ReferenceProcessor.class.isAssignableFrom(visitor.getType()));
+    assertTrue(LoggerMessageProcessor.class.isAssignableFrom(visitor.getType()));
   }
 
   @Test
   public void typeIsInstanceOfCheckedClassFromAttribute() throws ClassNotFoundException {
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
-        .withRawParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor").build());
+        .withRawParameter("type", LOGGER_PROCESSOR_FQCN).build());
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
-        .checkingThatIsClassOrInheritsFrom(ReferenceProcessor.class);
+        .checkingThatIsClassOrInheritsFrom(LoggerMessageProcessor.class);
     typeDefinition.visit(visitor);
-    assertTrue(ReferenceProcessor.class.isAssignableFrom(visitor.getType()));
+    assertTrue(LoggerMessageProcessor.class.isAssignableFrom(visitor.getType()));
   }
 
   @Test
   public void typeIsInstanceOfClassInheritedFromCheckedClassFromAttribute() throws ClassNotFoundException {
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
-        .withRawParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor").build());
+        .withRawParameter("type", LOGGER_PROCESSOR_FQCN).build());
     // Check that ReferenceProcessor inherits from AbstractProcessor
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
-        .checkingThatIsClassOrInheritsFrom(AbstractProcessor.class);
+        .checkingThatIsClassOrInheritsFrom(AbstractComponent.class);
     typeDefinition.visit(visitor);
-    assertTrue(AbstractProcessor.class.isAssignableFrom(visitor.getType()));
+    assertTrue(AbstractComponent.class.isAssignableFrom(visitor.getType()));
   }
 
   @Test
@@ -96,7 +100,7 @@ public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
         .withRawParameter("type", this.getClass().getName()).build());
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
-        .checkingThatIsClassOrInheritsFrom(ReferenceProcessor.class);
+        .checkingThatIsClassOrInheritsFrom(LoggerMessageProcessor.class);
     typeDefinition.visit(visitor);
   }
 
@@ -123,4 +127,3 @@ public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
   }
 
 }
-

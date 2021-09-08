@@ -4,17 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
-import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
-import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
@@ -44,9 +41,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.internal.processor.HasParamsAsTemplateProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
-import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.LinkedList;
@@ -210,7 +206,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
         // handling exceptions here in the interceptor adapter code. Any exception is to be handling by the interceptor
         // implementation
         if (expressionManager.isExpression(providedValue)) {
-          if (component instanceof LoggerMessageProcessor || component instanceof ParseTemplateProcessor) {
+          if (component instanceof HasParamsAsTemplateProcessor) {
             return expressionManager.parseLogTemplate(providedValue, event, component.getLocation(),
                                                       NULL_BINDING_CONTEXT);
           } else {

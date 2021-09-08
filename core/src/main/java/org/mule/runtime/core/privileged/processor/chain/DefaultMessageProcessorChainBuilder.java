@@ -29,7 +29,6 @@ import org.mule.runtime.core.api.processor.HasLocation;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 
 import java.util.ArrayList;
@@ -79,8 +78,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
       Processor processor = initializeMessageProcessor(processors.get(i));
-      if (processor instanceof InterceptingMessageProcessor && (!(processor instanceof ReferenceProcessor)
-          || ((ReferenceProcessor) processor).getReferencedProcessor() instanceof InterceptingMessageProcessor)) {
+      if (processor instanceof InterceptingMessageProcessor) {
         atLeastOneIntercepting = true;
         InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
         // Processor is intercepting so we can't simply iterate
@@ -224,7 +222,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
 
     private final Processor head;
     private final List<Processor> processorsForLifecycle;
-    private ComponentLocation pipeLineLocation;
+    private final ComponentLocation pipeLineLocation;
 
     protected InterceptingMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
                                                 Processor head,
