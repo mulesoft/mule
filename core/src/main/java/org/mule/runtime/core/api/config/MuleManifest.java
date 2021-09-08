@@ -116,11 +116,13 @@ public class MuleManifest {
 
   static class UrlPrivilegedAction implements PrivilegedAction<URL> {
 
+    private static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";
+
     @Override
     public URL run() {
       URL result = null;
       try {
-        Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+        Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources(MANIFEST_PATH);
         result = getManifestJarURL(e);
         if (result == null) {
           // if we haven't found a valid manifest yet, maybe we're running tests
@@ -133,10 +135,12 @@ public class MuleManifest {
     }
 
     URL getManifestJarURL(Enumeration<URL> e) {
-      SortedMap<String, URL> candidates = new TreeMap<String, URL>();
+      SortedMap<String, URL> candidates = new TreeMap<>();
       while (e.hasMoreElements()) {
         URL url = e.nextElement();
-        if ((url.toExternalForm().indexOf("mule-core") > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
+        if ((url.toExternalForm().contains("mule-core")
+            && !url.toExternalForm().contains("tests.jar")
+            && !url.toExternalForm().contains("mule-core-mvel"))
             || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*")) {
           candidates.put(url.toExternalForm(), url);
         }
@@ -155,10 +159,11 @@ public class MuleManifest {
 
     URL getManifestTestJarURL() throws IOException {
       String testManifestPath = "core-tests/target/test-classes";
-      Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+      Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources(MANIFEST_PATH);
       while (e.hasMoreElements()) {
         URL url = e.nextElement();
-        if ((url.toExternalForm().indexOf(testManifestPath) > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
+        if ((url.toExternalForm().contains(testManifestPath)
+            && !url.toExternalForm().contains("tests.jar"))
             || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*")) {
           return url;
         }
