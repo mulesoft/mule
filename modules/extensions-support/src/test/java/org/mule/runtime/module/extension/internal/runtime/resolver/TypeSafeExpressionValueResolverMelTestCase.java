@@ -24,6 +24,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUG
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -35,11 +38,17 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.verification.VerificationMode;
 
+@Feature(EXPRESSION_LANGUAGE)
+@Story(SUPPORT_MVEL_DW)
 public class TypeSafeExpressionValueResolverMelTestCase extends AbstractMuleContextTestCase {
 
   private static final String HELLO_WORLD = "Hello World!";

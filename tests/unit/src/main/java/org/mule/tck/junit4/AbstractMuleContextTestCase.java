@@ -57,7 +57,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.internal.el.ExpressionExecutor;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -79,13 +78,14 @@ import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
 
+import com.google.common.collect.ImmutableMap;
+
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.

@@ -24,19 +24,19 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.junit.Test;
-
 import java.util.Collection;
 import java.util.Map;
+
+import org.junit.Test;
 
 public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String ID = "id";
   private static final String OTHER_ID = "otherId";
 
-  private BindingContext.Builder builder = new DefaultBindingContextBuilder();
-  private TypedValue<String> typedValue = new TypedValue<>("", STRING);
-  private ModuleNamespace namespace = new ModuleNamespace("org", "mule", "mymodule");
+  private final BindingContext.Builder builder = new DefaultBindingContextBuilder();
+  private final TypedValue<String> typedValue = new TypedValue<>("", STRING);
+  private final ModuleNamespace namespace = new ModuleNamespace("org", "mule", "mymodule");
 
   @Test
   public void addsBinding() {
@@ -83,7 +83,6 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
             .addBinding(OTHER_ID, typedValue)
             .addModule(module)
             .build();
-
 
     BindingContext context = BindingContext.builder(previousContext).build();
 

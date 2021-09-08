@@ -112,10 +112,6 @@
             <artifactId>commons-cli</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
@@ -128,10 +124,6 @@
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.mule.mvel</groupId>
-            <artifactId>mule-mvel2</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.jgrapht</groupId>
             <artifactId>jgrapht-core</artifactId>
