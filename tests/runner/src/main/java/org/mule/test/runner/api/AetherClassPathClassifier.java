@@ -33,6 +33,7 @@ import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
+import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiVersionForTest;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -109,6 +110,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   private static final String RUNTIME_GROUP_ID = "org.mule.runtime";
   private static final String LOGGING_ARTIFACT_ID = "mule-module-logging";
+
+  private static final String SDK_API_GROUP_ID = "org.mule.sdk";
+  private static final String SDK_API_ARTIFACT_ID = "mule-sdk-api";
+  private static final String DEFAULT_SDK_API_VERSION = getDefaultSdkApiVersionForTest();
 
   private static final String MULE_ARTIFACT_JSON_PATH = "META-INF/mule-artifact/mule-artifact.json";
 
@@ -423,6 +428,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
     directDependencies
         .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion), COMPILE));
+
+    // TODO: MULE-19762 remove once forward compatiblity is finished
+    directDependencies
+        .add(new Dependency(new DefaultArtifact(SDK_API_GROUP_ID, SDK_API_ARTIFACT_ID, JAR_EXTENSION, DEFAULT_SDK_API_VERSION),
+                            COMPILE));
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
