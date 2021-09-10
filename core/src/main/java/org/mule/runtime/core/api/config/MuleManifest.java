@@ -140,7 +140,8 @@ public class MuleManifest {
         URL url = e.nextElement();
         if ((url.toExternalForm().contains("mule-core")
             && !url.toExternalForm().contains("tests.jar")
-            && !url.toExternalForm().contains("mule-core-mvel"))
+            && !url.toExternalForm().contains("mule-core-mvel")
+            && !url.toExternalForm().contains("mule-core-components"))
             || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*")) {
           candidates.put(url.toExternalForm(), url);
         }
