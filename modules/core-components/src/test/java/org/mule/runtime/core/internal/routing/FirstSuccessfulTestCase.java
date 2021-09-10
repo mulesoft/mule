@@ -35,12 +35,12 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.processor.ContextPropagationChecker;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
 @Story(FIRST_SUCCESSFUL)

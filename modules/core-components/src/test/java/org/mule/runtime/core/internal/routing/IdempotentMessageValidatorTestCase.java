@@ -33,14 +33,14 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(CORE_COMPONENTS)
 @Story(IDEMPOTENT_MESSAGE_VALIDATOR)

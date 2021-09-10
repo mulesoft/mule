@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -14,8 +16,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static java.util.Optional.empty;
 
 class ForeachContext {
 

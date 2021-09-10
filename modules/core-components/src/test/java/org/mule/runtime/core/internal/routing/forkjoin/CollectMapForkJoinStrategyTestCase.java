@@ -14,15 +14,15 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.ForkJoinStrategiesStory.COLLECT_MAP;
 
-import java.util.Map;
-
-import org.junit.Test;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
+
+import java.util.Map;
+
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;

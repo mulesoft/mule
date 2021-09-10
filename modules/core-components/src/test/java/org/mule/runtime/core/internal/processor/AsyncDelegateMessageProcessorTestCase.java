@@ -33,11 +33,11 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.Ignore;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
 @Story(ASYNC)

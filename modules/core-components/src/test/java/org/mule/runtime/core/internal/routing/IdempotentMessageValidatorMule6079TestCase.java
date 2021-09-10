@@ -31,11 +31,11 @@ import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.After;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(CORE_COMPONENTS)
 @Story(IDEMPOTENT_MESSAGE_VALIDATOR)

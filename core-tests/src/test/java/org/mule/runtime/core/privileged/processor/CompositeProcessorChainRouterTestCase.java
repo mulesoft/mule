@@ -14,7 +14,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,13 +51,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 // TODO MULE-13550 Improve CompositeProcessorChainRouter unit tests to cover scenario that was previously causing deadlock with flow-ref
 @Feature(ROUTERS)
@@ -66,6 +68,9 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
 
   private CompositeProcessorChainRouter chainRouter;
   private Scheduler scheduler;
+
+  @Rule
+  public ExpectedException expected = none();
 
   @Before
   public void setup() throws MuleException {
@@ -133,15 +138,14 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
 
     latch.await();
 
+    expected.expect(TimeoutException.class);
     try {
       future.get(BLOCK_TIMEOUT, MILLISECONDS);
-      fail("Timeout expected");
-    } catch (TimeoutException te) {
+    } finally {
+      childEventContext.get().success();
+
+      assertThat(future.get(BLOCK_TIMEOUT, MILLISECONDS).get().getMessage(), equalTo(testEvent().getMessage()));
     }
-
-    childEventContext.get().success();
-
-    assertThat(future.get(BLOCK_TIMEOUT, MILLISECONDS).get().getMessage(), equalTo(testEvent().getMessage()));
   }
 
   @Test

@@ -71,13 +71,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.reactivestreams.Publisher;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 import reactor.core.publisher.Mono;
 

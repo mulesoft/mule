@@ -37,13 +37,13 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.slf4j.Logger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.verification.VerificationMode;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(CORE_COMPONENTS)
 @Story(LOGGER)

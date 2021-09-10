@@ -40,7 +40,7 @@ import org.mockito.Mock;
 
 public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
 
-  private static final String LOGGER_PROCESSOR_FQCN = "org.mule.runtime.core.internal.processor.LoggerMessageProcessor";
+  private static final String LOGGER_PROCESSOR_FQCN = LoggerMessageProcessor.class.getName();
 
   @Mock(lenient = true)
   private StringType stringType;
@@ -64,7 +64,7 @@ public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void typeIsInstanceOfGivenClassFromAttribute() throws ClassNotFoundException {
+  public void typeIsInstanceOfGivenClassFromAttribute() {
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
         .withRawParameter("type", LOGGER_PROCESSOR_FQCN).build());
     TypeDefinition typeDefinition = fromConfigurationAttribute("type");
@@ -73,7 +73,7 @@ public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void typeIsInstanceOfCheckedClassFromAttribute() throws ClassNotFoundException {
+  public void typeIsInstanceOfCheckedClassFromAttribute() {
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
         .withRawParameter("type", LOGGER_PROCESSOR_FQCN).build());
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
@@ -83,7 +83,7 @@ public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void typeIsInstanceOfClassInheritedFromCheckedClassFromAttribute() throws ClassNotFoundException {
+  public void typeIsInstanceOfClassInheritedFromCheckedClassFromAttribute() {
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
         .withRawParameter("type", LOGGER_PROCESSOR_FQCN).build());
     // Check that ReferenceProcessor inherits from AbstractProcessor
@@ -94,7 +94,7 @@ public class ObjectTypeVisitorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testFailsIfTypeIsNotOfCheckedClass() throws ClassNotFoundException {
+  public void testFailsIfTypeIsNotOfCheckedClass() {
     exception.expect(MuleRuntimeException.class);
     exception.expectMessage("is not the same nor inherits from");
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()

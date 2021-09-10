@@ -56,9 +56,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,6 +63,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 import reactor.core.publisher.Flux;
 

@@ -17,12 +17,14 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.PROCESSING_TYPE;
 
-import java.util.Set;
-
-import org.junit.Test;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.Set;
+
 import org.slf4j.Logger;
+
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;

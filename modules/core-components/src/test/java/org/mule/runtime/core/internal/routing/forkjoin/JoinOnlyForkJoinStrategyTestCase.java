@@ -15,13 +15,13 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.ForkJoinStrategiesStory.JOIN_ONLY;
 
-import org.junit.Test;
-
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
+
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;

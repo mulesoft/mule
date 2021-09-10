@@ -48,12 +48,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(SCHEDULER)
 @Story(SCHEDULED_FLOW_EXECUTION)

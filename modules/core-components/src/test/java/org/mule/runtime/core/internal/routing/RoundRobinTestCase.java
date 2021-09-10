@@ -49,12 +49,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
 @Story(ROUND_ROBIN)

@@ -10,9 +10,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
-import org.slf4j.Logger;
 
 import java.util.Set;
+
+import org.slf4j.Logger;
 
 public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyProcessor {
 

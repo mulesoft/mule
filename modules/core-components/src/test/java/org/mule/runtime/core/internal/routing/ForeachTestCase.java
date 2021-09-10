@@ -83,10 +83,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -95,6 +91,10 @@ import org.junit.rules.ExpectedException;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(SCOPE)
 @Story(FOR_EACH)

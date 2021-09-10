@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static reactor.core.publisher.Flux.fromIterable;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -27,9 +28,9 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.Iterator;
 import java.util.List;
 
-import org.reactivestreams.Publisher;
-
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * <p>

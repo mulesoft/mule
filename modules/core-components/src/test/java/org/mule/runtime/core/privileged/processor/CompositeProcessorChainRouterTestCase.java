@@ -12,7 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
@@ -39,13 +39,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 // TODO MULE-13550 Improve CompositeProcessorChainRouter unit tests to cover scenario that was previously causing deadlock with flow-ref
 @Feature(ROUTERS)
@@ -55,6 +57,9 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
   private CompositeProcessorChainRouter chainRouter;
   private AsyncDelegateMessageProcessor async;
   private Scheduler scheduler;
+
+  @Rule
+  public ExpectedException expected = none();
 
   @Before
   public void setup() throws MuleException {
@@ -111,15 +116,14 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
 
     asyncLatch.await();
 
+    expected.expect(TimeoutException.class);
     try {
       future.get(BLOCK_TIMEOUT, MILLISECONDS);
-      fail("Timeout expected");
-    } catch (TimeoutException te) {
+    } finally {
+      latch.countDown();
+
+      assertThat(future.get(BLOCK_TIMEOUT, MILLISECONDS).get().getMessage(), equalTo(testEvent().getMessage()));
     }
-
-    latch.countDown();
-
-    assertThat(future.get(BLOCK_TIMEOUT, MILLISECONDS).get().getMessage(), equalTo(testEvent().getMessage()));
   }
 
   private CompositeProcessorChainRouter createCompositeProcessorChainRouter(MessageProcessorChain chain1,

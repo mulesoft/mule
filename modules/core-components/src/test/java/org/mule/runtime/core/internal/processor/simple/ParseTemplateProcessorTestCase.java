@@ -43,13 +43,13 @@ import java.net.URL;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(CORE_COMPONENTS)
 @Story(PARSE_TEMPLATE)

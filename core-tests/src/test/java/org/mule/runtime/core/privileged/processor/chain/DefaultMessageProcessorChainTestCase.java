@@ -60,7 +60,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
@@ -85,6 +84,7 @@ import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.InterceptingMessageProcessorChain;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -98,8 +98,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import io.qameta.allure.Issue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -107,6 +105,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import io.qameta.allure.Issue;
 
 import reactor.core.publisher.Flux;
 
@@ -157,6 +157,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   private Flow flow;
 
+  // psName exists only for showing the friendly name of the test parameter
   public DefaultMessageProcessorChainTestCase(String psName, ProcessingStrategyFactory processingStrategyFactory, Mode mode) {
     super(mode);
     this.processingStrategyFactory = processingStrategyFactory;
@@ -165,7 +166,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Before
   public void before() throws MuleException {
     nonBlockingProcessorsExecuted.set(0);
-    muleContext = spy(super.muleContext);
+    muleContext = spy(AbstractMuleContextTestCase.muleContext);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.isContainerMode()).thenReturn(false);
     when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
@@ -941,11 +942,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     initialiseIfNeeded(messageProcessor, muleContext);
     startIfNeeded(messageProcessor);
 
-    try {
-      return super.process(messageProcessor, event);
-    } finally {
-      final SchedulerService schedulerService = muleContext.getSchedulerService();
-    }
+    return super.process(messageProcessor, event);
   }
 
   private AppendingMP getAppendingMP(String append) {
@@ -1002,7 +999,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
     String appendString;
     boolean muleContextInjected;
-    boolean flowConstuctInjected;
     boolean initialised;
     boolean started;
     boolean stopped;
