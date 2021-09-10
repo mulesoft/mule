@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.info;
 
 
 /**
- * ADD JDOC
+ * Class that models the information of the RequiresEntitlement annotations.
  *
  * @since 4.5
  */
