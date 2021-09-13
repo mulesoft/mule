@@ -68,6 +68,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -251,9 +252,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           final AstXmlParser parser = createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
 
           artifactAst = parser.parse(stream(artifactConfigResources)
-              .map((CheckedFunction<ConfigResource, Pair<String, InputStream>>) (configFile -> new Pair<>(configFile
-                  .getResourceName(), configFile.getInputStream())))
-              .collect(toList()));
+              .map((CheckedFunction<ConfigResource, URL>) (ConfigResource::getUrl)).toArray(URL[]::new));
         }
       } else {
         artifactAst = toArtifactast(artifactDeclaration, extensions);
