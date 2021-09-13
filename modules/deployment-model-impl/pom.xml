@@ -107,13 +107,13 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>${aetherProviderVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tools.maven</groupId>
             <artifactId>mule-classloader-model</artifactId>
         </dependency>
 
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
@@ -200,7 +200,6 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-test</artifactId>
-            <version>${muleMavenClientTest}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

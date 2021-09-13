@@ -93,7 +93,6 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>${jodaTimeVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.dom4j</groupId>
