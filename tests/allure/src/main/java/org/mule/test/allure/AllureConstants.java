@@ -249,6 +249,24 @@ public interface AllureConstants {
 
     String CORE_COMPONENTS = "Core Components";
 
+    interface SetPayloadStory {
+
+      String SET_PAYLOAD = "Set Payload";
+
+    }
+
+    interface AddVariableStory {
+
+      String ADD_VARIABLE = "Add Variable";
+
+    }
+
+    interface RemoveVariableStory {
+
+      String REMOVE_VARIABLE = "Remove Variable";
+
+    }
+
     interface FlowReferenceStory {
 
       String FLOW_REFERENCE = "Flow Reference";
@@ -264,6 +282,12 @@ public interface AllureConstants {
     interface ParseTemplateStory {
 
       String PARSE_TEMPLATE = "Parse Template";
+
+    }
+
+    interface IdempotentMessageValidator {
+
+      String IDEMPOTENT_MESSAGE_VALIDATOR = "Idempotent Message Validator";
 
     }
 
@@ -518,6 +542,10 @@ public interface AllureConstants {
 
     String ROUTERS = "Routers";
 
+    /**
+     * @deprecated {@code foreach} is a scope.
+     */
+    @Deprecated
     interface ForeachStory {
 
       String FOR_EACH = "Foreach";
@@ -538,11 +566,19 @@ public interface AllureConstants {
       String FIRST_SUCCESSFUL = "First Successful";
     }
 
+    /**
+     * @deprecated {@code until-successful} is a scope.
+     */
+    @Deprecated
     interface UntilSuccessfulStory {
 
       String UNTIL_SUCCESSFUL = "Until Successful";
     }
 
+    /**
+     * @deprecated {@code async} is a scope.
+     */
+    @Deprecated
     interface AsyncStory {
 
       String ASYNC = "Async";
@@ -553,9 +589,18 @@ public interface AllureConstants {
       String PROCESSOR_CHAIN_ROUTER = "Processor Chain Router";
     }
 
+    /**
+     * @deprecated {@code parallel-foreach} is a scope.
+     */
+    @Deprecated
     interface ParallelForEachStory {
 
       String PARALLEL_FOR_EACH = "Parallel For Each";
+    }
+
+    interface ChoiceStory {
+
+      String CHOICE = "Choice";
     }
 
   }
@@ -578,6 +623,7 @@ public interface AllureConstants {
 
       String FLOW_DISPATCH = "Dispatch to flow";
       String POLLING = "Polling";
+      String REDELIVERY = "Redelivery";
       String WATERMARK = "Watermark";
     }
 
@@ -587,11 +633,34 @@ public interface AllureConstants {
 
     String SCOPE = "Scope";
 
+    /**
+     * @deprecated {@code choice} is a router.
+     */
+    @Deprecated
     interface ChoiceStory {
 
       String CHOICE = "Choice";
     }
 
+    interface ForeachStory {
+
+      String FOR_EACH = "Foreach";
+    }
+
+    interface UntilSuccessfulStory {
+
+      String UNTIL_SUCCESSFUL = "Until Successful";
+    }
+
+    interface AsyncStory {
+
+      String ASYNC = "Async";
+    }
+
+    interface ParallelForEachStory {
+
+      String PARALLEL_FOR_EACH = "Parallel For Each";
+    }
   }
 
   interface LifecycleAndDependencyInjectionFeature {

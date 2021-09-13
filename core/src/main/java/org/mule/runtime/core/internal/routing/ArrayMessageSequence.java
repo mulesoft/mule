@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import org.mule.runtime.core.internal.routing.AbstractMessageSequence;
-
 public class ArrayMessageSequence extends AbstractMessageSequence<Object> {
 
-  private Object[] array;
+  private final Object[] array;
   private int idx;
 
   public ArrayMessageSequence(Object[] array) {
