@@ -12,6 +12,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEntitlementInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
 
 import org.mule.runtime.api.meta.Category;
@@ -36,6 +38,8 @@ import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelPar
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
+import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
+import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -114,13 +118,13 @@ public class JavaExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public LicenseModelProperty getLicenseModelProperty() {
-    Optional<RequiresEntitlement> requiresEntitlementOptional = extensionElement.getAnnotation(RequiresEntitlement.class);
-    Optional<RequiresEnterpriseLicense> requiresEnterpriseLicenseOptional =
-        extensionElement.getAnnotation(RequiresEnterpriseLicense.class);
+    Optional<RequiresEntitlementInfo> requiresEntitlementOptional = getRequiresEntitlementInfo(extensionElement);
+    Optional<RequiresEnterpriseLicenseInfo> requiresEnterpriseLicenseOptional =
+        getRequiresEnterpriseLicenseInfo(extensionElement);
     boolean requiresEnterpriseLicense = requiresEnterpriseLicenseOptional.isPresent();
     boolean allowsEvaluationLicense =
-        requiresEnterpriseLicenseOptional.map(RequiresEnterpriseLicense::allowEvaluationLicense).orElse(true);
-    Optional<String> requiredEntitlement = requiresEntitlementOptional.map(RequiresEntitlement::name);
+        requiresEnterpriseLicenseOptional.map(RequiresEnterpriseLicenseInfo::isAllowEvaluationLicense).orElse(true);
+    Optional<String> requiredEntitlement = requiresEntitlementOptional.map(RequiresEntitlementInfo::getName);
 
     return new LicenseModelProperty(requiresEnterpriseLicense, allowsEvaluationLicense, requiredEntitlement);
   }

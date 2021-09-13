@@ -22,6 +22,8 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
+import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
+import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -55,6 +57,8 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
+import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
 
 import java.lang.annotation.Annotation;
 import java.util.LinkedList;
@@ -266,6 +270,53 @@ public final class JavaExtensionModelParserUtils {
 
   public static Optional<DeprecationModel> getDeprecationModel(ExtensionElement extensionElement) {
     return getDeprecationModel(extensionElement, "Extension", extensionElement.getName());
+  }
+
+  public static Optional<RequiresEnterpriseLicenseInfo> getRequiresEnterpriseLicenseInfo(ExtensionElement extensionElement) {
+    return getInfoFromExtension(extensionElement, RequiresEnterpriseLicense.class,
+                                org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class,
+                                requiresEnterpriseLicense -> new RequiresEnterpriseLicenseInfo(requiresEnterpriseLicense
+                                    .allowEvaluationLicense()),
+                                requiresEnterpriseLicense -> new RequiresEnterpriseLicenseInfo(requiresEnterpriseLicense
+                                    .allowEvaluationLicense()));
+  }
+
+  public static Optional<RequiresEntitlementInfo> getRequiresEntitlementInfo(ExtensionElement extensionElement) {
+    return getInfoFromExtension(extensionElement, RequiresEntitlement.class,
+                                org.mule.sdk.api.annotation.license.RequiresEntitlement.class,
+                                requiresEntitlementAnnotation -> new RequiresEntitlementInfo(requiresEntitlementAnnotation.name(),
+                                                                                             requiresEntitlementAnnotation
+                                                                                                 .description()),
+                                requiresEntitlementAnnotation -> new RequiresEntitlementInfo(requiresEntitlementAnnotation.name(),
+                                                                                             requiresEntitlementAnnotation
+                                                                                                 .description()));
+  }
+
+  private static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromExtension(ExtensionElement extensionElement,
+                                                                                                  Class<R> legacyAnnotationClass,
+                                                                                                  Class<S> sdkAnnotationClass,
+                                                                                                  Function<R, T> legacyAnnotationMapping,
+                                                                                                  Function<S, T> sdkAnnotationMapping) {
+    Optional<R> legacyAnnotation = extensionElement.getAnnotation(legacyAnnotationClass);
+    Optional<S> sdkAnnotation = extensionElement.getAnnotation(sdkAnnotationClass);
+
+    Optional<T> result;
+    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
+      throw new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                extensionElement.getName(),
+                                                                legacyAnnotationClass.getName(),
+                                                                sdkAnnotationClass.getName()));
+    } else if (legacyAnnotation.isPresent()) {
+      result = legacyAnnotation
+          .map(legacyAnnotationMapping);
+    } else if (sdkAnnotation.isPresent()) {
+      result = sdkAnnotation
+          .map(sdkAnnotationMapping);
+    } else {
+      result = empty();
+    }
+
+    return result;
   }
 
   private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
