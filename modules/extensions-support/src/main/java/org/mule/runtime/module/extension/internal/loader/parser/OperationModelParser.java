@@ -167,4 +167,6 @@ public interface OperationModelParser {
    */
   Optional<DisplayModel> getDisplayModel();
 
+
+  List<ErrorModelParser> getErrorModelParsers();
 }

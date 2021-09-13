@@ -54,6 +54,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
@@ -62,6 +63,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -409,6 +411,21 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   public boolean hasConfig() {
     return configParameter.isPresent();
   }
+
+  @Override
+  public List<ErrorModelParser> getErrorModelParsers() {
+    List<ErrorModelParser> errorParsers = new LinkedList<>();
+
+    return errorParsers;
+  }
+
+//  private Optional<Throws> getOperationThrowsDeclaration(MethodElement operationMethod, Type extensionElement) {
+//    Type operationContainer = operationMethod.getEnclosingType();
+//    return ofNullable(operationMethod.getAnnotation(Throws.class)
+//        .orElseGet(() -> operationContainer.getAnnotation(Throws.class)
+//            .orElseGet(() -> extensionElement.getAnnotation(Throws.class)
+//                .orElse(null))));
+//  }
 
   private void checkOperationIsNotAnExtension() {
     if (operationContainer.isAssignableFrom(extensionElement) || extensionElement.isAssignableFrom(operationContainer)) {

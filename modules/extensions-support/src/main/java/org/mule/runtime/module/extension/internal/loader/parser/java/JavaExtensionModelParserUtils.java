@@ -76,6 +76,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -307,6 +308,35 @@ public final class JavaExtensionModelParserUtils {
                                                                                                           .description()));
   }
 
+
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromExtension(ExtensionElement extensionElement,
+                                                                                                  Class<R> legacyAnnotationClass,
+                                                                                                  Class<S> sdkAnnotationClass,
+                                                                                                  Function<R, T> legacyAnnotationMapping,
+                                                                                                  Function<S, T> sdkAnnotationMapping) {
+    return getInfoFromAnnotation(
+        extensionElement,
+        legacyAnnotationClass,
+        sdkAnnotationClass,
+        legacyAnnotationMapping,
+        sdkAnnotationMapping,
+        () -> new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
+            extensionElement.getName(),
+            legacyAnnotationClass.getName(),
+            sdkAnnotationClass.getName()))
+        );
+  }
+
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
+      WithAnnotations element,
+      Class<R> legacyAnnotationClass,
+      Class<S> sdkAnnotationClass,
+      Function<R, T> legacyAnnotationMapping,
+      Function<S, T> sdkAnnotationMapping,
+      Supplier<? extends IllegalModelDefinitionException> dualDefinitionExceptionFactory) {
+
+    Optional<R> legacyAnnotation = element.getAnnotation(legacyAnnotationClass);
+    Optional<S> sdkAnnotation = element.getAnnotation(sdkAnnotationClass);
   public static Optional<DisplayModel> getDisplayModel(WithAnnotations element, String elementType, String elementName) {
     Optional<String> summary =
         getAnnotationValueFromElement(element, elementType, elementName, Summary.class,
@@ -355,6 +385,13 @@ public final class JavaExtensionModelParserUtils {
       pathModel.ifPresent(builder::path);
 
       displayModel = of(builder.build());
+    Optional<T> result;
+    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
+      throw dualDefinitionExceptionFactory.get();
+    } else if (legacyAnnotation.isPresent()) {
+      result = legacyAnnotation.map(legacyAnnotationMapping);
+    } else if (sdkAnnotation.isPresent()) {
+      result = sdkAnnotation.map(sdkAnnotationMapping);
     } else {
       displayModel = empty();
     }
@@ -362,7 +399,21 @@ public final class JavaExtensionModelParserUtils {
     return displayModel;
   }
 
+
   private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
+    return getInfoFromAnnotation(
+        element,
+        Deprecated.class,
+        org.mule.sdk.api.annotation.deprecated.Deprecated.class,
+        deprecated -> buildDeprecationModel(deprecated.message(), deprecated.since(), deprecated.toRemoveIn()),
+        deprecated -> buildDeprecationModel(deprecated.message(), deprecated.since(), deprecated.toRemoveIn()),
+        () -> new IllegalParameterModelDefinitionException(format("%s '%s' is annotated with '@%s' and '@%s' at the same time",
+        elementType,
+        elementName,
+        Deprecated.class.getName(),
+        org.mule.sdk.api.annotation.deprecated.Deprecated.class.getName()))
+        );
+  }
 
     Function<Deprecated, DeprecationModel> getDeprecationModelFromLegacyAnnotation = (Deprecated deprecated) -> {
       String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
@@ -375,6 +426,11 @@ public final class JavaExtensionModelParserUtils {
           return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
         };
 
+  private static DeprecationModel buildDeprecationModel(String message, String since, String toRemoveIn) {
+    if (isBlank(toRemoveIn)) {
+      toRemoveIn = null;
+    }
+    return new ImmutableDeprecationModel(message,since, toRemoveIn);
     return getAnnotationValueFromElement(element, elementType, elementName,
                                          Deprecated.class,
                                          org.mule.sdk.api.annotation.deprecated.Deprecated.class,

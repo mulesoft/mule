@@ -57,6 +57,8 @@ public interface ExtensionModelParser {
    */
   String getVendor();
 
+  String getExtensionNamespace();
+
   /**
    * @return a list with a {@link ConfigurationModelParser} per each configuration defined in the extension.
    */
@@ -81,6 +83,8 @@ public interface ExtensionModelParser {
    * @return a list with a {@link FunctionModelParser} per each expression function defined in the extension.
    */
   List<FunctionModelParser> getFunctionModelParsers();
+
+  List<ErrorModelParser> getErrorModelParsers();
 
   /**
    * @return a {@link LicenseModelProperty} which describes the extension's licensing.
