@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.profiling;
 
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -16,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -31,6 +33,7 @@ import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingNotificationListener;
@@ -86,16 +89,14 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   public void configureProfilingService() throws MuleException {
     profilingService = new DefaultProfilingService();
     initialiseIfNeeded(profilingService, muleContext);
-    profilingService.setProfilingDataConsumerDiscoveryStrategies(Optional
-        .of(Collections.singleton(new TestProfilingDataConsumerDiscoveryStrategy())));
+    profilingService
+        .setProfilingDataConsumerDiscoveryStrategies(of(Collections.singleton(new TestProfilingDataConsumerDiscoveryStrategy())));
     when(featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_PROFILING_SERVICE)).thenReturn(true);
     profilingService.setFeatureFlags(featureFlaggingService);
     startIfNeeded(profilingService);
     profilingService.registerProfilingDataProducer(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE,
                                                    new TestProfilingDataProducer(profilingService));
   }
-
-
 
   @Test
   @Description("When profiling data consumers are obtained, the correct data producers are returned")
@@ -128,6 +129,17 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
         profilingService.getProfilingDataProducer(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE);
     profilingDataProducer
         .triggerProfilingEvent(new TestProfilingEventContext());
+
+    verify(notificationManager).fireNotification(any(ProfilingNotification.class));
+  }
+
+  @Test
+  @Description("When a generic component profiling event is produced a notification is triggered")
+  public void notificationTriggeredOnComponentProfilingEvent() {
+    ProfilingDataProducer<ExtensionProfilingEventContext> profilingDataProducer =
+        profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT);
+    profilingDataProducer
+        .triggerProfilingEvent(new TestComponentProfilingEventContext());
 
     verify(notificationManager).fireNotification(any(ProfilingNotification.class));
   }
@@ -191,6 +203,32 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     @Override
     public long getTriggerTimestamp() {
       return 0;
+    }
+  }
+
+  /**
+   * Stub for testing profiling service.
+   */
+  private static class TestComponentProfilingEventContext implements ExtensionProfilingEventContext {
+
+    @Override
+    public long getTriggerTimestamp() {
+      return 0;
+    }
+
+    @Override
+    public String getProfilingDataSourceIdentifier() {
+      return "TEST_COMPONENT_ID";
+    }
+
+    @Override
+    public String getExtensionEventSubtypeIdentifier() {
+      return "TEST_COMPONENT_EVENT_ID";
+    }
+
+    @Override
+    public Optional<Object> get(String key) {
+      return of("NON_EXISTENT");
     }
   }
 
