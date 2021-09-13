@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.enricher;
+package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.find;
@@ -57,7 +57,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
+public class DisplayModelTestCase extends AbstractMuleTestCase {
 
   private static final DslResolvingContext DSL_CTX = getDefault(emptySet());
   private static final String PARAMETER_GROUP_DISPLAY_NAME = "Date of decease";
@@ -74,9 +74,6 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
     DefaultJavaModelLoaderDelegate marvelLoader = new DefaultJavaModelLoaderDelegate(MarvelExtension.class, version);
     heisenbergDeclarer = heisenbergLoader.declare(loadingCtx);
     marvelDeclarer = marvelLoader.declare(loadingCtx);
-    DisplayDeclarationEnricher enricher = new DisplayDeclarationEnricher();
-    enricher.enrich(new DefaultExtensionLoadingContext(heisenbergDeclarer, cl, DSL_CTX));
-    enricher.enrich(new DefaultExtensionLoadingContext(marvelDeclarer, cl, DSL_CTX));
   }
 
   @Test
