@@ -27,10 +27,18 @@ public class HttpServerConfiguration {
   private final int connectionIdleTimeout;
   private final String name;
   private final Supplier<Scheduler> schedulerSupplier;
-  private final Integer readTimeout;
+  private final long readTimeout;
+
+  private static final long DEFAULT_READ_TIMEOUT_MILLIS = 30000;
 
   HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
-                          int connectionIdleTimeout, String name, Supplier<Scheduler> schedulerSupplier, Integer readTimeout) {
+                          int connectionIdleTimeout, String name, Supplier<Scheduler> schedulerSupplier) {
+    this(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout, name, schedulerSupplier,
+         DEFAULT_READ_TIMEOUT_MILLIS);
+  }
+
+  HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
+                          int connectionIdleTimeout, String name, Supplier<Scheduler> schedulerSupplier, long readTimeout) {
     this.host = host;
     this.port = port;
     this.tlsContextFactory = tlsContextFactory;
@@ -69,7 +77,7 @@ public class HttpServerConfiguration {
     return schedulerSupplier;
   }
 
-  public Integer getReadTimeout() {
+  public long getReadTimeout() {
     return readTimeout;
   }
 
@@ -85,7 +93,7 @@ public class HttpServerConfiguration {
     private int connectionIdleTimeout = 30000;
     private Supplier<Scheduler> schedulerSupplier;
     private String name;
-    private Integer readTimeout;
+    private long readTimeout = 30000;
 
     /**
      * Defines the host where the requests will be sent to the {@link HttpServer}. Must be provided.
@@ -167,7 +175,7 @@ public class HttpServerConfiguration {
      * @param readTimeout timeout value (in milliseconds)
      * @return this builder
      */
-    public Builder setReadTimeout(Integer readTimeout) {
+    public Builder setReadTimeout(long readTimeout) {
       this.readTimeout = readTimeout;
       return this;
     }
