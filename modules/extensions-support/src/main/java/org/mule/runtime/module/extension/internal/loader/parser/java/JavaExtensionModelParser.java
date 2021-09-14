@@ -49,9 +49,6 @@ import java.util.Optional;
  */
 public class JavaExtensionModelParser extends AbstractModelParser implements ExtensionModelParser {
 
-  static final String PARAM_PREFIX = "_JavaExtensionModelParser.";
-  static final String EXTENSION_ERROR_TYPES_PARAM = PARAM_PREFIX + "extensionErrorTypes";
-
   private String namespace;
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
   private List<ErrorModelParser> errorModelParsers;
@@ -65,10 +62,10 @@ public class JavaExtensionModelParser extends AbstractModelParser implements Ext
     xmlDslConfiguration = parseXmlDslConfiguration();
     namespace = xmlDslConfiguration
         .map(dsl -> dsl.getPrefix().toLowerCase())
-        .orElseThrow(() -> new IllegalModelDefinitionException(format("Extension '%s' does not properly declare a namespace", getName())));
+        .orElseThrow(() -> new IllegalModelDefinitionException(format("Extension '%s' does not properly declare a namespace",
+                                                                      getName())));
 
     errorModelParsers = fetchErrorModelParsers();
-    loadingContext.addParameter(EXTENSION_ERROR_TYPES_PARAM, errorModelParsers);
 
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(extensionElement));
     extensionElement.getDeclaringClass()
@@ -94,17 +91,17 @@ public class JavaExtensionModelParser extends AbstractModelParser implements Ext
   public List<ConfigurationModelParser> getConfigurationParsers() {
     List<ConfigurationElement> configurations = extensionElement.getConfigurations();
     if (configurations.isEmpty()) {
-      return singletonList(new JavaConfigurationModelParser(extensionElement, extensionElement, loadingContext));
+      return singletonList(new JavaConfigurationModelParser(this, extensionElement, extensionElement, loadingContext));
     } else {
       return configurations.stream()
-          .map(config -> new JavaConfigurationModelParser(extensionElement, config, loadingContext))
+          .map(config -> new JavaConfigurationModelParser(this, extensionElement, config, loadingContext))
           .collect(toList());
     }
   }
 
   @Override
   public List<OperationModelParser> getOperationModelParsers() {
-    return JavaExtensionModelParserUtils.getOperationParsers(
+    return JavaExtensionModelParserUtils.getOperationParsers(this,
                                                              extensionElement,
                                                              extensionElement,
                                                              loadingContext);
@@ -136,7 +133,7 @@ public class JavaExtensionModelParser extends AbstractModelParser implements Ext
   }
 
   private List<ErrorModelParser> fetchErrorModelParsers() {
-    return JavaErrorModelParserUtils.getErrorModelParsers(extensionElement, getExtensionNamespace());
+    return JavaErrorModelParserUtils.parseExtensionErrorModels(extensionElement, this);
   }
 
   @Override
@@ -179,10 +176,10 @@ public class JavaExtensionModelParser extends AbstractModelParser implements Ext
 
   private Optional<XmlDslConfiguration> parseXmlDslConfiguration() {
     return getInfoFromExtension(
-        extensionElement,
-        Xml.class,
-        org.mule.sdk.api.annotation.dsl.xml.Xml.class,
-        xml -> new XmlDslConfiguration(xml.prefix(), xml.namespace()),
-        xml -> new XmlDslConfiguration(xml.prefix(), xml.namespace()));
+                                extensionElement,
+                                Xml.class,
+                                org.mule.sdk.api.annotation.dsl.xml.Xml.class,
+                                xml -> new XmlDslConfiguration(xml.prefix(), xml.namespace()),
+                                xml -> new XmlDslConfiguration(xml.prefix(), xml.namespace()));
   }
 }

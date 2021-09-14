@@ -21,6 +21,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forOperation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseOperationErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
@@ -55,6 +56,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
@@ -63,7 +65,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,6 +81,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                                VoidCompletionCallback.class,
                                                                                org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
 
+  private final ExtensionModelParser extensionModelParser;
   private final OperationElement operationElement;
   private final OperationContainerElement operationContainer;
   private final OperationContainerElement enclosingType;
@@ -94,12 +96,14 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private boolean autoPaging = false;
   private List<ExtensionParameter> routes = emptyList();
 
-  public JavaOperationModelParser(ExtensionElement extensionElement,
+  public JavaOperationModelParser(ExtensionModelParser extensionModelParser,
+                                  ExtensionElement extensionElement,
                                   OperationContainerElement operationContainer,
                                   OperationElement operationElement,
                                   ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
 
+    this.extensionModelParser = extensionModelParser;
     this.operationElement = operationElement;
 
     this.operationContainer = operationElement.getEnclosingType();
@@ -414,18 +418,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public List<ErrorModelParser> getErrorModelParsers() {
-    List<ErrorModelParser> errorParsers = new LinkedList<>();
-
-    return errorParsers;
+    return parseOperationErrorModels(extensionModelParser, extensionElement, operationElement);
   }
-
-//  private Optional<Throws> getOperationThrowsDeclaration(MethodElement operationMethod, Type extensionElement) {
-//    Type operationContainer = operationMethod.getEnclosingType();
-//    return ofNullable(operationMethod.getAnnotation(Throws.class)
-//        .orElseGet(() -> operationContainer.getAnnotation(Throws.class)
-//            .orElseGet(() -> extensionElement.getAnnotation(Throws.class)
-//                .orElse(null))));
-//  }
 
   private void checkOperationIsNotAnExtension() {
     if (operationContainer.isAssignableFrom(extensionElement) || extensionElement.isAssignableFrom(operationContainer)) {

@@ -61,6 +61,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
@@ -138,12 +139,14 @@ public final class JavaExtensionModelParserUtils {
     }
   }
 
-  public static List<OperationModelParser> getOperationParsers(ExtensionElement extensionElement,
+  public static List<OperationModelParser> getOperationParsers(ExtensionModelParser extensionModelParser,
+                                                               ExtensionElement extensionElement,
                                                                WithOperationContainers operationContainers,
                                                                ExtensionLoadingContext loadingContext) {
     return operationContainers.getOperationContainers().stream()
         .flatMap(container -> container.getOperations().stream()
-            .map(method -> new JavaOperationModelParser(extensionElement, container, method, loadingContext)))
+            .map(method -> new JavaOperationModelParser(extensionModelParser, extensionElement, container, method,
+                                                        loadingContext)))
         .collect(toList());
   }
 
@@ -310,30 +313,29 @@ public final class JavaExtensionModelParserUtils {
 
 
   public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromExtension(ExtensionElement extensionElement,
-                                                                                                  Class<R> legacyAnnotationClass,
-                                                                                                  Class<S> sdkAnnotationClass,
-                                                                                                  Function<R, T> legacyAnnotationMapping,
-                                                                                                  Function<S, T> sdkAnnotationMapping) {
+                                                                                                 Class<R> legacyAnnotationClass,
+                                                                                                 Class<S> sdkAnnotationClass,
+                                                                                                 Function<R, T> legacyAnnotationMapping,
+                                                                                                 Function<S, T> sdkAnnotationMapping) {
     return getInfoFromAnnotation(
-        extensionElement,
-        legacyAnnotationClass,
-        sdkAnnotationClass,
-        legacyAnnotationMapping,
-        sdkAnnotationMapping,
-        () -> new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
-            extensionElement.getName(),
-            legacyAnnotationClass.getName(),
-            sdkAnnotationClass.getName()))
-        );
+                                 extensionElement,
+                                 legacyAnnotationClass,
+                                 sdkAnnotationClass,
+                                 legacyAnnotationMapping,
+                                 sdkAnnotationMapping,
+                                 () -> new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                           extensionElement.getName(),
+                                                                                           legacyAnnotationClass.getName(),
+                                                                                           sdkAnnotationClass.getName())));
   }
 
   public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
-      WithAnnotations element,
-      Class<R> legacyAnnotationClass,
-      Class<S> sdkAnnotationClass,
-      Function<R, T> legacyAnnotationMapping,
-      Function<S, T> sdkAnnotationMapping,
-      Supplier<? extends IllegalModelDefinitionException> dualDefinitionExceptionFactory) {
+                                                                                                  WithAnnotations element,
+                                                                                                  Class<R> legacyAnnotationClass,
+                                                                                                  Class<S> sdkAnnotationClass,
+                                                                                                  Function<R, T> legacyAnnotationMapping,
+                                                                                                  Function<S, T> sdkAnnotationMapping,
+                                                                                                  Supplier<? extends IllegalModelDefinitionException> dualDefinitionExceptionFactory) {
 
     Optional<R> legacyAnnotation = element.getAnnotation(legacyAnnotationClass);
     Optional<S> sdkAnnotation = element.getAnnotation(sdkAnnotationClass);
@@ -402,17 +404,19 @@ public final class JavaExtensionModelParserUtils {
 
   private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
     return getInfoFromAnnotation(
-        element,
-        Deprecated.class,
-        org.mule.sdk.api.annotation.deprecated.Deprecated.class,
-        deprecated -> buildDeprecationModel(deprecated.message(), deprecated.since(), deprecated.toRemoveIn()),
-        deprecated -> buildDeprecationModel(deprecated.message(), deprecated.since(), deprecated.toRemoveIn()),
-        () -> new IllegalParameterModelDefinitionException(format("%s '%s' is annotated with '@%s' and '@%s' at the same time",
-        elementType,
-        elementName,
-        Deprecated.class.getName(),
-        org.mule.sdk.api.annotation.deprecated.Deprecated.class.getName()))
-        );
+                                 element,
+                                 Deprecated.class,
+                                 org.mule.sdk.api.annotation.deprecated.Deprecated.class,
+                                 deprecated -> buildDeprecationModel(deprecated.message(), deprecated.since(),
+                                                                     deprecated.toRemoveIn()),
+                                 deprecated -> buildDeprecationModel(deprecated.message(), deprecated.since(),
+                                                                     deprecated.toRemoveIn()),
+                                 () -> new IllegalParameterModelDefinitionException(format("%s '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                           elementType,
+                                                                                           elementName,
+                                                                                           Deprecated.class.getName(),
+                                                                                           org.mule.sdk.api.annotation.deprecated.Deprecated.class
+                                                                                               .getName())));
   }
 
     Function<Deprecated, DeprecationModel> getDeprecationModelFromLegacyAnnotation = (Deprecated deprecated) -> {

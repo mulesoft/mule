@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
-import static java.util.Optional.ofNullable;
-
+import org.mule.runtime.module.extension.internal.error.LegacyErrorTypeDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.Optional;
 
@@ -16,12 +16,16 @@ public class JavaErrorModelParser implements ErrorModelParser {
 
   private final String type;
   private final String namespace;
-  private final ErrorModelParser parent;
+  private final Optional<ErrorModelParser> parent;
+  private final Class<?> errorTypeDefinitionClass;
 
-  public JavaErrorModelParser(String type, String namespace, ErrorModelParser parent) {
-    this.type = type;
+  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, String namespace, Optional<ErrorModelParser> parent) {
+    this.type = errorTypeDefinition.getType();
     this.namespace = namespace;
     this.parent = parent;
+    errorTypeDefinitionClass = (errorTypeDefinition instanceof LegacyErrorTypeDefinitionAdapter)
+        ? ((LegacyErrorTypeDefinitionAdapter<?>) errorTypeDefinition).getDelegate().getClass()
+        : errorTypeDefinition.getClass();
   }
 
   @Override
@@ -36,6 +40,10 @@ public class JavaErrorModelParser implements ErrorModelParser {
 
   @Override
   public Optional<ErrorModelParser> getParent() {
-    return ofNullable(parent);
+    return parent;
+  }
+
+  public Class<?> getErrorTypeDefinitionClass() {
+    return errorTypeDefinitionClass;
   }
 }
