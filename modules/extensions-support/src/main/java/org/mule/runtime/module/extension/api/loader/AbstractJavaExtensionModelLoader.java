@@ -33,7 +33,6 @@ import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParamet
 import org.mule.runtime.module.extension.internal.loader.enricher.ClusterSupportEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionsErrorsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ImportedTypesDeclarationEnricher;
@@ -122,7 +121,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new RefNameDeclarationEnricher(),
                                                                                                new DefaultEncodingDeclarationEnricher(),
                                                                                                new RuntimeVersionDeclarationEnricher(),
-                                                                                               new ErrorsDeclarationEnricher(),
                                                                                                new NotificationsDeclarationEnricher(),
                                                                                                new JavaExportedTypesDeclarationEnricher(),
                                                                                                new StereotypesDeclarationEnricher(),

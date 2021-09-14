@@ -33,6 +33,7 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
@@ -74,12 +75,12 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
         ErrorTypeDefinition<?>[] errorTypes = (ErrorTypeDefinition<?>[]) errorAnnotation.get().value().getEnumConstants();
 
         if (errorTypes.length > 0) {
-          ErrorsModelFactory operationErrorModelDescriber = new ErrorsModelFactory(errorTypes, extensionNamespace);
-          operationErrorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
-
-          errorOperations.stream().forEach(pair -> registerOperationErrorTypes(pair.getSecond(), pair.getFirst(),
-                                                                               operationErrorModelDescriber, errorTypes,
-                                                                               extensionElement));
+          // ErrorsModelFactory operationErrorModelDescriber = new ErrorsModelFactory(errorTypes, extensionNamespace);
+          // operationErrorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
+          //
+          // errorOperations.stream().forEach(pair -> registerOperationErrorTypes(pair.getSecond(), pair.getFirst(),
+          // operationErrorModelDescriber, errorTypes,
+          // extensionElement));
         } else {
           handleNoErrorTypes(extensionElement, errorOperations);
         }
@@ -141,9 +142,9 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
                 ErrorTypeProvider errorTypeProvider = provider.newInstance();
                 errorTypeProvider.getErrorTypes().stream()
                     .map(error -> validateOperationThrows(extensionErrorTypes, error))
-                    .map(errorModelDescriber::getErrorModel)
-                    .forEach(operation::addErrorModel);
-
+                // .map(errorModelDescriber::getErrorModel)
+                // .forEach(operation::addErrorModel);
+                ;
 
               } catch (InstantiationException | IllegalAccessException e) {
                 throw new MuleRuntimeException(createStaticMessage("Could not create ErrorTypeProvider of type "

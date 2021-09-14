@@ -20,13 +20,13 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclarat
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.Set;
 

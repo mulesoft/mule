@@ -4,23 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.enricher;
+package org.mule.runtime.module.extension.internal.error;
 
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
-import static org.mule.runtime.extension.api.error.MuleErrors.CRITICAL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
-import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
+import static org.mule.sdk.api.error.MuleErrors.ANY;
+import static org.mule.sdk.api.error.MuleErrors.CONNECTIVITY;
+import static org.mule.sdk.api.error.MuleErrors.CRITICAL;
+import static org.mule.sdk.api.error.MuleErrors.RETRY_EXHAUSTED;
 
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParser;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
+import org.mule.sdk.api.error.MuleErrors;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -40,6 +43,24 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
  */
 public class ErrorsModelFactory {
 
+  private static ErrorTypeDefinition toErrorTypeDefinition(ErrorModelParser parser) {
+    return (parser instanceof JavaErrorModelParser)
+        ? ((JavaErrorModelParser) parser).getErrorTypeDefinition()
+        : new ErrorTypeDefinitionParserAdapter(parser);
+  }
+
+  private static ErrorTypeDefinition<?>[] toDefinitionArray(List<ErrorModelParser> parsers) {
+    return parsers.stream()
+        .map(ErrorsModelFactory::toErrorTypeDefinition)
+        .toArray(ErrorTypeDefinition[]::new);
+  }
+
+  private static ErrorTypeDefinition<?>[] adaptLegacyArray(org.mule.runtime.extension.api.error.ErrorTypeDefinition<?>[] errorTypesEnum) {
+    return Stream.of(errorTypesEnum)
+        .map(LegacyErrorTypeDefinitionAdapter::from)
+        .toArray(ErrorTypeDefinition[]::new);
+  }
+
   private static final String MULE = CORE_PREFIX.toUpperCase();
   private final String extensionNamespace;
   private final Map<String, ErrorModel> errorModelMap;
@@ -47,11 +68,33 @@ public class ErrorsModelFactory {
   /**
    * Creates a new instance of the factory
    *
+   * @param extensionErrorParsers a list of {@link ErrorModelParser} describing all the errors from an extension
+   * @param extensionNamespace    the namespace for the {@link ErrorModel} to be generated
+   */
+  public ErrorsModelFactory(List<ErrorModelParser> extensionErrorParsers, String extensionNamespace)
+      throws IllegalModelDefinitionException {
+    this(toDefinitionArray(extensionErrorParsers), extensionNamespace);
+  }
+
+  /**
+   * Creates a new instance of the factory
+   *
+   * @param errorTypesEnum     a legacy {@link org.mule.runtime.extension.api.error.ErrorTypeDefinition} describing all the errors
+   *                           from an extension
+   * @param extensionNamespace the namespace for the {@link ErrorModel} to be generated
+   */
+  public ErrorsModelFactory(org.mule.runtime.extension.api.error.ErrorTypeDefinition<?>[] errorTypesEnum,
+                            String extensionNamespace) {
+    this(adaptLegacyArray(errorTypesEnum), extensionNamespace);
+  }
+
+  /**
+   * Creates a new instance of the factory
+   *
    * @param errorTypesEnum     an {@link ErrorTypeDefinition} implementation indicating all the errors from an extension
    * @param extensionNamespace the namespace for the {@link ErrorModel} to be generated
    */
-  public ErrorsModelFactory(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace)
-      throws IllegalModelDefinitionException {
+  public ErrorsModelFactory(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace) {
     this.extensionNamespace = extensionNamespace.toUpperCase();
     final Graph<ErrorTypeDefinition, DefaultEdge> graph = toGraph(errorTypesEnum);
 
@@ -86,13 +129,13 @@ public class ErrorsModelFactory {
   }
 
   /**
-   * From a {@link ErrorTypeDefinition} gives the {@link ErrorModel} representation
+   * Transforms an {@link ErrorModelParser} into an {@link ErrorModel}
    *
-   * @param errorTypeDefinition to use to find the {@link ErrorModel} representation
-   * @return The correspondent {@link ErrorModel} for a given {@link ErrorTypeDefinition}
+   * @param errorModelParser the input representation
+   * @return The correspondent {@link ErrorModel} for a given {@link ErrorModelParser}
    */
-  ErrorModel getErrorModel(ErrorTypeDefinition errorTypeDefinition) {
-    return errorModelMap.get(toIdentifier(errorTypeDefinition));
+  public ErrorModel getErrorModel(ErrorModelParser errorModelParser) {
+    return errorModelMap.get(toIdentifier(toErrorTypeDefinition(errorModelParser)));
   }
 
   private DefaultDirectedGraph<ErrorTypeDefinition, DefaultEdge> toGraph(ErrorTypeDefinition<?>[] errorTypesEnum) {
@@ -128,8 +171,7 @@ public class ErrorsModelFactory {
     return errorType instanceof MuleErrors ? MULE : extensionNamespace;
   }
 
-  private void addType(ErrorTypeDefinition<?> errorType,
-                       Graph<ErrorTypeDefinition, DefaultEdge> graph) {
+  private void addType(ErrorTypeDefinition<?> errorType, Graph<ErrorTypeDefinition, DefaultEdge> graph) {
     graph.addVertex(errorType);
     String type = errorType.getType();
     if (!ANY.name().equals(type) && !CRITICAL.name().equals(type)) {

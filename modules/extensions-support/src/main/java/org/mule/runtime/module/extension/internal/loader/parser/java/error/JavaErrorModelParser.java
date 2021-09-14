@@ -14,28 +14,21 @@ import java.util.Optional;
 
 public class JavaErrorModelParser implements ErrorModelParser {
 
-  private final String type;
-  private final String namespace;
   private final Optional<ErrorModelParser> parent;
-  private final Class<?> errorTypeDefinitionClass;
+  private final ErrorTypeDefinition<?> errorTypeDefinition;
+  private final Class<?> errorTypeDefinitionDeclarationClass;
 
-  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, String namespace, Optional<ErrorModelParser> parent) {
-    this.type = errorTypeDefinition.getType();
-    this.namespace = namespace;
+  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, Optional<ErrorModelParser> parent) {
+    this.errorTypeDefinition = errorTypeDefinition;
     this.parent = parent;
-    errorTypeDefinitionClass = (errorTypeDefinition instanceof LegacyErrorTypeDefinitionAdapter)
+    errorTypeDefinitionDeclarationClass = (errorTypeDefinition instanceof LegacyErrorTypeDefinitionAdapter)
         ? ((LegacyErrorTypeDefinitionAdapter<?>) errorTypeDefinition).getDelegate().getClass()
         : errorTypeDefinition.getClass();
   }
 
   @Override
   public String getType() {
-    return type;
-  }
-
-  @Override
-  public String getNamespace() {
-    return namespace;
+    return errorTypeDefinition.getType();
   }
 
   @Override
@@ -43,7 +36,11 @@ public class JavaErrorModelParser implements ErrorModelParser {
     return parent;
   }
 
-  public Class<?> getErrorTypeDefinitionClass() {
-    return errorTypeDefinitionClass;
+  public ErrorTypeDefinition<?> getErrorTypeDefinition() {
+    return errorTypeDefinition;
+  }
+
+  public Class<?> getErrorTypeDefinitionDeclarationClass() {
+    return errorTypeDefinitionDeclarationClass;
   }
 }

@@ -39,12 +39,12 @@ import java.util.stream.Stream;
 
 public final class JavaErrorModelParserUtils {
 
-  public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element, ExtensionModelParser extensionParser) {
+  public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element) {
     return getInfoFromExtension(element,
                                 ErrorTypes.class,
                                 org.mule.sdk.api.annotation.error.ErrorTypes.class,
-                                errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value(), extensionParser),
-                                errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value(), extensionParser))
+                                errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()),
+                                errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()))
                                     .orElse(new LinkedList<>());
   }
 
@@ -62,10 +62,9 @@ public final class JavaErrorModelParserUtils {
         .orElse(new LinkedList<>());
   }
 
-  private static List<ErrorModelParser> parseErrorTypeDefinitions(Class<? extends Enum<?>> typeDefClass,
-                                                                  ExtensionModelParser extensionParser) {
+  private static List<ErrorModelParser> parseErrorTypeDefinitions(Class<? extends Enum<?>> typeDefClass) {
     return Stream.of(typeDefClass.getEnumConstants())
-        .map(def -> toParser(LegacyErrorTypeDefinitionAdapter.from(def), extensionParser.getExtensionNamespace()))
+        .map(def -> toParser(LegacyErrorTypeDefinitionAdapter.from(def)))
         .collect(toList());
   }
 
@@ -75,7 +74,7 @@ public final class JavaErrorModelParserUtils {
     }
 
     JavaErrorModelParser errorModelParser = (JavaErrorModelParser) extensionParser.getErrorModelParsers().get(0);
-    Class<?> extensionErrorType = errorModelParser.getErrorTypeDefinitionClass();
+    Class<?> extensionErrorType = errorModelParser.getErrorTypeDefinitionDeclarationClass();
 
     if (!error.getClass().equals(extensionErrorType) && !error.getClass().getSuperclass().equals(extensionErrorType)) {
       throw new IllegalModelDefinitionException(format("Invalid operation throws detected, the extension declared" +
@@ -84,11 +83,10 @@ public final class JavaErrorModelParserUtils {
     }
   }
 
-  private static ErrorModelParser toParser(ErrorTypeDefinition<?> errorTypeDefinition, String namespace) {
+  private static ErrorModelParser toParser(ErrorTypeDefinition<?> errorTypeDefinition) {
     return new JavaErrorModelParser(
                                     errorTypeDefinition,
-                                    namespace,
-                                    errorTypeDefinition.getParent().map(p -> toParser(p, namespace)));
+                                    errorTypeDefinition.getParent().map(p -> toParser(p)));
   }
 
   private static List<ErrorModelParser> parseErrorTypeProviders(Class<?>[] providerClasses,
@@ -101,7 +99,7 @@ public final class JavaErrorModelParserUtils {
             return errorTypeProvider.getErrorTypes().stream()
                 .map(error -> {
                   validateOperationThrows(extensionParser, error);
-                  return toParser(error, extensionParser.getExtensionNamespace());
+                  return toParser(error);
                 });
           } catch (InstantiationException | IllegalAccessException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not create ErrorTypeProvider of type "
@@ -132,10 +130,10 @@ public final class JavaErrorModelParserUtils {
 
   private static Supplier<IllegalModelDefinitionException> dualThrowsException(OperationElement operation) {
     return () -> new IllegalOperationModelDefinitionException(
-        format("Operation '%s' is annotated with '@%s' and '@%s' at the same time",
-            operation.getAlias(),
-            Throws.class.getName(),
-            org.mule.sdk.api.annotation.error.Throws.class.getName()));
+                                                              format("Operation '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                     operation.getAlias(),
+                                                                     Throws.class.getName(),
+                                                                     org.mule.sdk.api.annotation.error.Throws.class.getName()));
   }
 
   private JavaErrorModelParserUtils() {}

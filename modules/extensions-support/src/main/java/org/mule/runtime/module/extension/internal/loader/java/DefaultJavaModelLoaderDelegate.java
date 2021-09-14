@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -18,7 +19,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.CompileTi
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor
@@ -63,7 +63,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .fromVendor(parser.getVendor())
             .withCategory(parser.getCategory())
             .withModelProperty(parser.getLicenseModelProperty())
-            .withXmlDsl(JavaModelLoaderUtils.getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
+            .withXmlDsl(getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
 
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")
@@ -78,7 +78,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
     if (!isEmpty(extensionElement.getConfigurations())) {
-      operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
+      operationLoaderDelegate.declareOperations(declarer, declarer, parser, parser.getOperationModelParsers());
       functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
       sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
     }

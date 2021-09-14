@@ -57,8 +57,6 @@ public interface ExtensionModelParser {
    */
   String getVendor();
 
-  String getExtensionNamespace();
-
   /**
    * @return a list with a {@link ConfigurationModelParser} per each configuration defined in the extension.
    */

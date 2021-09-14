@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
@@ -14,12 +13,12 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEntitlementInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseExtensionErrorModels;
 
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -35,7 +34,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelPar
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
-import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
 
@@ -49,7 +47,6 @@ import java.util.Optional;
  */
 public class JavaExtensionModelParser extends AbstractModelParser implements ExtensionModelParser {
 
-  private String namespace;
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
   private List<ErrorModelParser> errorModelParsers;
 
@@ -60,11 +57,6 @@ public class JavaExtensionModelParser extends AbstractModelParser implements Ext
 
   private void parseStructure(ExtensionElement extensionElement) {
     xmlDslConfiguration = parseXmlDslConfiguration();
-    namespace = xmlDslConfiguration
-        .map(dsl -> dsl.getPrefix().toLowerCase())
-        .orElseThrow(() -> new IllegalModelDefinitionException(format("Extension '%s' does not properly declare a namespace",
-                                                                      getName())));
-
     errorModelParsers = fetchErrorModelParsers();
 
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(extensionElement));
@@ -133,7 +125,7 @@ public class JavaExtensionModelParser extends AbstractModelParser implements Ext
   }
 
   private List<ErrorModelParser> fetchErrorModelParsers() {
-    return JavaErrorModelParserUtils.parseExtensionErrorModels(extensionElement, this);
+    return parseExtensionErrorModels(extensionElement);
   }
 
   @Override
@@ -167,11 +159,6 @@ public class JavaExtensionModelParser extends AbstractModelParser implements Ext
   @Override
   public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
     return xmlDslConfiguration;
-  }
-
-  @Override
-  public String getExtensionNamespace() {
-    return namespace;
   }
 
   private Optional<XmlDslConfiguration> parseXmlDslConfiguration() {

@@ -7,12 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -36,6 +39,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
                          HasOperationDeclarer ownerDeclarer,
+                         ExtensionModelParser extensionModelParser,
                          List<OperationModelParser> operations) {
 
     for (OperationModelParser parser : operations) {
@@ -96,7 +100,25 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .describedAs(chain.getDescription())
           .setRequired(chain.isRequired()));
 
+      parseErrorModels(extensionDeclarer, operation, extensionModelParser, parser);
       operationDeclarers.put(parser, operation);
     }
+  }
+
+  private void parseErrorModels(ExtensionDeclarer extensionDeclarer,
+                                OperationDeclarer operation,
+                                ExtensionModelParser extensionModelParser,
+                                OperationModelParser parser) {
+    final String extensionNamespace = getExtensionsNamespace(extensionDeclarer.getDeclaration());
+    final ErrorsModelFactory errorModelDescriber = new ErrorsModelFactory(extensionNamespace);
+
+    errorModelDescriber.getErrorModels().forEach(operation::withErrorModel);
+
+    ErrorsModelFactory operationErrorModelDescriber =
+        new ErrorsModelFactory(extensionModelParser.getErrorModelParsers(), extensionNamespace);
+    operationErrorModelDescriber.getErrorModels().forEach(operation::withErrorModel);
+    parser.getErrorModelParsers().stream()
+        .map(operationErrorModelDescriber::getErrorModel)
+        .forEach(operation::withErrorModel);
   }
 }

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-import org.mule.runtime.extension.api.error.MuleErrors;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
+import org.mule.sdk.api.error.MuleErrors;
 
 import java.util.Optional;
 
