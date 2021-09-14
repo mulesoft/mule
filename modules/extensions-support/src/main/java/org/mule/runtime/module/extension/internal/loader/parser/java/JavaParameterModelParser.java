@@ -141,7 +141,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public Optional<LayoutModel> getLayoutModel() {
-    return parseLayoutAnnotations(parameter, LayoutModel.builder());
+    return parseLayoutAnnotations(parameter, LayoutModel.builder(), parameter.getName());
   }
 
   @Override

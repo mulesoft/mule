@@ -369,6 +369,7 @@ public final class JavaExtensionModelParserUtils {
 
     Optional<DeprecationModel> deprecationModel;
     if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
+      // TODO cambiar mensaje
       throw new IllegalParameterModelDefinitionException(format("%s '%s' is annotated with '@%s' and '@%s' at the same time",
                                                                 elementType,
                                                                 elementName,
