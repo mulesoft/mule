@@ -50,6 +50,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable, Disposable
 {
 
+    private static int count = 0;
+
     public static final int MAX_PROCESSED_GROUPS = 50000;
     public static final String EVENTS_STORE_REGISTRY_KEY_PREFIX = "aggregator.eventsObjectStore.";
 
@@ -119,7 +121,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
             public Object create()
             {
                 ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
-                return objectStoreManager.getObjectStore(storePrefix + ".processedGroups", persistentStores, MAX_PROCESSED_GROUPS, -1, 1000);
+                count++;
+                return objectStoreManager.getObjectStore(storePrefix + ".processedGroups-" + count , persistentStores, MAX_PROCESSED_GROUPS, -1, 1000);
             }
         };
     }
