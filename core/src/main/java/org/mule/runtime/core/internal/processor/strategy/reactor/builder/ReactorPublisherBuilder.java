@@ -13,19 +13,21 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 /**
  * Builder of a {@link Publisher} with common operations in {@link Mono} and {@link Flux}.
@@ -39,7 +41,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    * @param event the {@link CoreEvent} to emit.
    * @return a builder for a {@link Mono} that just emits one event.
    */
-  public static ReactorPublisherBuilder<Mono<CoreEvent>> buildMono(CoreEvent event) {
+  static ReactorPublisherBuilder<Mono<CoreEvent>> buildMono(CoreEvent event) {
     return new MonoBuilder(Mono.just(event));
   }
 
@@ -47,7 +49,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    * @param publisher the {@link Publisher} used as a base for creating the {@link Flux}.
    * @return a builder for a {@link Flux} that emits the same events from the publisher.
    */
-  public static ReactorPublisherBuilder<Flux<CoreEvent>> buildFlux(Publisher<CoreEvent> publisher) {
+  static ReactorPublisherBuilder<Flux<CoreEvent>> buildFlux(Publisher<CoreEvent> publisher) {
     return new FluxBuilder(Flux.from(publisher));
   }
 
@@ -55,25 +57,25 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    * @param onNext what to do on next.
    * @return builder with a doOnNext operator.
    */
-  public ReactorPublisherBuilder<T> doOnNext(Consumer<CoreEvent> onNext);
+  ReactorPublisherBuilder<T> doOnNext(Consumer<CoreEvent> onNext);
 
   /**
    * @param scheduler optional scheduler to publish on.
    * @return builder which publishes on the scheduler.
    */
-  public ReactorPublisherBuilder<T> publishOn(Optional<ScheduledExecutorService> scheduler);
+  ReactorPublisherBuilder<T> publishOn(Optional<ScheduledExecutorService> scheduler);
 
   /**
    * @param processor a {@link ReactiveProcessor} to transform the {@link Publisher}.
    * @return builder for the transformed {@link Publisher}.
    */
-  public ReactorPublisherBuilder<T> transform(ReactiveProcessor processor);
+  ReactorPublisherBuilder<T> transform(ReactiveProcessor processor);
 
   /**
    * @param function the function that sets the conte?t on subscription.
    * @return builder for a {@link Publisher} with the subscriberContext set.
    */
-  public ReactorPublisherBuilder<T> subscriberContext(Function<Context, Context> function);
+  ReactorPublisherBuilder<T> subscriberContext(Function<Context, Context> function);
 
   /**
    * @param onSubscribe operation done onSubscribe
@@ -88,11 +90,12 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    * @param artifactType the artifact type associated to the profiling event.
    * @return builder for a {@link Publisher} with the profiling action.
    */
-  ReactorPublisherBuilder<T> profileEvent(ComponentLocation location, Optional<? extends ProfilingDataProducer> dataProducer,
+  ReactorPublisherBuilder<T> profileEvent(ComponentLocation location,
+                                          Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducer,
                                           String artifactId,
                                           String artifactType);
 
-  public T build();
+  T build();
 
   /**
    * Builder for a {@link Mono}.
@@ -142,7 +145,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
     @Override
     public ReactorPublisherBuilder<Mono<CoreEvent>> profileEvent(ComponentLocation location,
-                                                                 Optional<? extends ProfilingDataProducer> dataProducer,
+                                                                 Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducer,
                                                                  String artifactId, String artifactType) {
       mono =
           dataProducer
@@ -202,7 +205,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
     @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> profileEvent(ComponentLocation location,
-                                                                 Optional<? extends ProfilingDataProducer> dataProducer,
+                                                                 Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducer,
                                                                  String artifactId, String artifactType) {
       flux = dataProducer.map(dp -> flux.doOnNext(e -> doProfileEvent(location, artifactId, artifactType, dp, e)))
           .orElse(flux);
@@ -210,15 +213,16 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
   }
 
-  static void doProfileEvent(ComponentLocation location, String artifactId, String artifactType, ProfilingDataProducer dp,
+  static void doProfileEvent(ComponentLocation location, String artifactId, String artifactType,
+                             ProfilingDataProducer<ProcessingStrategyProfilingEventContext> dataProducer,
                              CoreEvent e) {
-    dp.triggerProfilingEvent(
-                             new ComponentProcessingStrategyProfilingEventContext(e,
-                                                                                  location,
-                                                                                  currentThread()
-                                                                                      .getName(),
-                                                                                  artifactId,
-                                                                                  artifactType,
-                                                                                  currentTimeMillis()));
+    dataProducer.triggerProfilingEvent(
+                                       new ComponentProcessingStrategyProfilingEventContext(e,
+                                                                                            location,
+                                                                                            currentThread()
+                                                                                                .getName(),
+                                                                                            artifactId,
+                                                                                            artifactType,
+                                                                                            currentTimeMillis()));
   }
 }
