@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
@@ -100,25 +99,16 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .describedAs(chain.getDescription())
           .setRequired(chain.isRequired()));
 
-      parseErrorModels(extensionDeclarer, operation, extensionModelParser, parser);
+      parseErrorModels(operation, parser);
       operationDeclarers.put(parser, operation);
     }
   }
 
-  private void parseErrorModels(ExtensionDeclarer extensionDeclarer,
-                                OperationDeclarer operation,
-                                ExtensionModelParser extensionModelParser,
-                                OperationModelParser parser) {
-    final String extensionNamespace = getExtensionsNamespace(extensionDeclarer.getDeclaration());
-    final ErrorsModelFactory errorModelDescriber = new ErrorsModelFactory(extensionNamespace);
-
-    errorModelDescriber.getErrorModels().forEach(operation::withErrorModel);
-
-    ErrorsModelFactory operationErrorModelDescriber =
-        new ErrorsModelFactory(extensionModelParser.getErrorModelParsers(), extensionNamespace);
-    operationErrorModelDescriber.getErrorModels().forEach(operation::withErrorModel);
+  private void parseErrorModels(OperationDeclarer operation, OperationModelParser parser) {
+    final ErrorsModelFactory errorsModelFactory = loader.createErrorModelFactory();
+    errorsModelFactory.getErrorModels().forEach(operation::withErrorModel);
     parser.getErrorModelParsers().stream()
-        .map(operationErrorModelDescriber::getErrorModel)
+        .map(errorsModelFactory::getErrorModel)
         .forEach(operation::withErrorModel);
   }
 }

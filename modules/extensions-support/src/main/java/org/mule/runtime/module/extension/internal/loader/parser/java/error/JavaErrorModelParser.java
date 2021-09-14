@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
-import org.mule.runtime.module.extension.internal.error.LegacyErrorTypeDefinitionAdapter;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getDeclarationClass;
+
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
@@ -21,9 +22,7 @@ public class JavaErrorModelParser implements ErrorModelParser {
   public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, Optional<ErrorModelParser> parent) {
     this.errorTypeDefinition = errorTypeDefinition;
     this.parent = parent;
-    errorTypeDefinitionDeclarationClass = (errorTypeDefinition instanceof LegacyErrorTypeDefinitionAdapter)
-        ? ((LegacyErrorTypeDefinitionAdapter<?>) errorTypeDefinition).getDelegate().getClass()
-        : errorTypeDefinition.getClass();
+    errorTypeDefinitionDeclarationClass = getDeclarationClass(errorTypeDefinition);
   }
 
   @Override

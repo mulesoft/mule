@@ -62,6 +62,13 @@ public final class JavaErrorModelParserUtils {
         .orElse(new LinkedList<>());
   }
 
+  public static Class<?> getDeclarationClass(ErrorTypeDefinition errorTypeDefinition) {
+    return errorTypeDefinition instanceof LegacyErrorTypeDefinitionAdapter
+        ? ((LegacyErrorTypeDefinitionAdapter<?>) errorTypeDefinition).getDelegate().getClass()
+        : errorTypeDefinition.getClass();
+  }
+
+
   private static List<ErrorModelParser> parseErrorTypeDefinitions(Class<? extends Enum<?>> typeDefClass) {
     return Stream.of(typeDefClass.getEnumConstants())
         .map(def -> toParser(LegacyErrorTypeDefinitionAdapter.from(def)))
@@ -69,14 +76,17 @@ public final class JavaErrorModelParserUtils {
   }
 
   private static void validateOperationThrows(ExtensionModelParser extensionParser, ErrorTypeDefinition error) {
-    if (error.getClass().equals(MuleErrors.class) || extensionParser.getErrorModelParsers().isEmpty()) {
+    Class<?> errorDefinitionClass = JavaErrorModelParserUtils.getDeclarationClass(error);
+    if (errorDefinitionClass.getClass().equals(MuleErrors.class)
+        || errorDefinitionClass.getClass().equals(org.mule.sdk.api.error.MuleErrors.class)
+        || extensionParser.getErrorModelParsers().isEmpty()) {
       return;
     }
 
     JavaErrorModelParser errorModelParser = (JavaErrorModelParser) extensionParser.getErrorModelParsers().get(0);
     Class<?> extensionErrorType = errorModelParser.getErrorTypeDefinitionDeclarationClass();
 
-    if (!error.getClass().equals(extensionErrorType) && !error.getClass().getSuperclass().equals(extensionErrorType)) {
+    if (!errorDefinitionClass.equals(extensionErrorType) && !errorDefinitionClass.getSuperclass().equals(extensionErrorType)) {
       throw new IllegalModelDefinitionException(format("Invalid operation throws detected, the extension declared" +
           " to throw errors of %s type, but an error of %s type has been detected",
                                                        extensionErrorType, error.getClass()));
