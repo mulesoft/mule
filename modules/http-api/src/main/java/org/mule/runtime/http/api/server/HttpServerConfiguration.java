@@ -27,9 +27,10 @@ public class HttpServerConfiguration {
   private final int connectionIdleTimeout;
   private final String name;
   private final Supplier<Scheduler> schedulerSupplier;
+  private final Integer readTimeout;
 
   HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
-                          int connectionIdleTimeout, String name, Supplier<Scheduler> schedulerSupplier) {
+                          int connectionIdleTimeout, String name, Supplier<Scheduler> schedulerSupplier, Integer readTimeout) {
     this.host = host;
     this.port = port;
     this.tlsContextFactory = tlsContextFactory;
@@ -37,6 +38,7 @@ public class HttpServerConfiguration {
     this.connectionIdleTimeout = connectionIdleTimeout;
     this.name = name;
     this.schedulerSupplier = schedulerSupplier;
+    this.readTimeout = readTimeout;
   }
 
   public String getHost() {
@@ -67,6 +69,10 @@ public class HttpServerConfiguration {
     return schedulerSupplier;
   }
 
+  public Integer getReadTimeout() {
+    return readTimeout;
+  }
+
   /**
    * Builder for {@link HttpServerConfiguration}s. At the very least, a host, a port and a name must be provided.
    */
@@ -79,6 +85,7 @@ public class HttpServerConfiguration {
     private int connectionIdleTimeout = 30000;
     private Supplier<Scheduler> schedulerSupplier;
     private String name;
+    private Integer readTimeout;
 
     /**
      * Defines the host where the requests will be sent to the {@link HttpServer}. Must be provided.
@@ -155,6 +162,17 @@ public class HttpServerConfiguration {
     }
 
     /**
+     * Defines the number of milliseconds that should be waited when reading new input.
+     *
+     * @param readTimeout timeout value (in milliseconds)
+     * @return this builder
+     */
+    public Builder setReadTimeout(Integer readTimeout) {
+      this.readTimeout = readTimeout;
+      return this;
+    }
+
+    /**
      * @return a {@link HttpServerConfiguration} as specified.
      */
     public HttpServerConfiguration build() {
@@ -162,7 +180,7 @@ public class HttpServerConfiguration {
       checkNotNull(port, "Port is mandatory");
       checkNotNull(name, "Name is mandatory");
       return new HttpServerConfiguration(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout,
-                                         name, schedulerSupplier);
+                                         name, schedulerSupplier, readTimeout);
     }
   }
 }
