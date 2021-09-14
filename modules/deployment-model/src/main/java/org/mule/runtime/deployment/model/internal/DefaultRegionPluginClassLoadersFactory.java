@@ -158,7 +158,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
       if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
           || (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ParentFirstLookupStrategy
               && muleModulesExportedPackages.contains(localPackage))) {
-        LOGGER.warn("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
+        LOGGER.debug("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
             + "', but it will be ignored since it is already available from the container.");
       } else {
         pluginLocalPolicies.put(localPackage, CHILD_ONLY);
