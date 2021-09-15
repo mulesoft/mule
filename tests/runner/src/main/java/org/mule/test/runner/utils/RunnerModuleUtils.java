@@ -35,7 +35,7 @@ public final class RunnerModuleUtils {
   public static final String EXTRA_BOOT_PACKAGES = "extraBoot.packages";
   public static final String JAR_EXTENSION = "jar";
 
-  // TODO: MULE-19762 remove all the following once forward compatiblity is finished
+  // TODO: MULE-19762 remove once forward compatibility is finished
   private static String DEFAULT_TEST_SDK_API_VERSION_PROPERTY = SYSTEM_PROPERTY_PREFIX + "testSdkApiVersion";
   private static final String SDK_API_GROUP_ID = "org.mule.sdk";
   private static final String SDK_API_ARTIFACT_ID = "mule-sdk-api";
@@ -70,6 +70,16 @@ public final class RunnerModuleUtils {
     return DEFAULT_SDK_API_ARTIFACT;
   }
 
+  /**
+   * Tests the {@code extensionClassLoader} for the presence of the {@code mule-sdk-api} classpath and forces it
+   * to load it if missing
+   *
+   * @param extensionClassLoader the extension's classlaoder
+   * @param dependencyResolver a {@link DependencyResolver}
+   * @param repositories the repositories for fetching the mule-sdk-api if missing in the classloader
+   * @since 4.5.0
+   */
+  // TODO: MULE-19762 remove once forward compatibility is finished
   public static void assureSdkApiInClassLoader(ClassLoader extensionClassLoader,
                                                DependencyResolver dependencyResolver,
                                                List<RemoteRepository> repositories) {
@@ -98,7 +108,7 @@ public final class RunnerModuleUtils {
    * @return resolves the default version of {@code mule-sdk-api} to add into the container classpath
    * @sine 4.5.0
    */
-  // TODO: MULE-19762 remove once forward compatiblity is finished
+  // TODO: MULE-19762 remove once forward compatibility is finished
   private static String getDefaultSdkApiVersionForTest() {
     return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, "0.4.0");
   }
