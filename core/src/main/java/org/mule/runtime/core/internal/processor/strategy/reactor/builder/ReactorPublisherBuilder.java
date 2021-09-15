@@ -7,13 +7,15 @@
 
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
+import static org.mule.runtime.api.profiling.context.threading.ThreadProfilingContext.currentThreadProfilingContext;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.core.internal.profiling.ThreadProfilingContext.currentThreadProfilingContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.context.OperationMetadata;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -23,8 +25,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.mule.runtime.core.internal.profiling.OperationMetadata;
-import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
@@ -219,7 +219,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
                                                       ProfilingDataProducer<ComponentExecutionProfilingEventContext> dataProducer,
                                                       CoreEvent e) {
     // This could be done only once but might need refactoring (better to leave it for the granularity discussion)
-    currentThreadProfilingContext().setRunningOperationMetadata(new OperationMetadata(location));
+    currentThreadProfilingContext().setRunningComponentMetadata(new OperationMetadata(location));
     dataProducer.triggerProfilingEvent(
                                        new DefaultComponentExecutionProfilingEventContext(e,
                                                                                           location,
