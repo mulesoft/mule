@@ -29,12 +29,12 @@ public class PersonalInfo {
   @Parameter
   @Alias("myName")
   @Optional(defaultValue = HEISENBERG)
-  @Placement(order = 1)
+  @org.mule.sdk.api.annotation.param.display.Placement(order = 1)
   private String name;
 
   @Parameter
   @Optional(defaultValue = AGE)
-  @Placement(order = 2)
+  @org.mule.sdk.api.annotation.param.display.Placement(order = 2)
   private Integer age;
 
   @Parameter

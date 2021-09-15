@@ -42,8 +42,15 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclarat
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.ClassValue;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
@@ -223,6 +230,34 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
     assertThat(classValueModel.get().getAssignableFrom().get(0), equalTo("com.starkindustries.AIEngine"));
   }
 
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void parseLegacyAndSdkDisplayNameAnnotationsOnParameter() {
+    ModelLoaderDelegate modelLoaderDelegate =
+        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfDisplayNameAnnotation.class, "1.0.0-dev");
+    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+  }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void parseLegacyAndSdkExampleAnnotationsOnParameter() {
+    ModelLoaderDelegate modelLoaderDelegate =
+        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfExampleAnnotation.class, "1.0.0-dev");
+    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+  }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void parseLegacyAndSdkSummaryAnnotationsOnParameter() {
+    ModelLoaderDelegate modelLoaderDelegate =
+        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfSummaryAnnotation.class, "1.0.0-dev");
+    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+  }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void parseLegacyAndSdkClassValueAnnotationsOnParameter() {
+    ModelLoaderDelegate modelLoaderDelegate =
+        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfClassValueAnnotation.class, "1.0.0-dev");
+    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+  }
+
   private ConfigurationDeclaration findConfigByName(ExtensionDeclaration declaration, String name) {
     return declaration.getConfigurations().stream().filter(c -> c.getName().equals(name)).findAny().get();
   }
@@ -253,5 +288,41 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
 
   private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {
     return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
+  }
+
+  @Extension(name = "extensionWithInvalidUseOfDisplayNameAnnotation")
+  public static class ExtensionWithInvalidUseOfDisplayNameAnnotation {
+
+    @Parameter
+    @DisplayName("niceFirstParameter")
+    @org.mule.sdk.api.annotation.param.display.DisplayName("niceFirstParameter")
+    public String firstParameter;
+  }
+
+  @Extension(name = "extensionWithInvalidUseOfExampleAnnotation")
+  public static class ExtensionWithInvalidUseOfExampleAnnotation {
+
+    @Parameter
+    @Example("parameter")
+    @org.mule.sdk.api.annotation.param.display.Example("parameter")
+    public String firstParameter;
+  }
+
+  @Extension(name = "extensionWithInvalidUseOfSummaryAnnotation")
+  public static class ExtensionWithInvalidUseOfSummaryAnnotation {
+
+    @Parameter
+    @Summary("This is a test parameter")
+    @org.mule.sdk.api.annotation.param.display.Summary("This is a test parameter")
+    public String firstParameter;
+  }
+
+  @Extension(name = "extensionWithInvalidUseOfClassValueAnnotation")
+  public static class ExtensionWithInvalidUseOfClassValueAnnotation {
+
+    @Parameter
+    @ClassValue
+    @org.mule.sdk.api.annotation.param.display.ClassValue
+    public String firstParameter;
   }
 }
