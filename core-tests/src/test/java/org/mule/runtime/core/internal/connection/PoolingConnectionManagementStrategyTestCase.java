@@ -34,6 +34,7 @@ import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockL
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+import static org.slf4j.event.Level.DEBUG;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -89,7 +90,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     muleContext.start();
     resetConnectionProvider();
     debugMessages = new ArrayList<>();
-    logger = createMockLogger(debugMessages, new ArrayList<>());
+    logger = createMockLogger(debugMessages, DEBUG);
     oldLogger = setLogger(PoolingConnectionManagementStrategy.class, LOGGER_FIELD_NAME, logger);
   }
 

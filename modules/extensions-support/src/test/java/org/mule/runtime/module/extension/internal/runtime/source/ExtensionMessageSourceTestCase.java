@@ -28,7 +28,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 
@@ -66,8 +65,8 @@ import org.mockito.InOrder;
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
-  private static final int TEST_TIMEOUT = 2000;
-  private static final int TEST_POLL_DELAY = 10;
+  protected static final int TEST_TIMEOUT = 2000;
+  protected static final int TEST_POLL_DELAY = 10;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -422,33 +421,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.start();
     final Object metadataKeyValue = messageSource.getParameterValueResolver().getParameterValue(METADATA_KEY);
     assertThat(metadataKeyValue, is(person));
-  }
-
-  @Test
-  public void sourceInitializedLogMessage() throws Exception {
-    messageSource.initialise();
-    if (primaryNodeOnly) {
-      verifyLogMessage(debugMessages,
-                       "Message source 'source' on flow 'appleFlow' running on the primary node is initializing. Note that this Message source must run on the primary node only.");
-    } else {
-      verifyLogMessage(debugMessages,
-                       "Message source 'source' on flow 'appleFlow' is initializing. This is the primary node of the cluster.");
-    }
-  }
-
-  @Test
-  public void sourceStartedLogMessage() throws Exception {
-    messageSource.initialise();
-    messageSource.start();
-    verifyLogMessage(debugMessages, "Message source 'source' on flow 'appleFlow' is starting");
-  }
-
-  @Test
-  public void sourceStoppedLogMessage() throws Exception {
-    messageSource.initialise();
-    messageSource.start();
-    messageSource.stop();
-    verifyLogMessage(debugMessages, "Message source 'source' on flow 'appleFlow' is stopping");
   }
 
   private class DummySource extends Source {
