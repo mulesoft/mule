@@ -107,10 +107,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
-                .profileComponentExecutionEvent(location, getDataProducer(PS_SCHEDULING_FLOW_EXECUTION), artifactId, artifactType)
-                .profileComponentExecutionEvent(location, getDataProducer(STARTING_FLOW_EXECUTION), artifactId, artifactType)
+                .profileComponentExecution(location, getDataProducer(PS_SCHEDULING_FLOW_EXECUTION), artifactId, artifactType)
+                .profileComponentExecution(location, getDataProducer(STARTING_FLOW_EXECUTION), artifactId, artifactType)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
-                .profileComponentExecutionEvent(location, getDataProducer(FLOW_EXECUTED), artifactId, artifactType)
+                .profileComponentExecution(location, getDataProducer(FLOW_EXECUTED), artifactId, artifactType)
                 .build();
           } else {
             return from(pub).transform(delegate.onPipeline(pipeline));
@@ -142,12 +142,12 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
-                .profileComponentExecutionEvent(location, getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION), artifactId,
-                                                artifactType)
-                .profileComponentExecutionEvent(location, getDataProducer(STARTING_OPERATION_EXECUTION), artifactId, artifactType)
+                .profileComponentExecution(location, getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION), artifactId,
+                                           artifactType)
+                .profileComponentExecution(location, getDataProducer(STARTING_OPERATION_EXECUTION), artifactId, artifactType)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
-                .profileComponentExecutionEvent(location, getDataProducer(OPERATION_EXECUTED), artifactId, artifactType)
-                .profileComponentExecutionEvent(location, getDataProducer(PS_FLOW_MESSAGE_PASSING), artifactId, artifactType)
+                .profileComponentExecution(location, getDataProducer(OPERATION_EXECUTED), artifactId, artifactType)
+                .profileComponentExecution(location, getDataProducer(PS_FLOW_MESSAGE_PASSING), artifactId, artifactType)
                 .build();
           } else {
             return from(pub).transform(delegate.onProcessor(processor));

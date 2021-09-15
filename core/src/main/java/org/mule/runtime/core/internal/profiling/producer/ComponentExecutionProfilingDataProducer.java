@@ -18,14 +18,14 @@ import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutio
  *
  * @since 4.4
  */
-public class ComponentProcessingStrategyProfilingDataProducer
+public class ComponentExecutionProfilingDataProducer
     implements ProfilingDataProducer<DefaultComponentExecutionProfilingEventContext> {
 
   private final DefaultProfilingService defaultProfilingService;
   private final ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType;
 
-  public ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService defaultProfilingService,
-                                                          ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType) {
+  public ComponentExecutionProfilingDataProducer(DefaultProfilingService defaultProfilingService,
+                                                 ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType) {
     this.defaultProfilingService = defaultProfilingService;
     this.profilingEventType = profilingEventType;
   }

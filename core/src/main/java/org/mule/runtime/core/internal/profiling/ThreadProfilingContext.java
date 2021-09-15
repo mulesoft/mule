@@ -10,22 +10,22 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 
-public class ThreadRuntimeContext {
+public class ThreadProfilingContext {
 
-  private static final ThreadLocal<ThreadRuntimeContext> currentThreadRuntimeContext =
-      ThreadLocal.withInitial(ThreadRuntimeContext::new);
+  private static final ThreadLocal<ThreadProfilingContext> currentThreadProfilingContext =
+      ThreadLocal.withInitial(ThreadProfilingContext::new);
 
   private OperationMetadata runningOperationMetadata;
 
-  private ThreadRuntimeContext() {}
+  private ThreadProfilingContext() {}
 
-  public static ThreadRuntimeContext currentThreadRuntimeContext() {
-    return currentThreadRuntimeContext.get();
+  public static ThreadProfilingContext currentThreadProfilingContext() {
+    return currentThreadProfilingContext.get();
   }
 
-  public ThreadRuntimeContext replaceWith(ThreadRuntimeContext newContext) {
+  public ThreadProfilingContext replaceWith(ThreadProfilingContext newContext) {
     requireNonNull(newContext);
-    ThreadRuntimeContext currentContext = ThreadRuntimeContext.currentThreadRuntimeContext.get();
+    ThreadProfilingContext currentContext = ThreadProfilingContext.currentThreadProfilingContext.get();
     currentContext.setRunningOperationMetadata(newContext.getRunningOperationMetadata().orElse(null));
     return currentContext;
   }
@@ -35,14 +35,14 @@ public class ThreadRuntimeContext {
   }
 
   // TODO: This will be called by the PS at the same point than the STARTING_OPERATION_EXECUTION profiling event emission
-  public ThreadRuntimeContext setRunningOperationMetadata(OperationMetadata runningOperationMetadata) {
+  public ThreadProfilingContext setRunningOperationMetadata(OperationMetadata runningOperationMetadata) {
     requireNonNull(runningOperationMetadata);
     this.runningOperationMetadata = runningOperationMetadata;
     return this;
   }
 
   // TODO: This will be called by the execution engine when the operation has returned the control to the runtime (callback)
-  public ThreadRuntimeContext clearRunningOperationMetadata() {
+  public ThreadProfilingContext clearRunningOperationMetadata() {
     this.runningOperationMetadata = null;
     return this;
   }
