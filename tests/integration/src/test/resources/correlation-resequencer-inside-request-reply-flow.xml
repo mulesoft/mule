@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+ http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <flow name="vmreqrespFlow">
+        <vm:inbound-endpoint path="splitter" exchange-pattern="request-response"/>
+        <request-reply>
+            <processor-chain>
+                <collection-splitter enableCorrelation="ALWAYS"/>
+                <vm:outbound-endpoint exchange-pattern="one-way" path="vmq"/>
+            </processor-chain>
+            <vm:inbound-endpoint exchange-pattern="one-way" path="vmq1">
+                <resequencer/>
+                <collection-aggregator/>
+            </vm:inbound-endpoint>
+        </request-reply>
+    </flow>
+
+    <flow name="vmreqrespFlow1">
+        <vm:inbound-endpoint exchange-pattern="one-way" path="vmq"/>
+        <echo-component/>
+    </flow>
+</mule>
