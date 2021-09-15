@@ -40,6 +40,7 @@ public class LoggerComponentProcessingStrategyDataConsumer
 
   public static final String PROFILING_EVENT_TIMESTAMP_KEY = "profilingEventTimestamp";
   public static final String PROCESSING_THREAD_KEY = "processingThread";
+  public static final String PROCESSING_THREAD_STATE = "processingThreadState";
   public static final String ARTIFACT_ID_KEY = "artifactId";
   public static final String ARTIFACT_TYPE_KEY = "artifactType";
   public static final String RUNTIME_CORE_EVENT_CORRELATION_ID = "runtimeCoreEventCorrelationId";
@@ -68,6 +69,9 @@ public class LoggerComponentProcessingStrategyDataConsumer
     eventMap.put(ARTIFACT_ID_KEY, profilingEventContext.getArtifactId());
     eventMap.put(ARTIFACT_TYPE_KEY, profilingEventContext.getArtifactType());
     eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, profilingEventContext.getCorrelationId());
+    eventMap
+        .put(PROCESSING_THREAD_STATE,
+             profilingEventContext.getThreadState().map(gson::toJson).orElse("UNAVAILABLE (threading profiling is disabled)"));
     profilingEventContext.getLocation().map(loc -> eventMap.put(LOCATION, loc.getLocation()));
 
     return eventMap;
