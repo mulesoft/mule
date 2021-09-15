@@ -151,7 +151,7 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getErrorModels(),
                hasItem(newError(TRANSFORMATION).withParent(errorMuleAny).build()));
 
-    assertThat(coreExtensionModel.getTypes(), hasSize(5));
+    assertThat(coreExtensionModel.getTypes(), hasSize(6));
   }
 
   @Test
@@ -460,7 +460,7 @@ public class CoreExtensionModelTestCase {
   public void scatterGather() {
     final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
 
-    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(4));
+    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(5));
 
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getName(), is("timeout"));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
@@ -472,15 +472,20 @@ public class CoreExtensionModelTestCase {
     assertThat(scatterGatherModel.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(1).isRequired(), is(false));
 
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(2).getName(), is("collectList"));
     assertThat(scatterGatherModel.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultStringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultObjectType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(2).isRequired(), is(false));
 
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getName(), is(TARGET_VALUE_PARAMETER_NAME));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getExpressionSupport(), is(REQUIRED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(StringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(3).isRequired(), is(false));
+
+    assertThat(scatterGatherModel.getAllParameterModels().get(4).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(4).getExpressionSupport(), is(REQUIRED));
+    assertThat(scatterGatherModel.getAllParameterModels().get(4).getType(), instanceOf(StringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(4).isRequired(), is(false));
 
     assertThat(scatterGatherModel.getNestedComponents(), hasSize(1));
 
