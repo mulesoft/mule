@@ -31,7 +31,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -107,10 +107,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
-                .profileEvent(location, getDataProducer(PS_SCHEDULING_FLOW_EXECUTION), artifactId, artifactType)
-                .profileEvent(location, getDataProducer(STARTING_FLOW_EXECUTION), artifactId, artifactType)
+                .profileComponentExecutionEvent(location, getDataProducer(PS_SCHEDULING_FLOW_EXECUTION), artifactId, artifactType)
+                .profileComponentExecutionEvent(location, getDataProducer(STARTING_FLOW_EXECUTION), artifactId, artifactType)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
-                .profileEvent(location, getDataProducer(FLOW_EXECUTED), artifactId, artifactType)
+                .profileComponentExecutionEvent(location, getDataProducer(FLOW_EXECUTED), artifactId, artifactType)
                 .build();
           } else {
             return from(pub).transform(delegate.onPipeline(pipeline));
@@ -118,8 +118,8 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
         });
   }
 
-  private Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> getDataProducer(
-                                                                                                   ProfilingEventType<ProcessingStrategyProfilingEventContext> eventType) {
+  private Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> getDataProducer(
+                                                                                                   ProfilingEventType<ComponentExecutionProfilingEventContext> eventType) {
     if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
       return of(profilingService.getProfilingDataProducer(eventType));
     }
@@ -142,11 +142,12 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
-                .profileEvent(location, getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION), artifactId, artifactType)
-                .profileEvent(location, getDataProducer(STARTING_OPERATION_EXECUTION), artifactId, artifactType)
+                .profileComponentExecutionEvent(location, getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION), artifactId,
+                                                artifactType)
+                .profileComponentExecutionEvent(location, getDataProducer(STARTING_OPERATION_EXECUTION), artifactId, artifactType)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
-                .profileEvent(location, getDataProducer(OPERATION_EXECUTED), artifactId, artifactType)
-                .profileEvent(location, getDataProducer(PS_FLOW_MESSAGE_PASSING), artifactId, artifactType)
+                .profileComponentExecutionEvent(location, getDataProducer(OPERATION_EXECUTED), artifactId, artifactType)
+                .profileComponentExecutionEvent(location, getDataProducer(PS_FLOW_MESSAGE_PASSING), artifactId, artifactType)
                 .build();
           } else {
             return from(pub).transform(delegate.onProcessor(processor));

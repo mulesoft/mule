@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.profiling.producer;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 
 /**
  * Default {@link ProfilingDataProducer} returned by a diagnostic service.
@@ -19,19 +19,19 @@ import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
  * @since 4.4
  */
 public class ComponentProcessingStrategyProfilingDataProducer
-    implements ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext> {
+    implements ProfilingDataProducer<DefaultComponentExecutionProfilingEventContext> {
 
   private final DefaultProfilingService defaultProfilingService;
-  private final ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType;
+  private final ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType;
 
   public ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService defaultProfilingService,
-                                                          ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
+                                                          ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType) {
     this.defaultProfilingService = defaultProfilingService;
     this.profilingEventType = profilingEventType;
   }
 
   @Override
-  public void triggerProfilingEvent(ComponentProcessingStrategyProfilingEventContext profilingEventContext) {
+  public void triggerProfilingEvent(DefaultComponentExecutionProfilingEventContext profilingEventContext) {
     defaultProfilingService.notifyEvent(profilingEventContext, profilingEventType);
   }
 }
