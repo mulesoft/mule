@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
+import static org.mule.runtime.core.internal.profiling.ThreadProfilingContext.currentThreadProfilingContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -14,6 +15,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyPr
 import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.profiling.OperationMetadata;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
@@ -193,6 +195,8 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     public ReactorPublisherBuilder<Flux<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
                                                                                    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                                                    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
+      // This could be done only once but might need refactoring (better to leave it for the granularity discussion)
+      currentThreadProfilingContext().setRunningOperationMetadata(new OperationMetadata(location));
       flux = profilingService.enrichWithProfilingEventFlux(flux, dataProducer, transformer);
       return this;
     }
