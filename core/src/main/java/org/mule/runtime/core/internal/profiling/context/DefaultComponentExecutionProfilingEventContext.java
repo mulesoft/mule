@@ -14,7 +14,6 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.OperationThreadSnapshot;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.threading.DefaultOperationThreadSnapshot;
 
 import java.util.Optional;
 
@@ -31,7 +30,6 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
   private final String threadName;
   private final long profilingEventTimestamp;
   private final Optional<ComponentLocation> location;
-  private Optional<OperationThreadSnapshot> threadSnapshot;
 
   public DefaultComponentExecutionProfilingEventContext(CoreEvent event,
                                                         ComponentLocation location,
@@ -45,10 +43,6 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
     this.artifactType = artifactType;
     this.profilingEventTimestamp = profilingEventTimestamp;
     this.location = ofNullable(location);
-    // TODO: Replace by utility method.
-    // TODO: Add a capability flag (could be something like "threading_profiling") has a separate task in order to check D&I of
-    // such feature.
-    this.threadSnapshot = empty();
   }
 
   @Override
@@ -63,7 +57,7 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
 
   @Override
   public Optional<OperationThreadSnapshot> getThreadSnapshot() {
-    return threadSnapshot;
+    return empty();
   }
 
   @Override
@@ -84,9 +78,5 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
   @Override
   public Optional<ComponentLocation> getLocation() {
     return location;
-  }
-
-  public void setThreadSnapshot(DefaultOperationThreadSnapshot threadSnapshot) {
-    this.threadSnapshot = ofNullable(threadSnapshot);
   }
 }

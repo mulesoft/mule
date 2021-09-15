@@ -51,7 +51,6 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
-
         {
           put(FLOW_EXECUTED,
               new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED,
