@@ -19,7 +19,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 
 import com.google.gson.Gson;
 
@@ -34,7 +34,7 @@ import org.slf4j.Logger;
  * A {@link ProfilingDataConsumer} that logs information regarding the processing strategy for components.
  */
 public class LoggerComponentProcessingStrategyDataConsumer
-    implements ProfilingDataConsumer<ProcessingStrategyProfilingEventContext> {
+    implements ProfilingDataConsumer<ComponentExecutionProfilingEventContext> {
 
   private static final Logger LOGGER = getLogger(LoggerComponentProcessingStrategyDataConsumer.class);
 
@@ -49,16 +49,16 @@ public class LoggerComponentProcessingStrategyDataConsumer
   private final Gson gson = new Gson();
 
   @Override
-  public void onProfilingEvent(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
-                               ProcessingStrategyProfilingEventContext profilingEventContext) {
+  public void onProfilingEvent(ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType,
+                               ComponentExecutionProfilingEventContext profilingEventContext) {
     Logger logger = getDataConsumerLogger();
     if (logger.isDebugEnabled()) {
       logger.debug(gson.toJson(getInfoMap(profilingEventType, profilingEventContext)));
     }
   }
 
-  private Map<String, String> getInfoMap(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
-                                         ProcessingStrategyProfilingEventContext profilingEventContext) {
+  private Map<String, String> getInfoMap(ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType,
+                                         ComponentExecutionProfilingEventContext profilingEventContext) {
     Map<String, String> eventMap = new HashMap<>();
     eventMap.put(PROFILING_EVENT_TYPE,
                  profilingEventType.getProfilingEventTypeNamespace() + ":"
@@ -74,14 +74,14 @@ public class LoggerComponentProcessingStrategyDataConsumer
   }
 
   @Override
-  public Set<ProfilingEventType<ProcessingStrategyProfilingEventContext>> getProfilingEventTypes() {
+  public Set<ProfilingEventType<ComponentExecutionProfilingEventContext>> getProfilingEventTypes() {
     return of(PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION, OPERATION_EXECUTED,
               PS_FLOW_MESSAGE_PASSING, PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION,
               FLOW_EXECUTED);
   }
 
   @Override
-  public Predicate<ProcessingStrategyProfilingEventContext> getEventContextFilter() {
+  public Predicate<ComponentExecutionProfilingEventContext> getEventContextFilter() {
     return processingStrategyProfilingEventContext -> true;
   }
 

@@ -39,11 +39,11 @@ import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
-import org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
@@ -94,7 +94,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
   private final Gson gson = new Gson();
 
-  private final ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType;
+  private final ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType;
 
   private ProfilingService profilingService;
 
@@ -112,25 +112,25 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   }
 
   @Parameters(name = "eventType: {0}")
-  public static Collection<ProfilingEventType<ProcessingStrategyProfilingEventContext>> eventType() {
+  public static Collection<ProfilingEventType<ComponentExecutionProfilingEventContext>> eventType() {
     return asList(PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION, OPERATION_EXECUTED,
                   PS_FLOW_MESSAGE_PASSING, PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION,
                   FLOW_EXECUTED);
   }
 
-  public ProcessingStrategyDataConsumersTestCase(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
+  public ProcessingStrategyDataConsumersTestCase(ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType) {
     this.profilingEventType = profilingEventType;
   }
 
   @Test
   @Description("When a profiling event related to processing strategy is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForProcessingStrategiesProfilingEventTypesConsumeDataAccordingly() {
-    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> dataProducer =
+    ProfilingDataProducer<ComponentExecutionProfilingEventContext> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
-    ComponentProcessingStrategyProfilingEventContext profilerEventContext =
-        new ComponentProcessingStrategyProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
-                                                             PROFILING_EVENT_TIMESTAMP);
+    DefaultComponentExecutionProfilingEventContext profilerEventContext =
+        new DefaultComponentExecutionProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
+                                                           PROFILING_EVENT_TIMESTAMP);
     dataProducer.triggerProfilingEvent(
                                        profilerEventContext);
 
@@ -191,8 +191,8 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     }
   }
 
-  private String jsonToLog(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
-                           ProcessingStrategyProfilingEventContext profilingEventContext) {
+  private String jsonToLog(ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType,
+                           ComponentExecutionProfilingEventContext profilingEventContext) {
     Map<String, String> eventMap = new HashMap<>();
     eventMap.put(PROFILING_EVENT_TYPE,
                  getFullyQualifiedProfilingNotificationIdentifier(profilingEventType));
