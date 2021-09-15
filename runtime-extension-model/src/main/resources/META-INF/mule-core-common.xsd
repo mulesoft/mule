@@ -2532,12 +2532,10 @@
                         </xsd:element>
                         <xsd:element ref="route" minOccurs="2" maxOccurs="unbounded"/>
                         <xsd:element ref="abstract-fork-join-strategy" minOccurs="0" maxOccurs="1">
-                            <xsd:documentation>
-                                @Deprecated since 4.4. Use the element before the routes for consistency with routers created with the SDK.
-                            </xsd:documentation>
                             <xsd:annotation>
                                 <xsd:documentation>
                                     Strategy that determines how multiple routes should be processed and how their results are aggregated.
+                                    @Deprecated since 4.4. Use the element before the routes for consistency with routers created with the SDK.
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
