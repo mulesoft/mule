@@ -33,12 +33,14 @@ import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
-import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiVersionForTest;
+import static org.mule.test.runner.utils.RunnerModuleUtils.JAR_EXTENSION;
+import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiArtifact;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
+import org.mule.test.runner.utils.RunnerModuleUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -101,7 +103,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String ZIP_EXTENSION = ".zip";
 
   private static final String MAVEN_COORDINATES_SEPARATOR = ":";
-  private static final String JAR_EXTENSION = "jar";
   private static final String SNAPSHOT_WILCARD_FILE_FILTER = "*-SNAPSHOT*.*";
   private static final String TESTS_CLASSIFIER = "tests";
   private static final String TESTS_JAR = "-tests.jar";
@@ -110,10 +111,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   private static final String RUNTIME_GROUP_ID = "org.mule.runtime";
   private static final String LOGGING_ARTIFACT_ID = "mule-module-logging";
-
-  private static final String SDK_API_GROUP_ID = "org.mule.sdk";
-  private static final String SDK_API_ARTIFACT_ID = "mule-sdk-api";
-  private static final String DEFAULT_SDK_API_VERSION = getDefaultSdkApiVersionForTest();
 
   private static final String MULE_ARTIFACT_JSON_PATH = "META-INF/mule-artifact/mule-artifact.json";
 
@@ -430,9 +427,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion), COMPILE));
 
     // TODO: MULE-19762 remove once forward compatiblity is finished
-    directDependencies
-        .add(new Dependency(new DefaultArtifact(SDK_API_GROUP_ID, SDK_API_ARTIFACT_ID, JAR_EXTENSION, DEFAULT_SDK_API_VERSION),
-                            COMPILE));
+    directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
@@ -611,7 +606,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     if (context.isExtensionMetadataGenerationEnabled()) {
       ExtensionPluginMetadataGenerator extensionPluginMetadataGenerator =
           new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
-
 
       for (ArtifactClassificationNode pluginClassifiedNode : resolvedPluginsClassified) {
         File pluginClassifiedFile = toFile(pluginClassifiedNode.getUrls().get(0));
@@ -991,8 +985,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * {@link ClassPathClassifierContext#getTestInclusions()}. It also excludes
    * {@link ClassPathClassifierContext#getExcludedArtifacts()}, {@link ClassPathClassifierContext#getTestExclusions()}.
    * <p/>
-   * If the application artifact has not been classified as plugin its going to be resolved as {@value #JAR_EXTENSION} in order to
-   * include this its compiled classes classification.
+   * If the application artifact has not been classified as plugin its going to be resolved as
+   * {@link RunnerModuleUtils#JAR_EXTENSION} in order to include this its compiled classes classification.
    *
    * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
    * @param directDependencies             {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
@@ -1100,7 +1094,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Resolves the rootArtifact {@value #JAR_EXTENSION} output {@link File}s to be added to class loader.
+   * Resolves the rootArtifact {@link RunnerModuleUtils#JAR_EXTENSION} output {@link File}s to be added to class loader.
    *
    * @param rootArtifact {@link Artifact} being classified
    * @return {@link File} to be added to class loader
