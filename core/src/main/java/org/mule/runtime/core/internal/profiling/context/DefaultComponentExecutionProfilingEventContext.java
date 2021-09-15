@@ -4,19 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.profiling.context;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.OperationThreadSnapshot;
 import org.mule.runtime.core.api.event.CoreEvent;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
 import java.util.Optional;
-
 
 /**
  * {@link ComponentExecutionProfilingEventContext} default implementation.
@@ -31,8 +29,6 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
   private final String threadName;
   private final long profilingEventTimestamp;
   private final Optional<ComponentLocation> location;
-  // TODO: Replace ThreadInfo with the a runtime DTO.
-  private Optional<ThreadInfo> threadState;
 
   public DefaultComponentExecutionProfilingEventContext(CoreEvent event,
                                                         ComponentLocation location,
@@ -46,10 +42,6 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
     this.artifactType = artifactType;
     this.profilingEventTimestamp = profilingEventTimestamp;
     this.location = ofNullable(location);
-    // TODO: Replace by utility method.
-    // TODO: Add a capability flag (could be something like "threading_profiling") has a separate task in order to check D&I of
-    // such feature.
-    this.threadState = Optional.of(ManagementFactory.getThreadMXBean().getThreadInfo(Thread.currentThread().getId()));
   }
 
   @Override
@@ -63,8 +55,8 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
   }
 
   @Override
-  public Optional<ThreadInfo> getThreadState() {
-    return threadState;
+  public Optional<OperationThreadSnapshot> getThreadSnapshot() {
+    return empty();
   }
 
   @Override
