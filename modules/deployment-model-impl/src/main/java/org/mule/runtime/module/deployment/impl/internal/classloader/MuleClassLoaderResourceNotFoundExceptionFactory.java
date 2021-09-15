@@ -23,7 +23,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 import org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;

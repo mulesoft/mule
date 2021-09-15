@@ -7,18 +7,21 @@
 
 package org.mule.test.runner.utils;
 
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
-import static org.springframework.util.ReflectionUtils.findMethod;
 
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.test.runner.api.DependencyResolver;
 
+import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -80,24 +83,43 @@ public final class RunnerModuleUtils {
    * @since 4.5.0
    */
   // TODO: MULE-19762 remove once forward compatibility is finished
-  public static void assureSdkApiInClassLoader(ClassLoader extensionClassLoader,
-                                               DependencyResolver dependencyResolver,
-                                               List<RemoteRepository> repositories) {
+  public static ClassLoader assureSdkApiInClassLoader(ClassLoader extensionClassLoader,
+                                                      DependencyResolver dependencyResolver,
+                                                      List<RemoteRepository> repositories) {
     try {
       Class.forName("org.mule.sdk.api.runtime.parameter.ParameterResolver", true, extensionClassLoader);
+      return extensionClassLoader;
     } catch (ClassNotFoundException cnf) {
       try {
-        URL sdkApiUrl = dependencyResolver
+        Artifact sdkApiArtifact = dependencyResolver
             .resolveArtifact(getDefaultSdkApiArtifact(), repositories)
-            .getArtifact()
-            .getFile().getAbsoluteFile().toURL();
+            .getArtifact();
+        List<File> dependencies = new LinkedList<>();
+        dependencies.add(sdkApiArtifact.getFile());
+        dependencies.addAll(dependencyResolver.getDirectDependencies(sdkApiArtifact).stream()
+            .flatMap(dep -> {
+              try {
+                return dependencyResolver
+                    .resolveDependencies(dep, Collections.emptyList(), Collections.emptyList(), (n, p) -> true, repositories)
+                    .stream();
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .collect(Collectors.toList()));
 
-        Method method = findMethod(extensionClassLoader.getClass(), "addURL", URL.class);
+        URL[] urls = dependencies.stream().map(f -> {
+          try {
+            return f.getAbsoluteFile().toURL();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        }).toArray(URL[]::new);
 
-        if (method != null) {
-          method.setAccessible(true);
-          method.invoke(extensionClassLoader, sdkApiUrl);
-        }
+        extensionClassLoader = CompositeClassLoader.from(extensionClassLoader, new URLClassLoader(urls, extensionClassLoader));
+        Class.forName("org.mule.sdk.api.runtime.parameter.ParameterResolver", true, extensionClassLoader);
+
+        return extensionClassLoader;
       } catch (Exception e) {
         throw new RuntimeException("Could not assure sdk-api in extension classloader", e);
       }
@@ -110,7 +132,8 @@ public final class RunnerModuleUtils {
    */
   // TODO: MULE-19762 remove once forward compatibility is finished
   private static String getDefaultSdkApiVersionForTest() {
-    return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, "0.4.0");
+    return "1.0.0-SNAPSHOT";
+    // return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, "0.4.0");
   }
 
 }

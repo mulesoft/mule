@@ -10,6 +10,7 @@ package org.mule.test.runner.api;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import static org.mule.test.runner.utils.RunnerModuleUtils.assureSdkApiInClassLoader;
 
@@ -187,12 +188,16 @@ class ExtensionPluginMetadataGenerator {
    * @param rootArtifactRemoteRepositories
    * @return {@link ExtensionModel} for the extensionClass
    */
-  private ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver,
+  private ExtensionModel getExtensionModel(Artifact plugin,
+                                           Class extensionClass,
+                                           ClassLoader extensionClassLoader,
+                                           DependencyResolver dependencyResolver,
                                            List<RemoteRepository> rootArtifactRemoteRepositories) {
     ExtensionModelLoader loader =
         extensionModelLoaderFinder.findLoaderByProperty(plugin, dependencyResolver, rootArtifactRemoteRepositories)
             .orElse(extensionModelLoaderFinder.findLoaderFromMulePlugin(extensionMulePluginJson));
-    return extensionsInfrastructure.discoverExtension(extensionClass, loader);
+    return withContextClassLoader(extensionClassLoader,
+                                  () -> extensionsInfrastructure.discoverExtension(extensionClass, extensionClassLoader, loader));
   }
 
   /**
@@ -209,10 +214,11 @@ class ExtensionPluginMetadataGenerator {
                                   List<RemoteRepository> rootArtifactRemoteRepositories) {
     logger.debug("Generating Extension metadata for extension class: '{}'", extensionClass);
 
-    assureSdkApiInClassLoader(extensionClass.getClassLoader(), dependencyResolver, rootArtifactRemoteRepositories);
+    ClassLoader extensionClassLoader =
+        assureSdkApiInClassLoader(extensionClass.getClassLoader(), dependencyResolver, rootArtifactRemoteRepositories);
 
     final ExtensionModel extensionModel =
-        getExtensionModel(plugin, extensionClass, dependencyResolver, rootArtifactRemoteRepositories);
+        getExtensionModel(plugin, extensionClass, extensionClassLoader, dependencyResolver, rootArtifactRemoteRepositories);
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
     extensionsInfrastructure.generateLoaderResources(extensionModel, generatedResourcesDirectory);

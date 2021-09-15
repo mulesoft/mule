@@ -21,11 +21,11 @@ import static net.bytebuddy.matcher.ElementMatchers.isConstructor;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.internal.classloader.CompositeClassLoader.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;

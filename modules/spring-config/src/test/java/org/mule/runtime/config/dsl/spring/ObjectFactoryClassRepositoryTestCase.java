@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;

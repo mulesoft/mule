@@ -12,7 +12,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Collections.unmodifiableSet;
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.internal.classloader.CompositeClassLoader.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;

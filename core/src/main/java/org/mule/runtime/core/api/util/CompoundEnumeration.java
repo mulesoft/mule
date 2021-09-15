@@ -15,7 +15,9 @@ import java.util.NoSuchElementException;
  * @param <E>
  *
  * @since 4.2.0
+ * @deprecated since 4.4.0, use {@link org.mule.runtime.internal.util.collection.CompoundEnumeration}
  */
+@Deprecated
 public class CompoundEnumeration<E> implements Enumeration<E> {
 
   private Enumeration<E>[] enums;

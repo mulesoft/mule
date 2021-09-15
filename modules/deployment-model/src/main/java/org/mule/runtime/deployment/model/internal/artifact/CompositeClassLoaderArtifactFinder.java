@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.deployment.model.internal.artifact;
 
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 

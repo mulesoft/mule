@@ -10,11 +10,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.internal.classloader.CompositeClassLoader.from;
 import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
 import org.junit.Test;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;

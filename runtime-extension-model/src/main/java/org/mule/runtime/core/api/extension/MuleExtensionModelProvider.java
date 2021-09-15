@@ -19,17 +19,14 @@ import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_M
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
-
-import java.io.IOException;
-import java.util.Properties;
 
 /**
  * Utility class to access the {@link ExtensionModel} definition for Mule's Runtime
@@ -58,40 +55,66 @@ public final class MuleExtensionModelProvider {
   public static final MetadataType OBJECT_STORE_TYPE = TYPE_LOADER.load(ObjectStore.class);
 
   static {
-    try {
-      final Properties buildProperties = new Properties();
-      buildProperties.load(MuleExtensionModelDeclarer.class.getResourceAsStream("/build.properties"));
-      MULE_VERSION = buildProperties.getProperty("muleVersion", "4.0.0");
-    } catch (IOException e) {
-      throw new MuleRuntimeException(e);
-    }
+    // try {
+    // final Properties buildProperties = new Properties();
+    // buildProperties.load(MuleExtensionModelDeclarer.class.getResourceAsStream("/build.properties"));
+    // MULE_VERSION = buildProperties.getProperty("muleVersion", "4.0.0");
+    // } catch (IOException e) {
+    // throw new MuleRuntimeException(e);
+    // }
+    MULE_VERSION = "4.5.0";
   }
 
   private static MetadataType loadPrimitive(String id) {
     return PRIMITIVE_TYPES.get(id);
   }
 
-  private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(new DefaultExtensionLoadingContext(new MuleExtensionModelDeclarer().createExtensionModel(),
-                                                 MuleExtensionModelProvider.class.getClassLoader(),
-                                                 new NullDslResolvingContext())));
+  private static ClassLoader getExtensionClassLoader() {
+    ClassLoader containerClassLoader = MuleExtensionModelProvider.class.getClassLoader();
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-  private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(new DefaultExtensionLoadingContext(new TlsExtensionModelDeclarer().createExtensionModel(),
-                                                 MuleExtensionModelProvider.class.getClassLoader(),
-                                                 new NullDslResolvingContext())));
+    return containerClassLoader == contextClassLoader
+        ? containerClassLoader
+        : CompositeClassLoader.from(containerClassLoader, contextClassLoader);
+  }
+
+  private static ExtensionModel createExtensionModel(ExtensionDeclarer declarer) {
+    ClassLoader containerClassLoader = MuleExtensionModelProvider.class.getClassLoader();
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+
+    ClassLoader extensionClassLoader = containerClassLoader == contextClassLoader
+        ? containerClassLoader
+        : CompositeClassLoader.from(containerClassLoader, contextClassLoader);
+
+    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(extensionClassLoader);
+      return new ExtensionModelFactory()
+          .create(new DefaultExtensionLoadingContext(declarer, extensionClassLoader, new NullDslResolvingContext()));
+    } finally {
+      Thread.currentThread().setContextClassLoader(currentClassLoader);
+    }
+  }
+
+  // private static final LazyValue<ExtensionModel> EXTENSION_MODEL =
+  // new LazyValue<>(() -> createExtensionModel(new MuleExtensionModelDeclarer().createExtensionModel()));
+  //
+  // private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL =
+  // new LazyValue<>(() -> createExtensionModel(new TlsExtensionModelDeclarer().createExtensionModel()));
 
   /**
    * @return the {@link ExtensionModel} definition for Mule's Runtime
    */
   public static ExtensionModel getExtensionModel() {
-    return EXTENSION_MODEL.get();
+    // return EXTENSION_MODEL.get();
+    return createExtensionModel(new MuleExtensionModelDeclarer().createExtensionModel());
   }
 
   /**
    * @return the {@link ExtensionModel} definition containing the namespace declaration for the tls module.
    */
   public static ExtensionModel getTlsExtensionModel() {
-    return TLS_EXTENSION_MODEL.get();
+    // return TLS_EXTENSION_MODEL.get();
+    return createExtensionModel(new TlsExtensionModelDeclarer().createExtensionModel());
   }
 }

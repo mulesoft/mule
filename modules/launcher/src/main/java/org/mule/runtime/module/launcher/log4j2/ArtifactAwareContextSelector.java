@@ -12,10 +12,8 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;

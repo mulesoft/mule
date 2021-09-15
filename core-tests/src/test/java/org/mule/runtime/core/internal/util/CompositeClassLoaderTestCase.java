@@ -10,8 +10,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.internal.classloader.CompositeClassLoader.from;
 
+import org.mule.runtime.internal.classloader.CompositeClassLoader;
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

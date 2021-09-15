@@ -10,7 +10,7 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.internal.classloader.CompositeClassLoader.from;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.getNearestRegion;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
