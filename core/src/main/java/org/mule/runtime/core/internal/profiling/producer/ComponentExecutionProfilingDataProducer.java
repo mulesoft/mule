@@ -37,8 +37,10 @@ public class ComponentExecutionProfilingDataProducer
   @Override
   public void triggerProfilingEvent(ComponentExecutionProfilingEventContext profilingEventContext) {
     // TODO: Add a capability flag (could be something like "threading_profiling") has a separate task in order to check
-    //  design and implementation of such feature.
-    ComponentExecutionProfilingEventContext decorated = new ComponentExecutionProfilingEventContextWithThreadProfiling(profilingEventContext, operationThreadSnapshotCollector.collect());
+    // design and implementation of such feature.
+    ComponentExecutionProfilingEventContext decorated =
+        new ComponentExecutionProfilingEventContextWithThreadProfiling(profilingEventContext,
+                                                                       operationThreadSnapshotCollector.collect());
     defaultProfilingService.notifyEvent(decorated, profilingEventType);
   }
 }
