@@ -78,7 +78,7 @@ import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
@@ -148,7 +148,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
-  protected final ProfilingDataConsumer<ProcessingStrategyProfilingEventContext> profilingDataConsumer =
+  protected final ProfilingDataConsumer<ComponentExecutionProfilingEventContext> profilingDataConsumer =
       mock(ProfilingDataConsumer.class);
 
   protected Mode mode;
@@ -658,17 +658,17 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     if (enableProfilingServiceProperty.getValue().equals("true")) {
       InOrder profilingDataConsumerAssertions = inOrder(profilingDataConsumer);
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ComponentExecutionProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(PS_SCHEDULING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(PS_SCHEDULING_OPERATION_EXECUTION), any(ComponentExecutionProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(STARTING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(STARTING_OPERATION_EXECUTION), any(ComponentExecutionProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(OPERATION_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(OPERATION_EXECUTED), any(ComponentExecutionProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(PS_FLOW_MESSAGE_PASSING), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(PS_FLOW_MESSAGE_PASSING), any(ComponentExecutionProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(FLOW_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(FLOW_EXECUTED), any(ComponentExecutionProfilingEventContext.class));
     } else {
       verifyZeroInteractions(profilingDataConsumer);
     }

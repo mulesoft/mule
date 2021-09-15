@@ -13,8 +13,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
@@ -23,6 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
@@ -90,10 +90,10 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    * @param artifactType the artifact type associated to the profiling event.
    * @return builder for a {@link Publisher} with the profiling action.
    */
-  ReactorPublisherBuilder<T> profileEvent(ComponentLocation location,
-                                          Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducer,
-                                          String artifactId,
-                                          String artifactType);
+  ReactorPublisherBuilder<T> profileComponentExecutionEvent(ComponentLocation location,
+                                                            Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
+                                                            String artifactId,
+                                                            String artifactType);
 
   T build();
 
@@ -144,12 +144,12 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Mono<CoreEvent>> profileEvent(ComponentLocation location,
-                                                                 Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducer,
-                                                                 String artifactId, String artifactType) {
+    public ReactorPublisherBuilder<Mono<CoreEvent>> profileComponentExecutionEvent(ComponentLocation location,
+                                                                                   Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
+                                                                                   String artifactId, String artifactType) {
       mono =
           dataProducer
-              .map(dp -> mono.doOnNext(e -> doProfileEvent(location, artifactId, artifactType, dp, e)))
+              .map(dp -> mono.doOnNext(e -> triggerComponentExecutionProfilingEvent(location, artifactId, artifactType, dp, e)))
               .orElse(mono);
       return this;
     }
@@ -204,25 +204,26 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> profileEvent(ComponentLocation location,
-                                                                 Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducer,
-                                                                 String artifactId, String artifactType) {
-      flux = dataProducer.map(dp -> flux.doOnNext(e -> doProfileEvent(location, artifactId, artifactType, dp, e)))
+    public ReactorPublisherBuilder<Flux<CoreEvent>> profileComponentExecutionEvent(ComponentLocation location,
+                                                                                   Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
+                                                                                   String artifactId, String artifactType) {
+      flux = dataProducer
+          .map(dp -> flux.doOnNext(e -> triggerComponentExecutionProfilingEvent(location, artifactId, artifactType, dp, e)))
           .orElse(flux);
       return this;
     }
   }
 
-  static void doProfileEvent(ComponentLocation location, String artifactId, String artifactType,
-                             ProfilingDataProducer<ProcessingStrategyProfilingEventContext> dataProducer,
-                             CoreEvent e) {
+  static void triggerComponentExecutionProfilingEvent(ComponentLocation location, String artifactId, String artifactType,
+                                                      ProfilingDataProducer<ComponentExecutionProfilingEventContext> dataProducer,
+                                                      CoreEvent e) {
     dataProducer.triggerProfilingEvent(
-                                       new ComponentProcessingStrategyProfilingEventContext(e,
-                                                                                            location,
-                                                                                            currentThread()
-                                                                                                .getName(),
-                                                                                            artifactId,
-                                                                                            artifactType,
-                                                                                            currentTimeMillis()));
+                                       new DefaultComponentExecutionProfilingEventContext(e,
+                                                                                          location,
+                                                                                          currentThread()
+                                                                                              .getName(),
+                                                                                          artifactId,
+                                                                                          artifactType,
+                                                                                          currentTimeMillis()));
   }
 }
