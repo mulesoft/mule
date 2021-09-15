@@ -26,7 +26,7 @@ import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
-import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.producer.ComponentExecutionProfilingDataProducer;
 import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
 
 import java.util.HashMap;
@@ -53,20 +53,20 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
         {
           put(FLOW_EXECUTED,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
           put(PS_SCHEDULING_FLOW_EXECUTION,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_SCHEDULING_FLOW_EXECUTION));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_SCHEDULING_FLOW_EXECUTION));
           put(STARTING_FLOW_EXECUTION,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION));
           put(PS_FLOW_MESSAGE_PASSING,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING));
           put(OPERATION_EXECUTED,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED));
           put(PS_SCHEDULING_OPERATION_EXECUTION,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
-                                                                   PS_SCHEDULING_OPERATION_EXECUTION));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this,
+                                                          PS_SCHEDULING_OPERATION_EXECUTION));
           put(STARTING_OPERATION_EXECUTION,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this,
                                                                    STARTING_OPERATION_EXECUTION));
           put(EXTENSION_PROFILING_EVENT,
               new ExtensionProfilingDataProducer(DefaultProfilingService.this,

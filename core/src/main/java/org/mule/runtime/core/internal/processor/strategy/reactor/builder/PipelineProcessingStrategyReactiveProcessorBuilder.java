@@ -103,12 +103,12 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
         dataProducerFromProfilingService(FLOW_EXECUTED);
 
     return publisher
-        .profileComponentExecutionEvent(location, psSchedulingFlowExecutionDataProducer, artifactId, artifactType)
+        .profileComponentExecution(location, psSchedulingFlowExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(scheduler))
-        .profileComponentExecutionEvent(location, startingFlowExecutionDataproducer, artifactId, artifactType)
+        .profileComponentExecution(location, startingFlowExecutionDataproducer, artifactId, artifactType)
         .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
         .transform(pipeline)
-        .profileComponentExecutionEvent(location, flowExecutedDataProducer, artifactId, artifactType);
+        .profileComponentExecution(location, flowExecutedDataProducer, artifactId, artifactType);
   }
 
   private Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducerFromProfilingService(

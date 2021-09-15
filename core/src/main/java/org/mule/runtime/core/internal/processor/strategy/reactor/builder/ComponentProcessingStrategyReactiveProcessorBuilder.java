@@ -142,13 +142,13 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
 
     // General structure of processing strategy publishOn -> operation -> publishOn
     return builder
-        .profileComponentExecutionEvent(location, psSchedulingOperationExecutionDataProducer, artifactId, artifactType)
+        .profileComponentExecution(location, psSchedulingOperationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(dispatcherScheduler))
-        .profileComponentExecutionEvent(location, startingOperationExecutionDataProducer, artifactId, artifactType)
+        .profileComponentExecution(location, startingOperationExecutionDataProducer, artifactId, artifactType)
         .transform(processor)
-        .profileComponentExecutionEvent(location, operationExecutionDataProducer, artifactId, artifactType)
+        .profileComponentExecution(location, operationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(callbackScheduler))
-        .profileComponentExecutionEvent(location, psFlowMessagePassingDataProducer, artifactId, artifactType)
+        .profileComponentExecution(location, psFlowMessagePassingDataProducer, artifactId, artifactType)
         .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, contextScheduler));
   }
 

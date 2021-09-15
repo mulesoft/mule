@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static org.mule.runtime.core.internal.profiling.ThreadProfilingContext.currentThreadProfilingContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -22,6 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.mule.runtime.core.internal.profiling.OperationMetadata;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
@@ -90,10 +92,10 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    * @param artifactType the artifact type associated to the profiling event.
    * @return builder for a {@link Publisher} with the profiling action.
    */
-  ReactorPublisherBuilder<T> profileComponentExecutionEvent(ComponentLocation location,
-                                                            Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
-                                                            String artifactId,
-                                                            String artifactType);
+  ReactorPublisherBuilder<T> profileComponentExecution(ComponentLocation location,
+                                                       Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
+                                                       String artifactId,
+                                                       String artifactType);
 
   T build();
 
@@ -144,9 +146,9 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Mono<CoreEvent>> profileComponentExecutionEvent(ComponentLocation location,
-                                                                                   Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
-                                                                                   String artifactId, String artifactType) {
+    public ReactorPublisherBuilder<Mono<CoreEvent>> profileComponentExecution(ComponentLocation location,
+                                                                              Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
+                                                                              String artifactId, String artifactType) {
       mono =
           dataProducer
               .map(dp -> mono.doOnNext(e -> triggerComponentExecutionProfilingEvent(location, artifactId, artifactType, dp, e)))
@@ -155,7 +157,6 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
   }
-
 
   /**
    * Builder for a {@link Flux}.
@@ -204,9 +205,9 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> profileComponentExecutionEvent(ComponentLocation location,
-                                                                                   Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
-                                                                                   String artifactId, String artifactType) {
+    public ReactorPublisherBuilder<Flux<CoreEvent>> profileComponentExecution(ComponentLocation location,
+                                                                              Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
+                                                                              String artifactId, String artifactType) {
       flux = dataProducer
           .map(dp -> flux.doOnNext(e -> triggerComponentExecutionProfilingEvent(location, artifactId, artifactType, dp, e)))
           .orElse(flux);
@@ -217,6 +218,8 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
   static void triggerComponentExecutionProfilingEvent(ComponentLocation location, String artifactId, String artifactType,
                                                       ProfilingDataProducer<ComponentExecutionProfilingEventContext> dataProducer,
                                                       CoreEvent e) {
+    // This could be done only once but might need refactoring (better to leave it for the granularity discussion)
+    currentThreadProfilingContext().setRunningOperationMetadata(new OperationMetadata(location));
     dataProducer.triggerProfilingEvent(
                                        new DefaultComponentExecutionProfilingEventContext(e,
                                                                                           location,
