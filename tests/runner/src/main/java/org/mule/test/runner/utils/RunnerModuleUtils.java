@@ -71,12 +71,12 @@ public final class RunnerModuleUtils {
   }
 
   /**
-   * Tests the {@code extensionClassLoader} for the presence of the {@code mule-sdk-api} classpath and forces it
-   * to load it if missing
+   * Tests the {@code extensionClassLoader} for the presence of the {@code mule-sdk-api} classpath and forces it to load it if
+   * missing
    *
    * @param extensionClassLoader the extension's classlaoder
-   * @param dependencyResolver a {@link DependencyResolver}
-   * @param repositories the repositories for fetching the mule-sdk-api if missing in the classloader
+   * @param dependencyResolver   a {@link DependencyResolver}
+   * @param repositories         the repositories for fetching the mule-sdk-api if missing in the classloader
    * @since 4.5.0
    */
   // TODO: MULE-19762 remove once forward compatibility is finished
