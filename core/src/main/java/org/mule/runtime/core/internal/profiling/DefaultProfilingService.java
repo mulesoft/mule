@@ -27,6 +27,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentExecutionProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.threading.OperationThreadSnapshotCollector;
 import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
 
 import java.util.HashMap;
@@ -48,25 +49,33 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
+  private OperationThreadSnapshotCollector operationThreadSnapshotCollector = new OperationThreadSnapshotCollector();
+
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
 
         {
           put(FLOW_EXECUTED,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED,
+                                                          operationThreadSnapshotCollector));
           put(PS_SCHEDULING_FLOW_EXECUTION,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_SCHEDULING_FLOW_EXECUTION));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_SCHEDULING_FLOW_EXECUTION,
+                                                          operationThreadSnapshotCollector));
           put(STARTING_FLOW_EXECUTION,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION,
+                                                          operationThreadSnapshotCollector));
           put(PS_FLOW_MESSAGE_PASSING,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING,
+                                                          operationThreadSnapshotCollector));
           put(OPERATION_EXECUTED,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED,
+                                                          operationThreadSnapshotCollector));
           put(PS_SCHEDULING_OPERATION_EXECUTION,
               new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this,
-                                                          PS_SCHEDULING_OPERATION_EXECUTION));
+                                                          PS_SCHEDULING_OPERATION_EXECUTION, operationThreadSnapshotCollector));
           put(STARTING_OPERATION_EXECUTION,
               new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this,
+                                                          STARTING_OPERATION_EXECUTION, operationThreadSnapshotCollector));
                                                                    STARTING_OPERATION_EXECUTION));
           put(EXTENSION_PROFILING_EVENT,
               new ExtensionProfilingDataProducer(DefaultProfilingService.this,
