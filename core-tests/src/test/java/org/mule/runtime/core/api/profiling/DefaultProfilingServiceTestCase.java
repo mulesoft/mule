@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.profiling;
 
+import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -90,7 +91,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     profilingService = new DefaultProfilingService();
     initialiseIfNeeded(profilingService, muleContext);
     profilingService
-        .setProfilingDataConsumerDiscoveryStrategies(of(Collections.singleton(new TestProfilingDataConsumerDiscoveryStrategy())));
+        .setProfilingDataConsumerDiscoveryStrategies(of(singleton(new TestProfilingDataConsumerDiscoveryStrategy())));
     when(featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_PROFILING_SERVICE)).thenReturn(true);
     profilingService.setFeatureFlags(featureFlaggingService);
     startIfNeeded(profilingService);
