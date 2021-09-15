@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.sdk.api.annotation.param.display.Text;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;

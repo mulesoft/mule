@@ -153,13 +153,22 @@ public final class MuleExtensionAnnotationParser {
     }
   }
 
-  private static void doParseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
+  private static void doParseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder, String elementName) {
     java.util.Optional<Password> passwordAnnotation = annotatedElement.getAnnotation(Password.class);
     if (passwordAnnotation.isPresent()) {
       builder.asPassword();
     }
-    java.util.Optional<Text> textAnnotation = annotatedElement.getAnnotation(Text.class);
-    if (textAnnotation.isPresent()) {
+
+    java.util.Optional<Text> legacyTextAnnotation = annotatedElement.getAnnotation(Text.class);
+    java.util.Optional<org.mule.sdk.api.annotation.param.display.Text> sdkTextAnnotation =
+        annotatedElement.getAnnotation(org.mule.sdk.api.annotation.param.display.Text.class);
+
+    if (legacyTextAnnotation.isPresent() && sdkTextAnnotation.isPresent()) {
+      throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                elementName,
+                                                                Text.class.getName(),
+                                                                org.mule.sdk.api.annotation.param.display.Text.class.getName()));
+    } else if (legacyTextAnnotation.isPresent() || sdkTextAnnotation.isPresent()) {
       builder.asText();
     }
   }
@@ -220,7 +229,7 @@ public final class MuleExtensionAnnotationParser {
   public static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder,
                                                              String elementName) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
-      doParseLayoutAnnotations(annotatedElement, builder);
+      doParseLayoutAnnotations(annotatedElement, builder, elementName);
       parsePlacementAnnotation(annotatedElement, builder, elementName);
       return of(builder.build());
     }
@@ -239,12 +248,14 @@ public final class MuleExtensionAnnotationParser {
 
   private static boolean isDisplayAnnotationPresent(AnnotatedElement annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
+                                                   org.mule.sdk.api.annotation.param.display.Text.class,
                                                    org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 
   private static boolean isDisplayAnnotationPresent(WithAnnotations annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
+                                                   org.mule.sdk.api.annotation.param.display.Text.class,
                                                    org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
