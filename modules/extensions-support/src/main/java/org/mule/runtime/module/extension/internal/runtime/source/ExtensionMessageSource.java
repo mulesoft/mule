@@ -65,6 +65,7 @@ import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
+import org.mule.runtime.core.internal.retry.DefaultRetryContext;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -87,6 +88,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -97,6 +99,8 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import org.reactivestreams.Publisher;
+import java.sql.Timestamp;
 
 import reactor.core.publisher.Mono;
 
@@ -204,21 +208,34 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean restarting, RestartContext restartContext)
+  private RetryContext startSource(boolean restarting, RestartContext restartContext)
       throws MuleException {
+    Scheduler scheduler;
+    if (restarting && retryPolicyTemplate.isAsync()) {
+      scheduler = IMMEDIATE_SCHEDULER;
+    } else {
+      scheduler = retryScheduler;
+    }
     try {
-      if (restarting && retryPolicyTemplate.isAsync()) {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), IMMEDIATE_SCHEDULER);
-      } else {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), retryScheduler);
-      }
+      System.out.println(new Timestamp(System.currentTimeMillis()) + ": Using scheduler " + scheduler.getName());
+      return retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), scheduler);
     } catch (Throwable e) {
+      System.out.println(new Timestamp(System.currentTimeMillis()) + ": Throwing exception at start source");
       if (e instanceof MuleException) {
         throw (MuleException) e;
       } else {
         throw new MuleRuntimeException(e);
       }
     }
+
+    /*
+     * try { if (restarting && retryPolicyTemplate.isAsync()) { retryPolicyTemplate.execute(new StartSourceCallback(restarting,
+     * restartContext), IMMEDIATE_SCHEDULER); System.out.println(new Timestamp(System.currentTimeMillis()) + ": Executed Sync"); }
+     * else { retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), retryScheduler);
+     * System.out.println(new Timestamp(System.currentTimeMillis()) + ": Executed Async"); } } catch (Throwable e) {
+     * System.out.println(new Timestamp(System.currentTimeMillis()) + ": Throwing exception at start source"); if (e instanceof
+     * MuleException) { throw (MuleException) e; } else { throw new MuleRuntimeException(e); } }
+     */
   }
 
   private void startSource() throws MuleException {
@@ -324,8 +341,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
           .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
           .orElseGet(() -> create(sink -> {
             try {
-              restart();
-              sink.success();
+              System.out.println(new Timestamp(System.currentTimeMillis()) + ": Inside try");
+              RetryContext retryContext = restart();
+              if (retryContext.isOk()) {
+                sink.success();
+              } else {
+                sink.error(retryContext.getLastFailure());
+              }
             } catch (Exception e) {
               sink.error(e);
             }
@@ -337,9 +359,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
           .doOnError(this::onReconnectionFailed)
           .subscribe();
     });
+    System.out.println(new Timestamp(System.currentTimeMillis()) + ": return of OnException");
   }
 
   private void onReconnectionSuccessful() {
+    System.out.println(new Timestamp(System.currentTimeMillis()) + ": onRecSuccessful");
     if (LOGGER.isWarnEnabled()) {
       LOGGER.warn("Message source '{}' on flow '{}' successfully reconnected",
                   sourceModel.getName(), getLocation().getRootContainerName());
@@ -347,21 +371,25 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionFailed(Throwable exception) {
+    System.out.println(new Timestamp(System.currentTimeMillis()) + ": onRecFailed");
     LOGGER.error(format("Message source '%s' on flow '%s' could not be reconnected. Will be shutdown. %s",
                         sourceModel.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
     shutdown();
   }
 
-  private void restart() throws MuleException {
+  private RetryContext restart() throws MuleException {
     synchronized (started) {
       if (started.get()) {
         RestartContext restartContext = stopSource(true);
         disposeSource();
-        startSource(true, restartContext);
+        return startSource(true, restartContext);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
+        RetryContext retryContext = new DefaultRetryContext("Already started", Collections.emptyMap(), notificationDispatcher);
+        retryContext.setOk();
+        return retryContext;
       }
     }
   }

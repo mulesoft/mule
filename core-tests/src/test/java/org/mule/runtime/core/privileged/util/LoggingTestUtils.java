@@ -24,35 +24,57 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 public class LoggingTestUtils {
 
   private LoggingTestUtils() {}
 
-  public static Logger createMockLogger(List<String> debugMessageList, List<String> traceMessageList) {
+  public static Logger createMockLogger(List<String> messageList, Level level) {
     Logger logger = mock(Logger.class, withSettings().lenient());
     Answer answer = invocation -> {
-      String method = invocation.getMethod().getName();
       String message = invocation.getArgument(0, String.class);
       Object[] messageArgs = copyOfRange(invocation.getArguments(), 1, invocation.getArguments().length);
-      if (method.equals("debug")) {
-        debugMessageList.add(formatMessage(message, messageArgs));
-      } else if (method.equals("trace")) {
-        traceMessageList.add(formatMessage(message, messageArgs));
-      }
+      messageList.add(formatMessage(message, messageArgs));
       return null;
     };
-    doAnswer(answer).when(logger).debug(anyString());
-    doAnswer(answer).when(logger).debug(anyString(), (Object) any());
-    doAnswer(answer).when(logger).debug(anyString(), any(), any());
-    doAnswer(answer).when(logger).debug(anyString(), (Object[]) any());
-
-    doAnswer(answer).when(logger).trace(anyString());
-    doAnswer(answer).when(logger).trace(anyString(), (Object) any());
-    doAnswer(answer).when(logger).trace(anyString(), any(), any());
-    doAnswer(answer).when(logger).trace(anyString(), (Object[]) any());
-    when(logger.isDebugEnabled()).thenReturn(true);
-    when(logger.isTraceEnabled()).thenReturn(true);
+    switch (level) {
+      case ERROR:
+        when(logger.isErrorEnabled()).thenReturn(true);
+        doAnswer(answer).when(logger).error(anyString());
+        doAnswer(answer).when(logger).error(anyString(), (Object) any());
+        doAnswer(answer).when(logger).error(anyString(), any(), any());
+        doAnswer(answer).when(logger).error(anyString(), (Object[]) any());
+        break;
+      case WARN:
+        when(logger.isWarnEnabled()).thenReturn(true);
+        doAnswer(answer).when(logger).warn(anyString());
+        doAnswer(answer).when(logger).warn(anyString(), (Object) any());
+        doAnswer(answer).when(logger).warn(anyString(), any(), any());
+        doAnswer(answer).when(logger).warn(anyString(), (Object[]) any());
+        break;
+      case INFO:
+        when(logger.isInfoEnabled()).thenReturn(true);
+        doAnswer(answer).when(logger).info(anyString());
+        doAnswer(answer).when(logger).info(anyString(), (Object) any());
+        doAnswer(answer).when(logger).info(anyString(), any(), any());
+        doAnswer(answer).when(logger).info(anyString(), (Object[]) any());
+        break;
+      case DEBUG:
+        when(logger.isDebugEnabled()).thenReturn(true);
+        doAnswer(answer).when(logger).debug(anyString());
+        doAnswer(answer).when(logger).debug(anyString(), (Object) any());
+        doAnswer(answer).when(logger).debug(anyString(), any(), any());
+        doAnswer(answer).when(logger).debug(anyString(), (Object[]) any());
+        break;
+      case TRACE:
+        when(logger.isTraceEnabled()).thenReturn(true);
+        doAnswer(answer).when(logger).trace(anyString());
+        doAnswer(answer).when(logger).trace(anyString(), (Object) any());
+        doAnswer(answer).when(logger).trace(anyString(), any(), any());
+        doAnswer(answer).when(logger).trace(anyString(), (Object[]) any());
+        break;
+    }
     return logger;
   }
 
