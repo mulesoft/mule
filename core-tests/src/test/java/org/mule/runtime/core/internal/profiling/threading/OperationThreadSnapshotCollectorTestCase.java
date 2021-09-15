@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.core.internal.profiling.threading;
 
 import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.*;
@@ -35,7 +35,7 @@ public class OperationThreadSnapshotCollectorTestCase {
   @Test
   public void threadIsWaitingInSleep() throws InterruptedException {
     sleep(TEST_TIME);
-    OperationThreadSnapshot snapshot = collector.collect();
+    DefaultOperationThreadSnapshot snapshot = collector.collect();
     assertThat(snapshot.getWaitedTime(), is(greaterThanOrEqualTo(TEST_TIME)));
   }
 
@@ -44,7 +44,7 @@ public class OperationThreadSnapshotCollectorTestCase {
     synchronized (theSharedLock) {
       sleep(TEST_TIME);
     }
-    OperationThreadSnapshot snapshot = collector.collect();
+    DefaultOperationThreadSnapshot snapshot = collector.collect();
     assertThat(snapshot.getBlockedTime(), is(lessThanOrEqualTo(TOO_SHORT_TIME)));
   }
 
@@ -62,7 +62,7 @@ public class OperationThreadSnapshotCollectorTestCase {
         fail("Await operation has been interrupted");
       }
       synchronized (theSharedLock) {
-        OperationThreadSnapshot snapshot = collector.collect();
+        DefaultOperationThreadSnapshot snapshot = collector.collect();
         assertThat(snapshot.getBlockedTime(), is(greaterThanOrEqualTo(TEST_TIME)));
         terminationLatch.release();
       }
@@ -83,7 +83,7 @@ public class OperationThreadSnapshotCollectorTestCase {
     for (long l = 0L; l < 100L; ++l) {
       // Just the loop...
     }
-    OperationThreadSnapshot snapshot = collector.collect();
+    DefaultOperationThreadSnapshot snapshot = collector.collect();
     assertThat(snapshot.getCpuTime(), is(not(0L)));
   }
 }

@@ -12,6 +12,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.threading.OperationThreadSnapshotCollector;
 
 /**
  * Default {@link ProfilingDataProducer} returned by a diagnostic service.
@@ -23,15 +24,19 @@ public class ComponentExecutionProfilingDataProducer
 
   private final DefaultProfilingService defaultProfilingService;
   private final ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType;
+  private final OperationThreadSnapshotCollector operationThreadSnapshotCollector;
 
   public ComponentExecutionProfilingDataProducer(DefaultProfilingService defaultProfilingService,
-                                                 ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType) {
+                                                 ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType,
+                                                 OperationThreadSnapshotCollector operationThreadSnapshotCollector) {
     this.defaultProfilingService = defaultProfilingService;
     this.profilingEventType = profilingEventType;
+    this.operationThreadSnapshotCollector = operationThreadSnapshotCollector;
   }
 
   @Override
   public void triggerProfilingEvent(DefaultComponentExecutionProfilingEventContext profilingEventContext) {
+    profilingEventContext.setThreadSnapshot(operationThreadSnapshotCollector.collect());
     defaultProfilingService.notifyEvent(profilingEventContext, profilingEventType);
   }
 }

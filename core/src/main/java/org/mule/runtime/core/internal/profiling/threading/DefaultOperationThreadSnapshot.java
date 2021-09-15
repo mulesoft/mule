@@ -4,48 +4,35 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.core.internal.profiling.threading;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
+import org.mule.runtime.api.profiling.type.context.OperationThreadSnapshot;
 
-public class OperationThreadSnapshot {
+public final class DefaultOperationThreadSnapshot implements OperationThreadSnapshot {
 
   private final Long blockedTime;
   private final Long waitedTime;
   private final Long cpuTime;
 
-  private OperationThreadSnapshot(Long blockedTime, Long waitedTime, Long cpuTime) {
+  private DefaultOperationThreadSnapshot(Long blockedTime, Long waitedTime, Long cpuTime) {
     this.blockedTime = blockedTime;
     this.waitedTime = waitedTime;
     this.cpuTime = cpuTime;
   }
 
-  /**
-   * {@link ThreadInfo#getBlockedTime()}
-   * 
-   * @return
-   */
+  @Override
   public Long getBlockedTime() {
     return blockedTime;
   }
 
-  /**
-   * {@link ThreadInfo#getWaitedTime()}
-   * 
-   * @return
-   */
+  @Override
   public Long getWaitedTime() {
     return waitedTime;
   }
 
-  /**
-   * {@link ThreadMXBean#getThreadCpuTime(long)}
-   * 
-   * @return
-   */
+  @Override
   public Long getCpuTime() {
     return cpuTime;
   }
@@ -56,25 +43,25 @@ public class OperationThreadSnapshot {
     private Long waitedTime = null;
     private Long cpuTime = null;
 
-    public OperationThreadSnapshot build() {
+    public DefaultOperationThreadSnapshot build() {
       checkNotNull(blockedTime);
       checkNotNull(waitedTime);
       checkNotNull(cpuTime);
-      return new OperationThreadSnapshot(blockedTime, waitedTime, cpuTime);
+      return new DefaultOperationThreadSnapshot(blockedTime, waitedTime, cpuTime);
     }
 
-    public Builder withBlockedTime(Long blockedTime) {
-      this.blockedTime = blockedTime;
+    Builder withBlockedTime(Long pBlockedTime) {
+      this.blockedTime = pBlockedTime;
       return this;
     }
 
-    public Builder withWaitedTime(Long waitedTime) {
-      this.waitedTime = waitedTime;
+    Builder withWaitedTime(Long pWaitedTime) {
+      this.waitedTime = pWaitedTime;
       return this;
     }
 
-    public Builder withCPUTime(Long cpuTime) {
-      this.cpuTime = cpuTime;
+    Builder withCPUTime(Long pCpuTime) {
+      this.cpuTime = pCpuTime;
       return this;
     }
   }

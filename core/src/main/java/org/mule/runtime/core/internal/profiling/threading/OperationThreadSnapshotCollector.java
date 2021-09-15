@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.core.internal.profiling.threading;
 
 import static java.lang.Thread.currentThread;
 import static java.lang.management.ManagementFactory.getThreadMXBean;
@@ -26,10 +26,10 @@ public class OperationThreadSnapshotCollector {
     this.threadMXBean.setThreadCpuTimeEnabled(true);
   }
 
-  public OperationThreadSnapshot collect() {
+  public DefaultOperationThreadSnapshot collect() {
     final long id = currentThread().getId();
     ThreadInfo threadInfo = threadMXBean.getThreadInfo(id);
-    return OperationThreadSnapshot.builder()
+    return DefaultOperationThreadSnapshot.builder()
         .withBlockedTime(threadInfo.getBlockedTime())
         .withWaitedTime(threadInfo.getWaitedTime())
         .withCPUTime(threadMXBean.getThreadCpuTime(id))
