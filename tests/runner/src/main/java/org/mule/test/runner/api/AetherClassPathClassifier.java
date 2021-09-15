@@ -164,6 +164,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   @Override
   public ArtifactsUrlClassification classify(final ClassPathClassifierContext context) {
+    System.out.println("PUTO EL QUE LEE!!!!!!!!");
     checkNotNull(context, "context cannot be null");
 
     logger.info("Running dependencies classification on: '{}' in order to build Mule class loaders", context.getRootArtifact());
@@ -182,6 +183,12 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       throw new IllegalStateException("Couldn't be identified type for rootArtifact: " + context.getRootArtifact());
     }
     logger.debug("rootArtifact {} identified as {} type", context.getRootArtifact(), rootArtifactType);
+
+    // if (rootArtifactType == PLUGIN) {
+    // directDependencies
+    // .add(new Dependency(new DefaultArtifact(SDK_API_GROUP_ID, SDK_API_ARTIFACT_ID, JAR_EXTENSION, DEFAULT_SDK_API_VERSION),
+    // COMPILE));
+    // }
 
     List<RemoteRepository> remoteRepositories;
     try {
@@ -612,6 +619,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       ExtensionPluginMetadataGenerator extensionPluginMetadataGenerator =
           new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
 
+      try {
+
+        context.getClassPathURLs().addAll(toUrl(
+                                                dependencyResolver.resolveDependencies(new Dependency(rootArtifact, COMPILE),
+                                                                                       directDependencies, emptyList(),
+                                                                                       (n, p) -> true,
+                                                                                       rootArtifactRemoteRepositories)));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
 
       for (ArtifactClassificationNode pluginClassifiedNode : resolvedPluginsClassified) {
         File pluginClassifiedFile = toFile(pluginClassifiedNode.getUrls().get(0));
