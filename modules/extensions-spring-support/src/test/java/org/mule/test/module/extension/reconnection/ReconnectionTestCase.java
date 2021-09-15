@@ -16,7 +16,6 @@ import static org.mule.extension.test.extension.reconnection.ReconnectableConnec
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
 import static org.mule.tck.probe.PollingProber.check;
@@ -28,7 +27,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
 import org.mule.extension.test.extension.reconnection.NonReconnectableSource;
@@ -50,7 +48,6 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {

@@ -13,17 +13,41 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
+import static org.slf4j.event.Level.DEBUG;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.notification.ClusterNodeNotification;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
+
+  protected List<String> debugMessages;
+  private Logger oldLogger;
 
   public ClusterExtensionMessageSourceTestCase() {
     primaryNodeOnly = true;
+  }
+
+  @Before
+  public void setUpLogger() throws Exception {
+    debugMessages = new ArrayList<>();
+    oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
+  }
+
+  @After
+  protected void restoreLogger() throws Exception {
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Override

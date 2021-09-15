@@ -25,8 +25,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_M
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
@@ -54,6 +52,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -87,20 +86,17 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.slf4j.Logger;
 
 public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
 
-  private static final String LOGGER_FIELD_NAME = "LOGGER";
+  protected static final String LOGGER_FIELD_NAME = "LOGGER";
   protected static final String CONFIG_NAME = "myConfig";
   protected static final String ERROR_MESSAGE = "ERROR";
   protected static final String SOURCE_NAME = "source";
@@ -108,10 +104,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected final SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
   protected final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
-
-  protected Logger logger;
-  private Logger oldLogger;
-  protected List<String> debugMessages;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -230,8 +222,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     mockExceptionEnricher(extensionModel, null);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
-    retryPolicyTemplate
-        .setNotificationFirer(notificationDispatcher);
+    retryPolicyTemplate.setNotificationFirer(notificationDispatcher);
     initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
@@ -296,19 +287,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
   }
 
-
-  @Before
-  public void setUpLogger() throws Exception {
-    debugMessages = new ArrayList<>();
-    logger = createMockLogger(debugMessages, new ArrayList<>());
-    oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, logger);
-  }
-
-  @After
-  public void restoreLogger() throws Exception {
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
-  }
-
   @After
   public void after() throws MuleException {
     try {
@@ -335,17 +313,21 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
                              of(BackPressureAction.FAIL));
   }
 
-  protected ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
+  protected ExtensionMessageSource getNewExtensionMessageSourceInstance(RetryPolicyTemplate retryPolicy) throws MuleException {
 
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
-                                   retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager,
+                                   retryPolicy, cursorStreamProviderFactory, FAIL, extensionManager,
                                    notificationDispatcher, muleContext.getTransactionFactoryManager(),
                                    muleContext.getConfiguration().getId());
     messageSource.setListener(messageProcessor);
     messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     muleContext.getInjector().inject(messageSource);
     return messageSource;
+  }
+
+  protected ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
+    return getNewExtensionMessageSourceInstance(retryPolicyTemplate);
   }
 
 }

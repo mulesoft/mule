@@ -53,11 +53,12 @@ public class RetryWorker implements Runnable {
       return;
     }
     try {
+      logger.error("Inside run");
       context.setDelegateContext(delegate.execute(callback, workManager));
     } catch (Exception e) {
+      logger.error("Inside exception");
       this.exception = e;
       logger.error("Error retrying work", e);
-
     }
   }
 
