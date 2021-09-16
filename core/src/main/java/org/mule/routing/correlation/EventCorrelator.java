@@ -156,7 +156,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
-        String groupId = messageInfoMapping.getCorrelationId(event.getMessage());
+        final String groupId = messageInfoMapping.getCorrelationId(event.getMessage());
 
         if (logger.isTraceEnabled())
         {
@@ -234,7 +234,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 // add the incoming event to the group
                 try
                 {
-                    event.getMessage().setCorrelationId(groupId + event.getMessageSourceName());
                     group.addEvent(event);
                 }
                 catch (ObjectStoreException e)

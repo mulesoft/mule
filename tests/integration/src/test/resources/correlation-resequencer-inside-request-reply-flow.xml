@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="vmreqrespFlow">
+        <vm:inbound-endpoint path="splitter" exchange-pattern="request-response"/>
+        <request-reply>
+            <processor-chain>
+                <collection-splitter enableCorrelation="ALWAYS"/>
+                <vm:outbound-endpoint exchange-pattern="one-way" path="vmq"/>
+            </processor-chain>
+            <vm:inbound-endpoint exchange-pattern="one-way" path="vmq1">
+                <resequencer/>
+                <collection-aggregator/>
+            </vm:inbound-endpoint>
+        </request-reply>
+    </flow>
+
+    <flow name="vmreqrespFlow1">
+        <vm:inbound-endpoint exchange-pattern="one-way" path="vmq"/>
+        <echo-component/>
+    </flow>
+</mule>
