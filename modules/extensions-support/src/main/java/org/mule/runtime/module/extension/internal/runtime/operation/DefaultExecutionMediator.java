@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.lang.System.currentTimeMillis;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.getNearestRegion;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -24,10 +27,15 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.threading.OperationThreadSnapshotCollector;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -67,6 +75,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ResultTransformer resultTransformer;
   private final ClassLoader executionClassLoader;
   private final ComponentModel operationModel;
+  private final ProfilingDataProducer<ComponentExecutionProfilingEventContext> threadReleaseDataProducer;
 
   private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
 
@@ -79,21 +88,15 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   M operationModel,
                                   InterceptorChain interceptorChain,
                                   ErrorTypeRepository typeRepository,
-                                  ClassLoader executionClassLoader) {
-    this(extensionModel, operationModel, interceptorChain, typeRepository, executionClassLoader, null);
-  }
-
-  public DefaultExecutionMediator(ExtensionModel extensionModel,
-                                  M operationModel,
-                                  InterceptorChain interceptorChain,
-                                  ErrorTypeRepository typeRepository,
                                   ClassLoader executionClassLoader,
-                                  ResultTransformer resultTransformer) {
+                                  ResultTransformer resultTransformer,
+                                  ProfilingDataProducer<ComponentExecutionProfilingEventContext> threadReleaseDataProducer) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
+    this.threadReleaseDataProducer = threadReleaseDataProducer;
 
     // The effective execution ClassLoader will be a composition with the extension ClassLoader being used first and
     // then the default execution ClassLoader which may depend on the execution context.
@@ -228,9 +231,22 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       try {
         executor.execute(context, callback);
       } finally {
+        profileThreadRelease(context);
         setContextClassLoader(currentThread, executionClassLoader, currentClassLoader);
       }
     }
+  }
+
+  private void profileThreadRelease(ExecutionContextAdapter<M> context) {
+    if (threadReleaseDataProducer == null) {
+      return;
+    }
+
+    String threadName = Thread.currentThread().getName();
+    String artifactId = getArtifactId(context.getMuleContext());
+    String artifactType = getArtifactType(context.getMuleContext());
+    threadReleaseDataProducer.triggerProfilingEvent(new DefaultComponentExecutionProfilingEventContext(context.getEvent(), context
+        .getComponent().getLocation(), threadName, artifactId, artifactType, currentTimeMillis()));
   }
 
   private Throwable handleError(Throwable original, ExecutionContextAdapter context) {
