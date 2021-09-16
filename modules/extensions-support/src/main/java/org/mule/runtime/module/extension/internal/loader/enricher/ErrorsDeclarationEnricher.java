@@ -75,12 +75,12 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
         ErrorTypeDefinition<?>[] errorTypes = (ErrorTypeDefinition<?>[]) errorAnnotation.get().value().getEnumConstants();
 
         if (errorTypes.length > 0) {
-           ErrorsModelFactory operationErrorModelDescriber = new ErrorsModelFactory(errorTypes, extensionNamespace);
-           operationErrorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
+          ErrorsModelFactory operationErrorModelDescriber = new ErrorsModelFactory(errorTypes, extensionNamespace);
+          operationErrorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
 
-           errorOperations.stream().forEach(pair -> registerOperationErrorTypes(pair.getSecond(), pair.getFirst(),
-           operationErrorModelDescriber, errorTypes,
-           extensionElement));
+          errorOperations.stream().forEach(pair -> registerOperationErrorTypes(pair.getSecond(), pair.getFirst(),
+                                                                               operationErrorModelDescriber, errorTypes,
+                                                                               extensionElement));
         } else {
           handleNoErrorTypes(extensionElement, errorOperations);
         }

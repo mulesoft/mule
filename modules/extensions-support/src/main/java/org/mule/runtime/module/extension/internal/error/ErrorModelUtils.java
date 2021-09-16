@@ -13,12 +13,12 @@ public final class ErrorModelUtils {
 
   public static boolean isMuleError(ErrorTypeDefinition errorType) {
     if (errorType instanceof LegacyErrorTypeDefinitionAdapter) {
-      return ((LegacyErrorTypeDefinitionAdapter<?>) errorType).getDelegate() instanceof org.mule.runtime.extension.api.error.MuleErrors;
+      return ((LegacyErrorTypeDefinitionAdapter<?>) errorType)
+          .getDelegate() instanceof org.mule.runtime.extension.api.error.MuleErrors;
     }
 
     return errorType instanceof MuleErrors;
   }
 
-  private ErrorModelUtils() {
-  }
+  private ErrorModelUtils() {}
 }
