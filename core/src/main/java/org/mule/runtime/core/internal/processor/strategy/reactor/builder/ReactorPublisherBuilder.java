@@ -4,17 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
-import static org.mule.runtime.api.profiling.context.threading.ThreadProfilingContext.currentThreadProfilingContext;
+import static org.mule.runtime.api.profiling.context.threading.ThreadProfilingContext.getCurrentThreadProfilingContext;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.context.OperationMetadata;
+import org.mule.runtime.api.profiling.context.ComponentMetadata;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -218,8 +217,11 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
   static void triggerComponentExecutionProfilingEvent(ComponentLocation location, String artifactId, String artifactType,
                                                       ProfilingDataProducer<ComponentExecutionProfilingEventContext> dataProducer,
                                                       CoreEvent e) {
-    // This could be done only once but might need refactoring (better to leave it for the granularity discussion)
-    currentThreadProfilingContext().setRunningComponentMetadata(new OperationMetadata(location));
+    // TODO: This could be done only once but might need refactoring (better to leave it for the granularity discussion).
+    // TODO: Add a feature flag ever "thread traceability" or something like that (always false by default).
+    if (getCurrentThreadProfilingContext() != null) {
+      getCurrentThreadProfilingContext().setRunningComponentMetadata(new ComponentMetadata(location));
+    }
     dataProducer.triggerProfilingEvent(
                                        new DefaultComponentExecutionProfilingEventContext(e,
                                                                                           location,
