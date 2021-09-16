@@ -7,10 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromExtension;
 
@@ -31,8 +33,10 @@ import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -41,11 +45,11 @@ public final class JavaErrorModelParserUtils {
 
   public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element) {
     return getInfoFromExtension(element,
-                                ErrorTypes.class,
-                                org.mule.sdk.api.annotation.error.ErrorTypes.class,
-                                errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()),
-                                errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()))
-                                    .orElse(new LinkedList<>());
+        ErrorTypes.class,
+        org.mule.sdk.api.annotation.error.ErrorTypes.class,
+        errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()),
+        errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()))
+        .orElse(new LinkedList<>());
   }
 
   public static List<ErrorModelParser> parseOperationErrorModels(ExtensionModelParser extensionParser,
@@ -53,12 +57,12 @@ public final class JavaErrorModelParserUtils {
                                                                  OperationElement operation) {
     return getThrowsDeclaration(operation, extensionElement)
         .flatMap(withThrows -> getInfoFromAnnotation(
-                                                     withThrows,
-                                                     Throws.class,
-                                                     org.mule.sdk.api.annotation.error.Throws.class,
-                                                     ann -> parseErrorTypeProviders(ann.value(), extensionParser),
-                                                     ann -> parseErrorTypeProviders(ann.value(), extensionParser),
-                                                     dualThrowsException(operation)))
+            withThrows,
+            Throws.class,
+            org.mule.sdk.api.annotation.error.Throws.class,
+            ann -> parseErrorTypeProviders(ann.value(), extensionParser),
+            ann -> parseErrorTypeProviders(ann.value(), extensionParser),
+            dualThrowsException(operation)))
         .orElse(new LinkedList<>());
   }
 
@@ -69,9 +73,10 @@ public final class JavaErrorModelParserUtils {
   }
 
 
-  private static List<ErrorModelParser> parseErrorTypeDefinitions(Class<? extends Enum<?>> typeDefClass) {
+  private static List<ErrorModelParser> parseErrorTypeDefinitions(Class<? extends Enum> typeDefClass) {
+    Map<ErrorTypeDefinition, ErrorModelParser> cycleControls = new HashMap<>(emptyMap());
     return Stream.of(typeDefClass.getEnumConstants())
-        .map(def -> toParser(LegacyErrorTypeDefinitionAdapter.from(def)))
+        .map(def -> toParser(LegacyErrorTypeDefinitionAdapter.from(def), cycleControls))
         .collect(toList());
   }
 
@@ -88,19 +93,24 @@ public final class JavaErrorModelParserUtils {
 
     if (!errorDefinitionClass.equals(extensionErrorType) && !errorDefinitionClass.getSuperclass().equals(extensionErrorType)) {
       throw new IllegalModelDefinitionException(format("Invalid operation throws detected, the extension declared" +
-          " to throw errors of %s type, but an error of %s type has been detected",
-                                                       extensionErrorType, error.getClass()));
+              " to throw errors of %s type, but an error of %s type has been detected",
+          extensionErrorType, error.getClass()));
     }
   }
 
-  private static ErrorModelParser toParser(ErrorTypeDefinition<?> errorTypeDefinition) {
-    return new JavaErrorModelParser(
-                                    errorTypeDefinition,
-                                    errorTypeDefinition.getParent().map(p -> toParser(p)));
+  private static ErrorModelParser toParser(ErrorTypeDefinition<?> errorTypeDefinition,
+                                           Map<ErrorTypeDefinition, ErrorModelParser> cycleControl) {
+    JavaErrorModelParser parser = new JavaErrorModelParser(errorTypeDefinition, isMuleError(errorTypeDefinition));
+    cycleControl.put(errorTypeDefinition, parser);
+    parser.setParent(errorTypeDefinition.getParent()
+        .map(p -> cycleControl.computeIfAbsent(p, key -> toParser(p, cycleControl))));
+
+    return parser;
   }
 
   private static List<ErrorModelParser> parseErrorTypeProviders(Class<?>[] providerClasses,
                                                                 ExtensionModelParser extensionParser) {
+    Map<ErrorTypeDefinition, ErrorModelParser> cycleControl = new HashMap<>();
     return Stream.of(providerClasses)
         .flatMap(providerClass -> {
           try {
@@ -109,7 +119,7 @@ public final class JavaErrorModelParserUtils {
             return errorTypeProvider.getErrorTypes().stream()
                 .map(error -> {
                   validateOperationThrows(extensionParser, error);
-                  return toParser(error);
+                  return toParser(error, cycleControl);
                 });
           } catch (InstantiationException | IllegalAccessException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not create ErrorTypeProvider of type "
@@ -140,11 +150,12 @@ public final class JavaErrorModelParserUtils {
 
   private static Supplier<IllegalModelDefinitionException> dualThrowsException(OperationElement operation) {
     return () -> new IllegalOperationModelDefinitionException(
-                                                              format("Operation '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                     operation.getAlias(),
-                                                                     Throws.class.getName(),
-                                                                     org.mule.sdk.api.annotation.error.Throws.class.getName()));
+        format("Operation '%s' is annotated with '@%s' and '@%s' at the same time",
+            operation.getAlias(),
+            Throws.class.getName(),
+            org.mule.sdk.api.annotation.error.Throws.class.getName()));
   }
 
-  private JavaErrorModelParserUtils() {}
+  private JavaErrorModelParserUtils() {
+  }
 }

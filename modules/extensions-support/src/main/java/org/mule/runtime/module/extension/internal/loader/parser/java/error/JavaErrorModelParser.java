@@ -6,28 +6,41 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
+import static java.util.Objects.hash;
+import static java.util.Optional.empty;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getDeclarationClass;
 
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class JavaErrorModelParser implements ErrorModelParser {
 
-  private final Optional<ErrorModelParser> parent;
+  private final boolean muleError;
   private final ErrorTypeDefinition<?> errorTypeDefinition;
   private final Class<?> errorTypeDefinitionDeclarationClass;
+  private Optional<ErrorModelParser> parent = empty();
 
-  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, Optional<ErrorModelParser> parent) {
+  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, boolean muleError) {
     this.errorTypeDefinition = errorTypeDefinition;
-    this.parent = parent;
+    this.muleError = muleError;
     errorTypeDefinitionDeclarationClass = getDeclarationClass(errorTypeDefinition);
   }
 
   @Override
   public String getType() {
     return errorTypeDefinition.getType();
+  }
+
+  @Override
+  public boolean isMuleError() {
+    return muleError;
+  }
+
+  public void setParent(Optional<ErrorModelParser> parent) {
+    this.parent = parent;
   }
 
   @Override
@@ -41,5 +54,22 @@ public class JavaErrorModelParser implements ErrorModelParser {
 
   public Class<?> getErrorTypeDefinitionDeclarationClass() {
     return errorTypeDefinitionDeclarationClass;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    JavaErrorModelParser that = (JavaErrorModelParser) o;
+    return Objects.equals(errorTypeDefinitionDeclarationClass, that.errorTypeDefinitionDeclarationClass);
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(errorTypeDefinitionDeclarationClass);
   }
 }

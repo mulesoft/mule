@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.error;
 
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
 import static org.mule.sdk.api.error.MuleErrors.ANY;
@@ -19,7 +20,6 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
-import org.mule.sdk.api.error.MuleErrors;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -165,14 +165,6 @@ public class ErrorsModelFactory {
 
   private String toIdentifier(ErrorTypeDefinition errorTypeDefinition) {
     return getErrorNamespace(errorTypeDefinition) + ":" + errorTypeDefinition.getType();
-  }
-
-  private boolean isMuleError(ErrorTypeDefinition errorType) {
-    if (errorType instanceof LegacyErrorTypeDefinitionAdapter) {
-      return ((LegacyErrorTypeDefinitionAdapter<?>) errorType).getDelegate() instanceof org.mule.runtime.extension.api.error.MuleErrors;
-    }
-
-    return errorType instanceof MuleErrors;
   }
 
   private String getErrorNamespace(ErrorTypeDefinition errorType) {

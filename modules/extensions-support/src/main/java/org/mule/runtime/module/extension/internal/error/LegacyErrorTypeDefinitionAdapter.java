@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements ErrorTypeDefinition<E> {
@@ -47,5 +48,22 @@ public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements Erro
 
   public org.mule.runtime.extension.api.error.ErrorTypeDefinition<E> getDelegate() {
     return delegate;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    LegacyErrorTypeDefinitionAdapter<?> that = (LegacyErrorTypeDefinitionAdapter<?>) o;
+    return delegate == that.delegate;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(delegate);
   }
 }

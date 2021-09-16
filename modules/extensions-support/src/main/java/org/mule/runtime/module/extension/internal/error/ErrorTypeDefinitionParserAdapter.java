@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.error;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class ErrorTypeDefinitionParserAdapter<E extends Enum<E>> implements ErrorTypeDefinition<E> {
@@ -27,5 +28,22 @@ public class ErrorTypeDefinitionParserAdapter<E extends Enum<E>> implements Erro
   @Override
   public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
     return parser.getParent().map(ErrorTypeDefinitionParserAdapter::new);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ErrorTypeDefinitionParserAdapter<?> that = (ErrorTypeDefinitionParserAdapter<?>) o;
+    return Objects.equals(parser, that.parser);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(parser);
   }
 }

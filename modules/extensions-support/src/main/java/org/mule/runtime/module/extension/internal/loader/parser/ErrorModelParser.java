@@ -12,5 +12,7 @@ public interface ErrorModelParser {
 
   String getType();
 
+  boolean isMuleError();
+
   Optional<ErrorModelParser> getParent();
 }
