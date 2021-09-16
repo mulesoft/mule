@@ -167,8 +167,16 @@ public class ErrorsModelFactory {
     return getErrorNamespace(errorTypeDefinition) + ":" + errorTypeDefinition.getType();
   }
 
+  private boolean isMuleError(ErrorTypeDefinition errorType) {
+    if (errorType instanceof LegacyErrorTypeDefinitionAdapter) {
+      return ((LegacyErrorTypeDefinitionAdapter<?>) errorType).getDelegate() instanceof org.mule.runtime.extension.api.error.MuleErrors;
+    }
+
+    return errorType instanceof MuleErrors;
+  }
+
   private String getErrorNamespace(ErrorTypeDefinition errorType) {
-    return errorType instanceof MuleErrors ? MULE : extensionNamespace;
+    return isMuleError(errorType) ? MULE : extensionNamespace;
   }
 
   private void addType(ErrorTypeDefinition<?> errorType, Graph<ErrorTypeDefinition, DefaultEdge> graph) {
