@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
@@ -225,7 +226,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       if (resultTransformer != null) {
         callback = new TransformingExecutionCallbackDecorator(callback, context, resultTransformer);
       }
-      final Thread currentThread = Thread.currentThread();
+      final Thread currentThread = currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
       setContextClassLoader(currentThread, currentClassLoader, executionClassLoader);
       try {
@@ -242,7 +243,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return;
     }
 
-    String threadName = Thread.currentThread().getName();
+    String threadName = currentThread().getName();
     String artifactId = getArtifactId(context.getMuleContext());
     String artifactType = getArtifactType(context.getMuleContext());
     threadReleaseDataProducer.triggerProfilingEvent(new DefaultComponentExecutionProfilingEventContext(context.getEvent(), context
