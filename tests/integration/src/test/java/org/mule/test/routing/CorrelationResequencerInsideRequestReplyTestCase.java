@@ -6,7 +6,12 @@
  */
 package org.mule.test.routing;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.instanceOf;
+
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleMessage;
@@ -14,7 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -22,15 +27,19 @@ public class CorrelationResequencerInsideRequestReplyTestCase extends Functional
 {
 
     @Parameters
-    protected String getConfigFile() { return  "correlation-resequencer-inside-request-reply-flow.xml"; }
+    protected String getConfigFile()
+    {
+        return "correlation-resequencer-inside-request-reply-flow.xml";
+    }
 
     @Test
     public void testResequencer() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage request = new DefaultMuleMessage(Arrays.asList("a", "b", "c", "d", "e", "f"), (Map<String,Object>)null, muleContext);
+        List<String> payload = asList("a", "b", "c", "d", "e", "f");
+        MuleMessage request = new DefaultMuleMessage(payload, (Map<String,Object>)null, muleContext);
         MuleMessage message = client.send("vm://splitter", request);
 
-        assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), message.getPayload());
+        assertThat((List<String>) message.getPayload(), equalTo(payload));
     }
 }
