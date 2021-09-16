@@ -9,7 +9,9 @@ package org.mule.runtime.http.api.server;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -29,8 +31,12 @@ public class HttpServerConfiguration {
   private final Supplier<Scheduler> schedulerSupplier;
   private final long readTimeout;
 
-  private static final long DEFAULT_READ_TIMEOUT_MILLIS = 30000;
+  private static final long DEFAULT_READ_TIMEOUT_MILLIS = 30000L;
 
+  /**
+   * @deprecated since 4.5.0, use {@link #HttpServerConfiguration(String, int, TlsContextFactory, boolean, int, String, Supplier, long)} instead.
+   */
+  @Deprecated
   HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
                           int connectionIdleTimeout, String name, Supplier<Scheduler> schedulerSupplier) {
     this(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout, name, schedulerSupplier,
@@ -93,7 +99,7 @@ public class HttpServerConfiguration {
     private int connectionIdleTimeout = 30000;
     private Supplier<Scheduler> schedulerSupplier;
     private String name;
-    private long readTimeout = 30000;
+    private long readTimeout = DEFAULT_READ_TIMEOUT_MILLIS;
 
     /**
      * Defines the host where the requests will be sent to the {@link HttpServer}. Must be provided.
