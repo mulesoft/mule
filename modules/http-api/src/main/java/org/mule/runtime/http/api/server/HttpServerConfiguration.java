@@ -34,7 +34,8 @@ public class HttpServerConfiguration {
   private static final long DEFAULT_READ_TIMEOUT_MILLIS = 30000L;
 
   /**
-   * @deprecated since 4.5.0, use {@link #HttpServerConfiguration(String, int, TlsContextFactory, boolean, int, String, Supplier, long)} instead.
+   * @deprecated since 4.5.0, use
+   *             {@link #HttpServerConfiguration(String, int, TlsContextFactory, boolean, int, String, Supplier, long)} instead.
    */
   @Deprecated
   HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
