@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -23,6 +24,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Exten
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -96,13 +98,16 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   private void parseErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
-    initErrorModelFactorySupplier(parser, declarer);
-    new ErrorsModelFactory(getExtensionsNamespace(declarer.getDeclaration())).getErrorModels().forEach(declarer::withErrorModel);
-    createErrorModelFactory().getErrorModels().forEach(declarer::withErrorModel);
+    final String ns = getExtensionsNamespace(declarer.getDeclaration());
+    Set<ErrorModel> errors = new ErrorsModelFactory(ns).getErrorModels();
+
+    initErrorModelFactorySupplier(parser, ns);
+    errors.addAll(createErrorModelFactory().getErrorModels());
+    declarer.getDeclaration().getErrorModels().addAll(errors);
   }
 
-  private void initErrorModelFactorySupplier(ExtensionModelParser parser, ExtensionDeclarer declarer) {
-    errorsModelFactorySupplier = () -> new ErrorsModelFactory(parser.getErrorModelParsers(), getExtensionsNamespace(declarer.getDeclaration()));
+  private void initErrorModelFactorySupplier(ExtensionModelParser parser, String namespace) {
+    errorsModelFactorySupplier = () -> new ErrorsModelFactory(parser.getErrorModelParsers(), namespace);
   }
 
   OperationModelLoaderDelegate getOperationLoaderDelegate() {
