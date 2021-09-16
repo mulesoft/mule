@@ -50,7 +50,7 @@ public class SingletonsAreNotRepeated implements Validation {
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return topLevelElement()
-        .and(currentElemement(componentModel -> componentModel.getModel(EnrichableModel.class)
+        .and(currentElemement(component -> component.getModel(EnrichableModel.class)
             .flatMap(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class)
                 .map(smp -> isApplicable(smp)))
             .orElse(false)));
