@@ -195,8 +195,11 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     public ReactorPublisherBuilder<Flux<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
                                                                                    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                                                    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
-      // This could be done only once but might need refactoring (better to leave it for the granularity discussion)
-      currentThreadProfilingContext().setRunningOperationMetadata(new OperationMetadata(location));
+      // TODO: This could be done only once but might need refactoring (better to leave it for the granularity discussion).
+      // TODO: Add a feature flag ever "thread traceability" or something like that (always false by default).
+      if (getCurrentThreadProfilingContext() != null) {
+        getCurrentThreadProfilingContext().setRunningComponentMetadata(new ComponentMetadata(location));
+      }
       flux = profilingService.enrichWithProfilingEventFlux(flux, dataProducer, transformer);
       return this;
     }
