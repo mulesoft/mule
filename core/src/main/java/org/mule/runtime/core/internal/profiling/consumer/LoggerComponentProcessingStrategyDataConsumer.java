@@ -71,7 +71,7 @@ public class LoggerComponentProcessingStrategyDataConsumer
     eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, profilingEventContext.getCorrelationId());
     eventMap
         .put(PROCESSING_THREAD_STATE,
-             profilingEventContext.getThreadState().map(gson::toJson).orElse("UNAVAILABLE (threading profiling is disabled)"));
+             profilingEventContext.getThreadSnapshot().map(gson::toJson).orElse("UNAVAILABLE (threading profiling is disabled)"));
     profilingEventContext.getLocation().map(loc -> eventMap.put(LOCATION, loc.getLocation()));
 
     return eventMap;
