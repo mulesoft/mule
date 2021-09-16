@@ -123,6 +123,36 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
         }
     }
 
+    public void stop(String className) {
+        Class<?> clazz = null;
+        try
+        {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e)
+        {
+            logger.warn("Core extension not loaded: " + className, e);
+        }
+        if (clazz == null)
+        {
+            return;
+        }
+        for (MuleCoreExtension extension: orderedCoreExtensions)
+        {
+            if (clazz.isInstance(extension))
+            {
+                try
+                {
+                    extension.stop();
+                    logger.debug("Core extension '" + extension.toString() + "' stopped");
+                }
+                catch (Throwable e)
+                {
+                    logger.warn("Error stopping core extension: " + extension.getName(), e);
+                }
+            }
+        }
+    }
+
     private void initializeCoreExtensions() throws InitialisationException, DefaultMuleException
     {
         logger.info("Initializing core extensions");
