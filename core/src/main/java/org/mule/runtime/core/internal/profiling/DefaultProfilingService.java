@@ -8,6 +8,9 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static java.util.Optional.empty;
+import static java.lang.String.format;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.COMPONENT_THREAD_RELEASE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
@@ -16,8 +19,6 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
-import static java.util.Optional.empty;
-import static java.lang.String.format;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
@@ -76,6 +77,9 @@ public class DefaultProfilingService extends AbstractProfilingService {
           put(STARTING_OPERATION_EXECUTION,
               new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this,
                                                           STARTING_OPERATION_EXECUTION, operationThreadSnapshotCollector));
+          put(COMPONENT_THREAD_RELEASE,
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, COMPONENT_THREAD_RELEASE,
+                                                          operationThreadSnapshotCollector));
                                                                    STARTING_OPERATION_EXECUTION));
           put(EXTENSION_PROFILING_EVENT,
               new ExtensionProfilingDataProducer(DefaultProfilingService.this,
