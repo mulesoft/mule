@@ -48,6 +48,6 @@ public class CoreValidationsProvider implements ValidationsProvider {
 
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
-    return asList(new ImportedFilesExist());
+    return asList(new ImportValidTarget());
   }
 }

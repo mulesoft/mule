@@ -36,14 +36,14 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * Import elements in config files point to actual files and can be resolved.
+ * Import elements in config files point to actual and valid files.
  * <p>
  * This validation doesn't do the actual resource resolution, but instead generates the failed validation for any errors that
  * happened during the resolution of the imports during the artifact parsing.
  * 
  * @since 4.5
  */
-public class ImportedFilesExist implements ArtifactValidation {
+public class ImportValidTarget implements ArtifactValidation {
 
   @Override
   public String getName() {
@@ -52,7 +52,7 @@ public class ImportedFilesExist implements ArtifactValidation {
 
   @Override
   public String getDescription() {
-    return "Import elements in config files point to actual files and can be resolved.";
+    return "Import elements in config files point to actual and valid files.";
   }
 
   @Override
