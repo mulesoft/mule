@@ -14,7 +14,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -38,7 +37,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
                          HasOperationDeclarer ownerDeclarer,
-                         ExtensionModelParser extensionModelParser,
                          List<OperationModelParser> operations) {
 
     for (OperationModelParser parser : operations) {
@@ -106,7 +104,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private void parseErrorModels(OperationDeclarer operation, OperationModelParser parser) {
     final ErrorsModelFactory errorsModelFactory = loader.createErrorModelFactory();
-    errorsModelFactory.getErrorModels().forEach(operation::withErrorModel);
     parser.getErrorModelParsers().stream()
         .map(errorsModelFactory::getErrorModel)
         .forEach(operation::withErrorModel);

@@ -87,7 +87,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
     if (!isEmpty(extensionElement.getConfigurations())) {
-      operationLoaderDelegate.declareOperations(declarer, declarer, parser, parser.getOperationModelParsers());
+      operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
       functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
       sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
     }

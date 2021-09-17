@@ -45,8 +45,7 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       loader.getParameterModelsLoaderDelegate().declare(configurationDeclarer, configParser.getParameterGroupParsers());
 
-      getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, extensionModelParser,
-                                                     configParser.getOperationParsers());
+      getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configParser.getOperationParsers());
       getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configParser.getSourceModelParsers());
       getFunctionModelLoaderDelegate().declareFunctions(declarer, configParser.getFunctionModelParsers());
       getConnectionProviderModelLoaderDelegate().declareConnectionProviders(

@@ -135,7 +135,13 @@ public class ErrorsModelFactory {
    * @return The correspondent {@link ErrorModel} for a given {@link ErrorModelParser}
    */
   public ErrorModel getErrorModel(ErrorModelParser errorModelParser) {
-    return errorModelMap.get(toIdentifier(toErrorTypeDefinition(errorModelParser)));
+//    return errorModelMap.get(toIdentifier(toErrorTypeDefinition(errorModelParser)));
+    String errorKey = toIdentifier(toErrorTypeDefinition(errorModelParser));
+    if (errorModelMap.containsKey(errorKey)) {
+      return errorModelMap.get(errorKey);
+    }
+
+    return toErrorModel(toErrorTypeDefinition(errorModelParser), errorModelMap);
   }
 
   private DefaultDirectedGraph<ErrorTypeDefinition, DefaultEdge> toGraph(ErrorTypeDefinition<?>[] errorTypesEnum) {
