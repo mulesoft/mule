@@ -46,7 +46,7 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
   }
 
   @After
-  protected void restoreLogger() throws Exception {
+  public void restoreLogger() throws Exception {
     setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 

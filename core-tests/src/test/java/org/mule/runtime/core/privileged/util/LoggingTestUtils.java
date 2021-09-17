@@ -43,6 +43,7 @@ public class LoggingTestUtils {
         when(logger.isErrorEnabled()).thenReturn(true);
         doAnswer(answer).when(logger).error(anyString());
         doAnswer(answer).when(logger).error(anyString(), (Object) any());
+        doAnswer(answer).when(logger).error(anyString(), (Throwable) any());
         doAnswer(answer).when(logger).error(anyString(), any(), any());
         doAnswer(answer).when(logger).error(anyString(), (Object[]) any());
         break;
