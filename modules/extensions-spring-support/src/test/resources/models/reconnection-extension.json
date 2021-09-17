@@ -3623,7 +3623,6 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": true,
-              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -3638,7 +3637,6 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -3664,7 +3662,6 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
           "stereotype": {
             "type": "FAILING-CONNECTION",
             "namespace": "RECONNECTION",
@@ -3681,8 +3678,7 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "Reconnection",
-                      "infrastructureType": {}
+                      "typeId": "Reconnection"
                     },
                     "fields": [
                       {
@@ -3708,15 +3704,13 @@
                         "model": {
                           "type": "Union",
                           "annotations": {
-                            "typeId": "ReconnectionStrategy",
-                            "infrastructureType": {}
+                            "typeId": "ReconnectionStrategy"
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
-                                "typeId": "reconnect",
-                                "infrastructureType": {}
+                                "typeId": "reconnect"
                               },
                               "fields": [
                                 {
@@ -3788,8 +3782,7 @@
                             {
                               "type": "Object",
                               "annotations": {
-                                "typeId": "reconnect-forever",
-                                "infrastructureType": {}
+                                "typeId": "reconnect-forever"
                               },
                               "fields": [
                                 {
@@ -3855,7 +3848,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -3871,7 +3863,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -3955,7 +3946,6 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
-          "semanticTerms": [],
           "stereotype": {
             "type": "FAILING-CONNECTION-SOURCE",
             "namespace": "RECONNECTION",
@@ -3976,19 +3966,7 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
                     },
                     "fields": []
                   },
@@ -3996,7 +3974,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4020,7 +3997,6 @@
                       }
                     }
                   ],
-                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4034,7 +4010,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "defaultValue": false,
                   "role": "BEHAVIOUR",
@@ -4051,7 +4026,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -4061,8 +4035,7 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "RedeliveryPolicy",
-                      "infrastructureType": {}
+                      "typeId": "RedeliveryPolicy"
                     },
                     "fields": [
                       {
@@ -4177,7 +4150,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4193,7 +4165,6 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -4229,15 +4200,13 @@
                     "format": "java",
                     "type": "Union",
                     "annotations": {
-                      "typeId": "ReconnectionStrategy",
-                      "infrastructureType": {}
+                      "typeId": "ReconnectionStrategy"
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect",
-                          "infrastructureType": {}
+                          "typeId": "reconnect"
                         },
                         "fields": [
                           {
@@ -4309,8 +4278,7 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect-forever",
-                          "infrastructureType": {}
+                          "typeId": "reconnect-forever"
                         },
                         "fields": [
                           {
@@ -4368,7 +4336,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -4384,7 +4351,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
