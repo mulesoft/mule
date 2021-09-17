@@ -235,7 +235,7 @@ public class MuleContainer
     public void stop() throws MuleException
     {
         if (coreExtensionManager instanceof DefaultMuleCoreExtensionManager) {
-            ((DefaultMuleCoreExtensionManager) coreExtensionManager).stop("com.mulesoft.mule.plugin.PluginCoreExtension");
+            ((DefaultMuleCoreExtensionManager) coreExtensionManager).stopDeploymentServiceAwareExtensions();
         }
 
         if (deploymentService != null)

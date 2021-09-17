@@ -123,22 +123,10 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
         }
     }
 
-    public void stop(String className) {
-        Class<?> clazz = null;
-        try
-        {
-            clazz = Class.forName(className);
-        } catch (ClassNotFoundException e)
-        {
-            logger.warn("Core extension not loaded: " + className, e);
-        }
-        if (clazz == null)
-        {
-            return;
-        }
+    public void stopDeploymentServiceAwareExtensions() {
         for (MuleCoreExtension extension: orderedCoreExtensions)
         {
-            if (clazz.isInstance(extension))
+            if (extension instanceof DeploymentServiceAware)
             {
                 try
                 {
