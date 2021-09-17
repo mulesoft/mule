@@ -100,7 +100,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.5.0-SNAPSHOT",
+    "version": "4.4.1-SNAPSHOT",
     "labels": {
       "connectionProvider": "long-disconnection",
       "system": "reconnection",
