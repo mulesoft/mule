@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.enricher;
+package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
@@ -18,9 +18,9 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.EXTENSION;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.OPERATION;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getNamedObject;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -33,6 +33,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergErrors;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -44,7 +45,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
+public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
 
   private static final String HEISENBERG = "HEISENBERG";
   private static final String MULE_NAMESPACE = "MULE";
