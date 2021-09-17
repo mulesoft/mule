@@ -15,6 +15,10 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicy;
  */
 public interface RetryCallback {
 
+  default void onSuccess() {}
+
+  default void onFailure(Throwable t) {}
+
   void doWork(RetryContext context) throws Exception;
 
   String getWorkDescription();

@@ -25,7 +25,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 
-
 /**
  * A RetryPolicyTemplate creates a new {@link RetryPolicy} instance each time the retry goes into effect, thereby resetting any
  * state the policy may have (counters, etc.)

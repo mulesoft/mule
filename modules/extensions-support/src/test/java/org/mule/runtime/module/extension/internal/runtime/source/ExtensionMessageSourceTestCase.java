@@ -39,7 +39,9 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.sdk.api.runtime.source.Source;
@@ -65,19 +67,25 @@ import org.mockito.InOrder;
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
-  protected static final int TEST_TIMEOUT = 2000;
-  protected static final int TEST_POLL_DELAY = 10;
+  protected static final int TEST_TIMEOUT = 60000;
+  protected static final int TEST_POLL_DELAY = 1000;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        {"primary node only", true},
-        {"all nodes", false}
+        {"primary node only async", true, true}
     });
   }
 
-  public ExtensionMessageSourceTestCase(String name, boolean primaryNodeOnly) {
+  public ExtensionMessageSourceTestCase(String name, boolean primaryNodeOnly, boolean isAsync) {
     this.primaryNodeOnly = primaryNodeOnly;
+    if (isAsync) {
+      this.retryPolicyTemplate = new AsynchronousRetryTemplate(new SimpleRetryPolicyTemplate(0, 2));
+    } else {
+      SimpleRetryPolicyTemplate template = new SimpleRetryPolicyTemplate(0, 2);
+      template.setNotificationFirer(notificationDispatcher);
+      this.retryPolicyTemplate = template;
+    }
   }
 
   @Test
