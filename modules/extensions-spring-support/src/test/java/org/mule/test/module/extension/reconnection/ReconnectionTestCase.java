@@ -16,20 +16,12 @@ import static org.mule.extension.test.extension.reconnection.ReconnectableConnec
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.mule.extension.test.extension.reconnection.FailingConnection;
 import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
 import org.mule.extension.test.extension.reconnection.NonReconnectableSource;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
@@ -50,8 +42,15 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.junit.Test;
 
 public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -60,15 +59,12 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static List<CoreEvent> capturedEvents;
 
-  public static class CaptureProcessor implements Processor {
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      synchronized (capturedEvents) {
-        capturedEvents.add(event);
-      }
-      return event;
-    }
+  public static void resetCounters() {
+    closePagingProviderCalls = 0;
+    getPageCalls = 0;
+    disconnectCalls = 0;
+    SynchronizableSource.first = true;
+    SynchronizableConnection.disconnectionWaitedFullTimeout = false;
   }
 
   @Override
@@ -271,6 +267,20 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     check(TIMEOUT, POLL_DELAY, () -> SynchronizableConnection.disconnectionWaitedFullTimeout);
   }
 
+
+  @Test
+  public void connectionInvalidatedAndRecreatedIfConnectionExceptionOnStart() throws Exception {
+    ((Startable) getFlowConstruct("invalidateConnectionIfConnectionExceptionOnStart")).start();
+    check(10000, 1000, () -> {
+      synchronized (capturedEvents) {
+        return capturedEvents.stream()
+            .flatMap(event -> ((List<FailingConnection>) event.getMessage().getPayload().getValue()).stream())
+            .distinct()
+            .count() == 5;
+      }
+    });
+  }
+
   protected void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
     assertThat(template.isAsync(), is(async));
 
@@ -294,14 +304,6 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     return provider.openCursor();
   }
 
-  public static void resetCounters() {
-    closePagingProviderCalls = 0;
-    getPageCalls = 0;
-    disconnectCalls = 0;
-    SynchronizableSource.first = true;
-    SynchronizableConnection.disconnectionWaitedFullTimeout = false;
-  }
-
   private void clear(List<CoreEvent> list) {
     synchronized (list) {
       list.clear();
@@ -311,6 +313,18 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   private int size(List<CoreEvent> list) {
     synchronized (list) {
       return list.size();
+    }
+  }
+
+
+  public static class CaptureProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      synchronized (capturedEvents) {
+        capturedEvents.add(event);
+      }
+      return event;
     }
   }
 }
