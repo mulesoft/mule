@@ -23,6 +23,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
@@ -137,7 +138,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
     Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> psFlowMessagePassingDataProducer =
         dataProducerFromProfilingService(PS_FLOW_MESSAGE_PASSING);
 
-    // location
+    // Component data
     ComponentLocation location = getLocation(processor);
 
     // General structure of processing strategy publishOn -> operation -> publishOn

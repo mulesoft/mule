@@ -29,14 +29,12 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.threading.OperationThreadSnapshotCollector;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -239,6 +237,8 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   }
 
   private void profileThreadRelease(ExecutionContextAdapter<M> context) {
+    // TODO: Evaluate a feature flag check (could be "thread.profiling" or something like that) and a get of the producer for each
+    // invocation.
     if (threadReleaseDataProducer == null) {
       return;
     }

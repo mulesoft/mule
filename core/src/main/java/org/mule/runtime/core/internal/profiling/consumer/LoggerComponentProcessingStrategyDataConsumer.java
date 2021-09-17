@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.profiling.consumer;
 
 import static com.google.common.collect.ImmutableSet.of;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.COMPONENT_THREAD_RELEASE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -81,7 +82,7 @@ public class LoggerComponentProcessingStrategyDataConsumer
   public Set<ProfilingEventType<ComponentExecutionProfilingEventContext>> getProfilingEventTypes() {
     return of(PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION, OPERATION_EXECUTED,
               PS_FLOW_MESSAGE_PASSING, PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION,
-              FLOW_EXECUTED);
+              FLOW_EXECUTED, COMPONENT_THREAD_RELEASE);
   }
 
   @Override

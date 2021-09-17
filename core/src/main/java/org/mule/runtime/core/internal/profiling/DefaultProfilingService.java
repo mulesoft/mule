@@ -77,6 +77,8 @@ public class DefaultProfilingService extends AbstractProfilingService {
           put(STARTING_OPERATION_EXECUTION,
               new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this,
                                                           STARTING_OPERATION_EXECUTION, operationThreadSnapshotCollector));
+
+          // TODO: Evaluate a feature flag check (could be "thread.profiling" or something like that)
           put(COMPONENT_THREAD_RELEASE,
               new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, COMPONENT_THREAD_RELEASE,
                                                           operationThreadSnapshotCollector));
