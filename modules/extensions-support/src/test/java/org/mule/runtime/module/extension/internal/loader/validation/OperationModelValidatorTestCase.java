@@ -60,9 +60,6 @@ public class OperationModelValidatorTestCase extends AbstractMuleTestCase {
   @Mock(lenient = true)
   private ParameterModel goodParameter;
 
-  @Mock
-
-
   private ExtensionModelValidator validator = new OperationModelValidator();
 
   @Before

@@ -139,7 +139,7 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
     expectedException.expect(IllegalModelDefinitionException.class);
     expectedException.expectMessage(containsString("operation 'someOperation' declares error types which are not defined " +
         "in the extension. Offending errors are [OPERATION]"));
-      loadExtension(HeisenbergWithoutErrorTypes.class);
+    loadExtension(HeisenbergWithoutErrorTypes.class);
   }
 
   @ErrorTypes(CyclicErrorTypes.class)
@@ -165,8 +165,8 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
 
 
   @Extension(name = "Heisenberg")
-//  @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
-//      KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class})
+  // @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
+  // KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class})
   @Operations(OperationWithThrows.class)
   public static class HeisenbergWithoutErrorTypes extends HeisenbergExtension {
 
