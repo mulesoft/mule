@@ -106,7 +106,10 @@
             <!-- provided by mule-maven-client-impl, needed to compile -->
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.mule.tools.maven</groupId>
+            <artifactId>mule-classloader-model</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
