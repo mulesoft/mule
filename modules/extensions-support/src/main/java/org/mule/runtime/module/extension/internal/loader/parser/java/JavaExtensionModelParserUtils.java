@@ -286,42 +286,42 @@ public final class JavaExtensionModelParserUtils {
 
   public static Optional<RequiresEnterpriseLicenseInfo> getRequiresEnterpriseLicenseInfo(ExtensionElement extensionElement) {
     return getAnnotationValueFromElement(extensionElement, "extension", extensionElement.getName(),
-                                           RequiresEnterpriseLicense.class,
-                                           org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class,
-                                           requiresEnterpriseLicense -> new RequiresEnterpriseLicenseInfo(requiresEnterpriseLicense
-                                               .allowEvaluationLicense()),
-                                           requiresEnterpriseLicense -> new RequiresEnterpriseLicenseInfo(requiresEnterpriseLicense
-                                               .allowEvaluationLicense()));
+                                         RequiresEnterpriseLicense.class,
+                                         org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class,
+                                         requiresEnterpriseLicense -> new RequiresEnterpriseLicenseInfo(requiresEnterpriseLicense
+                                             .allowEvaluationLicense()),
+                                         requiresEnterpriseLicense -> new RequiresEnterpriseLicenseInfo(requiresEnterpriseLicense
+                                             .allowEvaluationLicense()));
   }
 
   public static Optional<RequiresEntitlementInfo> getRequiresEntitlementInfo(ExtensionElement extensionElement) {
     return getAnnotationValueFromElement(extensionElement, "extension", extensionElement.getName(), RequiresEntitlement.class,
-                                           org.mule.sdk.api.annotation.license.RequiresEntitlement.class,
-                                           requiresEntitlementAnnotation -> new RequiresEntitlementInfo(requiresEntitlementAnnotation
-                                               .name(),
-                                                                                                        requiresEntitlementAnnotation
-                                                                                                            .description()),
-                                           requiresEntitlementAnnotation -> new RequiresEntitlementInfo(requiresEntitlementAnnotation
-                                               .name(),
-                                                                                                        requiresEntitlementAnnotation
-                                                                                                            .description()));
+                                         org.mule.sdk.api.annotation.license.RequiresEntitlement.class,
+                                         requiresEntitlementAnnotation -> new RequiresEntitlementInfo(requiresEntitlementAnnotation
+                                             .name(),
+                                                                                                      requiresEntitlementAnnotation
+                                                                                                          .description()),
+                                         requiresEntitlementAnnotation -> new RequiresEntitlementInfo(requiresEntitlementAnnotation
+                                             .name(),
+                                                                                                      requiresEntitlementAnnotation
+                                                                                                          .description()));
   }
 
   public static Optional<DisplayModel> getDisplayModel(WithAnnotations element, String elementType, String elementName) {
     Optional<String> summary =
         getAnnotationValueFromElement(element, elementType, elementName, Summary.class,
-                                        org.mule.sdk.api.annotation.param.display.Summary.class,
-                                        Summary::value, org.mule.sdk.api.annotation.param.display.Summary::value);
+                                      org.mule.sdk.api.annotation.param.display.Summary.class,
+                                      Summary::value, org.mule.sdk.api.annotation.param.display.Summary::value);
 
     Optional<String> displayName =
         getAnnotationValueFromElement(element, elementType, elementName, DisplayName.class,
-                                        org.mule.sdk.api.annotation.param.display.DisplayName.class,
-                                        DisplayName::value, org.mule.sdk.api.annotation.param.display.DisplayName::value);
+                                      org.mule.sdk.api.annotation.param.display.DisplayName.class,
+                                      DisplayName::value, org.mule.sdk.api.annotation.param.display.DisplayName::value);
 
     Optional<String> example =
         getAnnotationValueFromElement(element, elementType, elementName, Example.class,
-                                        org.mule.sdk.api.annotation.param.display.Example.class,
-                                        Example::value, org.mule.sdk.api.annotation.param.display.Example::value);
+                                      org.mule.sdk.api.annotation.param.display.Example.class,
+                                      Example::value, org.mule.sdk.api.annotation.param.display.Example::value);
 
     Function<ClassValue, ClassValueModel> getClassValueFromLegacyAnnotation =
         (ClassValue classValue) -> new ClassValueModel(Stream.of(classValue.extendsOrImplements()).filter(p -> !isBlank(p))
@@ -331,8 +331,8 @@ public final class JavaExtensionModelParserUtils {
             .of(classValue.extendsOrImplements()).filter(p -> !isBlank(p)).collect(toList()));
     Optional<ClassValueModel> classValueModel =
         getAnnotationValueFromElement(element, elementType, elementName, ClassValue.class,
-                                        org.mule.sdk.api.annotation.param.display.ClassValue.class,
-                                        getClassValueFromLegacyAnnotation, getClassValueFromSdkAnnotation);
+                                      org.mule.sdk.api.annotation.param.display.ClassValue.class,
+                                      getClassValueFromLegacyAnnotation, getClassValueFromSdkAnnotation);
 
     Function<Path, PathModel> getPathModelFromLegacyAnnotation =
         (Path path) -> new PathModel(path.type(), path.acceptsUrls(), path.location(), path.acceptedFileExtensions());
@@ -341,8 +341,8 @@ public final class JavaExtensionModelParserUtils {
                                              filePath.acceptedFileExtensions());
     Optional<PathModel> pathModel =
         getAnnotationValueFromElement(element, elementType, elementName, Path.class, FilePath.class,
-                                        getPathModelFromLegacyAnnotation,
-                                        getPathModelFromSdkAnnotation);
+                                      getPathModelFromLegacyAnnotation,
+                                      getPathModelFromSdkAnnotation);
 
     Optional<DisplayModel> displayModel;
     if (summary.isPresent() || displayName.isPresent() || example.isPresent() || classValueModel.isPresent()
@@ -363,35 +363,22 @@ public final class JavaExtensionModelParserUtils {
   }
 
   private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
-    Optional<Deprecated> legacyAnnotation = element.getAnnotation(Deprecated.class);
-    Optional<org.mule.sdk.api.annotation.deprecated.Deprecated> sdkAnnotation =
-        element.getAnnotation(org.mule.sdk.api.annotation.deprecated.Deprecated.class);
 
-    Optional<DeprecationModel> deprecationModel;
-    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
-      throw new IllegalParameterModelDefinitionException(format("%s '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                elementType,
-                                                                elementName,
-                                                                Deprecated.class.getName(),
-                                                                org.mule.sdk.api.annotation.deprecated.Deprecated.class
-                                                                    .getName()));
-    } else if (legacyAnnotation.isPresent()) {
-      deprecationModel = legacyAnnotation
-          .map(deprecated -> {
-            String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
-            return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
-          });
-    } else if (sdkAnnotation.isPresent()) {
-      deprecationModel = sdkAnnotation
-          .map(deprecated -> {
-            String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
-            return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
-          });
-    } else {
-      deprecationModel = empty();
-    }
+    Function<Deprecated, DeprecationModel> getDeprecationModelFromLegacyAnnotation = (Deprecated deprecated) -> {
+      String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
+      return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
+    };
 
-    return deprecationModel;
+    Function<org.mule.sdk.api.annotation.deprecated.Deprecated, DeprecationModel> getDeprecationModelFromSdkAnnotation =
+        (org.mule.sdk.api.annotation.deprecated.Deprecated deprecated) -> {
+          String toRemoveIn = isBlank(deprecated.toRemoveIn()) ? null : deprecated.toRemoveIn();
+          return new ImmutableDeprecationModel(deprecated.message(), deprecated.since(), toRemoveIn);
+        };
+
+    return getAnnotationValueFromElement(element, elementType, elementName,
+                                         Deprecated.class,
+                                         org.mule.sdk.api.annotation.deprecated.Deprecated.class,
+                                         getDeprecationModelFromLegacyAnnotation, getDeprecationModelFromSdkAnnotation);
   }
 
   private static ExternalLibraryModel parseExternalLib(ExternalLib externalLibAnnotation) {
@@ -409,13 +396,13 @@ public final class JavaExtensionModelParserUtils {
   }
 
   private static <R extends Annotation, S extends Annotation, T> Optional<T> getAnnotationValueFromElement(
-                                                                                                             WithAnnotations element,
-                                                                                                             String elementType,
-                                                                                                             String elementName,
-                                                                                                             Class<R> legacyAnnotationClass,
-                                                                                                             Class<S> sdkAnnotationClass,
-                                                                                                             Function<R, T> legacyAnnotationMapping,
-                                                                                                             Function<S, T> sdkAnnotationMapping) {
+                                                                                                           WithAnnotations element,
+                                                                                                           String elementType,
+                                                                                                           String elementName,
+                                                                                                           Class<R> legacyAnnotationClass,
+                                                                                                           Class<S> sdkAnnotationClass,
+                                                                                                           Function<R, T> legacyAnnotationMapping,
+                                                                                                           Function<S, T> sdkAnnotationMapping) {
     Optional<R> legacyAnnotation = element.getAnnotation(legacyAnnotationClass);
     Optional<S> sdkAnnotation = element.getAnnotation(sdkAnnotationClass);
 
