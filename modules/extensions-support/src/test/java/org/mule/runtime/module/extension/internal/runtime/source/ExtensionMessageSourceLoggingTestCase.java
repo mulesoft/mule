@@ -16,12 +16,14 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.ERROR;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -66,7 +68,7 @@ public class ExtensionMessageSourceLoggingTestCase extends AbstractExtensionMess
     debugMessages = new ArrayList<>();
     errorMessages = new ArrayList<>();
     oldSource = messageSource;
-    messageSource = getNewExtensionMessageSourceInstance(new SimpleRetryPolicyTemplate(3000, 2));
+    messageSource = getNewExtensionMessageSourceInstance(new AsynchronousRetryTemplate(new SimpleRetryPolicyTemplate(1000, 2)));
     oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
   }
 
@@ -85,10 +87,11 @@ public class ExtensionMessageSourceLoggingTestCase extends AbstractExtensionMess
     doThrow(e).when(source).onStart(any());
     messageSource.onException(e);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verify(source, times(4)).onStop();
+      verifyLogRegex(errorMessages,
+                     "Message source 'source' on flow 'appleFlow' could not be reconnected. Will be shutdown. (.*)");
       return true;
     }));
-    verifyLogMessage(errorMessages, "Message source on flow could not be reconnected. Will be shutdown. ");
+
   }
 
   @Test
