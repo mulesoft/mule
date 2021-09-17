@@ -22,7 +22,6 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
-import org.reactivestreams.Publisher;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
@@ -75,7 +74,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
-import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -97,6 +95,7 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Mono;
@@ -317,7 +316,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     Optional<Publisher<Void>> action = sourceAdapter.getReconnectionAction(exception);
     if (!action.isPresent()) {
-      exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
+      invalidateConnection(exception);
     }
 
     retryScheduler.execute(() -> {
@@ -564,6 +563,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         sourceAdapter.start();
       } catch (Exception e) {
         try {
+          // On connection exception, if the failed connection is present, it must be invalidated before stopping the source. This
+          // warranties that a possible call to connectionProvider.disconnect made on the onStop method of the source, does not
+          // affect the connection's invalidation
+          extractConnectionException(e).ifPresent(connectionException -> invalidateConnection(connectionException));
           stopSource();
         } catch (Exception eStop) {
           e.addSuppressed(eStop);
@@ -743,5 +746,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
    */
   boolean isReconnecting() {
     return reconnecting.get();
+  }
+
+  private void invalidateConnection(ConnectionException exception) {
+    exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
   }
 }
