@@ -217,7 +217,7 @@
         <powermockVersion>2.0.0</powermockVersion>
         <allureReportVersion>2.8.1</allureReportVersion>
         <allure.maven.plugin.version>2.9</allure.maven.plugin.version>
-        <jacoco.version>0.8.6</jacoco.version>
+        <jacoco.version>0.8.2</jacoco.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
