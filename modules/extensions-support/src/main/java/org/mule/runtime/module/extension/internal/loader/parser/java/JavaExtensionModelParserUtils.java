@@ -285,7 +285,7 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static Optional<RequiresEnterpriseLicenseInfo> getRequiresEnterpriseLicenseInfo(ExtensionElement extensionElement) {
-    return getAnnotationValueFromParameter(extensionElement, "extension", extensionElement.getName(),
+    return getAnnotationValueFromElement(extensionElement, "extension", extensionElement.getName(),
                                            RequiresEnterpriseLicense.class,
                                            org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class,
                                            requiresEnterpriseLicense -> new RequiresEnterpriseLicenseInfo(requiresEnterpriseLicense
@@ -295,7 +295,7 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static Optional<RequiresEntitlementInfo> getRequiresEntitlementInfo(ExtensionElement extensionElement) {
-    return getAnnotationValueFromParameter(extensionElement, "extension", extensionElement.getName(), RequiresEntitlement.class,
+    return getAnnotationValueFromElement(extensionElement, "extension", extensionElement.getName(), RequiresEntitlement.class,
                                            org.mule.sdk.api.annotation.license.RequiresEntitlement.class,
                                            requiresEntitlementAnnotation -> new RequiresEntitlementInfo(requiresEntitlementAnnotation
                                                .name(),
@@ -309,17 +309,17 @@ public final class JavaExtensionModelParserUtils {
 
   public static Optional<DisplayModel> getDisplayModel(WithAnnotations element, String elementType, String elementName) {
     Optional<String> summary =
-        getAnnotationValueFromParameter(element, elementType, elementName, Summary.class,
+        getAnnotationValueFromElement(element, elementType, elementName, Summary.class,
                                         org.mule.sdk.api.annotation.param.display.Summary.class,
                                         Summary::value, org.mule.sdk.api.annotation.param.display.Summary::value);
 
     Optional<String> displayName =
-        getAnnotationValueFromParameter(element, elementType, elementName, DisplayName.class,
+        getAnnotationValueFromElement(element, elementType, elementName, DisplayName.class,
                                         org.mule.sdk.api.annotation.param.display.DisplayName.class,
                                         DisplayName::value, org.mule.sdk.api.annotation.param.display.DisplayName::value);
 
     Optional<String> example =
-        getAnnotationValueFromParameter(element, elementType, elementName, Example.class,
+        getAnnotationValueFromElement(element, elementType, elementName, Example.class,
                                         org.mule.sdk.api.annotation.param.display.Example.class,
                                         Example::value, org.mule.sdk.api.annotation.param.display.Example::value);
 
@@ -330,7 +330,7 @@ public final class JavaExtensionModelParserUtils {
         (org.mule.sdk.api.annotation.param.display.ClassValue classValue) -> new ClassValueModel(Stream
             .of(classValue.extendsOrImplements()).filter(p -> !isBlank(p)).collect(toList()));
     Optional<ClassValueModel> classValueModel =
-        getAnnotationValueFromParameter(element, elementType, elementName, ClassValue.class,
+        getAnnotationValueFromElement(element, elementType, elementName, ClassValue.class,
                                         org.mule.sdk.api.annotation.param.display.ClassValue.class,
                                         getClassValueFromLegacyAnnotation, getClassValueFromSdkAnnotation);
 
@@ -340,7 +340,7 @@ public final class JavaExtensionModelParserUtils {
         (FilePath filePath) -> new PathModel(filePath.type(), filePath.acceptsUrls(), filePath.location(),
                                              filePath.acceptedFileExtensions());
     Optional<PathModel> pathModel =
-        getAnnotationValueFromParameter(element, elementType, elementName, Path.class, FilePath.class,
+        getAnnotationValueFromElement(element, elementType, elementName, Path.class, FilePath.class,
                                         getPathModelFromLegacyAnnotation,
                                         getPathModelFromSdkAnnotation);
 
@@ -408,7 +408,7 @@ public final class JavaExtensionModelParserUtils {
     return builder.build();
   }
 
-  private static <R extends Annotation, S extends Annotation, T> Optional<T> getAnnotationValueFromParameter(
+  private static <R extends Annotation, S extends Annotation, T> Optional<T> getAnnotationValueFromElement(
                                                                                                              WithAnnotations element,
                                                                                                              String elementType,
                                                                                                              String elementName,
