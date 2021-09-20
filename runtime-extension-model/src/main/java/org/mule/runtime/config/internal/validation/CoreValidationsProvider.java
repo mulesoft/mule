@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.validation;
 
 import static java.util.Arrays.asList;
 
+import org.mule.runtime.ast.api.validation.ArtifactValidation;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 
@@ -45,5 +46,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
     );
   }
 
-
+  @Override
+  public List<ArtifactValidation> getArtifactValidations() {
+    return asList(new ImportValidTarget());
+  }
 }
