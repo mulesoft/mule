@@ -15,6 +15,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyProfilingUtils.getProcessingStrategyComponentInfoMap;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
@@ -23,8 +24,6 @@ import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEv
 
 import com.google.gson.Gson;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -38,14 +37,6 @@ public class LoggerComponentProcessingStrategyDataConsumer
 
   private static final Logger LOGGER = getLogger(LoggerComponentProcessingStrategyDataConsumer.class);
 
-  public static final String PROFILING_EVENT_TIMESTAMP_KEY = "profilingEventTimestamp";
-  public static final String PROCESSING_THREAD_KEY = "processingThread";
-  public static final String ARTIFACT_ID_KEY = "artifactId";
-  public static final String ARTIFACT_TYPE_KEY = "artifactType";
-  public static final String RUNTIME_CORE_EVENT_CORRELATION_ID = "runtimeCoreEventCorrelationId";
-  public static final String PROFILING_EVENT_TYPE = "profilingEventType";
-  public static final String LOCATION = "location";
-
   private final Gson gson = new Gson();
 
   @Override
@@ -53,24 +44,8 @@ public class LoggerComponentProcessingStrategyDataConsumer
                                ProcessingStrategyProfilingEventContext profilingEventContext) {
     Logger logger = getDataConsumerLogger();
     if (logger.isDebugEnabled()) {
-      logger.debug(gson.toJson(getInfoMap(profilingEventType, profilingEventContext)));
+      logger.debug(gson.toJson(getProcessingStrategyComponentInfoMap(profilingEventType, profilingEventContext)));
     }
-  }
-
-  private Map<String, String> getInfoMap(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
-                                         ProcessingStrategyProfilingEventContext profilingEventContext) {
-    Map<String, String> eventMap = new HashMap<>();
-    eventMap.put(PROFILING_EVENT_TYPE,
-                 profilingEventType.getProfilingEventTypeNamespace() + ":"
-                     + profilingEventType.getProfilingEventTypeIdentifier());
-    eventMap.put(PROFILING_EVENT_TIMESTAMP_KEY, Long.toString(profilingEventContext.getTriggerTimestamp()));
-    eventMap.put(PROCESSING_THREAD_KEY, profilingEventContext.getThreadName());
-    eventMap.put(ARTIFACT_ID_KEY, profilingEventContext.getArtifactId());
-    eventMap.put(ARTIFACT_TYPE_KEY, profilingEventContext.getArtifactType());
-    eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, profilingEventContext.getCorrelationId());
-    profilingEventContext.getLocation().map(loc -> eventMap.put(LOCATION, loc.getLocation()));
-
-    return eventMap;
   }
 
   @Override
