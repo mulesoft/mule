@@ -100,7 +100,7 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
 
   @Override
   public Optional<LayoutModel> getLayoutModel() {
-    return parseLayoutAnnotations(groupParameter, LayoutModel.builder());
+    return parseLayoutAnnotations(groupParameter, LayoutModel.builder(), groupParameter.getName());
   }
 
   @Override

@@ -11,6 +11,7 @@ import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
@@ -107,5 +108,10 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
     return decoratee.getAdditionalModelProperties();
+  }
+
+  @Override
+  public Optional<DisplayModel> getDisplayModel() {
+    return decoratee.getDisplayModel();
   }
 }

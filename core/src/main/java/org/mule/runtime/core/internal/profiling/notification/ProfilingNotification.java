@@ -12,6 +12,7 @@ import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -34,6 +35,7 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   private static final int STARTING_OPERATION_EXECUTION_ID = PROFILING_ACTION_START_RANGE + 6;
   private static final int OPERATION_EXECUTED_ID = PROFILING_ACTION_START_RANGE + 7;
   private static final int PS_FLOW_MESSAGE_PASSING_ID = PROFILING_ACTION_START_RANGE + 8;
+  private static final int COMPONENT_PROFILING_EVENT_ID = PROFILING_ACTION_START_RANGE + 9;
 
   /**
    * The separator between the profiling identifier and the namespace.
@@ -60,6 +62,8 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(OPERATION_EXECUTED), OPERATION_EXECUTED_ID);
 
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_FLOW_MESSAGE_PASSING), PS_FLOW_MESSAGE_PASSING_ID);
+
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(EXTENSION_PROFILING_EVENT), COMPONENT_PROFILING_EVENT_ID);
   }
 
   private final ProfilingEventType<T> profilingEventType;

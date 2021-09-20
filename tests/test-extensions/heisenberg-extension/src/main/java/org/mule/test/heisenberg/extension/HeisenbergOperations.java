@@ -46,22 +46,19 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Example;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.client.DefaultOperationParameters;
 import org.mule.runtime.extension.api.client.DefaultOperationParametersBuilder;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
-import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.sdk.api.annotation.deprecated.Deprecated;
+import org.mule.sdk.api.annotation.param.display.Example;
+import org.mule.sdk.api.annotation.param.display.Summary;
 import org.mule.sdk.api.future.SecretSdkFutureFeature;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
@@ -425,7 +422,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   public BarberPreferences getInlineInfo(@ParameterGroup(name = "Personal Barber",
-      showInDsl = true) @DisplayName("Personal preference") BarberPreferences preferences) {
+      showInDsl = true) @org.mule.sdk.api.annotation.param.display.DisplayName("Personal preference") BarberPreferences preferences) {
     return preferences;
   }
 
@@ -439,9 +436,10 @@ public class HeisenbergOperations implements Disposable {
     return transformation;
   }
 
-  public void disguice(@ParameterGroup(name = "currentLook") @DisplayName("Look") BarberPreferences currentLook,
+  public void disguice(@ParameterGroup(
+      name = "currentLook") @org.mule.sdk.api.annotation.param.display.DisplayName("Look") BarberPreferences currentLook,
                        @org.mule.sdk.api.annotation.param.ParameterGroup(name = "disguise",
-                           showInDsl = true) @DisplayName("Look") BarberPreferences disguise) {
+                           showInDsl = true) @org.mule.sdk.api.annotation.param.display.DisplayName("Look") BarberPreferences disguise) {
 
   }
 

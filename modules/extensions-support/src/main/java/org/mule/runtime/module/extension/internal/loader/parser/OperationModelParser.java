@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -160,4 +161,10 @@ public interface OperationModelParser {
    * @return the operation's {@link DeprecationModel} if one was defined
    */
   Optional<DeprecationModel> getDeprecationModel();
+
+  /**
+   * @return the operation's {@link DisplayModel}
+   */
+  Optional<DisplayModel> getDisplayModel();
+
 }

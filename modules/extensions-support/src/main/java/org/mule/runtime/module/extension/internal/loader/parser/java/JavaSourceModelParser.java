@@ -23,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -218,6 +219,11 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
     return JavaExtensionModelParserUtils.getDeprecationModel(sourceElement);
+  }
+
+  @Override
+  public Optional<DisplayModel> getDisplayModel() {
+    return JavaExtensionModelParserUtils.getDisplayModel(sourceElement, "source", sourceElement.getName());
   }
 
   @Override

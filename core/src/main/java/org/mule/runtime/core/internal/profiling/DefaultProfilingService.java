@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -26,6 +27,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,6 +68,9 @@ public class DefaultProfilingService extends AbstractProfilingService {
           put(STARTING_OPERATION_EXECUTION,
               new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
                                                                    STARTING_OPERATION_EXECUTION));
+          put(EXTENSION_PROFILING_EVENT,
+              new ExtensionProfilingDataProducer(DefaultProfilingService.this,
+                                                 EXTENSION_PROFILING_EVENT));
         }
       };
 
