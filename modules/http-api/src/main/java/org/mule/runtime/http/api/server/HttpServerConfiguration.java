@@ -34,7 +34,7 @@ public class HttpServerConfiguration {
   private static final long DEFAULT_READ_TIMEOUT_MILLIS = 30000L;
 
   /**
-   * @deprecated since 4.3.1, use
+   * @deprecated since 4.3.1, 4.4.1, 4.5.0, use
    *             {@link #HttpServerConfiguration(String, int, TlsContextFactory, boolean, int, String, Supplier, long)} instead.
    */
   @Deprecated
@@ -45,7 +45,7 @@ public class HttpServerConfiguration {
   }
 
   /**
-   * @since 4.3.1
+   * @since 4.3.1, 4.4.1, 4.5.0
    */
   HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
                           int connectionIdleTimeout, String name, Supplier<Scheduler> schedulerSupplier, long readTimeout) {
@@ -88,7 +88,7 @@ public class HttpServerConfiguration {
   }
 
   /**
-   * @since 4.3.1
+   * @since 4.3.1, 4.4.1, 4.5.0
    */
   public long getReadTimeout() {
     return readTimeout;
@@ -187,7 +187,7 @@ public class HttpServerConfiguration {
      *
      * @param readTimeout timeout value (in milliseconds)
      * @return this builder
-     * @since 4.3.1
+     * @since 4.3.1, 4.4.1, 4.5.0
      */
     public Builder setReadTimeout(long readTimeout) {
       this.readTimeout = readTimeout;
