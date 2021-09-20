@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 import org.mule.tck.size.SmallTest;
 
 import java.net.MalformedURLException;
@@ -15,7 +18,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 @SmallTest
@@ -25,25 +27,40 @@ public class MuleManifestTestCase {
   public void getCoreManifest() throws Exception {
     MuleManifest.UrlPrivilegedAction action = new MuleManifest.UrlPrivilegedAction();
     URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-core-3.jar", "mule-foo-3.jar"));
-    Assert.assertTrue(url.toExternalForm().contains("mule-core-3.jar"));
+    assertThat(url.toExternalForm(), containsString("mule-core-3.jar"));
+  }
+
+  @Test
+  public void getExtModelManifest() throws Exception {
+    MuleManifest.UrlPrivilegedAction action = new MuleManifest.UrlPrivilegedAction();
+    URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-runtime-extension-model-3.jar", "mule-foo-3.jar"));
+    assertThat(url.toExternalForm(), containsString("mule-runtime-extension-model-3.jar"));
   }
 
   @Test
   public void getCoreEeManifest() throws Exception {
     MuleManifest.UrlPrivilegedAction action = new MuleManifest.UrlPrivilegedAction();
     URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-core-3.jar", "mule-core-ee-3.jar", "mule-foo-3.jar"));
-    Assert.assertTrue(url.toExternalForm().contains("mule-core-ee-3.jar"));
+    assertThat(url.toExternalForm(), containsString("mule-core-ee-3.jar"));
+  }
+
+  @Test
+  public void getEeExtModelManifest() throws Exception {
+    MuleManifest.UrlPrivilegedAction action = new MuleManifest.UrlPrivilegedAction();
+    URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-core-3.jar", "mule-runtime-ee-extension-model-3.jar",
+                                                   "mule-foo-3.jar"));
+    assertThat(url.toExternalForm(), containsString("mule-runtime-ee-extension-model-3.jar"));
   }
 
   @Test
   public void getEmbeddedManifest() throws Exception {
     MuleManifest.UrlPrivilegedAction action = new MuleManifest.UrlPrivilegedAction();
     URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-3-embedded.jar", "mule-foo-3.jar"));
-    Assert.assertTrue(url.toExternalForm().contains("mule-3-embedded.jar"));
+    assertThat(url.toExternalForm(), containsString("mule-3-embedded.jar"));
   }
 
   private Enumeration<URL> getUrlsEnum(String... names) throws MalformedURLException {
-    List<URL> urls = new ArrayList<URL>();
+    List<URL> urls = new ArrayList<>();
     for (String name : names) {
       urls.add(new URL("file://" + name));
     }
