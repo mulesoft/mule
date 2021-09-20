@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @since 4.5.0
  */
-abstract class AbstractJavaExecutableComponentModelParser extends AbstractModelParser {
+abstract class AbstractJavaExecutableComponentModelParser extends AbstractJavaModelParser {
 
   protected OutputModelParser outputType;
   protected OutputModelParser outputAttributesType;

@@ -40,7 +40,7 @@ import java.util.Optional;
  * @see ParameterModelParser
  * @since 4.5.0
  */
-public interface ExtensionModelParser {
+public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
 
   /**
    * @return The Extension's Name
@@ -82,6 +82,9 @@ public interface ExtensionModelParser {
    */
   List<FunctionModelParser> getFunctionModelParsers();
 
+  /**
+   * @return a list with an {@link ErrorModelParser} per each error type defined in the extension.
+   */
   List<ErrorModelParser> getErrorModelParsers();
 
   /**
@@ -98,14 +101,6 @@ public interface ExtensionModelParser {
    * @return an {@link Optional} {@link ExceptionHandlerModelProperty} is an exception handler was defined at the extension level.
    */
   Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty();
-
-  /**
-   * Returns a list with all the {@link ModelProperty model properties} to be applied at the extension level which are
-   * specifically linked to the type of syntax used to define the extension.
-   *
-   * @return a list with {@link ModelProperty} instances.
-   */
-  List<ModelProperty> getAdditionalModelProperties();
 
   /**
    * @return the extension's {@link DeprecationModel} if one was defined

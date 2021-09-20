@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
@@ -23,7 +22,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface FunctionModelParser {
+public interface FunctionModelParser extends AdditionalPropertiesModelParser {
 
   /**
    * @return the function's name
@@ -58,14 +57,6 @@ public interface FunctionModelParser {
    * @return whether this function should be ignored and excluded from the resulting {@link ExtensionModel}
    */
   boolean isIgnored();
-
-  /**
-   * Returns a list with all the {@link ModelProperty model properties} to be applied at the function level which are specifically
-   * linked to the type of syntax used to define the extension.
-   *
-   * @return a list with {@link ModelProperty} instances.
-   */
-  List<ModelProperty> getAdditionalModelProperties();
 
   /**
    * @return the function's {@link DeprecationModel} if one was defined

@@ -42,7 +42,7 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class JavaConfigurationModelParser extends AbstractModelParser implements ConfigurationModelParser {
+public class JavaConfigurationModelParser extends AbstractJavaModelParser implements ConfigurationModelParser {
 
   private final ExtensionModelParser extensionModelParser;
   private final ComponentElement configElement;

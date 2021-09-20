@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
@@ -22,7 +21,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface ConfigurationModelParser {
+public interface ConfigurationModelParser extends AdditionalPropertiesModelParser {
 
   /**
    * @return the configuration's name
@@ -88,14 +87,6 @@ public interface ConfigurationModelParser {
    * @return a list with the config's {@link FunctionModelParser}
    */
   List<FunctionModelParser> getFunctionModelParsers();
-
-  /**
-   * Returns a list with all the {@link ModelProperty model properties} to be applied at the configuration level which are
-   * specifically linked to the type of syntax used to define the extension.
-   *
-   * @return a list with {@link ModelProperty} instances.
-   */
-  List<ModelProperty> getAdditionalModelProperties();
 
   /**
    * @return the configuration's {@link DeprecationModel} if one was defined

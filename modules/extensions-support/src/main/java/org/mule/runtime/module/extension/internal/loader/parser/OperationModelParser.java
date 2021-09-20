@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
@@ -27,7 +26,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface OperationModelParser {
+public interface OperationModelParser extends AdditionalPropertiesModelParser {
 
   /**
    * @return the operation's name
@@ -150,14 +149,6 @@ public interface OperationModelParser {
   Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty();
 
   /**
-   * Returns a list with all the {@link ModelProperty model properties} to be applied at the operation level which are
-   * specifically linked to the type of syntax used to define the extension.
-   *
-   * @return a list with {@link ModelProperty} instances.
-   */
-  List<ModelProperty> getAdditionalModelProperties();
-
-  /**
    * @return the operation's {@link DeprecationModel} if one was defined
    */
   Optional<DeprecationModel> getDeprecationModel();
@@ -168,5 +159,8 @@ public interface OperationModelParser {
   Optional<DisplayModel> getDisplayModel();
 
 
+  /**
+   * @return a list with an {@link ErrorModelParser} per each error that the operation can raise.
+   */
   List<ErrorModelParser> getErrorModelParsers();
 }

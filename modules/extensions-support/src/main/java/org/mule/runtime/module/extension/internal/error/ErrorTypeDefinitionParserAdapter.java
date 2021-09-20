@@ -12,6 +12,12 @@ import org.mule.sdk.api.error.ErrorTypeDefinition;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Adapts an {@link ErrorModelParser} into an {@link ErrorTypeDefinition}
+ * 
+ * @param <E> the definition's generic type
+ * @since 4.5.0
+ */
 public class ErrorTypeDefinitionParserAdapter<E extends Enum<E>> implements ErrorTypeDefinition<E> {
 
   private final ErrorModelParser parser;

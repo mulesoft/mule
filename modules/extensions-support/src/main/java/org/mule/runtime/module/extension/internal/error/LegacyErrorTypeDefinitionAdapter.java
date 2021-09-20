@@ -14,8 +14,25 @@ import org.mule.sdk.api.error.ErrorTypeDefinition;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Adapts a legacy {@link org.mule.runtime.extension.api.error.ErrorTypeDefinition} into an sdk-api {@link ErrorTypeDefinition}
+ *
+ * @param <E> the definition's generic type
+ * @since 4.5.0
+ */
 public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements ErrorTypeDefinition<E> {
 
+  /**
+   * Returns an adapted version of the {@code value}.
+   *
+   * If the {@code value} doesn't need adapting because it's already an {@link ErrorTypeDefinition}, then the same instance is
+   * returned
+   *
+   * @param value the value to adapt
+   * @param <E>   the definition's generic type
+   * @return an adapted value or the same instance if no adaptation needed
+   * @throws IllegalArgumentException if the value is not an instance of an adaptable type
+   */
   public static <E extends Enum<E>> ErrorTypeDefinition<E> from(Object value) {
     checkArgument(value != null, "Cannot adapt null value");
     if (value instanceof ErrorTypeDefinition) {
@@ -32,7 +49,7 @@ public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements Erro
 
   private final org.mule.runtime.extension.api.error.ErrorTypeDefinition<E> delegate;
 
-  public LegacyErrorTypeDefinitionAdapter(org.mule.runtime.extension.api.error.ErrorTypeDefinition<E> delegate) {
+  LegacyErrorTypeDefinitionAdapter(org.mule.runtime.extension.api.error.ErrorTypeDefinition<E> delegate) {
     this.delegate = delegate;
   }
 

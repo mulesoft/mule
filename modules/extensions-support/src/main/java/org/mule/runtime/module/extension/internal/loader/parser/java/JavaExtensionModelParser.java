@@ -45,7 +45,7 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class JavaExtensionModelParser extends AbstractModelParser implements ExtensionModelParser {
+public class JavaExtensionModelParser extends AbstractJavaModelParser implements ExtensionModelParser {
 
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
   private List<ErrorModelParser> errorModelParsers;

@@ -15,8 +15,24 @@ import org.mule.sdk.api.error.ErrorTypeDefinition;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * Adapts a legacy {@link org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider} into an sdk-api
+ * {@link ErrorTypeProvider}
+ *
+ * @since 4.5.0
+ */
 public class LegacyErrorTypeProviderAdapter implements ErrorTypeProvider {
 
+  /**
+   * Returns an adapted version of the {@code value}.
+   *
+   * If the {@code value} doesn't need adapting because it's already an {@link ErrorTypeProvider}, then the same instance is
+   * returned
+   *
+   * @param value the value to adapt
+   * @return an adapted value or the same instance if no adaptation needed
+   * @throws IllegalArgumentException if the value is not an instance of an adaptable type
+   */
   public static ErrorTypeProvider from(Object value) {
     checkArgument(value != null, "Cannot adapt null value");
 
@@ -35,7 +51,7 @@ public class LegacyErrorTypeProviderAdapter implements ErrorTypeProvider {
 
   private final org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider delegate;
 
-  public LegacyErrorTypeProviderAdapter(org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider delegate) {
+  private LegacyErrorTypeProviderAdapter(org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider delegate) {
     this.delegate = delegate;
   }
 

@@ -16,6 +16,11 @@ import org.mule.sdk.api.error.ErrorTypeDefinition;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * {@link ErrorModelParser} implementation for errors defined through the Java language API.
+ *
+ * @since 4.5.0
+ */
 public class JavaErrorModelParser implements ErrorModelParser {
 
   private final boolean muleError;
@@ -23,6 +28,12 @@ public class JavaErrorModelParser implements ErrorModelParser {
   private final Class<?> errorTypeDefinitionDeclarationClass;
   private Optional<ErrorModelParser> parent = empty();
 
+  /**
+   * Create a new instance
+   *
+   * @param errorTypeDefinition the {@link ErrorTypeDefinition}
+   * @param muleError           whether this represents a mule error
+   */
   public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, boolean muleError) {
     this.errorTypeDefinition = errorTypeDefinition;
     this.muleError = muleError;

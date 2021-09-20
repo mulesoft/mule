@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromExtension;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.error.MuleErrors;
@@ -41,8 +42,19 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+/**
+ * Utilities for parsing Java defined {@link ErrorModel error models}
+ *
+ * @since 4.5.0
+ */
 public final class JavaErrorModelParserUtils {
 
+  /**
+   * Parses the error types defined at the extension level
+   *
+   * @param element the {@link ExtensionElement}
+   * @return a list of {@link ErrorModelParser}.
+   */
   public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element) {
     return getInfoFromExtension(element,
                                 ErrorTypes.class,
@@ -52,6 +64,14 @@ public final class JavaErrorModelParserUtils {
                                     .orElse(new LinkedList<>());
   }
 
+  /**
+   * Parses the errors defined by the {@code operation}
+   *
+   * @param extensionParser  the extension's parser
+   * @param extensionElement the extension's element
+   * @param operation        the operation element
+   * @return a list of {@link ErrorModelParser}
+   */
   public static List<ErrorModelParser> parseOperationErrorModels(ExtensionModelParser extensionParser,
                                                                  ExtensionElement extensionElement,
                                                                  OperationElement operation) {
@@ -66,6 +86,14 @@ public final class JavaErrorModelParserUtils {
         .orElse(new LinkedList<>());
   }
 
+  /**
+   * Returns the root {@link Class} for the given {@code errorTypeDefinition}.
+   * <p>
+   * Use this method to avoid dealing with legacy adapters
+   *
+   * @param errorTypeDefinition the error type definition
+   * @return the root definition's {@link Class}
+   */
   public static Class<?> getDeclarationClass(ErrorTypeDefinition errorTypeDefinition) {
     return errorTypeDefinition instanceof LegacyErrorTypeDefinitionAdapter
         ? ((LegacyErrorTypeDefinitionAdapter<?>) errorTypeDefinition).getDelegate().getClass()

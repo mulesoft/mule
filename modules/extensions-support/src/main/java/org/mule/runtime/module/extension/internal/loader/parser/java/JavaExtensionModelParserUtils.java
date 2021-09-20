@@ -312,6 +312,22 @@ public final class JavaExtensionModelParserUtils {
   }
 
 
+  /**
+   * Monad for extracting information from an {@link ExtensionElement} {@code element} which might be annotated with two different
+   * annotations of similar semantics. Both annotations types are reduced to a single output type.
+   * <p>
+   * Simultaneous presence of both types will be considered an error
+   *
+   * @param extensionElement        the extension element
+   * @param legacyAnnotationClass   the legacy annotation type
+   * @param sdkAnnotationClass      the new annotation type
+   * @param legacyAnnotationMapping mapping function for the legacy annotation
+   * @param sdkAnnotationMapping    mapping function for the new annotation
+   * @param <R>                     Legacy annotation's generic type
+   * @param <S>                     New annotation's generic type
+   * @param <T>                     Output generic type
+   * @return a reduced value
+   */
   public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromExtension(ExtensionElement extensionElement,
                                                                                                  Class<R> legacyAnnotationClass,
                                                                                                  Class<S> sdkAnnotationClass,
@@ -329,6 +345,23 @@ public final class JavaExtensionModelParserUtils {
                                                                                            sdkAnnotationClass.getName())));
   }
 
+  /**
+   * Monad for extracting information from a {@link WithAnnotations} {@code element} which might be annotated with two different
+   * annotations of similar semantics. Both annotations types are reduced to a single output type.
+   * <p>
+   * Simultaneous presence of both types will be considered an error
+   *
+   * @param element                        the annotated element
+   * @param legacyAnnotationClass          the legacy annotation type
+   * @param sdkAnnotationClass             the new annotation type
+   * @param legacyAnnotationMapping        mapping function for the legacy annotation
+   * @param sdkAnnotationMapping           mapping function for the new annotation
+   * @param dualDefinitionExceptionFactory exception factory in case both annotations are defined at the same type.
+   * @param <R>                            Legacy annotation's generic type
+   * @param <S>                            New annotation's generic type
+   * @param <T>                            Output generic type
+   * @return a reduced value
+   */
   public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
                                                                                                   WithAnnotations element,
                                                                                                   Class<R> legacyAnnotationClass,
