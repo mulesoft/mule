@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 

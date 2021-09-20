@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
@@ -152,65 +153,110 @@ public final class MuleExtensionAnnotationParser {
     }
   }
 
-  private static void doParseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
+  private static void doParseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder, String elementName) {
     java.util.Optional<Password> passwordAnnotation = annotatedElement.getAnnotation(Password.class);
     if (passwordAnnotation.isPresent()) {
       builder.asPassword();
     }
-    java.util.Optional<Text> textAnnotation = annotatedElement.getAnnotation(Text.class);
-    if (textAnnotation.isPresent()) {
+
+    java.util.Optional<Text> legacyTextAnnotation = annotatedElement.getAnnotation(Text.class);
+    java.util.Optional<org.mule.sdk.api.annotation.param.display.Text> sdkTextAnnotation =
+        annotatedElement.getAnnotation(org.mule.sdk.api.annotation.param.display.Text.class);
+
+    if (legacyTextAnnotation.isPresent() && sdkTextAnnotation.isPresent()) {
+      throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                elementName,
+                                                                Text.class.getName(),
+                                                                org.mule.sdk.api.annotation.param.display.Text.class.getName()));
+    } else if (legacyTextAnnotation.isPresent() || sdkTextAnnotation.isPresent()) {
       builder.asText();
     }
   }
 
-  private static void parsePlacementAnnotation(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
-    java.util.Optional<Placement> placementAnnotation = annotatedElement.getAnnotation(Placement.class);
-    if (placementAnnotation.isPresent()) {
-      Placement placement = placementAnnotation.get();
-      builder.order(placement.order()).tabName(placement.tab());
+  private static void parsePlacementAnnotation(WithAnnotations annotatedElement, LayoutModelBuilder builder, String elementName) {
+    java.util.Optional<Placement> legacyPlacementAnnotation = annotatedElement.getAnnotation(Placement.class);
+    java.util.Optional<org.mule.sdk.api.annotation.param.display.Placement> sdkPlacementAnnotation =
+        annotatedElement.getAnnotation(org.mule.sdk.api.annotation.param.display.Placement.class);
+
+    if (legacyPlacementAnnotation.isPresent() && sdkPlacementAnnotation.isPresent()) {
+      throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                elementName,
+                                                                Placement.class.getName(),
+                                                                org.mule.sdk.api.annotation.param.display.Placement.class
+                                                                    .getName()));
+    } else if (legacyPlacementAnnotation.isPresent()) {
+      int order = legacyPlacementAnnotation.get().order();
+      String tab = legacyPlacementAnnotation.get().tab();
+      builder.order(order).tabName(tab);
+    } else if (sdkPlacementAnnotation.isPresent()) {
+      int order = sdkPlacementAnnotation.get().order();
+      String tab = sdkPlacementAnnotation.get().tab();
+      builder.order(order).tabName(tab);
     }
   }
 
-  private static void parsePlacementAnnotation(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
-    Placement placement = annotatedElement.getAnnotation(Placement.class);
-    if (placement != null) {
-      builder.order(placement.order()).tabName(placement.tab());
+  private static void parsePlacementAnnotation(AnnotatedElement annotatedElement, LayoutModelBuilder builder,
+                                               String elementName) {
+    Placement legacyPlacementAnnotation = annotatedElement.getAnnotation(Placement.class);
+    org.mule.sdk.api.annotation.param.display.Placement sdkPlacementAnnotation =
+        annotatedElement.getAnnotation(org.mule.sdk.api.annotation.param.display.Placement.class);
+
+    if (legacyPlacementAnnotation != null && sdkPlacementAnnotation != null) {
+      throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                elementName,
+                                                                Placement.class.getName(),
+                                                                org.mule.sdk.api.annotation.param.display.Placement.class
+                                                                    .getName()));
+    } else if (legacyPlacementAnnotation != null) {
+      int order = legacyPlacementAnnotation.order();
+      String tab = legacyPlacementAnnotation.tab();
+      builder.order(order).tabName(tab);
+    } else if (sdkPlacementAnnotation != null) {
+      int order = sdkPlacementAnnotation.order();
+      String tab = sdkPlacementAnnotation.tab();
+      builder.order(order).tabName(tab);
     }
   }
 
-  public static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement) {
-    return parseLayoutAnnotations(annotatedElement, LayoutModel.builder());
+  public static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement, String elementName) {
+    return parseLayoutAnnotations(annotatedElement, LayoutModel.builder(), elementName);
   }
 
-  public static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement) {
-    return parseLayoutAnnotations(annotatedElement, LayoutModel.builder());
+  public static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement, String elementName) {
+    return parseLayoutAnnotations(annotatedElement, LayoutModel.builder(), elementName);
   }
 
-  public static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
+  public static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder,
+                                                             String elementName) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
-      doParseLayoutAnnotations(annotatedElement, builder);
-      parsePlacementAnnotation(annotatedElement, builder);
+      doParseLayoutAnnotations(annotatedElement, builder, elementName);
+      parsePlacementAnnotation(annotatedElement, builder, elementName);
       return of(builder.build());
     }
     return empty();
   }
 
-  public static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
+  public static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder,
+                                                             String elementName) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
       doParseLayoutAnnotations(annotatedElement, builder);
-      parsePlacementAnnotation(annotatedElement, builder);
+      parsePlacementAnnotation(annotatedElement, builder, elementName);
       return of(builder.build());
     }
     return empty();
   }
 
   private static boolean isDisplayAnnotationPresent(AnnotatedElement annotatedElement) {
-    List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class);
+    List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
+                                                   org.mule.sdk.api.annotation.param.display.Text.class,
+                                                   org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 
   private static boolean isDisplayAnnotationPresent(WithAnnotations annotatedElement) {
-    List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class);
+    List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
+                                                   org.mule.sdk.api.annotation.param.display.Text.class,
+                                                   org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 
