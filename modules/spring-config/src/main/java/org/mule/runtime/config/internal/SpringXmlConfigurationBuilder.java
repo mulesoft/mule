@@ -41,6 +41,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ImportedResource;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseArtifactAst;
+import org.mule.runtime.ast.api.xml.AstXmlConfigResource;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
@@ -67,7 +68,9 @@ import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -251,9 +254,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           final AstXmlParser parser = createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
 
           artifactAst = parser.parse(stream(artifactConfigResources)
-              .map((CheckedFunction<ConfigResource, Pair<String, InputStream>>) (configFile -> new Pair<>(configFile
-                  .getResourceName(), configFile.getInputStream())))
-              .collect(toList()));
+              .map((CheckedFunction<ConfigResource, AstXmlConfigResource>) (this::astXmlConfigResourceFromConfigResource))
+              .toArray(AstXmlConfigResource[]::new));
         }
       } else {
         artifactAst = toArtifactast(artifactDeclaration, extensions);
@@ -265,6 +267,10 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private AstXmlConfigResource astXmlConfigResourceFromConfigResource(ConfigResource configResource) throws IOException {
+    return new AstXmlConfigResource(configResource.getResourceName(), configResource.getInputStream(), configResource.getUrl());
   }
 
   private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
