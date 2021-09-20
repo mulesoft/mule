@@ -102,18 +102,14 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <version>${aetherProviderVersion}</version>
+            <artifactId>aether-util</artifactId>
+            <!-- provided by mule-maven-client-impl, needed to compile -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tools.maven</groupId>
             <artifactId>mule-classloader-model</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
@@ -200,7 +196,6 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-test</artifactId>
-            <version>${muleMavenClientTest}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
