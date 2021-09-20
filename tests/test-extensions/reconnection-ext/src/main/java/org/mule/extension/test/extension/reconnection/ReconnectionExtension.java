@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
  * sources are going to be declared.
  */
 @Extension(name = "reconnection")
-@Configurations({ReconnectionConfiguration.class, SynchronizableConfiguration.class, FailingConnectionConfiguration.class})
+@Configurations({ReconnectionConfiguration.class, SynchronizableConfiguration.class})
 public class ReconnectionExtension {
 
 }

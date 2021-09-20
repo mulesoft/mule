@@ -94,7 +94,6 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.reactivestreams.Publisher;
 import java.sql.Timestamp;
@@ -324,7 +323,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     Optional<Publisher<Void>> action = sourceAdapter.getReconnectionAction(exception);
     if (!action.isPresent()) {
-      invalidateConnection(exception);
+      exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
       retryScheduler.execute(() -> {
         try {
           restart();
@@ -587,10 +586,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         sourceAdapter.start();
       } catch (Exception e) {
         try {
-          // On connection exception, if the failed connection is present, it must be invalidated before stopping the source. This
-          // warranties that a possible call to connectionProvider.disconnect made on the onStop method of the source, does not
-          // affect the connection's invalidation
-          extractConnectionException(e).ifPresent(connectionException -> invalidateConnection(connectionException));
           stopSource();
         } catch (Exception eStop) {
           e.addSuppressed(eStop);
@@ -770,9 +765,5 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
    */
   boolean isReconnecting() {
     return reconnecting.get();
-  }
-
-  private void invalidateConnection(ConnectionException exception) {
-    exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
   }
 }

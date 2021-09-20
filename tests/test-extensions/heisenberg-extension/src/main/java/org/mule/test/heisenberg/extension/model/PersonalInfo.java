@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.sdk.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -29,12 +29,12 @@ public class PersonalInfo {
   @Parameter
   @Alias("myName")
   @Optional(defaultValue = HEISENBERG)
-  @org.mule.sdk.api.annotation.param.display.Placement(order = 1)
+  @Placement(order = 1)
   private String name;
 
   @Parameter
   @Optional(defaultValue = AGE)
-  @org.mule.sdk.api.annotation.param.display.Placement(order = 2)
+  @Placement(order = 2)
   private Integer age;
 
   @Parameter

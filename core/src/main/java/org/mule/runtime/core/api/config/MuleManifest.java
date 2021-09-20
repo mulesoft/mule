@@ -142,8 +142,6 @@ public class MuleManifest {
             && !url.toExternalForm().contains("tests.jar")
             && !url.toExternalForm().contains("mule-core-mvel")
             && !url.toExternalForm().contains("mule-core-components"))
-            || url.toExternalForm().contains("mule-runtime-extension-model")
-            || url.toExternalForm().contains("mule-runtime-ee-extension-model")
             || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*")) {
           candidates.put(url.toExternalForm(), url);
         }
@@ -151,8 +149,7 @@ public class MuleManifest {
       if (!candidates.isEmpty()) {
         // if mule-core and mule-core-ee jars are present, then mule-core-ee gets precedence
         for (String candidateKey : candidates.keySet()) {
-          if (candidateKey.contains("mule-core-ee")
-              || candidateKey.contains("mule-runtime-ee-extension-model")) {
+          if (candidateKey.contains("mule-core-ee")) {
             return candidates.get(candidateKey);
           }
         }

@@ -113,7 +113,6 @@ import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
-import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
@@ -747,21 +746,6 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
-
-    scatterGather.onParameterGroup("Aggregation")
-        .withOptionalParameter("collectList")
-        .withRole(BEHAVIOUR)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .ofType(BaseTypeBuilder.create(JAVA).objectType()
-            .id("CollectList")
-            .with(new TypeDslAnnotation(true, false, null, null))
-            .build())
-        .withDsl(ParameterDslConfiguration.builder()
-            .allowsInlineDefinition(true)
-            .allowsReferences(false)
-            .allowTopLevelDefinition(false)
-            .build())
-        .describedAs("Strategy that determines that the results are aggregated in a list rather than on a map.");
 
     scatterGather.onParameterGroup(OUTPUT)
         .withOptionalParameter(TARGET_PARAMETER_NAME)

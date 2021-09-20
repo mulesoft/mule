@@ -75,7 +75,6 @@ public final class ParameterModelsLoaderDelegate {
         extensionParameter.getLayoutModel().ifPresent(parameter::withLayout);
         extensionParameter.getDslConfiguration().ifPresent(parameter::withDsl);
         extensionParameter.getDeprecationModel().ifPresent(parameter::withDeprecation);
-        extensionParameter.getDisplayModel().ifPresent(parameter::withDisplayModel);
         extensionParameter.getAdditionalModelProperties().forEach(parameter::withModelProperty);
         declarerList.add(parameter);
       });
