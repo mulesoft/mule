@@ -21,17 +21,12 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STA
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.ARTIFACT_ID_KEY;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.ARTIFACT_TYPE_KEY;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.LOCATION;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROCESSING_THREAD_KEY;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROFILING_EVENT_TIMESTAMP_KEY;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROFILING_EVENT_TYPE;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.RUNTIME_CORE_EVENT_CORRELATION_ID;
-import static org.mule.runtime.core.internal.profiling.notification.ProfilingNotification.getFullyQualifiedProfilingNotificationIdentifier;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyProfilingUtils.getProcessingStrategyComponentInfoMap;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
@@ -50,8 +45,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.Gson;
@@ -93,6 +86,12 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   @Mock
   private Logger logger;
 
+  @Mock
+  private TypedComponentIdentifier componentIdentifier;
+
+  @Mock
+  private ComponentIdentifier identifier;
+
   private final Gson gson = new Gson();
 
   private final ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType;
@@ -102,6 +101,10 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   @Before
   public void before() throws Exception {
     when(logger.isDebugEnabled()).thenReturn(true);
+    when(location.getComponentIdentifier()).thenReturn(componentIdentifier);
+    when(componentIdentifier.getIdentifier()).thenReturn(identifier);
+    when(identifier.getName()).thenReturn("test");
+    when(identifier.getNamespace()).thenReturn("test");
     profilingService = getTestProfilingService();
   }
 
@@ -194,17 +197,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
   private String jsonToLog(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
                            ProcessingStrategyProfilingEventContext profilingEventContext) {
-    Map<String, String> eventMap = new HashMap<>();
-    eventMap.put(PROFILING_EVENT_TYPE,
-                 getFullyQualifiedProfilingNotificationIdentifier(profilingEventType));
-    eventMap.put(PROFILING_EVENT_TIMESTAMP_KEY, Long.toString(profilingEventContext.getTriggerTimestamp()));
-    eventMap.put(PROCESSING_THREAD_KEY, profilingEventContext.getThreadName());
-    eventMap.put(ARTIFACT_ID_KEY, profilingEventContext.getArtifactId());
-    eventMap.put(ARTIFACT_TYPE_KEY, profilingEventContext.getArtifactType());
-    eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, profilingEventContext.getCorrelationId());
-    profilingEventContext.getLocation().map(loc -> eventMap.put(LOCATION, loc.getLocation()));
-
-    return gson.toJson(eventMap);
+    return gson.toJson(getProcessingStrategyComponentInfoMap(profilingEventType, profilingEventContext));
   }
 
 }
