@@ -54,11 +54,9 @@ public class RetryWorker implements Runnable {
     }
     try {
       context.setDelegateContext(delegate.execute(callback, workManager));
-      callback.onSuccess();
     } catch (Exception e) {
       this.exception = e;
       logger.error("Error retrying work", e);
-      callback.onFailure(e);
     }
   }
 
