@@ -26,7 +26,7 @@ public class ComponentProcessingStrategyProfilingUtils {
   public static final String RUNTIME_CORE_EVENT_CORRELATION_ID = "runtimeCoreEventCorrelationId";
   public static final String PROFILING_EVENT_TYPE = "profilingEventType";
   public static final String LOCATION = "location";
-  public static final String COMPONENT_IDENTIFIER = "componentIdentifier";
+  public static final String COMPONENT_TYPE_IDENTIFIER = "componentTypeIdentifier";
 
   public static Map<String, String> getProcessingStrategyComponentInfoMap(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
                                                                           ProcessingStrategyProfilingEventContext profilingEventContext) {
@@ -47,6 +47,6 @@ public class ComponentProcessingStrategyProfilingUtils {
   private static void addLocationInfo(Map<String, String> eventMap, ComponentLocation location) {
     eventMap.put(LOCATION, location.getLocation());
     ComponentIdentifier identifier = location.getComponentIdentifier().getIdentifier();
-    eventMap.put(COMPONENT_IDENTIFIER, identifier.getNamespace() + ":" + identifier.getName());
+    eventMap.put(COMPONENT_TYPE_IDENTIFIER, identifier.getNamespace() + ":" + identifier.getName());
   }
 }
