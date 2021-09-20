@@ -20,7 +20,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -110,9 +109,8 @@ public final class JavaErrorModelParserUtils {
 
   private static void validateOperationThrows(ExtensionModelParser extensionParser, ErrorTypeDefinition error) {
     Class<?> errorDefinitionClass = JavaErrorModelParserUtils.getDeclarationClass(error);
-    if (errorDefinitionClass.getClass().equals(MuleErrors.class)
-        || errorDefinitionClass.getClass().equals(org.mule.sdk.api.error.MuleErrors.class)
-        || extensionParser.getErrorModelParsers().isEmpty()) {
+
+    if (isMuleError(error) || extensionParser.getErrorModelParsers().isEmpty()) {
       return;
     }
 
