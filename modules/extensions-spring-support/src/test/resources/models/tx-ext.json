@@ -791,7 +791,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "FAILING_PAGED_TRANSACTIONAL_OPERATION",
@@ -2813,7 +2816,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_TRANSACTIONAL_OPERATION",
@@ -4202,7 +4208,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "STICKY_FAILING_PAGED_TRANSACTIONAL_OPERATION",

@@ -8608,7 +8608,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "JSON_ATTRIBUTES_PAGING_PROVIDER_WITH_RESULT",
@@ -9324,7 +9327,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "JSON_OUTPUT_PAGING_PROVIDER",
@@ -15695,7 +15701,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION_METADATA",
@@ -16498,7 +16507,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION_RESULT",
@@ -17343,7 +17355,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION_RESULT_WITH_ATTRIBUTES_RESOLVER",
@@ -40829,7 +40844,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "label": "Person",
         "classInformation": {
           "classname": "void",
           "hasDefaultConstructor": false,
@@ -40842,7 +40856,8 @@
           "genericTypes": [],
           "isMap": false
         },
-        "typeId": "http://example.com/example.json"
+        "typeId": "http://example.com/example.json",
+        "label": "Person"
       },
       "open": {
         "type": "Any"

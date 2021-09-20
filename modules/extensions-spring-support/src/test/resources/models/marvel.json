@@ -598,7 +598,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "MARVEL:CONNECTIVITY",
+            "MARVEL:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "GET_RELICS",
@@ -2686,7 +2689,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "MARVEL:CONNECTIVITY",
+            "MARVEL:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "SAY_MAGIC_WORDS",
@@ -14939,6 +14945,11 @@
   "notifications": [],
   "errors": [
     {
+      "error": "MARVEL:CUSTOM_ERROR",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "MULE:ANY",
       "handleable": true
     },
@@ -14960,11 +14971,6 @@
     {
       "error": "MARVEL:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
-      "handleable": true
-    },
-    {
-      "error": "MARVEL:CUSTOM_ERROR",
-      "parent": "MULE:ANY",
       "handleable": true
     }
   ],

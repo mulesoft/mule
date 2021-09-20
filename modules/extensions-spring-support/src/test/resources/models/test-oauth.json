@@ -4327,7 +4327,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "TEST-OAUTH:RETRY_EXHAUSTED",
+            "TEST-OAUTH:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
@@ -17618,7 +17621,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "TEST-OAUTH:RETRY_EXHAUSTED",
+            "TEST-OAUTH:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
@@ -24980,7 +24986,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "TEST-OAUTH:RETRY_EXHAUSTED",
+            "TEST-OAUTH:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
@@ -33256,7 +33265,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "TEST-OAUTH:RETRY_EXHAUSTED",
+            "TEST-OAUTH:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
@@ -41042,7 +41054,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "TEST-OAUTH:RETRY_EXHAUSTED",
+            "TEST-OAUTH:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",

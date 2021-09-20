@@ -884,7 +884,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "RECONNECTION:RETRY_EXHAUSTED",
+            "RECONNECTION:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
@@ -1717,7 +1720,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "RECONNECTION:RETRY_EXHAUSTED",
+            "RECONNECTION:CONNECTIVITY"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "STICKY_PAGED_OPERATION",
