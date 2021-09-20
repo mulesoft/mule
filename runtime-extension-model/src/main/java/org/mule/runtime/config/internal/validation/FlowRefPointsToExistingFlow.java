@@ -59,7 +59,7 @@ public class FlowRefPointsToExistingFlow implements Validation {
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER))
-        .and(currentElemement(component -> component.getParameter(DEFAULT_GROUP_NAME, "name").getValue().isRight()));
+        .and(currentElemement(componentModel -> componentModel.getParameter(DEFAULT_GROUP_NAME, "name").getValue().isRight()));
   }
 
   @Override

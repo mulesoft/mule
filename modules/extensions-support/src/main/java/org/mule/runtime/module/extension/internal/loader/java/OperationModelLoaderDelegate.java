@@ -85,7 +85,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       parser.getAttributesOutputType().applyOn(operation.withOutputAttributes());
       parser.getMediaTypeModelProperty().ifPresent(operation::withModelProperty);
       parser.getDeprecationModel().ifPresent(operation::withDeprecation);
-      parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
 
       loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
       parser.getExecutionType().ifPresent(operation::withExecutionType);

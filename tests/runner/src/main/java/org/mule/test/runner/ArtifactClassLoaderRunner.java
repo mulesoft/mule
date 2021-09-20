@@ -20,7 +20,6 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
-
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
@@ -39,6 +38,9 @@ import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.classification.DefaultWorkspaceReader;
 import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -51,8 +53,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
 import org.junit.internal.builders.AnnotatedBuilder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;

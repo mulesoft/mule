@@ -32,6 +32,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.BackPressureDe
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ClusterSupportEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
@@ -130,6 +131,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                // TODO: MOVE TO EXT_API when
                                                                                                // https://www.mulesoft.org/jira/browse/MULE-13070
                                                                                                new MimeTypeParametersDeclarationEnricher(),
+                                                                                               new DisplayDeclarationEnricher(),
                                                                                                new DynamicMetadataDeclarationEnricher(),
                                                                                                new RequiredForMetadataDeclarationEnricher(),
                                                                                                new ImportedTypesDeclarationEnricher(),

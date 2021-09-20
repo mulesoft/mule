@@ -6,17 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -25,13 +22,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Text;
-import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
@@ -83,20 +73,6 @@ public class LayoutModelTestCase extends AbstractJavaExtensionDeclarationTestCas
     assertParameterPlacement(findParameterInGroup(operation, "goodbyeMessage"), KILL_WITH_GROUP, 2);
   }
 
-  @Test(expected = IllegalParameterModelDefinitionException.class)
-  public void parseLegacyAndSdkPlacementAnnotationsOnParameter() {
-    ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
-    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
-  }
-
-  @Test(expected = IllegalParameterModelDefinitionException.class)
-  public void parseLegacyAndSdkTextAnnotationsOnParameter() {
-    ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
-    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
-  }
-
   private void assertParameterPlacement(Pair<ParameterGroupDeclaration, ParameterDeclaration> pair, String groupName,
                                         Integer order) {
     ParameterGroupDeclaration group = pair.getFirst();
@@ -111,23 +87,4 @@ public class LayoutModelTestCase extends AbstractJavaExtensionDeclarationTestCas
 
     assertThat(layout.getOrder(), equalTo(ofNullable(order)));
   }
-
-  @Extension(name = "extensionWithInvalidUseOfPlacementAnnotation")
-  public static class ExtensionWithInvalidUseOfPlacementAnnotation {
-
-    @Parameter
-    @Placement(order = 1, tab = "Advance")
-    @org.mule.sdk.api.annotation.param.display.Placement(order = 1, tab = "Advance")
-    public String firstParameter;
-  }
-
-  @Extension(name = "extensionWithInvalidUseOfTextAnnotation")
-  public static class ExtensionWithInvalidUseOfTextAnnotation {
-
-    @Parameter
-    @Text
-    @org.mule.sdk.api.annotation.param.display.Text()
-    public String firstParameter;
-  }
-
 }

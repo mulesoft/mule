@@ -66,42 +66,6 @@
     },
     "version": "4.5.0-SNAPSHOT",
     "labels": {
-      "connectionProvider": "failing-connection",
-      "system": "reconnection",
-      "type": "Connection"
-    }
-  },
-  {
-    "assets": [
-      {
-        "assetId": "mule-connector-reconnection",
-        "groupId": "org.mule.runtime.test.extension",
-        "version": "1.0.0"
-      }
-    ],
-    "groupId": "com.mulesoft.schemas",
-    "artifactId": "mule-connector-reconnection-connection",
-    "definition": {
-      "external": {},
-      "documents": {
-        "root": {
-          "encodes": "Connection"
-        }
-      },
-      "nodeMappings": {
-        "Connection": {
-          "mapping": {},
-          "classTerm": "connectivity.Connection"
-        }
-      },
-      "uses": {
-        "core": "anypoint://vocabulary/core.yaml",
-        "connectivity": "anypoint://vocabulary/connectivity.yaml",
-        "apiContract": "anypoint://vocabulary/api-contract.yaml"
-      }
-    },
-    "version": "4.5.0-SNAPSHOT",
-    "labels": {
       "connectionProvider": "long-disconnection",
       "system": "reconnection",
       "type": "Connection"
