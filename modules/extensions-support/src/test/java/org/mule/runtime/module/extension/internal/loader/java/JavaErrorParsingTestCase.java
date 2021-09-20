@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
@@ -134,14 +133,6 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
     assertThat(operationError.isPresent(), is(true));
   }
 
-  @Test
-  public void operationsWithErrorTypesButExtensionWithNone() {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage(containsString("operation 'someOperation' declares error types which are not defined " +
-        "in the extension. Offending errors are [OPERATION]"));
-    loadExtension(HeisenbergWithoutErrorTypes.class);
-  }
-
   @ErrorTypes(CyclicErrorTypes.class)
   @Extension(name = "Heisenberg")
   public static class HeisenbergWithCyclicErrorTypes extends HeisenbergExtension {
@@ -165,8 +156,6 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
 
 
   @Extension(name = "Heisenberg")
-  // @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
-  // KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class})
   @Operations(OperationWithThrows.class)
   public static class HeisenbergWithoutErrorTypes extends HeisenbergExtension {
 

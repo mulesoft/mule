@@ -135,7 +135,6 @@ public class ErrorsModelFactory {
    * @return The correspondent {@link ErrorModel} for a given {@link ErrorModelParser}
    */
   public ErrorModel getErrorModel(ErrorModelParser errorModelParser) {
-    // return errorModelMap.get(toIdentifier(toErrorTypeDefinition(errorModelParser)));
     String errorKey = toIdentifier(toErrorTypeDefinition(errorModelParser));
     if (errorModelMap.containsKey(errorKey)) {
       return errorModelMap.get(errorKey);
