@@ -461,13 +461,13 @@
             "MULE:ANY",
             "RAM:CANNOT_DISPATCH",
             "RAM:INVALID_WSDL",
+            "RAM:TIMEOUT",
+            "MULE:CONNECTIVITY",
             "MULE:RETRY_EXHAUSTED",
             "RAM:BAD_REQUEST",
-            "RAM:TIMEOUT",
             "RAM:CONNECTIVITY",
             "RAM:SOAP_FAULT",
-            "RAM:BAD_RESPONSE",
-            "MULE:CONNECTIVITY"
+            "RAM:BAD_RESPONSE"
           ],
           "semanticTerms": [],
           "stereotype": {

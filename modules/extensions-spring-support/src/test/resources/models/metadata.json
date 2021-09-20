@@ -378,8 +378,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -1039,8 +1039,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -1761,8 +1761,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -2488,8 +2488,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -3168,8 +3168,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -3895,8 +3895,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -4551,8 +4551,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -5118,8 +5118,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -5816,8 +5816,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -6387,8 +6387,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -7087,8 +7087,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -7814,8 +7814,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -8609,8 +8609,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -9328,8 +9328,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -10085,8 +10085,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -10804,8 +10804,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -11524,8 +11524,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -12196,8 +12196,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -12974,8 +12974,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -13693,8 +13693,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -14365,8 +14365,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -15032,8 +15032,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -15702,8 +15702,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -16508,8 +16508,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -17356,8 +17356,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -18112,8 +18112,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -18828,8 +18828,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -19568,8 +19568,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -20263,8 +20263,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:RETRY_EXHAUSTED",
-            "METADATA:CONNECTIVITY"
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -40856,8 +40856,8 @@
           "genericTypes": [],
           "isMap": false
         },
-        "typeId": "http://example.com/example.json",
-        "label": "Person"
+        "label": "Person",
+        "typeId": "http://example.com/example.json"
       },
       "open": {
         "type": "Any"

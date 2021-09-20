@@ -330,8 +330,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "RECONNECTION:RETRY_EXHAUSTED",
-            "RECONNECTION:CONNECTIVITY"
+            "RECONNECTION:CONNECTIVITY",
+            "RECONNECTION:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -885,8 +885,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "RECONNECTION:RETRY_EXHAUSTED",
-            "RECONNECTION:CONNECTIVITY"
+            "RECONNECTION:CONNECTIVITY",
+            "RECONNECTION:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -1721,8 +1721,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "RECONNECTION:RETRY_EXHAUSTED",
-            "RECONNECTION:CONNECTIVITY"
+            "RECONNECTION:CONNECTIVITY",
+            "RECONNECTION:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {

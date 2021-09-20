@@ -614,8 +614,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:RETRY_EXHAUSTED",
-            "VEGAN:CONNECTIVITY"
+            "VEGAN:CONNECTIVITY",
+            "VEGAN:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -6136,8 +6136,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:RETRY_EXHAUSTED",
-            "VEGAN:CONNECTIVITY"
+            "VEGAN:CONNECTIVITY",
+            "VEGAN:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -11342,8 +11342,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:RETRY_EXHAUSTED",
-            "VEGAN:CONNECTIVITY"
+            "VEGAN:CONNECTIVITY",
+            "VEGAN:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -12231,8 +12231,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:RETRY_EXHAUSTED",
-            "VEGAN:CONNECTIVITY"
+            "VEGAN:CONNECTIVITY",
+            "VEGAN:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {

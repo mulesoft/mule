@@ -258,8 +258,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -792,8 +792,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -1591,8 +1591,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -2201,8 +2201,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -2817,8 +2817,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -3593,8 +3593,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -4209,8 +4209,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -5008,8 +5008,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -5503,8 +5503,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -6033,8 +6033,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -6528,8 +6528,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -7023,8 +7023,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "TX:RETRY_EXHAUSTED",
-            "TX:CONNECTIVITY"
+            "TX:CONNECTIVITY",
+            "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
