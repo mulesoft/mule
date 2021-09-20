@@ -232,7 +232,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.4.0-20210915</muleDslApiVersion>
-        <muleAstVersion>1.0.0-20210915</muleAstVersion>
+        <muleAstVersion>1.0.0</muleAstVersion>
         <mulePropertiesApiVersion>1.0.0</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.4.0-20210915</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.0.0-20210915</muleConnectivityApiVersion>
