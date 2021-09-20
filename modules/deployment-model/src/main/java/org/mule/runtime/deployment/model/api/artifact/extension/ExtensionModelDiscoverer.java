@@ -51,12 +51,12 @@ public class ExtensionModelDiscoverer {
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
    * 
-   * @deprecated from 4.5 use {@link #discoverPluginsExtensionModels(ExtensionDiscoveryCommand)} instead.
+   * @deprecated from 4.5 use {@link #discoverPluginsExtensionModels(ExtensionDiscoveryRequest)} instead.
    */
   @Deprecated
   public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionModelLoaderRepository loaderRepository,
                                                                                             List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
-    return discoverPluginsExtensionModels(ExtensionDiscoveryCommand.builder()
+    return discoverPluginsExtensionModels(ExtensionDiscoveryRequest.builder()
         .setLoaderRepository(loaderRepository)
         .setArtifactPlugins(artifactPlugins)
         .build());
@@ -72,13 +72,13 @@ public class ExtensionModelDiscoverer {
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
    * 
-   * @deprecated form 4.5 use {@link #discoverPluginsExtensionModels(ExtensionDiscoveryCommand)} instead.
+   * @deprecated form 4.5 use {@link #discoverPluginsExtensionModels(ExtensionDiscoveryRequest)} instead.
    */
   @Deprecated
   public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionModelLoaderRepository loaderRepository,
                                                                                             List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins,
                                                                                             Set<ExtensionModel> parentArtifactExtensions) {
-    return discoverPluginsExtensionModels(ExtensionDiscoveryCommand.builder()
+    return discoverPluginsExtensionModels(ExtensionDiscoveryRequest.builder()
         .setLoaderRepository(loaderRepository)
         .setArtifactPlugins(artifactPlugins)
         .setParentArtifactExtensions(parentArtifactExtensions)
@@ -88,27 +88,24 @@ public class ExtensionModelDiscoverer {
   /**
    * For each artifactPlugin discovers the {@link ExtensionModel}.
    *
-   * @param loaderRepository         {@link ExtensionModelLoaderRepository} with the available extension loaders.
-   * @param artifactPlugins          {@link Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact
-   *                                 plugins deployed inside the artifact. Non null.
-   * @param parentArtifactExtensions {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
+   * @param discoveryRequest an object containing the parameterization of the discovery process.
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
    */
-  public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionDiscoveryCommand discoveryCommand) {
+  public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionDiscoveryRequest discoveryRequest) {
     final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = new HashSet<>();
-    discoveryCommand.getArtifactPlugins().forEach(artifactPlugin -> {
+    discoveryRequest.getArtifactPlugins().forEach(artifactPlugin -> {
       Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
-      extensions.addAll(discoveryCommand.getParentArtifactExtensions());
+      extensions.addAll(discoveryRequest.getParentArtifactExtensions());
       final ArtifactPluginDescriptor artifactPluginDescriptor = artifactPlugin.getFirst();
       Optional<LoaderDescriber> loaderDescriber = artifactPluginDescriptor.getExtensionModelDescriptorProperty();
       ClassLoader artifactClassloader = artifactPlugin.getSecond().getClassLoader();
       String artifactName = artifactPluginDescriptor.getName();
       ExtensionModel extension = loaderDescriber
-          .map(describer -> discoverExtensionThroughJsonDescriber(discoveryCommand.getLoaderRepository(), describer,
+          .map(describer -> discoverExtensionThroughJsonDescriber(discoveryRequest.getLoaderRepository(), describer,
                                                                   extensions, artifactClassloader,
                                                                   artifactName,
-                                                                  discoveryCommand.isEnrichDescriptions()
+                                                                  discoveryRequest.isEnrichDescriptions()
                                                                       ? emptyMap()
                                                                       : singletonMap("EXTENSION_LOADER_DISABLE_DESCRIPTIONS_ENRICHMENT",
                                                                                      true)))

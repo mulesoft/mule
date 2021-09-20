@@ -12,17 +12,26 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.artifact.extension.DefaultExtensionDiscoveryCommand;
+import org.mule.runtime.deployment.model.internal.artifact.extension.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.util.List;
 import java.util.Set;
 
-public interface ExtensionDiscoveryCommand {
+/**
+ * Container of the parameters that can be given to
+ * {@link ExtensionModelDiscoverer#discoverPluginsExtensionModels(ExtensionDiscoveryRequest)}.
+ * 
+ * @since 4.5
+ */
+public interface ExtensionDiscoveryRequest {
 
-  static ExtensionDiscoveryCommandBuilder builder() {
-    return new ExtensionDiscoveryCommandBuilder();
+  /**
+   * @return a fluent builder for creating a new {@link ExtensionDiscoveryRequest} instance.
+   */
+  static ExtensionDiscoveryRequestBuilder builder() {
+    return new ExtensionDiscoveryRequestBuilder();
   }
 
   /**
@@ -47,35 +56,35 @@ public interface ExtensionDiscoveryCommand {
    */
   boolean isEnrichDescriptions();
 
-  public final class ExtensionDiscoveryCommandBuilder {
+  public final class ExtensionDiscoveryRequestBuilder {
 
     private ExtensionModelLoaderRepository loaderRepository;
     private List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins;
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean enrichDescriptions = true;
 
-    public ExtensionDiscoveryCommandBuilder setLoaderRepository(ExtensionModelLoaderRepository loaderRepository) {
+    public ExtensionDiscoveryRequestBuilder setLoaderRepository(ExtensionModelLoaderRepository loaderRepository) {
       this.loaderRepository = loaderRepository;
       return this;
     }
 
-    public ExtensionDiscoveryCommandBuilder setArtifactPlugins(List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
+    public ExtensionDiscoveryRequestBuilder setArtifactPlugins(List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
       return this;
     }
 
-    public ExtensionDiscoveryCommandBuilder setParentArtifactExtensions(Set<ExtensionModel> parentArtifactExtensions) {
+    public ExtensionDiscoveryRequestBuilder setParentArtifactExtensions(Set<ExtensionModel> parentArtifactExtensions) {
       this.parentArtifactExtensions = parentArtifactExtensions;
       return this;
     }
 
-    public ExtensionDiscoveryCommandBuilder setEnrichDescriptions(boolean enrichDescriptions) {
+    public ExtensionDiscoveryRequestBuilder setEnrichDescriptions(boolean enrichDescriptions) {
       this.enrichDescriptions = enrichDescriptions;
       return this;
     }
 
-    public ExtensionDiscoveryCommand build() {
-      return new DefaultExtensionDiscoveryCommand(loaderRepository, artifactPlugins, parentArtifactExtensions,
+    public ExtensionDiscoveryRequest build() {
+      return new DefaultExtensionDiscoveryRequest(loaderRepository, artifactPlugins, parentArtifactExtensions,
                                                   enrichDescriptions);
     }
   }

@@ -8,7 +8,7 @@ package org.mule.runtime.deployment.model.internal.artifact.extension;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionDiscoveryCommand;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionDiscoveryRequest;
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -16,16 +16,17 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import java.util.List;
 import java.util.Set;
 
-public class DefaultExtensionDiscoveryCommand implements ExtensionDiscoveryCommand {
+public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryRequest {
 
   private final ExtensionModelLoaderRepository loaderRepository;
   private final List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins;
   private final Set<ExtensionModel> parentArtifactExtensions;
   private final boolean enrichDescriptions;
 
-  public DefaultExtensionDiscoveryCommand(ExtensionModelLoaderRepository loaderRepository,
+  public DefaultExtensionDiscoveryRequest(ExtensionModelLoaderRepository loaderRepository,
                                           List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins,
-                                          Set<ExtensionModel> parentArtifactExtensions, boolean enrichDescriptions) {
+                                          Set<ExtensionModel> parentArtifactExtensions,
+                                          boolean enrichDescriptions) {
     this.loaderRepository = loaderRepository;
     this.artifactPlugins = artifactPlugins;
     this.parentArtifactExtensions = parentArtifactExtensions;
@@ -47,6 +48,7 @@ public class DefaultExtensionDiscoveryCommand implements ExtensionDiscoveryComma
     return parentArtifactExtensions;
   }
 
+  @Override
   public boolean isEnrichDescriptions() {
     return enrichDescriptions;
   }
