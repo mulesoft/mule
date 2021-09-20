@@ -89,7 +89,6 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -98,7 +97,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.reactivestreams.Publisher;
 import java.sql.Timestamp;
-import java.util.function.Function;
 
 import reactor.core.publisher.Mono;
 
@@ -209,17 +207,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void startSource(boolean restarting, RestartContext restartContext)
       throws MuleException {
     Scheduler scheduler;
+    Consumer<Throwable> onFailure;
     if (restarting && retryPolicyTemplate.isAsync()) {
       scheduler = IMMEDIATE_SCHEDULER;
     } else {
       scheduler = retryScheduler;
     }
+    onFailure = retryPolicyTemplate.isAsync() ? this::onReconnectionFailed : t -> {
+    };
     try {
-      System.out.println(new Timestamp(System.currentTimeMillis()) + ": before execute");
-      StartSourceCallback callback =
-          new StartSourceCallback(restarting, restartContext, this::onReconnectionSuccessful, this::onReconnectionFailed);
-      retryPolicyTemplate.execute(callback, scheduler);
-      System.out.println(new Timestamp(System.currentTimeMillis()) + ": after execute");
+      retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext, this::onReconnectionSuccessful, onFailure),
+                                  scheduler);
     } catch (Throwable e) {
       System.out.println(new Timestamp(System.currentTimeMillis()) + ": Throwing exception at start source");
       if (e instanceof MuleException) {
@@ -329,7 +327,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       retryScheduler.execute(() -> {
         try {
           restart();
-        } catch (MuleException e) {
+        } catch (Exception e) {
           this.onReconnectionFailed(e);
         }
       });
