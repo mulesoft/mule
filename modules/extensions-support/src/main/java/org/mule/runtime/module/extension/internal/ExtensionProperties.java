@@ -7,11 +7,14 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.sdk.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 /**
  * Constants for the Extensions Framework
@@ -117,6 +120,15 @@ public class ExtensionProperties {
    */
   public static final String ENABLE_POLLING_SOURCE_LIMIT_PARAMETER =
       EXTENSION_LOADER_PROPERTY_PREFIX + "ENABLE_POLLING_SOURCE_LIMIT";
+
+  /**
+   * When present, the execution of any {@link DeclarationEnricher} that adds descriptions to a {@link ExtensionDeclaration} is
+   * skipped.
+   *
+   * @since 4.5
+   */
+  public static final String DISABLE_DESCRIPTIONS_ENRICHMENT =
+      EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_DESCRIPTIONS_ENRICHMENT";
 
   private ExtensionProperties() {}
 }

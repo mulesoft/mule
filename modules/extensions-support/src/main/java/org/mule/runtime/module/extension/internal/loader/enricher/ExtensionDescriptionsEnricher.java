@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_DESCRIPTIONS_ENRICHMENT;
 import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -41,12 +42,15 @@ import java.util.List;
  */
 public final class ExtensionDescriptionsEnricher implements DeclarationEnricher {
 
-
   /**
    * {@inheritDoc}
    */
   @Override
   public void enrich(ExtensionLoadingContext loadingContext) {
+    if (isDisableDscriptionsEnrichment(loadingContext)) {
+      return;
+    }
+
     String name = loadingContext.getExtensionDeclarer().getDeclaration().getName();
     ClassLoader classLoader = loadingContext.getExtensionClassLoader();
     try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + SERIALIZER.getFileName(name))) {
@@ -61,6 +65,12 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
     } catch (IOException e) {
       throw new RuntimeException("Cannot get descriptions persisted in the extensions-descriptions.xml file", e);
     }
+  }
+
+  public boolean isDisableDscriptionsEnrichment(ExtensionLoadingContext loadingContext) {
+    return loadingContext.getParameter(DISABLE_DESCRIPTIONS_ENRICHMENT)
+        .map(v -> v instanceof Boolean ? (Boolean) v : false)
+        .orElse(false);
   }
 
   /**
