@@ -25,7 +25,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface ConnectionProviderModelParser {
+public interface ConnectionProviderModelParser extends SemanticTermsParser {
 
   /**
    * @return the provider's name

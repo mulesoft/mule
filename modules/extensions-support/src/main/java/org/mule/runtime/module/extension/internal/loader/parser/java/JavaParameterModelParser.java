@@ -12,12 +12,21 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION_PARAMETER;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.PROXY_CONFIGURATION_PARAMETER;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.PROXY_CONFIGURATION_TYPE;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.SCALAR_SECRET;
+import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.SECRET;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getParameterTermsFromAnnotations;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addTermIfPresent;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -45,6 +54,7 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
@@ -60,9 +70,11 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
 import java.lang.reflect.Field;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link ParameterModelParser} for Java based syntax
@@ -202,6 +214,32 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public boolean isExcludedFromConnectivitySchema() {
     return parameter.getAnnotation(ExcludeFromConnectivitySchema.class).isPresent();
+  }
+
+  @Override
+  public Set<String> getSemanticTerms() {
+    Set<String> terms = new LinkedHashSet<>();
+    terms.addAll(getParameterTermsFromAnnotations(parameter::isAnnotatedWith));
+
+      Set<String> typeTerms = new LinkedHashSet<>(ExtensionMetadataTypeUtils.getSemanticTerms(getType()));
+
+      addTermIfPresent(typeTerms, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER, terms);
+      addTermIfPresent(typeTerms, NTLM_PROXY_CONFIGURATION, NTLM_PROXY_CONFIGURATION_PARAMETER, terms);
+
+      if (typeTerms.contains(SECRET)) {
+        getType().accept(new BasicTypeMetadataVisitor() {
+
+          @Override
+          protected void visitBasicType(MetadataType metadataType) {
+            typeTerms.remove(SECRET);
+            typeTerms.add(SCALAR_SECRET);
+          }
+        });
+      }
+
+      addCustomTerms(parameter, terms);
+
+      return terms;
   }
 
   private void collectAdditionalModelProperties() {

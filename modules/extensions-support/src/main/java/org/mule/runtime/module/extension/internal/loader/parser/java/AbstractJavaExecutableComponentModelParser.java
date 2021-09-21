@@ -24,7 +24,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 
 import java.util.List;
 
@@ -101,7 +101,7 @@ abstract class AbstractJavaExecutableComponentModelParser extends AbstractJavaMo
    * @param element the connected component
    */
   protected void parseComponentByteStreaming(WithAnnotations element) {
-    supportsStreaming = ModelLoaderUtils.isInputStream(outputType.getType())
+    supportsStreaming = JavaModelLoaderUtils.isInputStream(outputType.getType())
         || element.getAnnotation(Streaming.class).isPresent()
         || element.getAnnotation(org.mule.sdk.api.annotation.Streaming.class).isPresent();
   }

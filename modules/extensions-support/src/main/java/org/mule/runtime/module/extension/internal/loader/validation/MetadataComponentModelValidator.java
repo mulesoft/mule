@@ -19,8 +19,8 @@ import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.isNu
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isRouter;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isScope;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isCompileTime;
 
@@ -53,7 +53,6 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
-import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 

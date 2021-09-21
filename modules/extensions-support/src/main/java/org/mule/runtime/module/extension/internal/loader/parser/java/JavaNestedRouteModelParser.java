@@ -19,9 +19,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link NestedRouteModelParser} for Java based syntax
@@ -77,5 +79,10 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
     return JavaExtensionModelParserUtils.getDeprecationModel(route);
+  }
+
+  @Override
+  public Set<String> getSemanticTerms() {
+    return new LinkedHashSet<>();
   }
 }

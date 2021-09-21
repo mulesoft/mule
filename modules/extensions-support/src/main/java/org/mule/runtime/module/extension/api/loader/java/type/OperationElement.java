@@ -15,7 +15,7 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import java.util.List;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isNonBlocking;
 
 /**
  * {@link MethodElement} specification for Operations

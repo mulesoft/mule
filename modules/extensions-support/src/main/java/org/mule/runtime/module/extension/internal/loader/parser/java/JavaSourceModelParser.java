@@ -10,12 +10,14 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getAllTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getSourceParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forSource;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -47,8 +49,10 @@ import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourc
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelParser implements SourceModelParser {
 
@@ -148,6 +152,15 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   @Override
   public boolean hasConfig() {
     return configParameter.isPresent();
+  }
+
+  @Override
+  public Set<String> getSemanticTerms() {
+    Set<String> terms = new LinkedHashSet<>();
+    terms.addAll(getAllTermsFromAnnotations(sourceElement::isAnnotatedWith));
+    addCustomTerms(sourceElement, terms);
+
+    return terms;
   }
 
   private void collectAdditionalModelProperties() {

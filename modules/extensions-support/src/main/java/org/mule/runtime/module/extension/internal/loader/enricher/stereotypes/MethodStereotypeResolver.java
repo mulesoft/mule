@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRoute;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isProcessorChain;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isRoute;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;

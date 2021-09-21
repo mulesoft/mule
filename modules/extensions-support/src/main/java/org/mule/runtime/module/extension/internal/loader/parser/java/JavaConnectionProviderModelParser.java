@@ -13,10 +13,12 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getConnectionTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -47,9 +49,11 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 import org.mule.sdk.api.connectivity.NoConnectivityTest;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link ConnectionProviderModelParser} for Java based syntax
@@ -179,6 +183,15 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   @Override
   public Optional<DisplayModel> getDisplayModel() {
     return JavaExtensionModelParserUtils.getDisplayModel(element, "connection provider", element.getName());
+  }
+
+  @Override
+  public Set<String> getSemanticTerms() {
+    Set<String> terms = new LinkedHashSet<>();
+    terms.addAll(getConnectionTermsFromAnnotations(element::isAnnotatedWith));
+    addCustomTerms(element, terms);
+
+    return terms;
   }
 
   @Override

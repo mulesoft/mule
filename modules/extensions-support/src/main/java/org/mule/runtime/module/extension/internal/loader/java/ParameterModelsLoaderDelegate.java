@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
@@ -21,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class ParameterModelsLoaderDelegate {
-
 
   public List<ParameterDeclarer> declare(HasParametersDeclarer component, List<ParameterGroupModelParser> groupParsers) {
 
@@ -44,39 +44,41 @@ public final class ParameterModelsLoaderDelegate {
         group.getLayoutModel().ifPresent(groupDeclarer::withLayout);
       }
 
-      group.getParameterParsers().forEach(extensionParameter -> {
+      group.getParameterParsers().forEach(parameterParser -> {
         ParameterDeclarer parameter;
-        if (extensionParameter.isRequired()) {
-          parameter = groupDeclarer.withRequiredParameter(extensionParameter.getName());
+        if (parameterParser.isRequired()) {
+          parameter = groupDeclarer.withRequiredParameter(parameterParser.getName());
         } else {
-          parameter = groupDeclarer.withOptionalParameter(extensionParameter.getName())
-              .defaultingTo(extensionParameter.getDefaultValue());
+          parameter = groupDeclarer.withOptionalParameter(parameterParser.getName())
+              .defaultingTo(parameterParser.getDefaultValue());
         }
 
-        final MetadataType metadataType = extensionParameter.getType();
+        final MetadataType metadataType = parameterParser.getType();
         parameter.ofType(metadataType)
-            .describedAs(extensionParameter.getDescription())
-            .withAllowedStereotypes(extensionParameter.getAllowedStereotypes())
-            .withRole(extensionParameter.getRole())
-            .withExpressionSupport(extensionParameter.getExpressionSupport());
+            .describedAs(parameterParser.getDescription())
+            .withAllowedStereotypes(parameterParser.getAllowedStereotypes())
+            .withRole(parameterParser.getRole())
+            .withExpressionSupport(parameterParser.getExpressionSupport());
 
-        if (extensionParameter.isComponentId()) {
+        if (parameterParser.isComponentId()) {
           parameter.asComponentId();
         }
 
-        if (extensionParameter.isConfigOverride()) {
+        if (parameterParser.isConfigOverride()) {
           parameter.asConfigOverride();
         }
 
-        if (extensionParameter.isExcludedFromConnectivitySchema()) {
+        if (parameterParser.isExcludedFromConnectivitySchema()) {
           parameter.withModelProperty(new ExcludeFromConnectivitySchemaModelProperty());
         }
 
-        extensionParameter.getLayoutModel().ifPresent(parameter::withLayout);
-        extensionParameter.getDslConfiguration().ifPresent(parameter::withDsl);
-        extensionParameter.getDeprecationModel().ifPresent(parameter::withDeprecation);
-        extensionParameter.getDisplayModel().ifPresent(parameter::withDisplayModel);
-        extensionParameter.getAdditionalModelProperties().forEach(parameter::withModelProperty);
+        parameterParser.getLayoutModel().ifPresent(parameter::withLayout);
+        parameterParser.getDslConfiguration().ifPresent(parameter::withDsl);
+        parameterParser.getDeprecationModel().ifPresent(parameter::withDeprecation);
+        parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
+        parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
+        addSemanticTerms(parameter.getDeclaration(), parameterParser);
+        parameter.getDeclaration().getSemanticTerms().addAll(parameterParser.getSemanticTerms());
         declarerList.add(parameter);
       });
 

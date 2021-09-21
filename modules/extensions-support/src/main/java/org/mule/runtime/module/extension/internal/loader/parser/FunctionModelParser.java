@@ -22,7 +22,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface FunctionModelParser extends AdditionalPropertiesModelParser {
+public interface FunctionModelParser extends SemanticTermsParser, AdditionalPropertiesModelParser {
 
   /**
    * @return the function's name
