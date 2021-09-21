@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static java.util.Optional.of;
+import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -15,9 +16,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
-import org.apache.commons.io.FileUtils;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -121,19 +121,14 @@ public class SpringXmlConfigurationBuilderTestCase {
     final URL originalResource = Thread.currentThread().getContextClassLoader().getResource(resourceName);
     final File simpleAppFileOutsideClassPath = new File(tempFolder.getRoot(), resourceName);
     assertThat(originalResource, is(not(nullValue())));
-    FileUtils.copyURLToFile(originalResource, simpleAppFileOutsideClassPath);
+    copyURLToFile(originalResource, simpleAppFileOutsideClassPath);
   }
 
   private SpringXmlConfigurationBuilder xmlConfigurationBuilderRelativeToPath(File basePath, String[] resources)
-      throws IOException, ConfigurationException {
-    final ClassLoader applicationClassLoader = new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null);
-    final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(applicationClassLoader);
-    try {
-      return new SpringXmlConfigurationBuilder(resources, new HashMap<>(), ArtifactType.APP, false, false);
-    } finally {
-      Thread.currentThread().setContextClassLoader(originalClassLoader);
-    }
+      throws IOException {
+    return withContextClassLoader(new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null),
+                                  () -> new SpringXmlConfigurationBuilder(resources, new HashMap<>(), ArtifactType.APP, false,
+                                                                          false));
   }
 
   public static final class TestExtensionSchemagenerator implements ExtensionSchemaGenerator {
