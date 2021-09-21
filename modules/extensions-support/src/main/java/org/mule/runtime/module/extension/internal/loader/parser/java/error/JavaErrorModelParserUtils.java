@@ -28,7 +28,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter;
-import org.mule.runtime.module.extension.internal.error.SdkrrorTypeProviderAdapter;
+import org.mule.runtime.module.extension.internal.error.SdkErrorTypeProviderAdapter;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
@@ -141,7 +141,7 @@ public final class JavaErrorModelParserUtils {
         .flatMap(providerClass -> {
           try {
             org.mule.sdk.api.annotation.error.ErrorTypeProvider errorTypeProvider =
-                SdkrrorTypeProviderAdapter.from(providerClass.newInstance());
+                SdkErrorTypeProviderAdapter.from(providerClass.newInstance());
             return errorTypeProvider.getErrorTypes().stream()
                 .map(error -> {
                   validateOperationThrows(extensionParser, error);

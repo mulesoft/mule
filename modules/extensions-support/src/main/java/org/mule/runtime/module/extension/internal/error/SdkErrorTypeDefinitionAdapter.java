@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.error;
 
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.sdk.api.error.ErrorTypeDefinition;
@@ -40,10 +41,10 @@ public class SdkErrorTypeDefinitionAdapter<E extends Enum<E>> implements ErrorTy
     } else if (value instanceof org.mule.runtime.extension.api.error.ErrorTypeDefinition) {
       return new SdkErrorTypeDefinitionAdapter<E>((org.mule.runtime.extension.api.error.ErrorTypeDefinition) value);
     } else {
-      throw new IllegalArgumentException(String.format("Value of class '%s' is neither a '%s' or a '%s'",
-                                                       value.getClass().getName(),
-                                                       ErrorTypeDefinition.class.getName(),
-                                                       org.mule.runtime.extension.api.error.ErrorTypeDefinition.class.getName()));
+      throw new IllegalArgumentException(format("Value of class '%s' is neither a '%s' nor a '%s'",
+                                                value.getClass().getName(),
+                                                ErrorTypeDefinition.class.getName(),
+                                                org.mule.runtime.extension.api.error.ErrorTypeDefinition.class.getName()));
     }
   }
 
