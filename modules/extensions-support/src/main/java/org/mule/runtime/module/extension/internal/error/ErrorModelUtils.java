@@ -21,8 +21,8 @@ public final class ErrorModelUtils {
    *         ({@code false})
    */
   public static boolean isMuleError(ErrorTypeDefinition errorType) {
-    if (errorType instanceof LegacyErrorTypeDefinitionAdapter) {
-      return ((LegacyErrorTypeDefinitionAdapter<?>) errorType)
+    if (errorType instanceof SdkErrorTypeDefinitionAdapter) {
+      return ((SdkErrorTypeDefinitionAdapter<?>) errorType)
           .getDelegate() instanceof org.mule.runtime.extension.api.error.MuleErrors;
     }
 

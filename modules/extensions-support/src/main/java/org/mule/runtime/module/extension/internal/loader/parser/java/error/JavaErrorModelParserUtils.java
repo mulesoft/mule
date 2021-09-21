@@ -27,8 +27,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
-import org.mule.runtime.module.extension.internal.error.LegacyErrorTypeDefinitionAdapter;
-import org.mule.runtime.module.extension.internal.error.LegacyErrorTypeProviderAdapter;
+import org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter;
+import org.mule.runtime.module.extension.internal.error.SdkrrorTypeProviderAdapter;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
@@ -94,8 +94,8 @@ public final class JavaErrorModelParserUtils {
    * @return the root definition's {@link Class}
    */
   public static Class<?> getDeclarationClass(ErrorTypeDefinition errorTypeDefinition) {
-    return errorTypeDefinition instanceof LegacyErrorTypeDefinitionAdapter
-        ? ((LegacyErrorTypeDefinitionAdapter<?>) errorTypeDefinition).getDelegate().getClass()
+    return errorTypeDefinition instanceof SdkErrorTypeDefinitionAdapter
+        ? ((SdkErrorTypeDefinitionAdapter<?>) errorTypeDefinition).getDelegate().getClass()
         : errorTypeDefinition.getClass();
   }
 
@@ -103,7 +103,7 @@ public final class JavaErrorModelParserUtils {
   private static List<ErrorModelParser> parseErrorTypeDefinitions(Class<? extends Enum> typeDefClass) {
     Map<ErrorTypeDefinition, ErrorModelParser> cycleControls = new HashMap<>(emptyMap());
     return Stream.of(typeDefClass.getEnumConstants())
-        .map(def -> toParser(LegacyErrorTypeDefinitionAdapter.from(def), cycleControls))
+        .map(def -> toParser(SdkErrorTypeDefinitionAdapter.from(def), cycleControls))
         .collect(toList());
   }
 
@@ -141,7 +141,7 @@ public final class JavaErrorModelParserUtils {
         .flatMap(providerClass -> {
           try {
             org.mule.sdk.api.annotation.error.ErrorTypeProvider errorTypeProvider =
-                LegacyErrorTypeProviderAdapter.from(providerClass.newInstance());
+                SdkrrorTypeProviderAdapter.from(providerClass.newInstance());
             return errorTypeProvider.getErrorTypes().stream()
                 .map(error -> {
                   validateOperationThrows(extensionParser, error);

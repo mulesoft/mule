@@ -21,7 +21,7 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-public class LegacyErrorTypeProviderAdapter implements ErrorTypeProvider {
+public class SdkrrorTypeProviderAdapter implements ErrorTypeProvider {
 
   /**
    * Returns an adapted version of the {@code value}.
@@ -39,7 +39,7 @@ public class LegacyErrorTypeProviderAdapter implements ErrorTypeProvider {
     if (value instanceof ErrorTypeProvider) {
       return (ErrorTypeProvider) value;
     } else if (value instanceof org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider) {
-      return new LegacyErrorTypeProviderAdapter((org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider) value);
+      return new SdkrrorTypeProviderAdapter((org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider) value);
     } else {
       throw new IllegalArgumentException(String.format("Value of class '%s' is neither a '%s' or a '%s'",
                                                        value.getClass().getName(),
@@ -51,14 +51,14 @@ public class LegacyErrorTypeProviderAdapter implements ErrorTypeProvider {
 
   private final org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider delegate;
 
-  private LegacyErrorTypeProviderAdapter(org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider delegate) {
+  private SdkrrorTypeProviderAdapter(org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider delegate) {
     this.delegate = delegate;
   }
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
     return (Set<ErrorTypeDefinition>) delegate.getErrorTypes().stream()
-        .map(LegacyErrorTypeDefinitionAdapter::new)
+        .map(SdkErrorTypeDefinitionAdapter::new)
         .collect(toCollection(LinkedHashSet::new));
   }
 }

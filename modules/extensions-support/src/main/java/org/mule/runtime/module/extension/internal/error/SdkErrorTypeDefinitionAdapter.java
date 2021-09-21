@@ -20,7 +20,7 @@ import java.util.Optional;
  * @param <E> the definition's generic type
  * @since 4.5.0
  */
-public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements ErrorTypeDefinition<E> {
+public class SdkErrorTypeDefinitionAdapter<E extends Enum<E>> implements ErrorTypeDefinition<E> {
 
   /**
    * Returns an adapted version of the {@code value}.
@@ -38,7 +38,7 @@ public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements Erro
     if (value instanceof ErrorTypeDefinition) {
       return (ErrorTypeDefinition<E>) value;
     } else if (value instanceof org.mule.runtime.extension.api.error.ErrorTypeDefinition) {
-      return new LegacyErrorTypeDefinitionAdapter<E>((org.mule.runtime.extension.api.error.ErrorTypeDefinition) value);
+      return new SdkErrorTypeDefinitionAdapter<E>((org.mule.runtime.extension.api.error.ErrorTypeDefinition) value);
     } else {
       throw new IllegalArgumentException(String.format("Value of class '%s' is neither a '%s' or a '%s'",
                                                        value.getClass().getName(),
@@ -49,7 +49,7 @@ public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements Erro
 
   private final org.mule.runtime.extension.api.error.ErrorTypeDefinition<E> delegate;
 
-  LegacyErrorTypeDefinitionAdapter(org.mule.runtime.extension.api.error.ErrorTypeDefinition<E> delegate) {
+  SdkErrorTypeDefinitionAdapter(org.mule.runtime.extension.api.error.ErrorTypeDefinition<E> delegate) {
     this.delegate = delegate;
   }
 
@@ -60,7 +60,7 @@ public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements Erro
 
   @Override
   public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
-    return delegate.getParent().map(LegacyErrorTypeDefinitionAdapter::new);
+    return delegate.getParent().map(SdkErrorTypeDefinitionAdapter::new);
   }
 
   public org.mule.runtime.extension.api.error.ErrorTypeDefinition<E> getDelegate() {
@@ -75,7 +75,7 @@ public class LegacyErrorTypeDefinitionAdapter<E extends Enum<E>> implements Erro
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    LegacyErrorTypeDefinitionAdapter<?> that = (LegacyErrorTypeDefinitionAdapter<?>) o;
+    SdkErrorTypeDefinitionAdapter<?> that = (SdkErrorTypeDefinitionAdapter<?>) o;
     return delegate == that.delegate;
   }
 

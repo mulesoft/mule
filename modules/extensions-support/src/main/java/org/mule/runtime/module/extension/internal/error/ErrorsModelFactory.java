@@ -57,7 +57,7 @@ public class ErrorsModelFactory {
 
   private static ErrorTypeDefinition<?>[] adaptLegacyArray(org.mule.runtime.extension.api.error.ErrorTypeDefinition<?>[] errorTypesEnum) {
     return Stream.of(errorTypesEnum)
-        .map(LegacyErrorTypeDefinitionAdapter::from)
+        .map(SdkErrorTypeDefinitionAdapter::from)
         .toArray(ErrorTypeDefinition[]::new);
   }
 
