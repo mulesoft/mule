@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
@@ -27,7 +26,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface SourceModelParser {
+public interface SourceModelParser extends AdditionalPropertiesModelParser {
 
   /**
    * @return the source's name
@@ -129,14 +128,6 @@ public interface SourceModelParser {
    * @return an {@link Optional} {@link ExceptionHandlerModelProperty} is an exception handler was defined for this source.
    */
   Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty();
-
-  /**
-   * Returns a list with all the {@link ModelProperty model properties} to be applied at the operation level which are
-   * specifically linked to the type of syntax used to define the extension.
-   *
-   * @return a list with {@link ModelProperty} instances.
-   */
-  List<ModelProperty> getAdditionalModelProperties();
 
   /**
    * @return the source's {@link DeprecationModel} if one was defined

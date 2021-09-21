@@ -2929,8 +2929,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "PETSTORE:CONNECTIVITY",
             "PETSTORE:PET_ERROR",
+            "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
@@ -35769,13 +35769,13 @@
       "handleable": true
     },
     {
-      "error": "PETSTORE:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "PETSTORE:PET_ERROR",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
-      "error": "PETSTORE:PET_ERROR",
-      "parent": "MULE:ANY",
+      "error": "PETSTORE:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],

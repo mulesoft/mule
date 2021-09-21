@@ -11,7 +11,8 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.assertLayoutModel;
-import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getNamedObject;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;

@@ -7,18 +7,23 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
+
+import java.util.function.Supplier;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor
@@ -38,6 +43,8 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
   private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate = new ParameterModelsLoaderDelegate();
+
+  private Supplier<ErrorsModelFactory> errorsModelFactorySupplier;
 
   public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
@@ -63,7 +70,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .fromVendor(parser.getVendor())
             .withCategory(parser.getCategory())
             .withModelProperty(parser.getLicenseModelProperty())
-            .withXmlDsl(JavaModelLoaderUtils.getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
+            .withXmlDsl(getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
 
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")
@@ -73,6 +80,8 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
+
+    parseErrorModels(parser, declarer);
 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
@@ -84,6 +93,15 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     }
 
     return declarer;
+  }
+
+  private void parseErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+    initErrorModelFactorySupplier(parser, getExtensionsNamespace(declarer.getDeclaration()));
+    declarer.getDeclaration().getErrorModels().addAll(createErrorModelFactory().getErrorModels());
+  }
+
+  private void initErrorModelFactorySupplier(ExtensionModelParser parser, String namespace) {
+    errorsModelFactorySupplier = () -> new ErrorsModelFactory(parser.getErrorModelParsers(), namespace);
   }
 
   OperationModelLoaderDelegate getOperationLoaderDelegate() {
@@ -100,6 +118,11 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   ConnectionProviderModelLoaderDelegate getConnectionProviderModelLoaderDelegate() {
     return connectionProviderModelLoaderDelegate;
+  }
+
+  ErrorsModelFactory createErrorModelFactory() {
+    checkState(errorsModelFactorySupplier != null, "errorModelFactorySupplier not yet initialized");
+    return errorsModelFactorySupplier.get();
   }
 
   public ParameterModelsLoaderDelegate getParameterModelsLoaderDelegate() {

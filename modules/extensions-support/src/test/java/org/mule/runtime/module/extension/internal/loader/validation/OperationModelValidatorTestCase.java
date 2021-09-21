@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -67,6 +68,7 @@ public class OperationModelValidatorTestCase extends AbstractMuleTestCase {
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(operationModel.getOutput().getType()).thenReturn(TYPE_LOADER.load(String.class));
     when(operationModel.getOutputAttributes().getType()).thenReturn(TYPE_LOADER.load(void.class));
+    when(operationModel.getErrorModels()).thenReturn(emptySet());
     when(goodParameter.getName()).thenReturn("valid");
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(operationModel.getAllParameterModels()).thenReturn(asList(goodParameter));

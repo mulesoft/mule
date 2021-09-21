@@ -41,6 +41,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -753,5 +754,9 @@ public class MuleExtensionUtils {
   public static boolean isSourceCompletionCallbackType(Class<?> clazz) {
     return SourceCompletionCallback.class.equals(clazz)
         || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(clazz);
+  }
+
+  public static <T extends NamedObject> T getNamedObject(List<T> elemenets, String name) {
+    return elemenets.stream().filter(elem -> elem.getName().equals(name)).findFirst().get();
   }
 }

@@ -2836,7 +2836,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -3601,7 +3604,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -4378,7 +4384,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -5138,7 +5147,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -7670,7 +7682,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -9208,7 +9223,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -10064,7 +10082,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -10846,7 +10867,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -14688,7 +14712,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -15453,7 +15480,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -16746,7 +16776,10 @@
           "supportsStreaming": true,
           "notifications": [],
           "nestedComponents": [],
-          "errors": [],
+          "errors": [
+            "HEISENBERG:CONNECTIVITY",
+            "HEISENBERG:RETRY_EXHAUSTED"
+          ],
           "semanticTerms": [],
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
@@ -54506,6 +54539,11 @@
   ],
   "errors": [
     {
+      "error": "MULE:VALIDATION",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "MULE:ANY",
       "handleable": true
     },
@@ -54527,11 +54565,6 @@
     {
       "error": "HEISENBERG:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
-      "handleable": true
-    },
-    {
-      "error": "MULE:VALIDATION",
-      "parent": "MULE:ANY",
       "handleable": true
     },
     {

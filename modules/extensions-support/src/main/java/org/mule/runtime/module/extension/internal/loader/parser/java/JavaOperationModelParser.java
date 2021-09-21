@@ -21,6 +21,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forOperation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseOperationErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
@@ -54,6 +55,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
@@ -78,6 +81,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                                VoidCompletionCallback.class,
                                                                                org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
 
+  private final ExtensionModelParser extensionModelParser;
   private final OperationElement operationElement;
   private final OperationContainerElement operationContainer;
   private final OperationContainerElement enclosingType;
@@ -92,12 +96,14 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private boolean autoPaging = false;
   private List<ExtensionParameter> routes = emptyList();
 
-  public JavaOperationModelParser(ExtensionElement extensionElement,
+  public JavaOperationModelParser(ExtensionModelParser extensionModelParser,
+                                  ExtensionElement extensionElement,
                                   OperationContainerElement operationContainer,
                                   OperationElement operationElement,
                                   ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
 
+    this.extensionModelParser = extensionModelParser;
     this.operationElement = operationElement;
 
     this.operationContainer = operationElement.getEnclosingType();
@@ -408,6 +414,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public boolean hasConfig() {
     return configParameter.isPresent();
+  }
+
+  @Override
+  public List<ErrorModelParser> getErrorModelParsers() {
+    return parseOperationErrorModels(extensionModelParser, extensionElement, operationElement);
   }
 
   private void checkOperationIsNotAnExtension() {

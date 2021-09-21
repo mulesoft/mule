@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.lang.String.format;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -27,7 +26,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Connectiv
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -37,17 +35,13 @@ import java.util.List;
  *
  * @since 4.5.0
  */
-abstract class AbstractJavaExecutableComponentModelParser {
-
-  protected final ExtensionElement extensionElement;
-  protected final ExtensionLoadingContext loadingContext;
+abstract class AbstractJavaExecutableComponentModelParser extends AbstractJavaModelParser {
 
   protected OutputModelParser outputType;
   protected OutputModelParser outputAttributesType;
   protected boolean supportsStreaming = false;
   protected boolean connected = false;
   protected boolean transactional = false;
-  protected final List<ModelProperty> additionalModelProperties = new LinkedList<>();
 
   /**
    * Creates a new instance
@@ -56,8 +50,7 @@ abstract class AbstractJavaExecutableComponentModelParser {
    * @param loadingContext   the loading context
    */
   public AbstractJavaExecutableComponentModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
-    this.extensionElement = extensionElement;
-    this.loadingContext = loadingContext;
+    super(extensionElement, loadingContext);
   }
 
   /**
@@ -68,7 +61,7 @@ abstract class AbstractJavaExecutableComponentModelParser {
   protected abstract String getComponentTypeName();
 
   /**
-   * @return The parsed compoent's name
+   * @return The parsed component's name
    */
   protected abstract String getName();
 
@@ -148,9 +141,5 @@ abstract class AbstractJavaExecutableComponentModelParser {
 
   public boolean isTransactional() {
     return transactional;
-  }
-
-  public List<ModelProperty> getAdditionalModelProperties() {
-    return additionalModelProperties;
   }
 }

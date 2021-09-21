@@ -13,6 +13,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -96,7 +97,15 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .describedAs(chain.getDescription())
           .setRequired(chain.isRequired()));
 
+      parseErrorModels(operation, parser);
       operationDeclarers.put(parser, operation);
     }
+  }
+
+  private void parseErrorModels(OperationDeclarer operation, OperationModelParser parser) {
+    final ErrorsModelFactory errorsModelFactory = loader.createErrorModelFactory();
+    parser.getErrorModelParsers().stream()
+        .map(errorsModelFactory::getErrorModel)
+        .forEach(operation::withErrorModel);
   }
 }

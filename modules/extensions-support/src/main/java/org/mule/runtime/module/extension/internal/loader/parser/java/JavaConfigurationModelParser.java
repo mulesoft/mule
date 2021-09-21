@@ -7,14 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
@@ -29,13 +27,13 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,20 +42,26 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class JavaConfigurationModelParser implements ConfigurationModelParser {
+public class JavaConfigurationModelParser extends AbstractJavaModelParser implements ConfigurationModelParser {
 
-  private final ExtensionElement extensionElement;
+  private final ExtensionModelParser extensionModelParser;
   private final ComponentElement configElement;
-  private final ExtensionLoadingContext loadingContext;
 
-  public JavaConfigurationModelParser(ExtensionElement extensionElement,
+  public JavaConfigurationModelParser(ExtensionModelParser extensionModelParser,
+                                      ExtensionElement extensionElement,
                                       ComponentElement configElement,
                                       ExtensionLoadingContext loadingContext) {
-    checkConfigurationIsNotAnOperation(extensionElement, configElement);
-
-    this.extensionElement = extensionElement;
+    super(extensionElement, loadingContext);
+    this.extensionModelParser = extensionModelParser;
     this.configElement = configElement;
-    this.loadingContext = loadingContext;
+
+    parseStructure();
+  }
+
+  private void parseStructure() {
+    checkConfigurationIsNotAnOperation(extensionElement, configElement);
+    additionalModelProperties.add(new ImplementingTypeModelProperty(configElement.getDeclaringClass().orElse(Object.class)));
+    additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(configElement));
   }
 
   @Override
@@ -81,7 +85,8 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
 
   @Override
   public List<OperationModelParser> getOperationParsers() {
-    return JavaExtensionModelParserUtils.getOperationParsers(extensionElement, configElement, loadingContext);
+    return JavaExtensionModelParserUtils.getOperationParsers(extensionModelParser, extensionElement, configElement,
+                                                             loadingContext);
   }
 
   @Override
@@ -141,16 +146,6 @@ public class JavaConfigurationModelParser implements ConfigurationModelParser {
       }
     }
   }
-
-  @Override
-  public List<ModelProperty> getAdditionalModelProperties() {
-    List<ModelProperty> properties = new LinkedList<>();
-    properties.add(new ImplementingTypeModelProperty(configElement.getDeclaringClass().orElse(Object.class)));
-    properties.add(new ExtensionTypeDescriptorModelProperty(configElement));
-
-    return unmodifiableList(properties);
-  }
-
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {

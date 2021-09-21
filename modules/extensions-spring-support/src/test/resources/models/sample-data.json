@@ -310,8 +310,8 @@
           },
           "nestedComponents": [],
           "errors": [
-            "SAMPLE-DATA:RETRY_EXHAUSTED",
-            "SAMPLE-DATA:CONNECTIVITY"
+            "SAMPLE-DATA:CONNECTIVITY",
+            "SAMPLE-DATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -929,8 +929,8 @@
           },
           "nestedComponents": [],
           "errors": [
-            "SAMPLE-DATA:RETRY_EXHAUSTED",
-            "SAMPLE-DATA:CONNECTIVITY"
+            "SAMPLE-DATA:CONNECTIVITY",
+            "SAMPLE-DATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -1533,8 +1533,8 @@
           },
           "nestedComponents": [],
           "errors": [
-            "SAMPLE-DATA:RETRY_EXHAUSTED",
-            "SAMPLE-DATA:CONNECTIVITY"
+            "SAMPLE-DATA:CONNECTIVITY",
+            "SAMPLE-DATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -2152,8 +2152,8 @@
           },
           "nestedComponents": [],
           "errors": [
-            "SAMPLE-DATA:RETRY_EXHAUSTED",
-            "SAMPLE-DATA:CONNECTIVITY"
+            "SAMPLE-DATA:CONNECTIVITY",
+            "SAMPLE-DATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -2771,8 +2771,8 @@
           },
           "nestedComponents": [],
           "errors": [
-            "SAMPLE-DATA:RETRY_EXHAUSTED",
-            "SAMPLE-DATA:CONNECTIVITY"
+            "SAMPLE-DATA:CONNECTIVITY",
+            "SAMPLE-DATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -3375,8 +3375,8 @@
           },
           "nestedComponents": [],
           "errors": [
-            "SAMPLE-DATA:RETRY_EXHAUSTED",
-            "SAMPLE-DATA:CONNECTIVITY"
+            "SAMPLE-DATA:CONNECTIVITY",
+            "SAMPLE-DATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
@@ -3979,8 +3979,8 @@
           },
           "nestedComponents": [],
           "errors": [
-            "SAMPLE-DATA:RETRY_EXHAUSTED",
-            "SAMPLE-DATA:CONNECTIVITY"
+            "SAMPLE-DATA:CONNECTIVITY",
+            "SAMPLE-DATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
           "stereotype": {
