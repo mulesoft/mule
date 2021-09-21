@@ -31,6 +31,5 @@ public final class SemanticTermsParserUtils {
     }
   }
 
-  private SemanticTermsParserUtils() {
-  }
+  private SemanticTermsParserUtils() {}
 }

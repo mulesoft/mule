@@ -221,25 +221,25 @@ public class JavaParameterModelParser implements ParameterModelParser {
     Set<String> terms = new LinkedHashSet<>();
     terms.addAll(getParameterTermsFromAnnotations(parameter::isAnnotatedWith));
 
-      Set<String> typeTerms = new LinkedHashSet<>(ExtensionMetadataTypeUtils.getSemanticTerms(getType()));
+    Set<String> typeTerms = new LinkedHashSet<>(ExtensionMetadataTypeUtils.getSemanticTerms(getType()));
 
-      addTermIfPresent(typeTerms, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER, terms);
-      addTermIfPresent(typeTerms, NTLM_PROXY_CONFIGURATION, NTLM_PROXY_CONFIGURATION_PARAMETER, terms);
+    addTermIfPresent(typeTerms, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER, terms);
+    addTermIfPresent(typeTerms, NTLM_PROXY_CONFIGURATION, NTLM_PROXY_CONFIGURATION_PARAMETER, terms);
 
-      if (typeTerms.contains(SECRET)) {
-        getType().accept(new BasicTypeMetadataVisitor() {
+    if (typeTerms.contains(SECRET)) {
+      getType().accept(new BasicTypeMetadataVisitor() {
 
-          @Override
-          protected void visitBasicType(MetadataType metadataType) {
-            typeTerms.remove(SECRET);
-            typeTerms.add(SCALAR_SECRET);
-          }
-        });
-      }
+        @Override
+        protected void visitBasicType(MetadataType metadataType) {
+          typeTerms.remove(SECRET);
+          typeTerms.add(SCALAR_SECRET);
+        }
+      });
+    }
 
-      addCustomTerms(parameter, terms);
+    addCustomTerms(parameter, terms);
 
-      return terms;
+    return terms;
   }
 
   private void collectAdditionalModelProperties() {

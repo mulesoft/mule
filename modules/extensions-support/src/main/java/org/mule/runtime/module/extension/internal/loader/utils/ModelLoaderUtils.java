@@ -17,8 +17,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.SemanticTermsPar
  */
 public final class ModelLoaderUtils {
 
-  private ModelLoaderUtils() {
-  }
+  private ModelLoaderUtils() {}
 
   /**
    * Adds all the semantic terms in the {@code parser} into the given {@code declaration}

@@ -97,7 +97,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       parser.getExceptionHandlerModelProperty().ifPresent(operation::withModelProperty);
 
       parser.getNestedChainParser().ifPresent(chain -> {
-        NestedChainDeclarer chainDeclarer  = operation.withChain(chain.getName())
+        NestedChainDeclarer chainDeclarer = operation.withChain(chain.getName())
             .describedAs(chain.getDescription())
             .setRequired(chain.isRequired());
         addSemanticTerms(chainDeclarer.getDeclaration(), chain);

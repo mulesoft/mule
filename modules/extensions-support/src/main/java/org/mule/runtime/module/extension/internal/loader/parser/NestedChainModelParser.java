@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.model.nested.NestedChainModel;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface NestedChainModelParser extends SemanticTermsParser{
+public interface NestedChainModelParser extends SemanticTermsParser {
 
   /**
    * @return the chain's name
