@@ -137,10 +137,14 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     public ReactorPublisherBuilder<Mono<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
                                                                                    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                                                    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
+      // TODO: This could be done only once but might need refactoring (better to leave it for the granularity discussion).
+      // TODO: Add a feature flag ever "thread traceability" or something like that (always false by default).
+      if (getCurrentThreadProfilingContext() != null) {
+        getCurrentThreadProfilingContext().setRunningComponentMetadata(new ComponentMetadata(location));
+      }
       mono = profilingService.enrichWithProfilingEventMono(mono, dataProducer, transformer);
       return this;
     }
-
 
   }
 
@@ -192,15 +196,12 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
-                                                                                   ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
-                                                                                   Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
-      // TODO: This could be done only once but might need refactoring (better to leave it for the granularity discussion).
-      // TODO: Add a feature flag ever "thread traceability" or something like that (always false by default).
-      if (getCurrentThreadProfilingContext() != null) {
-        getCurrentThreadProfilingContext().setRunningComponentMetadata(new ComponentMetadata(location));
-      }
-      flux = profilingService.enrichWithProfilingEventFlux(flux, dataProducer, transformer);
+    public ReactorPublisherBuilder<Flux<CoreEvent>> profileProcessingStrategyEvent(ComponentLocation location,
+                                                                                   Optional<? extends ProfilingDataProducer> dataProducer,
+                                                                                   String artifactId, String artifactType) {
+      flux =
+          dataProducer.map(dp -> flux.doOnNext(e -> doProfileProcessingStrategyEvent(location, artifactId, artifactType, dp, e)))
+              .orElse(flux);
       return this;
     }
 
