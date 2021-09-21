@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.api;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
+
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -73,6 +74,9 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
     return this.location;
   }
 
+  /**
+   * @return the config files within the artifact, as filenames relative to the root of the packaged artifact.
+   */
   public Set<String> getConfigResources() {
     return configResources;
   }
