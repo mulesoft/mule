@@ -11,7 +11,7 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.OperationThreadSnapshot;
+import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Optional;
@@ -55,7 +55,7 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
   }
 
   @Override
-  public Optional<OperationThreadSnapshot> getThreadSnapshot() {
+  public Optional<ThreadSnapshot> getThreadSnapshot() {
     return empty();
   }
 

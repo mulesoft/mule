@@ -38,7 +38,7 @@ import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContex
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingNotificationListener;
-import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -113,7 +113,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     assertThat(profilingService.getDiscoveryStrategy(), instanceOf(CompositeProfilingDataConsumerDiscoveryStrategy.class));
     Set<ProfilingDataConsumer<?>> profilingDataConsumers = profilingService.getDiscoveryStrategy().discover();
     assertThat(profilingDataConsumers, hasSize(2));
-    assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentProcessingStrategyDataConsumer.class))));
+    assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentExecutionDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(testProfilingDataConsumer));
   }
 

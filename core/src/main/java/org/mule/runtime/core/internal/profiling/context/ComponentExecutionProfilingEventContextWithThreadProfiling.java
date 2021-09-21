@@ -10,17 +10,17 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.OperationThreadSnapshot;
+import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 
 import java.util.Optional;
 
 public class ComponentExecutionProfilingEventContextWithThreadProfiling implements ComponentExecutionProfilingEventContext {
 
   private final ComponentExecutionProfilingEventContext delegate;
-  private final Optional<OperationThreadSnapshot> threadSnapshot;
+  private final Optional<ThreadSnapshot> threadSnapshot;
 
   public ComponentExecutionProfilingEventContextWithThreadProfiling(ComponentExecutionProfilingEventContext delegate,
-                                                                    OperationThreadSnapshot threadSnapshot) {
+                                                                    ThreadSnapshot threadSnapshot) {
     this.delegate = delegate;
     this.threadSnapshot = ofNullable(threadSnapshot);
   }
@@ -41,7 +41,7 @@ public class ComponentExecutionProfilingEventContextWithThreadProfiling implemen
   }
 
   @Override
-  public Optional<OperationThreadSnapshot> getThreadSnapshot() {
+  public Optional<ThreadSnapshot> getThreadSnapshot() {
     return threadSnapshot;
   }
 

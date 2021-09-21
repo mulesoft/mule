@@ -28,7 +28,6 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentExecutionProfilingDataProducer;
-import org.mule.runtime.core.internal.profiling.threading.OperationThreadSnapshotCollector;
 import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
 
 import java.util.HashMap;
@@ -50,39 +49,30 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
-  private OperationThreadSnapshotCollector operationThreadSnapshotCollector = new OperationThreadSnapshotCollector();
-
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
 
         {
           put(FLOW_EXECUTED,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED,
-                                                          operationThreadSnapshotCollector));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
           put(PS_SCHEDULING_FLOW_EXECUTION,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_SCHEDULING_FLOW_EXECUTION,
-                                                          operationThreadSnapshotCollector));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_SCHEDULING_FLOW_EXECUTION));
           put(STARTING_FLOW_EXECUTION,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION,
-                                                          operationThreadSnapshotCollector));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION));
           put(PS_FLOW_MESSAGE_PASSING,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING,
-                                                          operationThreadSnapshotCollector));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING));
           put(OPERATION_EXECUTED,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED,
-                                                          operationThreadSnapshotCollector));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED));
           put(PS_SCHEDULING_OPERATION_EXECUTION,
               new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this,
-                                                          PS_SCHEDULING_OPERATION_EXECUTION, operationThreadSnapshotCollector));
+                                                          PS_SCHEDULING_OPERATION_EXECUTION));
           put(STARTING_OPERATION_EXECUTION,
               new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this,
-                                                          STARTING_OPERATION_EXECUTION, operationThreadSnapshotCollector));
-
+                                                          STARTING_OPERATION_EXECUTION));
           // TODO: Evaluate a feature flag check (could be "thread.profiling" or something like that)
           put(COMPONENT_THREAD_RELEASE,
-              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, COMPONENT_THREAD_RELEASE,
-                                                          operationThreadSnapshotCollector));
-                                                                   STARTING_OPERATION_EXECUTION));
+              new ComponentExecutionProfilingDataProducer(DefaultProfilingService.this, COMPONENT_THREAD_RELEASE));
+
           put(EXTENSION_PROFILING_EVENT,
               new ExtensionProfilingDataProducer(DefaultProfilingService.this,
                                                  EXTENSION_PROFILING_EVENT));

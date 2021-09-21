@@ -21,13 +21,13 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STA
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.ARTIFACT_ID_KEY;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.ARTIFACT_TYPE_KEY;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.LOCATION;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROCESSING_THREAD_KEY;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROFILING_EVENT_TIMESTAMP_KEY;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.PROFILING_EVENT_TYPE;
-import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer.RUNTIME_CORE_EVENT_CORRELATION_ID;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.ARTIFACT_ID_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.ARTIFACT_TYPE_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.LOCATION;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.PROCESSING_THREAD_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.PROFILING_EVENT_TIMESTAMP_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.PROFILING_EVENT_TYPE;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.RUNTIME_CORE_EVENT_CORRELATION_ID;
 import static org.mule.runtime.core.internal.profiling.notification.ProfilingNotification.getFullyQualifiedProfilingNotificationIdentifier;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
@@ -42,7 +42,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
-import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -169,18 +169,18 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
     @Override
     public Set<ProfilingDataConsumer<?>> discover() {
-      return of(new TestLoggerComponentProcessingStrategyDataConsumer(logger));
+      return of(new TestLoggerComponentExecutionDataConsumer(logger));
     }
   }
 
   /**
-   * Stub {@link LoggerComponentProcessingStrategyDataConsumer} for injecting a mocked {@link Logger}
+   * Stub {@link LoggerComponentExecutionDataConsumer} for injecting a mocked {@link Logger}
    */
-  private static class TestLoggerComponentProcessingStrategyDataConsumer extends LoggerComponentProcessingStrategyDataConsumer {
+  private static class TestLoggerComponentExecutionDataConsumer extends LoggerComponentExecutionDataConsumer {
 
     private final Logger logger;
 
-    public TestLoggerComponentProcessingStrategyDataConsumer(Logger logger) {
+    public TestLoggerComponentExecutionDataConsumer(Logger logger) {
       super();
       this.logger = logger;
     }

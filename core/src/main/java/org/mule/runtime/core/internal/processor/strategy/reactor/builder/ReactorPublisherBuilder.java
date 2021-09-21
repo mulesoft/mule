@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
-import static org.mule.runtime.api.profiling.context.threading.ThreadProfilingContext.getCurrentThreadProfilingContext;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static org.mule.runtime.api.profiling.tracing.TaskTracingService.getTaskTracingContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.context.ComponentMetadata;
+import org.mule.runtime.api.profiling.tracing.ComponentMetadata;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -219,8 +219,8 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
                                                       CoreEvent e) {
     // TODO: This could be done only once but might need refactoring (better to leave it for the granularity discussion).
     // TODO: Add a feature flag ever "thread traceability" or something like that (always false by default).
-    if (getCurrentThreadProfilingContext() != null) {
-      getCurrentThreadProfilingContext().setRunningComponentMetadata(new ComponentMetadata(location));
+    if (getTaskTracingContext() != null) {
+      getTaskTracingContext().setRunningComponentMetadata(new ComponentMetadata(location));
     }
     dataProducer.triggerProfilingEvent(
                                        new DefaultComponentExecutionProfilingEventContext(e,
