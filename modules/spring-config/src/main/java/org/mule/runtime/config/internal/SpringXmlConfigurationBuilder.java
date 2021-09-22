@@ -7,9 +7,9 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -22,6 +22,7 @@ import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifac
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
@@ -64,6 +65,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -313,7 +315,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             // Since there is already a workaround to allow polices to use http connector without declaring the dependency
             // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
             // well.
-            return new FilteredErrorTypeRepository(parentArtifactAst.getErrorTypeRepository(), singleton("HTTP"));
+            return new FilteredErrorTypeRepository(parentArtifactAst.getErrorTypeRepository(),
+                                                   new HashSet<>(asList("HTTP", CORE_NAMESPACE_NAME)));
           }
 
           @Override
