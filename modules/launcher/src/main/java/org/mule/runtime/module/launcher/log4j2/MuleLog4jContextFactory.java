@@ -122,12 +122,16 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
 
     @Override
     public Cancellable addShutdownCallback(Runnable callback) {
-      hooks.add(callback);
+      synchronized (hooks) {
+    	  hooks.add(callback);
+      }
       return new Cancellable() {
 
         @Override
         public void cancel() {
-          hooks.remove(callback);
+            synchronized (hooks) {
+            	hooks.remove(callback);
+            }
         }
 
         @Override
