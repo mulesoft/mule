@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -349,11 +350,12 @@ public class MuleContainer {
       toolingService.stop();
     }
 
-    if (LogManager.getFactory() instanceof MuleLog4jContextFactory) {
-      ((MuleLog4jContextFactory) LogManager.getFactory()).dispose();
+    LoggerContextFactory defaultLogManagerFactory = LogManager.getFactory();
+    if (defaultLogManagerFactory instanceof MuleLog4jContextFactory) {
+      ((MuleLog4jContextFactory) defaultLogManagerFactory).dispose();
     }
 
-    if (log4jContextFactory != null) {
+    if (log4jContextFactory != null && log4jContextFactory != defaultLogManagerFactory) {
       log4jContextFactory.dispose();
     }
   }
