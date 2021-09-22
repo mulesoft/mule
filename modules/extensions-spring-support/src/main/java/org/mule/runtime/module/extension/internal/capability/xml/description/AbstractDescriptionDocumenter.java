@@ -7,7 +7,9 @@
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import static java.util.Collections.unmodifiableMap;
-import org.mule.runtime.extension.api.annotation.Alias;
+import static java.util.Optional.ofNullable;
+
+import org.mule.runtime.extension.internal.util.AnnotationUtils;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -50,10 +52,8 @@ abstract class AbstractDescriptionDocumenter {
   }
 
   Optional<String> getAlias(Element element) {
-    Alias annotation = element.getAnnotation(Alias.class);
-    return annotation != null ? Optional.of(annotation.value()) : Optional.empty();
+    return ofNullable(AnnotationUtils.getAlias(element::getAnnotation, () -> null));
   }
-
 
   Map<String, Element> getApiMethods(ProcessingEnvironment processingEnv, List<TypeElement> containerClasses) {
     Map<String, Element> methods = new HashMap<>();

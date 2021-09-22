@@ -9,13 +9,14 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.extension.internal.util.AnnotationUtils.getAlias;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel.LayoutModelBuilder;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
@@ -117,17 +119,9 @@ public final class MuleExtensionAnnotationParser {
   }
 
   public static List<String> getParamNames(Method method) {
-    ImmutableList.Builder<String> paramNames = ImmutableList.builder();
-    for (java.lang.reflect.Parameter parameter : method.getParameters()) {
-      Alias alias = parameter.getAnnotation(Alias.class);
-      if (alias != null) {
-        paramNames.add(alias.value());
-      } else {
-        paramNames.add(parameter.getName());
-      }
-    }
-
-    return paramNames.build();
+    return Stream.of(method.getParameters())
+        .map(parameter -> getAlias(parameter, parameter::getName))
+        .collect(toList());
   }
 
   public static Map<Class<? extends Annotation>, Annotation> toMap(Annotation[] annotations) {

@@ -104,6 +104,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
+import org.mule.runtime.extension.internal.util.AnnotationUtils;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -159,6 +160,8 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
+import com.google.common.collect.ImmutableList;
+import org.apache.commons.collections.CollectionUtils;
 import com.google.common.collect.ImmutableList;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -1032,16 +1035,16 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Returns the {@link Alias} name of the given {@code element}. If the element doesn't have an alias, then the default name is
-   * return
+   * Returns the {@link Alias} or {@link org.mule.sdk.api.annotation.Alias} name of the given {@code element}.
+   * <p>
+   * If the element doesn't have an alias, then the default name is returned
    *
    * @param element an annotated member
    * @param <T>     the generic type of the element
    * @return an alias name
    */
   public static <T extends AnnotatedElement & Member> String getAlias(T element) {
-    Alias alias = element.getAnnotation(Alias.class);
-    return alias != null ? alias.value() : element.getName();
+    return AnnotationUtils.getAlias(element, element::getName);
   }
 
   private static List<Class<?>> getDescendingHierarchy(Class<?> type) {
@@ -1097,12 +1100,7 @@ public final class IntrospectionUtils {
   }
 
   public static String getSourceName(Class<?> sourceType) {
-    Alias alias = sourceType.getAnnotation(Alias.class);
-    if (alias != null) {
-      return alias.value();
-    }
-
-    return sourceType.getSimpleName();
+    return AnnotationUtils.getAlias(sourceType);
   }
 
   /**
