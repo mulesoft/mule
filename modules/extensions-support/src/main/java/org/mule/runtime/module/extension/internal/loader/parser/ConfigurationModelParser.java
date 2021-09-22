@@ -21,7 +21,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface ConfigurationModelParser extends AdditionalPropertiesModelParser {
+public interface ConfigurationModelParser extends StereotypeModelParser, AdditionalPropertiesModelParser {
 
   /**
    * @return the configuration's name

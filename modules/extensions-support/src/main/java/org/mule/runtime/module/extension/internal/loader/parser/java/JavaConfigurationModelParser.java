@@ -7,14 +7,18 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
@@ -137,6 +141,16 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public List<ExternalLibraryModel> getExternalLibraryModels() {
     return parseExternalLibraryModels(configElement);
+  }
+
+  @Override
+  public Optional<StereotypeModel> getStereotypeModel() {
+    final StereotypeModel defaultStereotype = createStereotype(config.getName(), CONFIG);
+    ifPresent(config.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+            .map(ExtensionTypeDescriptorModelProperty::getType),
+        type -> resolveStereotype(type, config, defaultStereotype),
+        () -> config.withStereotype(defaultStereotype));
+    componentConfigs = populateComponentConfigsMap(config);
   }
 
   private void checkConfigurationIsNotAnOperation(ExtensionElement extensionElement, ComponentElement componentElement) {
