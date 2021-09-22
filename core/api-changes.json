@@ -4,6 +4,24 @@
       "ignore": [
         {
           "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.server.HttpServerConfiguration.Builder org.mule.runtime.http.api.server.HttpServerConfiguration.Builder::setReadTimeout(long)",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "Builder",
+          "methodName": "setReadTimeout",
+          "elementKind": "method",
+          "justification": "MULE-19779: Adapt Mule and HTTP Service projects to support the read timeout feature for the http listener"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method long org.mule.runtime.http.api.server.HttpServerConfiguration::getReadTimeout()",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "HttpServerConfiguration",
+          "methodName": "getReadTimeout",
+          "elementKind": "method",
+          "justification": "MULE-19779: Adapt Mule and HTTP Service projects to support the read timeout feature for the http listener"
+        },
+        {
+          "code": "java.method.added",
           "new": "method java.lang.reflect.Field org.mule.runtime.core.api.util.ClassUtils::getField(java.lang.Class<?>, java.lang.String, boolean) throws java.lang.NoSuchFieldException",
           "package": "org.mule.runtime.core.api.util",
           "classSimpleName": "ClassUtils",
