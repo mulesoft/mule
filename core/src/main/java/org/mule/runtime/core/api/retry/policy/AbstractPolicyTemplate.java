@@ -51,7 +51,6 @@ public abstract class AbstractPolicyTemplate extends AbstractComponent implement
 
   @Override
   public RetryContext execute(RetryCallback callback, Executor workManager) throws Exception {
-    LOGGER.error("execute abstract ret pol");
     PolicyStatus status = null;
     RetryPolicy policy = createRetryInstance();
     DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription(), metaInfo, notificationFirer);

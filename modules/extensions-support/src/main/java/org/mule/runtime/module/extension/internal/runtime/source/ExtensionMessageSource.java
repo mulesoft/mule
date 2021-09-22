@@ -19,11 +19,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 
@@ -57,6 +57,7 @@ import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactor
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -218,45 +219,41 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void startSource(boolean restarting, RestartContext restartContext) throws MuleException {
-    startSource(restarting, restartContext, () -> {
-    }, (t) -> {
-    });
-  }
+    Runnable onSuccess;
+    Consumer<Throwable> onFailure;
 
-  private void startSource(boolean restarting, RestartContext restartContext, Runnable onSuccess, Consumer<Throwable> onFailure)
-      throws MuleException {
-    Scheduler scheduler;
-    if (restarting && retryPolicyTemplate.isAsync()) {
-      scheduler = IMMEDIATE_SCHEDULER;
+    if (retryPolicyTemplate.isAsync()) {
+      onSuccess = this::onReconnectionSuccessful;
+      onFailure = this::onReconnectionFailed;
     } else {
-      scheduler = retryScheduler;
+      onSuccess = () -> {
+      };
+      onFailure = (t) -> {
+      };
     }
+
     Supplier<CompletableFuture<Void>> futureSupplier = () -> {
       CompletableFuture<Void> future = new CompletableFuture<>();
-      scheduler.execute(() -> doWork(restarting, restartContext, future));
+      retryScheduler.execute(() -> doWork(restarting, restartContext, future));
       return future;
     };
-    try {
-      CompletableFuture<Void> future = retryPolicyTemplate.applyPolicy(futureSupplier, t -> true, t -> {
-      }, t -> {
-      }, identity(), scheduler).whenComplete((v, e) -> {
-        if (e != null) {
-          onFailure.accept(e);
-        } else {
-          onSuccess.run();
-        }
-      });
-      if (!retryPolicyTemplate.isAsync()) {
+
+    CompletableFuture<Void> future = retryPolicyTemplate
+        .applyPolicy(futureSupplier, t -> true, NULL_THROWABLE_CONSUMER, NULL_THROWABLE_CONSUMER, identity(), retryScheduler)
+        .whenComplete((v, e) -> {
+          if (e != null) {
+            onFailure.accept(e);
+          } else {
+            onSuccess.run();
+          }
+        });
+    if (!retryPolicyTemplate.isAsync()) {
+      try {
         future.get();
-      }
-      // retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext, this::onReconnectionSuccessful,
-      // onFailure), scheduler);
-    } catch (ExecutionException | InterruptedException exception) {
-      System.out.println(new Timestamp(System.currentTimeMillis()) + ": Throwing exception at start source");
-      Throwable e = exception.getCause();
-      if (e instanceof MuleException) {
-        throw (MuleException) e;
-      } else {
+        this.onReconnectionSuccessful();
+      } catch (ExecutionException exception) {
+        throw new RetryPolicyExhaustedException(exception.getCause(), ExtensionMessageSource.this);
+      } catch (InterruptedException e) {
         throw new MuleRuntimeException(e);
       }
     }
@@ -362,7 +359,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         try {
           restart();
         } catch (MuleException e) {
-          e.printStackTrace();
+          onReconnectionFailed(e);
         }
       });
     } else {
@@ -374,7 +371,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
             .subscribe();
       });
     }
-    System.out.println(new Timestamp(System.currentTimeMillis()) + ": return of OnException");
   }
 
   private void onReconnectionSuccessful() {
@@ -400,7 +396,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       if (started.get()) {
         RestartContext restartContext = stopSource(true);
         disposeSource();
-        startSource(true, restartContext, this::onReconnectionSuccessful, this::onReconnectionFailed);
+        startSource(true, restartContext);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
@@ -837,6 +833,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       if (connectionException.isPresent()) {
         throwable = connectionException.get();
       }
+      throwable = throwable instanceof Exception ? ((Exception) throwable) : new MuleRuntimeException(throwable);
       future.completeExceptionally(throwable);
     }
   }
