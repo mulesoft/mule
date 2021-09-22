@@ -159,21 +159,21 @@
         <derbyVersion>10.14.2.0</derbyVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <weaveVersion>2.5.0-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.5.0-20210917</weaveVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.5.0-SNAPSHOT</muleDslApiVersion>
-        <muleAstVersion>1.1.0-SNAPSHOT</muleAstVersion>
-        <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.5.0-SNAPSHOT</muleExtensionsApiVersion>
-        <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
-        <muleHttpPolicyApiVersion>1.5.0-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.7.0-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.7.0-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.7.0-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.5.0-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.5.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.5.0-SNAPSHOT</muleMetadataModelVersion>
+        <muleDslApiVersion>1.5.0-20210917</muleDslApiVersion>
+        <muleAstVersion>1.1.0-20210917</muleAstVersion>
+        <mulePropertiesApiVersion>1.1.0-20210917</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.5.0-20210917</muleExtensionsApiVersion>
+        <muleConnectivityApiVersion>1.1.0-20210917</muleConnectivityApiVersion>
+        <muleHttpPolicyApiVersion>1.5.0-20210917</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.7.0-20210917</muleMavenClientApi>
+        <muleMavenClientImpl>1.7.0-20210917</muleMavenClientImpl>
+        <muleMavenClientTest>1.7.0-20210917</muleMavenClientTest>
+        <mulePolicyApiVersion>1.5.0-20210917</mulePolicyApiVersion>
+        <muleApiVersion>1.5.0-20210917</muleApiVersion>
+        <muleMetadataModelVersion>1.5.0-20210917</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
