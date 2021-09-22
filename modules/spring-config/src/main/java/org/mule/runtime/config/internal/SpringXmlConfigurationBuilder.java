@@ -7,14 +7,12 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -34,7 +32,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -56,7 +53,6 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -67,13 +63,11 @@ import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
@@ -249,11 +243,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           artifactAst = emptyArtifact();
         } else {
           final AstXmlParser parser = createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
-
-          artifactAst = parser.parse(stream(artifactConfigResources)
-              .map((CheckedFunction<ConfigResource, Pair<String, InputStream>>) (configFile -> new Pair<>(configFile
-                  .getResourceName(), configFile.getInputStream())))
-              .collect(toList()));
+          artifactAst = parser.parse(artifactConfigResources);
         }
       } else {
         artifactAst = toArtifactast(artifactDeclaration, extensions);
