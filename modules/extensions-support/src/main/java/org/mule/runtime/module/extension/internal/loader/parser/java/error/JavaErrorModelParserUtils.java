@@ -128,8 +128,14 @@ public final class JavaErrorModelParserUtils {
                                            Map<ErrorTypeDefinition, ErrorModelParser> cycleControl) {
     JavaErrorModelParser parser = new JavaErrorModelParser(errorTypeDefinition, isMuleError(errorTypeDefinition));
     cycleControl.put(errorTypeDefinition, parser);
-    parser.setParent(errorTypeDefinition.getParent()
-        .map(p -> cycleControl.computeIfAbsent(p, key -> toParser(p, cycleControl))));
+    parser.setParent(errorTypeDefinition.getParent().map(p -> {
+      ErrorModelParser parentParser = cycleControl.get(p);
+      if (parentParser == null) {
+        parentParser = toParser(p, cycleControl);
+        cycleControl.put(p, parentParser);
+      }
+      return parentParser;
+    }));
 
     return parser;
   }
