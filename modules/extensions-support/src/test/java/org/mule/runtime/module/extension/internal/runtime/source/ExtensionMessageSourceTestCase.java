@@ -89,9 +89,9 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public ExtensionMessageSourceTestCase(String name, boolean primaryNodeOnly, boolean isAsync) {
     this.primaryNodeOnly = primaryNodeOnly;
     if (isAsync) {
-      this.retryPolicyTemplate = new AsynchronousRetryTemplate(new SimpleRetryPolicyTemplate(0, 2));
+      this.retryPolicyTemplate = new AsynchronousRetryTemplate(new SimpleRetryPolicyTemplate(10, 2));
     } else {
-      SimpleRetryPolicyTemplate template = new SimpleRetryPolicyTemplate(0, 2);
+      SimpleRetryPolicyTemplate template = new SimpleRetryPolicyTemplate(10, 2);
       template.setNotificationFirer(notificationDispatcher);
       this.retryPolicyTemplate = template;
     }
