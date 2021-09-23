@@ -42,7 +42,6 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -279,9 +278,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   private void parseExpressionSupport() {
-    expressionSupport = parameter.getAnnotation(Expression.class)
-        .map(expression -> IntrospectionUtils.getExpressionSupport(expression))
-        .orElse(SUPPORTED);
+    expressionSupport = IntrospectionUtils.getExpressionSupport(parameter).orElse(SUPPORTED);
   }
 
   private void parseExclusiveOptionals() {

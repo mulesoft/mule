@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.description;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.extension.internal.util.AnnotationUtils;
+import org.mule.runtime.extension.internal.loader.util.JavaParserUtils;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -52,7 +52,7 @@ abstract class AbstractDescriptionDocumenter {
   }
 
   Optional<String> getAlias(Element element) {
-    return ofNullable(AnnotationUtils.getAlias(element::getAnnotation, () -> null));
+    return ofNullable(JavaParserUtils.getAlias(element::getAnnotation, () -> null));
   }
 
   Map<String, Element> getApiMethods(ProcessingEnvironment processingEnv, List<TypeElement> containerClasses) {

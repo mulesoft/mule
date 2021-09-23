@@ -18,6 +18,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.RESOURCE_OWNER_ID_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.UNAUTHORIZE_OPERATION_NAME;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -35,7 +36,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -164,15 +164,12 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
     private void validateExpressionSupport(ConnectionProviderDeclaration provider,
                                            ParameterDeclaration parameter,
                                            Field field) {
-      Expression expression = field.getAnnotation(Expression.class);
-      if (expression != null && expression.value() != NOT_SUPPORTED) {
-        throw new IllegalConnectionProviderModelDefinitionException(
-                                                                    format(
-                                                                           "Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "
-                                                                               + "in OAuth parameters",
-                                                                           parameter.getName(),
-                                                                           provider.getName()));
-      }
+      getExpressionSupport(field)
+          .filter(expression -> expression == NOT_SUPPORTED)
+          .orElseThrow(() ->
+              new IllegalConnectionProviderModelDefinitionException(format(
+                  "Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "
+                      + "in OAuth parameters", parameter.getName(), provider.getName())));
     }
 
     private void enrichCallbackValues(ConnectionProviderDeclaration declaration, Class type) {

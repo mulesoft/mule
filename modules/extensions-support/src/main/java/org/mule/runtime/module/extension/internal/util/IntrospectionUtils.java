@@ -85,7 +85,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -103,8 +102,8 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.extension.internal.loader.util.JavaParserUtils;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
-import org.mule.runtime.extension.internal.util.AnnotationUtils;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -1044,7 +1043,7 @@ public final class IntrospectionUtils {
    * @return an alias name
    */
   public static <T extends AnnotatedElement & Member> String getAlias(T element) {
-    return AnnotationUtils.getAlias(element, element::getName);
+    return JavaParserUtils.getAlias(element, element::getName);
   }
 
   private static List<Class<?>> getDescendingHierarchy(Class<?> type) {
@@ -1091,16 +1090,12 @@ public final class IntrospectionUtils {
     }
   }
 
-  public static ExpressionSupport getExpressionSupport(AnnotatedElement object) {
-    return getExpressionSupport(object.getAnnotation(Expression.class));
-  }
-
-  public static ExpressionSupport getExpressionSupport(Expression expressionAnnotation) {
-    return expressionAnnotation != null ? expressionAnnotation.value() : SUPPORTED;
+  public static Optional<ExpressionSupport> getExpressionSupport(WithAnnotations annotatedElement) {
+    return JavaParserUtils.getExpressionSupport(clazz -> annotatedElement.getAnnotation(clazz).orElse(null));
   }
 
   public static String getSourceName(Class<?> sourceType) {
-    return AnnotationUtils.getAlias(sourceType);
+    return JavaParserUtils.getAlias(sourceType);
   }
 
   /**
