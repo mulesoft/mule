@@ -55,8 +55,6 @@ import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListe
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.retry.RetryCallback;
-import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -103,7 +101,6 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import java.sql.Timestamp;
 import java.util.function.Supplier;
 
 import reactor.core.publisher.Mono;
@@ -374,7 +371,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionSuccessful() {
-    System.out.println(new Timestamp(System.currentTimeMillis()) + ": onRecSuccessful");
     if (LOGGER.isWarnEnabled()) {
       LOGGER.warn("Message source '{}' on flow '{}' successfully reconnected",
                   sourceModel.getName(), getLocation().getRootContainerName());
@@ -383,7 +379,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionFailed(Throwable exception) {
-    System.out.println(new Timestamp(System.currentTimeMillis()) + ": onRecFailed");
     LOGGER.error(format("Message source '%s' on flow '%s' could not be reconnected. Will be shutdown. %s",
                         sourceModel.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
@@ -578,74 +573,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         return flowConstruct.get();
       }
     };
-  }
-
-  private class StartSourceCallback implements RetryCallback {
-
-    boolean restarting;
-    RestartContext restartContext;
-    Runnable onSuccess;
-    Consumer<Throwable> onFailure;
-
-    StartSourceCallback(boolean restarting, RestartContext restartContext, Runnable onSuccess, Consumer<Throwable> onFailure) {
-      this.restarting = restarting;
-      this.restartContext = restartContext;
-      this.onSuccess = onSuccess;
-      this.onFailure = onFailure;
-    }
-
-    @Override
-    public void onSuccess() {
-      onSuccess.run();
-    }
-
-    @Override
-    public void onFailure(Throwable t) {
-      onFailure.accept(t);
-    }
-
-    @Override
-    public void doWork(RetryContext context) throws Exception {
-      try {
-        createSource(restarting);
-        initialiseIfNeeded(sourceAdapter);
-        if (restarting) {
-          sourceAdapter.finishRestart(restartContext);
-        }
-        sourceAdapter.start();
-      } catch (Exception e) {
-        try {
-          // On connection exception, if the failed connection is present, it must be invalidated before stopping the source. This
-          // warranties that a possible call to connectionProvider.disconnect made on the onStop method of the source, does not
-          // affect the connection's invalidation
-          extractConnectionException(e).ifPresent(connectionException -> invalidateConnection(connectionException));
-          stopSource();
-        } catch (Exception eStop) {
-          e.addSuppressed(eStop);
-        }
-        try {
-          disposeSource();
-        } catch (Exception eDispose) {
-          e.addSuppressed(eDispose);
-        }
-        Throwable throwable = exceptionEnricherManager.process(e);
-        Optional<ConnectionException> connectionException = extractConnectionException(throwable);
-        if (connectionException.isPresent()) {
-          throwable = connectionException.get();
-        }
-        throw throwable instanceof Exception ? ((Exception) throwable) : new MuleRuntimeException(throwable);
-      }
-    }
-
-    @Override
-    public String getWorkDescription() {
-      return "Message Source Reconnection";
-    }
-
-    @Override
-    public Object getWorkOwner() {
-      return ExtensionMessageSource.this;
-    }
   }
 
   @Override

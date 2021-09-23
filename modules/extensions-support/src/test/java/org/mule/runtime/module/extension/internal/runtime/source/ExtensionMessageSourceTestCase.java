@@ -14,10 +14,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -32,11 +35,11 @@ import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockL
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
-import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.slf4j.event.Level.ERROR;
 import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.WARN;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -83,8 +86,10 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        {"primary node only sync", true, true},
-        {"all nodes sync", false, true},
+        {"primary node only sync", true, false},
+        {"primary node only async", true, true},
+        {"all nodes sync", false, false},
+        {"all nodes async", false, true}
     });
   }
 
@@ -207,6 +212,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     if (!this.retryPolicyTemplate.isAsync()) {
       assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
       assertThat(throwable, is(exhaustedBecauseOf(connectionException)));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(throwable);
+        return true;
+      }));
     }
 
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
@@ -224,6 +234,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     if (!this.retryPolicyTemplate.isAsync()) {
       assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
       assertThat(getThrowables(throwable), hasItemInArray(instanceOf(IOException.class)));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(throwable);
+        return true;
+      }));
     }
 
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
@@ -269,8 +284,10 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void startFailsWithRandomException() throws Exception {
     Exception e = new RuntimeException();
     doThrow(e).when(source).onStart(sourceCallback);
+    initialise();
+    Throwable t = catchThrowable(messageSource::start);
     if (!this.retryPolicyTemplate.isAsync()) {
-      expectedException.expect(exhaustedBecauseOf(new BaseMatcher<Throwable>() {
+      assertThat(t, exhaustedBecauseOf(new BaseMatcher<Throwable>() {
 
         private final Matcher<Exception> exceptionMatcher = hasCause(sameInstance(e));
 
@@ -284,16 +301,12 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
           exceptionMatcher.describeTo(description);
         }
       }));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(t);
+        return true;
+      }));
     }
-
-    initialise();
-    messageSource.start();
-
-    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verify(source, times(3)).onStart(sourceCallback);
-      verify(source, times(3)).onStop();
-      return true;
-    }));
   }
 
   @Test
@@ -358,15 +371,14 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     if (!this.retryPolicyTemplate.isAsync()) {
       assertThat(ExceptionUtils.containsType(t, ConnectionException.class), is(true));
       assertThat(t.getMessage(), containsString(ENRICHED_MESSAGE + ERROR_MESSAGE));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(t);
+        return true;
+      }));
     }
 
     messageSource.stop();
-
-    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verify(source, times(1)).onStart(sourceCallback);
-      verify(source, times(2)).onStop();
-      return true;
-    }));
   }
 
   @Test
@@ -384,15 +396,14 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
     if (!this.retryPolicyTemplate.isAsync()) {
       assertThat(t.getMessage(), containsString(enrichedErrorMessage));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(t);
+        return true;
+      }));
     }
 
     messageSource.stop();
-
-    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verify(source, times(1)).onStart(sourceCallback);
-      verify(source, times(2)).onStop();
-      return true;
-    }));
   }
 
   @Test
@@ -490,6 +501,19 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   }
 
   @Test
+  public void getMetadataKeyIdObjectValue() throws Exception {
+    final String person = "person";
+    source = new DummySource(person);
+    sourceAdapter = createSourceAdapter();
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
+    messageSource = getNewExtensionMessageSourceInstance();
+    messageSource.initialise();
+    messageSource.start();
+    final Object metadataKeyValue = messageSource.getParameterValueResolver().getParameterValue(METADATA_KEY);
+    assertThat(metadataKeyValue, is(person));
+  }
+
+  @Test
   public void sourceInitializedLogMessage() throws Exception {
     ArrayList<String> debugMessages = new ArrayList<>();
     Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
@@ -527,7 +551,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
 
   @Test
-  public void failWithConnectionExceptionWhenRunningAndGetRetryPolicyExhausted() throws Exception {
+  public void getRetryPolicyExhaustedAndLogShutdownMessage() throws Exception {
     ArrayList<String> errorMessages = new ArrayList<>();
     Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(errorMessages, ERROR));
     start();
@@ -543,16 +567,17 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   }
 
   @Test
-  public void getMetadataKeyIdObjectValue() throws Exception {
-    final String person = "person";
-    source = new DummySource(person);
-    sourceAdapter = createSourceAdapter();
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
-    messageSource = getNewExtensionMessageSourceInstance();
-    messageSource.initialise();
-    messageSource.start();
-    final Object metadataKeyValue = messageSource.getParameterValueResolver().getParameterValue(METADATA_KEY);
-    assertThat(metadataKeyValue, is(person));
+  public void reconnectAndLogSuccessMessage() throws Exception {
+    ArrayList<String> warnMessages = new ArrayList<>();
+    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(warnMessages, WARN));
+    start();
+    ConnectionException e = new ConnectionException(ERROR_MESSAGE);
+    messageSource.onException(e);
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verifyLogMessage(warnMessages, "Message source 'source' on flow 'appleFlow' successfully reconnected");
+      return true;
+    }));
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   private class DummySource extends Source {
