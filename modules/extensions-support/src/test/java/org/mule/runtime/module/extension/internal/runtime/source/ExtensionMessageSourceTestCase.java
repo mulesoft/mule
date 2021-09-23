@@ -19,8 +19,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -80,8 +78,8 @@ import org.slf4j.Logger;
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
-  protected static final int TEST_TIMEOUT = 3000;
-  protected static final int TEST_POLL_DELAY = 1000;
+  protected static final int TEST_TIMEOUT = 2000;
+  protected static final int TEST_POLL_DELAY = 100;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -96,9 +94,9 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public ExtensionMessageSourceTestCase(String name, boolean primaryNodeOnly, boolean isAsync) {
     this.primaryNodeOnly = primaryNodeOnly;
     if (isAsync) {
-      this.retryPolicyTemplate = new AsynchronousRetryTemplate(new SimpleRetryPolicyTemplate(100, 2));
+      this.retryPolicyTemplate = new AsynchronousRetryTemplate(new SimpleRetryPolicyTemplate(10, 2));
     } else {
-      SimpleRetryPolicyTemplate template = new SimpleRetryPolicyTemplate(100, 2);
+      SimpleRetryPolicyTemplate template = new SimpleRetryPolicyTemplate(10, 2);
       template.setNotificationFirer(notificationDispatcher);
       this.retryPolicyTemplate = template;
     }
@@ -170,19 +168,17 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
     MuleException e = new DefaultMuleException(connectionException);
     doThrow(e).when(source).onStart(any());
-    if (!this.retryPolicyTemplate.isAsync()) {
-      expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
-      expectedException.expectCause(is(connectionException));
-    }
-
     messageSource.initialise();
-    messageSource.start();
-
-    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verify(source, times(0)).onStart(sourceCallback);
-      verify(source, times(0)).onStop();
-      return true;
-    }));
+    final Throwable throwable = catchThrowable(this::start);
+    if (!this.retryPolicyTemplate.isAsync()) {
+      assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
+      assertThat(throwable.getCause(), is(connectionException));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(throwable);
+        return true;
+      }));
+    }
   }
 
   @Test
