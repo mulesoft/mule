@@ -25,9 +25,9 @@ import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.DATETI
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.STRING;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.TIME;
+import static org.mule.runtime.ast.api.xml.AstXmlParserAttribute.IS_CDATA;
 import static org.mule.runtime.config.internal.dsl.XmlConstants.buildRawParamKeyForDocAttribute;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.LayoutOrderComparator.OBJECTS_FIELDS_BY_LAYOUT_ORDER;
@@ -836,7 +836,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .filter(e -> !e.getKey().equals(CONFIG_ATTRIBUTE_NAME))
         .forEach(e -> builder
             .withParameter(e.getKey(),
-                           (boolean) e.getValue().getMetadata().map(m -> m.getParserAttributes().getOrDefault(IS_CDATA, false))
+                           e.getValue().getMetadata().map(m -> IS_CDATA.get(m).orElse(false))
                                .orElse(false)
                                    ? createParameterSimpleCdataValue(e.getValue().getRawValue(),
                                                                      getGroupParameterType(group, e.getKey()))

@@ -54,7 +54,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   public void heisenbergDefaultConfigNegative() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("[validation/heisenberg-default-illegal-config.xml:21]: "
+        .expectMessage("[validation/heisenberg-default-illegal-config.xml:10]: "
             + "Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
     loadConfiguration("validation/heisenberg-default-illegal-config.xml");
   }
@@ -72,7 +72,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   public void operationWithExpressionConfigReference() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("[validation/operation-with-expression-config-ref.xml:19]: "
+        .expectMessage("[validation/operation-with-expression-config-ref.xml:8]: "
             + "Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
     loadConfiguration("validation/operation-with-expression-config-ref.xml");
   }
@@ -81,7 +81,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   public void sourceWithExpressionConfigReference() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("[validation/source-with-expression-config-ref.xml:20]: "
+        .expectMessage("[validation/source-with-expression-config-ref.xml:8]: "
             + "Element <heisenberg:config> is missing required parameter 'knownAddresses'.");
     loadConfiguration("validation/source-with-expression-config-ref.xml");
   }
