@@ -9,7 +9,6 @@ package org.mule.tck.junit4.matcher;
 
 import org.hamcrest.Description;
 import org.hamcrest.DiagnosingMatcher;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
 
@@ -55,7 +54,6 @@ public class HasClassInHierarchy extends DiagnosingMatcher<Object> {
   }
 
   @SuppressWarnings("unchecked")
-  @Factory
   /**
    * Creates a matcher that will check if a given object has a given class name in the hierarchy.
    *
