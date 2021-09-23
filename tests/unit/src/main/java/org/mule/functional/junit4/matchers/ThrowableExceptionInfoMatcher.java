@@ -9,7 +9,6 @@ package org.mule.functional.junit4.matchers;
 import org.mule.runtime.api.exception.MuleException;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -39,7 +38,6 @@ public class ThrowableExceptionInfoMatcher<T extends MuleException> extends Type
     description.appendDescriptionOf(matcher);
   }
 
-  @Factory
   public static <T extends MuleException> Matcher<T> hasInfo(final Matcher<Map<? extends String, ?>> matcher) {
     return new ThrowableExceptionInfoMatcher<>(matcher);
   }
