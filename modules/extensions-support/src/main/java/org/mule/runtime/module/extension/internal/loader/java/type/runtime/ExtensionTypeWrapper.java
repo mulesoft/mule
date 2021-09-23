@@ -17,9 +17,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
@@ -71,12 +69,10 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    */
   @Override
   public List<OperationElement> getOperations() {
-    return getAnnotation(Operations.class)
-        .map(classes -> Stream.of(classes.value())
-            .flatMap(clazz -> getApiMethods(clazz).stream())
-            .map(clazz -> (OperationElement) new OperationWrapper(clazz, typeLoader))
-            .collect(toList()))
-        .orElse(emptyList());
+    return getOperationClassStream()
+        .flatMap(clazz -> getApiMethods(clazz).stream())
+        .map(clazz -> (OperationElement) new OperationWrapper(clazz, typeLoader))
+        .collect(toList());
   }
 
   /**
@@ -84,12 +80,10 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    */
   @Override
   public List<FunctionElement> getFunctions() {
-    return getAnnotation(ExpressionFunctions.class)
-        .map(classes -> Stream.of(classes.value())
+    return getExpressionFunctionClassStream()
             .flatMap(clazz -> getApiMethods(clazz).stream())
             .map(clazz -> (FunctionElement) new FunctionWrapper(clazz, typeLoader))
-            .collect(toList()))
-        .orElse(emptyList());
+            .collect(toList());
   }
 
   @Override

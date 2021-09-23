@@ -54,10 +54,7 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
    */
   @Override
   public List<OperationContainerElement> getOperationContainers() {
-    return concat(
-        collectElements(Operations.class, Operations::value),
-        collectElements(org.mule.sdk.api.annotation.Operations.class, org.mule.sdk.api.annotation.Operations::value)
-    )
+    return getOperationClassStream()
         .map(aClass -> new OperationContainerWrapper(aClass, typeLoader))
         .collect(toList());
   }
@@ -67,10 +64,7 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
    */
   @Override
   public List<FunctionContainerElement> getFunctionContainers() {
-    return concat(
-        collectElements(ExpressionFunctions.class, ExpressionFunctions::value),
-        collectElements(org.mule.sdk.api.annotation.ExpressionFunctions.class, org.mule.sdk.api.annotation.ExpressionFunctions::value)
-    )
+    return getExpressionFunctionClassStream()
         .map(c -> new FunctionContainerWrapper(c, typeLoader))
         .collect(toList());
   }
@@ -92,5 +86,19 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
     return getAnnotation(annotationClass)
         .map(a -> Stream.of(extractTypeFunction.apply(a)))
         .orElse(Stream.empty());
+  }
+
+  protected Stream<Class> getOperationClassStream() {
+    return concat(
+        collectElements(Operations.class, Operations::value),
+        collectElements(org.mule.sdk.api.annotation.Operations.class, org.mule.sdk.api.annotation.Operations::value)
+    );
+  }
+
+  protected Stream<Class> getExpressionFunctionClassStream() {
+    return concat(
+        collectElements(ExpressionFunctions.class, ExpressionFunctions::value),
+        collectElements(org.mule.sdk.api.annotation.ExpressionFunctions.class, org.mule.sdk.api.annotation.ExpressionFunctions::value)
+    );
   }
 }
