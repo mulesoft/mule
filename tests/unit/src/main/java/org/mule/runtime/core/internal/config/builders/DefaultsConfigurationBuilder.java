@@ -13,6 +13,7 @@ import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
@@ -142,6 +143,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
       mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext);
       registerObject(OBJECT_EXPRESSION_LANGUAGE, mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext),
                      muleContext);
+      registerObject(COMPATIBILITY_PLUGIN_INSTALLED, true, muleContext);
     } catch (ClassNotFoundException cnfe) {
       // no mvel in classpath, move on
     }
