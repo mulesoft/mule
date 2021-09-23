@@ -236,7 +236,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     };
 
     CompletableFuture<Void> future = retryPolicyTemplate
-        .applyPolicy(futureSupplier, t -> true, NULL_THROWABLE_CONSUMER, NULL_THROWABLE_CONSUMER, identity(), retryScheduler)
+        .applyPolicy(futureSupplier, t -> true, t -> computeStats(), NULL_THROWABLE_CONSUMER, identity(), retryScheduler)
         .whenComplete((v, e) -> {
           if (e != null) {
             onFailure.accept(e);

@@ -22,7 +22,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate;

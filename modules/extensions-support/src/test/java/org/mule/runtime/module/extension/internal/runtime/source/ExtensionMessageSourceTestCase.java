@@ -12,6 +12,7 @@ import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertNull;
@@ -28,17 +29,20 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.slf4j.event.Level.ERROR;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.WARN;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -64,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Inject;
 import javax.resource.spi.work.Work;
 
 import org.hamcrest.BaseMatcher;
@@ -77,6 +82,9 @@ import org.slf4j.Logger;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   protected static final int TEST_TIMEOUT = 2000;
   protected static final int TEST_POLL_DELAY = 100;
@@ -168,17 +176,14 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
     MuleException e = new DefaultMuleException(connectionException);
     doThrow(e).when(source).onStart(any());
-    messageSource.initialise();
-    final Throwable throwable = catchThrowable(this::start);
     if (!this.retryPolicyTemplate.isAsync()) {
-      assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
-      assertThat(throwable.getCause(), is(connectionException));
+      expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
+      expectedException.expectCause(is(connectionException));
     } else {
-      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-        assertNull(throwable);
-        return true;
-      }));
+      expectedException.none();
     }
+    messageSource.initialise();
+    messageSource.start();
   }
 
   @Test
@@ -193,7 +198,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     } else {
       expectedException.expect(is(instanceOf(DefaultMuleException.class)));
     }
-
     messageSource.initialise();
     messageSource.start();
   }
@@ -507,6 +511,27 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.start();
     final Object metadataKeyValue = messageSource.getParameterValueResolver().getParameterValue(METADATA_KEY);
     assertThat(metadataKeyValue, is(person));
+  }
+
+  @Test
+  public void getRetryPolicyExhaustedAndCnnectionErrorsAreComputed() throws Exception {
+
+    muleContext.getStatistics().setEnabled(true);
+    messageSource.initialise();
+    final ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
+    doThrow(new RuntimeException(connectionException)).when(source).onStart(sourceCallback);
+    final Throwable throwable = catchThrowable(messageSource::start);
+
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      assertThat(muleContext.getStatistics().getApplicationStatistics().getConnectionErrors(), equalTo(2l));
+      assertThat(muleContext.getStatistics().getApplicationStatistics().getExecutionErrors(), equalTo(2l));
+      return true;
+    }));
+  }
+
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() {
+    System.setProperty(COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY, "true");
   }
 
   @Test
