@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExtensionInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromExtension;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 
@@ -17,12 +18,12 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
+import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -38,10 +39,11 @@ import java.util.stream.Stream;
  */
 public class ExtensionTypeWrapper<T> extends ComponentWrapper implements ExtensionElement, ParameterizableTypeElement {
 
-  private LazyValue<Extension> extensionAnnotation = new LazyValue<>(() -> getAnnotation(Extension.class).get());
+  private LazyValue<ExtensionInfo> extensionInfo;
 
   public ExtensionTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
     super(aClass, newCachedClassTypeLoader(typeLoader));
+    extensionInfo =  new LazyValue<>(() -> getExtensionInfo(aClass));
   }
 
   private static ClassTypeLoader newCachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
@@ -88,17 +90,17 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
 
   @Override
   public Category getCategory() {
-    return extensionAnnotation.get().category();
+    return extensionInfo.get().getCategory();
   }
 
   @Override
   public String getVendor() {
-    return extensionAnnotation.get().vendor();
+    return extensionInfo.get().getVendor();
   }
 
   @Override
   public String getName() {
-    return extensionAnnotation.get().name();
+    return extensionInfo.get().getName();
   }
 
   private static class CachedClassTypeLoader implements ClassTypeLoader {

@@ -10,7 +10,6 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.annotation.Soap;
 import org.mule.runtime.extension.api.soap.annotation.SoapMessageDispatcherProviders;
@@ -21,7 +20,7 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 
 /**
- * {@link SoapComponentWrapper} implementation for the {@link Extension} annotated class, which is a Soap Extension either because
+ * {@link SoapComponentWrapper} implementation for the extension annotated class, which is a Soap Extension either because
  * implements the {@link SoapServiceProvider} interface or is annotated with the {@link Soap} annotation.
  *
  * @since 4.0

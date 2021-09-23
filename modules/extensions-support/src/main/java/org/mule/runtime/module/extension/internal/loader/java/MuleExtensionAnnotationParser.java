@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.getAlias;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.toMuleApi;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
@@ -22,12 +22,14 @@ import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionHandlerFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -64,16 +66,19 @@ public final class MuleExtensionAnnotationParser {
         .orElse(defaultName);
   }
 
-  public static Extension getExtension(Class<?> extensionType) {
-    try {
-      Extension extension = extensionType.getAnnotation(Extension.class);
-      checkState(extension != null, format("%s is not a Mule extension since it's not annotated with %s", extensionType.getName(),
-                                           Extension.class.getName()));
-      return extension;
-    } catch (Exception e) {
-      logger.error(format("%s getting '@Extension' annotation from %s", e.getClass().getName(), extensionType.getName()), e);
-      throw e;
+  public static ExtensionInfo getExtensionInfo(Class<?> extensionType) {
+    Extension legacy = extensionType.getAnnotation(Extension.class);
+    if (legacy != null) {
+      return new ExtensionInfo(legacy.name(), legacy.vendor(), legacy.category());
+    } else {
+      org.mule.sdk.api.annotation.Extension extension = extensionType.getAnnotation(org.mule.sdk.api.annotation.Extension.class);
+      if (extension != null) {
+        return new ExtensionInfo(extension.name(), extension.vendor(), toMuleApi(extension.category()));
+      }
     }
+
+    throw new IllegalModelDefinitionException(String.format("Class '%s' not annotated with neither '%s' nor '%s'",
+        extensionType.getName(), Extension.class.getName(), org.mule.sdk.api.annotation.Extension.class.getName()));
   }
 
   public static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,

@@ -44,6 +44,16 @@ import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLo
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
 
+import java.io.File;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -52,14 +62,6 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.Test;
@@ -232,10 +234,8 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
       if (declaration == null) {
         ExtensionDescriptionDocumenter documenter = new ExtensionDescriptionDocumenter(processingEnv, roundEnv);
-        Element extension = roundEnv.getElementsAnnotatedWith(Extension.class).stream()
-            .filter(element -> element.getSimpleName().contentEquals(extensionClass.getSimpleName()))
-            .findFirst()
-            .get();
+        Element extension = findExtensionElement(extensionClass, Extension.class, roundEnv)
+            .orElseGet(() -> findExtensionElement(extensionClass, org.mule.sdk.api.annotation.Extension.class, roundEnv).get());
 
         assertThat(extension, instanceOf(TypeElement.class));
         ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(), getDefault(emptySet()));
@@ -262,6 +262,14 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
 
   private boolean isSingleConfigTest() {
     return SINGLE_CONFIG.equals(name);
+  }
+
+  private Optional<Element> findExtensionElement(Class<?> extensionClass,
+                                                 Class<? extends Annotation> annotationClass,
+                                                 RoundEnvironment roundEnv) {
+    return (Optional<Element>) roundEnv.getElementsAnnotatedWith(annotationClass).stream()
+        .filter(element -> element.getSimpleName().contentEquals(extensionClass.getSimpleName()))
+        .findFirst();
   }
 
   protected Iterable<JavaFileObject> testSourceFiles() throws Exception {

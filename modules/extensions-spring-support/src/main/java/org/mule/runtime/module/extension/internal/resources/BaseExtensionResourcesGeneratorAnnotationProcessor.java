@@ -31,9 +31,6 @@ import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +48,12 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+
 /**
- * Annotation processor that picks up all the extensions annotated with {@link Extension} and use a {@link ResourcesGenerator} to
- * generated the required resources.
+ * Annotation processor that picks up all the extensions annotated with {@link Extension} or
+ * {@link org.mule.sdk.api.annotation.Extension} and uses a {@link ResourcesGenerator} to generate the required resources.
  * <p>
  * This annotation processor will automatically generate and package into the output jar the XSD schema, spring bundles and
  * extension registration files necessary for mule to work with this extension.
@@ -138,11 +138,14 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
 
   private Optional<TypeElement> getExtension(RoundEnvironment env) {
     Set<TypeElement> elements = processor.getTypeElementsAnnotatedWith(Extension.class, env);
+    elements.addAll(processor.getTypeElementsAnnotatedWith(org.mule.sdk.api.annotation.Extension.class, env));
+
     if (elements.size() > 1) {
       String message =
-          format("Only one extension is allowed per plugin, however several classes annotated with @%s were found. Offending classes are [%s]",
-                 Extension.class.getSimpleName(),
-                 Joiner.on(", ").join(elements.stream().map(TypeElement::getQualifiedName).collect(toList())));
+          format("Only one extension is allowed per plugin, however several classes annotated with either @%s or @%s were found. Offending classes are [%s]",
+              Extension.class.getName(),
+              org.mule.sdk.api.annotation.Extension.class.getName(),
+              Joiner.on(", ").join(elements.stream().map(TypeElement::getQualifiedName).collect(toList())));
 
       throw new RuntimeException(message);
     }
