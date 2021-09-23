@@ -8,7 +8,6 @@
 package org.mule.tck.junit4.matcher;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -44,7 +43,6 @@ public class IsEqualIgnoringLineBreaks extends TypeSafeMatcher<String> {
     description.appendText("equalToIgnoringLineBreaks(").appendValue(this.string).appendText(")");
   }
 
-  @Factory
   public static Matcher<String> equalToIgnoringLineBreaks(String expectedString) {
     return new IsEqualIgnoringLineBreaks(expectedString);
   }

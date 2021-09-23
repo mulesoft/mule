@@ -7,7 +7,6 @@
 package org.mule.functional.junit4.matchers;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -48,7 +47,6 @@ public class ThrowableRootCauseMatcher<T extends Throwable> extends TypeSafeMatc
     return t;
   }
 
-  @Factory
   public static <T extends Throwable> Matcher<T> hasRootCause(final Matcher<T> matcher) {
     return new ThrowableRootCauseMatcher<>(matcher);
   }

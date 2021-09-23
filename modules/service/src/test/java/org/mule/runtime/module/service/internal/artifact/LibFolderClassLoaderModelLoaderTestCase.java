@@ -9,7 +9,7 @@ package org.mule.runtime.module.service.internal.artifact;
 
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsArrayContaining.hasItemInArray;
+import static org.hamcrest.collection.ArrayMatching.hasItemInArray;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;

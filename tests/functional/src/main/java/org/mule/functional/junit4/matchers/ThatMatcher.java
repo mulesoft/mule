@@ -8,7 +8,6 @@ package org.mule.functional.junit4.matchers;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.Is;
 
@@ -40,7 +39,6 @@ public class ThatMatcher<T> extends BaseMatcher<T> {
     delegateMatcher.describeMismatch(item, mismatchDescription);
   }
 
-  @Factory
   public static <T> Matcher<T> that(Matcher<T> matcher) {
     return new ThatMatcher<>(matcher);
   }
