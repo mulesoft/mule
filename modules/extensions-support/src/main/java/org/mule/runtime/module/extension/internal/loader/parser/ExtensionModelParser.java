@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -112,4 +113,8 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @return the extension's {@link XmlDslModel}
    */
   Optional<XmlDslConfiguration> getXmlDslConfiguration();
+
+  List<MetadataType> getExportedTypes();
+
+  List<String> getExportedResources();
 }

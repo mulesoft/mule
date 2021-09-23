@@ -11,6 +11,13 @@ import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoad
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.IntersectionType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -81,6 +88,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
     parseErrorModels(parser, declarer);
+    parseExportedResources(parser, declarer);
 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
@@ -97,6 +105,45 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private void parseErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
     initErrorModelFactorySupplier(parser, getExtensionsNamespace(declarer.getDeclaration()));
     declarer.getDeclaration().getErrorModels().addAll(createErrorModelFactory().getErrorModels());
+  }
+
+  private void parseExportedResources(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+    parser.getExportedTypes().forEach(type -> registerType(declarer, type));
+    declarer.getDeclaration().getResources().addAll(parser.getExportedResources());
+  }
+
+  private void registerType(ExtensionDeclarer declarer, MetadataType type) {
+    type.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (objectType.isOpen()) {
+          objectType.getOpenRestriction().get().accept(this);
+        } else {
+          declarer.withType(objectType);
+        }
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        arrayType.getType().accept(this);
+      }
+
+      @Override
+      public void visitIntersection(IntersectionType intersectionType) {
+        intersectionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        unionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitObjectField(ObjectFieldType objectFieldType) {
+        objectFieldType.getValue().accept(this);
+      }
+    });
   }
 
   private void initErrorModelFactorySupplier(ExtensionModelParser parser, String namespace) {
