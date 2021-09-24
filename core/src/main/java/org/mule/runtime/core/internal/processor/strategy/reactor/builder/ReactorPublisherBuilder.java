@@ -12,8 +12,6 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.tracing.TaskTracingContext;
-import org.mule.runtime.api.profiling.tracing.TaskTracingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -24,8 +22,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
-import org.mule.runtime.core.internal.profiling.tracing.DefaultTaskTracingContext;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
@@ -85,8 +81,6 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    * @return builder for a {@link Publisher} with the onSubscribe performed.
    */
   ReactorPublisherBuilder<T> doOnSubscribe(Consumer<? super Subscription> onSubscribe);
-
-  ReactorPublisherBuilder<T> setTaskContext(TaskTracingService taskTracingService, ComponentLocation location);
 
   /**
    * @param location     the {@link ComponentLocation} associated to the profiling event.
@@ -149,14 +143,6 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Mono<CoreEvent>> setTaskContext(TaskTracingService taskTracingService,
-                                                                   ComponentLocation location) {
-      TaskTracingContext taskTracingContext = new DefaultTaskTracingContext(new DefaultComponentMetadata(location));
-      mono = mono.doOnNext(coreEvent -> taskTracingService.setCurrentTaskTracingContext(taskTracingContext));
-      return this;
-    }
-
-    @Override
     public ReactorPublisherBuilder<Mono<CoreEvent>> profileComponentExecution(ComponentLocation location,
                                                                               Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
                                                                               String artifactId, String artifactType) {
@@ -212,14 +198,6 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> doOnSubscribe(Consumer<? super Subscription> onSubscribe) {
       flux = flux.doOnSubscribe(onSubscribe);
-      return this;
-    }
-
-    @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> setTaskContext(TaskTracingService taskTracingService,
-                                                                   ComponentLocation location) {
-      TaskTracingContext taskTracingContext = new DefaultTaskTracingContext(new DefaultComponentMetadata(location));
-      flux = flux.doOnNext(coreEvent -> taskTracingService.setCurrentTaskTracingContext(taskTracingContext));
       return this;
     }
 

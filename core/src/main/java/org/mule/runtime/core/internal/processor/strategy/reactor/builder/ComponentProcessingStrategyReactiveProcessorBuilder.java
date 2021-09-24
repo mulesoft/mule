@@ -145,7 +145,6 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
         .profileComponentExecution(location, psSchedulingOperationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(dispatcherScheduler))
         .profileComponentExecution(location, startingOperationExecutionDataProducer, artifactId, artifactType)
-        .setTaskContext(profilingService.getTaskTracingService(), location)
         .transform(processor)
         .profileComponentExecution(location, operationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(callbackScheduler))
