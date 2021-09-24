@@ -78,7 +78,6 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
         addSemanticTerms(parameter.getDeclaration(), parameterParser);
-        parameter.getDeclaration().getSemanticTerms().addAll(parameterParser.getSemanticTerms());
         declarerList.add(parameter);
       });
 
