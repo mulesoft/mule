@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.notification.ClusterNodeNotification;
+import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import java.util.ArrayList;
@@ -37,6 +38,9 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
 
   public ClusterExtensionMessageSourceTestCase() {
     primaryNodeOnly = true;
+    SimpleRetryPolicyTemplate template = new SimpleRetryPolicyTemplate(0, 2);
+    template.setNotificationFirer(notificationDispatcher);
+    this.retryPolicyTemplate = template;
   }
 
   @Before

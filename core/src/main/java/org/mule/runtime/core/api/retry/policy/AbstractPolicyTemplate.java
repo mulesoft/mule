@@ -87,7 +87,6 @@ public abstract class AbstractPolicyTemplate extends AbstractComponent implement
       if (status == null || status.isOk()) {
         return context;
       } else {
-        LOGGER.error("failed");
         context.setFailed(cause);
         throw new RetryPolicyExhaustedException(cause, callback.getWorkOwner());
       }
