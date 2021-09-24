@@ -7,15 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
-import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.toMuleApi;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -125,18 +123,6 @@ public final class JavaExtensionModelParserUtils {
         || parameter.getAnnotation(org.mule.sdk.api.annotation.param.Parameter.class).isPresent();
   }
 
-  public static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {
-    Optional<ExternalLibs> externalLibs = element.getAnnotation(ExternalLibs.class);
-    if (externalLibs.isPresent()) {
-      return stream(externalLibs.get().value())
-          .map(lib -> parseExternalLib(lib))
-          .collect(toList());
-    } else {
-      return element.getAnnotation(ExternalLib.class)
-          .map(lib -> singletonList(parseExternalLib(lib)))
-          .orElse(emptyList());
-    }
-  }
 
   public static List<OperationModelParser> getOperationParsers(ExtensionModelParser extensionModelParser,
                                                                ExtensionElement extensionElement,
@@ -420,14 +406,13 @@ public final class JavaExtensionModelParserUtils {
    * Monad for extracting information from a {@link WithAnnotations} {@code element} which might be annotated with two different
    * annotations of similar semantics. Both annotations types are reduced to a single output type.
    * <p>
-   * Simultaneous presence of both types will be considered an error
+   * Simultaneous presence of both types will result in an {@link Optional#empty()} value
    *
    * @param element                        the annotated element
    * @param legacyAnnotationClass          the legacy annotation type
    * @param sdkAnnotationClass             the new annotation type
    * @param legacyAnnotationMapping        mapping function for the legacy annotation
    * @param sdkAnnotationMapping           mapping function for the new annotation
-   * @param dualDefinitionExceptionFactory exception factory in case both annotations are defined at the same type.
    * @param <R>                            Legacy annotation's generic type
    * @param <S>                            New annotation's generic type
    * @param <T>                            Output generic type
@@ -483,17 +468,4 @@ public final class JavaExtensionModelParserUtils {
     return new ImmutableDeprecationModel(message, since, toRemoveIn);
   }
 
-  private static ExternalLibraryModel parseExternalLib(ExternalLib externalLibAnnotation) {
-    ExternalLibraryModel.ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
-        .withName(externalLibAnnotation.name())
-        .withDescription(externalLibAnnotation.description())
-        .withType(externalLibAnnotation.type())
-        .isOptional(externalLibAnnotation.optional());
-
-    ifNotBlank(externalLibAnnotation.nameRegexpMatcher(), builder::withRegexpMatcher);
-    ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
-    ifNotBlank(externalLibAnnotation.coordinates(), builder::withCoordinates);
-
-    return builder.build();
-  }
 }
