@@ -311,21 +311,16 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
                              of(BackPressureAction.FAIL));
   }
 
-  protected ExtensionMessageSource getNewExtensionMessageSourceInstance(RetryPolicyTemplate retryPolicy) throws MuleException {
-
+  protected ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
-                                   retryPolicy, cursorStreamProviderFactory, FAIL, extensionManager,
+                                   retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager,
                                    notificationDispatcher, muleContext.getTransactionFactoryManager(),
                                    muleContext.getConfiguration().getId());
     messageSource.setListener(messageProcessor);
     messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     muleContext.getInjector().inject(messageSource);
     return messageSource;
-  }
-
-  protected ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
-    return getNewExtensionMessageSourceInstance(retryPolicyTemplate);
   }
 
 }

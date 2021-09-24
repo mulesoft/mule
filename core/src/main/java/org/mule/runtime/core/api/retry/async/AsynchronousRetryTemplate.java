@@ -60,12 +60,10 @@ public final class AsynchronousRetryTemplate extends AbstractComponent
       throw new IllegalStateException("Cannot schedule a work till the workManager is initialized. Probably the connector hasn't been initialized yet");
     }
 
-    LOGGER.error("creating retry worker");
     RetryWorker worker = new RetryWorker(delegate, callback, workManager, startLatch);
     FutureRetryContext context = worker.getRetryContext();
 
     workManager.execute(worker);
-    LOGGER.error("return context");
     return context;
   }
 
