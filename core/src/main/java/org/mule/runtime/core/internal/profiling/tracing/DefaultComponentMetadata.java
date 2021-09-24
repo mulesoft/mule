@@ -1,0 +1,25 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.core.internal.profiling.tracing;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.profiling.tracing.ComponentMetadata;
+
+import java.util.Optional;
+
+public class DefaultComponentMetadata implements ComponentMetadata {
+
+  private final ComponentLocation componentLocation;
+
+  public DefaultComponentMetadata(ComponentLocation componentLocation) {
+    this.componentLocation = componentLocation;
+  }
+
+  public Optional<ComponentLocation> getComponentLocation() {
+    return Optional.ofNullable(componentLocation);
+  }
+}
