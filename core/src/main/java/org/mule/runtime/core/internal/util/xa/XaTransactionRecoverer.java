@@ -6,14 +6,11 @@
  */
 package org.mule.runtime.core.internal.util.xa;
 
-import static org.apache.commons.collections.CollectionUtils.find;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.internal.util.journal.queue.XaQueueTxJournalEntry;
 import org.mule.runtime.core.internal.util.journal.queue.XaTxQueueTransactionJournal;
 import org.mule.runtime.core.internal.util.queue.PersistentXaTransactionContext;
 import org.mule.runtime.core.internal.util.queue.QueueProvider;
-import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
-
-import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +20,8 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.apache.commons.collections.Predicate;
+import com.google.common.collect.Multimap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,18 +54,11 @@ public class XaTransactionRecoverer {
       logger.debug("Executing XA recover");
       logger.debug("Found " + xidXaJournalEntryMultimap.size() + " in the tx log");
     }
-    List<Xid> txsToRecover = new ArrayList<Xid>();
+    List<Xid> txsToRecover = new ArrayList<>();
     for (Xid xid : xidXaJournalEntryMultimap.keySet()) {
       Collection<XaQueueTxJournalEntry> entries = xidXaJournalEntryMultimap.get(xid);
-      Object commitOrRollback = find(entries, new Predicate() {
 
-        @Override
-        public boolean evaluate(Object object) {
-          XaQueueTxJournalEntry logEntry = (XaQueueTxJournalEntry) object;
-          return logEntry.isCommit() || logEntry.isRollback();
-        }
-      });
-      if (commitOrRollback != null) {
+      if (entries.stream().anyMatch(logEntry -> logEntry.isCommit() || logEntry.isRollback())) {
         continue;
       }
       txsToRecover.add(xid);

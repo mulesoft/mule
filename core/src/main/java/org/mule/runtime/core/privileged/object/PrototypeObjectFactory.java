@@ -12,7 +12,10 @@ import java.util.Map;
 
 /**
  * Creates a new instance of the object on each call.
+ * 
+ * @deprecated this will be removed in next major version
  */
+@Deprecated
 public final class PrototypeObjectFactory extends AbstractObjectFactory {
 
   /** For Spring only */

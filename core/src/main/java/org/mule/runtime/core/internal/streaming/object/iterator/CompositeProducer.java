@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-
 /**
  * Implementation of {@link Producer} to expose streams from several producers as a single data feed. Producers are consumed in
  * order until they're all consumed. All producers need to share the same generic type T
@@ -35,7 +33,7 @@ public class CompositeProducer<T> implements Producer<T> {
    * @param producers a list of {@link Producer}
    */
   public CompositeProducer(List<Producer<T>> producers) {
-    if (CollectionUtils.isEmpty(producers)) {
+    if (producers == null || producers.isEmpty()) {
       throw new IllegalArgumentException("Cannot make a composition of null or empty producers list");
     }
 

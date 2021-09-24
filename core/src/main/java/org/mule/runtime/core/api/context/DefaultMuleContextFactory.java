@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.context;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
-import static org.apache.commons.collections.MapUtils.isEmpty;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
@@ -88,7 +87,7 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
    */
   @Deprecated
   public MuleContext createMuleContext(String resource) throws InitialisationException, ConfigurationException {
-    return createMuleContext(resource, null);
+    return createMuleContext(resource, emptyMap());
   }
 
   /**
@@ -104,7 +103,7 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
       throws InitialisationException, ConfigurationException {
     return doCreateMuleContext(MuleContextBuilder.builder(APP), muleContext -> {
       // Configure with startup properties
-      if (!isEmpty(properties)) {
+      if (!properties.isEmpty()) {
         new SimpleConfigurationBuilder(properties).configure(muleContext);
       }
 
@@ -155,7 +154,7 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
     contextBuilder.setMuleConfiguration(configuration);
     return doCreateMuleContext(contextBuilder, muleContext -> {
       // Configure with startup properties
-      if (!isEmpty(properties)) {
+      if (!properties.isEmpty()) {
         new SimpleConfigurationBuilder(properties).configure(muleContext);
       }
 

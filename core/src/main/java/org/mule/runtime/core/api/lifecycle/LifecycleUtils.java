@@ -29,7 +29,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
 /**
@@ -339,10 +338,6 @@ public class LifecycleUtils {
 
   private static void doApplyPhase(String phase, Collection<? extends Object> objects, MuleContext muleContext, Logger logger)
       throws MuleException {
-    if (CollectionUtils.isEmpty(objects)) {
-      return;
-    }
-
     for (Object object : objects) {
       object = unwrap(object);
       if (object == null) {

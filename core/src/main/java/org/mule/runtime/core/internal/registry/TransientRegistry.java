@@ -41,8 +41,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.functors.InstanceofPredicate;
-
 /**
  * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
  *
@@ -175,7 +173,7 @@ public abstract class TransientRegistry extends AbstractRegistry {
   @Override
   @SuppressWarnings("unchecked")
   public <T> Collection<T> lookupObjects(Class<T> returntype) {
-    return (Collection<T>) registryMap.select(new InstanceofPredicate(returntype));
+    return (Collection<T>) registryMap.select(returntype::isInstance);
   }
 
   @Override

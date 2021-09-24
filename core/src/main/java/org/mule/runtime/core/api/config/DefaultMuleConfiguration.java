@@ -58,7 +58,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 
@@ -700,7 +699,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   @Override
   public <T> T getExtension(final Class<T> extensionType) {
-    return (T) CollectionUtils.find(extensions, object -> extensionType.isAssignableFrom(object.getClass()));
+    return (T) extensions
+        .stream()
+        .filter(object -> extensionType.isAssignableFrom(object.getClass()))
+        .findFirst()
+        .orElse(null);
   }
 
   public List<ConfigurationExtension> getExtensions() {

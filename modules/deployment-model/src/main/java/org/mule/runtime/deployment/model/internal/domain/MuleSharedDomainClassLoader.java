@@ -8,7 +8,6 @@ package org.mule.runtime.deployment.model.internal.domain;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
-import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
@@ -18,12 +17,12 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+
+import org.slf4j.Logger;
 
 /**
  * Defines a {@link MuleArtifactClassLoader} for a domain artifact.
@@ -36,7 +35,7 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
 
   private static final Logger LOGGER = getLogger(MuleSharedDomainClassLoader.class);
 
-  private NativeLibraryFinder nativeLibraryFinder;
+  private final NativeLibraryFinder nativeLibraryFinder;
 
   public MuleSharedDomainClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent,
                                      ClassLoaderLookupPolicy lookupPolicy, List<URL> urls,
@@ -83,7 +82,6 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
 
   @Override
   protected String[] getLocalResourceLocations() {
-    return new String[] {getDomainFolder(getArtifactDescriptor().getName()).getAbsolutePath(),
-        getMuleConfDir().getAbsolutePath()};
+    return new String[] {getDomainFolder(getArtifactDescriptor().getName()).getAbsolutePath()};
   }
 }
