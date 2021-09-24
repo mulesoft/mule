@@ -6,15 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromExtension;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEntitlementInfo;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseExtensionErrorModels;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -22,7 +25,10 @@ import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.Export;
+import org.mule.runtime.extension.api.annotation.Import;
+import org.mule.runtime.extension.api.annotation.ImportedTypes;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -60,6 +66,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<ErrorModelParser> errorModelParsers;
   private final List<MetadataType> exportedTypes = new LinkedList<>();
   private final List<String> exportedResources = new LinkedList<>();
+  private List<MetadataType> importedTypes = new LinkedList<>();
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
@@ -73,11 +80,39 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(extensionElement));
     extensionElement.getDeclaringClass()
         .ifPresent(extensionClass -> additionalModelProperties.add(new ImplementingTypeModelProperty(extensionClass)));
-    parseExported();
+
+    ClassTypeLoader typeLoader = getDefault().createTypeLoader(loadingContext.getExtensionClassLoader());
+
+    parseExported(typeLoader);
+    parseImportedTypes(typeLoader);
   }
 
-  private void parseExported() {
-    ClassTypeLoader typeLoader = getDefault().createTypeLoader(loadingContext.getExtensionClassLoader());
+  private void parseImportedTypes(ClassTypeLoader typeLoader) {
+    List<Class<?>> types = parseRepeatableAnnotation(extensionElement,
+        Import.class,
+        container -> ((ImportedTypes) container).value())
+        .map(Import::type)
+        .collect(toList());
+
+    parseRepeatableAnnotation(extensionElement,
+        org.mule.sdk.api.annotation.Import.class,
+        container -> ((org.mule.sdk.api.annotation.ImportedTypes) container).value())
+        .map(org.mule.sdk.api.annotation.Import::type)
+        .collect(toCollection(() -> types));
+
+    importedTypes = types.stream()
+        .distinct()
+        .map(typeLoader::load)
+        .collect(toList());
+
+    if (types.size() != importedTypes.size()) {
+        throw new IllegalModelDefinitionException(
+            format("There should be only one Import declaration for any given type in extension [%s]."
+                    + " Multiple imports of the same type are not allowed", getName()));
+      }
+  }
+
+  private void parseExported(ClassTypeLoader typeLoader) {
     ExportInfo info = getInfoFromExtension(extensionElement,
         Export.class,
         org.mule.sdk.api.annotation.Export.class,
@@ -206,6 +241,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public List<String> getExportedResources() {
     return exportedResources;
+  }
+
+  @Override
+  public List<MetadataType> getImportedTypes() {
+    return importedTypes;
   }
 
   private Optional<XmlDslConfiguration> parseXmlDslConfiguration() {

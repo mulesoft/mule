@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.lang.String.format;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
@@ -19,6 +22,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
@@ -29,6 +33,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Exten
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -89,6 +94,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
     parseErrorModels(parser, declarer);
     parseExportedResources(parser, declarer);
+    parseImportedTypes(parser, declarer, context);
 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
@@ -110,6 +116,21 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private void parseExportedResources(ExtensionModelParser parser, ExtensionDeclarer declarer) {
     parser.getExportedTypes().forEach(type -> registerType(declarer, type));
     declarer.getDeclaration().getResources().addAll(parser.getExportedResources());
+  }
+
+  private void parseImportedTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
+    parser.getImportedTypes().forEach(importedType -> {
+      final Optional<String> typeId = getTypeId(importedType);
+
+      if (!(importedType instanceof ObjectType)) {
+        throw new IllegalArgumentException(format("Type '%s' is not complex. Only complex types can be imported from other extensions.",
+            typeId.orElseGet(importedType::toString)));
+      }
+
+      declarer.withImportedType(new ImportedTypeModel(typeId
+              .flatMap(importedTypeId -> context.getDslResolvingContext().getTypeCatalog().getType(importedTypeId))
+              .orElse((ObjectType) importedType)));
+    });
   }
 
   private void registerType(ExtensionDeclarer declarer, MetadataType type) {

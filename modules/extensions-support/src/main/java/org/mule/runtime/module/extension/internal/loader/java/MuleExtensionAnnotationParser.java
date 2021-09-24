@@ -26,20 +26,17 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
-import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionHandlerFactory;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +44,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,46 +77,17 @@ public final class MuleExtensionAnnotationParser {
         extensionType.getName(), Extension.class.getName(), org.mule.sdk.api.annotation.Extension.class.getName()));
   }
 
-  public static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
-                                                                         Function<Annotation, T[]> containerConsumer) {
-    List<T> annotationDeclarations = ImmutableList.of();
-
+  public static <T extends Annotation> Stream<T> parseRepeatableAnnotation(WithAnnotations element,
+                                                                         Class<T> annotation,
+                                                                         Function<Annotation, T[]> containerMapper) {
     Repeatable repeatableContainer = annotation.getAnnotation(Repeatable.class);
     if (repeatableContainer != null) {
-      Annotation container = IntrospectionUtils.getAnnotation(extensionType, repeatableContainer.value());
-      if (container != null) {
-        annotationDeclarations = ImmutableList.copyOf(containerConsumer.apply(container));
-      }
+      return element.getAnnotation(repeatableContainer.value())
+          .map(container -> Stream.of(containerMapper.apply(container)))
+          .orElse(Stream.empty());
     }
 
-    T singleDeclaration = IntrospectionUtils.getAnnotation(extensionType, annotation);
-    if (singleDeclaration != null) {
-      annotationDeclarations = ImmutableList.of(singleDeclaration);
-    }
-
-    return annotationDeclarations;
-  }
-
-  public static <T extends Annotation> List<AnnotationValueFetcher<T>> parseRepeatableAnnotation(Type extensionType,
-                                                                                                 Class<T> annotation,
-                                                                                                 Function<Annotation, T[]> containerConsumer) {
-    List<AnnotationValueFetcher<T>> annotationDeclarations = ImmutableList.of();
-
-    Repeatable repeatableContainer = annotation.getAnnotation(Repeatable.class);
-    if (repeatableContainer != null) {
-      Optional<? extends AnnotationValueFetcher<? extends Annotation>> container =
-          extensionType.getValueFromAnnotation(repeatableContainer.value());
-      if (container.isPresent()) {
-        annotationDeclarations = container.get().getInnerAnnotations((Function) containerConsumer);
-      }
-    }
-
-    Optional<AnnotationValueFetcher<T>> singleDeclaration = extensionType.getValueFromAnnotation(annotation);
-    if (singleDeclaration.isPresent()) {
-      annotationDeclarations = Collections.singletonList(singleDeclaration.get());
-    }
-
-    return annotationDeclarations;
+    return element.getAnnotation(annotation).map(Stream::of).orElse(Stream.empty());
   }
 
   public static List<String> getParamNames(Method method) {
