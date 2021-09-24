@@ -81,7 +81,9 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
   }
 
   private List<TypeElement> getOperationClasses(ProcessingEnvironment processingEnv, Element element) {
-    return processor.getArrayClassAnnotationValue(element, Operations.class, VALUE_PROPERTY, processingEnv);
-  }
+    List<TypeElement> types = processor.getArrayClassAnnotationValue(element, Operations.class, VALUE_PROPERTY, processingEnv);
+    types.addAll(processor.getArrayClassAnnotationValue(element, org.mule.sdk.api.annotation.Operations.class, VALUE_PROPERTY, processingEnv));
 
+    return types;
+  }
 }

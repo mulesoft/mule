@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -21,6 +20,13 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocModel;
 
+import java.lang.annotation.Annotation;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
@@ -33,12 +39,6 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
-
-import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -114,7 +114,7 @@ public final class ExtensionAnnotationProcessor {
     return this.<List<AnnotationValue>>getAnnotationValue(processingEnv, element, annotationClass, propertyName)
         .map(list -> list.stream().map(annotationValue -> (TypeElement) ((DeclaredType) annotationValue.getValue()).asElement())
             .collect(toList()))
-        .orElse(emptyList());
+        .orElseGet(LinkedList::new);
   }
 
   public Map<String, VariableElement> getFieldsAnnotatedWith(TypeElement element, Class<? extends Annotation> annotation) {
