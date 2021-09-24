@@ -11,11 +11,11 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromExtension;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEntitlementInfo;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getExceptionHandlerModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseExtensionErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 
@@ -220,7 +220,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty() {
-    return getExceptionEnricherFactory(extensionElement).map(ExceptionHandlerModelProperty::new);
+    return getExceptionHandlerModelProperty(extensionElement, "Extension", getName());
   }
 
   @Override

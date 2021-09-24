@@ -18,10 +18,12 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
@@ -29,8 +31,10 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeProviderAdapter;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
+import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionHandlerFactory;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.HashMap;
@@ -56,11 +60,11 @@ public final class JavaErrorModelParserUtils {
    */
   public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element) {
     return getInfoFromExtension(element,
-                                ErrorTypes.class,
-                                org.mule.sdk.api.annotation.error.ErrorTypes.class,
-                                errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()),
-                                errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()))
-                                    .orElse(new LinkedList<>());
+        ErrorTypes.class,
+        org.mule.sdk.api.annotation.error.ErrorTypes.class,
+        errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()),
+        errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()))
+        .orElse(new LinkedList<>());
   }
 
   /**
@@ -76,12 +80,12 @@ public final class JavaErrorModelParserUtils {
                                                                  OperationElement operation) {
     return getThrowsDeclaration(operation, extensionElement)
         .flatMap(withThrows -> getInfoFromAnnotation(
-                                                     withThrows,
-                                                     Throws.class,
-                                                     org.mule.sdk.api.annotation.error.Throws.class,
-                                                     ann -> parseErrorTypeProviders(ann.value(), extensionParser),
-                                                     ann -> parseErrorTypeProviders(ann.value(), extensionParser),
-                                                     dualThrowsException(operation)))
+            withThrows,
+            Throws.class,
+            org.mule.sdk.api.annotation.error.Throws.class,
+            ann -> parseErrorTypeProviders(ann.value(), extensionParser),
+            ann -> parseErrorTypeProviders(ann.value(), extensionParser),
+            dualThrowsException(operation)))
         .orElse(new LinkedList<>());
   }
 
@@ -99,6 +103,23 @@ public final class JavaErrorModelParserUtils {
         : errorTypeDefinition.getClass();
   }
 
+  public static java.util.Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty(WithAnnotations element,
+                                                                                                   String elementType,
+                                                                                                   String elementName) {
+    Optional<Type> classValue = getInfoFromAnnotation(
+        element,
+        elementType,
+        elementName,
+        OnException.class,
+        org.mule.sdk.api.annotation.OnException.class,
+        ann -> element.getValueFromAnnotation(OnException.class).get().getClassValue(OnException::value),
+        ann -> element.getValueFromAnnotation(org.mule.sdk.api.annotation.OnException.class).get().getClassValue(org.mule.sdk.api.annotation.OnException::value)
+    );
+
+    return classValue
+        .flatMap(c -> c.getDeclaringClass())
+        .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory((Class<? extends ExceptionHandler>) clazz)));
+  }
 
   private static List<ErrorModelParser> parseErrorTypeDefinitions(Class<? extends Enum> typeDefClass) {
     Map<ErrorTypeDefinition, ErrorModelParser> cycleControls = new HashMap<>(emptyMap());
@@ -119,8 +140,8 @@ public final class JavaErrorModelParserUtils {
 
     if (!errorDefinitionClass.equals(extensionErrorType) && !errorDefinitionClass.getSuperclass().equals(extensionErrorType)) {
       throw new IllegalModelDefinitionException(format("Invalid operation throws detected, the extension declared" +
-          " to throw errors of %s type, but an error of %s type has been detected",
-                                                       extensionErrorType, error.getClass()));
+              " to throw errors of %s type, but an error of %s type has been detected",
+          extensionErrorType, error.getClass()));
     }
   }
 
@@ -182,11 +203,12 @@ public final class JavaErrorModelParserUtils {
 
   private static Supplier<IllegalModelDefinitionException> dualThrowsException(OperationElement operation) {
     return () -> new IllegalOperationModelDefinitionException(
-                                                              format("Operation '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                     operation.getAlias(),
-                                                                     Throws.class.getName(),
-                                                                     org.mule.sdk.api.annotation.error.Throws.class.getName()));
+        format("Operation '%s' is annotated with '@%s' and '@%s' at the same time",
+            operation.getAlias(),
+            Throws.class.getName(),
+            org.mule.sdk.api.annotation.error.Throws.class.getName()));
   }
 
-  private JavaErrorModelParserUtils() {}
+  private JavaErrorModelParserUtils() {
+  }
 }

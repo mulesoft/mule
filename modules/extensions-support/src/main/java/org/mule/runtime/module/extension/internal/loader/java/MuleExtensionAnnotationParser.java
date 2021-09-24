@@ -44,9 +44,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * Utilities for reading annotations as a mean to describe extensions
@@ -54,8 +51,6 @@ import org.slf4j.LoggerFactory;
  * @since 3.7.0
  */
 public final class MuleExtensionAnnotationParser {
-
-  private static final Logger logger = LoggerFactory.getLogger(MuleExtensionAnnotationParser.class);
 
   public static String getMemberName(BaseDeclaration<?> declaration, String defaultName) {
     return declaration.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName())
@@ -224,14 +219,5 @@ public final class MuleExtensionAnnotationParser {
                                                    org.mule.sdk.api.annotation.param.display.Text.class,
                                                    org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
-  }
-
-  public static java.util.Optional<ExceptionHandlerFactory> getExceptionEnricherFactory(WithAnnotations element) {
-    if (element.isAnnotatedWith(OnException.class)) {
-      Type classValue = element.getValueFromAnnotation(OnException.class).get().getClassValue(OnException::value);
-      return classValue.getDeclaringClass()
-          .map(clazz -> new DefaultExceptionHandlerFactory((Class<? extends ExceptionHandler>) clazz));
-    }
-    return java.util.Optional.empty();
   }
 }
