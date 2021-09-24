@@ -10,6 +10,11 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 
 import java.util.List;
 
+/**
+ * General contract for a model parser capable of reading additional model properties
+ *
+ * @since 4.5.0
+ */
 public interface AdditionalPropertiesModelParser {
 
   /**

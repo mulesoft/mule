@@ -15,6 +15,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getAllTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getCompletionCallbackParameters;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
@@ -22,7 +23,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forOperation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseOperationErrorModels;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getRoutes;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -65,8 +67,10 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link OperationModelParser} for Java based syntax
@@ -419,6 +423,15 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public List<ErrorModelParser> getErrorModelParsers() {
     return parseOperationErrorModels(extensionModelParser, extensionElement, operationElement);
+  }
+
+  @Override
+  public Set<String> getSemanticTerms() {
+    Set<String> terms = new LinkedHashSet<>();
+    terms.addAll(getAllTermsFromAnnotations(operationElement::isAnnotatedWith));
+    addCustomTerms(operationElement, terms);
+
+    return terms;
   }
 
   private void checkOperationIsNotAnExtension() {

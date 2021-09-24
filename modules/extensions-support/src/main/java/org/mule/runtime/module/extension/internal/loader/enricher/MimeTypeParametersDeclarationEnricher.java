@@ -14,7 +14,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toM
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADVANCED_TAB_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isInputStream;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;

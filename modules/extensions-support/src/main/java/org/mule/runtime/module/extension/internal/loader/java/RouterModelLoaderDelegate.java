@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
@@ -47,7 +49,7 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     parser.getAdditionalModelProperties().forEach(router::withModelProperty);
 
     loader.getParameterModelsLoaderDelegate().declare(router, parser.getParameterGroupModelParsers());
-
+    addSemanticTerms(router.getDeclaration(), parser);
     declareRoutes(router, parser);
 
     constructDeclarers.put(parser, router);

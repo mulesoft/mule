@@ -7,10 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
@@ -89,13 +91,17 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
 
       loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
+      addSemanticTerms(operation.getDeclaration(), parser);
       parser.getExecutionType().ifPresent(operation::withExecutionType);
       parser.getAdditionalModelProperties().forEach(operation::withModelProperty);
       parser.getExceptionHandlerModelProperty().ifPresent(operation::withModelProperty);
 
-      parser.getNestedChainParser().ifPresent(chain -> operation.withChain(chain.getName())
-          .describedAs(chain.getDescription())
-          .setRequired(chain.isRequired()));
+      parser.getNestedChainParser().ifPresent(chain -> {
+        NestedChainDeclarer chainDeclarer = operation.withChain(chain.getName())
+            .describedAs(chain.getDescription())
+            .setRequired(chain.isRequired());
+        addSemanticTerms(chainDeclarer.getDeclaration(), chain);
+      });
 
       parseErrorModels(operation, parser);
       operationDeclarers.put(parser, operation);

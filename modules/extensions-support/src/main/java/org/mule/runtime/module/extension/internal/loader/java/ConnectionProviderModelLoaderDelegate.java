@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
@@ -58,6 +60,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
 
       loader.getParameterModelsLoaderDelegate().declare(providerDeclarer, parser.getParameterGroupModelParsers());
       parser.getAdditionalModelProperties().forEach(providerDeclarer::withModelProperty);
+      addSemanticTerms(providerDeclarer.getDeclaration(), parser);
       connectionProviderDeclarers.put(parser, providerDeclarer);
     }
   }

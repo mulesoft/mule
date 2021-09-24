@@ -18,6 +18,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Base class for implementing the decorator pattern around a {@link ParameterModelParser}
@@ -113,5 +114,10 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   @Override
   public Optional<DisplayModel> getDisplayModel() {
     return decoratee.getDisplayModel();
+  }
+
+  @Override
+  public Set<String> getSemanticTerms() {
+    return decoratee.getSemanticTerms();
   }
 }

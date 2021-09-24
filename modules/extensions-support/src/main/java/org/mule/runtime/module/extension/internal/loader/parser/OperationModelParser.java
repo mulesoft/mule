@@ -26,7 +26,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface OperationModelParser extends AdditionalPropertiesModelParser {
+public interface OperationModelParser extends SemanticTermsParser, AdditionalPropertiesModelParser {
 
   /**
    * @return the operation's name

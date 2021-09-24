@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
@@ -51,6 +53,7 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
       parser.getAdditionalModelProperties().forEach(function::withModelProperty);
+      addSemanticTerms(function.getDeclaration(), parser);
 
       functionDeclarers.put(parser, function);
     }

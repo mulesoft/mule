@@ -9,6 +9,9 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * {@link NestedChainModelParser} for Java based syntax
  *
@@ -35,5 +38,10 @@ public class JavaNestedChainModelParser implements NestedChainModelParser {
   @Override
   public boolean isRequired() {
     return extensionParameter.isRequired();
+  }
+
+  @Override
+  public Set<String> getSemanticTerms() {
+    return new LinkedHashSet<>();
   }
 }
