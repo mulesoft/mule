@@ -78,4 +78,5 @@ public class DefaultComponentExecutionProfilingEventContext implements Component
   public Optional<ComponentLocation> getLocation() {
     return location;
   }
+
 }

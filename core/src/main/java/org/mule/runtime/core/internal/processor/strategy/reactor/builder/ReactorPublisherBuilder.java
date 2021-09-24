@@ -8,12 +8,12 @@ package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.api.profiling.tracing.TaskTracingService.getTaskTracingContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.tracing.ComponentMetadata;
+import org.mule.runtime.api.profiling.tracing.TaskTracingContext;
+import org.mule.runtime.api.profiling.tracing.TaskTracingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -24,6 +24,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultTaskTracingContext;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
@@ -84,6 +86,8 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    */
   ReactorPublisherBuilder<T> doOnSubscribe(Consumer<? super Subscription> onSubscribe);
 
+  ReactorPublisherBuilder<T> setTaskContext(TaskTracingService taskTracingService, ComponentLocation location);
+
   /**
    * @param location     the {@link ComponentLocation} associated to the profiling event.
    * @param dataProducer the optional {@link ProfilingDataProducer} used to notify the profiling event.
@@ -141,6 +145,14 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     @Override
     public ReactorPublisherBuilder<Mono<CoreEvent>> doOnSubscribe(Consumer<? super Subscription> onSubscribe) {
       mono = mono.doOnSubscribe(onSubscribe);
+      return this;
+    }
+
+    @Override
+    public ReactorPublisherBuilder<Mono<CoreEvent>> setTaskContext(TaskTracingService taskTracingService,
+                                                                   ComponentLocation location) {
+      TaskTracingContext taskTracingContext = new DefaultTaskTracingContext(new DefaultComponentMetadata(location));
+      mono = mono.doOnNext(coreEvent -> taskTracingService.setCurrentTaskTracingContext(taskTracingContext));
       return this;
     }
 
@@ -204,6 +216,14 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
+    public ReactorPublisherBuilder<Flux<CoreEvent>> setTaskContext(TaskTracingService taskTracingService,
+                                                                   ComponentLocation location) {
+      TaskTracingContext taskTracingContext = new DefaultTaskTracingContext(new DefaultComponentMetadata(location));
+      flux = flux.doOnNext(coreEvent -> taskTracingService.setCurrentTaskTracingContext(taskTracingContext));
+      return this;
+    }
+
+    @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> profileComponentExecution(ComponentLocation location,
                                                                               Optional<ProfilingDataProducer<ComponentExecutionProfilingEventContext>> dataProducer,
                                                                               String artifactId, String artifactType) {
@@ -217,11 +237,6 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
   static void triggerComponentExecutionProfilingEvent(ComponentLocation location, String artifactId, String artifactType,
                                                       ProfilingDataProducer<ComponentExecutionProfilingEventContext> dataProducer,
                                                       CoreEvent e) {
-    // TODO: This could be done only once but might need refactoring (better to leave it for the granularity discussion).
-    // TODO: Add a feature flag ever "thread traceability" or something like that (always false by default).
-    if (getTaskTracingContext() != null) {
-      getTaskTracingContext().setRunningComponentMetadata(new ComponentMetadata(location));
-    }
     dataProducer.triggerProfilingEvent(
                                        new DefaultComponentExecutionProfilingEventContext(e,
                                                                                           location,

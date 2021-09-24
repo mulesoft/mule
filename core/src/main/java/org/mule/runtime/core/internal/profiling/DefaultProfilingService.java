@@ -24,11 +24,15 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
+import org.mule.runtime.api.profiling.tracing.TaskTracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentExecutionProfilingDataProducer;
 import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
+import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTaskTracingService;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +52,10 @@ import javax.inject.Inject;
 public class DefaultProfilingService extends AbstractProfilingService {
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
+
+  private final TaskTracingService taskTracingService = new ThreadLocalTaskTracingService();
+
+  private ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
@@ -106,5 +114,16 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Inject
   public void setProfilingDataConsumerDiscoveryStrategies(Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies) {
     this.profilingDataConsumerDiscoveryStrategies = profilingDataConsumerDiscoveryStrategies;
+  }
+
+  @Override
+  public ThreadSnapshotCollector getThreadSnapshotCollector() {
+    // TODO: Move this to a service
+    throw new UnsupportedOperationException("Not implemented yet");
+  }
+
+  @Override
+  public TaskTracingService getTaskTracingService() {
+    return taskTracingService;
   }
 }

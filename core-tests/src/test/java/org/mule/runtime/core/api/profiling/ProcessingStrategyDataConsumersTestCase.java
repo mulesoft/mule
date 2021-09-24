@@ -25,6 +25,7 @@ import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentE
 import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.ARTIFACT_TYPE_KEY;
 import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.LOCATION;
 import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.PROCESSING_THREAD_KEY;
+import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.PROCESSING_THREAD_STATE;
 import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.PROFILING_EVENT_TIMESTAMP_KEY;
 import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.PROFILING_EVENT_TYPE;
 import static org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer.RUNTIME_CORE_EVENT_CORRELATION_ID;
@@ -43,6 +44,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEv
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentExecutionDataConsumer;
+import org.mule.runtime.core.internal.profiling.context.ComponentExecutionProfilingEventContextWithThreadProfiling;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentExecutionProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -128,11 +130,18 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     ProfilingDataProducer<ComponentExecutionProfilingEventContext> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
-    DefaultComponentExecutionProfilingEventContext profilerEventContext =
-        new DefaultComponentExecutionProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
-                                                           PROFILING_EVENT_TIMESTAMP);
-    dataProducer.triggerProfilingEvent(
-                                       profilerEventContext);
+    ComponentExecutionProfilingEventContextWithThreadProfiling profilerEventContext =
+        new ComponentExecutionProfilingEventContextWithThreadProfiling(
+                                                                       new DefaultComponentExecutionProfilingEventContext(event,
+                                                                                                                          location,
+                                                                                                                          THREAD_NAME,
+                                                                                                                          ARTIFACT_ID,
+                                                                                                                          ARTIFACT_TYPE,
+                                                                                                                          PROFILING_EVENT_TIMESTAMP),
+                                                                       profilingService.getThreadSnapshotCollector()
+                                                                           .getCurrentThreadSnapshot());
+
+    dataProducer.triggerProfilingEvent(profilerEventContext);
 
     verify(logger).debug(jsonToLog(profilingEventType, profilerEventContext));
   }
@@ -193,7 +202,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
   private String jsonToLog(ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType,
                            ComponentExecutionProfilingEventContext profilingEventContext) {
-    Map<String, String> eventMap = new HashMap<>();
+    Map<String, Object> eventMap = new HashMap<>();
     eventMap.put(PROFILING_EVENT_TYPE,
                  getFullyQualifiedProfilingNotificationIdentifier(profilingEventType));
     eventMap.put(PROFILING_EVENT_TIMESTAMP_KEY, Long.toString(profilingEventContext.getTriggerTimestamp()));
@@ -201,7 +210,8 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     eventMap.put(ARTIFACT_ID_KEY, profilingEventContext.getArtifactId());
     eventMap.put(ARTIFACT_TYPE_KEY, profilingEventContext.getArtifactType());
     eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, profilingEventContext.getCorrelationId());
-    profilingEventContext.getLocation().map(loc -> eventMap.put(LOCATION, loc.getLocation()));
+    profilingEventContext.getLocation().ifPresent(loc -> eventMap.put(LOCATION, loc.getLocation()));
+    profilingEventContext.getThreadSnapshot().ifPresent(threadSnapshot -> eventMap.put(PROCESSING_THREAD_STATE, threadSnapshot));
 
     return gson.toJson(eventMap);
   }

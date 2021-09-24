@@ -23,7 +23,6 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
@@ -146,6 +145,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
         .profileComponentExecution(location, psSchedulingOperationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(dispatcherScheduler))
         .profileComponentExecution(location, startingOperationExecutionDataProducer, artifactId, artifactType)
+        .setTaskContext(profilingService.getTaskTracingService(), location)
         .transform(processor)
         .profileComponentExecution(location, operationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(callbackScheduler))

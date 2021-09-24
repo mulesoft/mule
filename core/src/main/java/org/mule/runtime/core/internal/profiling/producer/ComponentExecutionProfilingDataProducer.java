@@ -7,8 +7,6 @@
 
 package org.mule.runtime.core.internal.profiling.producer;
 
-import static org.mule.runtime.api.profiling.threading.ThreadingService.getCurrentThreadSnapshot;
-
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentExecutionProfilingEventContext;
@@ -23,22 +21,27 @@ import org.mule.runtime.core.internal.profiling.context.ComponentExecutionProfil
 public class ComponentExecutionProfilingDataProducer
     implements ProfilingDataProducer<ComponentExecutionProfilingEventContext> {
 
-  private final DefaultProfilingService defaultProfilingService;
+  private final DefaultProfilingService profilingService;
   private final ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType;
 
-  public ComponentExecutionProfilingDataProducer(DefaultProfilingService defaultProfilingService,
+  public ComponentExecutionProfilingDataProducer(DefaultProfilingService profilingService,
                                                  ProfilingEventType<ComponentExecutionProfilingEventContext> profilingEventType) {
-    this.defaultProfilingService = defaultProfilingService;
+    this.profilingService = profilingService;
     this.profilingEventType = profilingEventType;
   }
 
   @Override
   public void triggerProfilingEvent(ComponentExecutionProfilingEventContext profilingEventContext) {
-    // TODO: Add a capability flag (could be something like "threading_profiling") has a separate task in order to check
-    // design and implementation of such feature.
-    ComponentExecutionProfilingEventContext decorated =
-        new ComponentExecutionProfilingEventContextWithThreadProfiling(profilingEventContext,
-                                                                       getCurrentThreadSnapshot());
-    defaultProfilingService.notifyEvent(decorated, profilingEventType);
+    // TODO: Add a capability flag (could be something like "threading_profiling") has a separate task in order to check design
+    // and implementation of such feature.
+    // TODO: This could be done only once but might need refactoring (better to leave it for the granularity discussion).
+    // TODO: Add a feature flag ever "thread traceability" or something like that (always false by default).
+    triggerProfilingEvent(
+                          new ComponentExecutionProfilingEventContextWithThreadProfiling(profilingEventContext,
+                                                                                         profilingService
+                                                                                             .getThreadSnapshotCollector()
+                                                                                             .getCurrentThreadSnapshot()));
+    profilingService.notifyEvent(profilingEventContext, profilingEventType);
   }
+
 }
