@@ -93,7 +93,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
     parseErrorModels(parser, declarer);
-    parseExportedResources(parser, declarer);
+    parseExports(parser, declarer);
     parseImportedTypes(parser, declarer, context);
 
     configLoaderDelegate.declareConfigurations(declarer, parser);
@@ -113,9 +113,11 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     declarer.getDeclaration().getErrorModels().addAll(createErrorModelFactory().getErrorModels());
   }
 
-  private void parseExportedResources(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+  private void parseExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
     parser.getExportedTypes().forEach(type -> registerType(declarer, type));
     declarer.getDeclaration().getResources().addAll(parser.getExportedResources());
+    parser.getPrivilegedExportedArtifacts().forEach(declarer::withPrivilegedArtifact);
+    parser.getPrivilegedExportedPackages().forEach(declarer::withPrivilegedPackage);
   }
 
   private void parseImportedTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {

@@ -118,5 +118,9 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
 
   List<MetadataType> getImportedTypes();
 
+  List<String> getPrivilegedExportedArtifacts();
+
+  List<String> getPrivilegedExportedPackages();
+
   List<String> getExportedResources();
 }

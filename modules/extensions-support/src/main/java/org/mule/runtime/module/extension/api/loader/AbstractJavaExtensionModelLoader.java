@@ -36,7 +36,6 @@ import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadat
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurationDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.JavaPrivilegedExportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.NotificationsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ObjectStoreParameterDeclarationEnricher;
@@ -125,7 +124,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new DynamicMetadataDeclarationEnricher(),
                                                                                                new RequiredForMetadataDeclarationEnricher(),
                                                                                                new JavaConfigurationDeclarationEnricher(),
-                                                                                               new JavaPrivilegedExportedTypesDeclarationEnricher(),
                                                                                                new JavaOAuthDeclarationEnricher(),
                                                                                                new RedeliveryPolicyDeclarationEnricher(),
                                                                                                new SubTypesDeclarationEnricher(),

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -24,9 +25,11 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.ImportedTypes;
+import org.mule.runtime.extension.api.annotation.PrivilegedExport;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -66,7 +69,10 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<ErrorModelParser> errorModelParsers;
   private final List<MetadataType> exportedTypes = new LinkedList<>();
   private final List<String> exportedResources = new LinkedList<>();
+
   private List<MetadataType> importedTypes = new LinkedList<>();
+  private List<String> privilegedExportedArtifacts = new LinkedList<>();
+  private List<String> privilegedExportedPackages = new LinkedList<>();
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
@@ -134,6 +140,21 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     if (!exportedClassNames.isEmpty()) {
       additionalModelProperties.add(new ExportedClassNamesModelProperty(exportedClassNames));
     }
+
+    parsePrivilegeExport();
+  }
+
+  private void parsePrivilegeExport() {
+    getInfoFromExtension(
+        extensionElement,
+        PrivilegedExport.class,
+        org.mule.sdk.api.annotation.PrivilegedExport.class,
+        e -> new Pair<>(e.artifacts(), e.packages()),
+        e -> new Pair<>(e.artifacts(), e.packages())
+        ).ifPresent(exported -> {
+          privilegedExportedArtifacts = asList(exported.getFirst());
+          privilegedExportedPackages = asList(exported.getSecond());
+    });
   }
 
   @Override
@@ -241,6 +262,16 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public List<String> getExportedResources() {
     return exportedResources;
+  }
+
+  @Override
+  public List<String> getPrivilegedExportedArtifacts() {
+    return privilegedExportedArtifacts;
+  }
+
+  @Override
+  public List<String> getPrivilegedExportedPackages() {
+    return privilegedExportedPackages;
   }
 
   @Override
