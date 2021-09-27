@@ -42,7 +42,7 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
 
   public ExtensionTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
     super(aClass, newCachedClassTypeLoader(typeLoader));
-    extensionInfo =  new LazyValue<>(() -> getExtensionInfo(aClass));
+    extensionInfo = new LazyValue<>(() -> getExtensionInfo(aClass));
   }
 
   private static ClassTypeLoader newCachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
@@ -54,15 +54,16 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    */
   public List<ConfigurationElement> getConfigurations() {
     return getInfoFromExtension(
-        this,
-        Configurations.class,
-        org.mule.sdk.api.annotation.Configurations.class,
-        value -> value.getClassArrayValue(Configurations::value),
-        value -> value.getClassArrayValue(org.mule.sdk.api.annotation.Configurations::value))
-        .map(types -> types.stream()
-            .map(type -> (ConfigurationElement) new ConfigurationWrapper(type.getDeclaringClass().get(), typeLoader))
-            .collect(toList())
-        ).orElse(emptyList());
+                                this,
+                                Configurations.class,
+                                org.mule.sdk.api.annotation.Configurations.class,
+                                value -> value.getClassArrayValue(Configurations::value),
+                                value -> value.getClassArrayValue(org.mule.sdk.api.annotation.Configurations::value))
+                                    .map(types -> types.stream()
+                                        .map(type -> (ConfigurationElement) new ConfigurationWrapper(type.getDeclaringClass()
+                                            .get(), typeLoader))
+                                        .collect(toList()))
+                                    .orElse(emptyList());
   }
 
   /**
@@ -82,9 +83,9 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
   @Override
   public List<FunctionElement> getFunctions() {
     return getExpressionFunctionClassStream()
-            .flatMap(clazz -> getApiMethods(clazz).stream())
-            .map(clazz -> (FunctionElement) new FunctionWrapper(clazz, typeLoader))
-            .collect(toList());
+        .flatMap(clazz -> getApiMethods(clazz).stream())
+        .map(clazz -> (FunctionElement) new FunctionWrapper(clazz, typeLoader))
+        .collect(toList());
   }
 
   @Override

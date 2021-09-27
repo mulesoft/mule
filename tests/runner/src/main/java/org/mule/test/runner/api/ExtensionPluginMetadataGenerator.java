@@ -173,8 +173,8 @@ class ExtensionPluginMetadataGenerator {
         }
       }
       logger.debug("No class found annotated with {} or {} ",
-          Extension.class.getName(),
-          org.mule.sdk.api.annotation.Extension.class.getName());
+                   Extension.class.getName(),
+                   org.mule.sdk.api.annotation.Extension.class.getName());
       return null;
     } catch (IOException e) {
       throw new UncheckedIOException(e);

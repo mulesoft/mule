@@ -70,17 +70,16 @@ import org.junit.runners.BlockJUnit4ClassRunner;
  * The classification for {@link ClassLoader}s would be based on dependencies scope, provided will go to the container, compile to
  * plugin and test to the application. For more information about the classification process see {@link ClassPathClassifier}.
  * <p/>
- * For plugins it will scan the plugin set of {@link java.net.URL}s to search for classes annotated with
- * {@link Extension} or {@link org.mule.sdk.api.annotation.Extension}, if a class is annotated it will generate the metadata
- * for the extension in runtime an it will also register it to the {@link ExtensionManager}. Non extension plugins will set its
- * filter based on {@code mule-module.properties} file.
+ * For plugins it will scan the plugin set of {@link java.net.URL}s to search for classes annotated with {@link Extension} or
+ * {@link org.mule.sdk.api.annotation.Extension}, if a class is annotated it will generate the metadata for the extension in
+ * runtime an it will also register it to the {@link ExtensionManager}. Non extension plugins will set its filter based on
+ * {@code mule-module.properties} file.
  * <p/>
- * By default this test runs internally with a {@link BlockJUnit4ClassRunner} runner. On those cases where the
- * test has to be run with another runner the {@link RunnerDelegateTo} should be used to define it.
+ * By default this test runs internally with a {@link BlockJUnit4ClassRunner} runner. On those cases where the test has to be run
+ * with another runner the {@link RunnerDelegateTo} should be used to define it.
  * <p/>
  * {@link PluginClassLoadersAware} will define that this class also needs to get access to plugin {@link ArtifactClassLoader} in
- * order to load extension classes (they are not exposed to the application) for registering them to the
- * {@link ExtensionManager}.
+ * order to load extension classes (they are not exposed to the application) for registering them to the {@link ExtensionManager}.
  * <p/>
  * Due to the cost of reading the classpath, scanning the dependencies and classes to generate the {@link ClassLoader} is high,
  * this runner will hold an static reference to the {@link ClassLoader} created for the first test and will use the same during
@@ -253,8 +252,8 @@ abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   }
 
   /**
-   * Adds a {@link ConfigurationBuilder} that sets the {@link ExtensionManager} into the
-   * {@link #muleContext}. This {@link ConfigurationBuilder} is set as the first element of the {@code builders} {@link List}
+   * Adds a {@link ConfigurationBuilder} that sets the {@link ExtensionManager} into the {@link #muleContext}. This
+   * {@link ConfigurationBuilder} is set as the first element of the {@code builders} {@link List}
    *
    * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
    */

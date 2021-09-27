@@ -166,10 +166,11 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
                                            Field field) {
       getExpressionSupport(field)
           .filter(expression -> expression == NOT_SUPPORTED)
-          .orElseThrow(() ->
-              new IllegalConnectionProviderModelDefinitionException(format(
-                  "Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "
-                      + "in OAuth parameters", parameter.getName(), provider.getName())));
+          .orElseThrow(() -> new IllegalConnectionProviderModelDefinitionException(format(
+                                                                                          "Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "
+                                                                                              + "in OAuth parameters",
+                                                                                          parameter.getName(),
+                                                                                          provider.getName())));
     }
 
     private void enrichCallbackValues(ConnectionProviderDeclaration declaration, Class type) {

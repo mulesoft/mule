@@ -27,16 +27,14 @@ public final class JavaExternalLIbModelParserUtils {
     List<ExternalLibraryModel> libraries = new LinkedList<>();
 
     parseExternalLibs(element,
-        ExternalLibs.class,
-        libs -> Stream.of(libs.value()).map(lib -> parseExternalLib(lib)).collect(toList()),
-        libraries
-        );
+                      ExternalLibs.class,
+                      libs -> Stream.of(libs.value()).map(lib -> parseExternalLib(lib)).collect(toList()),
+                      libraries);
 
     parseExternalLibs(element,
-        org.mule.sdk.api.annotation.ExternalLibs.class,
-        libs -> Stream.of(libs.value()).map(lib -> parseExternalLib(lib)).collect(toList()),
-        libraries
-    );
+                      org.mule.sdk.api.annotation.ExternalLibs.class,
+                      libs -> Stream.of(libs.value()).map(lib -> parseExternalLib(lib)).collect(toList()),
+                      libraries);
 
     element.getAnnotation(ExternalLib.class)
         .map(lib -> parseExternalLib(lib))
@@ -86,6 +84,5 @@ public final class JavaExternalLIbModelParserUtils {
         .ifPresent(accumulator::addAll);
   }
 
-  private JavaExternalLIbModelParserUtils() {
-  }
+  private JavaExternalLIbModelParserUtils() {}
 }

@@ -73,7 +73,8 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
 
     processor.getArrayClassAnnotationValue(element, Configurations.class, VALUE_PROPERTY, processingEnv)
         .forEach(consumer);
-    processor.getArrayClassAnnotationValue(element, org.mule.sdk.api.annotation.Configurations.class, VALUE_PROPERTY, processingEnv)
+    processor
+        .getArrayClassAnnotationValue(element, org.mule.sdk.api.annotation.Configurations.class, VALUE_PROPERTY, processingEnv)
         .forEach(consumer);
 
     elements.putAll(getApiMethods(processingEnv, getOperationClasses(processingEnv, element)));
@@ -82,7 +83,8 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
 
   private List<TypeElement> getOperationClasses(ProcessingEnvironment processingEnv, Element element) {
     List<TypeElement> types = processor.getArrayClassAnnotationValue(element, Operations.class, VALUE_PROPERTY, processingEnv);
-    types.addAll(processor.getArrayClassAnnotationValue(element, org.mule.sdk.api.annotation.Operations.class, VALUE_PROPERTY, processingEnv));
+    types.addAll(processor.getArrayClassAnnotationValue(element, org.mule.sdk.api.annotation.Operations.class, VALUE_PROPERTY,
+                                                        processingEnv));
 
     return types;
   }

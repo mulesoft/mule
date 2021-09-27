@@ -90,7 +90,7 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   private ExtensionDeclarer getExtensionDeclarer(ExtensionLoadingContext context) {
-    ExtensionInfo info =  MuleExtensionAnnotationParser.getExtensionInfo(extensionType);
+    ExtensionInfo info = MuleExtensionAnnotationParser.getExtensionInfo(extensionType);
     return context.getExtensionDeclarer()
         .named(info.getName())
         .onVersion(version)

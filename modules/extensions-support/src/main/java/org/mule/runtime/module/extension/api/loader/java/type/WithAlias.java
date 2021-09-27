@@ -28,13 +28,15 @@ public interface WithAlias extends WithAnnotations, WithName {
    */
   default String getAlias() {
     return getInfoFromAnnotation(this,
-        Alias.class,
-        org.mule.sdk.api.annotation.Alias.class,
-        value -> value.getStringValue(Alias::value),
-        value -> value.getStringValue(org.mule.sdk.api.annotation.Alias::value),
-        () -> new IllegalModelDefinitionException(format("Both %s and %s annotations are present on element '%s",
-            Alias.class.getName(), org.mule.sdk.api.annotation.Alias.class.getName(), getName()))
-    ).orElseGet(this::getName);
+                                 Alias.class,
+                                 org.mule.sdk.api.annotation.Alias.class,
+                                 value -> value.getStringValue(Alias::value),
+                                 value -> value.getStringValue(org.mule.sdk.api.annotation.Alias::value),
+                                 () -> new IllegalModelDefinitionException(format("Both %s and %s annotations are present on element '%s",
+                                                                                  Alias.class.getName(),
+                                                                                  org.mule.sdk.api.annotation.Alias.class
+                                                                                      .getName(),
+                                                                                  getName()))).orElseGet(this::getName);
   }
 
   /**
@@ -42,13 +44,15 @@ public interface WithAlias extends WithAnnotations, WithName {
    */
   default String getDescription() {
     return getInfoFromAnnotation(
-        this,
-        Alias.class,
-        org.mule.sdk.api.annotation.Alias.class,
-        value -> value.getStringValue(Alias::description),
-        value -> value.getStringValue(org.mule.sdk.api.annotation.Alias::description),
-        () -> new IllegalModelDefinitionException(format("Both %s and %s annotations are present on element '%s",
-            Alias.class.getName(), org.mule.sdk.api.annotation.Alias.class.getName(), getName()))
-    ).orElse(EMPTY);
+                                 this,
+                                 Alias.class,
+                                 org.mule.sdk.api.annotation.Alias.class,
+                                 value -> value.getStringValue(Alias::description),
+                                 value -> value.getStringValue(org.mule.sdk.api.annotation.Alias::description),
+                                 () -> new IllegalModelDefinitionException(format("Both %s and %s annotations are present on element '%s",
+                                                                                  Alias.class.getName(),
+                                                                                  org.mule.sdk.api.annotation.Alias.class
+                                                                                      .getName(),
+                                                                                  getName()))).orElse(EMPTY);
   }
 }

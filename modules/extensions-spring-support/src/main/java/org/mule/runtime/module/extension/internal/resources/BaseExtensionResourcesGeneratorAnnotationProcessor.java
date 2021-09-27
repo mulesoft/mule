@@ -143,9 +143,9 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     if (elements.size() > 1) {
       String message =
           format("Only one extension is allowed per plugin, however several classes annotated with either @%s or @%s were found. Offending classes are [%s]",
-              Extension.class.getName(),
-              org.mule.sdk.api.annotation.Extension.class.getName(),
-              Joiner.on(", ").join(elements.stream().map(TypeElement::getQualifiedName).collect(toList())));
+                 Extension.class.getName(),
+                 org.mule.sdk.api.annotation.Extension.class.getName(),
+                 Joiner.on(", ").join(elements.stream().map(TypeElement::getQualifiedName).collect(toList())));
 
       throw new RuntimeException(message);
     }

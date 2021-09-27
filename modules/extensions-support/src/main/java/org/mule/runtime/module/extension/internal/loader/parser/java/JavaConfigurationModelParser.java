@@ -68,13 +68,13 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public String getName() {
     return getInfoFromAnnotation(configElement,
-        "Configuration", configElement.getName(),
-        Configuration.class,
-        org.mule.sdk.api.annotation.Configuration.class,
-        value -> value.getStringValue(Configuration::name),
-        value -> value.getStringValue(org.mule.sdk.api.annotation.Configuration::name)
-        ).map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
-        .orElse(DEFAULT_CONFIG_NAME);
+                                 "Configuration", configElement.getName(),
+                                 Configuration.class,
+                                 org.mule.sdk.api.annotation.Configuration.class,
+                                 value -> value.getStringValue(Configuration::name),
+                                 value -> value.getStringValue(org.mule.sdk.api.annotation.Configuration::name))
+                                     .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
+                                     .orElse(DEFAULT_CONFIG_NAME);
   }
 
   @Override

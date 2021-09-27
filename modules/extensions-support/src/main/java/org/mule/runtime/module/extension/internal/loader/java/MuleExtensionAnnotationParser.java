@@ -67,22 +67,22 @@ public final class MuleExtensionAnnotationParser {
     }
 
     throw new IllegalModelDefinitionException(String.format("Class '%s' not annotated with neither '%s' nor '%s'",
-        extensionType.getName(), Extension.class.getName(), org.mule.sdk.api.annotation.Extension.class.getName()));
+                                                            extensionType.getName(), Extension.class.getName(),
+                                                            org.mule.sdk.api.annotation.Extension.class.getName()));
   }
 
   public static <L extends Annotation, A extends Annotation, T> Stream<T> parseRepeatableAnnotation(
-      WithAnnotations element,
-      Class<L> legacyAnnotationType,
-      Class<A> sdkApiAnnotationType,
-      Function<Annotation, L[]> legacyContainerMapping,
-      Function<Annotation, A[]> sdkApiContainerMapping,
-      Function<AnnotationValueFetcher<L>, T> legacyMapping,
-      Function<AnnotationValueFetcher<A>, T> sdkApiMapping) {
+                                                                                                    WithAnnotations element,
+                                                                                                    Class<L> legacyAnnotationType,
+                                                                                                    Class<A> sdkApiAnnotationType,
+                                                                                                    Function<Annotation, L[]> legacyContainerMapping,
+                                                                                                    Function<Annotation, A[]> sdkApiContainerMapping,
+                                                                                                    Function<AnnotationValueFetcher<L>, T> legacyMapping,
+                                                                                                    Function<AnnotationValueFetcher<A>, T> sdkApiMapping) {
 
     return Stream.concat(
-        parseRepeatableAnnotation(element, legacyAnnotationType, legacyContainerMapping).map(legacyMapping),
-        parseRepeatableAnnotation(element, sdkApiAnnotationType, sdkApiContainerMapping).map(sdkApiMapping)
-    );
+                         parseRepeatableAnnotation(element, legacyAnnotationType, legacyContainerMapping).map(legacyMapping),
+                         parseRepeatableAnnotation(element, sdkApiAnnotationType, sdkApiContainerMapping).map(sdkApiMapping));
   }
 
   public static <T extends Annotation> Stream<AnnotationValueFetcher<T>> parseRepeatableAnnotation(WithAnnotations element,
@@ -146,9 +146,9 @@ public final class MuleExtensionAnnotationParser {
 
     if (legacyTextAnnotation.isPresent() && sdkTextAnnotation.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
-          elementName,
-          Text.class.getName(),
-          org.mule.sdk.api.annotation.param.display.Text.class.getName()));
+                                                                elementName,
+                                                                Text.class.getName(),
+                                                                org.mule.sdk.api.annotation.param.display.Text.class.getName()));
     } else if (legacyTextAnnotation.isPresent() || sdkTextAnnotation.isPresent()) {
       builder.asText();
     }
@@ -161,10 +161,10 @@ public final class MuleExtensionAnnotationParser {
 
     if (legacyPlacementAnnotation.isPresent() && sdkPlacementAnnotation.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
-          elementName,
-          Placement.class.getName(),
-          org.mule.sdk.api.annotation.param.display.Placement.class
-              .getName()));
+                                                                elementName,
+                                                                Placement.class.getName(),
+                                                                org.mule.sdk.api.annotation.param.display.Placement.class
+                                                                    .getName()));
     } else if (legacyPlacementAnnotation.isPresent()) {
       int order = legacyPlacementAnnotation.get().order();
       String tab = legacyPlacementAnnotation.get().tab();
@@ -184,10 +184,10 @@ public final class MuleExtensionAnnotationParser {
 
     if (legacyPlacementAnnotation != null && sdkPlacementAnnotation != null) {
       throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
-          elementName,
-          Placement.class.getName(),
-          org.mule.sdk.api.annotation.param.display.Placement.class
-              .getName()));
+                                                                elementName,
+                                                                Placement.class.getName(),
+                                                                org.mule.sdk.api.annotation.param.display.Placement.class
+                                                                    .getName()));
     } else if (legacyPlacementAnnotation != null) {
       int order = legacyPlacementAnnotation.order();
       String tab = legacyPlacementAnnotation.tab();
@@ -229,15 +229,15 @@ public final class MuleExtensionAnnotationParser {
 
   private static boolean isDisplayAnnotationPresent(AnnotatedElement annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
-        org.mule.sdk.api.annotation.param.display.Text.class,
-        org.mule.sdk.api.annotation.param.display.Placement.class);
+                                                   org.mule.sdk.api.annotation.param.display.Text.class,
+                                                   org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 
   private static boolean isDisplayAnnotationPresent(WithAnnotations annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
-        org.mule.sdk.api.annotation.param.display.Text.class,
-        org.mule.sdk.api.annotation.param.display.Placement.class);
+                                                   org.mule.sdk.api.annotation.param.display.Text.class,
+                                                   org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 
@@ -258,43 +258,43 @@ public final class MuleExtensionAnnotationParser {
    * @return a reduced value
    */
   public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromExtension(
-      ExtensionElement extensionElement,
-      Class<R> legacyAnnotationClass,
-      Class<S> sdkAnnotationClass,
-      Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
-      Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
+                                                                                                 ExtensionElement extensionElement,
+                                                                                                 Class<R> legacyAnnotationClass,
+                                                                                                 Class<S> sdkAnnotationClass,
+                                                                                                 Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+                                                                                                 Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
 
     return getInfoFromAnnotation(
-        extensionElement,
-        legacyAnnotationClass,
-        sdkAnnotationClass,
-        legacyAnnotationMapping,
-        sdkAnnotationMapping,
-        () -> new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
-            extensionElement.getName(),
-            legacyAnnotationClass.getName(),
-            sdkAnnotationClass.getName())));
+                                 extensionElement,
+                                 legacyAnnotationClass,
+                                 sdkAnnotationClass,
+                                 legacyAnnotationMapping,
+                                 sdkAnnotationMapping,
+                                 () -> new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                           extensionElement.getName(),
+                                                                                           legacyAnnotationClass.getName(),
+                                                                                           sdkAnnotationClass.getName())));
   }
 
   public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
-      WithAnnotations element,
-      String elementType,
-      String elementName,
-      Class<R> legacyAnnotationClass,
-      Class<S> sdkAnnotationClass,
-      Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
-      Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
+                                                                                                  WithAnnotations element,
+                                                                                                  String elementType,
+                                                                                                  String elementName,
+                                                                                                  Class<R> legacyAnnotationClass,
+                                                                                                  Class<S> sdkAnnotationClass,
+                                                                                                  Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+                                                                                                  Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
 
     return getInfoFromAnnotation(
-        element,
-        legacyAnnotationClass,
-        sdkAnnotationClass,
-        legacyAnnotationMapping,
-        sdkAnnotationMapping,
-        () -> new IllegalParameterModelDefinitionException(format("Annotations %s and %s are both present at the same time on %s %s",
-            legacyAnnotationClass.getName(),
-            sdkAnnotationClass.getName(),
-            elementType, elementName)));
+                                 element,
+                                 legacyAnnotationClass,
+                                 sdkAnnotationClass,
+                                 legacyAnnotationMapping,
+                                 sdkAnnotationMapping,
+                                 () -> new IllegalParameterModelDefinitionException(format("Annotations %s and %s are both present at the same time on %s %s",
+                                                                                           legacyAnnotationClass.getName(),
+                                                                                           sdkAnnotationClass.getName(),
+                                                                                           elementType, elementName)));
   }
 
   /**
@@ -314,12 +314,12 @@ public final class MuleExtensionAnnotationParser {
    * @return a reduced value
    */
   public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
-      WithAnnotations element,
-      Class<R> legacyAnnotationClass,
-      Class<S> sdkAnnotationClass,
-      Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
-      Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping,
-      Supplier<? extends IllegalModelDefinitionException> dualDefinitionExceptionFactory) {
+                                                                                                  WithAnnotations element,
+                                                                                                  Class<R> legacyAnnotationClass,
+                                                                                                  Class<S> sdkAnnotationClass,
+                                                                                                  Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+                                                                                                  Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping,
+                                                                                                  Supplier<? extends IllegalModelDefinitionException> dualDefinitionExceptionFactory) {
 
     Optional<AnnotationValueFetcher<R>> legacyAnnotation = element.getValueFromAnnotation(legacyAnnotationClass);
     Optional<AnnotationValueFetcher<S>> sdkAnnotation = element.getValueFromAnnotation(sdkAnnotationClass);

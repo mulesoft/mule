@@ -97,8 +97,8 @@ class ClasspathBasedDslContext implements DslResolvingContext {
         .filter(url -> url.getPath().contains(MULE_PLUGIN_CLASSIFIER))
         .collect(toList());
 
-    getExtensionTypes(mulePluginsUrls).forEach(type ->
-        extensionsByName.put(MuleExtensionAnnotationParser.getExtensionInfo(type).getName(), type));
+    getExtensionTypes(mulePluginsUrls)
+        .forEach(type -> extensionsByName.put(MuleExtensionAnnotationParser.getExtensionInfo(type).getName(), type));
   }
 
   private Set<Class<?>> getExtensionTypes(Collection<URL> urls) {

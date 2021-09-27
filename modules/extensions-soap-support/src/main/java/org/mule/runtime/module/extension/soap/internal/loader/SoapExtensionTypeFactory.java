@@ -23,7 +23,7 @@ class SoapExtensionTypeFactory {
    * Creates a {@link ExtensionElement} from a given {@link Class} that will help to introspect an extension.
    *
    * @param extensionType SOAP A class annotated with {@link Extension} or {@link org.mule.sdk.api.annotation.Extension}
-   * @param typeLoader a {@link ClassTypeLoader}
+   * @param typeLoader    a {@link ClassTypeLoader}
    * @return an {@link ExtensionElement} wrapping the extension {@link Class} structure
    */
 

@@ -22,7 +22,8 @@ public class ExportInfo {
   }
 
   public static ExportInfo fromSdkApi(AnnotationValueFetcher<org.mule.sdk.api.annotation.Export> annotation) {
-    return new ExportInfo(annotation.getClassArrayValue(org.mule.sdk.api.annotation.Export::classes), annotation.getArrayValue(org.mule.sdk.api.annotation.Export::resources));
+    return new ExportInfo(annotation.getClassArrayValue(org.mule.sdk.api.annotation.Export::classes),
+                          annotation.getArrayValue(org.mule.sdk.api.annotation.Export::resources));
   }
 
   public ExportInfo(List<Type> types, List<String> resources) {

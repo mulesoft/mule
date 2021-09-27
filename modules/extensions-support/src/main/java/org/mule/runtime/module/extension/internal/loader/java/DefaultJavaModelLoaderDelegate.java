@@ -117,7 +117,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   private void parseExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
     parser.getExportedTypes().forEach(type -> registerType(declarer, type));
-parser.getExportedResources().forEach(declarer::withResource);
+    parser.getExportedResources().forEach(declarer::withResource);
     parser.getPrivilegedExportedArtifacts().forEach(declarer::withPrivilegedArtifact);
     parser.getPrivilegedExportedPackages().forEach(declarer::withPrivilegedPackage);
   }
@@ -128,12 +128,12 @@ parser.getExportedResources().forEach(declarer::withResource);
 
       if (!(importedType instanceof ObjectType)) {
         throw new IllegalArgumentException(format("Type '%s' is not complex. Only complex types can be imported from other extensions.",
-            typeId.orElseGet(importedType::toString)));
+                                                  typeId.orElseGet(importedType::toString)));
       }
 
       declarer.withImportedType(new ImportedTypeModel(typeId
-              .flatMap(importedTypeId -> context.getDslResolvingContext().getTypeCatalog().getType(importedTypeId))
-              .orElse((ObjectType) importedType)));
+          .flatMap(importedTypeId -> context.getDslResolvingContext().getTypeCatalog().getType(importedTypeId))
+          .orElse((ObjectType) importedType)));
     });
   }
 

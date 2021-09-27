@@ -84,11 +84,11 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
     return configurations.stream()
         .filter(config -> {
           String annotationName = getInfoFromAnnotation(element,
-                  Configuration.class,
-                  org.mule.sdk.api.annotation.Configuration.class,
-                  Configuration::name,
-                  org.mule.sdk.api.annotation.Configuration::name)
-              .orElse(EMPTY);
+                                                        Configuration.class,
+                                                        org.mule.sdk.api.annotation.Configuration.class,
+                                                        Configuration::name,
+                                                        org.mule.sdk.api.annotation.Configuration::name)
+                                                            .orElse(EMPTY);
           String name = config.getName();
           String defaultNaming = hyphenize(element.getSimpleName().toString());
           return name.equals(defaultNaming) || name.equals(annotationName) || name.equals(DEFAULT_CONFIG_NAME);

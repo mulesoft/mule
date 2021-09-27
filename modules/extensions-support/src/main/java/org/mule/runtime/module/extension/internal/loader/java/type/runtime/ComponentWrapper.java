@@ -42,11 +42,10 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
   @Override
   public List<SourceElement> getSources() {
     return concat(
-        collectElements(Sources.class, Sources::value),
-        collectElements(org.mule.sdk.api.annotation.Sources.class, org.mule.sdk.api.annotation.Sources::value)
-    )
-        .map(s -> new SourceTypeWrapper(s, typeLoader))
-        .collect(toList());
+                  collectElements(Sources.class, Sources::value),
+                  collectElements(org.mule.sdk.api.annotation.Sources.class, org.mule.sdk.api.annotation.Sources::value))
+                      .map(s -> new SourceTypeWrapper(s, typeLoader))
+                      .collect(toList());
   }
 
   /**
@@ -75,14 +74,15 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
   @Override
   public List<ConnectionProviderElement> getConnectionProviders() {
     return concat(
-        collectElements(ConnectionProviders.class, ConnectionProviders::value),
-        collectElements(org.mule.sdk.api.annotation.connectivity.ConnectionProviders.class, org.mule.sdk.api.annotation.connectivity.ConnectionProviders::value)
-    )
-        .map(c -> new ConnectionProviderTypeWrapper(c, typeLoader))
-        .collect(toList());
+                  collectElements(ConnectionProviders.class, ConnectionProviders::value),
+                  collectElements(org.mule.sdk.api.annotation.connectivity.ConnectionProviders.class,
+                                  org.mule.sdk.api.annotation.connectivity.ConnectionProviders::value))
+                                      .map(c -> new ConnectionProviderTypeWrapper(c, typeLoader))
+                                      .collect(toList());
   }
 
-  protected <A extends Annotation> Stream<Class> collectElements(Class<A> annotationClass, Function<A, Class[]> extractTypeFunction) {
+  protected <A extends Annotation> Stream<Class> collectElements(Class<A> annotationClass,
+                                                                 Function<A, Class[]> extractTypeFunction) {
     return getAnnotation(annotationClass)
         .map(a -> Stream.of(extractTypeFunction.apply(a)))
         .orElse(Stream.empty());
@@ -90,15 +90,14 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
 
   protected Stream<Class> getOperationClassStream() {
     return concat(
-        collectElements(Operations.class, Operations::value),
-        collectElements(org.mule.sdk.api.annotation.Operations.class, org.mule.sdk.api.annotation.Operations::value)
-    );
+                  collectElements(Operations.class, Operations::value),
+                  collectElements(org.mule.sdk.api.annotation.Operations.class, org.mule.sdk.api.annotation.Operations::value));
   }
 
   protected Stream<Class> getExpressionFunctionClassStream() {
     return concat(
-        collectElements(ExpressionFunctions.class, ExpressionFunctions::value),
-        collectElements(org.mule.sdk.api.annotation.ExpressionFunctions.class, org.mule.sdk.api.annotation.ExpressionFunctions::value)
-    );
+                  collectElements(ExpressionFunctions.class, ExpressionFunctions::value),
+                  collectElements(org.mule.sdk.api.annotation.ExpressionFunctions.class,
+                                  org.mule.sdk.api.annotation.ExpressionFunctions::value));
   }
 }
