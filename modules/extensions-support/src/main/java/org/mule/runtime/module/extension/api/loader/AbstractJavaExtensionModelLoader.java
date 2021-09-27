@@ -46,7 +46,6 @@ import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclara
 import org.mule.runtime.module.extension.internal.loader.enricher.RequiredForMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RuntimeVersionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SampleDataDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
@@ -125,7 +124,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new JavaConfigurationDeclarationEnricher(),
                                                                                                new JavaOAuthDeclarationEnricher(),
                                                                                                new RedeliveryPolicyDeclarationEnricher(),
-                                                                                               new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
                                                                                                new SampleDataDeclarationEnricher(),

@@ -117,7 +117,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   private void parseExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
     parser.getExportedTypes().forEach(type -> registerType(declarer, type));
-    declarer.getDeclaration().getResources().addAll(parser.getExportedResources());
+parser.getExportedResources().forEach(declarer::withResource);
     parser.getPrivilegedExportedArtifacts().forEach(declarer::withPrivilegedArtifact);
     parser.getPrivilegedExportedPackages().forEach(declarer::withPrivilegedPackage);
   }
@@ -151,7 +151,9 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
                                          MetadataType subType,
                                          ExtensionLoadingContext loadingContext) {
     getTypeId(subType)
-        .filter(imported -> getType(subType, loadingContext.getExtensionClassLoader()).isPresent())
+        .filter(imported -> getType(subType, loadingContext.getExtensionClassLoader())
+            .map(clazz -> !clazz.getClassLoader().equals(loadingContext.getExtensionClassLoader()))
+            .orElse(true))
         .ifPresent(subTypeId -> loadingContext.getDslResolvingContext().getTypeCatalog().getType(subTypeId)
             .map(ImportedTypeModel::new)
             .ifPresent(declarer::withImportedType));
