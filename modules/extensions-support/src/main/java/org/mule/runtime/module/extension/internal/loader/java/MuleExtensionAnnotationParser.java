@@ -18,19 +18,15 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel.LayoutModelBuilder;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
-import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionHandlerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
@@ -72,17 +68,39 @@ public final class MuleExtensionAnnotationParser {
         extensionType.getName(), Extension.class.getName(), org.mule.sdk.api.annotation.Extension.class.getName()));
   }
 
-  public static <T extends Annotation> Stream<T> parseRepeatableAnnotation(WithAnnotations element,
-                                                                         Class<T> annotation,
-                                                                         Function<Annotation, T[]> containerMapper) {
+  public static <L extends Annotation, A extends Annotation, T> Stream<T> parseRepeatableAnnotation(
+      WithAnnotations element,
+      Class<L> legacyAnnotationType,
+      Class<A> sdkApiAnnotationType,
+      Function<Annotation, L[]> legacyContainerMapping,
+      Function<Annotation, A[]> sdkApiContainerMapping,
+      Function<AnnotationValueFetcher<L>, T> legacyMapping,
+      Function<AnnotationValueFetcher<A>, T> sdkApiMapping) {
+
+    return Stream.concat(
+        parseRepeatableAnnotation(element, legacyAnnotationType, legacyContainerMapping).map(legacyMapping),
+        parseRepeatableAnnotation(element, sdkApiAnnotationType, sdkApiContainerMapping).map(sdkApiMapping)
+    );
+  }
+
+  public static <T extends Annotation> Stream<AnnotationValueFetcher<T>> parseRepeatableAnnotation(WithAnnotations element,
+                                                                                                   Class<T> annotation,
+                                                                                                   Function<Annotation, T[]> containerMapper) {
+
+    Stream<AnnotationValueFetcher<T>> singleElementStream = element.getValueFromAnnotation(annotation)
+        .map(Stream::of)
+        .orElse(Stream.empty());
+
     Repeatable repeatableContainer = annotation.getAnnotation(Repeatable.class);
     if (repeatableContainer != null) {
-      return element.getAnnotation(repeatableContainer.value())
-          .map(container -> Stream.of(containerMapper.apply(container)))
+      Stream<AnnotationValueFetcher<T>> containerStream = element.getValueFromAnnotation(repeatableContainer.value())
+          .map(container -> container.getInnerAnnotations((Function) containerMapper).stream())
           .orElse(Stream.empty());
-    }
 
-    return element.getAnnotation(annotation).map(Stream::of).orElse(Stream.empty());
+      return Stream.concat(singleElementStream, containerStream);
+    } else {
+      return singleElementStream;
+    }
   }
 
   public static List<String> getParamNames(Method method) {
@@ -126,9 +144,9 @@ public final class MuleExtensionAnnotationParser {
 
     if (legacyTextAnnotation.isPresent() && sdkTextAnnotation.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                elementName,
-                                                                Text.class.getName(),
-                                                                org.mule.sdk.api.annotation.param.display.Text.class.getName()));
+          elementName,
+          Text.class.getName(),
+          org.mule.sdk.api.annotation.param.display.Text.class.getName()));
     } else if (legacyTextAnnotation.isPresent() || sdkTextAnnotation.isPresent()) {
       builder.asText();
     }
@@ -141,10 +159,10 @@ public final class MuleExtensionAnnotationParser {
 
     if (legacyPlacementAnnotation.isPresent() && sdkPlacementAnnotation.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                elementName,
-                                                                Placement.class.getName(),
-                                                                org.mule.sdk.api.annotation.param.display.Placement.class
-                                                                    .getName()));
+          elementName,
+          Placement.class.getName(),
+          org.mule.sdk.api.annotation.param.display.Placement.class
+              .getName()));
     } else if (legacyPlacementAnnotation.isPresent()) {
       int order = legacyPlacementAnnotation.get().order();
       String tab = legacyPlacementAnnotation.get().tab();
@@ -164,10 +182,10 @@ public final class MuleExtensionAnnotationParser {
 
     if (legacyPlacementAnnotation != null && sdkPlacementAnnotation != null) {
       throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                elementName,
-                                                                Placement.class.getName(),
-                                                                org.mule.sdk.api.annotation.param.display.Placement.class
-                                                                    .getName()));
+          elementName,
+          Placement.class.getName(),
+          org.mule.sdk.api.annotation.param.display.Placement.class
+              .getName()));
     } else if (legacyPlacementAnnotation != null) {
       int order = legacyPlacementAnnotation.order();
       String tab = legacyPlacementAnnotation.tab();
@@ -209,15 +227,15 @@ public final class MuleExtensionAnnotationParser {
 
   private static boolean isDisplayAnnotationPresent(AnnotatedElement annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
-                                                   org.mule.sdk.api.annotation.param.display.Text.class,
-                                                   org.mule.sdk.api.annotation.param.display.Placement.class);
+        org.mule.sdk.api.annotation.param.display.Text.class,
+        org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 
   private static boolean isDisplayAnnotationPresent(WithAnnotations annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
-                                                   org.mule.sdk.api.annotation.param.display.Text.class,
-                                                   org.mule.sdk.api.annotation.param.display.Placement.class);
+        org.mule.sdk.api.annotation.param.display.Text.class,
+        org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 }

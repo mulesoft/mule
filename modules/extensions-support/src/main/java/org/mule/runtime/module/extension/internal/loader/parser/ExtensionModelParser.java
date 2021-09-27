@@ -108,7 +108,6 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    */
   Optional<DeprecationModel> getDeprecationModel();
 
-
   /**
    * @return the extension's {@link XmlDslModel}
    */
