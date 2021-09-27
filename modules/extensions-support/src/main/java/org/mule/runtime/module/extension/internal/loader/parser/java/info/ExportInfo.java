@@ -12,6 +12,12 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 
 import java.util.List;
 
+/**
+ * Simple bean which maps the info defined in the {@link org.mule.runtime.extension.api.annotation.Export} or
+ * {@link org.mule.sdk.api.annotation.Export} annotations, so that consumers can decouple from which was used.
+ *
+ * @since 4.5.0
+ */
 public class ExportInfo {
 
   private final List<Type> types;

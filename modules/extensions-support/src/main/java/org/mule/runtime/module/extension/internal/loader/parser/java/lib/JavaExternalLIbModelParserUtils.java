@@ -21,6 +21,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Utilities for parsing External Libraries definitions on a Java based extension
+ *
+ * @since 4.5.0
+ */
 public final class JavaExternalLIbModelParserUtils {
 
   public static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {

@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExtensionInfo;
 import static org.reflections.util.ClasspathHelper.forClassLoader;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -21,7 +22,6 @@ import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.api.util.MuleExtensionUtils;
-import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 
 import java.net.URL;
 import java.util.Collection;
@@ -98,7 +98,7 @@ class ClasspathBasedDslContext implements DslResolvingContext {
         .collect(toList());
 
     getExtensionTypes(mulePluginsUrls)
-        .forEach(type -> extensionsByName.put(MuleExtensionAnnotationParser.getExtensionInfo(type).getName(), type));
+        .forEach(type -> extensionsByName.put(getExtensionInfo(type).getName(), type));
   }
 
   private Set<Class<?>> getExtensionTypes(Collection<URL> urls) {

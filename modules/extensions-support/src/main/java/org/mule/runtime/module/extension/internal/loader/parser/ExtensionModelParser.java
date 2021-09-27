@@ -114,15 +114,35 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    */
   Optional<XmlDslConfiguration> getXmlDslConfiguration();
 
+  /**
+   * @return the list of types that the extension exports
+   */
   List<MetadataType> getExportedTypes();
 
-  List<MetadataType> getImportedTypes();
-
-  List<String> getPrivilegedExportedArtifacts();
-
-  List<String> getPrivilegedExportedPackages();
-
+  /**
+   * @return List of resource paths which the extension's exports
+   */
   List<String> getExportedResources();
 
+  /**
+   * @return the list of types that the extension imports from others
+   */
+  List<MetadataType> getImportedTypes();
+
+  /**
+   * @return List of artifacts which can access the extension's privileged API
+   */
+  List<String> getPrivilegedExportedArtifacts();
+
+  /**
+   * @return List of package names which conform the extension's privileged API.
+   */
+  List<String> getPrivilegedExportedPackages();
+
+  /**
+   * The extension's subtype mappings.
+   *
+   * @return a {@link Map} wihich keys represent the base types and each value represents the list of known subtypes
+   */
   Map<MetadataType, List<MetadataType>> getSubTypes();
 }
