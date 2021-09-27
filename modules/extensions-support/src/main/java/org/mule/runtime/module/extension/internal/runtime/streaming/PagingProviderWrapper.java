@@ -76,7 +76,7 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
     setContextClassLoader(currentThread, currentClassLoader, extensionClassLoader);
     try {
       List<T> page = delegate.getPage(connection);
-      if (page.isEmpty()) {
+      if (page == null || page.isEmpty()) {
         try {
           LOGGER.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
           close(connection);
