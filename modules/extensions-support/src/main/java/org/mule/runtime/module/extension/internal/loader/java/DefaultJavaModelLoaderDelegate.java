@@ -11,6 +11,7 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
@@ -95,6 +96,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     parseErrorModels(parser, declarer);
     parseExports(parser, declarer);
     parseImportedTypes(parser, declarer, context);
+    parseSubTypes(parser, declarer, context);
 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
@@ -133,6 +135,26 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
               .flatMap(importedTypeId -> context.getDslResolvingContext().getTypeCatalog().getType(importedTypeId))
               .orElse((ObjectType) importedType)));
     });
+  }
+
+  private void parseSubTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
+    parser.getSubTypes().forEach((base, subTypes) -> {
+      declarer.withSubTypes(base, subTypes);
+
+      // For subtypes that reference types from other artifacts, auto-import them.
+      autoImportReferencedTypes(declarer, base, context);
+      subTypes.forEach(subTypeEntry -> autoImportReferencedTypes(declarer, subTypeEntry, context));
+    });
+  }
+
+  private void autoImportReferencedTypes(ExtensionDeclarer declarer,
+                                         MetadataType subType,
+                                         ExtensionLoadingContext loadingContext) {
+    getTypeId(subType)
+        .filter(imported -> getType(subType, loadingContext.getExtensionClassLoader()).isPresent())
+        .ifPresent(subTypeId -> loadingContext.getDslResolvingContext().getTypeCatalog().getType(subTypeId)
+            .map(ImportedTypeModel::new)
+            .ifPresent(declarer::withImportedType));
   }
 
   private void registerType(ExtensionDeclarer declarer, MetadataType type) {

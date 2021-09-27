@@ -13,8 +13,8 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromExtension;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromExtension;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -62,9 +62,9 @@ public final class JavaErrorModelParserUtils {
     return getInfoFromExtension(element,
         ErrorTypes.class,
         org.mule.sdk.api.annotation.error.ErrorTypes.class,
-        errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()),
-        errorAnnotation -> parseErrorTypeDefinitions(errorAnnotation.value()))
-        .orElse(new LinkedList<>());
+        value -> parseErrorTypeDefinitions(value.getClassValue(ErrorTypes::value)),
+        value -> parseErrorTypeDefinitions(value.getClassValue(org.mule.sdk.api.annotation.error.ErrorTypes::value))
+    ).orElse(new LinkedList<>());
   }
 
   /**
@@ -83,8 +83,8 @@ public final class JavaErrorModelParserUtils {
             withThrows,
             Throws.class,
             org.mule.sdk.api.annotation.error.Throws.class,
-            ann -> parseErrorTypeProviders(ann.value(), extensionParser),
-            ann -> parseErrorTypeProviders(ann.value(), extensionParser),
+            ann -> parseErrorTypeProviders(ann.getClassArrayValue(Throws::value), extensionParser),
+            ann -> parseErrorTypeProviders(ann.getClassArrayValue(org.mule.sdk.api.annotation.error.Throws::value), extensionParser),
             dualThrowsException(operation)))
         .orElse(new LinkedList<>());
   }
@@ -121,9 +121,10 @@ public final class JavaErrorModelParserUtils {
         .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory((Class<? extends ExceptionHandler>) clazz)));
   }
 
-  private static List<ErrorModelParser> parseErrorTypeDefinitions(Class<? extends Enum> typeDefClass) {
+  private static List<ErrorModelParser> parseErrorTypeDefinitions(Type typeDefClass) {
     Map<ErrorTypeDefinition, ErrorModelParser> cycleControls = new HashMap<>(emptyMap());
-    return Stream.of(typeDefClass.getEnumConstants())
+    Class<Enum> enumClass = (Class<Enum>) typeDefClass.getDeclaringClass().get();
+    return Stream.of(enumClass.getEnumConstants())
         .map(def -> toParser(SdkErrorTypeDefinitionAdapter.from(def), cycleControls))
         .collect(toList());
   }
@@ -161,14 +162,14 @@ public final class JavaErrorModelParserUtils {
     return parser;
   }
 
-  private static List<ErrorModelParser> parseErrorTypeProviders(Class<?>[] providerClasses,
+  private static List<ErrorModelParser> parseErrorTypeProviders(List<Type> providerClasses,
                                                                 ExtensionModelParser extensionParser) {
     Map<ErrorTypeDefinition, ErrorModelParser> cycleControl = new HashMap<>();
-    return Stream.of(providerClasses)
+    return providerClasses.stream()
         .flatMap(providerClass -> {
           try {
             org.mule.sdk.api.annotation.error.ErrorTypeProvider errorTypeProvider =
-                SdkErrorTypeProviderAdapter.from(providerClass.newInstance());
+                SdkErrorTypeProviderAdapter.from(providerClass.getDeclaringClass().get().newInstance());
             return errorTypeProvider.getErrorTypes().stream()
                 .map(error -> {
                   validateOperationThrows(extensionParser, error);

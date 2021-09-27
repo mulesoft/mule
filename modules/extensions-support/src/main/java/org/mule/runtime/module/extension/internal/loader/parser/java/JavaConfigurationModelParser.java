@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 
@@ -71,9 +71,9 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
         "Configuration", configElement.getName(),
         Configuration.class,
         org.mule.sdk.api.annotation.Configuration.class,
-        Configuration::name,
-        org.mule.sdk.api.annotation.Configuration::name)
-        .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
+        value -> value.getStringValue(Configuration::name),
+        value -> value.getStringValue(org.mule.sdk.api.annotation.Configuration::name)
+        ).map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
         .orElse(DEFAULT_CONFIG_NAME);
   }
 

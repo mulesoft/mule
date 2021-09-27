@@ -18,6 +18,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -122,4 +123,6 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   List<String> getPrivilegedExportedPackages();
 
   List<String> getExportedResources();
+
+  Map<MetadataType, List<MetadataType>> getSubTypes();
 }

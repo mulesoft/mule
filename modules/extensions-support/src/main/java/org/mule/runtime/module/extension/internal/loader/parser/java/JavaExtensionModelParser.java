@@ -7,19 +7,18 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromExtension;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromExtension;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEntitlementInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getExceptionHandlerModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseExtensionErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -54,9 +53,13 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.info.Export
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -75,6 +78,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<MetadataType> importedTypes = new LinkedList<>();
   private List<String> privilegedExportedArtifacts = new LinkedList<>();
   private List<String> privilegedExportedPackages = new LinkedList<>();
+  private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
@@ -89,9 +93,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     extensionElement.getDeclaringClass()
         .ifPresent(extensionClass -> additionalModelProperties.add(new ImplementingTypeModelProperty(extensionClass)));
 
-    ClassTypeLoader typeLoader = getDefault().createTypeLoader(loadingContext.getExtensionClassLoader());
-
-    parseExported(typeLoader);
+    parseExported();
     parseImportedTypes();
     parseSubtypes();
   }
@@ -107,7 +109,21 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
         value -> new Pair<>(value.getClassValue(sub -> sub.baseType()), value.getClassArrayValue(sub -> sub.subTypes()))
     ).collect(toList());
 
+    Set<Object> baseTypes = new HashSet<>();
+    pairs.forEach(mapping -> {
 
+      final Type baseType = mapping.getFirst();
+      baseTypes.add(baseType);
+
+      MetadataType baseMetadataType = baseType.asMetadataType();
+      Map<Type, MetadataType> subTypesMetadataTypes = mapping.getSecond()
+          .stream()
+          .collect(toMap(identity(), Type::asMetadataType, (u, v) -> {
+            throw new IllegalStateException(format("Duplicate key %s", u));
+          }, LinkedHashMap::new));
+
+      subTypes.put(baseMetadataType, new ArrayList<>(subTypesMetadataTypes.values()));
+    });
   }
 
   private void parseImportedTypes() {
@@ -132,12 +148,12 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
       }
   }
 
-  private void parseExported(ClassTypeLoader typeLoader) {
+  private void parseExported() {
     ExportInfo info = getInfoFromExtension(extensionElement,
         Export.class,
         org.mule.sdk.api.annotation.Export.class,
-        export -> ExportInfo.from(export, typeLoader),
-        export -> ExportInfo.from(export, typeLoader)
+        export -> ExportInfo.fromLegacy(export),
+        export -> ExportInfo.fromSdkApi(export)
     ).orElse(null);
 
     if (info == null) {
@@ -163,11 +179,12 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
         extensionElement,
         PrivilegedExport.class,
         org.mule.sdk.api.annotation.PrivilegedExport.class,
-        e -> new Pair<>(e.artifacts(), e.packages()),
-        e -> new Pair<>(e.artifacts(), e.packages())
+        value -> new Pair<>(value.getArrayValue(PrivilegedExport::artifacts), value.getArrayValue(PrivilegedExport::packages)),
+        value -> new Pair<>(value.getArrayValue(org.mule.sdk.api.annotation.PrivilegedExport::artifacts),
+            value.getArrayValue(org.mule.sdk.api.annotation.PrivilegedExport::packages))
         ).ifPresent(exported -> {
-          privilegedExportedArtifacts = asList(exported.getFirst());
-          privilegedExportedPackages = asList(exported.getSecond());
+          privilegedExportedArtifacts = exported.getFirst();
+          privilegedExportedPackages = exported.getSecond();
     });
   }
 
@@ -274,6 +291,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   @Override
+  public Map<MetadataType, List<MetadataType>> getSubTypes() {
+    return subTypes;
+  }
+
+  @Override
   public List<String> getExportedResources() {
     return exportedResources;
   }
@@ -298,7 +320,12 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                 extensionElement,
                                 Xml.class,
                                 org.mule.sdk.api.annotation.dsl.xml.Xml.class,
-                                xml -> new XmlDslConfiguration(xml.prefix(), xml.namespace()),
-                                xml -> new XmlDslConfiguration(xml.prefix(), xml.namespace()));
+                                xml -> new XmlDslConfiguration(
+                                    xml.getStringValue(Xml::prefix),
+                                    xml.getStringValue(Xml::namespace)),
+                                xml -> new XmlDslConfiguration(
+                                    xml.getStringValue(org.mule.sdk.api.annotation.dsl.xml.Xml::prefix),
+                                    xml.getStringValue(org.mule.sdk.api.annotation.dsl.xml.Xml::namespace))
+    );
   }
 }

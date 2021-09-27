@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 
@@ -237,5 +239,102 @@ public final class MuleExtensionAnnotationParser {
         org.mule.sdk.api.annotation.param.display.Text.class,
         org.mule.sdk.api.annotation.param.display.Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
+  }
+
+  /**
+   * Monad for extracting information from an {@link ExtensionElement} {@code element} which might be annotated with two different
+   * annotations of similar semantics. Both annotations types are reduced to a single output type.
+   * <p>
+   * Simultaneous presence of both types will be considered an error
+   *
+   * @param extensionElement        the extension element
+   * @param legacyAnnotationClass   the legacy annotation type
+   * @param sdkAnnotationClass      the new annotation type
+   * @param legacyAnnotationMapping mapping function for the legacy annotation
+   * @param sdkAnnotationMapping    mapping function for the new annotation
+   * @param <R>                     Legacy annotation's generic type
+   * @param <S>                     New annotation's generic type
+   * @param <T>                     Output generic type
+   * @return a reduced value
+   */
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromExtension(
+      ExtensionElement extensionElement,
+      Class<R> legacyAnnotationClass,
+      Class<S> sdkAnnotationClass,
+      Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+      Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
+
+    return getInfoFromAnnotation(
+        extensionElement,
+        legacyAnnotationClass,
+        sdkAnnotationClass,
+        legacyAnnotationMapping,
+        sdkAnnotationMapping,
+        () -> new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
+            extensionElement.getName(),
+            legacyAnnotationClass.getName(),
+            sdkAnnotationClass.getName())));
+  }
+
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
+      WithAnnotations element,
+      String elementType,
+      String elementName,
+      Class<R> legacyAnnotationClass,
+      Class<S> sdkAnnotationClass,
+      Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+      Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
+
+    return getInfoFromAnnotation(
+        element,
+        legacyAnnotationClass,
+        sdkAnnotationClass,
+        legacyAnnotationMapping,
+        sdkAnnotationMapping,
+        () -> new IllegalParameterModelDefinitionException(format("Annotations %s and %s are both present at the same time on %s %s",
+            legacyAnnotationClass.getName(),
+            sdkAnnotationClass.getName(),
+            elementType, elementName)));
+  }
+
+  /**
+   * Monad for extracting information from a {@link WithAnnotations} {@code element} which might be annotated with two different
+   * annotations of similar semantics. Both annotations types are reduced to a single output type.
+   * <p>
+   * Simultaneous presence of both types will result in an {@link Optional#empty()} value
+   *
+   * @param element                 the annotated element
+   * @param legacyAnnotationClass   the legacy annotation type
+   * @param sdkAnnotationClass      the new annotation type
+   * @param legacyAnnotationMapping mapping function for the legacy annotation
+   * @param sdkAnnotationMapping    mapping function for the new annotation
+   * @param <R>                     Legacy annotation's generic type
+   * @param <S>                     New annotation's generic type
+   * @param <T>                     Output generic type
+   * @return a reduced value
+   */
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
+      WithAnnotations element,
+      Class<R> legacyAnnotationClass,
+      Class<S> sdkAnnotationClass,
+      Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+      Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping,
+      Supplier<? extends IllegalModelDefinitionException> dualDefinitionExceptionFactory) {
+
+    Optional<AnnotationValueFetcher<R>> legacyAnnotation = element.getValueFromAnnotation(legacyAnnotationClass);
+    Optional<AnnotationValueFetcher<S>> sdkAnnotation = element.getValueFromAnnotation(sdkAnnotationClass);
+
+    Optional<T> result;
+    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
+      throw dualDefinitionExceptionFactory.get();
+    } else if (legacyAnnotation.isPresent()) {
+      result = legacyAnnotation.map(legacyAnnotationMapping);
+    } else if (sdkAnnotation.isPresent()) {
+      result = sdkAnnotation.map(sdkAnnotationMapping);
+    } else {
+      result = empty();
+    }
+
+    return result;
   }
 }

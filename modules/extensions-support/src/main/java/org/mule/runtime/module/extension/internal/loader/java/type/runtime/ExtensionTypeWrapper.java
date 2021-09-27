@@ -10,7 +10,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExtensionInfo;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getInfoFromExtension;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromExtension;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
-import java.util.stream.Stream;
 
 /**
  * {@link ConfigurationWrapper} specification for classes that are considered as Extensions
@@ -58,10 +57,10 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
         this,
         Configurations.class,
         org.mule.sdk.api.annotation.Configurations.class,
-        Configurations::value,
-        org.mule.sdk.api.annotation.Configurations::value)
-        .map(classes -> Stream.of(classes)
-            .map(aClass -> (ConfigurationElement) new ConfigurationWrapper(aClass, typeLoader))
+        value -> value.getClassArrayValue(Configurations::value),
+        value -> value.getClassArrayValue(org.mule.sdk.api.annotation.Configurations::value))
+        .map(types -> types.stream()
+            .map(type -> (ConfigurationElement) new ConfigurationWrapper(type.getDeclaringClass().get(), typeLoader))
             .collect(toList())
         ).orElse(emptyList());
   }

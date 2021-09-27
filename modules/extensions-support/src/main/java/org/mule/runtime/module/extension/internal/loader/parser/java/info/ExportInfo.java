@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.info;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ClassBasedAnnotationValueFetcher;
 
 import java.util.List;
 
@@ -19,14 +17,12 @@ public class ExportInfo {
   private final List<Type> types;
   private final List<String> resources;
 
-  public static ExportInfo from(Export annotation, ClassTypeLoader typeLoader) {
-    AnnotationValueFetcher<Export> fetcher = new ClassBasedAnnotationValueFetcher<>(annotation, typeLoader);
-    return new ExportInfo(fetcher.getClassArrayValue(Export::classes), fetcher.getArrayValue(Export::resources));
+  public static ExportInfo fromLegacy(AnnotationValueFetcher<Export> annotation) {
+    return new ExportInfo(annotation.getClassArrayValue(Export::classes), annotation.getArrayValue(Export::resources));
   }
 
-  public static ExportInfo from(org.mule.sdk.api.annotation.Export annotation, ClassTypeLoader typeLoader) {
-    AnnotationValueFetcher<org.mule.sdk.api.annotation.Export> fetcher = new ClassBasedAnnotationValueFetcher<>(annotation, typeLoader);
-    return new ExportInfo(fetcher.getClassArrayValue(org.mule.sdk.api.annotation.Export::classes), fetcher.getArrayValue(org.mule.sdk.api.annotation.Export::resources));
+  public static ExportInfo fromSdkApi(AnnotationValueFetcher<org.mule.sdk.api.annotation.Export> annotation) {
+    return new ExportInfo(annotation.getClassArrayValue(org.mule.sdk.api.annotation.Export::classes), annotation.getArrayValue(org.mule.sdk.api.annotation.Export::resources));
   }
 
   public ExportInfo(List<Type> types, List<String> resources) {
