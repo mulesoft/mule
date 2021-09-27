@@ -25,13 +25,13 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getId;
-import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -85,6 +85,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -132,7 +133,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -1034,16 +1034,15 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Returns the {@link Alias} or {@link org.mule.sdk.api.annotation.Alias} name of the given {@code element}.
+   * Returns the {@link Alias} or {@link org.mule.sdk.api.annotation.Alias} name of the given {@code field}.
    * <p>
    * If the element doesn't have an alias, then the default name is returned
    *
-   * @param element an annotated member
-   * @param <T>     the generic type of the element
+   * @param field the introspected field
    * @return an alias name
    */
-  public static <T extends AnnotatedElement & Member> String getAlias(T element) {
-    return JavaParserUtils.getAlias(element, element::getName);
+  public static String getAlias(Field field) {
+    return JavaParserUtils.getAlias(field);
   }
 
   private static List<Class<?>> getDescendingHierarchy(Class<?> type) {
@@ -1090,8 +1089,18 @@ public final class IntrospectionUtils {
     }
   }
 
-  public static Optional<ExpressionSupport> getExpressionSupport(WithAnnotations annotatedElement) {
-    return JavaParserUtils.getExpressionSupport(clazz -> annotatedElement.getAnnotation(clazz).orElse(null));
+  public static Optional<ExpressionSupport> getExpressionSupport(WithAnnotations annotatedElement,
+                                                                 String elementType,
+                                                                 String elementName) {
+    return getInfoFromAnnotation(
+                                 annotatedElement,
+                                 elementType,
+                                 elementName,
+                                 Expression.class,
+                                 org.mule.sdk.api.annotation.Expression.class,
+                                 value -> value.getEnumValue(Expression::value),
+                                 value -> JavaParserUtils
+                                     .toMuleApi(value.getEnumValue(org.mule.sdk.api.annotation.Expression::value)));
   }
 
   public static String getSourceName(Class<?> sourceType) {

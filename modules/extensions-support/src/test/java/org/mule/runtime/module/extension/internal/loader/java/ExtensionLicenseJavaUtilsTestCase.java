@@ -155,18 +155,18 @@ public class ExtensionLicenseJavaUtilsTestCase {
 
   private void mockRequiresEnterpriseLicenseAnnotationPresent() {
     when(extensionElementMock.getValueFromAnnotation(RequiresEnterpriseLicense.class)).thenReturn(
-        of(new ClassBasedAnnotationValueFetcher<>(new RequiresEnterpriseLicense() {
+                                                                                                  of(new ClassBasedAnnotationValueFetcher<>(new RequiresEnterpriseLicense() {
 
-      @Override
-      public boolean allowEvaluationLicense() {
-        return ENTREPRISE_LICENSE_ALLOWS_EVALUATION;
-      }
+                                                                                                    @Override
+                                                                                                    public boolean allowEvaluationLicense() {
+                                                                                                      return ENTREPRISE_LICENSE_ALLOWS_EVALUATION;
+                                                                                                    }
 
-      @Override
-      public Class<? extends Annotation> annotationType() {
-        return RequiresEnterpriseLicense.class;
-      }
-    }, typeLoader)));
+                                                                                                    @Override
+                                                                                                    public Class<? extends Annotation> annotationType() {
+                                                                                                      return RequiresEnterpriseLicense.class;
+                                                                                                    }
+                                                                                                  }, typeLoader)));
   }
 
   private void mockRequiresEnterpriseLicenseAnnotationAbsent() {

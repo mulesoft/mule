@@ -278,7 +278,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   private void parseExpressionSupport() {
-    expressionSupport = IntrospectionUtils.getExpressionSupport(parameter).orElse(SUPPORTED);
+    expressionSupport = IntrospectionUtils.getExpressionSupport(parameter, "parameter", getName()).orElse(SUPPORTED);
   }
 
   private void parseExclusiveOptionals() {
