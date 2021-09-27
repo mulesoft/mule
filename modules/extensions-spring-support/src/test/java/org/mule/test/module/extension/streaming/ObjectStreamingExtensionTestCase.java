@@ -95,7 +95,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
     CoreEvent event = flowRunner("getStreamWithTarget").keepStreamsOpen().withPayload(data).run();
     assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), is(instanceOf(CursorIteratorProvider.class)));
     assertThat(stream(spliteratorUnknownSize(((CursorIteratorProvider) event.getVariables().get(MY_STREAM_VAR).getValue())
-                                                 .openCursor(),
+        .openCursor(),
                                              Spliterator.ORDERED),
                       false)
                           .collect(toList()),
