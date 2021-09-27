@@ -89,7 +89,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
  * @since 4.0
  */
 @RunWith(ArtifactClassLoaderRunner.class)
-abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
+public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   /**
    * As part of providing support for handling different artifacts without unzipping them, the factory for URL must be registered
