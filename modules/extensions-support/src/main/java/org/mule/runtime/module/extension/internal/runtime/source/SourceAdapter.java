@@ -11,7 +11,6 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
@@ -29,8 +28,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConnectionFieldFromSourceObject;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 
@@ -64,7 +61,6 @@ import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -87,7 +83,6 @@ import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -95,12 +90,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 

@@ -12,7 +12,6 @@ import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.collections.CollectionUtils.intersection;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -690,7 +689,10 @@ public class MuleExtensionUtils {
     for (ParameterGroupModel group : groups) {
       for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
         Set<String> parameterNames = resolveParameterNames(group, parameters, aliasedParameterNames);
-        Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), parameterNames);
+        Collection<String> definedExclusiveParameters = exclusiveModel.getExclusiveParameterNames()
+            .stream()
+            .filter(parameterNames::contains)
+            .collect(toSet());
         if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
           throw new ConfigurationException((createStaticMessage(format(
                                                                        "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "

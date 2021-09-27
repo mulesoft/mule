@@ -24,6 +24,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -62,17 +63,19 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -105,11 +108,11 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   @Mock
   private SourceCallbackModel sourceCallbackModel;
 
-  private BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
+  private final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
   private ObjectType dictionaryType;
   private ArrayType arrayType;
 
-  private MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
+  private final MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
 
 
   public static class SimpleOutputResolver implements OutputTypeResolver<String>, AttributesTypeResolver<String> {
@@ -432,7 +435,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public void metadataResolverWithRepeatedResolverName() {
     exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage("Resolver names should be unique for a given category");
-    Map<String, Supplier<? extends InputTypeResolver>> inputResolvers = new HashedMap();
+    Map<String, Supplier<? extends InputTypeResolver>> inputResolvers = new HashMap<>();
     ParameterModel parameterModel = mock(ParameterModel.class);
     when(parameterModel.getName()).thenReturn(PARAMETER_NAME);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());

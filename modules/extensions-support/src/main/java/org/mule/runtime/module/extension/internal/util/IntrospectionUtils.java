@@ -19,7 +19,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static javax.lang.model.element.ElementKind.METHOD;
 import static javax.lang.model.element.Modifier.PUBLIC;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
@@ -37,7 +36,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
-import static org.reflections.ReflectionUtils.withAnnotations;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.ResolvableType.NONE;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
@@ -124,7 +122,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.sdk.api.runtime.parameter.ParameterResolver;
-import org.mule.sdk.api.runtime.source.Source;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -162,14 +159,13 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
-import org.apache.commons.collections.CollectionUtils;
+import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -716,7 +712,7 @@ public final class IntrospectionUtils {
 
     List<java.lang.reflect.Type> generics = getSuperClassGenerics(type, superClass);
 
-    if (isEmpty(generics) && !Object.class.equals(superClass)) {
+    if (generics.isEmpty() && !Object.class.equals(superClass)) {
       return findGenericsInSuperHierarchy(superClass);
     }
 
@@ -1783,7 +1779,7 @@ public final class IntrospectionUtils {
     for (Class<? extends Annotation> annotation : annotations) {
       fields.addAll(getAllFields(object.getClass(), withAnnotation(annotation)));
     }
-    if (CollectionUtils.isEmpty(fields)) {
+    if (fields.isEmpty()) {
       return empty();
     }
 
