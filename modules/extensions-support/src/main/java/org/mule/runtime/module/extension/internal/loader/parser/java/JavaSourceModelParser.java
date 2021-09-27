@@ -146,7 +146,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty() {
-    return JavaErrorModelParserUtils.getExceptionHandlerModelProperty(extensionElement, "Source", getName());
+    return JavaErrorModelParserUtils.getExceptionHandlerModelProperty(sourceElement, "Source", getName());
   }
 
   @Override

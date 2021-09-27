@@ -407,7 +407,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty() {
-    return JavaErrorModelParserUtils.getExceptionHandlerModelProperty(extensionElement, "Operation", getName());
+    return JavaErrorModelParserUtils.getExceptionHandlerModelProperty(operationElement, "Operation", getName());
   }
 
   @Override
