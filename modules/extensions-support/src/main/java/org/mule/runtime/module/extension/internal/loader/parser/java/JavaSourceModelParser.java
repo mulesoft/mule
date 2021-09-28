@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getAllTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
@@ -18,6 +19,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forSource;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.source.BackPressureSourceUtils.fromSdkBackPressureMode;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -28,10 +30,12 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
@@ -49,10 +53,12 @@ import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParse
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.source.BackPressureSourceUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -251,6 +257,15 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   @Override
   public Optional<StereotypeModel> getStereotype(StereotypeModelFactory factory) {
     return resolveStereotype(sourceElement, "Source", getName(), factory);
+  }
+
+  public Optional<BackPressureSupportInfo> getBackPressureSupportInfo() {
+    return getInfoFromAnnotation(sourceElement, "source", sourceElement.getName(), BackPressure.class,
+                                 org.mule.sdk.api.annotation.source.BackPressure.class,
+                                 (legacyAnnotation) -> new BackPressureSupportInfo(legacyAnnotation
+                                     .defaultMode(), new HashSet<BackPressureMode>(asList(legacyAnnotation.supportedModes()))),
+                                 (sdkAnnotation) -> new BackPressureSupportInfo(fromSdkBackPressureMode(sdkAnnotation
+                                     .defaultMode()), new HashSet<BackPressureMode>(stream(sdkAnnotation.supportedModes()).map(BackPressureSourceUtils::fromSdkBackPressureMode).collect(toList()))));
   }
 
   @Override

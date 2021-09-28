@@ -141,6 +141,11 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   Optional<DisplayModel> getDisplayModel();
 
   /**
+   * @return the back pressure support info for the source
+   */
+  Optional<BackPressureSupportInfo> getBackPressureSupportInfo();
+
+  /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a
    * uniform way, regardless of the actual syntax used by the extension developer.
    *

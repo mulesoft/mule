@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.parser.BackPressureSupportInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
 
@@ -104,7 +105,16 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate);
       declareSourceCallbackParameters(parser.getOnBackPressureCallbackParser(), sourceDeclarer::onBackPressure);
 
+      declareBackPressureSupport(parser.getBackPressureSupportInfo(), sourceDeclarer)
+
       sourceDeclarers.put(parser, sourceDeclarer);
+    }
+  }
+
+  private void declareBackPressureSupport(Optional<BackPressureSupportInfo> backPressureSupportInfo, SourceDeclarer sourceDeclarer) {
+    if(backPressureSupportInfo.isPresent()) {
+      BackPressureSupportInfo backPressureSupportInfoObject = backPressureSupportInfo.get();
+
     }
   }
 
