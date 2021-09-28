@@ -10,6 +10,7 @@ package org.mule.test.runner.utils;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.findMethod;
 
 import org.mule.test.runner.api.DependencyResolver;
@@ -50,11 +51,14 @@ import net.bytebuddy.implementation.bytecode.StackSize;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
 
 /**
  * Utility class for runner.
  */
 public final class RunnerModuleUtils {
+
+  private static final Logger LOGGER = getLogger(RunnerModuleUtils.class);
 
   public static final String EXCLUDED_PROPERTIES_FILE = "excluded.properties";
 
@@ -155,8 +159,9 @@ public final class RunnerModuleUtils {
           ClassLoadingStrategy.Default.INJECTION.load(extensionClassLoader, mapEntry);
           addedClasses.add(classEntry.getKey().getName());
           classAdded = true;
+          LOGGER.debug("Class {} was succesfully added to the extension classloader.", classEntry.getKey().getName());
         } catch (Exception e) {
-          // Problem found adding class to class loader.
+          LOGGER.debug("Class {} failed to be added to the extension classloader.", classEntry.getKey().getName());
         }
       }
     }
