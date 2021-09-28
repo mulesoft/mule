@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -18,6 +18,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDo
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -68,16 +69,23 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
 
   private Map<String, Element> getAllOperations(ProcessingEnvironment processingEnv, Element element) {
     Map<String, Element> elements = new LinkedHashMap<>();
+    Consumer<TypeElement> consumer = c -> elements.putAll(getApiMethods(processingEnv, getOperationClasses(processingEnv, c)));
 
     processor.getArrayClassAnnotationValue(element, Configurations.class, VALUE_PROPERTY, processingEnv)
-        .forEach(c -> elements.putAll(getApiMethods(processingEnv, getOperationClasses(processingEnv, c))));
+        .forEach(consumer);
+    processor
+        .getArrayClassAnnotationValue(element, org.mule.sdk.api.annotation.Configurations.class, VALUE_PROPERTY, processingEnv)
+        .forEach(consumer);
 
     elements.putAll(getApiMethods(processingEnv, getOperationClasses(processingEnv, element)));
     return elements;
   }
 
   private List<TypeElement> getOperationClasses(ProcessingEnvironment processingEnv, Element element) {
-    return processor.getArrayClassAnnotationValue(element, Operations.class, VALUE_PROPERTY, processingEnv);
-  }
+    List<TypeElement> types = processor.getArrayClassAnnotationValue(element, Operations.class, VALUE_PROPERTY, processingEnv);
+    types.addAll(processor.getArrayClassAnnotationValue(element, org.mule.sdk.api.annotation.Operations.class, VALUE_PROPERTY,
+                                                        processingEnv));
 
+    return types;
+  }
 }

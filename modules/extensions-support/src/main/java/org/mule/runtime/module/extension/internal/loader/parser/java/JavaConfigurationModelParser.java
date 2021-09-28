@@ -9,7 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -66,9 +67,14 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public String getName() {
-    return configElement.getAnnotation(Configuration.class)
-        .map(configuration -> isBlank(configuration.name()) ? DEFAULT_CONFIG_NAME : configuration.name())
-        .orElse(DEFAULT_CONFIG_NAME);
+    return getInfoFromAnnotation(configElement,
+                                 "Configuration", configElement.getName(),
+                                 Configuration.class,
+                                 org.mule.sdk.api.annotation.Configuration.class,
+                                 value -> value.getStringValue(Configuration::name),
+                                 value -> value.getStringValue(org.mule.sdk.api.annotation.Configuration::name))
+                                     .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
+                                     .orElse(DEFAULT_CONFIG_NAME);
   }
 
   @Override
@@ -124,7 +130,8 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public boolean isForceNoExplicit() {
-    return configElement.isAnnotatedWith(NoImplicit.class);
+    return configElement.isAnnotatedWith(NoImplicit.class) ||
+        configElement.isAnnotatedWith(org.mule.sdk.api.annotation.NoImplicit.class);
   }
 
   @Override

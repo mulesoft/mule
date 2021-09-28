@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExtensionInfo;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionTypeFactory.getSoapExtensionType;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -17,15 +18,14 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
-import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.TypeAwareConfigurationFactory;
+import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
@@ -90,12 +90,12 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   private ExtensionDeclarer getExtensionDeclarer(ExtensionLoadingContext context) {
-    Extension extension = MuleExtensionAnnotationParser.getExtension(extensionType);
+    ExtensionInfo info = getExtensionInfo(extensionType);
     return context.getExtensionDeclarer()
-        .named(extension.name())
+        .named(info.getName())
         .onVersion(version)
-        .fromVendor(extension.vendor())
-        .withCategory(extension.category())
+        .fromVendor(info.getVendor())
+        .withCategory(info.getCategory())
         .withModelProperty(new SoapExtensionModelProperty())
         .withModelProperty(new ExtensionTypeDescriptorModelProperty(new TypeWrapper(extensionType, typeLoader)))
         .withModelProperty(new ImplementingTypeModelProperty(extensionType));

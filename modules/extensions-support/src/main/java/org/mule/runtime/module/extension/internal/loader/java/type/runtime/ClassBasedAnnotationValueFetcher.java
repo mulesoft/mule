@@ -32,12 +32,13 @@ public class ClassBasedAnnotationValueFetcher<T extends Annotation> implements A
   private ClassTypeLoader typeLoader;
   private LazyValue<T> annotation;
 
-  ClassBasedAnnotationValueFetcher(Class<T> annotationClass, AnnotatedElement annotatedElement, ClassTypeLoader typeLoader) {
+  public ClassBasedAnnotationValueFetcher(Class<T> annotationClass, AnnotatedElement annotatedElement,
+                                          ClassTypeLoader typeLoader) {
     this.typeLoader = typeLoader;
     this.annotation = new LazyValue<>(() -> annotatedElement.getAnnotation(annotationClass));
   }
 
-  private ClassBasedAnnotationValueFetcher(T annotation, ClassTypeLoader typeLoader) {
+  public ClassBasedAnnotationValueFetcher(T annotation, ClassTypeLoader typeLoader) {
     this.typeLoader = typeLoader;
     this.annotation = new LazyValue<>(annotation);
   }

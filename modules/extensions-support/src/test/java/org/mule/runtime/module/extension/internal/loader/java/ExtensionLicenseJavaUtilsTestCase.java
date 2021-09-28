@@ -17,10 +17,13 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEntitlementInfo;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ClassBasedAnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
 
@@ -39,6 +42,7 @@ public class ExtensionLicenseJavaUtilsTestCase {
   private static final boolean ENTREPRISE_LICENSE_ALLOWS_EVALUATION = true;
 
   private ExtensionElement extensionElementMock = mock(ExtensionElement.class);
+  private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   @Rule
   public ExpectedException expectedException = none();
@@ -125,42 +129,44 @@ public class ExtensionLicenseJavaUtilsTestCase {
   }
 
   private void mockRequiresEntitlementAnnotationPresent() {
-    when(extensionElementMock.getAnnotation(RequiresEntitlement.class)).thenReturn(of(new RequiresEntitlement() {
+    when(extensionElementMock.getValueFromAnnotation(RequiresEntitlement.class))
+        .thenReturn(of(new ClassBasedAnnotationValueFetcher<>(new RequiresEntitlement() {
 
-      @Override
-      public String name() {
-        return ENTITLEMENT_NAME;
-      }
+          @Override
+          public String name() {
+            return ENTITLEMENT_NAME;
+          }
 
-      @Override
-      public String description() {
-        return ENTITLEMENT_DESCRIPTION;
-      }
+          @Override
+          public String description() {
+            return ENTITLEMENT_DESCRIPTION;
+          }
 
-      @Override
-      public Class<? extends Annotation> annotationType() {
-        return RequiresEntitlement.class;
-      }
-    }));
+          @Override
+          public Class<? extends Annotation> annotationType() {
+            return RequiresEntitlement.class;
+          }
+        }, typeLoader)));
   }
 
   private void mockRequiresEntitlementAnnotationAbsent() {
-    when(extensionElementMock.getAnnotation(RequiresEntitlement.class)).thenReturn(empty());
+    when(extensionElementMock.getValueFromAnnotation(RequiresEntitlement.class)).thenReturn(empty());
   }
 
   private void mockRequiresEnterpriseLicenseAnnotationPresent() {
-    when(extensionElementMock.getAnnotation(RequiresEnterpriseLicense.class)).thenReturn(of(new RequiresEnterpriseLicense() {
+    when(extensionElementMock.getValueFromAnnotation(RequiresEnterpriseLicense.class)).thenReturn(
+                                                                                                  of(new ClassBasedAnnotationValueFetcher<>(new RequiresEnterpriseLicense() {
 
-      @Override
-      public boolean allowEvaluationLicense() {
-        return ENTREPRISE_LICENSE_ALLOWS_EVALUATION;
-      }
+                                                                                                    @Override
+                                                                                                    public boolean allowEvaluationLicense() {
+                                                                                                      return ENTREPRISE_LICENSE_ALLOWS_EVALUATION;
+                                                                                                    }
 
-      @Override
-      public Class<? extends Annotation> annotationType() {
-        return RequiresEnterpriseLicense.class;
-      }
-    }));
+                                                                                                    @Override
+                                                                                                    public Class<? extends Annotation> annotationType() {
+                                                                                                      return RequiresEnterpriseLicense.class;
+                                                                                                    }
+                                                                                                  }, typeLoader)));
   }
 
   private void mockRequiresEnterpriseLicenseAnnotationAbsent() {
@@ -168,8 +174,8 @@ public class ExtensionLicenseJavaUtilsTestCase {
   }
 
   private void mockRequiresEntitlementSdkAnnotationPresent() {
-    when(extensionElementMock.getAnnotation(org.mule.sdk.api.annotation.license.RequiresEntitlement.class))
-        .thenReturn(of(new org.mule.sdk.api.annotation.license.RequiresEntitlement() {
+    when(extensionElementMock.getValueFromAnnotation(org.mule.sdk.api.annotation.license.RequiresEntitlement.class))
+        .thenReturn(of(new ClassBasedAnnotationValueFetcher<>(new org.mule.sdk.api.annotation.license.RequiresEntitlement() {
 
           @Override
           public String name() {
@@ -185,7 +191,7 @@ public class ExtensionLicenseJavaUtilsTestCase {
           public Class<? extends Annotation> annotationType() {
             return org.mule.sdk.api.annotation.license.RequiresEntitlement.class;
           }
-        }));
+        }, typeLoader)));
   }
 
   private void mockRequiresEntitlementSdkAnnotationAbsent() {
@@ -193,8 +199,8 @@ public class ExtensionLicenseJavaUtilsTestCase {
   }
 
   private void mockRequiresEnterpriseLicenseSdkAnnotationPresent() {
-    when(extensionElementMock.getAnnotation(org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class))
-        .thenReturn(of(new org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense() {
+    when(extensionElementMock.getValueFromAnnotation(org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class))
+        .thenReturn(of(new ClassBasedAnnotationValueFetcher<>(new org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense() {
 
           @Override
           public boolean allowEvaluationLicense() {
@@ -205,11 +211,11 @@ public class ExtensionLicenseJavaUtilsTestCase {
           public Class<? extends Annotation> annotationType() {
             return org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class;
           }
-        }));
+        }, typeLoader)));
   }
 
   private void mockRequiresEnterpriseLicenseSdkAnnotationAbsent() {
-    when(extensionElementMock.getAnnotation(org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class))
+    when(extensionElementMock.getValueFromAnnotation(org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class))
         .thenReturn(empty());
   }
 

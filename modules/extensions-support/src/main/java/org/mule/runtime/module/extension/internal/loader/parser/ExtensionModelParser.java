@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -17,6 +18,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -107,9 +109,40 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    */
   Optional<DeprecationModel> getDeprecationModel();
 
-
   /**
    * @return the extension's {@link XmlDslModel}
    */
   Optional<XmlDslConfiguration> getXmlDslConfiguration();
+
+  /**
+   * @return the list of types that the extension exports
+   */
+  List<MetadataType> getExportedTypes();
+
+  /**
+   * @return List of resource paths which the extension's exports
+   */
+  List<String> getExportedResources();
+
+  /**
+   * @return the list of types that the extension imports from others
+   */
+  List<MetadataType> getImportedTypes();
+
+  /**
+   * @return List of artifacts which can access the extension's privileged API
+   */
+  List<String> getPrivilegedExportedArtifacts();
+
+  /**
+   * @return List of package names which conform the extension's privileged API.
+   */
+  List<String> getPrivilegedExportedPackages();
+
+  /**
+   * The extension's subtype mappings.
+   *
+   * @return a {@link Map} wihich keys represent the base types and each value represents the list of known subtypes
+   */
+  Map<MetadataType, List<MetadataType>> getSubTypes();
 }

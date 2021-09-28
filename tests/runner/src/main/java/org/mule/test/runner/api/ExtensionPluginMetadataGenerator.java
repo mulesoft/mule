@@ -147,6 +147,7 @@ class ExtensionPluginMetadataGenerator {
 
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
+    scanner.addIncludeFilter(new AnnotationTypeFilter(org.mule.sdk.api.annotation.Extension.class));
     try (URLClassLoader classLoader = new URLClassLoader(new URL[] {firstURL}, null)) {
       scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
       Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
@@ -171,7 +172,9 @@ class ExtensionPluginMetadataGenerator {
               + classpath, e);
         }
       }
-      logger.debug("No class found annotated with {}", Extension.class.getName());
+      logger.debug("No class found annotated with {} or {} ",
+                   Extension.class.getName(),
+                   org.mule.sdk.api.annotation.Extension.class.getName());
       return null;
     } catch (IOException e) {
       throw new UncheckedIOException(e);

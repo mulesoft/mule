@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.api.loader;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -34,11 +33,8 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ClusterSupport
 import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ImportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurationDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.JavaExportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.JavaPrivilegedExportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.NotificationsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ObjectStoreParameterDeclarationEnricher;
@@ -50,7 +46,6 @@ import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclara
 import org.mule.runtime.module.extension.internal.loader.enricher.RequiredForMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RuntimeVersionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SampleDataDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
@@ -120,19 +115,15 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new DefaultEncodingDeclarationEnricher(),
                                                                                                new RuntimeVersionDeclarationEnricher(),
                                                                                                new NotificationsDeclarationEnricher(),
-                                                                                               new JavaExportedTypesDeclarationEnricher(),
                                                                                                new StereotypesDeclarationEnricher(),
                                                                                                // TODO: MOVE TO EXT_API when
                                                                                                // https://www.mulesoft.org/jira/browse/MULE-13070
                                                                                                new MimeTypeParametersDeclarationEnricher(),
                                                                                                new DynamicMetadataDeclarationEnricher(),
                                                                                                new RequiredForMetadataDeclarationEnricher(),
-                                                                                               new ImportedTypesDeclarationEnricher(),
                                                                                                new JavaConfigurationDeclarationEnricher(),
-                                                                                               new JavaPrivilegedExportedTypesDeclarationEnricher(),
                                                                                                new JavaOAuthDeclarationEnricher(),
                                                                                                new RedeliveryPolicyDeclarationEnricher(),
-                                                                                               new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
                                                                                                new SampleDataDeclarationEnricher(),
@@ -200,11 +191,13 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
         // TODO: MULE-12744. If this call throws an exception it means that the extension cannot access the privileged API.
         ClassLoader extensionClassLoader = context.getExtensionClassLoader();
         Class annotation = extensionClassLoader.loadClass(DeclarationEnrichers.class.getName());
-        return (Collection<DeclarationEnricher>) extensionType.getAnnotation((Class<DeclarationEnrichers>) annotation)
-            .map(enrichers -> withContextClassLoader(extensionClassLoader,
-                                                     () -> stream(enrichers.value())
-                                                         .map(this::instantiateOrFail)
-                                                         .collect(toList())))
+
+
+        return (Collection<DeclarationEnricher>) extensionType.getValueFromAnnotation((Class<DeclarationEnrichers>) annotation)
+            .map(value -> withContextClassLoader(extensionClassLoader,
+                                                 () -> value.getClassArrayValue(DeclarationEnrichers::value)).stream()
+                                                     .map(type -> instantiateOrFail(type.getDeclaringClass().get()))
+                                                     .collect(toList()))
             .orElse(emptyList());
       } catch (ClassNotFoundException e) {
         // Do nothing

@@ -25,7 +25,9 @@ public interface WithAnnotations {
    * @param annotationClass Of the annotation to retrieve
    * @param <A>             The annotation type
    * @return The {@link Optional} annotation to retrieve
+   * @deprecated since 4.5.0. Use {@link #getValueFromAnnotation(Class)} instead
    */
+  @Deprecated
   <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass);
 
   /**

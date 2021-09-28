@@ -6,12 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.lang.String.format;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.IntersectionType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
@@ -22,6 +34,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Exten
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -81,6 +94,9 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
     parseErrorModels(parser, declarer);
+    parseExports(parser, declarer);
+    parseImportedTypes(parser, declarer, context);
+    parseSubTypes(parser, declarer, context);
 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
@@ -97,6 +113,84 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private void parseErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
     initErrorModelFactorySupplier(parser, getExtensionsNamespace(declarer.getDeclaration()));
     declarer.getDeclaration().getErrorModels().addAll(createErrorModelFactory().getErrorModels());
+  }
+
+  private void parseExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+    parser.getExportedTypes().forEach(type -> registerType(declarer, type));
+    parser.getExportedResources().forEach(declarer::withResource);
+    parser.getPrivilegedExportedArtifacts().forEach(declarer::withPrivilegedArtifact);
+    parser.getPrivilegedExportedPackages().forEach(declarer::withPrivilegedPackage);
+  }
+
+  private void parseImportedTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
+    parser.getImportedTypes().forEach(importedType -> {
+      final Optional<String> typeId = getTypeId(importedType);
+
+      if (!(importedType instanceof ObjectType)) {
+        throw new IllegalArgumentException(format("Type '%s' is not complex. Only complex types can be imported from other extensions.",
+                                                  typeId.orElseGet(importedType::toString)));
+      }
+
+      declarer.withImportedType(new ImportedTypeModel(typeId
+          .flatMap(importedTypeId -> context.getDslResolvingContext().getTypeCatalog().getType(importedTypeId))
+          .orElse((ObjectType) importedType)));
+    });
+  }
+
+  private void parseSubTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
+    parser.getSubTypes().forEach((base, subTypes) -> {
+      declarer.withSubTypes(base, subTypes);
+
+      // For subtypes that reference types from other artifacts, auto-import them.
+      autoImportReferencedTypes(declarer, base, context);
+      subTypes.forEach(subTypeEntry -> autoImportReferencedTypes(declarer, subTypeEntry, context));
+    });
+  }
+
+  private void autoImportReferencedTypes(ExtensionDeclarer declarer,
+                                         MetadataType subType,
+                                         ExtensionLoadingContext loadingContext) {
+    getTypeId(subType)
+        .filter(imported -> getType(subType, loadingContext.getExtensionClassLoader())
+            .map(clazz -> !clazz.getClassLoader().equals(loadingContext.getExtensionClassLoader()))
+            .orElse(true))
+        .ifPresent(subTypeId -> loadingContext.getDslResolvingContext().getTypeCatalog().getType(subTypeId)
+            .map(ImportedTypeModel::new)
+            .ifPresent(declarer::withImportedType));
+  }
+
+  private void registerType(ExtensionDeclarer declarer, MetadataType type) {
+    type.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (objectType.isOpen()) {
+          objectType.getOpenRestriction().get().accept(this);
+        } else {
+          declarer.withType(objectType);
+        }
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        arrayType.getType().accept(this);
+      }
+
+      @Override
+      public void visitIntersection(IntersectionType intersectionType) {
+        intersectionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        unionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitObjectField(ObjectFieldType objectFieldType) {
+        objectFieldType.getValue().accept(this);
+      }
+    });
   }
 
   private void initErrorModelFactorySupplier(ExtensionModelParser parser, String namespace) {
