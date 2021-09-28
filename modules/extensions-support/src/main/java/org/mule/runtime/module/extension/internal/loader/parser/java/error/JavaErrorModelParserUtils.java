@@ -7,10 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
@@ -29,6 +31,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.internal.error.AstElementErrorTypeDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeProviderAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
@@ -127,12 +130,22 @@ public final class JavaErrorModelParserUtils {
         .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory((Class<? extends ExceptionHandler>) clazz)));
   }
 
-  private static List<ErrorModelParser> parseErrorTypeDefinitions(Type typeDefClass) {
-    Map<ErrorTypeDefinition, ErrorModelParser> cycleControls = new HashMap<>(emptyMap());
-    Class<Enum> enumClass = (Class<Enum>) typeDefClass.getDeclaringClass().get();
-    return Stream.of(enumClass.getEnumConstants())
-        .map(def -> toParser(SdkErrorTypeDefinitionAdapter.from(def), cycleControls))
-        .collect(toList());
+  private static List<ErrorModelParser> parseErrorTypeDefinitions(Type type) {
+    Map<ErrorTypeDefinition, ErrorModelParser> cycleControl = new HashMap<>(emptyMap());
+
+    if (type.getDeclaringClass().isPresent()) {
+      Class<Enum> enumClass = (Class<Enum>) type.getDeclaringClass().get();
+      return Stream.of(enumClass.getEnumConstants())
+          .map(def -> toParser(SdkErrorTypeDefinitionAdapter.from(def), cycleControl))
+          .collect(toList());
+    } else {
+      return type.getElement()
+          .map(element -> element.getEnclosedElements().stream()
+              .filter(enclosed -> enclosed.getKind().equals(ENUM_CONSTANT))
+              .map(def -> toParser(new AstElementErrorTypeDefinitionAdapter(def), cycleControl))
+              .collect(toList()))
+          .orElse(emptyList());
+    }
   }
 
   private static void validateOperationThrows(ExtensionModelParser extensionParser, ErrorTypeDefinition error) {
@@ -168,14 +181,15 @@ public final class JavaErrorModelParserUtils {
     return parser;
   }
 
-  private static List<ErrorModelParser> parseErrorTypeProviders(List<Type> providerClasses,
+  private static List<ErrorModelParser> parseErrorTypeProviders(List<Type> providerTypes,
                                                                 ExtensionModelParser extensionParser) {
     Map<ErrorTypeDefinition, ErrorModelParser> cycleControl = new HashMap<>();
-    return providerClasses.stream()
-        .flatMap(providerClass -> {
+    return providerTypes.stream()
+        .filter(type -> type.getDeclaringClass().isPresent())
+        .flatMap(type -> {
           try {
             org.mule.sdk.api.annotation.error.ErrorTypeProvider errorTypeProvider =
-                SdkErrorTypeProviderAdapter.from(providerClass.getDeclaringClass().get().newInstance());
+                SdkErrorTypeProviderAdapter.from(type.getDeclaringClass().get().newInstance());
             return errorTypeProvider.getErrorTypes().stream()
                 .map(error -> {
                   validateOperationThrows(extensionParser, error);
@@ -183,7 +197,7 @@ public final class JavaErrorModelParserUtils {
                 });
           } catch (InstantiationException | IllegalAccessException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not create ErrorTypeProvider of type "
-                + providerClass.getName()), e);
+                + type.getName()), e);
           }
         })
         .collect(toList());
