@@ -18,8 +18,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 
-import io.qameta.allure.Issue;
-import org.junit.runner.RunWith;
 import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
@@ -30,10 +28,14 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import io.qameta.allure.Issue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OnCriticalErrorHandler.class)
@@ -51,7 +53,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void setGoodProcessors() throws Exception {
-    List<Processor> list = new ArrayList<Processor>();
+    List<Processor> list = new ArrayList<>();
     list.add(mock(Processor.class));
     list.add(mock(Processor.class));
 

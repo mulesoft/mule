@@ -11,7 +11,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -99,7 +98,9 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
+
 import org.hamcrest.Matcher;
+
 import org.mockito.Mockito;
 
 public final class ExtensionsTestUtils {
@@ -391,8 +392,10 @@ public final class ExtensionsTestUtils {
 
   public static ConnectionProviderDeclaration findConnectionProvider(ConfigurationDeclaration configurationDeclaration,
                                                                      final String connectionProviderName) {
-    return (ConnectionProviderDeclaration) find(configurationDeclaration.getConnectionProviders(),
-                                                connectionProvider -> ((ConnectionProviderDeclaration) connectionProvider)
-                                                    .getName().equals(connectionProviderName));
+    return configurationDeclaration.getConnectionProviders()
+        .stream()
+        .filter(connectionProvider -> connectionProvider.getName().equals(connectionProviderName))
+        .findAny()
+        .orElse(null);
   }
 }

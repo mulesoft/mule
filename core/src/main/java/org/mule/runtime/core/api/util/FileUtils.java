@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.util;
 
 import static java.lang.System.getProperty;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
@@ -160,16 +159,10 @@ public class FileUtils {
   // TODO Document me!
   public static synchronized File stringToFile(String filename, String data, boolean append, boolean newLine) throws IOException {
     File f = createFile(filename);
-    BufferedWriter writer = null;
-    try {
-      writer = new BufferedWriter(new FileWriter(f, append));
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(f, append))) {
       writer.write(data);
       if (newLine) {
         writer.newLine();
-      }
-    } finally {
-      if (writer != null) {
-        writer.close();
       }
     }
     return f;
@@ -854,7 +847,7 @@ public class FileUtils {
       }
     }, true);
 
-    return isEmpty(files) ? null : files.iterator().next();
+    return files.isEmpty() ? null : files.iterator().next();
   }
 
   /**

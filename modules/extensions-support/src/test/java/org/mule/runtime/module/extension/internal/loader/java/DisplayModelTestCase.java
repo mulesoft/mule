@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Collections.emptySet;
-import static org.apache.commons.collections.CollectionUtils.find;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -282,12 +281,18 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
   }
 
   private OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
-    return (OperationDeclaration) find(declaration.getOperations(),
-                                       object -> ((OperationDeclaration) object).getName().equals(operationName));
+    List<OperationDeclaration> operations = declaration.getOperations();
+    return operations.stream()
+        .filter(operation -> operation.getName().equals(operationName))
+        .findAny()
+        .orElse(null);
   }
 
   private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {
-    return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
+    return parameters.stream()
+        .filter(param -> param.getName().equals(name))
+        .findAny()
+        .orElse(null);
   }
 
   @Extension(name = "extensionWithInvalidUseOfDisplayNameAnnotation")

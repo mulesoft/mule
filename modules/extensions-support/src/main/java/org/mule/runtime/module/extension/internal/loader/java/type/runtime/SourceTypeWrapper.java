@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodsAnnotatedWith;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -41,7 +40,7 @@ import java.util.Optional;
 public final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement {
 
   private final Class<T> aClass;
-  private LazyValue<List<Type>> sourceGenerics;
+  private final LazyValue<List<Type>> sourceGenerics;
 
   public SourceTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
     super(aClass, typeLoader);
@@ -95,7 +94,7 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
       }
     }
 
-    if (isEmpty(methods)) {
+    if (methods.isEmpty()) {
       return empty();
     } else if (methods.size() > 1) {
       throw new IllegalSourceModelDefinitionException(

@@ -10,7 +10,6 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
-import static org.apache.commons.collections.MapUtils.getObject;
 import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
@@ -779,7 +778,7 @@ public class ClassUtils {
     Class[] primitives = new Class[wrappers.length];
 
     for (int i = 0; i < wrappers.length; i++) {
-      primitives[i] = (Class) getObject(wrapperToPrimitiveMap, wrappers[i], wrappers[i]);
+      primitives[i] = wrapperToPrimitiveMap.getOrDefault(wrappers[i], wrappers[i]);
     }
 
     return primitives;

@@ -6,6 +6,9 @@
  */
 package org.mule.test.module.extension.streaming;
 
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -28,12 +31,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Spliterator;
 
-import org.apache.commons.collections.IteratorUtils;
-import org.hamcrest.BaseMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.hamcrest.BaseMatcher;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -90,7 +94,11 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   public void getObjectStreamWithTargetVariable() throws Exception {
     CoreEvent event = flowRunner("getStreamWithTarget").keepStreamsOpen().withPayload(data).run();
     assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), is(instanceOf(CursorIteratorProvider.class)));
-    assertThat(IteratorUtils.toList(((CursorIteratorProvider) event.getVariables().get(MY_STREAM_VAR).getValue()).openCursor()),
+    assertThat(stream(spliteratorUnknownSize(((CursorIteratorProvider) event.getVariables().get(MY_STREAM_VAR).getValue())
+        .openCursor(),
+                                             Spliterator.ORDERED),
+                      false)
+                          .collect(toList()),
                equalTo(data));
     assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(List.class)));
     assertThat(event.getMessage().getPayload().getValue(), equalTo(data));

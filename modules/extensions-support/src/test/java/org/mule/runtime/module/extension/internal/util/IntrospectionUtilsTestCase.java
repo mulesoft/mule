@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import static org.apache.commons.cli.OptionBuilder.isRequired;
-import static org.apache.commons.collections.CollectionUtils.find;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -97,14 +95,15 @@ import java.util.function.Function;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
+import com.google.testing.compile.CompilationRule;
+
+import org.springframework.core.ResolvableType;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.springframework.core.ResolvableType;
-
-import com.google.testing.compile.CompilationRule;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -517,7 +516,10 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private Field findField(String name, Collection<Field> fields) {
-    return (Field) find(fields, f -> name.equals(((Field) f).getName()));
+    return fields.stream()
+        .filter(f -> name.equals(f.getName()))
+        .findAny()
+        .orElse(null);
   }
 
   private void assertType(MetadataType type, Class<?> rawType) {

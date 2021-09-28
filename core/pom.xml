@@ -99,6 +99,10 @@
             <artifactId>commons-beanutils</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+        </dependency>
+        <dependency>
             <!-- UUID generator, only called directly by mule-core -->
             <groupId>org.mule.com.github.stephenc.eaio-uuid</groupId>
             <artifactId>uuid</artifactId>

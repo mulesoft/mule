@@ -16,6 +16,9 @@
     <properties>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+
+        <!-- remove once this artifact is released -->
+        <revapi.skip>true</revapi.skip>
     </properties>
 
     <!--
@@ -39,6 +42,11 @@
             <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
         </dependency>
 
         <dependency>

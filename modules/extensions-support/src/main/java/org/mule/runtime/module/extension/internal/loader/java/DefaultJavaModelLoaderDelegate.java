@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
@@ -86,7 +85,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
-    if (!isEmpty(extensionElement.getConfigurations())) {
+    if (!extensionElement.getConfigurations().isEmpty()) {
       operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
       functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
       sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());

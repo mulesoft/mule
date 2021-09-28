@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
 /**
@@ -75,10 +74,6 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
   private void doApplyLifecycle(LifecyclePhase phase, Set<Object> duplicates, Collection<?> targetObjects)
       throws LifecycleException {
-    if (CollectionUtils.isEmpty(targetObjects)) {
-      return;
-    }
-
     for (Object target : targetObjects) {
       if (target == null || duplicates.contains(target)) {
         continue;

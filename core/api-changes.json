@@ -3,6 +3,22 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.el.context.EventVariablesMapContext",
+          "package": "org.mule.runtime.core.privileged.el.context",
+          "classSimpleName": "EventVariablesMapContext",
+          "elementKind": "class",
+          "justification": "Moved to core-mvel, same package"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.el.context.SessionVariableMapContext",
+          "package": "org.mule.runtime.core.privileged.el.context",
+          "classSimpleName": "SessionVariableMapContext",
+          "elementKind": "class",
+          "justification": "Moved to core-mvel, same package"
+        },
+        {
           "code": "java.method.added",
           "new": "method java.lang.reflect.Field org.mule.runtime.core.api.util.ClassUtils::getField(java.lang.Class<?>, java.lang.String, boolean) throws java.lang.NoSuchFieldException",
           "package": "org.mule.runtime.core.api.util",

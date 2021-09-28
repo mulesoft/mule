@@ -25,11 +25,10 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.util.Optional;
-
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Validates that POJOs have a default constructor, and implements methods equals and hashCode
@@ -102,8 +101,9 @@ public class PojosModelValidator implements ExtensionModelValidator {
   }
 
   private Optional<Type> getFirstGenericType(Type typeWithGenerics) {
-    return !CollectionUtils.isEmpty(typeWithGenerics.getGenerics())
-        ? Optional.ofNullable(typeWithGenerics.getGenerics().get(0).getConcreteType())
-        : Optional.empty();
+    return typeWithGenerics.getGenerics()
+        .stream()
+        .findFirst()
+        .map(TypeGeneric::getConcreteType);
   }
 }

@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.core.api.object;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 
 /**
  * <code>ObjectFactory</code> is a generic Factory interface.
+ * 
+ * @deprecated this will be removed in next major version
  */
+@Deprecated
 public interface ObjectFactory extends Initialisable, Disposable {
 
   /**

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Collections.emptySet;
-import static org.apache.commons.collections.CollectionUtils.find;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -58,13 +57,19 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName) {
-    return (ConfigurationDeclaration) find(extensionDeclaration.getConfigurations(),
-                                           object -> ((ConfigurationDeclaration) object).getName().equals(configurationName));
+    return extensionDeclaration.getConfigurations()
+        .stream()
+        .filter(config -> config.getName().equals(configurationName))
+        .findAny()
+        .orElse(null);
   }
 
   protected OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
-    return (OperationDeclaration) find(declaration.getOperations(),
-                                       object -> ((OperationDeclaration) object).getName().equals(operationName));
+    List<OperationDeclaration> operations = declaration.getOperations();
+    return operations.stream()
+        .filter(operation -> operation.getName().equals(operationName))
+        .findAny()
+        .orElse(null);
   }
 
   protected Pair<ParameterGroupDeclaration, ParameterDeclaration> findParameterInGroup(ParameterizedDeclaration<?> declaration,
@@ -79,7 +84,10 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {
-    return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
+    return parameters.stream()
+        .filter(param -> param.getName().equals(name))
+        .findAny()
+        .orElse(null);
   }
 
   protected void assertConfigRefParam(ParameterModel configRef) {

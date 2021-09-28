@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.util.UUID;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -24,8 +23,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <code>BeanUtils</code> provides functions for altering the way commons BeanUtils works
+ * 
+ * @deprecated this will be removed in next major version
  */
 // @ThreadSafe
+@Deprecated
 public class BeanUtils {
 
   public static final String SET_PROPERTIES_METHOD = "setProperties";
@@ -57,8 +59,8 @@ public class BeanUtils {
         }
       }
     } else {
-      for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-        Map.Entry entry = (Map.Entry) iterator.next();
+      for (Object element : props.entrySet()) {
+        Map.Entry entry = (Map.Entry) element;
 
         try {
           org.apache.commons.beanutils.BeanUtils.setProperty(object, entry.getKey().toString(), entry.getValue());
@@ -88,8 +90,7 @@ public class BeanUtils {
       org.apache.commons.beanutils.BeanUtils.setProperty(bean, "properties", props);
     } else {
       Map master = describe(bean);
-      for (Iterator iterator = props.keySet().iterator(); iterator.hasNext();) {
-        Object o = iterator.next();
+      for (Object o : props.keySet()) {
         if (!master.containsKey(o)) {
           throw new IllegalArgumentException(CoreMessages.propertyDoesNotExistOnObject(o.toString(), bean).getMessage());
         }

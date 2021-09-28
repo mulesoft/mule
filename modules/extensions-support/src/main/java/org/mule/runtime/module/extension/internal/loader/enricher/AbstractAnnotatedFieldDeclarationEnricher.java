@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 import static org.reflections.ReflectionUtils.getAllFields;
 
@@ -70,7 +69,7 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
 
     declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(typeProperty -> {
       Collection<Field> fields = getAllFields(typeProperty.getType(), fieldHasAnnotationPredicate);
-      if (isEmpty(fields)) {
+      if (fields.isEmpty()) {
         return;
       }
 
