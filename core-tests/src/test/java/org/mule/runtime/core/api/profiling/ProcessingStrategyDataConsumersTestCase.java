@@ -12,12 +12,12 @@ import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -34,11 +34,10 @@ import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
-import org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
@@ -93,7 +92,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
   private final Gson gson = new Gson();
 
-  private final ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType;
+  private final ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType;
 
   private ProfilingService profilingService;
 
@@ -115,24 +114,24 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   }
 
   @Parameters(name = "eventType: {0}")
-  public static Collection<ProfilingEventType<ProcessingStrategyProfilingEventContext>> eventType() {
-    return asList(PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION, OPERATION_EXECUTED,
+  public static Collection<ProfilingEventType<ComponentProcessingStrategyProfilingEventContext>> eventType() {
+    return asList(PS_SCHEDULING_OPERATION_EXECUTION, PS_STARTING_OPERATION_EXECUTION, PS_OPERATION_EXECUTED,
                   PS_FLOW_MESSAGE_PASSING, PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION,
                   FLOW_EXECUTED);
   }
 
-  public ProcessingStrategyDataConsumersTestCase(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
+  public ProcessingStrategyDataConsumersTestCase(ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType) {
     this.profilingEventType = profilingEventType;
   }
 
   @Test
   @Description("When a profiling event related to processing strategy is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForProcessingStrategiesProfilingEventTypesConsumeDataAccordingly() {
-    ProfilingDataProducer<ProcessingStrategyProfilingEventContext> dataProducer =
+    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
-    ComponentProcessingStrategyProfilingEventContext profilerEventContext =
-        new ComponentProcessingStrategyProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
+    org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext profilerEventContext =
+        new org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
                                                              PROFILING_EVENT_TIMESTAMP);
     dataProducer.triggerProfilingEvent(
                                        profilerEventContext);
@@ -194,8 +193,8 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     }
   }
 
-  private String jsonToLog(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
-                           ProcessingStrategyProfilingEventContext profilingEventContext) {
+  private String jsonToLog(ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
+                           ComponentProcessingStrategyProfilingEventContext profilingEventContext) {
     return gson.toJson(getProcessingStrategyComponentInfoMap(profilingEventType, profilingEventContext));
   }
 

@@ -9,7 +9,8 @@ package org.mule.runtime.core.internal.profiling.consumer;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +29,8 @@ public class ComponentProcessingStrategyProfilingUtils {
   public static final String LOCATION = "location";
   public static final String COMPONENT_IDENTIFIER = "componentIdentifier";
 
-  public static Map<String, String> getProcessingStrategyComponentInfoMap(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
-                                                                          ProcessingStrategyProfilingEventContext profilingEventContext) {
+  public static Map<String, String> getProcessingStrategyComponentInfoMap(ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
+                                                                          ComponentProcessingStrategyProfilingEventContext profilingEventContext) {
     Map<String, String> eventMap = new HashMap<>();
     eventMap.put(PROFILING_EVENT_TYPE,
                  profilingEventType.getProfilingEventTypeNamespace() + ":"
@@ -41,6 +42,12 @@ public class ComponentProcessingStrategyProfilingUtils {
     eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, profilingEventContext.getCorrelationId());
     profilingEventContext.getLocation().ifPresent(loc -> addLocationInfo(eventMap, loc));
 
+    return eventMap;
+  }
+
+  public static Map<String, String> getComponentThreadingInfoMap(ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType,
+                                                                 ComponentThreadingProfilingEventContext profilingEventContext) {
+    Map<String, String> eventMap = new HashMap<>();
     return eventMap;
   }
 

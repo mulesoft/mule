@@ -11,12 +11,12 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
@@ -31,7 +31,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -118,8 +118,8 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
         });
   }
 
-  private Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> getDataProducer(
-                                                                                                   ProfilingEventType<ProcessingStrategyProfilingEventContext> eventType) {
+  private Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> getDataProducer(
+                                                                                                            ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> eventType) {
     if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
       return of(profilingService.getProfilingDataProducer(eventType));
     }
@@ -143,9 +143,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
                 .profileEvent(location, getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION), artifactId, artifactType)
-                .profileEvent(location, getDataProducer(STARTING_OPERATION_EXECUTION), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(PS_STARTING_OPERATION_EXECUTION), artifactId, artifactType)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
-                .profileEvent(location, getDataProducer(OPERATION_EXECUTED), artifactId, artifactType)
+                .profileEvent(location, getDataProducer(PS_OPERATION_EXECUTED), artifactId, artifactType)
                 .profileEvent(location, getDataProducer(PS_FLOW_MESSAGE_PASSING), artifactId, artifactType)
                 .build();
           } else {

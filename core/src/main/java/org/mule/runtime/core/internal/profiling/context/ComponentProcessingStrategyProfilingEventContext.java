@@ -8,7 +8,6 @@
 package org.mule.runtime.core.internal.profiling.context;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Optional;
@@ -16,11 +15,13 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 
 /**
- * A {@link ProcessingStrategyProfilingEventContext} that encapsulates data for the profiling event.
+ * A {@link org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext} that encapsulates data
+ * for the profiling event.
  *
  * @since 4.4
  */
-public class ComponentProcessingStrategyProfilingEventContext implements ProcessingStrategyProfilingEventContext {
+public class ComponentProcessingStrategyProfilingEventContext
+    implements org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext {
 
   private final CoreEvent event;
   private final String artifactId;

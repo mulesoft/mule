@@ -14,12 +14,12 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 
 /**
  * A {@link Notification} that produces data for troubleshooting. This is extended for using notifications for producing profiling
@@ -56,10 +56,10 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_SCHEDULING_OPERATION_EXECUTION),
                    PS_SCHEDULING_OPERATION_EXECUTION_ID);
 
-    registerAction(getFullyQualifiedProfilingNotificationIdentifier(STARTING_OPERATION_EXECUTION),
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_STARTING_OPERATION_EXECUTION),
                    STARTING_OPERATION_EXECUTION_ID);
 
-    registerAction(getFullyQualifiedProfilingNotificationIdentifier(OPERATION_EXECUTED), OPERATION_EXECUTED_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_OPERATION_EXECUTED), OPERATION_EXECUTED_ID);
 
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(PS_FLOW_MESSAGE_PASSING), PS_FLOW_MESSAGE_PASSING_ID);
 

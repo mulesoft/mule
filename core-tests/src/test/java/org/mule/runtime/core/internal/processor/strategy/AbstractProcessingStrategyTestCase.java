@@ -35,12 +35,12 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.FLOW_BACK_PRESSURE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -78,7 +78,7 @@ import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
@@ -148,7 +148,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
-  protected final ProfilingDataConsumer<ProcessingStrategyProfilingEventContext> profilingDataConsumer =
+  protected final ProfilingDataConsumer<ComponentProcessingStrategyProfilingEventContext> profilingDataConsumer =
       mock(ProfilingDataConsumer.class);
 
   protected Mode mode;
@@ -312,8 +312,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     // Profiling events mocking
     when(profilingDataConsumer.getProfilingEventTypes())
         .thenReturn(new HashSet<>(Arrays.asList(PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION, FLOW_EXECUTED,
-                                                PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION,
-                                                OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
+                                                PS_SCHEDULING_OPERATION_EXECUTION, PS_STARTING_OPERATION_EXECUTION,
+                PS_OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
     when(profilingDataConsumer.getEventContextFilter()).thenReturn(processingStrategyProfilingEventContext -> true);
   }
 
@@ -658,17 +658,17 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     if (enableProfilingServiceProperty.getValue().equals("true")) {
       InOrder profilingDataConsumerAssertions = inOrder(profilingDataConsumer);
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ComponentProcessingStrategyProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(PS_SCHEDULING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(PS_SCHEDULING_OPERATION_EXECUTION), any(ComponentProcessingStrategyProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(STARTING_OPERATION_EXECUTION), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(PS_STARTING_OPERATION_EXECUTION), any(ComponentProcessingStrategyProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(OPERATION_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(PS_OPERATION_EXECUTED), any(ComponentProcessingStrategyProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(PS_FLOW_MESSAGE_PASSING), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(PS_FLOW_MESSAGE_PASSING), any(ComponentProcessingStrategyProfilingEventContext.class));
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
-          .onProfilingEvent(eq(FLOW_EXECUTED), any(ProcessingStrategyProfilingEventContext.class));
+          .onProfilingEvent(eq(FLOW_EXECUTED), any(ComponentProcessingStrategyProfilingEventContext.class));
     } else {
       verifyZeroInteractions(profilingDataConsumer);
     }
