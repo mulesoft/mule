@@ -7,6 +7,7 @@
 
 package org.mule.test.runner.utils;
 
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
@@ -160,8 +161,10 @@ public final class RunnerModuleUtils {
           addedClasses.add(classEntry.getKey().getName());
           classAdded = true;
           LOGGER.debug("Class {} was succesfully added to the extension classloader.", classEntry.getKey().getName());
-        } catch (Exception e) {
-          LOGGER.debug("Class {} failed to be added to the extension classloader.", classEntry.getKey().getName());
+        } catch (IllegalStateException e) {
+          LOGGER.debug(format("Class %s failed to be added to the extension classloader. Error message : %s",
+                              classEntry.getKey().getName(), e.getMessage()),
+                       e);
         }
       }
     }
