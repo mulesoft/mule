@@ -35,7 +35,6 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Streaming;
-import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.notification.Fires;
@@ -57,6 +56,7 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.annotation.deprecated.Deprecated;
+import org.mule.sdk.api.annotation.error.Throws;
 import org.mule.sdk.api.annotation.param.display.Example;
 import org.mule.sdk.api.annotation.param.display.Summary;
 import org.mule.sdk.api.future.SecretSdkFutureFeature;
@@ -465,7 +465,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @OnException(CureCancerExceptionEnricher.class)
-  @Throws(HeisenbergErrorTyperProvider.class)
+  @Throws(HeisenbergErrorTypeProvider.class)
   @MediaType(TEXT_PLAIN)
   public String cureCancer() throws HealthException {
     throw new HealthException(CURE_CANCER_MESSAGE);

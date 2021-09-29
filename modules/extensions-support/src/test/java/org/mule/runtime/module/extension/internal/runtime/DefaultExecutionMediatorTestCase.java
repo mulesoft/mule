@@ -358,7 +358,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void enrichThrownModuleExceptionInValueTransformer() throws Throwable {
-    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, HEALTH, exception);
+    final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
+        new org.mule.sdk.api.exception.ModuleException(ERROR, HEALTH, exception);
     expectedException.expectCause(sameInstance(moduleExceptionToThrow));
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
@@ -396,7 +397,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void notEnrichThrownModuleExceptionInValueTransformer() throws Throwable {
-    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, HEALTH, exception);
+    final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
+        new org.mule.sdk.api.exception.ModuleException(ERROR, HEALTH, exception);
     expectedException.expect(instanceOf(TypedException.class));
     expectedException.expectCause(sameInstance(exception));
     mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
@@ -435,7 +437,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   @Test
   public void notReconnectInValueTransformerWhenVariableIsSet() {
     int expectedRetries = retryPolicy.isEnabled() ? 1 : 0;
-    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, CONNECTIVITY, connectionException);
+    final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
+        new org.mule.sdk.api.exception.ModuleException(ERROR, CONNECTIVITY, connectionException);
     when(operationContext.getVariable(DO_NOT_RETRY)).thenReturn("true");
     clearInvocations(operationContext);
     mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());

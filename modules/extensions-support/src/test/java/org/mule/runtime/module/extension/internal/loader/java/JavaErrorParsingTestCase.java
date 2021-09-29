@@ -142,7 +142,7 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
 
   @Extension(name = "Heisenberg")
   @Operations(InvalidErrorOperations.class)
-  @ErrorTypes(HeisenbergErrors.class)
+  @org.mule.sdk.api.annotation.error.ErrorTypes(HeisenbergErrors.class)
   public static class HeisenbergWithNotMappedErrorType extends HeisenbergExtension {
 
   }

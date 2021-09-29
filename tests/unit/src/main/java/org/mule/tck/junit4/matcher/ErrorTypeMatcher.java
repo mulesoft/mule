@@ -38,6 +38,10 @@ public final class ErrorTypeMatcher extends TypeSafeMatcher<ErrorType> {
     return errorType(anything, is(type.getType()));
   }
 
+  public static ErrorTypeMatcher errorType(org.mule.sdk.api.error.ErrorTypeDefinition type) {
+    return errorType(anything, is(type.getType()));
+  }
+
   public static ErrorTypeMatcher errorType(String namespace, String type) {
     return new ErrorTypeMatcher(is(namespace), is(type));
   }
