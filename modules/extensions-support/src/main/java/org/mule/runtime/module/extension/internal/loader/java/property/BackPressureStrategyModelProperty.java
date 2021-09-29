@@ -45,7 +45,12 @@ public class BackPressureStrategyModelProperty implements ModelProperty {
     return settings;
   }
 
-  private BackPressureStrategyModelProperty() {}
+  private BackPressureStrategyModelProperty(){}
+
+  public BackPressureStrategyModelProperty(BackPressureMode defaultMode, Set<BackPressureMode> supportedModes) {
+    this.defaultMode = defaultMode;
+    this.supportedModes = supportedModes;
+  }
 
   public BackPressureMode getDefaultMode() {
     return defaultMode;

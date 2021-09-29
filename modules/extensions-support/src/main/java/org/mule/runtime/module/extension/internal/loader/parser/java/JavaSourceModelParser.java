@@ -41,6 +41,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -259,12 +260,12 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     return resolveStereotype(sourceElement, "Source", getName(), factory);
   }
 
-  public Optional<BackPressureSupportInfo> getBackPressureSupportInfo() {
+  public Optional<BackPressureStrategyModelProperty> getBackPressureSupportInfo() {
     return getInfoFromAnnotation(sourceElement, "source", sourceElement.getName(), BackPressure.class,
                                  org.mule.sdk.api.annotation.source.BackPressure.class,
-                                 (legacyAnnotation) -> new BackPressureSupportInfo(legacyAnnotation
+                                 (legacyAnnotation) -> new BackPressureStrategyModelProperty(legacyAnnotation
                                      .defaultMode(), new HashSet<BackPressureMode>(asList(legacyAnnotation.supportedModes()))),
-                                 (sdkAnnotation) -> new BackPressureSupportInfo(fromSdkBackPressureMode(sdkAnnotation
+                                 (sdkAnnotation) -> new BackPressureStrategyModelProperty(fromSdkBackPressureMode(sdkAnnotation
                                      .defaultMode()), new HashSet<BackPressureMode>(stream(sdkAnnotation.supportedModes()).map(BackPressureSourceUtils::fromSdkBackPressureMode).collect(toList()))));
   }
 

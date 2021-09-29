@@ -12,6 +12,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
@@ -143,7 +144,7 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   /**
    * @return the back pressure support info for the source
    */
-  Optional<BackPressureSupportInfo> getBackPressureSupportInfo();
+  Optional<BackPressureStrategyModelProperty> getBackPressureStrategyModelProperty();
 
   /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a
