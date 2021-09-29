@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="mimeTypeOnly">
+        <vm:inbound-endpoint path="testInput1" exchange-pattern="request-response"/>
+
+        <set-variable variableName="testVariable" value="#['test']" encoding="UTF-16" mimeType="application/json"/>
+
+        <component class="org.mule.transformers.simple.SetVariableMimeTypeTestCase$FlowVariableDataTypeAccessor"/>
+    </flow>
+
+    <flow name="contentTypeOnly">
+        <vm:inbound-endpoint path="testInput2" exchange-pattern="request-response"/>
+
+        <set-variable variableName="testVariable" value="#['test']" encoding="UTF-16"/>
+
+        <set-property propertyName="Content-Type" value="application/json;charset=UTF-16BE"/>
+
+        <component class="org.mule.transformers.simple.SetVariableMimeTypeTestCase$FlowVariableDataTypeAccessor"/>
+    </flow>
+
+    <flow name="withoutAnyDataType">
+        <vm:inbound-endpoint path="testInput3" exchange-pattern="request-response"/>
+
+        <set-variable variableName="testVariable" value="#['test']" encoding="UTF-16"/>
+
+        <component class="org.mule.transformers.simple.SetVariableMimeTypeTestCase$FlowVariableDataTypeAccessor"/>
+    </flow>
+
+
+</mule>
