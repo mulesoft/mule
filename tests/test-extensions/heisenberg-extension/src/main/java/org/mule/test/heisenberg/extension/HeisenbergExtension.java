@@ -153,6 +153,8 @@ public class HeisenbergExtension implements Lifecycle {
   @Optional
   private List<? extends Weapon> wildCardWeapons;
 
+  // Since the generic of this parameter is a wildcard, its children type cannot be determined.
+  // Because of this, the dslConfiguration for this parameter will have `allowInlineDefinition=false`
   @Parameter
   @Optional
   private List<?> wildCards;
