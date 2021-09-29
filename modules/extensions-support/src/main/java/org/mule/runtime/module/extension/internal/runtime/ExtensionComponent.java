@@ -69,6 +69,7 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
@@ -123,7 +124,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
 
   protected final ExtensionManager extensionManager;
-  protected final ClassLoader classLoader;
+  protected ClassLoader classLoader;
   protected final T componentModel;
 
   protected CursorProviderFactory cursorProviderFactory;
@@ -257,6 +258,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void start() throws MuleException {
+    if (!(Thread.currentThread().getContextClassLoader() instanceof CompositeClassLoader)) {
+      classLoader = CompositeClassLoader.from(classLoader, Thread.currentThread().getContextClassLoader());
+    }
     withContextClassLoader(classLoader, () -> {
       doStart();
       return null;
