@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
+package org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes;
 
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;

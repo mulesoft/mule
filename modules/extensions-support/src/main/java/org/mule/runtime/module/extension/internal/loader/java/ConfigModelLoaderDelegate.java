@@ -12,9 +12,15 @@ import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasStereotypeDeclarer;
 import org.mule.runtime.extension.api.property.NoImplicitModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.StereotypeResolver;
+
+import java.util.Optional;
 
 /**
  * Helper class for declaring configurations through a {@link DefaultJavaModelLoaderDelegate}
@@ -65,5 +71,12 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     }
 
     return description;
+  }
+
+  private void <T extends HasStereotypeDeclarer & HasModelProperties> parseStereotype(StereotypeModelParser parser,
+                                                                                      T declarer,
+                                                                                      Optional<StereotypeModelParser> fallback) {
+    
+
   }
 }

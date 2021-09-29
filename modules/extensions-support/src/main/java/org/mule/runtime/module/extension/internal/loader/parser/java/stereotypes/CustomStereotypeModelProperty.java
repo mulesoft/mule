@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
+package org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;

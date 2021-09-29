@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 
@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.TypeAwareConfigurationFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -71,7 +72,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public String getName() {
-    return getInfoFromAnnotation(configElement,
+    return MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(configElement,
                                  "Configuration", configElement.getName(),
                                  Configuration.class,
                                  org.mule.sdk.api.annotation.Configuration.class,
@@ -145,6 +146,13 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<StereotypeModel> getStereotypeModel() {
+
+    ifPresent(config.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+            .map(ExtensionTypeDescriptorModelProperty::getType),
+        type -> resolveStereotype(type, config, defaultStereotype),
+        () -> config.withStereotype(defaultStereotype));
+    componentConfigs = populateComponentConfigsMap(config);
+
     final StereotypeModel defaultStereotype = createStereotype(config.getName(), CONFIG);
     ifPresent(config.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
             .map(ExtensionTypeDescriptorModelProperty::getType),

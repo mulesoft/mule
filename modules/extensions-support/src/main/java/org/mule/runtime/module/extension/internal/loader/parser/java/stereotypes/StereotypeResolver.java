@@ -5,19 +5,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
+package org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes;
 
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.computeIfAbsent;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition.NAMESPACE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.WithStereotypesDeclaration;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
@@ -26,36 +28,24 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Base implementation for objects that given an {@link WithAnnotations annotated element} resolves it's stereotype.
  *
  * @since 4.0
  */
-public abstract class StereotypeResolver<T extends WithAnnotations> {
+public class StereotypeResolver {
 
-  protected final T annotatedElement;
-  protected final WithStereotypesDeclaration declaration;
+  protected final WithAnnotations annotatedElement;
   protected final String namespace;
-  protected final StereotypeModel fallbackStereotype;
-  protected Validator validatorAnnotation;
-  protected Stereotype stereotypeAnnotation;
+  protected boolean isValidator;
+  protected org.mule.sdk.api.stereotype.StereotypeDefinition stereotypeDefinition;
   protected Map<StereotypeDefinition, StereotypeModel> stereotypesCache;
-
-  public static StereotypeModel createCustomStereotype(Class<? extends StereotypeDefinition> definitionClass,
-                                                       String namespace,
-                                                       Map<StereotypeDefinition, StereotypeModel> stereotypesCache) {
-    try {
-      return getStereotype(instantiateClass(definitionClass), namespace, stereotypesCache);
-    } catch (Exception e) {
-      throw new IllegalModelDefinitionException(
-                                                "Invalid StereotypeDefinition found with name: " + definitionClass.getName(),
-                                                e);
-    }
-  }
 
   protected static StereotypeModel getStereotype(StereotypeDefinition stereotypeDefinition,
                                                  String namespace,
@@ -92,20 +82,31 @@ public abstract class StereotypeResolver<T extends WithAnnotations> {
     return namespace.equals(stereotypeDefinition.getNamespace()) || NAMESPACE.equals(stereotypeDefinition.getNamespace());
   }
 
-  protected StereotypeResolver(T annotatedElement,
-                               WithStereotypesDeclaration declaration,
+  public StereotypeResolver(WithAnnotations annotatedElement,
                                String namespace,
-                               StereotypeModel fallbackStereotype,
+                               String elementType,
+                               String elementName,
                                Map<StereotypeDefinition, StereotypeModel> stereotypesCache) {
     this.annotatedElement = annotatedElement;
-    this.declaration = declaration;
     this.namespace = namespace;
     this.stereotypesCache = stereotypesCache;
-    this.fallbackStereotype = fallbackStereotype;
-    stereotypeAnnotation = getAnnotation(Stereotype.class);
-    validatorAnnotation = getAnnotation(Validator.class);
 
-    if (validatorAnnotation != null && stereotypeAnnotation != null) {
+    stereotypeDefinition = mapReduceExtensionAnnotation(
+        annotatedElement,
+        elementType,
+        elementName,
+        Stereotype.class,
+        org.mule.sdk.api.annotation.param.stereotype.Stereotype.class,
+        value -> value.getClassValue(Stereotype::value),
+        value -> value.getClassValue(org.mule.sdk.api.annotation.param.stereotype.Stereotype::value)
+    ).flatMap(type -> type.getDeclaringClass())
+        .map(SdkStereotypeDefinitionAdapter::from)
+        .orElse(null);
+
+    isValidator = annotatedElement.isAnnotatedWith(Validator.class)
+        || annotatedElement.isAnnotatedWith(org.mule.sdk.api.annotation.param.stereotype.Validator.class);
+
+    if (stereotypeDefinition != null && isValidator) {
       throw new IllegalModelDefinitionException(format("%s is annotated with both @%s and @%s. Only one can "
           + "be provided at the same time for the same component",
                                                        resolveDescription(), Stereotype.class.getSimpleName(),
@@ -113,12 +114,14 @@ public abstract class StereotypeResolver<T extends WithAnnotations> {
     }
   }
 
-  protected abstract <T extends Annotation> T getAnnotation(Class<T> annotationType);
-
   protected abstract String resolveDescription();
 
-  protected void resolveStereotype() {
-    if (validatorAnnotation != null || stereotypeAnnotation != null) {
+  public StereotypeResolution resolveStereotype() {
+    if (isValidator) {
+      return new StereotypeResolution(empty(), true);
+    }
+    return new StereotypeResolution(of(createCustomStereotype()), false);
+    if (validatorAnnotation != null || stereotypeDefinition != null) {
       if (declaration instanceof BaseDeclaration) {
         ((BaseDeclaration) declaration).addModelProperty(new CustomStereotypeModelProperty());
       }
@@ -127,17 +130,11 @@ public abstract class StereotypeResolver<T extends WithAnnotations> {
       } else {
         declaration.withStereotype(createCustomStereotype());
       }
-    } else {
-      addFallbackStereotype();
     }
   }
 
-  protected void addFallbackStereotype() {
-    declaration.withStereotype(fallbackStereotype);
-  }
-
   protected StereotypeModel createCustomStereotype() {
-    return createCustomStereotype(stereotypeAnnotation.value(), namespace, stereotypesCache);
+    return createCustomStereotype(stereotypeDefinition, namespace, stereotypesCache);
   }
 
   protected void addValidationStereotype() {

@@ -12,7 +12,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromExtension;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -57,6 +57,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
+import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
@@ -298,7 +299,7 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static Optional<DisplayModel> getDisplayModel(WithAnnotations element, String elementType, String elementName) {
-    Optional<String> summary = getInfoFromAnnotation(
+    Optional<String> summary = MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(
                                                      element,
                                                      elementType,
                                                      elementName,
@@ -308,7 +309,7 @@ public final class JavaExtensionModelParserUtils {
                                                      value -> value
                                                          .getStringValue(org.mule.sdk.api.annotation.param.display.Summary::value));
 
-    Optional<String> displayName = getInfoFromAnnotation(
+    Optional<String> displayName = MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(
                                                          element,
                                                          elementType,
                                                          elementName,
@@ -319,7 +320,7 @@ public final class JavaExtensionModelParserUtils {
                                                          value -> value
                                                              .getStringValue(org.mule.sdk.api.annotation.param.display.DisplayName::value));
 
-    Optional<String> example = getInfoFromAnnotation(
+    Optional<String> example = MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(
                                                      element,
                                                      elementType,
                                                      elementName,
@@ -341,7 +342,7 @@ public final class JavaExtensionModelParserUtils {
             .filter(p -> !isBlank(p))
             .collect(toList()));
 
-    Optional<ClassValueModel> classValueModel = getInfoFromAnnotation(
+    Optional<ClassValueModel> classValueModel = MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(
                                                                       element,
                                                                       elementType,
                                                                       elementName,
@@ -374,7 +375,7 @@ public final class JavaExtensionModelParserUtils {
                                                                                                                   .stream()
                                                                                                                   .toArray(String[]::new));
 
-    Optional<PathModel> pathModel = getInfoFromAnnotation(element,
+    Optional<PathModel> pathModel = MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(element,
                                                           elementType,
                                                           elementName,
                                                           Path.class,
@@ -418,7 +419,7 @@ public final class JavaExtensionModelParserUtils {
   }
 
   private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
-    return getInfoFromAnnotation(
+    return mapReduceExtensionAnnotation(
                                  element,
                                  Deprecated.class,
                                  org.mule.sdk.api.annotation.deprecated.Deprecated.class,

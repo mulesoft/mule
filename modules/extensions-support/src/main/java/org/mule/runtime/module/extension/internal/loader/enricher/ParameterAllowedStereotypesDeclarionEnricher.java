@@ -14,7 +14,7 @@ import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
-import static org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypeResolver.createCustomStereotype;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.StereotypeResolver.createCustomStereotype;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.api.loader.java.type;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -27,7 +27,7 @@ public interface WithAlias extends WithAnnotations, WithName {
    * @return The alias of the implementer component
    */
   default String getAlias() {
-    return getInfoFromAnnotation(this,
+    return mapReduceExtensionAnnotation(this,
                                  Alias.class,
                                  org.mule.sdk.api.annotation.Alias.class,
                                  value -> value.getStringValue(Alias::value),
@@ -43,7 +43,7 @@ public interface WithAlias extends WithAnnotations, WithName {
    * @return The description of the implementer component
    */
   default String getDescription() {
-    return getInfoFromAnnotation(
+    return mapReduceExtensionAnnotation(
                                  this,
                                  Alias.class,
                                  org.mule.sdk.api.annotation.Alias.class,

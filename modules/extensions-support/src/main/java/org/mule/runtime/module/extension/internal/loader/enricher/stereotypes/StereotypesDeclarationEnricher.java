@@ -18,8 +18,8 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTI
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypeResolver.createCustomStereotype;
-import static org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypeResolver.getStereotype;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.StereotypeResolver.createCustomStereotype;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.StereotypeResolver.getStereotype;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -64,6 +64,8 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
+import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.ClassStereotypeResolver;
+import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.MethodStereotypeResolver;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

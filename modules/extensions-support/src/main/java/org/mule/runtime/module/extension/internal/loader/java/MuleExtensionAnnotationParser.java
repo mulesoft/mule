@@ -264,7 +264,7 @@ public final class MuleExtensionAnnotationParser {
                                                                                                  Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
                                                                                                  Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
 
-    return getInfoFromAnnotation(
+    return mapReduceExtensionAnnotation(
                                  extensionElement,
                                  legacyAnnotationClass,
                                  sdkAnnotationClass,
@@ -276,7 +276,7 @@ public final class MuleExtensionAnnotationParser {
                                                                                            sdkAnnotationClass.getName())));
   }
 
-  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> mapReduceExtensionAnnotation(
                                                                                                   WithAnnotations element,
                                                                                                   String elementType,
                                                                                                   String elementName,
@@ -285,7 +285,7 @@ public final class MuleExtensionAnnotationParser {
                                                                                                   Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
                                                                                                   Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
 
-    return getInfoFromAnnotation(
+    return mapReduceExtensionAnnotation(
                                  element,
                                  legacyAnnotationClass,
                                  sdkAnnotationClass,
@@ -313,7 +313,7 @@ public final class MuleExtensionAnnotationParser {
    * @param <T>                     Output generic type
    * @return a reduced value
    */
-  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> mapReduceExtensionAnnotation(
                                                                                                   WithAnnotations element,
                                                                                                   Class<R> legacyAnnotationClass,
                                                                                                   Class<S> sdkAnnotationClass,

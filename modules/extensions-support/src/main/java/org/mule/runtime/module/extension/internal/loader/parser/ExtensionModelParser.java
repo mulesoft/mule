@@ -59,6 +59,8 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    */
   String getVendor();
 
+  Optional<String> getNamespace();
+
   /**
    * @return a list with a {@link ConfigurationModelParser} per each configuration defined in the extension.
    */

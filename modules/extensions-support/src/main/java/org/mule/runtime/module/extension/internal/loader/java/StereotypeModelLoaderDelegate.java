@@ -17,11 +17,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarati
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.ClassStereotypeResolver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
-public class StereotypeModelModelLoaderDelegate {
+public class StereotypeModelLoaderDelegate {
 
   private final Map<StereotypeDefinition, StereotypeModel> stereotypes = new HashMap<>();
   private final String namespace;
@@ -39,7 +39,7 @@ public class StereotypeModelModelLoaderDelegate {
   private final ClassTypeLoader typeLoader;
   private final DslResolvingContext dslResolvingContext;
 
-  public StereotypeModelModelLoaderDelegate(ExtensionLoadingContext extensionLoadingContext, String namespace) {
+  public StereotypeModelLoaderDelegate(ExtensionLoadingContext extensionLoadingContext, String namespace) {
     dslResolvingContext = extensionLoadingContext.getDslResolvingContext();
     ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
     this.typeLoader =
@@ -51,6 +51,10 @@ public class StereotypeModelModelLoaderDelegate {
 
 
     resolveDeclaredTypesStereotypes(declaration, namespace);
+  }
+
+  private void resolveStereotype(Type type) {
+    new ClassStereotypeResolver(type, declaration, namespace, stereotypes).resolveStereotype();
   }
 
   private String getStereotypePrefix(ExtensionDeclarer extensionDeclarer) {

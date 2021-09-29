@@ -79,6 +79,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<String> privilegedExportedArtifacts = new LinkedList<>();
   private List<String> privilegedExportedPackages = new LinkedList<>();
   private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
+  private Optional<String> namespace;
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
@@ -87,6 +88,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   private void parseStructure(ExtensionElement extensionElement) {
     xmlDslConfiguration = parseXmlDslConfiguration();
+    namespace = xmlDslConfiguration.map(xml -> xml.getPrefix().toUpperCase());
     errorModelParsers = fetchErrorModelParsers();
 
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(extensionElement));
@@ -205,6 +207,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public String getVendor() {
     return extensionElement.getVendor();
+  }
+
+  @Override
+  public Optional<String> getNamespace() {
+    return namespace;
   }
 
   @Override

@@ -31,7 +31,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -159,8 +159,6 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
-import com.google.common.collect.ImmutableList;
-import org.apache.commons.collections.CollectionUtils;
 import com.google.common.collect.ImmutableList;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -1092,7 +1090,7 @@ public final class IntrospectionUtils {
   public static Optional<ExpressionSupport> getExpressionSupport(WithAnnotations annotatedElement,
                                                                  String elementType,
                                                                  String elementName) {
-    return getInfoFromAnnotation(
+    return MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(
                                  annotatedElement,
                                  elementType,
                                  elementName,
