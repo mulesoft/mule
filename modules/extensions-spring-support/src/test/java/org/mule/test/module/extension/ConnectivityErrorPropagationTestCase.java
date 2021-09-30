@@ -24,7 +24,6 @@ import org.mule.test.some.extension.CustomConnectionException;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -58,7 +57,6 @@ public class ConnectivityErrorPropagationTestCase extends AbstractExtensionFunct
   }
 
   @Test
-  @Ignore
   public void failAtConnectWithDomainException() {
     Matcher<Exception> exceptionMatcher =
         is(allOf(instanceOf(ConnectionException.class), hasCause(instanceOf(CustomConnectionException.class))));
@@ -66,14 +64,12 @@ public class ConnectivityErrorPropagationTestCase extends AbstractExtensionFunct
   }
 
   @Test
-  @Ignore
   public void failAtValidateWithModuleException() {
     Matcher<Exception> exceptionMatcher = is(instanceOf(ModuleException.class));
     utils.assertFailedConnection("failAtValidateWithModuleException", exceptionMatcher, is(errorType(OAUTH2)));
   }
 
   @Test
-  @Ignore
   public void failAtValidateWithDomainException() {
     Matcher<Exception> exceptionMatcher = is(instanceOf(CustomConnectionException.class));
     utils.assertFailedConnection("failAtValidateWithDomainException", exceptionMatcher, is(errorType(OAUTH2)));
