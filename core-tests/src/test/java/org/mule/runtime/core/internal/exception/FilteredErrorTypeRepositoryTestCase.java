@@ -10,6 +10,7 @@ import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
@@ -28,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(ERROR_HANDLING)
@@ -35,14 +37,16 @@ import io.qameta.allure.Story;
 @SmallTest
 public class FilteredErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
 
-  private ErrorTypeRepository errorTypeRepository;
+  private static final String NS1_NAMESPACE = "NS1";
 
-  private final ComponentIdentifier ns1error = ComponentIdentifier.builder().namespace("NS1").name("AN_ERROR").build();
+  private final ComponentIdentifier ns1error = ComponentIdentifier.builder().namespace(NS1_NAMESPACE).name("AN_ERROR").build();
   private final ComponentIdentifier ns2error = ComponentIdentifier.builder().namespace("NS2").name("AN_ERROR").build();
   private final ComponentIdentifier ns1internalError =
-      ComponentIdentifier.builder().namespace("NS1").name("AN_INTERNAL_ERROR").build();
+      ComponentIdentifier.builder().namespace(NS1_NAMESPACE).name("AN_INTERNAL_ERROR").build();
   private final ComponentIdentifier ns2internalError =
       ComponentIdentifier.builder().namespace("NS2").name("AN_INTERNAL_ERROR").build();
+
+  private ErrorTypeRepository errorTypeRepository;
 
   @Before
   public void before() {
@@ -55,15 +59,15 @@ public class FilteredErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getErrorNamespaces() {
-    final FilteredErrorTypeRepository filtered = new FilteredErrorTypeRepository(errorTypeRepository, singleton("NS1"));
+    final FilteredErrorTypeRepository filtered = new FilteredErrorTypeRepository(errorTypeRepository, singleton(NS1_NAMESPACE));
 
-    assertThat(filtered.getErrorNamespaces(), containsInAnyOrder("NS1"));
+    assertThat(filtered.getErrorNamespaces(), containsInAnyOrder(NS1_NAMESPACE));
     assertThat(filtered.getErrorNamespaces(), not(contains("NS2")));
   }
 
   @Test
   public void getErrorTypes() {
-    final FilteredErrorTypeRepository filtered = new FilteredErrorTypeRepository(errorTypeRepository, singleton("NS1"));
+    final FilteredErrorTypeRepository filtered = new FilteredErrorTypeRepository(errorTypeRepository, singleton(NS1_NAMESPACE));
 
     final Set<ComponentIdentifier> errorTypeIdentifiers = filtered.getErrorTypes().stream()
         .map(err -> ComponentIdentifier.builder().namespace(err.getNamespace()).name(err.getIdentifier()).build())
@@ -77,7 +81,7 @@ public class FilteredErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getInternalErrorTypes() {
-    final FilteredErrorTypeRepository filtered = new FilteredErrorTypeRepository(errorTypeRepository, singleton("NS1"));
+    final FilteredErrorTypeRepository filtered = new FilteredErrorTypeRepository(errorTypeRepository, singleton(NS1_NAMESPACE));
 
     final Set<ComponentIdentifier> internalErrorTypeIdentifiers = filtered.getInternalErrorTypes().stream()
         .map(err -> ComponentIdentifier.builder().namespace(err.getNamespace()).name(err.getIdentifier()).build())
@@ -87,5 +91,15 @@ public class FilteredErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
     assertThat(internalErrorTypeIdentifiers, not(contains(ns2internalError)));
     assertThat(internalErrorTypeIdentifiers, not(contains(ns1error)));
     assertThat(internalErrorTypeIdentifiers, not(contains(ns2error)));
+  }
+
+  @Test
+  @Issue("MULE-19821")
+  public void caseInsensitiveness() {
+    final FilteredErrorTypeRepository filtered = new FilteredErrorTypeRepository(errorTypeRepository, singleton(NS1_NAMESPACE));
+    
+    ComponentIdentifier ns1LowercaseError = ComponentIdentifier.builder().namespace(NS1_NAMESPACE.toLowerCase()).name("AN_ERROR").build();
+    assertThat(filtered.lookupErrorType(ns1LowercaseError).get().getNamespace(), is(NS1_NAMESPACE));
+    assertThat(filtered.getErrorType(ns1LowercaseError).get().getNamespace(), is(NS1_NAMESPACE));
   }
 }
