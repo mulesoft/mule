@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
@@ -18,6 +19,7 @@ import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -27,6 +29,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -80,6 +83,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
@@ -170,6 +174,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Inject
   protected ErrorTypeRepository errorTypeRepository;
 
+  @Inject
+  FeatureFlaggingService featureFlaggingService;
+
   private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
   protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
@@ -204,6 +211,12 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
           .orElseGet(() -> streamingManager.forBytes().getDefaultCursorProviderFactory());
     }
+
+    if (!featureFlaggingService.isEnabled(LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER) &&
+        classLoader != null && classLoader.getParent() != null) {
+      classLoader = from(classLoader, ((RegionClassLoader) classLoader.getParent()).getOwnerClassLoader().getClassLoader());
+    }
+
     withContextClassLoader(classLoader, () -> {
       validateConfigurationProviderIsNotExpression();
       initConfigurationResolver();
@@ -258,9 +271,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void start() throws MuleException {
-    if (!(Thread.currentThread().getContextClassLoader() instanceof CompositeClassLoader)) {
-      classLoader = CompositeClassLoader.from(classLoader, Thread.currentThread().getContextClassLoader());
-    }
     withContextClassLoader(classLoader, () -> {
       doStart();
       return null;

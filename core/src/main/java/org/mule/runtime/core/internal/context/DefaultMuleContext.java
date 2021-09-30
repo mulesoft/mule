@@ -14,6 +14,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -295,6 +296,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEntityResolverFailOnFirstErrorFeature();
       configureEnableProfilingService();
       configureSetVariableWithNullVale();
+      configureLoadExtensionWithArtifactClassloader();
     }
   }
 
@@ -1257,6 +1259,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureSetVariableWithNullVale() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(SET_VARIABLE_WITH_NULL_VALUE, featureContext -> featureContext
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER} feature flag.
+   *
+   * @since 4.4.0
+   */
+  private static void configureLoadExtensionWithArtifactClassloader() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER, featureContext -> featureContext
         .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 
