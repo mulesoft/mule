@@ -6,6 +6,7 @@
  */
 package org.mule.module.scripting;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mule.api.MuleEvent;
@@ -31,6 +32,7 @@ public class JRubyTestCase extends FunctionalTestCase
     private final String key = "message";
     private final String value = "myMessage";
 
+    @Ignore("MULE-19814: flaky test")
     @Test
     public void testJRuby() throws Exception
     {

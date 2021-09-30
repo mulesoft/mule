@@ -48,6 +48,7 @@ public class SetVariableMimeTypeTestCase extends FunctionalTestCase {
         LocalMuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("vm://testInput2", TEST_MESSAGE, null);
+        response.setOutboundProperty("Content-Type", "application/json");
 
         String mimeType = response.getDataType().getMimeType();
 
@@ -64,6 +65,7 @@ public class SetVariableMimeTypeTestCase extends FunctionalTestCase {
         String mimeType = response.getDataType().getMimeType();
 
         assertThat(mimeType, equalTo(MimeTypes.ANY));
+        assertThat(mimeType, equalTo("*/*"));
 
     }
 
