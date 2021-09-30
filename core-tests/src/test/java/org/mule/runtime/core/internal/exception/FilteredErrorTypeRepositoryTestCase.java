@@ -97,8 +97,9 @@ public class FilteredErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
   @Issue("MULE-19821")
   public void caseInsensitiveness() {
     final FilteredErrorTypeRepository filtered = new FilteredErrorTypeRepository(errorTypeRepository, singleton(NS1_NAMESPACE));
-    
-    ComponentIdentifier ns1LowercaseError = ComponentIdentifier.builder().namespace(NS1_NAMESPACE.toLowerCase()).name("AN_ERROR").build();
+
+    ComponentIdentifier ns1LowercaseError =
+        ComponentIdentifier.builder().namespace(NS1_NAMESPACE.toLowerCase()).name("AN_ERROR").build();
     assertThat(filtered.lookupErrorType(ns1LowercaseError).get().getNamespace(), is(NS1_NAMESPACE));
     assertThat(filtered.getErrorType(ns1LowercaseError).get().getNamespace(), is(NS1_NAMESPACE));
   }
