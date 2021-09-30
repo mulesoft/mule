@@ -27,7 +27,6 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.enricher.BackPressureDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ClusterSupportEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
@@ -127,7 +126,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new ClusterSupportEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
-                                                                                               new BackPressureDeclarationEnricher(),
                                                                                                new ObjectStoreParameterDeclarationEnricher(),
                                                                                                new PollingSourceDeclarationEnricher()));
 

@@ -7,13 +7,13 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
+import static org.mule.sdk.api.runtime.source.BackPressureMode.DROP;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.source.BackPressure;
+import org.mule.sdk.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;

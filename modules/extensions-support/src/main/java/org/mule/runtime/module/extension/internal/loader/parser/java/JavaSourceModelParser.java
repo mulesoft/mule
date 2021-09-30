@@ -7,11 +7,14 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getAllTermsFromAnnotations;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
@@ -260,13 +263,18 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     return resolveStereotype(sourceElement, "Source", getName(), factory);
   }
 
-  public Optional<BackPressureStrategyModelProperty> getBackPressureSupportInfo() {
+  public Optional<BackPressureStrategyModelProperty> getBackPressureStrategyModelProperty() {
     return getInfoFromAnnotation(sourceElement, "source", sourceElement.getName(), BackPressure.class,
                                  org.mule.sdk.api.annotation.source.BackPressure.class,
                                  (legacyAnnotation) -> new BackPressureStrategyModelProperty(legacyAnnotation
-                                     .defaultMode(), new HashSet<BackPressureMode>(asList(legacyAnnotation.supportedModes()))),
+                                     .getEnumValue(BackPressure::defaultMode), new HashSet<BackPressureMode>(legacyAnnotation.getArrayValue(BackPressure::supportedModes))),
                                  (sdkAnnotation) -> new BackPressureStrategyModelProperty(fromSdkBackPressureMode(sdkAnnotation
-                                     .defaultMode()), new HashSet<BackPressureMode>(stream(sdkAnnotation.supportedModes()).map(BackPressureSourceUtils::fromSdkBackPressureMode).collect(toList()))));
+                                     .getEnumValue(org.mule.sdk.api.annotation.source.BackPressure::defaultMode)),
+                                                                                          new HashSet<BackPressureMode>(sdkAnnotation
+                                                                                              .getArrayValue(org.mule.sdk.api.annotation.source.BackPressure::supportedModes)
+                                                                                              .stream()
+                                                                                              .map(BackPressureSourceUtils::fromSdkBackPressureMode)
+                                                                                              .collect(toList()))));
   }
 
   @Override

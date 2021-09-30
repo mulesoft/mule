@@ -128,8 +128,10 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
     }
   }
 
-  private void declareBackPressureSupport(ExtensionDeclarer extensionDeclarer, SourceDeclarer sourceDeclarer, Optional<BackPressureStrategyModelProperty> configuredBackPressureStrategyModelProperty) {
-    BackPressureStrategyModelProperty backPressureStrategyModelProperty = configuredBackPressureStrategyModelProperty.orElseGet(BackPressureStrategyModelProperty::getDefault);
+  private void declareBackPressureSupport(ExtensionDeclarer extensionDeclarer, SourceDeclarer sourceDeclarer,
+                                          Optional<BackPressureStrategyModelProperty> configuredBackPressureStrategyModelProperty) {
+    BackPressureStrategyModelProperty backPressureStrategyModelProperty =
+        configuredBackPressureStrategyModelProperty.orElseGet(BackPressureStrategyModelProperty::getDefault);
     sourceDeclarer.withModelProperty(backPressureStrategyModelProperty);
     if (backPressureStrategyModelProperty.getSupportedModes().size() > 1) {
       addBackPressureParameter(extensionDeclarer, sourceDeclarer, backPressureStrategyModelProperty);
@@ -140,17 +142,19 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                         SourceDeclarer sourceDeclarer,
                                         BackPressureStrategyModelProperty property) {
 
-    OptionalParameterDeclarer parameter = sourceDeclarer.onParameterGroup(DEFAULT_GROUP_NAME).withOptionalParameter(BACK_PRESSURE_STRATEGY_PARAMETER_NAME);
+    OptionalParameterDeclarer parameter =
+        sourceDeclarer.onParameterGroup(DEFAULT_GROUP_NAME).withOptionalParameter(BACK_PRESSURE_STRATEGY_PARAMETER_NAME);
     parameter.describedAs(BACK_PRESSURE_STRATEGY_PARAMETER_DESCRIPTION);
     parameter.defaultingTo(property.getDefaultMode());
     parameter.withExpressionSupport(NOT_SUPPORTED);
     parameter.withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
 
     MetadataType type = BaseTypeBuilder.create(JAVA).stringType()
-      .id(format("%s-%s-backPressureStrategy", extensionDeclarer.getDeclaration().getName(), sourceDeclarer.getDeclaration().getName()))
-      .with(new EnumAnnotation<>(property.getSupportedModes().stream().map(BackPressureMode::name).toArray(String[]::new)))
-      .with(new ClassInformationAnnotation(BackPressureMode.class))
-      .build();
+        .id(format("%s-%s-backPressureStrategy", extensionDeclarer.getDeclaration().getName(),
+                   sourceDeclarer.getDeclaration().getName()))
+        .with(new EnumAnnotation<>(property.getSupportedModes().stream().map(BackPressureMode::name).toArray(String[]::new)))
+        .with(new ClassInformationAnnotation(BackPressureMode.class))
+        .build();
     parameter.ofDynamicType(type);
   }
 

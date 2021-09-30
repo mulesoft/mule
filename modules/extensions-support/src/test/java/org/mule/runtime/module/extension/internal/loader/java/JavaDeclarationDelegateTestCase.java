@@ -815,15 +815,20 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
     assertThat(config.getMessageSources(), hasSize(5));
-    assertHeisenbergSource(config.getMessageSources().get(0), ASYNC_SOURCE_NAME, AsyncHeisenbergSource.class);
-    assertHeisenbergSource(config.getMessageSources().get(1), SOURCE_NAME, HeisenbergSource.class);
+    assertHeisenbergSource(config.getMessageSources().get(0), ASYNC_SOURCE_NAME, AsyncHeisenbergSource.class, false);
+    assertHeisenbergSource(config.getMessageSources().get(1), SOURCE_NAME, HeisenbergSource.class, true);
   }
 
-  private void assertHeisenbergSource(SourceDeclaration source, String sourceName, Class<? extends Source> type) {
+  private void assertHeisenbergSource(SourceDeclaration source, String sourceName, Class<? extends Source> type,
+                                      boolean hasBackpressureOptions) {
     assertThat(source.getName(), is(sourceName));
 
     List<ParameterDeclaration> parameters = source.getAllParameters();
-    assertThat(parameters, hasSize(33));
+    if (hasBackpressureOptions) {
+      assertThat(parameters, hasSize(34));
+    } else {
+      assertThat(parameters, hasSize(33));
+    }
 
     assertParameter(parameters, SOURCE_PARAMETER, "", INT_TYPE, true, NOT_SUPPORTED, null);
     assertParameter(parameters, SOURCE_CALLBACK_PARAMETER, "", toMetadataType(Long.class), false, SUPPORTED, "#[payload]");
