@@ -55,13 +55,6 @@ public class ModuleExceptionHandler {
           .name(errorDefinition.getType())
           .build());
 
-      String errorTypeDefinitionName;
-      if (errorDefinition instanceof SdkErrorTypeDefinitionAdapter) {
-        errorTypeDefinitionName = ((SdkErrorTypeDefinitionAdapter<?>) errorDefinition).getDelegate().toString();
-      } else {
-        errorTypeDefinitionName = errorDefinition.toString();
-      }
-
       if (errorTypeLookedUp.isPresent()) {
         final ErrorType errorType = errorTypeLookedUp.get();
 
@@ -71,8 +64,7 @@ public class ModuleExceptionHandler {
           return exception -> {
             throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but"
                 + " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
-                                                               extensionNamespace + ":" + errorTypeDefinitionName,
-                                                               allowedErrorTypes),
+                                                               extensionNamespace + ":" + errorDefinition, allowedErrorTypes),
                                            exception.getCause());
           };
         }
@@ -80,7 +72,7 @@ public class ModuleExceptionHandler {
         return exception -> {
           throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
               + "in the Error Repository", componentModel.getName(), extensionModel.getName(),
-                                                             extensionNamespace + ":" + errorTypeDefinitionName),
+                                                             extensionNamespace + ":" + errorDefinition),
                                          getExceptionCause(exception));
         };
       }
