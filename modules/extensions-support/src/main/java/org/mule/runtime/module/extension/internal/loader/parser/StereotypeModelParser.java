@@ -12,5 +12,13 @@ import java.util.Optional;
 
 public interface StereotypeModelParser {
 
-  Optional<StereotypeModel> getStereotypeModel();
+  interface ParsedStereotype {
+
+    Optional<StereotypeModel> getStereotypeModel();
+
+    boolean isValidator();
+  }
+
+  ParsedStereotype getParsedStereotype();
+
 }

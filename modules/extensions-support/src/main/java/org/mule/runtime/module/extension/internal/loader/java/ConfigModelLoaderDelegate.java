@@ -6,21 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasStereotypeDeclarer;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.property.NoImplicitModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.CustomStereotypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.StereotypeResolver;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Helper class for declaring configurations through a {@link DefaultJavaModelLoaderDelegate}
@@ -75,8 +81,35 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private void <T extends HasStereotypeDeclarer & HasModelProperties> parseStereotype(StereotypeModelParser parser,
                                                                                       T declarer,
-                                                                                      Optional<StereotypeModelParser> fallback) {
-    
+                                                                                      Optional<Supplier<StereotypeModel>> fallback) {
+
+    StereotypeModelParser.ParsedStereotype stereotype = parser.getParsedStereotype();
+    if (stereotype.isValidator() || stereotype.getStereotypeModel().isPresent()) {
+      declarer.withModelProperty(new CustomStereotypeModelProperty());
+    }
+
+    StereotypeModel model = stereotype.getStereotypeModel()
+        .orElseGet(() -> {
+          if (stereotype.isValidator()) {
+            return getStereotypeModelLoaderDelegate().getValidatorStereotype();
+          } else {
+            return fallback.map(Supplier::get).orElse(null);
+          }
+        });
+
+    if (model != null) {
+      declarer.withStereotype(model);
+    }
+    if (stereotype.isValidator()) {
+
+      declarer.withStereotype(getStereotypeModelLoaderDelegate().getValidatorStereotype());
+    }
+    final StereotypeModel defaultStereotype = createStereotype(config.getName(), CONFIG);
+    ifPresent(config.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+            .map(ExtensionTypeDescriptorModelProperty::getType),
+        type -> resolveStereotype(type, config, defaultStereotype),
+        () -> config.withStereotype(defaultStereotype));
+    componentConfigs = populateComponentConfigsMap(config);
 
   }
 }

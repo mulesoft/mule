@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
@@ -55,6 +54,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
   private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate = new ParameterModelsLoaderDelegate();
+  private StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate;
 
   private Supplier<ErrorsModelFactory> errorsModelFactorySupplier;
 
@@ -74,6 +74,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
+    stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context, "");
     ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, context);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
@@ -211,6 +212,11 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   ConnectionProviderModelLoaderDelegate getConnectionProviderModelLoaderDelegate() {
     return connectionProviderModelLoaderDelegate;
+  }
+
+  StereotypeModelLoaderDelegate getStereotypeModelLoaderDelegate() {
+    checkState(stereotypeModelLoaderDelegate != null, "stereotypeDelegate not yet initialized");
+    return stereotypeModelLoaderDelegate;
   }
 
   ErrorsModelFactory createErrorModelFactory() {
