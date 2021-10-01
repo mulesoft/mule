@@ -9,7 +9,6 @@ package org.mule.functional.junit4.matchers;
 import static org.hamcrest.Matchers.is;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -37,12 +36,10 @@ public class ThrowableMessageMatcher<T extends Throwable> extends TypeSafeMatche
     description.appendDescriptionOf(matcher);
   }
 
-  @Factory
   public static <T extends Throwable> Matcher<T> hasMessage(final Matcher<String> matcher) {
     return new ThrowableMessageMatcher<>(matcher);
   }
 
-  @Factory
   public static <T extends Throwable> Matcher<T> hasMessage(final String expectedMessage) {
     return new ThrowableMessageMatcher<>(is(expectedMessage));
   }
