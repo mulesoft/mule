@@ -14,8 +14,8 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -296,7 +296,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEntityResolverFailOnFirstErrorFeature();
       configureEnableProfilingService();
       configureSetVariableWithNullVale();
-      configureLoadExtensionWithArtifactClassloader();
+      configureStartExtensionComponentsWithArtifactClassloader();
     }
   }
 
@@ -1263,14 +1263,16 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures the {@link MuleRuntimeFeature#LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER} feature flag.
+   * Configures the {@link MuleRuntimeFeature#START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER} feature flag.
    *
    * @since 4.4.0
    */
-  private static void configureLoadExtensionWithArtifactClassloader() {
+  private static void configureStartExtensionComponentsWithArtifactClassloader() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+    featureFlaggingRegistry.registerFeatureFlag(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER,
+                                                featureContext -> featureContext
+                                                    .getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 
 }

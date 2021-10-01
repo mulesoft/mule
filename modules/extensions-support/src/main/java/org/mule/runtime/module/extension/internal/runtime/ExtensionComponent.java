@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
@@ -72,7 +72,6 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
@@ -175,13 +174,24 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected ErrorTypeRepository errorTypeRepository;
 
   @Inject
-  FeatureFlaggingService featureFlaggingService;
+  protected FeatureFlaggingService featureFlaggingService;
 
   private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
   protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
   private Function<CoreEvent, Optional<ConfigurationInstance>> configurationResolver;
+
+  private static Class<ClassLoader> regionClClass;
+
+  static {
+    try {
+      regionClClass = (Class<ClassLoader>) ExtensionComponent.class.getClassLoader()
+          .loadClass("org.mule.runtime.module.artifact.api.classloader.RegionClassLoader");
+    } catch (ClassNotFoundException e) {
+      LOGGER.debug("RegionClassLoader interface not available in current context", e);
+    }
+  }
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                T componentModel,
@@ -212,8 +222,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           .orElseGet(() -> streamingManager.forBytes().getDefaultCursorProviderFactory());
     }
 
-    if (!featureFlaggingService.isEnabled(LOAD_EXTENSION_WITH_ARTIFACT_CLASSLOADER) &&
-        classLoader != null && classLoader.getParent() != null) {
+    if (!featureFlaggingService.isEnabled(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER) &&
+        classLoader != null && classLoader.getParent() != null && regionClClass != null
+        && regionClClass.isAssignableFrom(classLoader.getParent().getClass())) {
       classLoader = from(classLoader, ((RegionClassLoader) classLoader.getParent()).getOwnerClassLoader().getClassLoader());
     }
 
