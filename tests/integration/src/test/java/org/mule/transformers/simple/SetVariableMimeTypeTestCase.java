@@ -8,21 +8,31 @@
 package org.mule.transformers.simple;
 
 import org.junit.Test;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.transformer.types.MimeTypes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 public class SetVariableMimeTypeTestCase extends FunctionalTestCase {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
+            newOptions().method(HttpConstants.Methods.POST.name()).build();
 
     @Override
     protected String getConfigFile()
@@ -47,8 +57,10 @@ public class SetVariableMimeTypeTestCase extends FunctionalTestCase {
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://testInput2", TEST_MESSAGE, null);
-        response.setOutboundProperty("Content-Type", "application/json");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("Content-Type", "application/json");
+        MuleMessage response = client.send("vm://testInput2",
+                new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), HTTP_REQUEST_OPTIONS);
 
         String mimeType = response.getDataType().getMimeType();
 

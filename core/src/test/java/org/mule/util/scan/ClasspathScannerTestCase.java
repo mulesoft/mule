@@ -6,15 +6,26 @@
  */
 package org.mule.util.scan;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.*;
-import org.mule.util.scan.annotations.*;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.BloodOrange;
+import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.OrangeInterface;
+import org.mule.tck.testmodels.fruit.RedApple;
+import org.mule.util.scan.annotations.Marker;
+import org.mule.util.scan.annotations.Meta;
+import org.mule.util.scan.annotations.NonMeta;
+import org.mule.util.scan.annotations.SampleBeanWithAnnotations;
+import org.mule.util.scan.annotations.SampleClassWithAnnotations;
 
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class ClasspathScannerTestCase extends AbstractMuleTestCase
 {
@@ -70,7 +81,6 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    @Ignore("MULE-19814")
     public void testImplementationScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org/mule");
