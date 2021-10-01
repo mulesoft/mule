@@ -35,14 +35,13 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SmallTest
-public class ExtensionComponentTestCase extends AbstractMuleContextTestCase {
+public class ExtensionComponentTestCase {
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
