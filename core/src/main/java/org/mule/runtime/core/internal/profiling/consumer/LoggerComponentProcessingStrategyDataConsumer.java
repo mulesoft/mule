@@ -15,7 +15,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyProfilingUtils.getProcessingStrategyComponentInfoMap;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;

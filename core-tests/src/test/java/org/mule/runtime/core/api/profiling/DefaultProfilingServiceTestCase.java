@@ -155,7 +155,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Description("When a operation started event is produced, then a notification is triggered")
   public void notificationTriggeredOnOperationStartedEvent() {
     ProfilingDataProducer<ComponentThreadingProfilingEventContext> profilingDataProducer =
-            profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
+        profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
     profilingDataProducer.triggerProfilingEvent(mock(ComponentThreadingProfilingEventContext.class));
 
     verify(notificationManager).fireNotification(any(ProfilingNotification.class));

@@ -21,7 +21,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyProfilingUtils.getProcessingStrategyComponentInfoMap;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 

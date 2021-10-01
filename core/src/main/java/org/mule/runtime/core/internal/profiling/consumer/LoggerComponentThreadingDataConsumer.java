@@ -11,7 +11,7 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyProfilingUtils.getComponentThreadingInfoMap;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getComponentThreadingInfoMap;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.google.gson.Gson;

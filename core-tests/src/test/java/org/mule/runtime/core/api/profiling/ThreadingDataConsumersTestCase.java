@@ -17,7 +17,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STA
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyProfilingUtils.getComponentThreadingInfoMap;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getComponentThreadingInfoMap;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
@@ -125,7 +125,9 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
     ProfilingDataProducer<ComponentThreadingProfilingEventContext> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
-    ComponentThreadingProfilingEventContext profilerEventContext = new DefaultComponentThreadingProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE, PROFILING_EVENT_TIMESTAMP);
+    ComponentThreadingProfilingEventContext profilerEventContext =
+        new DefaultComponentThreadingProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
+                                                           PROFILING_EVENT_TIMESTAMP);
     dataProducer.triggerProfilingEvent(profilerEventContext);
 
     verify(logger).debug(jsonToLog(profilingEventType, profilerEventContext));
