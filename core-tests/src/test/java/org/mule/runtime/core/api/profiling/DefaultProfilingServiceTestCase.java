@@ -45,6 +45,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingNotificationListener;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -118,15 +119,16 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   public void correctDiscoveryStrategy() {
     assertThat(profilingService.getDiscoveryStrategy(), instanceOf(CompositeProfilingDataConsumerDiscoveryStrategy.class));
     Set<ProfilingDataConsumer<?>> profilingDataConsumers = profilingService.getDiscoveryStrategy().discover();
-    assertThat(profilingDataConsumers, hasSize(2));
+    assertThat(profilingDataConsumers, hasSize(3));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentProcessingStrategyDataConsumer.class))));
+    assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentThreadingDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(testProfilingDataConsumer));
   }
 
   @Test
   @Description("The notification listener is correctly set so that the notifications are managed")
   public void correctNotificationListenerSet() {
-    verify(notificationManager, times(2)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
+    verify(notificationManager, times(3)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
   }
 
   @Test

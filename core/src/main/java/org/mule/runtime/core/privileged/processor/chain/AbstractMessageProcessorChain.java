@@ -401,12 +401,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   private void triggerOperationExecuted(CoreEvent event, ComponentLocation componentLocation) {
+    if (startingOperationExecutionDataProducer == null) {
+      return;
+    }
     endOperationExecutionDataProducer
         .triggerProfilingEvent(new DefaultComponentThreadingProfilingEventContext(event, componentLocation, currentThread()
             .getName(), getArtifactId(muleContext), getArtifactType(muleContext), currentTimeMillis()));
   }
 
   private void triggerStartingOperation(CoreEvent event, ComponentLocation componentLocation) {
+    if (startingOperationExecutionDataProducer == null) {
+      return;
+    }
     startingOperationExecutionDataProducer
         .triggerProfilingEvent(new DefaultComponentThreadingProfilingEventContext(event, componentLocation, currentThread()
             .getName(), getArtifactId(muleContext), getArtifactType(muleContext), currentTimeMillis()));
@@ -580,8 +586,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
 
-    startingOperationExecutionDataProducer = profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
-    endOperationExecutionDataProducer = profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
+    if (profilingService != null) {
+      startingOperationExecutionDataProducer = profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
+      endOperationExecutionDataProducer = profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
+    }
   }
 
   @Override

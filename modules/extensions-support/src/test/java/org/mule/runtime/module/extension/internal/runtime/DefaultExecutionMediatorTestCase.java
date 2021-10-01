@@ -208,6 +208,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getTransactionConfig()).thenReturn(empty());
     when(operationContext.getRetryPolicyTemplate()).thenReturn(ofNullable(retryPolicy));
     when(operationContext.getCurrentScheduler()).thenReturn(IMMEDIATE_SCHEDULER);
+    when(operationContext.getMuleContext()).thenReturn(muleContext);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
 
