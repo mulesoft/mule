@@ -131,7 +131,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void handleTypedException() {
+  public void handleLegacyModuleExceptionAndCreateTypedException() {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     typeRepository.addErrorType(builder()
@@ -142,6 +142,26 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
 
     ModuleException moduleException =
         new ModuleException(CONNECTIVITY, new RuntimeException());
+    Throwable exception = handler.processException(moduleException);
+
+    assertThat(exception, is(instanceOf(TypedException.class)));
+    ErrorType errorType = ((TypedException) exception).getErrorType();
+    assertThat(errorType.getIdentifier(), is(CONNECTIVITY_ERROR_IDENTIFIER));
+    assertThat(errorType.getNamespace(), is(ERROR_NAMESPACE));
+  }
+
+  @Test
+  public void handleSdkModuleExceptionAndCreateTypedException() {
+    when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    typeRepository.addErrorType(builder()
+        .name(CONNECTIVITY_ERROR_IDENTIFIER)
+        .namespace(ERROR_NAMESPACE)
+        .build(),
+                                getCoreErrorTypeRepo().getAnyErrorType());
+
+    org.mule.sdk.api.exception.ModuleException moduleException =
+        new org.mule.sdk.api.exception.ModuleException(org.mule.sdk.api.error.MuleErrors.CONNECTIVITY, new RuntimeException());
     Throwable exception = handler.processException(moduleException);
 
     assertThat(exception, is(instanceOf(TypedException.class)));
