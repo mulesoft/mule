@@ -9,7 +9,6 @@ package org.mule.tck.junit4.matcher;
 import org.mule.runtime.api.metadata.DataType;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -36,7 +35,6 @@ public class DataTypeCompatibilityMatcher extends TypeSafeMatcher<DataType> {
     mismatchDescription.appendText("got ").appendValue(dataType);
   }
 
-  @Factory
   public static Matcher<DataType> assignableTo(DataType dataType) {
     return new DataTypeCompatibilityMatcher(dataType);
   }
