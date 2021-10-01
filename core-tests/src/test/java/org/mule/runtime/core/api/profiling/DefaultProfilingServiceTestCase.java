@@ -15,10 +15,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -26,6 +28,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
+import org.mockito.Mockito;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,7 +37,9 @@ import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
@@ -141,6 +147,16 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
         profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT);
     profilingDataProducer
         .triggerProfilingEvent(new TestComponentProfilingEventContext());
+
+    verify(notificationManager).fireNotification(any(ProfilingNotification.class));
+  }
+
+  @Test
+  @Description("When a operation started event is produced, then a notification is triggered")
+  public void notificationTriggeredOnOperationStartedEvent() {
+    ProfilingDataProducer<ComponentThreadingProfilingEventContext> profilingDataProducer =
+            profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
+    profilingDataProducer.triggerProfilingEvent(mock(ComponentThreadingProfilingEventContext.class));
 
     verify(notificationManager).fireNotification(any(ProfilingNotification.class));
   }
