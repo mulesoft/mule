@@ -80,11 +80,13 @@ public class DefaultProfilingService extends AbstractProfilingService {
               new ExtensionProfilingDataProducer(DefaultProfilingService.this,
                                                  EXTENSION_PROFILING_EVENT));
           put(STARTING_OPERATION_EXECUTION,
-              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, STARTING_OPERATION_EXECUTION));
+              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, STARTING_OPERATION_EXECUTION,
+                                                          threadSnapshotCollector));
           put(OPERATION_THREAD_RELEASE,
-              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, OPERATION_THREAD_RELEASE));
-          put(OPERATION_EXECUTED,
-              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED));
+              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, OPERATION_THREAD_RELEASE,
+                                                          threadSnapshotCollector));
+          put(OPERATION_EXECUTED, new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED,
+                                                                              threadSnapshotCollector));
         }
       };
 

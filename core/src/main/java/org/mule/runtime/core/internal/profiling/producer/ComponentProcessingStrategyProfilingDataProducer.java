@@ -11,6 +11,7 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 
 /**
  * Default {@link ProfilingDataProducer} returned by a diagnostic service.
@@ -19,7 +20,7 @@ import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
  */
 public class ComponentProcessingStrategyProfilingDataProducer
     implements
-    ProfilingDataProducer<org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext> {
+    ProfilingDataProducer<DefaultComponentProcessingStrategyProfilingEventContext> {
 
   private final DefaultProfilingService defaultProfilingService;
   private final ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType;
@@ -31,7 +32,7 @@ public class ComponentProcessingStrategyProfilingDataProducer
   }
 
   @Override
-  public void triggerProfilingEvent(org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext profilingEventContext) {
+  public void triggerProfilingEvent(DefaultComponentProcessingStrategyProfilingEventContext profilingEventContext) {
     defaultProfilingService.notifyEvent(profilingEventContext, profilingEventType);
   }
 }

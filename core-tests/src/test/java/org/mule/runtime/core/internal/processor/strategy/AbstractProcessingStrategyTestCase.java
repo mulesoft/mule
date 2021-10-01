@@ -313,7 +313,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     when(profilingDataConsumer.getProfilingEventTypes())
         .thenReturn(new HashSet<>(Arrays.asList(PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION, FLOW_EXECUTED,
                                                 PS_SCHEDULING_OPERATION_EXECUTION, PS_STARTING_OPERATION_EXECUTION,
-                PS_OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
+                                                PS_OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
     when(profilingDataConsumer.getEventContextFilter()).thenReturn(processingStrategyProfilingEventContext -> true);
   }
 

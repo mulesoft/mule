@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.profiling.context;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Optional;
@@ -20,8 +21,7 @@ import static java.util.Optional.ofNullable;
  *
  * @since 4.4
  */
-public class ComponentProcessingStrategyProfilingEventContext
-    implements org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext {
+public class DefaultComponentProcessingStrategyProfilingEventContext implements ComponentProcessingStrategyProfilingEventContext {
 
   private final CoreEvent event;
   private final String artifactId;
@@ -30,12 +30,12 @@ public class ComponentProcessingStrategyProfilingEventContext
   private final long profilingEventTimestamp;
   private final Optional<ComponentLocation> location;
 
-  public ComponentProcessingStrategyProfilingEventContext(CoreEvent event,
-                                                          ComponentLocation location,
-                                                          String threadName,
-                                                          String artifactId,
-                                                          String artifactType,
-                                                          long profilingEventTimestamp) {
+  public DefaultComponentProcessingStrategyProfilingEventContext(CoreEvent event,
+                                                                 ComponentLocation location,
+                                                                 String threadName,
+                                                                 String artifactId,
+                                                                 String artifactType,
+                                                                 long profilingEventTimestamp) {
     this.event = event;
     this.threadName = threadName;
     this.artifactId = artifactId;

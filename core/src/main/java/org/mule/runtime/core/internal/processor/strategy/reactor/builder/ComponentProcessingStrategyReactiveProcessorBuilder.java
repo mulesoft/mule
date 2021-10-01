@@ -142,18 +142,17 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
 
     // General structure of processing strategy publishOn -> operation -> publishOn
     return builder
-        .profileEvent(location, psSchedulingOperationExecutionDataProducer, artifactId, artifactType)
+        .profileProcessingStrategyEvent(location, psSchedulingOperationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(dispatcherScheduler))
-        .profileEvent(location, startingOperationExecutionDataProducer, artifactId, artifactType)
+        .profileProcessingStrategyEvent(location, startingOperationExecutionDataProducer, artifactId, artifactType)
         .transform(processor)
-        .profileEvent(location, operationExecutionDataProducer, artifactId, artifactType)
+        .profileProcessingStrategyEvent(location, operationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(callbackScheduler))
-        .profileEvent(location, psFlowMessagePassingDataProducer, artifactId, artifactType)
+        .profileProcessingStrategyEvent(location, psFlowMessagePassingDataProducer, artifactId, artifactType)
         .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, contextScheduler));
   }
 
-  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromProfilingService(
-                                                                                                                ProfilingEventType<T> profilingEventType) {
+  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromProfilingService(ProfilingEventType<T> profilingEventType) {
     return ofNullable(profilingService).map(ds -> ds.getProfilingDataProducer(profilingEventType));
   }
 }

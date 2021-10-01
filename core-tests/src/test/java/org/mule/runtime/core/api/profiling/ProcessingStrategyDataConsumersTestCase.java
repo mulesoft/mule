@@ -38,6 +38,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyPr
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
@@ -130,11 +131,10 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
-    org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext profilerEventContext =
-        new org.mule.runtime.core.internal.profiling.context.ComponentProcessingStrategyProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
-                                                             PROFILING_EVENT_TIMESTAMP);
-    dataProducer.triggerProfilingEvent(
-                                       profilerEventContext);
+    ComponentProcessingStrategyProfilingEventContext profilerEventContext =
+        new DefaultComponentProcessingStrategyProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
+                                                                    PROFILING_EVENT_TIMESTAMP);
+    dataProducer.triggerProfilingEvent(profilerEventContext);
 
     verify(logger).debug(jsonToLog(profilingEventType, profilerEventContext));
   }

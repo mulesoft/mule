@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.profiling.producer;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
@@ -24,15 +25,19 @@ public class ComponentThreadingProfilingDataProducer
 
   private final DefaultProfilingService defaultProfilingService;
   private final ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType;
+  private final ThreadSnapshotCollector threadSnapshotCollector;
 
   public ComponentThreadingProfilingDataProducer(DefaultProfilingService defaultProfilingService,
-                                                 ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType) {
+                                                 ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType,
+                                                 ThreadSnapshotCollector threadSnapshotCollector) {
     this.defaultProfilingService = defaultProfilingService;
     this.profilingEventType = profilingEventType;
+    this.threadSnapshotCollector = threadSnapshotCollector;
   }
 
   @Override
   public void triggerProfilingEvent(ComponentThreadingProfilingEventContext eventContext) {
+    eventContext.setThreadSnapshot(threadSnapshotCollector.getCurrentThreadSnapshot());
     defaultProfilingService.notifyEvent(eventContext, profilingEventType);
   }
 }
