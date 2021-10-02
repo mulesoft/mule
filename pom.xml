@@ -191,7 +191,6 @@
         <shade.plugin.version>3.1.0</shade.plugin.version>
         <build.helper.maven.plugin.version>3.0.0</build.helper.maven.plugin.version>
         <maven.help.plugin.version>2.2</maven.help.plugin.version>
-        <assembly.verifier.version>1.4</assembly.verifier.version>
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
@@ -222,13 +221,13 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
         <oldMuleArtifactVersion>4.3.0</oldMuleArtifactVersion>
-        
+
         <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <groovyVersion>3.0.7</groovyVersion>
-        <assembly.verifier.version>1.4</assembly.verifier.version>
+        <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
         <allureJunitVersion>2.8.1</allureJunitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
@@ -584,29 +583,6 @@
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>${assembly.verifier.version}</version>
-                    <configuration>
-                        <skip>${skipVerifications}</skip>
-                    </configuration>
-                    <dependencies>
-                        <!--
-                            Groovy dependency is handled by Mule differently,
-                            declare the compatible one explicitly for the plugin.
-                        -->
-                        <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy</artifactId>
-                            <version>${groovyVersion}</version>
-                        </dependency>
-                    </dependencies>
-
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila</groupId>
@@ -951,7 +927,7 @@
                 <surefire.args>-agentpath:'${yourkit.agent.path}'=disablestacktelemetry,exceptions=disable,probe_disable=*,listen=all ${surefire.args.base}</surefire.args>
             </properties>
         </profile>
-		<profile>
+        <profile>
             <id>release</id>
             <properties>
                 <skipVerifications>false</skipVerifications>

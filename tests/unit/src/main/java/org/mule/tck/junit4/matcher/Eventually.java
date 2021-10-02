@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
 /**
@@ -30,7 +29,6 @@ public class Eventually<T> extends BaseMatcher {
    *
    * @param matcher the matcher that will be executed until the timeout
    */
-  @Factory
   public static <T> Eventually<T> eventually(Matcher<T> matcher) {
     return new Eventually<T>(matcher);
   }
