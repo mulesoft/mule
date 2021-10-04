@@ -25,6 +25,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.Map;
 import java.util.ServiceConfigurationError;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -81,8 +82,8 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
     request.getSpringComponentModel().setBeanDefinition(wrappedBeanDefinition);
   }
 
-  static void processMuleProperties(ComponentAst component, BeanDefinitionBuilder beanDefinitionBuilder,
-                                    BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
+  private static void processMuleProperties(ComponentAst component, BeanDefinitionBuilder beanDefinitionBuilder,
+                                            BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
     // TODO (MULE-19608) remove this method, by having a component building definition that
     // allows to have the properties being set as any other component
     if (component == null) {
@@ -94,12 +95,16 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
         .contains(component.getIdentifier())) {
       return;
     }
-    component.directChildrenStream()
+    doProcessMuleProperties(beanDefinitionBuilder, component.directChildrenStream()
         .filter(innerComponent -> {
           ComponentIdentifier identifier = innerComponent.getIdentifier();
           return identifier.equals(MULE_PROPERTY_IDENTIFIER)
               || identifier.equals(MULE_PROPERTIES_IDENTIFIER);
-        })
+        }));
+  }
+
+  static void doProcessMuleProperties(BeanDefinitionBuilder beanDefinitionBuilder, Stream<ComponentAst> properties) {
+    properties
         .forEach(propertyComponentModel -> {
           Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
           beanDefinitionBuilder.addPropertyValue(propertyValue.getFirst(), propertyValue.getSecond());
