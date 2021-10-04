@@ -174,24 +174,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected ErrorTypeRepository errorTypeRepository;
 
   @Inject
-  protected FeatureFlaggingService featureFlaggingService;
+  private FeatureFlaggingService featureFlaggingService;
 
   private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
   protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
   private Function<CoreEvent, Optional<ConfigurationInstance>> configurationResolver;
-
-  private static Class<ClassLoader> regionClClass;
-
-  static {
-    try {
-      regionClClass = (Class<ClassLoader>) ExtensionComponent.class.getClassLoader()
-          .loadClass("org.mule.runtime.module.artifact.api.classloader.RegionClassLoader");
-    } catch (ClassNotFoundException e) {
-      LOGGER.debug("RegionClassLoader interface not available in current context", e);
-    }
-  }
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                T componentModel,
@@ -223,9 +212,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
 
     if (!featureFlaggingService.isEnabled(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER) &&
-        classLoader != null && classLoader.getParent() != null && regionClClass != null
-        && regionClClass.isAssignableFrom(classLoader.getParent().getClass())) {
+        classLoader != null && classLoader.getParent() != null &&
+        classLoader.getParent() instanceof RegionClassLoader) {
       classLoader = from(classLoader, ((RegionClassLoader) classLoader.getParent()).getOwnerClassLoader().getClassLoader());
+    }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Starting extensions with %s", classLoader));
     }
 
     withContextClassLoader(classLoader, () -> {

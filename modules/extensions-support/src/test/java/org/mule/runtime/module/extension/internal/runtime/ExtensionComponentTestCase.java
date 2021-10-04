@@ -12,13 +12,11 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.junit.MockitoJUnit.rule;
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,6 +24,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
@@ -35,16 +34,25 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.Issue;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoRule;
+
 @SmallTest
-public class ExtensionComponentTestCase {
+@Issue("MULE-19815")
+public class ExtensionComponentTestCase extends AbstractMuleContextTestCase {
 
   @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
+  public MockitoRule rule = rule();
 
   @Mock
   private FeatureFlaggingService featureFlaggingService;
@@ -64,8 +72,6 @@ public class ExtensionComponentTestCase {
                                                     mock(ComponentModel.class), mock(ConfigurationProvider.class),
                                                     mock(CursorProviderFactory.class), mock(ExtensionManager.class));
 
-    extensionComponent.featureFlaggingService = featureFlaggingService;
-
     RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
     when(regionClassLoader.getOwnerClassLoader()).thenReturn(applicationClassLoader);
     when(applicationClassLoader.getClassLoader()).thenReturn(applicationClassLoader);
@@ -81,14 +87,13 @@ public class ExtensionComponentTestCase {
     when(metadataCacheIdGeneratorFactory.create(any(), any())).thenReturn(null);
     extensionComponent.setCacheIdGeneratorFactory(metadataCacheIdGeneratorFactory);
     executedClassloader.set(null);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
   }
-
-
 
   @Test
   public void testLoadingWithComposite() throws MuleException {
     when(featureFlaggingService.isEnabled(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER)).thenReturn(false);
-    extensionComponent.initialise();
+    initialiseIfNeeded(extensionComponent, muleContext);
     extensionComponent.start();
     assertThat(executedClassloader.get(), instanceOf(CompositeClassLoader.class));
     assertThat(((CompositeClassLoader) executedClassloader.get()).getDelegates().size(), is(2));
@@ -99,12 +104,11 @@ public class ExtensionComponentTestCase {
   @Test
   public void testLoadingWithArtifact() throws MuleException {
     when(featureFlaggingService.isEnabled(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER)).thenReturn(true);
-    extensionComponent.initialise();
+    initialiseIfNeeded(extensionComponent, muleContext);
     extensionComponent.start();
     assertThat(executedClassloader.get(), instanceOf(MuleArtifactClassLoader.class));
     assertThat(executedClassloader.get(), is(artifactClassLoader));
   }
-
 
   private final class TestExtensionComponent extends ExtensionComponent {
 
