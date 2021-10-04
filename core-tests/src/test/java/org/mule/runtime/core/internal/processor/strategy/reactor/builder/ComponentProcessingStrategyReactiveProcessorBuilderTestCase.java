@@ -13,10 +13,10 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
@@ -105,8 +105,8 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
 
     // The profiling data producers are obtained
     verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_FLOW_MESSAGE_PASSING);
-    verify(profilingService, atLeastOnce()).getProfilingDataProducer(OPERATION_EXECUTED);
-    verify(profilingService, atLeastOnce()).getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_OPERATION_EXECUTED);
+    verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_STARTING_OPERATION_EXECUTION);
     verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_SCHEDULING_OPERATION_EXECUTION);
     verify(profilingDataProducer, atLeastOnce()).triggerProfilingEvent(any());
   }

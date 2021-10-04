@@ -7,10 +7,13 @@
 
 package org.mule.runtime.core.internal.profiling.discovery;
 
+import static com.google.common.collect.ImmutableSet.of;
+
 import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 
 import java.util.Set;
 
@@ -23,7 +26,8 @@ public class DefaultProfilingDataConsumerDiscoveryStrategy implements ProfilingD
 
   @Override
   public Set<ProfilingDataConsumer<?>> discover() {
-    return ImmutableSet.of(new LoggerComponentProcessingStrategyDataConsumer());
+    return of(new LoggerComponentProcessingStrategyDataConsumer(),
+              new LoggerComponentThreadingDataConsumer());
   }
 
 }
