@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes;
 
 import static java.lang.String.format;
+import static java.util.Objects.hash;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class SdkStereotypeDefinitionAdapter implements StereotypeDefinition {
@@ -54,5 +56,29 @@ public class SdkStereotypeDefinitionAdapter implements StereotypeDefinition {
   @Override
   public Optional<StereotypeDefinition> getParent() {
     return delegate.getParent().map(SdkStereotypeDefinitionAdapter::new);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    SdkStereotypeDefinitionAdapter that = (SdkStereotypeDefinitionAdapter) o;
+    return Objects.equals(delegate, that.delegate);
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(delegate);
+  }
+
+  @Override
+  public String toString() {
+    return delegate.toString();
   }
 }

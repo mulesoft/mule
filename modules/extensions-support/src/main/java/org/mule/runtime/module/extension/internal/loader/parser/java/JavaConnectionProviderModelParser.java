@@ -62,12 +62,15 @@ import java.util.Set;
  */
 public class JavaConnectionProviderModelParser implements ConnectionProviderModelParser {
 
+  private final JavaExtensionModelParser extensionModelParser;
   private final ConnectionProviderElement element;
-
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
 
-  public JavaConnectionProviderModelParser(ExtensionElement extensionElement, ConnectionProviderElement element) {
+  public JavaConnectionProviderModelParser(JavaExtensionModelParser extensionModelParser,
+                                           ExtensionElement extensionElement,
+                                           ConnectionProviderElement element) {
+    this.extensionModelParser = extensionModelParser;
     this.element = element;
     extensionClassLoader = extensionElement.getDeclaringClass()
         .map(Class::getClassLoader)
@@ -152,6 +155,12 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
     );
 
     return grantTypes.isEmpty() ? empty() : of(new OAuthModelProperty(grantTypes));
+  }
+
+  @Override
+  public ParsedStereotype getParsedStereotype() {
+    return extensionModelParser.getStereotypeLoaderDelegate()
+        .resolveStereotype(element, "Connection Provider", getName());
   }
 
   @Override

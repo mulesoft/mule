@@ -26,9 +26,9 @@ import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Validator;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
-import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
+import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -44,8 +44,12 @@ public class StereotypeResolver {
   protected final WithAnnotations annotatedElement;
   protected final String namespace;
   protected boolean isValidator;
-  protected org.mule.sdk.api.stereotype.StereotypeDefinition stereotypeDefinition;
+  protected StereotypeDefinition stereotypeDefinition;
   protected Map<StereotypeDefinition, StereotypeModel> stereotypesCache;
+
+  public StereotypeResolver() {
+
+  }
 
   protected static StereotypeModel getStereotype(StereotypeDefinition stereotypeDefinition,
                                                  String namespace,
@@ -58,6 +62,31 @@ public class StereotypeResolver {
                                                              + "stereotypes on namespaces other than its own",
                                                          stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
                                                          namespace));
+      }
+
+      String resolvedNamespace = isBlank(stereotypeDefinition.getNamespace()) ? namespace : stereotypeDefinition.getNamespace();
+      final StereotypeModelBuilder builder = newStereotype(stereotypeDefinition.getName(), resolvedNamespace);
+      stereotypeDefinition.getParent().ifPresent(parent -> {
+        String parentNamespace = parent.getNamespace();
+        if (isBlank(parentNamespace)) {
+          parentNamespace = namespace;
+        }
+        builder.withParent(getStereotype(parent, parentNamespace, stereotypesCache));
+      });
+
+      return builder.build();
+    });
+  }
+
+  private StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition) {
+    return computeIfAbsent(stereotypesCache, stereotypeDefinition, definition -> {
+
+      if (!isValidStereotype(stereotypeDefinition, namespace)) {
+        throw new IllegalModelDefinitionException(format(
+            "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
+                + "stereotypes on namespaces other than its own",
+            stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
+            namespace));
       }
 
       String resolvedNamespace = isBlank(stereotypeDefinition.getNamespace()) ? namespace : stereotypeDefinition.getNamespace();
@@ -120,26 +149,6 @@ public class StereotypeResolver {
     if (isValidator) {
       return new StereotypeResolution(empty(), true);
     }
-    return new StereotypeResolution(of(createCustomStereotype()), false);
-    if (validatorAnnotation != null || stereotypeDefinition != null) {
-      if (declaration instanceof BaseDeclaration) {
-        ((BaseDeclaration) declaration).addModelProperty(new CustomStereotypeModelProperty());
-      }
-      if (validatorAnnotation != null) {
-        addValidationStereotype();
-      } else {
-        declaration.withStereotype(createCustomStereotype());
-      }
-    }
-  }
-
-  protected StereotypeModel createCustomStereotype() {
-    return createCustomStereotype(stereotypeDefinition, namespace, stereotypesCache);
-  }
-
-  protected void addValidationStereotype() {
-    declaration.withStereotype(newStereotype(VALIDATOR_DEFINITION.getName(), namespace)
-        .withParent(MuleStereotypes.VALIDATOR)
-        .build());
+    return new StereotypeResolution(of(getStereotype(stereotypeDefinition, namespace, stereotypesCache)), false);
   }
 }

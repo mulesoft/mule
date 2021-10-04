@@ -16,7 +16,7 @@ import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromExtension;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -63,7 +63,7 @@ public final class JavaErrorModelParserUtils {
    * @return a list of {@link ErrorModelParser}.
    */
   public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element) {
-    return getInfoFromExtension(element,
+    return MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(element,
                                 ErrorTypes.class,
                                 org.mule.sdk.api.annotation.error.ErrorTypes.class,
                                 value -> parseErrorTypeDefinitions(value.getClassValue(ErrorTypes::value)),

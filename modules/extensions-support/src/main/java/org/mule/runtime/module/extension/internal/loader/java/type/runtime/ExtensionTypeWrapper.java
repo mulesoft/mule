@@ -10,7 +10,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExtensionInfo;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromExtension;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -53,7 +53,7 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    * {@inheritDoc}
    */
   public List<ConfigurationElement> getConfigurations() {
-    return getInfoFromExtension(
+    return mapReduceExtensionAnnotation(
                                 this,
                                 Configurations.class,
                                 org.mule.sdk.api.annotation.Configurations.class,

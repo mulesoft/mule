@@ -11,13 +11,15 @@ import static java.util.Collections.singletonList;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromExtension;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEntitlementInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getExceptionHandlerModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseExtensionErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
@@ -36,6 +38,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExportedClassNamesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -74,21 +77,26 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<ErrorModelParser> errorModelParsers;
   private final List<MetadataType> exportedTypes = new LinkedList<>();
   private final List<String> exportedResources = new LinkedList<>();
+  private final StereotypeModelLoaderDelegate stereotypeLoaderDelegate;
 
   private List<MetadataType> importedTypes = new LinkedList<>();
   private List<String> privilegedExportedArtifacts = new LinkedList<>();
   private List<String> privilegedExportedPackages = new LinkedList<>();
   private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
-  private Optional<String> namespace;
 
-  public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
+  public JavaExtensionModelParser(ExtensionElement extensionElement,
+                                  StereotypeModelLoaderDelegate stereotypeLoaderDelegate,
+                                  ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
+    this.stereotypeLoaderDelegate = stereotypeLoaderDelegate;
     parseStructure(extensionElement);
   }
 
   private void parseStructure(ExtensionElement extensionElement) {
     xmlDslConfiguration = parseXmlDslConfiguration();
-    namespace = xmlDslConfiguration.map(xml -> xml.getPrefix().toUpperCase());
+
+    // use dummy version since this is just for obtaining the namespace
+    stereotypeLoaderDelegate.setNamespace(getXmlDslModel(extensionElement, "1.0.0", xmlDslConfiguration).getNamespace());
     errorModelParsers = fetchErrorModelParsers();
 
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(extensionElement));
@@ -101,7 +109,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   private void parseSubtypes() {
-    List<Pair<Type, List<Type>>> pairs = parseRepeatableAnnotation(
+    List<Pair<Type, List<Type>>> pairs = mapReduceRepeatableAnnotation(
                                                                    extensionElement,
                                                                    SubTypeMapping.class,
                                                                    org.mule.sdk.api.annotation.SubTypeMapping.class,
@@ -133,7 +141,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   private void parseImportedTypes() {
-    List<Type> types = parseRepeatableAnnotation(extensionElement,
+    List<Type> types = mapReduceRepeatableAnnotation(extensionElement,
                                                  Import.class,
                                                  org.mule.sdk.api.annotation.Import.class,
                                                  container -> ((ImportedTypes) container).value(),
@@ -155,7 +163,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   private void parseExported() {
-    ExportInfo info = getInfoFromExtension(extensionElement,
+    ExportInfo info = mapReduceExtensionAnnotation(extensionElement,
                                            Export.class,
                                            org.mule.sdk.api.annotation.Export.class,
                                            export -> ExportInfo.fromLegacy(export),
@@ -180,7 +188,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   private void parsePrivilegeExport() {
-    getInfoFromExtension(
+    mapReduceExtensionAnnotation(
                          extensionElement,
                          PrivilegedExport.class,
                          org.mule.sdk.api.annotation.PrivilegedExport.class,
@@ -210,11 +218,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   @Override
-  public Optional<String> getNamespace() {
-    return namespace;
-  }
-
-  @Override
   public List<ConfigurationModelParser> getConfigurationParsers() {
     List<ConfigurationElement> configurations = extensionElement.getConfigurations();
     if (configurations.isEmpty()) {
@@ -228,10 +231,10 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public List<OperationModelParser> getOperationModelParsers() {
-    return JavaExtensionModelParserUtils.getOperationParsers(this,
-                                                             extensionElement,
-                                                             extensionElement,
-                                                             loadingContext);
+    return getOperationParsers(this,
+        extensionElement,
+        extensionElement,
+        loadingContext);
   }
 
   @Override
@@ -243,8 +246,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
-    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(extensionElement,
-                                                                           extensionElement.getConnectionProviders());
+    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(this, extensionElement, extensionElement.getConnectionProviders());
   }
 
   @Override
@@ -326,8 +328,12 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     return importedTypes;
   }
 
+  public StereotypeModelLoaderDelegate getStereotypeLoaderDelegate() {
+    return stereotypeLoaderDelegate;
+  }
+
   private Optional<XmlDslConfiguration> parseXmlDslConfiguration() {
-    return getInfoFromExtension(
+    return mapReduceExtensionAnnotation(
                                 extensionElement,
                                 Xml.class,
                                 org.mule.sdk.api.annotation.dsl.xml.Xml.class,

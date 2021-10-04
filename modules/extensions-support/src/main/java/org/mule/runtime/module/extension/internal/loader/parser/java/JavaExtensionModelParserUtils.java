@@ -13,7 +13,6 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromExtension;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -144,11 +143,13 @@ public final class JavaExtensionModelParserUtils {
         .collect(toList());
   }
 
-  public static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(ExtensionElement extensionElement,
-                                                                                      List<ConnectionProviderElement> connectionProviderElements) {
+  public static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(
+      JavaExtensionModelParser extensionModelParser,
+      ExtensionElement extensionElement,
+      List<ConnectionProviderElement> connectionProviderElements) {
 
     return connectionProviderElements.stream()
-        .map(cpElement -> new JavaConnectionProviderModelParser(extensionElement, cpElement))
+        .map(cpElement -> new JavaConnectionProviderModelParser(extensionModelParser, extensionElement, cpElement))
         .collect(toList());
   }
 
@@ -275,7 +276,7 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static Optional<RequiresEnterpriseLicenseInfo> getRequiresEnterpriseLicenseInfo(ExtensionElement extensionElement) {
-    return getInfoFromExtension(extensionElement, RequiresEnterpriseLicense.class,
+    return MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(extensionElement, RequiresEnterpriseLicense.class,
                                 org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class,
                                 value -> new RequiresEnterpriseLicenseInfo(value
                                     .getBooleanValue(RequiresEnterpriseLicense::allowEvaluationLicense)),
@@ -284,7 +285,7 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static Optional<RequiresEntitlementInfo> getRequiresEntitlementInfo(ExtensionElement extensionElement) {
-    return getInfoFromExtension(
+    return MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(
                                 extensionElement,
                                 RequiresEntitlement.class,
                                 org.mule.sdk.api.annotation.license.RequiresEntitlement.class,

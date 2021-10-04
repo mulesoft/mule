@@ -137,7 +137,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
               .map(ExtensionTypeDescriptorModelProperty::getType),
                     type -> resolveStereotype(type, config, defaultStereotype),
                     () -> config.withStereotype(defaultStereotype));
-          componentConfigs = populateComponentConfigsMap(config);
+          componentConfigs = populateCxomponentConfigsMap(config);
         }
 
         @Override

@@ -71,7 +71,7 @@ public final class MuleExtensionAnnotationParser {
                                                             org.mule.sdk.api.annotation.Extension.class.getName()));
   }
 
-  public static <L extends Annotation, A extends Annotation, T> Stream<T> parseRepeatableAnnotation(
+  public static <L extends Annotation, A extends Annotation, T> Stream<T> mapReduceRepeatableAnnotation(
                                                                                                     WithAnnotations element,
                                                                                                     Class<L> legacyAnnotationType,
                                                                                                     Class<A> sdkApiAnnotationType,
@@ -81,13 +81,13 @@ public final class MuleExtensionAnnotationParser {
                                                                                                     Function<AnnotationValueFetcher<A>, T> sdkApiMapping) {
 
     return Stream.concat(
-                         parseRepeatableAnnotation(element, legacyAnnotationType, legacyContainerMapping).map(legacyMapping),
-                         parseRepeatableAnnotation(element, sdkApiAnnotationType, sdkApiContainerMapping).map(sdkApiMapping));
+                         mapReduceRepeatableAnnotation(element, legacyAnnotationType, legacyContainerMapping).map(legacyMapping),
+                         mapReduceRepeatableAnnotation(element, sdkApiAnnotationType, sdkApiContainerMapping).map(sdkApiMapping));
   }
 
-  public static <T extends Annotation> Stream<AnnotationValueFetcher<T>> parseRepeatableAnnotation(WithAnnotations element,
-                                                                                                   Class<T> annotation,
-                                                                                                   Function<Annotation, T[]> containerMapper) {
+  public static <T extends Annotation> Stream<AnnotationValueFetcher<T>> mapReduceRepeatableAnnotation(WithAnnotations element,
+                                                                                                       Class<T> annotation,
+                                                                                                       Function<Annotation, T[]> containerMapper) {
 
     Stream<AnnotationValueFetcher<T>> singleElementStream = element.getValueFromAnnotation(annotation)
         .map(Stream::of)
@@ -257,7 +257,7 @@ public final class MuleExtensionAnnotationParser {
    * @param <T>                     Output generic type
    * @return a reduced value
    */
-  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromExtension(
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> mapReduceExtensionAnnotation(
                                                                                                  ExtensionElement extensionElement,
                                                                                                  Class<R> legacyAnnotationClass,
                                                                                                  Class<S> sdkAnnotationClass,

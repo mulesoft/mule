@@ -7,18 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.parseExternalLibraryModels;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
-import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
@@ -33,7 +28,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
@@ -50,10 +44,10 @@ import java.util.Optional;
  */
 public class JavaConfigurationModelParser extends AbstractJavaModelParser implements ConfigurationModelParser {
 
-  private final ExtensionModelParser extensionModelParser;
+  private final JavaExtensionModelParser extensionModelParser;
   private final ComponentElement configElement;
 
-  public JavaConfigurationModelParser(ExtensionModelParser extensionModelParser,
+  public JavaConfigurationModelParser(JavaExtensionModelParser extensionModelParser,
                                       ExtensionElement extensionElement,
                                       ComponentElement configElement,
                                       ExtensionLoadingContext loadingContext) {
@@ -107,8 +101,10 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
-    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(extensionElement,
-                                                                           configElement.getConnectionProviders());
+    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
+        extensionModelParser,
+        extensionElement,
+        configElement.getConnectionProviders());
   }
 
   @Override
@@ -145,20 +141,9 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   }
 
   @Override
-  public Optional<StereotypeModel> getStereotypeModel() {
-
-    ifPresent(config.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-            .map(ExtensionTypeDescriptorModelProperty::getType),
-        type -> resolveStereotype(type, config, defaultStereotype),
-        () -> config.withStereotype(defaultStereotype));
-    componentConfigs = populateComponentConfigsMap(config);
-
-    final StereotypeModel defaultStereotype = createStereotype(config.getName(), CONFIG);
-    ifPresent(config.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-            .map(ExtensionTypeDescriptorModelProperty::getType),
-        type -> resolveStereotype(type, config, defaultStereotype),
-        () -> config.withStereotype(defaultStereotype));
-    componentConfigs = populateComponentConfigsMap(config);
+  public ParsedStereotype getParsedStereotype() {
+    return extensionModelParser.getStereotypeLoaderDelegate()
+        .resolveStereotype(configElement, "Configuration", getName());
   }
 
   private void checkConfigurationIsNotAnOperation(ExtensionElement extensionElement, ComponentElement componentElement) {
