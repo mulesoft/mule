@@ -49,7 +49,7 @@ public class SetVariableMimeTypeTestCase extends FunctionalTestCase {
 
         DataType dataType = (DataType) response.getPayload();
 
-        assertThat(dataType, DataTypeMatcher.like(String.class, MimeTypes.APPLICATION_JSON, UTF_16.name()));
+        assertThat(dataType.getMimeType(), equalTo(MimeTypes.APPLICATION_JSON));
     }
 
     @Test
@@ -62,9 +62,9 @@ public class SetVariableMimeTypeTestCase extends FunctionalTestCase {
         MuleMessage response = client.send("vm://testInput2",
                 new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), HTTP_REQUEST_OPTIONS);
 
-        String mimeType = response.getDataType().getMimeType();
+        DataType dataType = (DataType) response.getPayload();
 
-        assertThat(mimeType, equalTo(MimeTypes.APPLICATION_JSON));
+        assertThat(dataType.getMimeType(), equalTo(MimeTypes.APPLICATION_JSON));
     }
 
     @Test
@@ -74,10 +74,10 @@ public class SetVariableMimeTypeTestCase extends FunctionalTestCase {
 
         MuleMessage response = client.send("vm://testInput3", TEST_MESSAGE, null);
 
-        String mimeType = response.getDataType().getMimeType();
+        DataType dataType = (DataType) response.getPayload();
 
-        assertThat(mimeType, equalTo(MimeTypes.ANY));
-        assertThat(mimeType, equalTo("*/*"));
+        assertThat(dataType.getMimeType(), equalTo(MimeTypes.ANY));
+        assertThat(dataType.getMimeType(), equalTo("*/*"));
 
     }
 

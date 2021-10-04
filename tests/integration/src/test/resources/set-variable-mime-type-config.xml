@@ -8,7 +8,7 @@
     <flow name="mimeTypeOnly">
         <vm:inbound-endpoint path="testInput1" exchange-pattern="request-response"/>
 
-        <set-variable variableName="testVariable" value="#['test']" encoding="UTF-16" mimeType="application/json"/>
+        <set-variable variableName="testVariable" value="#[payload]" mimeType="application/json"/>
 
         <component class="org.mule.transformers.simple.SetVariableMimeTypeTestCase$FlowVariableDataTypeAccessor"/>
     </flow>
@@ -16,7 +16,7 @@
     <flow name="contentTypeOnly">
         <vm:inbound-endpoint path="testInput2" exchange-pattern="request-response"/>
 
-        <set-variable variableName="testVariable" value="#['test']" encoding="UTF-16"/>
+        <set-variable variableName="testVariable" value="#[payload]"/>
 
         <component class="org.mule.transformers.simple.SetVariableMimeTypeTestCase$FlowVariableDataTypeAccessor"/>
     </flow>
@@ -24,7 +24,7 @@
     <flow name="withoutAnyDataType">
         <vm:inbound-endpoint path="testInput3" exchange-pattern="request-response"/>
 
-        <set-variable variableName="testVariable" value="#['test']" encoding="UTF-16"/>
+        <set-variable variableName="testVariable" value="#[payload]"/>
 
         <component class="org.mule.transformers.simple.SetVariableMimeTypeTestCase$FlowVariableDataTypeAccessor"/>
     </flow>
