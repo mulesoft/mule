@@ -262,7 +262,7 @@ public class MuleContextUtils {
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
-      injectableObjects.put(ProfilingService.class, new DefaultProfilingService());
+      injectableObjects.put(ProfilingService.class, mock(DefaultProfilingService.class));
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));
