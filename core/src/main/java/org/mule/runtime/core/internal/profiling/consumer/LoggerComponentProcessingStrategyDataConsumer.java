@@ -9,18 +9,18 @@ package org.mule.runtime.core.internal.profiling.consumer;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
-import static org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyProfilingUtils.getProcessingStrategyComponentInfoMap;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 
 import com.google.gson.Gson;
 
@@ -33,15 +33,15 @@ import org.slf4j.Logger;
  * A {@link ProfilingDataConsumer} that logs information regarding the processing strategy for components.
  */
 public class LoggerComponentProcessingStrategyDataConsumer
-    implements ProfilingDataConsumer<ProcessingStrategyProfilingEventContext> {
+    implements ProfilingDataConsumer<ComponentProcessingStrategyProfilingEventContext> {
 
   private static final Logger LOGGER = getLogger(LoggerComponentProcessingStrategyDataConsumer.class);
 
   private final Gson gson = new Gson();
 
   @Override
-  public void onProfilingEvent(ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType,
-                               ProcessingStrategyProfilingEventContext profilingEventContext) {
+  public void onProfilingEvent(ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
+                               ComponentProcessingStrategyProfilingEventContext profilingEventContext) {
     Logger logger = getDataConsumerLogger();
     if (logger.isDebugEnabled()) {
       logger.debug(gson.toJson(getProcessingStrategyComponentInfoMap(profilingEventType, profilingEventContext)));
@@ -49,14 +49,14 @@ public class LoggerComponentProcessingStrategyDataConsumer
   }
 
   @Override
-  public Set<ProfilingEventType<ProcessingStrategyProfilingEventContext>> getProfilingEventTypes() {
-    return of(PS_SCHEDULING_OPERATION_EXECUTION, STARTING_OPERATION_EXECUTION, OPERATION_EXECUTED,
+  public Set<ProfilingEventType<ComponentProcessingStrategyProfilingEventContext>> getProfilingEventTypes() {
+    return of(PS_SCHEDULING_OPERATION_EXECUTION, PS_STARTING_OPERATION_EXECUTION, PS_OPERATION_EXECUTED,
               PS_FLOW_MESSAGE_PASSING, PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION,
               FLOW_EXECUTED);
   }
 
   @Override
-  public Predicate<ProcessingStrategyProfilingEventContext> getEventContextFilter() {
+  public Predicate<ComponentProcessingStrategyProfilingEventContext> getEventContextFilter() {
     return processingStrategyProfilingEventContext -> true;
   }
 
