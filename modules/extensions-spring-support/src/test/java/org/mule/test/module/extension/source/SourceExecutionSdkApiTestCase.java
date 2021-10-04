@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class SourceNotificationSdkApiTestCase extends AbstractExtensionFunctionalTestCase {
+public class SourceExecutionSdkApiTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final int TIMEOUT = 5000;
   private static final int DELAY = 100;
