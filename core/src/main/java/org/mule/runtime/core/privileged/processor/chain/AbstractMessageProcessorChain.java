@@ -342,8 +342,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .transform(doOnNextOrErrorWithContext(TCCL_REACTOR_CTX_CONSUMER)
             .andThen(next)
             // #1 Set back previous TCCL.
-            .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_CONSUMER)))
-        .doOnNext(event -> afterProcessorInSameThread(event, (Processor) processor)));
+            .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_CONSUMER))));
 
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
