@@ -7,13 +7,15 @@
 package org.mule.test.module.extension.source;
 
 import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.test.petstore.extension.PetStoreSimpleSourceWithSdkApi.ON_ERROR_CALL_COUNT;
+import static org.mule.test.petstore.extension.PetStoreSimpleSourceWithSdkApi.ON_SUCCESS_CALL_COUNT;
+import static org.mule.test.petstore.extension.PetStoreSimpleSourceWithSdkApi.ON_TERMINATE_CALL_COUNT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.petstore.extension.PetStoreSimpleSourceWithSdkApi;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -40,15 +42,15 @@ public class SourceExecutionSdkApiTestCase extends AbstractExtensionFunctionalTe
   @Test
   public void onSuccessMethodCall() throws Exception {
     startFlow("onSuccessMethodCallFlow");
-    check(TIMEOUT, DELAY, () -> PetStoreSimpleSourceWithSdkApi.ON_SUCCESS_CALL_COUNT > 0);
-    check(TIMEOUT, DELAY, () -> PetStoreSimpleSourceWithSdkApi.ON_TERMINATE_CALL_COUNT > 0);
+    check(TIMEOUT, DELAY, () -> ON_SUCCESS_CALL_COUNT > 0);
+    check(TIMEOUT, DELAY, () -> ON_TERMINATE_CALL_COUNT > 0);
   }
 
   @Test
   public void onErrorMethodCall() throws Exception {
     startFlow("onErrorMethodCallFlow");
-    check(TIMEOUT, DELAY, () -> PetStoreSimpleSourceWithSdkApi.ON_ERROR_CALL_COUNT > 0);
-    check(TIMEOUT, DELAY, () -> PetStoreSimpleSourceWithSdkApi.ON_TERMINATE_CALL_COUNT > 0);
+    check(TIMEOUT, DELAY, () -> ON_ERROR_CALL_COUNT > 0);
+    check(TIMEOUT, DELAY, () -> ON_TERMINATE_CALL_COUNT > 0);
   }
 
   private void startFlow(String flowName) throws Exception {

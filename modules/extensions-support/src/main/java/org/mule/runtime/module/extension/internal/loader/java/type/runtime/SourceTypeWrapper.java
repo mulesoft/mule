@@ -28,7 +28,6 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -108,9 +107,7 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
   }
 
   private Collection<Method> getMethodAnnotatedWith(Class<?> searchClass, Class<? extends Annotation>... annotationTypes) {
-    Collection<Method> methods = new ArrayList<>();
-    Stream.of(annotationTypes)
-        .forEach(annotationType -> methods.addAll(getMethodsAnnotatedWith(searchClass, annotationType, false)));
-    return methods;
+    return Stream.of(annotationTypes).map(annotationType -> getMethodsAnnotatedWith(searchClass, annotationType, false))
+        .flatMap(Collection::stream).collect(toList());
   }
 }
