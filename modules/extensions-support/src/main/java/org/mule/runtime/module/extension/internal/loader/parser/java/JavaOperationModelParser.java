@@ -56,7 +56,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
@@ -84,7 +83,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                                VoidCompletionCallback.class,
                                                                                org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
 
-  private final ExtensionModelParser extensionModelParser;
+  private final JavaExtensionModelParser extensionModelParser;
   private final OperationElement operationElement;
   private final OperationContainerElement operationContainer;
   private final OperationContainerElement enclosingType;
@@ -99,7 +98,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private boolean autoPaging = false;
   private List<ExtensionParameter> routes = emptyList();
 
-  public JavaOperationModelParser(ExtensionModelParser extensionModelParser,
+  public JavaOperationModelParser(JavaExtensionModelParser extensionModelParser,
                                   ExtensionElement extensionElement,
                                   OperationContainerElement operationContainer,
                                   OperationElement operationElement,
@@ -464,6 +463,19 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public Optional<DisplayModel> getDisplayModel() {
     return JavaExtensionModelParserUtils.getDisplayModel(operationElement, "operation", operationElement.getName());
+  }
+
+  @Override
+  public ParsedStereotype getParsedStereotype() {
+    ParsedStereotype stereotype = extensionModelParser.getStereotypeLoaderDelegate()
+        .resolveStereotype(operationElement, "Operation", getName());
+
+    if (!stereotype.getStereotypeModel().isPresent() && !stereotype.isValidator()) {
+      stereotype = extensionModelParser.getStereotypeLoaderDelegate()
+          .resolveStereotype(operationElement.getEnclosingType(), "Operation", getName());
+    }
+
+    return stereotype;
   }
 
   @Override

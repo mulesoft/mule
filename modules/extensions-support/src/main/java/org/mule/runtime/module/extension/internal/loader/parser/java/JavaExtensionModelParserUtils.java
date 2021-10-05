@@ -58,7 +58,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithOperationConta
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
@@ -124,7 +123,7 @@ public final class JavaExtensionModelParserUtils {
   }
 
 
-  public static List<OperationModelParser> getOperationParsers(ExtensionModelParser extensionModelParser,
+  public static List<OperationModelParser> getOperationParsers(JavaExtensionModelParser extensionModelParser,
                                                                ExtensionElement extensionElement,
                                                                WithOperationContainers operationContainers,
                                                                ExtensionLoadingContext loadingContext) {

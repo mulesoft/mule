@@ -101,6 +101,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
             .describedAs(chain.getDescription())
             .setRequired(chain.isRequired());
         addSemanticTerms(chainDeclarer.getDeclaration(), chain);
+        chainDeclarer.withAllowedStereotypes()
       });
 
       parseErrorModels(operation, parser);
