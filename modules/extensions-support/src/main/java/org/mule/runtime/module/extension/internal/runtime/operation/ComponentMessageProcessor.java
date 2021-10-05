@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -63,6 +64,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -244,6 +246,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private ProfilingService profilingService;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -1152,14 +1157,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
-                                        getThreadReleaseDataProducer(profilingService));
+                                        getThreadReleaseDataProducer());
   }
 
-  private ProfilingDataProducer<ComponentThreadingProfilingEventContext> getThreadReleaseDataProducer(ProfilingService profilingService) {
-    if (profilingService == null) {
-      return null;
-    } else {
+  private boolean isProfilingEnabled() {
+    return profilingService != null && featureFlaggingService != null && featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE);
+  }
+
+  private ProfilingDataProducer<ComponentThreadingProfilingEventContext> getThreadReleaseDataProducer() {
+    if (isProfilingEnabled()) {
       return profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE);
+    } else {
+      return null;
     }
   }
 
