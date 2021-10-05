@@ -1161,7 +1161,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private boolean isProfilingEnabled() {
-    return profilingService != null && featureFlaggingService != null && featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE);
+    return profilingService != null && featureFlaggingService != null
+        && featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE);
   }
 
   private ProfilingDataProducer<ComponentThreadingProfilingEventContext> getThreadReleaseDataProducer() {
