@@ -11,7 +11,7 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.processMuleProperties;
+import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.doProcessMuleProperties;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
@@ -20,7 +20,9 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
+import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -81,4 +83,15 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentB
 
     return true;
   }
+
+  private void processMuleProperties(ComponentAst component, BeanDefinitionBuilder beanDefinitionBuilder,
+                                     BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
+    // TODO (MULE-19608) remove this method, by having a component building definition that
+    // allows to have the properties being set as any other component
+    doProcessMuleProperties(beanDefinitionBuilder,
+                            ((List<ComponentAst>) component.getParameter("General", "property")
+                                .getValue().getRight())
+                                    .stream());
+  }
+
 }
