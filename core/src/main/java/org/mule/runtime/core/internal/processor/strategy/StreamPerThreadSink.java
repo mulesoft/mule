@@ -110,6 +110,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
   public void dispose() {
     disposing = true;
     sinks.asMap().values().forEach(sink -> sink.complete());
+    sinksNestedTx.asMap().values().forEach(sink -> sink.complete());
 
     final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
     long startMillis = currentTimeMillis();
@@ -129,6 +130,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
                     flowConstruct.getName());
       }
       sinks.invalidateAll();
+      sinksNestedTx.invalidateAll();
     } else if (disponsableSinks.get() != 0) {
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
         throw new IllegalStateException(format("TX Subscribers of ProcessingStrategy for flow '%s' not completed in %d ms",
@@ -139,6 +141,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
                     shutdownTimeout);
       }
       sinks.invalidateAll();
+      sinksNestedTx.invalidateAll();
     }
   }
 }
