@@ -11,29 +11,23 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static java.util.Optional.empty;
 import static java.lang.String.format;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
-import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
-import org.mule.runtime.core.internal.profiling.producer.ComponentThreadingProfilingDataProducer;
 import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
-import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,8 +48,6 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
-  private ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
-
   protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
       new HashMap() {
 
@@ -68,25 +60,17 @@ public class DefaultProfilingService extends AbstractProfilingService {
               new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION));
           put(PS_FLOW_MESSAGE_PASSING,
               new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING));
-          put(PS_OPERATION_EXECUTED,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_OPERATION_EXECUTED));
+          put(OPERATION_EXECUTED,
+              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED));
           put(PS_SCHEDULING_OPERATION_EXECUTION,
               new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
                                                                    PS_SCHEDULING_OPERATION_EXECUTION));
-          put(PS_STARTING_OPERATION_EXECUTION,
+          put(STARTING_OPERATION_EXECUTION,
               new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
-                                                                   PS_STARTING_OPERATION_EXECUTION));
+                                                                   STARTING_OPERATION_EXECUTION));
           put(EXTENSION_PROFILING_EVENT,
               new ExtensionProfilingDataProducer(DefaultProfilingService.this,
                                                  EXTENSION_PROFILING_EVENT));
-          put(STARTING_OPERATION_EXECUTION,
-              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, STARTING_OPERATION_EXECUTION,
-                                                          threadSnapshotCollector));
-          put(OPERATION_THREAD_RELEASE,
-              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, OPERATION_THREAD_RELEASE,
-                                                          threadSnapshotCollector));
-          put(OPERATION_EXECUTED, new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED,
-                                                                              threadSnapshotCollector));
         }
       };
 
@@ -94,11 +78,6 @@ public class DefaultProfilingService extends AbstractProfilingService {
   public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
                                                                               ProfilingDataProducer<T> profilingDataProducer) {
     profilingDataProducers.put(profilingEventType, profilingDataProducer);
-  }
-
-  @Override
-  public ThreadSnapshotCollector getThreadSnapshotCollector() {
-    return threadSnapshotCollector;
   }
 
   @Override
@@ -115,7 +94,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
     Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies = new HashSet<>();
     discoveryStrategies.add(new DefaultProfilingDataConsumerDiscoveryStrategy());
-    this.profilingDataConsumerDiscoveryStrategies.ifPresent(discoveryStrategies::addAll);
+    this.profilingDataConsumerDiscoveryStrategies.map(discoveryStrategies::addAll);
     return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies);
   }
 

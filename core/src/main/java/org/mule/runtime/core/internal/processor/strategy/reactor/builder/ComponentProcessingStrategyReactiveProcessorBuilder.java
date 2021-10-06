@@ -7,10 +7,10 @@
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
@@ -20,7 +20,7 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
@@ -128,13 +128,13 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
                                                                                                   ReactorPublisherBuilder<T> builder) {
 
     // Profiling data producers
-    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> psSchedulingOperationExecutionDataProducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> psSchedulingOperationExecutionDataProducer =
         dataProducerFromProfilingService(PS_SCHEDULING_OPERATION_EXECUTION);
-    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> startingOperationExecutionDataProducer =
-        dataProducerFromProfilingService(PS_STARTING_OPERATION_EXECUTION);
-    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> operationExecutionDataProducer =
-        dataProducerFromProfilingService(PS_OPERATION_EXECUTED);
-    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> psFlowMessagePassingDataProducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> startingOperationExecutionDataProducer =
+        dataProducerFromProfilingService(STARTING_OPERATION_EXECUTION);
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> operationExecutionDataProducer =
+        dataProducerFromProfilingService(OPERATION_EXECUTED);
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> psFlowMessagePassingDataProducer =
         dataProducerFromProfilingService(PS_FLOW_MESSAGE_PASSING);
 
     // location
@@ -142,17 +142,18 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
 
     // General structure of processing strategy publishOn -> operation -> publishOn
     return builder
-        .profileProcessingStrategyEvent(location, psSchedulingOperationExecutionDataProducer, artifactId, artifactType)
+        .profileEvent(location, psSchedulingOperationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(dispatcherScheduler))
-        .profileProcessingStrategyEvent(location, startingOperationExecutionDataProducer, artifactId, artifactType)
+        .profileEvent(location, startingOperationExecutionDataProducer, artifactId, artifactType)
         .transform(processor)
-        .profileProcessingStrategyEvent(location, operationExecutionDataProducer, artifactId, artifactType)
+        .profileEvent(location, operationExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(callbackScheduler))
-        .profileProcessingStrategyEvent(location, psFlowMessagePassingDataProducer, artifactId, artifactType)
+        .profileEvent(location, psFlowMessagePassingDataProducer, artifactId, artifactType)
         .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, contextScheduler));
   }
 
-  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromProfilingService(ProfilingEventType<T> profilingEventType) {
+  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromProfilingService(
+                                                                                                                ProfilingEventType<T> profilingEventType) {
     return ofNullable(profilingService).map(ds -> ds.getProfilingDataProducer(profilingEventType));
   }
 }

@@ -17,7 +17,6 @@ import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -76,9 +75,6 @@ import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -241,9 +237,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private CursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
-
-  @Inject
-  private ProfilingService profilingService;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -1151,16 +1144,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         createInterceptorChain(),
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
-                                        resultTransformer,
-                                        getThreadReleaseDataProducer(profilingService));
-  }
-
-  private ProfilingDataProducer<ComponentThreadingProfilingEventContext> getThreadReleaseDataProducer(ProfilingService profilingService) {
-    if (profilingService == null) {
-      return null;
-    } else {
-      return profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE);
-    }
+                                        resultTransformer);
   }
 
   protected InterceptorChain createInterceptorChain() {

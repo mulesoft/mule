@@ -8,7 +8,7 @@
 package org.mule.runtime.core.internal.profiling.context;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Optional;
@@ -16,12 +16,11 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 
 /**
- * A {@link org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext} that encapsulates data
- * for the profiling event.
+ * A {@link ProcessingStrategyProfilingEventContext} that encapsulates data for the profiling event.
  *
  * @since 4.4
  */
-public class DefaultComponentProcessingStrategyProfilingEventContext implements ComponentProcessingStrategyProfilingEventContext {
+public class ComponentProcessingStrategyProfilingEventContext implements ProcessingStrategyProfilingEventContext {
 
   private final CoreEvent event;
   private final String artifactId;
@@ -30,12 +29,12 @@ public class DefaultComponentProcessingStrategyProfilingEventContext implements 
   private final long profilingEventTimestamp;
   private final Optional<ComponentLocation> location;
 
-  public DefaultComponentProcessingStrategyProfilingEventContext(CoreEvent event,
-                                                                 ComponentLocation location,
-                                                                 String threadName,
-                                                                 String artifactId,
-                                                                 String artifactType,
-                                                                 long profilingEventTimestamp) {
+  public ComponentProcessingStrategyProfilingEventContext(CoreEvent event,
+                                                          ComponentLocation location,
+                                                          String threadName,
+                                                          String artifactId,
+                                                          String artifactType,
+                                                          long profilingEventTimestamp) {
     this.event = event;
     this.threadName = threadName;
     this.artifactId = artifactId;

@@ -21,7 +21,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -95,24 +95,24 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
                                                                                                   ReactorPublisherBuilder<T> publisher) {
 
     ComponentLocation location = getLocation(pipeline);
-    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> psSchedulingFlowExecutionDataProducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> psSchedulingFlowExecutionDataProducer =
         dataProducerFromProfilingService(PS_SCHEDULING_FLOW_EXECUTION);
-    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> startingFlowExecutionDataproducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> startingFlowExecutionDataproducer =
         dataProducerFromProfilingService(STARTING_FLOW_EXECUTION);
-    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> flowExecutedDataProducer =
+    Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> flowExecutedDataProducer =
         dataProducerFromProfilingService(FLOW_EXECUTED);
 
     return publisher
-        .profileProcessingStrategyEvent(location, psSchedulingFlowExecutionDataProducer, artifactId, artifactType)
+        .profileEvent(location, psSchedulingFlowExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(scheduler))
-        .profileProcessingStrategyEvent(location, startingFlowExecutionDataproducer, artifactId, artifactType)
+        .profileEvent(location, startingFlowExecutionDataproducer, artifactId, artifactType)
         .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
         .transform(pipeline)
-        .profileProcessingStrategyEvent(location, flowExecutedDataProducer, artifactId, artifactType);
+        .profileEvent(location, flowExecutedDataProducer, artifactId, artifactType);
   }
 
-  private Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> dataProducerFromProfilingService(
-                                                                                                                             ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType) {
+  private Optional<ProfilingDataProducer<ProcessingStrategyProfilingEventContext>> dataProducerFromProfilingService(
+                                                                                                                    ProfilingEventType<ProcessingStrategyProfilingEventContext> profilingEventType) {
     if (profilingService == null) {
       return empty();
     } else {
