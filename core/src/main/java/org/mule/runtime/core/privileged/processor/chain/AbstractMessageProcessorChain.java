@@ -11,7 +11,6 @@ import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.replace;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -46,7 +45,6 @@ import static reactor.core.publisher.Operators.lift;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -160,9 +158,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Inject
   private ProfilingService profilingService;
-
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
 
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext> startingOperationExecutionDataProducer;
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext> endOperationExecutionDataProducer;
@@ -591,15 +586,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
 
-    if (isProfilingEnabled()) {
+    if (profilingService != null) {
       startingOperationExecutionDataProducer = profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
       endOperationExecutionDataProducer = profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
     }
-  }
-
-  private boolean isProfilingEnabled() {
-    return profilingService != null && featureFlaggingService != null
-        && featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE);
   }
 
   @Override
