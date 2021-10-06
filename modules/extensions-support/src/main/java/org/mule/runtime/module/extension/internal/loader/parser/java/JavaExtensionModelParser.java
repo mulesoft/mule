@@ -96,7 +96,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     xmlDslConfiguration = parseXmlDslConfiguration();
 
     // use dummy version since this is just for obtaining the namespace
-    stereotypeLoaderDelegate.setNamespace(getXmlDslModel(extensionElement, "1.0.0", xmlDslConfiguration).getNamespace());
+    stereotypeLoaderDelegate.setNamespace(getXmlDslModel(extensionElement, "1.0.0", xmlDslConfiguration).getPrefix());
     errorModelParsers = fetchErrorModelParsers();
 
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(extensionElement));

@@ -15,5 +15,7 @@ public interface StereotypeModelFactory {
 
   StereotypeModel getProcessorParentStereotype();
 
+  StereotypeModel getSourceParentStereotype();
+
   StereotypeModel getValidatorStereotype();
 }

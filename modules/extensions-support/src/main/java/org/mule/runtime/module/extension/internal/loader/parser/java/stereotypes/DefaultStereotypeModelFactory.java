@@ -14,14 +14,12 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.VALIDATOR;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -31,32 +29,22 @@ import org.mule.sdk.api.stereotype.StereotypeDefinition;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
-
 public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
-  private String namespace;
 
   private final Map<StereotypeDefinition, StereotypeModel> stereotypesCache = new HashMap<>();
-  private final Multimap<ComponentDeclaration, ConfigurationDeclaration> componentConfigs = LinkedListMultimap.create();
-  private final StereotypeModel sourceParent;
-  private final StereotypeModel processorParent;
-  private final ClassTypeLoader typeLoader;
   private final DslResolvingContext dslResolvingContext;
-  private final LazyValue<StereotypeModel> validatorStereotype;
 
+  private String namespace;
+  private StereotypeModel sourceParent;
+  private StereotypeModel processorParent;
+  private StereotypeModel validatorStereotype;
+
+  private final ClassTypeLoader typeLoader;
   public DefaultStereotypeModelFactory(ExtensionLoadingContext extensionLoadingContext) {
     dslResolvingContext = extensionLoadingContext.getDslResolvingContext();
     this.typeLoader =
         new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
-    this.processorParent = newStereotype(PROCESSOR.getType(), namespace).withParent(PROCESSOR).build();
-    this.sourceParent = newStereotype(SOURCE.getType(), namespace).withParent(SOURCE).build();
-    validatorStereotype = new LazyValue<>(() -> newStereotype(VALIDATOR_DEFINITION.getName(), namespace)
-        .withParent(org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR)
-        .build());
-
-
 //    resolveDeclaredTypesStereotypes(declaration, namespace);
   }
 
@@ -72,8 +60,22 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
   }
 
   @Override
+  public StereotypeModel getSourceParentStereotype() {
+    return sourceParent;
+  }
+
+  @Override
   public StereotypeModel getValidatorStereotype() {
-    return validatorStereotype.get();
+    return validatorStereotype;
+  }
+
+  public void setNamespace(String namespace) {
+    this.namespace = namespace;
+    processorParent = newStereotype(PROCESSOR.getType(), namespace).withParent(PROCESSOR).build();
+    sourceParent = newStereotype(SOURCE.getType(), namespace).withParent(SOURCE).build();
+    validatorStereotype = newStereotype(VALIDATOR_DEFINITION.getName(), namespace)
+        .withParent(VALIDATOR)
+        .build();
   }
 
   private StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {

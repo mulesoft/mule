@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Optional.of;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -66,7 +65,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       getStereotypeModelLoaderDelegate().addStereotype(
           parser,
           providerDeclarer,
-          of(() -> getStereotypeModelLoaderDelegate().createStereotype(parser.getName(), CONNECTION)));
+          of(() -> getStereotypeModelLoaderDelegate().getDefaultConnectionProviderStereotype(parser.getName())));
 
       connectionProviderDeclarers.put(parser, providerDeclarer);
     }

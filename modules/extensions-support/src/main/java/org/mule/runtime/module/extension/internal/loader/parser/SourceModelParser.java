@@ -26,7 +26,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface SourceModelParser extends SemanticTermsParser, AdditionalPropertiesModelParser {
+public interface SourceModelParser extends SemanticTermsParser, StereotypeModelParser, AdditionalPropertiesModelParser {
 
   /**
    * @return the source's name
