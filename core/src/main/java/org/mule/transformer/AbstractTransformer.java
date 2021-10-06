@@ -6,6 +6,8 @@
  */
 package org.mule.transformer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.AbstractAnnotatedObject;
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
@@ -29,18 +31,14 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractTransformer</code> is a base class for all transformers.
@@ -88,6 +86,11 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      * Allows a transformer to return a null result
      */
     private boolean allowNullReturn = false;
+
+    /**
+     * Checks if the MIME type is set
+     */
+    private boolean isMimeTypeSet = false;
 
     /*
      *  Mime type and encoding for transformer output
@@ -256,6 +259,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         {
             MimeType mt = new MimeType(mimeType);
             this.mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
+            isMimeTypeSet = true;
         }
         if (returnType != null)
         {
@@ -267,6 +271,11 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     public String getMimeType()
     {
         return mimeType;
+    }
+
+    public boolean isMimeTypeSet()
+    {
+        return isMimeTypeSet;
     }
 
     @Override
