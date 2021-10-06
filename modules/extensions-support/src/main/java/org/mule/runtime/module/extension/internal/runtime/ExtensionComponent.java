@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
@@ -20,6 +21,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -54,6 +56,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -79,6 +82,7 @@ import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
@@ -124,7 +128,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
 
   protected final ExtensionManager extensionManager;
-  protected final ClassLoader classLoader;
+  protected ClassLoader classLoader;
   protected final T componentModel;
 
   protected CursorProviderFactory cursorProviderFactory;
@@ -153,6 +157,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   @Inject
   protected ErrorTypeRepository errorTypeRepository;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
@@ -191,6 +198,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
           .orElseGet(() -> streamingManager.forBytes().getDefaultCursorProviderFactory());
     }
+
+    if (!featureFlaggingService.isEnabled(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER) &&
+        classLoader != null && classLoader.getParent() != null &&
+        classLoader.getParent() instanceof RegionClassLoader) {
+      classLoader = from(classLoader, ((RegionClassLoader) classLoader.getParent()).getOwnerClassLoader().getClassLoader());
+    }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Starting extensions with %s", classLoader));
+    }
+
     withContextClassLoader(classLoader, () -> {
       validateConfigurationProviderIsNotExpression();
       initConfigurationResolver();
