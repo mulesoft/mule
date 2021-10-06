@@ -11,7 +11,6 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -37,6 +36,7 @@ public class JvmThreadSnapshotCollectorTestCase {
 
   private static final ExecutorService executor = newSingleThreadExecutor();
   private static final long TEST_TIME = 10L;
+  private static final long TOO_SHORT_TIME = 1L;
 
   private final Object theSharedLock = new Object();
   private final ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
@@ -49,12 +49,12 @@ public class JvmThreadSnapshotCollectorTestCase {
   }
 
   @Test
-  public void threadWaitedButItDidNotWasteThatTimeTryingToLock() throws InterruptedException {
+  public void threadWaitedButItDidNotWasteTimeTryingToLock() throws InterruptedException {
     synchronized (theSharedLock) {
       sleep(TEST_TIME);
     }
     ThreadSnapshot snapshot = threadSnapshotCollector.getCurrentThreadSnapshot();
-    assertThat(snapshot.getBlockedTime(), is(lessThan(TEST_TIME)));
+    assertThat(snapshot.getBlockedTime(), is(lessThanOrEqualTo(TOO_SHORT_TIME)));
   }
 
   @Test
