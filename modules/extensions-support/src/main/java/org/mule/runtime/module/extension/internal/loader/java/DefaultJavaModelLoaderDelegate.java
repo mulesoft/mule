@@ -74,7 +74,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context, version);
+    stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
     ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, context);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()

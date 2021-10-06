@@ -9,17 +9,26 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.stereotype
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Validator;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public final class JavaStereotypeModelParserUtils {
 
@@ -59,6 +68,29 @@ public final class JavaStereotypeModelParserUtils {
         ? of(factory.createStereotype(stereotypeDefinition))
         : empty();
   }
+
+  public static List<StereotypeModel> getAllowedStereotypes(WithAnnotations element, StereotypeModelFactory factory) {
+    return concat(
+        getAllowedTypeStream(element,
+            AllowedStereotypes.class,
+            AllowedStereotypes::value),
+        getAllowedTypeStream(element,
+            org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes.class,
+            org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes::value)
+    )
+        .map(type -> factory.createStereotype(from(type.getDeclaringClass().get())))
+        .collect(toList());
+  }
+
+  private static <A extends Annotation> Stream<Type> getAllowedTypeStream(WithAnnotations element,
+                                                                          Class<A> annotationType,
+                                                                          Function<A, Class[]> mapper) {
+    return element.getValueFromAnnotation(annotationType)
+        .map(value -> value.getClassArrayValue(mapper).stream()
+            .filter(type -> type.getDeclaringClass().isPresent())
+        ).orElse(Stream.empty());
+  }
+
 
   private JavaStereotypeModelParserUtils() {
   }

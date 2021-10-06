@@ -419,7 +419,7 @@ public final class JavaExtensionModelParserUtils {
   }
 
   private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
-    return mapReduceExtensionAnnotation(
+    return MuleExtensionAnnotationParser.mapReduceAnnotation(
                                  element,
                                  Deprecated.class,
                                  org.mule.sdk.api.annotation.deprecated.Deprecated.class,

@@ -16,7 +16,6 @@ import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -63,7 +62,7 @@ public final class JavaErrorModelParserUtils {
    * @return a list of {@link ErrorModelParser}.
    */
   public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element) {
-    return MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(element,
+    return mapReduceExtensionAnnotation(element,
                                 ErrorTypes.class,
                                 org.mule.sdk.api.annotation.error.ErrorTypes.class,
                                 value -> parseErrorTypeDefinitions(value.getClassValue(ErrorTypes::value)),
@@ -84,7 +83,7 @@ public final class JavaErrorModelParserUtils {
                                                                  ExtensionElement extensionElement,
                                                                  OperationElement operation) {
     return getThrowsDeclaration(operation, extensionElement)
-        .flatMap(withThrows -> mapReduceExtensionAnnotation(
+        .flatMap(withThrows -> MuleExtensionAnnotationParser.mapReduceAnnotation(
                                                      withThrows,
                                                      Throws.class,
                                                      org.mule.sdk.api.annotation.error.Throws.class,
@@ -114,7 +113,7 @@ public final class JavaErrorModelParserUtils {
   public static java.util.Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty(WithAnnotations element,
                                                                                                    String elementType,
                                                                                                    String elementName) {
-    Optional<Type> classValue = MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(
+    Optional<Type> classValue = mapReduceExtensionAnnotation(
                                                       element,
                                                       elementType,
                                                       elementName,

@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensi
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 
 /**
  * A generic contract for any kind of component that can contain an alias name or description
@@ -27,7 +28,7 @@ public interface WithAlias extends WithAnnotations, WithName {
    * @return The alias of the implementer component
    */
   default String getAlias() {
-    return mapReduceExtensionAnnotation(this,
+    return MuleExtensionAnnotationParser.mapReduceAnnotation(this,
                                  Alias.class,
                                  org.mule.sdk.api.annotation.Alias.class,
                                  value -> value.getStringValue(Alias::value),
@@ -43,7 +44,7 @@ public interface WithAlias extends WithAnnotations, WithName {
    * @return The description of the implementer component
    */
   default String getDescription() {
-    return mapReduceExtensionAnnotation(
+    return MuleExtensionAnnotationParser.mapReduceAnnotation(
                                  this,
                                  Alias.class,
                                  org.mule.sdk.api.annotation.Alias.class,
