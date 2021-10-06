@@ -11,9 +11,11 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
@@ -32,6 +34,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelPar
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,9 +144,8 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   }
 
   @Override
-  public ParsedStereotype getParsedStereotype() {
-    return extensionModelParser.getStereotypeLoaderDelegate()
-        .resolveStereotype(configElement, "Configuration", getName());
+  public Optional<StereotypeModel> getStereotype(StereotypeModelFactory factory) {
+    return resolveStereotype(configElement, "Configuration", getName(), factory);
   }
 
   private void checkConfigurationIsNotAnOperation(ExtensionElement extensionElement, ComponentElement componentElement) {

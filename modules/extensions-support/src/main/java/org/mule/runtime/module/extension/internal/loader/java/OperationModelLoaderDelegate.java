@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -103,6 +105,11 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         addSemanticTerms(chainDeclarer.getDeclaration(), chain);
         chainDeclarer.withAllowedStereotypes()
       });
+
+      getStereotypeModelLoaderDelegate().addStereotype(
+          parser,
+          operation,
+          of(() -> getStereotypeModelLoaderDelegate().getProcessorParentStereotype()));
 
       parseErrorModels(operation, parser);
       operationDeclarers.put(parser, operation);

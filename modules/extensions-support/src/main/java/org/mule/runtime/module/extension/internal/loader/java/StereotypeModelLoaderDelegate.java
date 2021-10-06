@@ -7,17 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
-import static org.mule.runtime.api.util.FunctionalUtils.computeIfAbsent;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition.NAMESPACE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isProcessorChain;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isRoute;
@@ -39,21 +32,16 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclaration
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithAllowedStereotypesDeclaration;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
-import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
-import org.mule.runtime.extension.api.annotation.param.stereotype.Validator;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelParser.ParsedStereotype;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.CustomStereotypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter;
+import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.DefaultStereotypeModelFactory;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
 import java.util.HashMap;
@@ -74,92 +62,26 @@ public class StereotypeModelLoaderDelegate {
   private final StereotypeModel processorParent;
   private final ClassTypeLoader typeLoader;
   private final DslResolvingContext dslResolvingContext;
-  private final LazyValue<StereotypeModel> validatorStereotype;
+  private final StereotypeModelFactory stereotypeModelFactory;
 
   public StereotypeModelLoaderDelegate(ExtensionLoadingContext extensionLoadingContext) {
+    stereotypeModelFactory = new DefaultStereotypeModelFactory(extensionLoadingContext);
     dslResolvingContext = extensionLoadingContext.getDslResolvingContext();
     this.typeLoader =
         new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
     ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
     this.processorParent = newStereotype(PROCESSOR.getType(), namespace).withParent(PROCESSOR).build();
     this.sourceParent = newStereotype(SOURCE.getType(), namespace).withParent(SOURCE).build();
-    validatorStereotype = new LazyValue<>(() -> newStereotype(VALIDATOR_DEFINITION.getName(), namespace)
-        .withParent(VALIDATOR)
-        .build());
-
 
     resolveDeclaredTypesStereotypes(declaration, namespace);
   }
 
-  public ParsedStereotype resolveStereotype(WithAnnotations annotatedElement,
-                                            String elementType,
-                                            String elementName) {
-    StereotypeDefinition stereotypeDefinition = mapReduceExtensionAnnotation(
-        annotatedElement,
-        elementType,
-        elementName,
-        Stereotype.class,
-        org.mule.sdk.api.annotation.param.stereotype.Stereotype.class,
-        value -> value.getClassValue(Stereotype::value),
-        value -> value.getClassValue(org.mule.sdk.api.annotation.param.stereotype.Stereotype::value)
-    ).flatMap(type -> type.getDeclaringClass())
-        .map(SdkStereotypeDefinitionAdapter::from)
-        .orElse(null);
-
-    boolean isValidator = annotatedElement.isAnnotatedWith(Validator.class)
-        || annotatedElement.isAnnotatedWith(org.mule.sdk.api.annotation.param.stereotype.Validator.class);
-
-    if (stereotypeDefinition != null && isValidator) {
-      throw new IllegalModelDefinitionException(format("%s '%s' is annotated with both @%s and @%s. Only one can "
-              + "be provided at the same time for the same component",
-          elementType, elementName, Stereotype.class.getSimpleName(), Validator.class.getSimpleName()));
-    }
-
-    if (isValidator) {
-      return new DefaultParsedStereotype(empty(), true);
-    }
-    return new DefaultParsedStereotype(of(toStereotypeModel(stereotypeDefinition, namespace)), false);
-  }
-
-  private StereotypeModel toStereotypeModel(StereotypeDefinition stereotypeDefinition, String namespace) {
-    return computeIfAbsent(stereotypesCache, stereotypeDefinition, definition -> {
-
-      if (!isValidStereotype(stereotypeDefinition, namespace)) {
-        throw new IllegalModelDefinitionException(format(
-            "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
-                + "stereotypes on namespaces other than its own",
-            stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
-            namespace));
-      }
-
-      String resolvedNamespace = isBlank(stereotypeDefinition.getNamespace()) ? namespace : stereotypeDefinition.getNamespace();
-      final StereotypeModelBuilder builder = newStereotype(stereotypeDefinition.getName(), resolvedNamespace);
-      stereotypeDefinition.getParent().ifPresent(parent -> {
-        String parentNamespace = parent.getNamespace();
-        if (isBlank(parentNamespace)) {
-          parentNamespace = namespace;
-        }
-        builder.withParent(toStereotypeModel(parent, parentNamespace));
-      });
-
-      return builder.build();
-    });
-  }
-
-  private boolean isValidStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {
-    if (isBlank(stereotypeDefinition.getNamespace())) {
-      return true;
-    }
-
-    return namespace.equals(stereotypeDefinition.getNamespace()) || NAMESPACE.equals(stereotypeDefinition.getNamespace());
+  public StereotypeModel getProcessorParentStereotype() {
+    return stereotypeModelFactory.getProcessorParentStereotype();
   }
 
   public StereotypeModel createStereotype(String name, StereotypeModel parent) {
     return newStereotype(name, namespace).withParent(parent).build();
-  }
-
-  public StereotypeModel getValidatorStereotype() {
-    return validatorStereotype.get();
   }
 
   public void addStereotype(StereotypeModelParser parser,
@@ -187,22 +109,19 @@ public class StereotypeModelLoaderDelegate {
       T declarer,
       Optional<Supplier<StereotypeModel>> fallback) {
 
-    ParsedStereotype stereotype = parser.getParsedStereotype();
-    if (stereotype.isValidator() || stereotype.getStereotypeModel().isPresent()) {
-      declarer.withModelProperty(new CustomStereotypeModelProperty());
+
+    StereotypeModel stereotypeModel = parser.getStereotype(stereotypeModelFactory).orElse(null);
+    if (stereotypeModel != null) {
+      declarer.withModelProperty(CustomStereotypeModelProperty.INSTANCE);
+    } else {
+      stereotypeModel = fallback.map(Supplier::get).orElse(null);
     }
 
-    StereotypeModel model = stereotype.getStereotypeModel().orElseGet(() -> fallback.map(Supplier::get).orElse(null));
-
-    if (model == null && stereotype.isValidator()) {
-      model = getValidatorStereotype();
+    if (stereotypeModel != null) {
+      declarer.withStereotype(stereotypeModel);
     }
 
-    if (model != null) {
-      declarer.withStereotype(model);
-    }
-
-    return model;
+    return stereotypeModel;
   }
 
   private void addAllowedStereotypes(String namespace, ComponentDeclaration<?> declaration, MethodElement methodElement) {

@@ -17,6 +17,15 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
  */
 public class CustomStereotypeModelProperty implements ModelProperty {
 
+  public final static CustomStereotypeModelProperty INSTANCE = new CustomStereotypeModelProperty();
+
+  /**
+   * @deprecated since 4.5.0. Use {@link #INSTANCE} instead
+   */
+  @Deprecated
+  public CustomStereotypeModelProperty() {
+  }
+
   @Override
   public String getName() {
     return "CustomStereotype";

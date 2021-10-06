@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
-import java.util.Optional;
+public interface StereotypeModelFactory {
 
-public interface StereotypeModelParser {
+  StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition);
 
-  Optional<StereotypeModel> getStereotype(StereotypeModelFactory factory);
+  StereotypeModel getProcessorParentStereotype();
 
+  StereotypeModel getValidatorStereotype();
 }
