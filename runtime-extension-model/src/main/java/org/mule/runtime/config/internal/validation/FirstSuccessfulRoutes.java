@@ -8,7 +8,7 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
@@ -25,32 +25,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-@IgnoreOnLazyInit
-public class ScatterGatherRoutes implements Validation {
+public class FirstSuccessfulRoutes implements Validation {
 
-  private static final String SCATTER_GATHER_ELEMENT = "scatter-gather";
+  private static final String FIRST_SUCCESSFUL_ELEMENT = "first-successful";
 
-  private static final ComponentIdentifier SCATTER_GATHER_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(SCATTER_GATHER_ELEMENT).build();
+  private static final ComponentIdentifier FIRST_SUCCESSFUL_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(FIRST_SUCCESSFUL_ELEMENT).build();
 
   @Override
   public String getName() {
-    return "'scatter-gather' has at least 2 routes";
+    return "'first-successful' has at least 2 routes";
   }
 
   @Override
   public String getDescription() {
-    return "'scatter-gather' has at least 2 routes";
+    return "'first-successful' has at least 2 routes";
   }
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    // While functional with just one route, it is the same as not having the router at all.
+    return WARN;
   }
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(component -> component.getIdentifier().equals(SCATTER_GATHER_IDENTIFIER));
+    return currentElemement(component -> component.getIdentifier().equals(FIRST_SUCCESSFUL_IDENTIFIER));
   }
 
   @Override
@@ -58,7 +58,7 @@ public class ScatterGatherRoutes implements Validation {
     if (component.directChildrenStream()
         .filter(c -> c.getIdentifier().getName().equals("route"))
         .count() < 2) {
-      return of(create(component, this, "At least 2 routes are required for '" + SCATTER_GATHER_ELEMENT + "'."));
+      return of(create(component, this, "At least 2 routes are required for '" + FIRST_SUCCESSFUL_ELEMENT + "'."));
     } else {
       return empty();
     }

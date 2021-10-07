@@ -41,6 +41,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new ParameterGroupExclusiveness(),
                   new ExpressionsInRequiredExpressionsParams(),
                   new PollingSourceHasSchedulingStrategy(),
+                  new RoundRobinRoutes(),
+                  new FirstSuccessfulRoutes(),
                   new ScatterGatherRoutes(),
                   new ParseTemplateResourceExist(artifactRegionClassLoader)
     // Commented out because this causes failures because of a lying extension model for munit, in the 'ignore' parameter
