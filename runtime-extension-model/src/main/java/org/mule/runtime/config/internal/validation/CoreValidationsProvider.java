@@ -16,6 +16,8 @@ import java.util.List;
 
 public class CoreValidationsProvider implements ValidationsProvider {
 
+  private ClassLoader artifactRegionClassLoader;
+
   @Override
   public List<Validation> get() {
     return asList(new SingletonsAreNotRepeated(),
@@ -39,7 +41,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new ParameterGroupExclusiveness(),
                   new ExpressionsInRequiredExpressionsParams(),
                   new PollingSourceHasSchedulingStrategy(),
-                  new ScatterGatherRoutes()
+                  new ScatterGatherRoutes(),
+                  new ParseTemplateResourceExist(artifactRegionClassLoader)
     // Commented out because this causes failures because of a lying extension model for munit, in the 'ignore' parameter
     // new NoExpressionsInNoExpressionsSupportedParams()
     // validate expressions!
@@ -49,5 +52,10 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
     return asList(new ImportValidTarget());
+  }
+
+  @Override
+  public void setArtifactRegionClassLoader(ClassLoader artifactRegionClassLoader) {
+    this.artifactRegionClassLoader = artifactRegionClassLoader;
   }
 }

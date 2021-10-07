@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Collections.emptySet;
-import static java.util.Comparator.comparing;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -41,6 +32,17 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
+
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptySet;
+import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -220,7 +222,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected final void doValidateModel(ArtifactAst appModel, Predicate<Validation> validationsFilter)
       throws ConfigurationException {
-    final ValidationResult validation = validate(appModel, validationsFilter);
+    final ValidationResult validation = validate(appModel, validationsFilter,
+                                                 // get the region classloader from the artifact one
+                                                 this.muleContext.getExecutionClassLoader().getParent());
 
     final Collection<ValidationResultItem> items = validation.getItems();
 
