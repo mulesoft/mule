@@ -13,6 +13,8 @@ public interface StereotypeModelFactory {
 
   StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition);
 
+  StereotypeModel createStereotype(String name, StereotypeModel parent);
+
   StereotypeModel getProcessorParentStereotype();
 
   StereotypeModel getSourceParentStereotype();

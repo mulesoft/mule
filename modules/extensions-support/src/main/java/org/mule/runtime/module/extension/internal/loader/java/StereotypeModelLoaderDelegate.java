@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONNECTION;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -39,8 +39,6 @@ import java.util.function.Supplier;
 
 public class StereotypeModelLoaderDelegate {
 
-  private String namespace;
-
   private final Map<ComponentDeclaration, List<StereotypeModel>> componentsConfigStereotypes = new HashMap<>();
   private final ClassTypeLoader typeLoader;
   private final DslResolvingContext dslResolvingContext;
@@ -56,24 +54,24 @@ public class StereotypeModelLoaderDelegate {
     resolveDeclaredTypesStereotypes(declaration, namespace);
   }
 
-  public StereotypeModel getDefaultConfigStereotype(String name) {
-    return createStereotype(name, MuleStereotypes.CONFIG);
+  public StereotypeModel getDefaultConfigStereotype(String configName) {
+    return createStereotype(configName, CONFIG);
   }
 
-  public StereotypeModel getDefaultConnectionProviderStereotype(String name) {
-    return createStereotype(name, CONNECTION);
+  public StereotypeModel getDefaultConnectionProviderStereotype(String connectionProviderName) {
+    return createStereotype(connectionProviderName, CONNECTION);
   }
 
-  public StereotypeModel getDefaultOperationStereotype(String name) {
-    return createStereotype(name, stereotypeModelFactory.getProcessorParentStereotype());
+  public StereotypeModel getDefaultOperationStereotype(String operationName) {
+    return createStereotype(operationName, stereotypeModelFactory.getProcessorParentStereotype());
   }
 
-  public StereotypeModel getDefaultSourceStereotype(String name) {
-    return createStereotype(name, stereotypeModelFactory.getSourceParentStereotype());
+  public StereotypeModel getDefaultSourceStereotype(String sourceName) {
+    return createStereotype(sourceName, stereotypeModelFactory.getSourceParentStereotype());
   }
 
   private StereotypeModel createStereotype(String name, StereotypeModel parent) {
-    return newStereotype(name, namespace).withParent(parent).build();
+    return stereotypeModelFactory.createStereotype(name, parent);
   }
 
   public void addStereotype(StereotypeModelParser parser,
@@ -96,8 +94,7 @@ public class StereotypeModelLoaderDelegate {
     addConfigRefStereoTypesIfNeeded((ComponentDeclaration<?>) declarer.getDeclaration());
   }
 
-  public void addAllowedStereotypes(AllowedStereotypesModelParser parser,
-                                    NestedComponentDeclarer declarer) {
+  public void addAllowedStereotypes(AllowedStereotypesModelParser parser, NestedComponentDeclarer declarer) {
     List<StereotypeModel> allowedStereotypes = parser.getAllowedStereotypes(stereotypeModelFactory);
     if (allowedStereotypes.isEmpty()) {
       declarer.withAllowedStereotypes(MuleStereotypes.PROCESSOR);

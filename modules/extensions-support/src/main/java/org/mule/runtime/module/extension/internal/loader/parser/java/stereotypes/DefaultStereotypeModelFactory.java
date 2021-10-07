@@ -48,10 +48,14 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 //    resolveDeclaredTypesStereotypes(declaration, namespace);
   }
 
-
   @Override
   public StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition) {
     return createStereotype(stereotypeDefinition, namespace);
+  }
+
+  @Override
+  public StereotypeModel createStereotype(String name, StereotypeModel parent) {
+    return newStereotype(name, namespace).withParent(parent).build();
   }
 
   @Override
