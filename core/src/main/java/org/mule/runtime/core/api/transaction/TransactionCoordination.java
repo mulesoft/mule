@@ -33,6 +33,11 @@ public final class TransactionCoordination {
   private final ThreadLocal<Deque<Transaction>> suspendedTransaction = new ThreadLocal<>();
   private final ThreadLocal<ArrayStack> isolatedTransactions = new ThreadLocal<>();
 
+  public boolean runningNestedTransaction() {
+    Deque<Transaction> suspended = suspendedTransaction.get();
+    return suspended != null && suspended.size() >= 1;
+  }
+
   /** Lock variable that is used to access {@link #txCounter}. */
   private final Object txCounterLock = new Object();
 
