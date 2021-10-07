@@ -76,7 +76,7 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
 
   @Override
   public boolean isSynchronous() {
-    return false;
+    return true;
   }
 
   @Override
