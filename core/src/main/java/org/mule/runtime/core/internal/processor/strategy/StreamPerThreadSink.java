@@ -20,6 +20,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,7 +43,8 @@ import reactor.core.publisher.FluxSink;
 public class StreamPerThreadSink implements Sink, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StreamPerThreadSink.class);
-  private static final int CACHE_TIME_LIMIT_IN_MINUTES = 60;
+  private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
+  private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
 
   private final ReactiveProcessor processor;
   private final Consumer<CoreEvent> eventConsumer;
@@ -49,7 +52,9 @@ public class StreamPerThreadSink implements Sink, Disposable {
 
   private volatile boolean disposing = false;
   private final Cache<Thread, FluxSink<CoreEvent>> sinks =
-      Caffeine.newBuilder().weakKeys().expireAfterAccess(CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();;
+      Caffeine.newBuilder().weakKeys().expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+  private final Cache<Transaction, FluxSink<CoreEvent>> sinksNestedTx =
+      Caffeine.newBuilder().weakKeys().expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
   // We add this counter so we can count the amount of finished sinks when disposing
   // The previous way involved having a strong reference to the thread, which caused MULE-19209
   private AtomicLong disponsableSinks = new AtomicLong();
@@ -67,26 +72,32 @@ public class StreamPerThreadSink implements Sink, Disposable {
     this.flowConstruct = flowConstruct;
   }
 
+  private FluxSink<CoreEvent> createSink() {
+    disponsableSinks.incrementAndGet();
+    final FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
+    recorder.flux()
+        .doOnNext(request -> eventConsumer.accept(request))
+        .transform(processor)
+        .subscribe(null, e -> {
+          LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
+          disponsableSinks.decrementAndGet();
+        }, () -> disponsableSinks.decrementAndGet());
+
+    return recorder.getFluxSink();
+  }
+
   @Override
   public void accept(CoreEvent event) {
     if (disposing) {
       throw new IllegalStateException("Already disposed");
     }
 
-    sinks.get(currentThread(), t -> {
-      disponsableSinks.incrementAndGet();
-      final FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
-      recorder.flux()
-          .doOnNext(request -> eventConsumer.accept(request))
-          .transform(processor)
-          .subscribe(null, e -> {
-            LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
-            disponsableSinks.decrementAndGet();
-          }, () -> disponsableSinks.decrementAndGet());
-
-      return recorder.getFluxSink();
-    })
-        .next(event);
+    TransactionCoordination txCoord = TransactionCoordination.getInstance();
+    if (txCoord.runningNestedTransaction()) {
+      sinksNestedTx.get(txCoord.getTransaction(), tx -> createSink()).next(event);
+    } else {
+      sinks.get(currentThread(), t -> createSink()).next(event);
+    }
   }
 
   @Override
@@ -99,6 +110,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
   public void dispose() {
     disposing = true;
     sinks.asMap().values().forEach(sink -> sink.complete());
+    sinksNestedTx.asMap().values().forEach(sink -> sink.complete());
 
     final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
     long startMillis = currentTimeMillis();
@@ -118,6 +130,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
                     flowConstruct.getName());
       }
       sinks.invalidateAll();
+      sinksNestedTx.invalidateAll();
     } else if (disponsableSinks.get() != 0) {
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
         throw new IllegalStateException(format("TX Subscribers of ProcessingStrategy for flow '%s' not completed in %d ms",
@@ -128,6 +141,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
                     shutdownTimeout);
       }
       sinks.invalidateAll();
+      sinksNestedTx.invalidateAll();
     }
   }
 }
