@@ -82,6 +82,24 @@ public final class JavaStereotypeModelParserUtils {
         .collect(toList());
   }
 
+  public static StereotypeDefinition asDefinition(StereotypeModel model) {
+    return new StereotypeDefinition() {
+      @Override
+      public String getName() {
+        return model.getType();
+      }
+
+      @Override
+      public String getNamespace() {
+        return model.getNamespace();
+      }
+
+      @Override
+      public Optional<StereotypeDefinition> getParent() {
+        return model.getParent().map(parent -> asDefinition(parent));
+      }
+    };
+
   private static <A extends Annotation> Stream<Type> getAllowedTypeStream(WithAnnotations element,
                                                                           Class<A> annotationType,
                                                                           Function<A, Class[]> mapper) {

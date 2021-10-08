@@ -9,10 +9,10 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.NameUtils.underscorize;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONNECTION;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
 import org.mule.metadata.api.model.MetadataType;
@@ -31,11 +31,9 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasStereotypeDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 import org.mule.runtime.module.extension.internal.loader.parser.AllowedStereotypesModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.CustomStereotypeModelProperty;
@@ -43,6 +41,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.sdk.api.stereotype.ImplicitStereotypeDefinition;
 import org.mule.sdk.api.stereotype.MuleStereotypes;
+import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,7 +56,6 @@ import java.util.function.Supplier;
 public class StereotypeModelLoaderDelegate {
 
   private final Map<ComponentDeclaration, List<StereotypeModel>> componentsConfigStereotypes = new HashMap<>();
-  private final ClassTypeLoader typeLoader;
   private final DslResolvingContext dslResolvingContext;
   private final DefaultStereotypeModelFactory stereotypeModelFactory;
 
@@ -66,9 +64,6 @@ public class StereotypeModelLoaderDelegate {
   public StereotypeModelLoaderDelegate(ExtensionLoadingContext extensionLoadingContext) {
     stereotypeModelFactory = new DefaultStereotypeModelFactory(extensionLoadingContext);
     dslResolvingContext = extensionLoadingContext.getDslResolvingContext();
-    this.typeLoader =
-        new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
-    ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
   }
 
   public StereotypeModel getDefaultConfigStereotype(String configName) {
@@ -126,12 +121,13 @@ public class StereotypeModelLoaderDelegate {
         .forEach(subTypeModel -> subTypeModel.getSubTypes()
             .forEach(subType -> subTypeToParent.put(subType, subTypeModel.getBaseType())));
 
-    BiFunction<ObjectType, Class<? extends StereotypeDefinition>, StereotypeModel> resolver =
-        (type, def) -> resolveStereotype(def, type, namespace, subTypeToParent);
-    declaration.getTypes().forEach(type -> resolveStereotype(type, resolver));
+    ObjectTypeStereotypeResolver resolver = (type, def) -> resolveStereotype(def, type, namespace, subTypeToParent);
+    LegacyObjectTypeStereotypeResolver legacyResolver = (type, def) -> resolveStereotype(def, type, namespace, subTypeToParent);
+
+    declaration.getTypes().forEach(type -> resolveStereotype(type, resolver, legacyResolver));
   }
 
-  private StereotypeModel resolveStereotype(Class<? extends StereotypeDefinition> def,
+  private StereotypeModel resolveStereotype(Class<?> def,
                                             ObjectType type,
                                             String namespace,
                                             Map<ObjectType, ObjectType> subTypeToParent) {
@@ -144,19 +140,14 @@ public class StereotypeModelLoaderDelegate {
       final String stereotypeName = toStereotypeName(type.getAnnotation(ClassInformationAnnotation.class).get().getClassname());
 
       final ObjectType parentObjectType = subTypeToParent.get(type);
-      if (parentObjectType != null) {
-        // If the type is a subtype, link to its parent stereotype
-        return stereotypeModelFactory.createStereotype(
-            new org.mule.sdk.api.stereotype.ImplicitStereotypeDefinition(stereotypeName,
-                new org.mule.sdk.api.stereotype.ImplicitStereotypeDefinition(toStereotypeName(parentObjectType
-                    .getAnnotation(ClassInformationAnnotation.class).get()
-                    .getClassname()))));
-      } else {
-        // else, create the stereotype without a parent
-        return stereotypeModelFactory.createStereotype(new ImplicitStereotypeDefinition(stereotypeName));
-      }
+      final StereotypeDefinition definition = parentObjectType != null
+          ? new ImplicitStereotypeDefinition(stereotypeName, new ImplicitStereotypeDefinition(toStereotypeName(parentObjectType
+              .getAnnotation(ClassInformationAnnotation.class).get().getClassname())))
+          : new ImplicitStereotypeDefinition(stereotypeName);
+
+      return stereotypeModelFactory.createStereotype(definition, namespace);
     } else {
-      return createCustomStereotype(def, namespace, stereotypes);
+      return stereotypeModelFactory.createStereotype(from(def), namespace);
     }
   }
 
@@ -165,7 +156,8 @@ public class StereotypeModelLoaderDelegate {
   }
 
   private void resolveStereotype(ObjectType type,
-                                 BiFunction<ObjectType, Class<? extends StereotypeDefinition>, StereotypeModel> resolver) {
+                                 ObjectTypeStereotypeResolver resolver,
+                                 LegacyObjectTypeStereotypeResolver legacyResolver) {
     type.accept(new MetadataTypeVisitor() {
 
       // This is created to avoid a recursive types infinite loop, producing an StackOverflow when resolving the stereotypes.
@@ -176,7 +168,7 @@ public class StereotypeModelLoaderDelegate {
         if (!registeredTypes.contains(objectType)
             && !objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
           registeredTypes.add(objectType);
-          objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotypes(objectType, resolver));
+          objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveAllowedStereotypes(objectType, resolver, legacyResolver));
           objectType.getFields().forEach(f -> f.getValue().accept(this));
           objectType.getOpenRestriction().ifPresent(open -> open.accept(this));
         }
@@ -252,5 +244,15 @@ public class StereotypeModelLoaderDelegate {
   public void setNamespace(String namespace) {
     this.namespace = namespace;
     stereotypeModelFactory.setNamespace(namespace.toUpperCase());
+  }
+
+  @FunctionalInterface
+  interface ObjectTypeStereotypeResolver extends BiFunction<ObjectType, Class<? extends StereotypeDefinition>, StereotypeModel> {
+
+  }
+
+  @FunctionalInterface
+  interface LegacyObjectTypeStereotypeResolver extends BiFunction<ObjectType, Class<? extends org.mule.runtime.extension.api.stereotype.StereotypeDefinition>, StereotypeModel> {
+
   }
 }

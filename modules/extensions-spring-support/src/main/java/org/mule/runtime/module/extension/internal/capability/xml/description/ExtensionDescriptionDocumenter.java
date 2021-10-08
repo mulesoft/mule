@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.getInfoFromAnnotation;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.mapReduceAnnotation;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -83,7 +83,7 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
     }
     return configurations.stream()
         .filter(config -> {
-          String annotationName = getInfoFromAnnotation(element,
+          String annotationName = mapReduceAnnotation(element,
                                                         Configuration.class,
                                                         org.mule.sdk.api.annotation.Configuration.class,
                                                         Configuration::name,

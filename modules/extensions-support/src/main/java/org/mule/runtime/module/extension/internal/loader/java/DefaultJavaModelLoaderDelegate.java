@@ -146,6 +146,8 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
       autoImportReferencedTypes(declarer, base, context);
       subTypes.forEach(subTypeEntry -> autoImportReferencedTypes(declarer, subTypeEntry, context));
     });
+
+    getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
   }
 
   private void autoImportReferencedTypes(ExtensionDeclarer declarer,

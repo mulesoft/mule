@@ -14,13 +14,12 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.asDefinition;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.VALIDATOR;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
-import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
@@ -28,6 +27,7 @@ import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
@@ -40,12 +40,8 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
   private StereotypeModel processorParent;
   private StereotypeModel validatorStereotype;
 
-  private final ClassTypeLoader typeLoader;
   public DefaultStereotypeModelFactory(ExtensionLoadingContext extensionLoadingContext) {
     dslResolvingContext = extensionLoadingContext.getDslResolvingContext();
-    this.typeLoader =
-        new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
-//    resolveDeclaredTypesStereotypes(declaration, namespace);
   }
 
   @Override
@@ -54,8 +50,45 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
   }
 
   @Override
+  public StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {
+    return computeIfAbsent(stereotypesCache, stereotypeDefinition, definition -> {
+
+      if (!isValidStereotype(stereotypeDefinition, namespace)) {
+        throw new IllegalModelDefinitionException(format(
+            "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
+                + "stereotypes on namespaces other than its own",
+            stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
+            namespace));
+      }
+
+      String resolvedNamespace = isBlank(stereotypeDefinition.getNamespace()) ? namespace : stereotypeDefinition.getNamespace();
+      final StereotypeModelBuilder builder = newStereotype(stereotypeDefinition.getName(), resolvedNamespace);
+      stereotypeDefinition.getParent().ifPresent(parent -> {
+        String parentNamespace = parent.getNamespace();
+        if (isBlank(parentNamespace)) {
+          parentNamespace = namespace;
+        }
+        builder.withParent(createStereotype(parent, parentNamespace));
+      });
+
+      return builder.build();
+    });
+  }
+
+  @Override
   public StereotypeModel createStereotype(String name, StereotypeModel parent) {
-    return newStereotype(name, namespace).withParent(parent).build();
+    return createStereotype(new StereotypeDefinition() {
+
+      @Override
+      public String getName() {
+        return name;
+      }
+
+      @Override
+      public Optional<StereotypeDefinition> getParent() {
+        return parent.getParent().map(p -> asDefinition(p));
+      }
+    });
   }
 
   @Override
@@ -82,31 +115,6 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
         .build();
   }
 
-  private StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {
-    return computeIfAbsent(stereotypesCache, stereotypeDefinition, definition -> {
-
-      if (!isValidStereotype(stereotypeDefinition, namespace)) {
-        throw new IllegalModelDefinitionException(format(
-            "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
-                + "stereotypes on namespaces other than its own",
-            stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
-            namespace));
-      }
-
-      String resolvedNamespace = isBlank(stereotypeDefinition.getNamespace()) ? namespace : stereotypeDefinition.getNamespace();
-      final StereotypeModelBuilder builder = newStereotype(stereotypeDefinition.getName(), resolvedNamespace);
-      stereotypeDefinition.getParent().ifPresent(parent -> {
-        String parentNamespace = parent.getNamespace();
-        if (isBlank(parentNamespace)) {
-          parentNamespace = namespace;
-        }
-        builder.withParent(createStereotype(parent, parentNamespace));
-      });
-
-      return builder.build();
-    });
-  }
-
   private boolean isValidStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {
     if (isBlank(stereotypeDefinition.getNamespace())) {
       return true;
@@ -114,5 +122,4 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
     return namespace.equals(stereotypeDefinition.getNamespace()) || NAMESPACE.equals(stereotypeDefinition.getNamespace());
   }
-
 }
