@@ -36,7 +36,8 @@ import java.util.Optional;
  */
 public class XmlExtensionModelLoader extends ExtensionModelLoader {
 
-  private final List<DeclarationEnricher> customEnrichers = unmodifiableList(asList(new StereotypesDiscoveryDeclarationEnricher()));
+  private final List<DeclarationEnricher> customEnrichers =
+      unmodifiableList(asList(new StereotypesDiscoveryDeclarationEnricher()));
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(new CorrectPrefixesValidator(),
                                                                                          new GlobalElementNamesValidator(),

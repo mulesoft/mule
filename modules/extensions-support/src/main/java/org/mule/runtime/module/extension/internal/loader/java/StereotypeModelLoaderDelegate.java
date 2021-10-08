@@ -168,7 +168,8 @@ public class StereotypeModelLoaderDelegate {
         if (!registeredTypes.contains(objectType)
             && !objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
           registeredTypes.add(objectType);
-          objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveAllowedStereotypes(objectType, resolver, legacyResolver));
+          objectType.getAnnotation(StereotypeTypeAnnotation.class)
+              .ifPresent(a -> a.resolveAllowedStereotypes(objectType, resolver, legacyResolver));
           objectType.getFields().forEach(f -> f.getValue().accept(this));
           objectType.getOpenRestriction().ifPresent(open -> open.accept(this));
         }
@@ -209,9 +210,9 @@ public class StereotypeModelLoaderDelegate {
   }
 
   private <T extends HasStereotypeDeclarer & HasModelProperties> StereotypeModel doAddStereotypes(
-      StereotypeModelParser parser,
-      T declarer,
-      Optional<Supplier<StereotypeModel>> fallback) {
+                                                                                                  StereotypeModelParser parser,
+                                                                                                  T declarer,
+                                                                                                  Optional<Supplier<StereotypeModel>> fallback) {
 
 
     StereotypeModel stereotypeModel = parser.getStereotype(stereotypeModelFactory).orElse(null);
@@ -252,7 +253,8 @@ public class StereotypeModelLoaderDelegate {
   }
 
   @FunctionalInterface
-  interface LegacyObjectTypeStereotypeResolver extends BiFunction<ObjectType, Class<? extends org.mule.runtime.extension.api.stereotype.StereotypeDefinition>, StereotypeModel> {
+  interface LegacyObjectTypeStereotypeResolver extends
+      BiFunction<ObjectType, Class<? extends org.mule.runtime.extension.api.stereotype.StereotypeDefinition>, StereotypeModel> {
 
   }
 }

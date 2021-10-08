@@ -58,7 +58,8 @@ public final class ParameterModelsLoaderDelegate {
             .describedAs(parameterParser.getDescription())
             .withAllowedStereotypes(parameterParser.getAllowedStereotypes())
             .withRole(parameterParser.getRole())
-            .withExpressionSupport(parameterParser.getExpressionSupport());
+            .withExpressionSupport(parameterParser.getExpressionSupport())
+            .withAllowedStereotypes(parameterParser.getAllowedStereotypes());
 
         if (parameterParser.isComponentId()) {
           parameter.asComponentId();

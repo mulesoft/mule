@@ -120,4 +120,9 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   public Set<String> getSemanticTerms() {
     return decoratee.getSemanticTerms();
   }
+
+  @Override
+  public List<StereotypeModel> getAllowedStereotypes(StereotypeModelFactory factory) {
+    return decoratee.getAllowedStereotypes(factory);
+  }
 }

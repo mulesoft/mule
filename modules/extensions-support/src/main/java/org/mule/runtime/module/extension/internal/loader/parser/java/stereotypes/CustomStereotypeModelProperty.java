@@ -23,8 +23,7 @@ public class CustomStereotypeModelProperty implements ModelProperty {
    * @deprecated since 4.5.0. Use {@link #INSTANCE} instead
    */
   @Deprecated
-  public CustomStereotypeModelProperty() {
-  }
+  public CustomStereotypeModelProperty() {}
 
   @Override
   public String getName() {

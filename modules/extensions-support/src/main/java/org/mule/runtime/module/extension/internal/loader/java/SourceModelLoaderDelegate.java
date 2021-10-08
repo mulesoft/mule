@@ -88,9 +88,10 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
       getStereotypeModelLoaderDelegate().addStereotype(
-          parser,
-          sourceDeclarer,
-          of(() -> getStereotypeModelLoaderDelegate().getDefaultSourceStereotype(parser.getName())));
+                                                       parser,
+                                                       sourceDeclarer,
+                                                       of(() -> getStereotypeModelLoaderDelegate()
+                                                           .getDefaultSourceStereotype(parser.getName())));
       parser.getAdditionalModelProperties().forEach(sourceDeclarer::withModelProperty);
 
       // TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection

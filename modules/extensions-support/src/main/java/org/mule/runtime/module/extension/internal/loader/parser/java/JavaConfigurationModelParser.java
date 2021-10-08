@@ -69,14 +69,15 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public String getName() {
-    return MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(configElement,
-                                 "Configuration", configElement.getName(),
-                                 Configuration.class,
-                                 org.mule.sdk.api.annotation.Configuration.class,
-                                 value -> value.getStringValue(Configuration::name),
-                                 value -> value.getStringValue(org.mule.sdk.api.annotation.Configuration::name))
-                                     .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
-                                     .orElse(DEFAULT_CONFIG_NAME);
+    return MuleExtensionAnnotationParser.mapReduceSingleAnnotation(configElement,
+                                                                   "Configuration", configElement.getName(),
+                                                                   Configuration.class,
+                                                                   org.mule.sdk.api.annotation.Configuration.class,
+                                                                   value -> value.getStringValue(Configuration::name),
+                                                                   value -> value
+                                                                       .getStringValue(org.mule.sdk.api.annotation.Configuration::name))
+        .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
+        .orElse(DEFAULT_CONFIG_NAME);
   }
 
   @Override
@@ -105,9 +106,9 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
     return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
-        extensionModelParser,
-        extensionElement,
-        configElement.getConnectionProviders());
+                                                                           extensionModelParser,
+                                                                           extensionElement,
+                                                                           configElement.getConnectionProviders());
   }
 
   @Override

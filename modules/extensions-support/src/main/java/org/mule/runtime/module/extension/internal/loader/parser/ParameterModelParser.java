@@ -27,7 +27,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface ParameterModelParser extends SemanticTermsParser {
+public interface ParameterModelParser extends SemanticTermsParser, AllowedStereotypesModelParser {
 
   /**
    * @return the parameter's name

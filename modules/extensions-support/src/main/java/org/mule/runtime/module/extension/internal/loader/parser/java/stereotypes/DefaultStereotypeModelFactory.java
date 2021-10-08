@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.stereotype
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.computeIfAbsent;
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition.NAMESPACE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
@@ -55,10 +56,10 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
       if (!isValidStereotype(stereotypeDefinition, namespace)) {
         throw new IllegalModelDefinitionException(format(
-            "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
-                + "stereotypes on namespaces other than its own",
-            stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
-            namespace));
+                                                         "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
+                                                             + "stereotypes on namespaces other than its own",
+                                                         stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
+                                                         namespace));
       }
 
       String resolvedNamespace = isBlank(stereotypeDefinition.getNamespace()) ? namespace : stereotypeDefinition.getNamespace();
@@ -77,11 +78,21 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
   @Override
   public StereotypeModel createStereotype(String name, StereotypeModel parent) {
+    return createStereotype(name, EMPTY, parent);
+  }
+
+  @Override
+  public StereotypeModel createStereotype(String name, String namespace, StereotypeModel parent) {
     return createStereotype(new StereotypeDefinition() {
 
       @Override
       public String getName() {
         return name;
+      }
+
+      @Override
+      public String getNamespace() {
+        return namespace;
       }
 
       @Override

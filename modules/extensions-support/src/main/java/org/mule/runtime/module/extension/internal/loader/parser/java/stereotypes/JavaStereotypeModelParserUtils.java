@@ -11,7 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.stereotype.Validator;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
@@ -41,15 +42,17 @@ public final class JavaStereotypeModelParserUtils {
                                                             String elementType,
                                                             String elementName,
                                                             StereotypeModelFactory factory) {
-    StereotypeDefinition stereotypeDefinition = mapReduceExtensionAnnotation(
-        annotatedElement,
-        elementType,
-        elementName,
-        Stereotype.class,
-        org.mule.sdk.api.annotation.param.stereotype.Stereotype.class,
-        value -> value.getClassValue(Stereotype::value),
-        value -> value.getClassValue(org.mule.sdk.api.annotation.param.stereotype.Stereotype::value)
-    ).flatMap(type -> type.getDeclaringClass())
+    StereotypeDefinition stereotypeDefinition = MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
+                                                                                                        annotatedElement,
+                                                                                                        elementType,
+                                                                                                        elementName,
+                                                                                                        Stereotype.class,
+                                                                                                        org.mule.sdk.api.annotation.param.stereotype.Stereotype.class,
+                                                                                                        value -> value
+                                                                                                            .getClassValue(Stereotype::value),
+                                                                                                        value -> value
+                                                                                                            .getClassValue(org.mule.sdk.api.annotation.param.stereotype.Stereotype::value))
+        .flatMap(type -> type.getDeclaringClass())
         .map(SdkStereotypeDefinitionAdapter::from)
         .orElse(null);
 
@@ -57,8 +60,9 @@ public final class JavaStereotypeModelParserUtils {
     if (isValidator(annotatedElement)) {
       if (stereotypeDefinition != null) {
         throw new IllegalModelDefinitionException(format("%s '%s' is annotated with both @%s and @%s. Only one can "
-                + "be provided at the same time for the same component",
-            elementType, elementName, Stereotype.class.getSimpleName(), Validator.class.getSimpleName()));
+            + "be provided at the same time for the same component",
+                                                         elementType, elementName, Stereotype.class.getSimpleName(),
+                                                         Validator.class.getSimpleName()));
       }
 
       return of(factory.getValidatorStereotype());
@@ -71,19 +75,19 @@ public final class JavaStereotypeModelParserUtils {
 
   public static List<StereotypeModel> getAllowedStereotypes(WithAnnotations element, StereotypeModelFactory factory) {
     return concat(
-        getAllowedTypeStream(element,
-            AllowedStereotypes.class,
-            AllowedStereotypes::value),
-        getAllowedTypeStream(element,
-            org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes.class,
-            org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes::value)
-    )
-        .map(type -> factory.createStereotype(from(type.getDeclaringClass().get())))
-        .collect(toList());
+                  getAllowedTypeStream(element,
+                                       AllowedStereotypes.class,
+                                       AllowedStereotypes::value),
+                  getAllowedTypeStream(element,
+                                       org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes.class,
+                                       org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes::value))
+                                           .map(type -> factory.createStereotype(from(type.getDeclaringClass().get())))
+                                           .collect(toList());
   }
 
   public static StereotypeDefinition asDefinition(StereotypeModel model) {
     return new StereotypeDefinition() {
+
       @Override
       public String getName() {
         return model.getType();
@@ -99,17 +103,17 @@ public final class JavaStereotypeModelParserUtils {
         return model.getParent().map(parent -> asDefinition(parent));
       }
     };
+  }
 
   private static <A extends Annotation> Stream<Type> getAllowedTypeStream(WithAnnotations element,
                                                                           Class<A> annotationType,
                                                                           Function<A, Class[]> mapper) {
     return element.getValueFromAnnotation(annotationType)
         .map(value -> value.getClassArrayValue(mapper).stream()
-            .filter(type -> type.getDeclaringClass().isPresent())
-        ).orElse(Stream.empty());
+            .filter(type -> type.getDeclaringClass().isPresent()))
+        .orElse(Stream.empty());
   }
 
 
-  private JavaStereotypeModelParserUtils() {
-  }
+  private JavaStereotypeModelParserUtils() {}
 }

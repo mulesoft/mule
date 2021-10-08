@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -62,13 +62,13 @@ public final class JavaErrorModelParserUtils {
    * @return a list of {@link ErrorModelParser}.
    */
   public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element) {
-    return mapReduceExtensionAnnotation(element,
-                                ErrorTypes.class,
-                                org.mule.sdk.api.annotation.error.ErrorTypes.class,
-                                value -> parseErrorTypeDefinitions(value.getClassValue(ErrorTypes::value)),
-                                value -> parseErrorTypeDefinitions(value
-                                    .getClassValue(org.mule.sdk.api.annotation.error.ErrorTypes::value)))
-                                        .orElse(new LinkedList<>());
+    return mapReduceSingleAnnotation(element,
+                                     ErrorTypes.class,
+                                     org.mule.sdk.api.annotation.error.ErrorTypes.class,
+                                     value -> parseErrorTypeDefinitions(value.getClassValue(ErrorTypes::value)),
+                                     value -> parseErrorTypeDefinitions(value
+                                         .getClassValue(org.mule.sdk.api.annotation.error.ErrorTypes::value)))
+                                             .orElse(new LinkedList<>());
   }
 
   /**
@@ -84,15 +84,16 @@ public final class JavaErrorModelParserUtils {
                                                                  OperationElement operation) {
     return getThrowsDeclaration(operation, extensionElement)
         .flatMap(withThrows -> MuleExtensionAnnotationParser.mapReduceAnnotation(
-                                                     withThrows,
-                                                     Throws.class,
-                                                     org.mule.sdk.api.annotation.error.Throws.class,
-                                                     ann -> parseErrorTypeProviders(ann.getClassArrayValue(Throws::value),
-                                                                                    extensionParser),
-                                                     ann -> parseErrorTypeProviders(ann
-                                                         .getClassArrayValue(org.mule.sdk.api.annotation.error.Throws::value),
-                                                                                    extensionParser),
-                                                     dualThrowsException(operation)))
+                                                                                 withThrows,
+                                                                                 Throws.class,
+                                                                                 org.mule.sdk.api.annotation.error.Throws.class,
+                                                                                 ann -> parseErrorTypeProviders(ann
+                                                                                     .getClassArrayValue(Throws::value),
+                                                                                                                extensionParser),
+                                                                                 ann -> parseErrorTypeProviders(ann
+                                                                                     .getClassArrayValue(org.mule.sdk.api.annotation.error.Throws::value),
+                                                                                                                extensionParser),
+                                                                                 dualThrowsException(operation)))
         .orElse(new LinkedList<>());
   }
 
@@ -113,17 +114,20 @@ public final class JavaErrorModelParserUtils {
   public static java.util.Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty(WithAnnotations element,
                                                                                                    String elementType,
                                                                                                    String elementName) {
-    Optional<Type> classValue = mapReduceExtensionAnnotation(
-                                                      element,
-                                                      elementType,
-                                                      elementName,
-                                                      OnException.class,
-                                                      org.mule.sdk.api.annotation.OnException.class,
-                                                      ann -> element.getValueFromAnnotation(OnException.class).get()
-                                                          .getClassValue(OnException::value),
-                                                      ann -> element
-                                                          .getValueFromAnnotation(org.mule.sdk.api.annotation.OnException.class)
-                                                          .get().getClassValue(org.mule.sdk.api.annotation.OnException::value));
+    Optional<Type> classValue = MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
+                                                                                        element,
+                                                                                        elementType,
+                                                                                        elementName,
+                                                                                        OnException.class,
+                                                                                        org.mule.sdk.api.annotation.OnException.class,
+                                                                                        ann -> element
+                                                                                            .getValueFromAnnotation(OnException.class)
+                                                                                            .get()
+                                                                                            .getClassValue(OnException::value),
+                                                                                        ann -> element
+                                                                                            .getValueFromAnnotation(org.mule.sdk.api.annotation.OnException.class)
+                                                                                            .get()
+                                                                                            .getClassValue(org.mule.sdk.api.annotation.OnException::value));
 
     return classValue
         .flatMap(c -> c.getDeclaringClass())

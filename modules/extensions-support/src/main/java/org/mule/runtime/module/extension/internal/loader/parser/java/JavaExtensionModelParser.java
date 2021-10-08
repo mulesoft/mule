@@ -11,7 +11,7 @@ import static java.util.Collections.singletonList;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
@@ -84,6 +84,10 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<String> privilegedExportedPackages = new LinkedList<>();
   private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
 
+  public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
+    this(extensionElement, new StereotypeModelLoaderDelegate(loadingContext), loadingContext);
+  }
+
   public JavaExtensionModelParser(ExtensionElement extensionElement,
                                   StereotypeModelLoaderDelegate stereotypeLoaderDelegate,
                                   ExtensionLoadingContext loadingContext) {
@@ -110,18 +114,20 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   private void parseSubtypes() {
     List<Pair<Type, List<Type>>> pairs = mapReduceRepeatableAnnotation(
-                                                                   extensionElement,
-                                                                   SubTypeMapping.class,
-                                                                   org.mule.sdk.api.annotation.SubTypeMapping.class,
-                                                                   container -> ((SubTypesMapping) container).value(),
-                                                                   container -> ((org.mule.sdk.api.annotation.SubTypesMapping) container)
-                                                                       .value(),
-                                                                   value -> new Pair<>(value.getClassValue(sub -> sub.baseType()),
-                                                                                       value.getClassArrayValue(sub -> sub
-                                                                                           .subTypes())),
-                                                                   value -> new Pair<>(value.getClassValue(sub -> sub.baseType()),
-                                                                                       value.getClassArrayValue(sub -> sub
-                                                                                           .subTypes()))).collect(toList());
+                                                                       extensionElement,
+                                                                       SubTypeMapping.class,
+                                                                       org.mule.sdk.api.annotation.SubTypeMapping.class,
+                                                                       container -> ((SubTypesMapping) container).value(),
+                                                                       container -> ((org.mule.sdk.api.annotation.SubTypesMapping) container)
+                                                                           .value(),
+                                                                       value -> new Pair<>(value
+                                                                           .getClassValue(sub -> sub.baseType()),
+                                                                                           value.getClassArrayValue(sub -> sub
+                                                                                               .subTypes())),
+                                                                       value -> new Pair<>(value
+                                                                           .getClassValue(sub -> sub.baseType()),
+                                                                                           value.getClassArrayValue(sub -> sub
+                                                                                               .subTypes()))).collect(toList());
 
     Set<Object> baseTypes = new HashSet<>();
     pairs.forEach(mapping -> {
@@ -142,13 +148,13 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   private void parseImportedTypes() {
     List<Type> types = mapReduceRepeatableAnnotation(extensionElement,
-                                                 Import.class,
-                                                 org.mule.sdk.api.annotation.Import.class,
-                                                 container -> ((ImportedTypes) container).value(),
-                                                 container -> ((org.mule.sdk.api.annotation.ImportedTypes) container).value(),
-                                                 value -> value.getClassValue(Import::type),
-                                                 value -> value.getClassValue(org.mule.sdk.api.annotation.Import::type))
-                                                     .collect(toList());
+                                                     Import.class,
+                                                     org.mule.sdk.api.annotation.Import.class,
+                                                     container -> ((ImportedTypes) container).value(),
+                                                     container -> ((org.mule.sdk.api.annotation.ImportedTypes) container).value(),
+                                                     value -> value.getClassValue(Import::type),
+                                                     value -> value.getClassValue(org.mule.sdk.api.annotation.Import::type))
+                                                         .collect(toList());
 
     importedTypes = types.stream()
         .distinct()
@@ -163,11 +169,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   private void parseExported() {
-    ExportInfo info = mapReduceExtensionAnnotation(extensionElement,
-                                           Export.class,
-                                           org.mule.sdk.api.annotation.Export.class,
-                                           export -> ExportInfo.fromLegacy(export),
-                                           export -> ExportInfo.fromSdkApi(export)).orElse(null);
+    ExportInfo info = mapReduceSingleAnnotation(extensionElement,
+                                                Export.class,
+                                                org.mule.sdk.api.annotation.Export.class,
+                                                export -> ExportInfo.fromLegacy(export),
+                                                export -> ExportInfo.fromSdkApi(export)).orElse(null);
 
     if (info == null) {
       return;
@@ -188,18 +194,18 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   private void parsePrivilegeExport() {
-    mapReduceExtensionAnnotation(
-                         extensionElement,
-                         PrivilegedExport.class,
-                         org.mule.sdk.api.annotation.PrivilegedExport.class,
-                         value -> new Pair<>(value.getArrayValue(PrivilegedExport::artifacts),
-                                             value.getArrayValue(PrivilegedExport::packages)),
-                         value -> new Pair<>(value.getArrayValue(org.mule.sdk.api.annotation.PrivilegedExport::artifacts),
-                                             value.getArrayValue(org.mule.sdk.api.annotation.PrivilegedExport::packages)))
-                                                 .ifPresent(exported -> {
-                                                   privilegedExportedArtifacts = exported.getFirst();
-                                                   privilegedExportedPackages = exported.getSecond();
-                                                 });
+    mapReduceSingleAnnotation(
+                              extensionElement,
+                              PrivilegedExport.class,
+                              org.mule.sdk.api.annotation.PrivilegedExport.class,
+                              value -> new Pair<>(value.getArrayValue(PrivilegedExport::artifacts),
+                                                  value.getArrayValue(PrivilegedExport::packages)),
+                              value -> new Pair<>(value.getArrayValue(org.mule.sdk.api.annotation.PrivilegedExport::artifacts),
+                                                  value.getArrayValue(org.mule.sdk.api.annotation.PrivilegedExport::packages)))
+                                                      .ifPresent(exported -> {
+                                                        privilegedExportedArtifacts = exported.getFirst();
+                                                        privilegedExportedPackages = exported.getSecond();
+                                                      });
   }
 
   @Override
@@ -232,9 +238,9 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public List<OperationModelParser> getOperationModelParsers() {
     return getOperationParsers(this,
-        extensionElement,
-        extensionElement,
-        loadingContext);
+                               extensionElement,
+                               extensionElement,
+                               loadingContext);
   }
 
   @Override
@@ -246,7 +252,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
-    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(this, extensionElement, extensionElement.getConnectionProviders());
+    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(this, extensionElement,
+                                                                           extensionElement.getConnectionProviders());
   }
 
   @Override
@@ -333,15 +340,15 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   private Optional<XmlDslConfiguration> parseXmlDslConfiguration() {
-    return mapReduceExtensionAnnotation(
-                                extensionElement,
-                                Xml.class,
-                                org.mule.sdk.api.annotation.dsl.xml.Xml.class,
-                                xml -> new XmlDslConfiguration(
-                                                               xml.getStringValue(Xml::prefix),
-                                                               xml.getStringValue(Xml::namespace)),
-                                xml -> new XmlDslConfiguration(
-                                                               xml.getStringValue(org.mule.sdk.api.annotation.dsl.xml.Xml::prefix),
-                                                               xml.getStringValue(org.mule.sdk.api.annotation.dsl.xml.Xml::namespace)));
+    return mapReduceSingleAnnotation(
+                                     extensionElement,
+                                     Xml.class,
+                                     org.mule.sdk.api.annotation.dsl.xml.Xml.class,
+                                     xml -> new XmlDslConfiguration(
+                                                                    xml.getStringValue(Xml::prefix),
+                                                                    xml.getStringValue(Xml::namespace)),
+                                     xml -> new XmlDslConfiguration(
+                                                                    xml.getStringValue(org.mule.sdk.api.annotation.dsl.xml.Xml::prefix),
+                                                                    xml.getStringValue(org.mule.sdk.api.annotation.dsl.xml.Xml::namespace)));
   }
 }

@@ -26,7 +26,9 @@ public class SdkStereotypeDefinitionAdapter implements StereotypeDefinition {
       instance = ClassUtils.instantiateClass(definitionClass);
     } catch (Exception e) {
       throw new IllegalModelDefinitionException(format(
-          "Cannot instantiate stereotype definition of class '%s'. %s", definitionClass.getName(), e.getMessage()), e);
+                                                       "Cannot instantiate stereotype definition of class '%s'. %s",
+                                                       definitionClass.getName(), e.getMessage()),
+                                                e);
     }
 
     if (instance instanceof StereotypeDefinition) {
@@ -35,7 +37,8 @@ public class SdkStereotypeDefinitionAdapter implements StereotypeDefinition {
       return new SdkStereotypeDefinitionAdapter((org.mule.runtime.extension.api.stereotype.StereotypeDefinition) instance);
     } else {
       throw new IllegalModelDefinitionException(format(
-          "Class '%s' does not represent a valid StereotypeDefinition", definitionClass.getName()));
+                                                       "Class '%s' does not represent a valid StereotypeDefinition",
+                                                       definitionClass.getName()));
     }
   }
 

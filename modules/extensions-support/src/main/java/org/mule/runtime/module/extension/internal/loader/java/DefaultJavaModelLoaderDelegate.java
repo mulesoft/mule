@@ -98,6 +98,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     parseExports(parser, declarer);
     parseImportedTypes(parser, declarer, context);
     parseSubTypes(parser, declarer, context);
+    getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
@@ -146,8 +147,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
       autoImportReferencedTypes(declarer, base, context);
       subTypes.forEach(subTypeEntry -> autoImportReferencedTypes(declarer, subTypeEntry, context));
     });
-
-    getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
   }
 
   private void autoImportReferencedTypes(ExtensionDeclarer declarer,

@@ -31,7 +31,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceExtensionAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -1090,15 +1090,16 @@ public final class IntrospectionUtils {
   public static Optional<ExpressionSupport> getExpressionSupport(WithAnnotations annotatedElement,
                                                                  String elementType,
                                                                  String elementName) {
-    return MuleExtensionAnnotationParser.mapReduceExtensionAnnotation(
-                                 annotatedElement,
-                                 elementType,
-                                 elementName,
-                                 Expression.class,
-                                 org.mule.sdk.api.annotation.Expression.class,
-                                 value -> value.getEnumValue(Expression::value),
-                                 value -> JavaParserUtils
-                                     .toMuleApi(value.getEnumValue(org.mule.sdk.api.annotation.Expression::value)));
+    return MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
+                                                                   annotatedElement,
+                                                                   elementType,
+                                                                   elementName,
+                                                                   Expression.class,
+                                                                   org.mule.sdk.api.annotation.Expression.class,
+                                                                   value -> value.getEnumValue(Expression::value),
+                                                                   value -> JavaParserUtils
+                                                                       .toMuleApi(value
+                                                                           .getEnumValue(org.mule.sdk.api.annotation.Expression::value)));
   }
 
   public static String getSourceName(Class<?> sourceType) {
