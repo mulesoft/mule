@@ -87,11 +87,6 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   }
 
   @Override
-  public List<StereotypeModel> getAllowedStereotypes() {
-    return decoratee.getAllowedStereotypes();
-  }
-
-  @Override
   public boolean isExcludedFromConnectivitySchema() {
     return decoratee.isExcludedFromConnectivitySchema();
   }

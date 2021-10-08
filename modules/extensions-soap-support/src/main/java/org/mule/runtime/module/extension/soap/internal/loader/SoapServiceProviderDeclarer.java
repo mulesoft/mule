@@ -21,11 +21,14 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.module.extension.internal.loader.java.ParameterModelsLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.java.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapServiceProviderWrapper;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
+
+import java.util.function.Supplier;
 
 /**
  * Declares a Connection Provider of {@link ForwardingSoapClient} instances given a {@link SoapServiceProvider}.
@@ -39,8 +42,8 @@ public class SoapServiceProviderDeclarer {
   private final ParameterModelsLoaderDelegate parametersLoader;
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  SoapServiceProviderDeclarer() {
-    parametersLoader = new ParameterModelsLoaderDelegate();
+  SoapServiceProviderDeclarer(Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader) {
+    parametersLoader = new ParameterModelsLoaderDelegate(stereotypeModelLoader);
   }
 
   /**

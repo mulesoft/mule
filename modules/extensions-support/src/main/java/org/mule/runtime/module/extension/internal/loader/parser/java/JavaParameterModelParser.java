@@ -148,13 +148,6 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   @Override
-  public List<StereotypeModel> getAllowedStereotypes() {
-    return type.getAnnotation(StereotypeTypeAnnotation.class)
-        .map(StereotypeTypeAnnotation::getAllowedStereotypes)
-        .orElse(emptyList());
-  }
-
-  @Override
   public ParameterRole getRole() {
     return roleOf(parameter.getAnnotation(Content.class));
   }
@@ -269,6 +262,10 @@ public class JavaParameterModelParser implements ParameterModelParser {
                                                           .collect(toList()))
                                                       .orElse(new LinkedList<>());
     }
+
+    stereotypes.addAll(type.getAnnotation(StereotypeTypeAnnotation.class)
+        .map(StereotypeTypeAnnotation::getAllowedStereotypes)
+        .orElse(emptyList()));
 
     return stereotypes;
   }

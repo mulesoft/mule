@@ -20,8 +20,15 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public final class ParameterModelsLoaderDelegate {
+
+  private final Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader;
+
+  public ParameterModelsLoaderDelegate(Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader) {
+    this.stereotypeModelLoader = stereotypeModelLoader;
+  }
 
   public List<ParameterDeclarer> declare(HasParametersDeclarer component, List<ParameterGroupModelParser> groupParsers) {
 
@@ -56,10 +63,8 @@ public final class ParameterModelsLoaderDelegate {
         final MetadataType metadataType = parameterParser.getType();
         parameter.ofType(metadataType)
             .describedAs(parameterParser.getDescription())
-            .withAllowedStereotypes(parameterParser.getAllowedStereotypes())
             .withRole(parameterParser.getRole())
-            .withExpressionSupport(parameterParser.getExpressionSupport())
-            .withAllowedStereotypes(parameterParser.getAllowedStereotypes());
+            .withExpressionSupport(parameterParser.getExpressionSupport());
 
         if (parameterParser.isComponentId()) {
           parameter.asComponentId();
@@ -78,7 +83,9 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getDeprecationModel().ifPresent(parameter::withDeprecation);
         parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
+
         addSemanticTerms(parameter.getDeclaration(), parameterParser);
+        stereotypeModelLoader.get().addStereotypes(parameterParser, parameter);
         declarerList.add(parameter);
       });
 

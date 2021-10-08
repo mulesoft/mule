@@ -53,7 +53,7 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                             configurationDeclarer,
                                                                             configParser.getConnectionProviderModelParsers());
 
-      getStereotypeModelLoaderDelegate().addStereotype(configParser,
+      getStereotypeModelLoaderDelegate().addStereotypes(configParser,
                                                        configurationDeclarer,
                                                        of(() -> getStereotypeModelLoaderDelegate()
                                                            .getDefaultConfigStereotype(configParser.getName())));

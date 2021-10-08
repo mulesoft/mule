@@ -31,11 +31,13 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasStereotypeDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.AllowedStereotypesModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.CustomStereotypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.DefaultStereotypeModelFactory;
@@ -86,24 +88,28 @@ public class StereotypeModelLoaderDelegate {
     return stereotypeModelFactory.createStereotype(name, parent);
   }
 
-  public void addStereotype(StereotypeModelParser parser,
-                            ConfigurationDeclarer declarer,
-                            Optional<Supplier<StereotypeModel>> fallback) {
+  public void addStereotypes(StereotypeModelParser parser,
+                             ConfigurationDeclarer declarer,
+                             Optional<Supplier<StereotypeModel>> fallback) {
     doAddStereotypes(parser, declarer, fallback);
     populateComponentConfigsMap(declarer.getDeclaration());
   }
 
-  public void addStereotype(StereotypeModelParser parser,
-                            ConnectionProviderDeclarer declarer,
-                            Optional<Supplier<StereotypeModel>> fallback) {
+  public void addStereotypes(StereotypeModelParser parser,
+                             ConnectionProviderDeclarer declarer,
+                             Optional<Supplier<StereotypeModel>> fallback) {
     doAddStereotypes(parser, declarer, fallback);
   }
 
-  public void addStereotype(StereotypeModelParser parser,
-                            ComponentDeclarer declarer,
-                            Optional<Supplier<StereotypeModel>> fallback) {
+  public void addStereotypes(StereotypeModelParser parser,
+                             ComponentDeclarer declarer,
+                             Optional<Supplier<StereotypeModel>> fallback) {
     doAddStereotypes(parser, declarer, fallback);
     addConfigRefStereoTypesIfNeeded((ComponentDeclaration<?>) declarer.getDeclaration());
+  }
+
+  public void addStereotypes(ParameterModelParser parser, ParameterDeclarer declarer) {
+    declarer.getDeclaration().getAllowedStereotypeModels().addAll(parser.getAllowedStereotypes(stereotypeModelFactory));
   }
 
   public void addAllowedStereotypes(AllowedStereotypesModelParser parser, NestedComponentDeclarer declarer) {

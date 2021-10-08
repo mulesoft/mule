@@ -87,7 +87,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       parser.getMediaTypeModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
-      getStereotypeModelLoaderDelegate().addStereotype(
+      getStereotypeModelLoaderDelegate().addStereotypes(
                                                        parser,
                                                        sourceDeclarer,
                                                        of(() -> getStereotypeModelLoaderDelegate()

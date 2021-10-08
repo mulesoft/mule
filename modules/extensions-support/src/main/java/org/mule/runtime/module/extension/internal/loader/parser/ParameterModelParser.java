@@ -15,7 +15,6 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -73,11 +72,6 @@ public interface ParameterModelParser extends SemanticTermsParser, AllowedStereo
    * @return the parameter's {@link ParameterDslConfiguration} if one was defined
    */
   Optional<ParameterDslConfiguration> getDslConfiguration();
-
-  /**
-   * @return a list with the allowed {@link StereotypeModel stereotypes}
-   */
-  List<StereotypeModel> getAllowedStereotypes();
 
   /**
    * @return whether this parameter should be skipped when generating the extension's connectivity schemas

@@ -105,7 +105,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         getStereotypeModelLoaderDelegate().addAllowedStereotypes(chain, chainDeclarer);
       });
 
-      getStereotypeModelLoaderDelegate().addStereotype(
+      getStereotypeModelLoaderDelegate().addStereotypes(
                                                        parser,
                                                        operation,
                                                        of(() -> getStereotypeModelLoaderDelegate()

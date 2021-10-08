@@ -30,7 +30,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Configura
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
@@ -49,18 +48,17 @@ import java.util.Set;
 public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
 
   private final SoapInvokeOperationDeclarer operationDeclarer;
-  private final SoapServiceProviderDeclarer serviceProviderDeclarer;
   private final Class<?> extensionType;
   private final ExtensionElement extensionElement;
   private final String version;
   private final ClassTypeLoader typeLoader;
+  private SoapServiceProviderDeclarer serviceProviderDeclarer;
 
   public SoapModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.extensionType = extensionElement.getDeclaringClass().get();
     this.extensionElement = extensionElement;
     this.version = version;
     this.typeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionType.getClassLoader());
-    this.serviceProviderDeclarer = new SoapServiceProviderDeclarer();
     this.operationDeclarer = new SoapInvokeOperationDeclarer();
   }
 
@@ -68,7 +66,8 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
    * {@inheritDoc}
    */
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, context);
+    JavaExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, context);
+    serviceProviderDeclarer = new SoapServiceProviderDeclarer(parser::getStereotypeLoaderDelegate);
     final SoapExtensionTypeWrapper<?> extension = getSoapExtensionType(this.extensionType, typeLoader);
     List<MessageDispatcherProviderTypeWrapper> customTransportProviders = extension.getDispatcherProviders();
     ExtensionDeclarer extensionDeclarer = getExtensionDeclarer(context);

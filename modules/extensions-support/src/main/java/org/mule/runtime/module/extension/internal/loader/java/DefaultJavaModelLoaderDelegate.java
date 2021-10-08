@@ -53,7 +53,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final SourceModelLoaderDelegate sourceModelLoaderDelegate = new SourceModelLoaderDelegate(this);
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
-  private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate = new ParameterModelsLoaderDelegate();
+  private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate = new ParameterModelsLoaderDelegate(this::getStereotypeModelLoaderDelegate);
   private StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate;
 
   private Supplier<ErrorsModelFactory> errorsModelFactorySupplier;
