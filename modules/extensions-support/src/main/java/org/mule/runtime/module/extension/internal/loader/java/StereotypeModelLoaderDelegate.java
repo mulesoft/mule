@@ -12,6 +12,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONNECTION;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.PROCESSOR;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
@@ -40,7 +41,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.DefaultStereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.sdk.api.stereotype.ImplicitStereotypeDefinition;
-import org.mule.sdk.api.stereotype.MuleStereotypes;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
 import java.util.HashMap;
@@ -109,7 +109,7 @@ public class StereotypeModelLoaderDelegate {
   public void addAllowedStereotypes(AllowedStereotypesModelParser parser, NestedComponentDeclarer declarer) {
     List<StereotypeModel> allowedStereotypes = parser.getAllowedStereotypes(stereotypeModelFactory);
     if (allowedStereotypes.isEmpty()) {
-      declarer.withAllowedStereotypes(MuleStereotypes.PROCESSOR);
+      declarer.withAllowedStereotypes(PROCESSOR);
     } else {
       allowedStereotypes.forEach(declarer::withAllowedStereotypes);
     }
