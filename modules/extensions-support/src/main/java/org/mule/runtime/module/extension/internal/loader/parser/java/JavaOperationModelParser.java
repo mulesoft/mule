@@ -357,7 +357,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public List<NestedRouteModelParser> getNestedRouteParsers() {
-    return routes.stream().map(r -> new JavaNestedRouteModelParser(r)).collect(toList());
+    return routes.stream().map(JavaNestedRouteModelParser::new).collect(toList());
   }
 
   @Override

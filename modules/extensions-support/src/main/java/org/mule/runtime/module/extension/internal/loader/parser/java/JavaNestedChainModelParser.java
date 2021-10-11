@@ -46,7 +46,7 @@ public class JavaNestedChainModelParser implements NestedChainModelParser {
 
   @Override
   public List<StereotypeModel> getAllowedStereotypes(StereotypeModelFactory factory) {
-    return JavaStereotypeModelParserUtils.getAllowedStereotypes(extensionParameter, factory);
+    return JavaStereotypeModelParserUtils.getAllowedStereotypes(extensionParameter, extensionParameter.getType(), factory);
   }
 
   @Override

@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
@@ -71,6 +70,18 @@ public final class JavaStereotypeModelParserUtils {
     return stereotypeDefinition != null
         ? of(factory.createStereotype(stereotypeDefinition))
         : empty();
+  }
+
+  public static List<StereotypeModel> getAllowedStereotypes(WithAnnotations element,
+                                                            WithAnnotations fallbackElement,
+                                                            StereotypeModelFactory factory) {
+
+    List<StereotypeModel> stereotypes = getAllowedStereotypes(element, factory);
+    if (stereotypes.isEmpty()) {
+      stereotypes = JavaStereotypeModelParserUtils.getAllowedStereotypes(fallbackElement, factory);
+    }
+
+    return stereotypes;
   }
 
   public static List<StereotypeModel> getAllowedStereotypes(WithAnnotations element, StereotypeModelFactory factory) {

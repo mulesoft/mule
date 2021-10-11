@@ -86,7 +86,7 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
 
   @Override
   public List<StereotypeModel> getAllowedStereotypes(StereotypeModelFactory factory) {
-    return JavaStereotypeModelParserUtils.getAllowedStereotypes(route, factory);
+    return JavaStereotypeModelParserUtils.getAllowedStereotypes(route, route.getType(), factory);
   }
 
   @Override
