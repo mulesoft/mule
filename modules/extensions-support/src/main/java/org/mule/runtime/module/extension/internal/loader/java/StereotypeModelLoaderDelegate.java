@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.NameUtils.underscorize;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONNECTION;
@@ -22,11 +21,6 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasStereotypeDeclarer;
@@ -47,7 +41,6 @@ import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,7 +50,6 @@ import java.util.function.Supplier;
 
 public class StereotypeModelLoaderDelegate {
 
-  private final Map<ComponentDeclaration, List<StereotypeModel>> componentsConfigStereotypes = new HashMap<>();
   private final DslResolvingContext dslResolvingContext;
   private final DefaultStereotypeModelFactory stereotypeModelFactory;
 
@@ -88,24 +80,20 @@ public class StereotypeModelLoaderDelegate {
     return stereotypeModelFactory.createStereotype(name, parent);
   }
 
-  public void addStereotypes(StereotypeModelParser parser,
-                             ConfigurationDeclarer declarer,
-                             Optional<Supplier<StereotypeModel>> fallback) {
-    doAddStereotypes(parser, declarer, fallback);
-    populateComponentConfigsMap(declarer.getDeclaration());
-  }
+  public <T extends HasStereotypeDeclarer & HasModelProperties> void addStereotypes(StereotypeModelParser parser,
+                                                                                    T declarer,
+                                                                                    Optional<Supplier<StereotypeModel>> fallback) {
 
-  public void addStereotypes(StereotypeModelParser parser,
-                             ConnectionProviderDeclarer declarer,
-                             Optional<Supplier<StereotypeModel>> fallback) {
-    doAddStereotypes(parser, declarer, fallback);
-  }
+    StereotypeModel stereotypeModel = parser.getStereotype(stereotypeModelFactory).orElse(null);
+    if (stereotypeModel != null) {
+      declarer.withModelProperty(CustomStereotypeModelProperty.INSTANCE);
+    } else {
+      stereotypeModel = fallback.map(Supplier::get).orElse(null);
+    }
 
-  public void addStereotypes(StereotypeModelParser parser,
-                             ComponentDeclarer declarer,
-                             Optional<Supplier<StereotypeModel>> fallback) {
-    doAddStereotypes(parser, declarer, fallback);
-    addConfigRefStereoTypesIfNeeded((ComponentDeclaration<?>) declarer.getDeclaration());
+    if (stereotypeModel != null) {
+      declarer.withStereotype(stereotypeModel);
+    }
   }
 
   public void addStereotypes(ParameterModelParser parser, ParameterDeclarer declarer) {
@@ -203,49 +191,6 @@ public class StereotypeModelLoaderDelegate {
         .flatMap(typeId -> dslResolvingContext.getExtensionForType(typeId))
         .map(ExtensionNamespaceUtils::getExtensionsNamespace)
         .orElse(defaultNamespace);
-  }
-
-  private void addConfigRefStereoTypesIfNeeded(ComponentDeclaration<?> declaration) {
-    List<StereotypeModel> configStereotypes = componentsConfigStereotypes.get(declaration);
-    if (configStereotypes != null && !configStereotypes.isEmpty()) {
-      declaration.getAllParameters().stream()
-          .filter(p -> CONFIG_ATTRIBUTE_NAME.equals(p.getName()))
-          .findAny()
-          .ifPresent(configRef -> configRef.setAllowedStereotypeModels(configStereotypes));
-    }
-  }
-
-  private <T extends HasStereotypeDeclarer & HasModelProperties> StereotypeModel doAddStereotypes(
-                                                                                                  StereotypeModelParser parser,
-                                                                                                  T declarer,
-                                                                                                  Optional<Supplier<StereotypeModel>> fallback) {
-
-
-    StereotypeModel stereotypeModel = parser.getStereotype(stereotypeModelFactory).orElse(null);
-    if (stereotypeModel != null) {
-      declarer.withModelProperty(CustomStereotypeModelProperty.INSTANCE);
-    } else {
-      stereotypeModel = fallback.map(Supplier::get).orElse(null);
-    }
-
-    if (stereotypeModel != null) {
-      declarer.withStereotype(stereotypeModel);
-    }
-
-    return stereotypeModel;
-  }
-
-  private void populateComponentConfigsMap(ConfigurationDeclaration config) {
-    StereotypeModel configStereotype = config.getStereotype();
-    if (configStereotype != null) {
-      config.getConstructs().forEach(construct -> addComponentConfigStereotype(construct, configStereotype));
-      config.getMessageSources().forEach(source -> addComponentConfigStereotype(source, configStereotype));
-      config.getOperations().forEach(operation -> addComponentConfigStereotype(operation, configStereotype));
-    }
-  }
-
-  private void addComponentConfigStereotype(ComponentDeclaration declaration, StereotypeModel configStereotype) {
-    componentsConfigStereotypes.computeIfAbsent(declaration, key -> new LinkedList<>()).add(configStereotype);
   }
 
   public void setNamespace(String namespace) {
