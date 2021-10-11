@@ -5546,7 +5546,12 @@
                     "query": false,
                     "order": 1
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "TEST_TRANSACTIONAL_CONNECTION",
+                      "namespace": "TX"
+                    }
+                  ],
                   "semanticTerms": [],
                   "name": "transactionalConnection",
                   "description": "",
@@ -10678,7 +10683,12 @@
           "value": "TestTransactionalConnection"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "TEST_TRANSACTIONAL_CONNECTION",
+              "namespace": "TX"
+            }
+          ]
         }
       },
       "fields": []

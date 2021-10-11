@@ -514,7 +514,12 @@
                 "query": false,
                 "order": 15
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "WEAPON",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "weapon",
               "description": "",
@@ -683,7 +688,12 @@
                 "query": false,
                 "order": 18
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "WEAPON",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "weaponValueMap",
               "displayModel": {
@@ -736,7 +746,12 @@
                 "query": false,
                 "order": 19
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "KNOCKEABLE_DOOR",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "candidateDoors",
               "description": "",
@@ -1201,7 +1216,16 @@
                 "order": 1,
                 "tabName": "General"
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "RICIN",
+                  "namespace": "HEISENBERG",
+                  "parent": {
+                    "type": "WEAPON",
+                    "namespace": "HEISENBERG"
+                  }
+                }
+              ],
               "semanticTerms": [],
               "name": "labeledRicin",
               "description": "",
@@ -1230,7 +1254,12 @@
                 "query": false,
                 "order": 27
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "KNOCKEABLE_DOOR",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "nextDoor",
               "description": "",
@@ -1281,7 +1310,16 @@
                 "order": 2,
                 "tabName": "General"
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "RICIN",
+                  "namespace": "HEISENBERG",
+                  "parent": {
+                    "type": "WEAPON",
+                    "namespace": "HEISENBERG"
+                  }
+                }
+              ],
               "semanticTerms": [],
               "name": "ricinPacks",
               "displayModel": {
@@ -18996,7 +19034,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -19025,7 +19072,12 @@
                       "query": false,
                       "order": 20
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -19076,7 +19128,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -19625,7 +19686,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -19654,7 +19724,12 @@
                       "query": false,
                       "order": 25
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -19705,7 +19780,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -20425,7 +20509,12 @@
                     "query": false,
                     "order": 12
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "WEAPON",
+                      "namespace": "HEISENBERG"
+                    }
+                  ],
                   "semanticTerms": [],
                   "name": "usableWeapons",
                   "description": "",
@@ -21250,7 +21339,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -21279,7 +21377,12 @@
                       "query": false,
                       "order": 20
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -21330,7 +21433,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -21882,7 +21994,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -21911,7 +22032,12 @@
                       "query": false,
                       "order": 25
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -21962,7 +22088,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -22691,7 +22826,12 @@
                     "query": false,
                     "order": 12
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "WEAPON",
+                      "namespace": "HEISENBERG"
+                    }
+                  ],
                   "semanticTerms": [],
                   "name": "usableWeapons",
                   "description": "",
@@ -23568,7 +23708,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -23597,7 +23746,12 @@
                       "query": false,
                       "order": 10
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -23648,7 +23802,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -23939,7 +24102,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -23968,7 +24140,12 @@
                       "query": false,
                       "order": 14
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -24019,7 +24196,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -25111,7 +25297,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -25140,7 +25335,12 @@
                       "query": false,
                       "order": 21
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -25191,7 +25391,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -25743,7 +25952,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -25772,7 +25990,12 @@
                       "query": false,
                       "order": 26
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -25823,7 +26046,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -26547,7 +26779,12 @@
                     "query": false,
                     "order": 12
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "WEAPON",
+                      "namespace": "HEISENBERG"
+                    }
+                  ],
                   "semanticTerms": [],
                   "name": "usableWeapons",
                   "description": "",
@@ -27405,7 +27642,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -27434,7 +27680,12 @@
                       "query": false,
                       "order": 20
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -27485,7 +27736,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -28037,7 +28297,16 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "labeledRicin",
                     "description": "",
@@ -28066,7 +28335,12 @@
                       "query": false,
                       "order": 25
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "KNOCKEABLE_DOOR",
+                        "namespace": "HEISENBERG"
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "nextDoor",
                     "description": "",
@@ -28117,7 +28391,16 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [],
+                    "allowedStereotypeModels": [
+                      {
+                        "type": "RICIN",
+                        "namespace": "HEISENBERG",
+                        "parent": {
+                          "type": "WEAPON",
+                          "namespace": "HEISENBERG"
+                        }
+                      }
+                    ],
                     "semanticTerms": [],
                     "name": "ricinPacks",
                     "displayModel": {
@@ -28841,7 +29124,12 @@
                     "query": false,
                     "order": 12
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "WEAPON",
+                      "namespace": "HEISENBERG"
+                    }
+                  ],
                   "semanticTerms": [],
                   "name": "usableWeapons",
                   "description": "",
@@ -30632,7 +30920,12 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "RECURSIVE_POJO",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "recursivePojo",
               "description": "",
@@ -30661,7 +30954,12 @@
                 "query": false,
                 "order": 3
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "RECURSIVE_CHAIN_B",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "recursiveChainB",
               "description": "",
@@ -30690,7 +30988,12 @@
                 "query": false,
                 "order": 4
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "RECURSIVE_CHAIN_A",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "recursiveChainA",
               "description": "",
@@ -31185,7 +31488,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "WEAPON",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "awesomeWeapon",
               "description": "",
@@ -33286,7 +33594,16 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "RICIN",
+                  "namespace": "HEISENBERG",
+                  "parent": {
+                    "type": "WEAPON",
+                    "namespace": "HEISENBERG"
+                  }
+                }
+              ],
               "semanticTerms": [],
               "name": "ricins",
               "description": "",
@@ -41523,7 +41840,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "WEAPON",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "weapons",
               "description": "",
@@ -41904,7 +42226,16 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "RICIN",
+                  "namespace": "HEISENBERG",
+                  "parent": {
+                    "type": "WEAPON",
+                    "namespace": "HEISENBERG"
+                  }
+                }
+              ],
               "semanticTerms": [],
               "name": "ricins",
               "description": "",
@@ -42214,7 +42545,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "WEAPON",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "weapon",
               "description": "",
@@ -42603,7 +42939,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "KNOCKEABLE_DOOR",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "knockedDoor",
               "description": "",
@@ -42945,7 +43286,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "KNOCKEABLE_DOOR",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "doors",
               "displayModel": {
@@ -49753,7 +50099,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "MY_INTERFACE",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "myInterface",
               "description": "",
@@ -50060,7 +50411,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "MY_INTERFACE",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "myInterface",
               "description": "",
@@ -50367,7 +50723,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "MY_INTERFACE",
+                  "namespace": "HEISENBERG"
+                }
+              ],
               "semanticTerms": [],
               "name": "myInterface",
               "description": "",
@@ -57838,7 +58199,16 @@
           "value": "CarWash"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "CAR_WASH",
+              "namespace": "HEISENBERG",
+              "parent": {
+                "type": "INVESTMENT",
+                "namespace": "HEISENBERG"
+              }
+            }
+          ]
         }
       },
       "fields": [
@@ -58734,7 +59104,12 @@
           "value": "door"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "KNOCKEABLE_DOOR",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": [
@@ -58855,7 +59230,12 @@
           "value": "MyInterface"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "MY_INTERFACE",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": []
@@ -59207,7 +59587,12 @@
           "value": "RecursiveChainA"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "RECURSIVE_CHAIN_A",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": [
@@ -59254,7 +59639,12 @@
                 "value": "RecursiveChainB"
               },
               "stereotype": {
-                "allowedStereotypes": []
+                "allowedStereotypes": [
+                  {
+                    "type": "RECURSIVE_CHAIN_B",
+                    "namespace": "HEISENBERG"
+                  }
+                ]
               }
             },
             "fields": [
@@ -59374,7 +59764,12 @@
                   "value": "RecursiveChainB"
                 },
                 "stereotype": {
-                  "allowedStereotypes": []
+                  "allowedStereotypes": [
+                    {
+                      "type": "RECURSIVE_CHAIN_B",
+                      "namespace": "HEISENBERG"
+                    }
+                  ]
                 }
               },
               "fields": [
@@ -59473,7 +59868,12 @@
           "value": "RecursiveChainB"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "RECURSIVE_CHAIN_B",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": [
@@ -59520,7 +59920,12 @@
                 "value": "RecursiveChainA"
               },
               "stereotype": {
-                "allowedStereotypes": []
+                "allowedStereotypes": [
+                  {
+                    "type": "RECURSIVE_CHAIN_A",
+                    "namespace": "HEISENBERG"
+                  }
+                ]
               }
             },
             "fields": [
@@ -59640,7 +60045,12 @@
                   "value": "RecursiveChainA"
                 },
                 "stereotype": {
-                  "allowedStereotypes": []
+                  "allowedStereotypes": [
+                    {
+                      "type": "RECURSIVE_CHAIN_A",
+                      "namespace": "HEISENBERG"
+                    }
+                  ]
                 }
               },
               "fields": [
@@ -59739,7 +60149,12 @@
           "value": "RecursivePojo"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "RECURSIVE_POJO",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": [
@@ -59847,7 +60262,16 @@
           "value": "Ricin"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "RICIN",
+              "namespace": "HEISENBERG",
+              "parent": {
+                "type": "WEAPON",
+                "namespace": "HEISENBERG"
+              }
+            }
+          ]
         }
       },
       "fields": [
@@ -59913,7 +60337,12 @@
                 "value": "door"
               },
               "stereotype": {
-                "allowedStereotypes": []
+                "allowedStereotypes": [
+                  {
+                    "type": "KNOCKEABLE_DOOR",
+                    "namespace": "HEISENBERG"
+                  }
+                ]
               }
             },
             "fields": [
@@ -60092,7 +60521,12 @@
           "value": "Weapon"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "WEAPON",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": []
@@ -60150,7 +60584,12 @@
           "value": "Drug"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "DRUG",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": []

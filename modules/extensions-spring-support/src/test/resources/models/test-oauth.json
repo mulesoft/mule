@@ -6189,8 +6189,16 @@
           "errors": [],
           "semanticTerms": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "UNAUTHORIZE",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -19475,8 +19483,16 @@
           "errors": [],
           "semanticTerms": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "UNAUTHORIZE",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -26832,8 +26848,16 @@
           "errors": [],
           "semanticTerms": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "UNAUTHORIZE",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -35103,8 +35127,16 @@
           "errors": [],
           "semanticTerms": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "UNAUTHORIZE",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -42884,8 +42916,16 @@
           "errors": [],
           "semanticTerms": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "UNAUTHORIZE",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
