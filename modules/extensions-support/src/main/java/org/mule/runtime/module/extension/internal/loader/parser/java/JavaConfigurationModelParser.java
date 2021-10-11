@@ -70,14 +70,14 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public String getName() {
     return mapReduceSingleAnnotation(configElement,
-        "Configuration", configElement.getName(),
-        Configuration.class,
-        org.mule.sdk.api.annotation.Configuration.class,
-        value -> value.getStringValue(Configuration::name),
-        value -> value
-            .getStringValue(org.mule.sdk.api.annotation.Configuration::name))
-        .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
-        .orElse(DEFAULT_CONFIG_NAME);
+                                     "Configuration", configElement.getName(),
+                                     Configuration.class,
+                                     org.mule.sdk.api.annotation.Configuration.class,
+                                     value -> value.getStringValue(Configuration::name),
+                                     value -> value
+                                         .getStringValue(org.mule.sdk.api.annotation.Configuration::name))
+                                             .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
+                                             .orElse(DEFAULT_CONFIG_NAME);
   }
 
   @Override
@@ -88,14 +88,14 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public List<ParameterGroupModelParser> getParameterGroupParsers() {
     return JavaExtensionModelParserUtils.getParameterGroupParsers(
-        configElement.getParameters(),
-        forConfig(configElement.getName()));
+                                                                  configElement.getParameters(),
+                                                                  forConfig(configElement.getName()));
   }
 
   @Override
   public List<OperationModelParser> getOperationParsers() {
     return JavaExtensionModelParserUtils.getOperationParsers(extensionModelParser, extensionElement, configElement,
-        loadingContext);
+                                                             loadingContext);
   }
 
   @Override
@@ -106,16 +106,16 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
     return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
-        extensionModelParser,
-        extensionElement,
-        configElement.getConnectionProviders());
+                                                                           extensionModelParser,
+                                                                           extensionElement,
+                                                                           configElement.getConnectionProviders());
   }
 
   @Override
   public List<FunctionModelParser> getFunctionModelParsers() {
     return JavaExtensionModelParserUtils.getFunctionModelParsers(extensionElement,
-        configElement.getFunctionContainers(),
-        loadingContext);
+                                                                 configElement.getFunctionContainers(),
+                                                                 loadingContext);
   }
 
   @Override
@@ -158,8 +158,8 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
       if (componentElement.isAssignableFrom(operationClass)
           || componentElement.isAssignableTo(operationClass)) {
         throw new IllegalConfigurationModelDefinitionException(
-            format("Configuration class '%s' cannot be the same class (nor a derivative) of any operation class '%s",
-                componentElement.getName(), operationClass.getName()));
+                                                               format("Configuration class '%s' cannot be the same class (nor a derivative) of any operation class '%s",
+                                                                      componentElement.getName(), operationClass.getName()));
       }
     }
   }

@@ -42,24 +42,25 @@ public final class JavaStereotypeModelParserUtils {
                                                             String elementName,
                                                             StereotypeModelFactory factory) {
     StereotypeDefinition stereotypeDefinition = mapReduceSingleAnnotation(
-        annotatedElement,
-        elementType,
-        elementName,
-        Stereotype.class,
-        org.mule.sdk.api.annotation.param.stereotype.Stereotype.class,
-        value -> value.getClassValue(Stereotype::value),
-        value -> value.getClassValue(org.mule.sdk.api.annotation.param.stereotype.Stereotype::value))
-        .flatMap(type -> type.getDeclaringClass())
-        .map(SdkStereotypeDefinitionAdapter::from)
-        .orElse(null);
+                                                                          annotatedElement,
+                                                                          elementType,
+                                                                          elementName,
+                                                                          Stereotype.class,
+                                                                          org.mule.sdk.api.annotation.param.stereotype.Stereotype.class,
+                                                                          value -> value.getClassValue(Stereotype::value),
+                                                                          value -> value
+                                                                              .getClassValue(org.mule.sdk.api.annotation.param.stereotype.Stereotype::value))
+                                                                                  .flatMap(type -> type.getDeclaringClass())
+                                                                                  .map(SdkStereotypeDefinitionAdapter::from)
+                                                                                  .orElse(null);
 
 
     if (isValidator(annotatedElement)) {
       if (stereotypeDefinition != null) {
         throw new IllegalModelDefinitionException(format("%s '%s' is annotated with both @%s and @%s. Only one can "
-                + "be provided at the same time for the same component",
-            elementType, elementName, Stereotype.class.getSimpleName(),
-            Validator.class.getSimpleName()));
+            + "be provided at the same time for the same component",
+                                                         elementType, elementName, Stereotype.class.getSimpleName(),
+                                                         Validator.class.getSimpleName()));
       }
 
       return of(factory.getValidatorStereotype());
@@ -84,14 +85,14 @@ public final class JavaStereotypeModelParserUtils {
 
   public static List<StereotypeModel> getAllowedStereotypes(WithAnnotations element, StereotypeModelFactory factory) {
     return concat(
-        getAllowedTypeStream(element,
-            AllowedStereotypes.class,
-            AllowedStereotypes::value),
-        getAllowedTypeStream(element,
-            org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes.class,
-            org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes::value))
-        .map(type -> factory.createStereotype(from(type.getDeclaringClass().get())))
-        .collect(toList());
+                  getAllowedTypeStream(element,
+                                       AllowedStereotypes.class,
+                                       AllowedStereotypes::value),
+                  getAllowedTypeStream(element,
+                                       org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes.class,
+                                       org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes::value))
+                                           .map(type -> factory.createStereotype(from(type.getDeclaringClass().get())))
+                                           .collect(toList());
   }
 
   public static StereotypeDefinition asDefinition(StereotypeModel model) {
@@ -124,6 +125,5 @@ public final class JavaStereotypeModelParserUtils {
   }
 
 
-  private JavaStereotypeModelParserUtils() {
-  }
+  private JavaStereotypeModelParserUtils() {}
 }
