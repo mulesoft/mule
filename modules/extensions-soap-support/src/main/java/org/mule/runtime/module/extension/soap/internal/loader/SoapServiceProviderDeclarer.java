@@ -41,9 +41,12 @@ public class SoapServiceProviderDeclarer {
 
   private final ParameterModelsLoaderDelegate parametersLoader;
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final StereotypeModelLoaderDelegate stereotypeDelegate;
 
-  SoapServiceProviderDeclarer(Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader) {
+  SoapServiceProviderDeclarer(Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader,
+                              StereotypeModelLoaderDelegate stereotypeDelegate) {
     parametersLoader = new ParameterModelsLoaderDelegate(stereotypeModelLoader);
+    this.stereotypeDelegate = stereotypeDelegate;
   }
 
   /**
@@ -57,15 +60,17 @@ public class SoapServiceProviderDeclarer {
     String description = provider.getDescription();
 
     // Declares the Service Provider as a Connection Provider.
-    ConnectionProviderDeclarer providerDeclarer = configDeclarer.withConnectionProvider(provider.getAlias())
+    final String providerName = provider.getAlias();
+    ConnectionProviderDeclarer providerDeclarer = configDeclarer.withConnectionProvider(providerName)
         .describedAs(description)
         .withModelProperty(new ConnectionTypeModelProperty(ForwardingSoapClient.class))
         // TODO - MULE-14311 - Make loader work in compile time
         .withModelProperty(new ImplementingTypeModelProperty(provider.getDeclaringClass().get()))
         .withConnectionManagementType(POOLING)
-        .supportsConnectivityTesting(provider.supportsConnectivityTesting());
+        .supportsConnectivityTesting(provider.supportsConnectivityTesting())
+        .withStereotype(stereotypeDelegate.getDefaultConnectionProviderStereotype(providerName));
 
-    ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", provider.getAlias());
+    ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerName);
 
     parametersLoader.declare(providerDeclarer, getParameterGroupParsers(provider.getParameters(), context));
     if (hasCustomTransports) {

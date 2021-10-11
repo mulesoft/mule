@@ -151,16 +151,7 @@
           "value": "Ricin"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "RICIN",
-              "namespace": "HEISENBERG",
-              "parent": {
-                "type": "WEAPON",
-                "namespace": "HEISENBERG"
-              }
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": [
@@ -226,12 +217,7 @@
                 "value": "door"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "KNOCKEABLE_DOOR",
-                    "namespace": "HEISENBERG"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [
@@ -306,12 +292,7 @@
           "value": "Weapon"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "WEAPON",
-              "namespace": "HEISENBERG"
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": []
@@ -485,12 +466,7 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DOOR",
-                  "namespace": "SUBTYPES"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "doorInterface",
               "description": "",
@@ -519,16 +495,7 @@
                 "query": false,
                 "order": 3
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "SQUARE",
-                  "namespace": "SUBTYPES",
-                  "parent": {
-                    "type": "PARENT_SHAPE",
-                    "namespace": "SUBTYPES"
-                  }
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "explicitSquare",
               "description": "",
@@ -586,16 +553,7 @@
                 "query": false,
                 "order": 5
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "RICIN",
-                  "namespace": "HEISENBERG",
-                  "parent": {
-                    "type": "WEAPON",
-                    "namespace": "HEISENBERG"
-                  }
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "ricin",
               "description": "",
@@ -624,12 +582,7 @@
                 "query": false,
                 "order": 6
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "WEAPON",
-                  "namespace": "HEISENBERG"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "extensibleWeapon",
               "description": "",
@@ -837,12 +790,7 @@
                 "query": false,
                 "order": 11
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "WEAPON",
-                  "namespace": "HEISENBERG"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "weapons",
               "description": "",
@@ -892,12 +840,7 @@
                 "query": false,
                 "order": 12
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "WEAPON",
-                  "namespace": "HEISENBERG"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "weaponMap",
               "description": "",
@@ -2021,12 +1964,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "DOOR",
-                      "namespace": "SUBTYPES"
-                    }
-                  ],
+                  "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "doorInterface",
                   "description": "",
@@ -2076,12 +2014,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "DOOR",
-                      "namespace": "SUBTYPES"
-                    }
-                  ],
+                  "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "doors",
                   "description": "",
@@ -2431,12 +2364,7 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DOOR",
-                  "namespace": "SUBTYPES"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "door",
               "description": "",
@@ -3455,12 +3383,7 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DOOR",
-                  "namespace": "SUBTYPES"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "door",
               "description": "",
@@ -3510,12 +3433,7 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DOOR",
-                  "namespace": "SUBTYPES"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "doorRegistry",
               "description": "",
@@ -4212,12 +4130,7 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DOOR",
-                  "namespace": "SUBTYPES"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "door",
               "description": "",
@@ -4682,12 +4595,7 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DOOR",
-                  "namespace": "SUBTYPES"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "doorInterface",
               "description": "",
@@ -4737,12 +4645,7 @@
                 "query": false,
                 "order": 3
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DOOR",
-                  "namespace": "SUBTYPES"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "doors",
               "description": "",
@@ -5074,12 +4977,7 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DOOR",
-                  "namespace": "SUBTYPES"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "doorParam",
               "description": "",
@@ -5345,16 +5243,7 @@
           "value": "CarDoor"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "CAR_DOOR",
-              "namespace": "SUBTYPES",
-              "parent": {
-                "type": "DOOR",
-                "namespace": "SUBTYPES"
-              }
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": [
@@ -5409,12 +5298,7 @@
           "value": "Door"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "DOOR",
-              "namespace": "SUBTYPES"
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": []
@@ -5589,12 +5473,7 @@
                 "value": "Door"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "DOOR",
-                    "namespace": "SUBTYPES"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": []
@@ -5717,16 +5596,7 @@
           "value": "HouseDoor"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "HOUSE_DOOR",
-              "namespace": "SUBTYPES",
-              "parent": {
-                "type": "DOOR",
-                "namespace": "SUBTYPES"
-              }
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": [
@@ -6026,7 +5896,7 @@
               "namespace": "SUBTYPES",
               "parent": {
                 "type": "WEAPON",
-                "namespace": "HEISENBERG"
+                "namespace": "SUBTYPES"
               }
             }
           ]
@@ -6089,16 +5959,7 @@
           "value": "Square"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "SQUARE",
-              "namespace": "SUBTYPES",
-              "parent": {
-                "type": "PARENT_SHAPE",
-                "namespace": "SUBTYPES"
-              }
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": [
@@ -6200,12 +6061,7 @@
                 "value": "Door"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "DOOR",
-                    "namespace": "SUBTYPES"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": []
@@ -6423,12 +6279,7 @@
                 "value": "Square"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "SQUARE",
-                    "namespace": "SUBTYPES"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [
@@ -6563,12 +6414,7 @@
                 "value": "Ricin"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "RICIN",
-                    "namespace": "HEISENBERG"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [
@@ -6634,12 +6480,7 @@
                       "value": "door"
                     },
                     "stereotype": {
-                      "allowedStereotypes": [
-                        {
-                          "type": "KNOCKEABLE_DOOR",
-                          "namespace": "HEISENBERG"
-                        }
-                      ]
+                      "allowedStereotypes": []
                     }
                   },
                   "fields": [
@@ -6724,12 +6565,7 @@
                 "value": "Weapon"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "WEAPON",
-                    "namespace": "HEISENBERG"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": []
@@ -7074,12 +6910,7 @@
                   "value": "Weapon"
                 },
                 "stereotype": {
-                  "allowedStereotypes": [
-                    {
-                      "type": "WEAPON",
-                      "namespace": "HEISENBERG"
-                    }
-                  ]
+                  "allowedStereotypes": []
                 }
               },
               "fields": []
@@ -7136,12 +6967,7 @@
                   "value": "Weapon"
                 },
                 "stereotype": {
-                  "allowedStereotypes": [
-                    {
-                      "type": "WEAPON",
-                      "namespace": "HEISENBERG"
-                    }
-                  ]
+                  "allowedStereotypes": []
                 }
               },
               "fields": []
@@ -7181,16 +7007,7 @@
           "value": "triangleAlias"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "TRIANGLE",
-              "namespace": "SUBTYPES",
-              "parent": {
-                "type": "PARENT_SHAPE",
-                "namespace": "SUBTYPES"
-              }
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": [

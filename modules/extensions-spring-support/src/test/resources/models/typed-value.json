@@ -143,12 +143,7 @@
           "value": "door"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "KNOCKEABLE_DOOR",
-              "namespace": "HEISENBERG"
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": [
@@ -259,12 +254,7 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DIFFERED_KNOCKABLE_DOOR",
-                  "namespace": "HEISENBERG"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "differedDoor",
               "description": "",
@@ -2772,12 +2762,7 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "DIFFERED_KNOCKABLE_DOOR",
-                  "namespace": "HEISENBERG"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "differedDoor",
               "description": "",
@@ -6285,12 +6270,7 @@
                 "value": "DifferedKnockableDoor"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "DIFFERED_KNOCKABLE_DOOR",
-                    "namespace": "HEISENBERG"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [
