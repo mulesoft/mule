@@ -47,11 +47,9 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -458,24 +456,6 @@ public class MuleExtensionUtils {
                                                                   Function<P, T> map,
                                                                   Supplier<? extends RuntimeException> exceptionSupplier) {
     return model.getModelProperty(modelPropertyType).map(map).orElseThrow(exceptionSupplier);
-  }
-
-  /**
-   * @return the extension's error namespace for a given {@link ExtensionModel}
-   */
-  public static String getExtensionsNamespace(ExtensionModel extensionModel) {
-    return getExtensionsNamespace(extensionModel.getXmlDslModel());
-  }
-
-  /**
-   * @return the extension's error namespace for a given {@link ExtensionDeclaration}
-   */
-  public static String getExtensionsNamespace(ExtensionDeclaration extensionDeclaration) {
-    return getExtensionsNamespace(extensionDeclaration.getXmlDslModel());
-  }
-
-  private static String getExtensionsNamespace(XmlDslModel dslModel) {
-    return dslModel.getPrefix().toUpperCase();
   }
 
   public static ExtensionModel loadExtension(Class<?> clazz) {

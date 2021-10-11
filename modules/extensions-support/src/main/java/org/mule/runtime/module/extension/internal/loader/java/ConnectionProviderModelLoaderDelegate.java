@@ -63,10 +63,10 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       parser.getAdditionalModelProperties().forEach(providerDeclarer::withModelProperty);
       addSemanticTerms(providerDeclarer.getDeclaration(), parser);
       getStereotypeModelLoaderDelegate().addStereotypes(
-                                                       parser,
-                                                       providerDeclarer,
-                                                       of(() -> getStereotypeModelLoaderDelegate()
-                                                           .getDefaultConnectionProviderStereotype(parser.getName())));
+                                                        parser,
+                                                        providerDeclarer,
+                                                        of(() -> getStereotypeModelLoaderDelegate()
+                                                            .getDefaultConnectionProviderStereotype(parser.getName())));
 
       connectionProviderDeclarers.put(parser, providerDeclarer);
     }

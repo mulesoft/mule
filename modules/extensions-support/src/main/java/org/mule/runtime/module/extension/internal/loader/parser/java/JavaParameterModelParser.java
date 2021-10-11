@@ -34,6 +34,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.contributor
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addTermIfPresent;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -80,7 +81,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
-import org.mule.sdk.api.stereotype.MuleStereotypes;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
@@ -224,26 +224,22 @@ public class JavaParameterModelParser implements ParameterModelParser {
       return singletonList(OBJECT_STORE);
     }
 
-    List<StereotypeModel> stereotypes = mapReduceRepeatableAnnotation(
-                                                                      parameter,
-                                                                      ConfigReference.class,
-                                                                      org.mule.sdk.api.annotation.param.reference.ConfigReference.class,
-                                                                      container -> ((ConfigReferences) container).value(),
-                                                                      container -> ((org.mule.sdk.api.annotation.ConfigReferences) container)
-                                                                          .value(),
-                                                                      value -> factory.createStereotype(
-                                                                                                        value
-                                                                                                            .getStringValue(ConfigReference::name),
-                                                                                                        value
-                                                                                                            .getStringValue(ConfigReference::namespace),
-                                                                                                        MuleStereotypes.CONFIG),
-                                                                      value -> factory.createStereotype(
-                                                                                                        value
-                                                                                                            .getStringValue(org.mule.sdk.api.annotation.param.reference.ConfigReference::name),
-                                                                                                        value
-                                                                                                            .getStringValue(org.mule.sdk.api.annotation.param.reference.ConfigReference::namespace),
-                                                                                                        MuleStereotypes.CONFIG))
-                                                                                                            .collect(toList());
+    List<StereotypeModel> stereotypes =
+        mapReduceRepeatableAnnotation(
+                                      parameter,
+                                      ConfigReference.class,
+                                      org.mule.sdk.api.annotation.param.reference.ConfigReference.class,
+                                      container -> ((ConfigReferences) container).value(),
+                                      container -> ((org.mule.sdk.api.annotation.ConfigReferences) container).value(),
+                                      value -> factory.createStereotype(value.getStringValue(ConfigReference::name),
+                                                                        value.getStringValue(ConfigReference::namespace), CONFIG),
+                                      value -> factory.createStereotype(
+                                                                        value
+                                                                            .getStringValue(org.mule.sdk.api.annotation.param.reference.ConfigReference::name),
+                                                                        value
+                                                                            .getStringValue(org.mule.sdk.api.annotation.param.reference.ConfigReference::namespace),
+                                                                        CONFIG))
+                                                                            .collect(toList());
 
     if (stereotypes.isEmpty()) {
       stereotypes = mapReduceSingleAnnotation(

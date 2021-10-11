@@ -36,12 +36,12 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.AllowedStereotypesModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.CustomStereotypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.DefaultStereotypeModelFactory;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.sdk.api.stereotype.ImplicitStereotypeDefinition;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
@@ -201,7 +201,7 @@ public class StereotypeModelLoaderDelegate {
   private String resolveImportedTypeNamespace(ObjectType type, String defaultNamespace) {
     return getTypeId(type)
         .flatMap(typeId -> dslResolvingContext.getExtensionForType(typeId))
-        .map(MuleExtensionUtils::getExtensionsNamespace)
+        .map(ExtensionNamespaceUtils::getExtensionsNamespace)
         .orElse(defaultNamespace);
   }
 
@@ -249,8 +249,8 @@ public class StereotypeModelLoaderDelegate {
   }
 
   public void setNamespace(String namespace) {
-    this.namespace = namespace;
-    stereotypeModelFactory.setNamespace(namespace.toUpperCase());
+    this.namespace = namespace.toUpperCase();
+    stereotypeModelFactory.setNamespace(this.namespace);
   }
 
   @FunctionalInterface

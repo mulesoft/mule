@@ -11,7 +11,7 @@ import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
+import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;

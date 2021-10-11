@@ -55,10 +55,10 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     declareRoutes(router, parser);
 
     getStereotypeModelLoaderDelegate().addStereotypes(
-                                                     parser,
-                                                     router,
-                                                     of(() -> getStereotypeModelLoaderDelegate()
-                                                         .getDefaultOperationStereotype(parser.getName())));
+                                                      parser,
+                                                      router,
+                                                      of(() -> getStereotypeModelLoaderDelegate()
+                                                          .getDefaultOperationStereotype(parser.getName())));
 
     constructDeclarers.put(parser, router);
   }

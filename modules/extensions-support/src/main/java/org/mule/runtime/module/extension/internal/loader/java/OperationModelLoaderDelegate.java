@@ -106,10 +106,10 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       });
 
       getStereotypeModelLoaderDelegate().addStereotypes(
-                                                       parser,
-                                                       operation,
-                                                       of(() -> getStereotypeModelLoaderDelegate()
-                                                           .getDefaultOperationStereotype(parser.getName())));
+                                                        parser,
+                                                        operation,
+                                                        of(() -> getStereotypeModelLoaderDelegate()
+                                                            .getDefaultOperationStereotype(parser.getName())));
 
       parseErrorModels(operation, parser);
       operationDeclarers.put(parser, operation);

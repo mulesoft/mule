@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes;
 
-import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.computeIfAbsent;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition.NAMESPACE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
@@ -21,7 +20,6 @@ import static org.mule.sdk.api.stereotype.MuleStereotypes.VALIDATOR;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
@@ -53,15 +51,6 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
   @Override
   public StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {
     return computeIfAbsent(stereotypesCache, stereotypeDefinition, definition -> {
-
-      if (!isValidStereotype(stereotypeDefinition, namespace)) {
-        throw new IllegalModelDefinitionException(format(
-                                                         "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
-                                                             + "stereotypes on namespaces other than its own",
-                                                         stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
-                                                         namespace));
-      }
-
       String resolvedNamespace = isBlank(stereotypeDefinition.getNamespace()) ? namespace : stereotypeDefinition.getNamespace();
       final StereotypeModelBuilder builder = newStereotype(stereotypeDefinition.getName(), resolvedNamespace);
       stereotypeDefinition.getParent().ifPresent(parent -> {
@@ -83,6 +72,7 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
   @Override
   public StereotypeModel createStereotype(String name, String namespace, StereotypeModel parent) {
+    final String effectiveNamespace = namespace.toUpperCase();
     return createStereotype(new StereotypeDefinition() {
 
       @Override
@@ -92,12 +82,12 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
       @Override
       public String getNamespace() {
-        return namespace;
+        return effectiveNamespace;
       }
 
       @Override
       public Optional<StereotypeDefinition> getParent() {
-        return parent.getParent().map(p -> asDefinition(p));
+        return ofNullable(parent).map(p -> asDefinition(p));
       }
     });
   }
@@ -124,13 +114,5 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
     validatorStereotype = newStereotype(VALIDATOR_DEFINITION.getName(), namespace)
         .withParent(VALIDATOR)
         .build();
-  }
-
-  private boolean isValidStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {
-    if (isBlank(stereotypeDefinition.getNamespace())) {
-      return true;
-    }
-
-    return namespace.equals(stereotypeDefinition.getNamespace()) || NAMESPACE.equals(stereotypeDefinition.getNamespace());
   }
 }

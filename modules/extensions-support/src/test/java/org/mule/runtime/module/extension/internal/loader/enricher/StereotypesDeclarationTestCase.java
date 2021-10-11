@@ -47,7 +47,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-public class StereotypesDeclarationEnricherTestCase extends AbstractJavaExtensionDeclarationTestCase {
+public class StereotypesDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
 
   public static final String MARVEL_NAMESPACE = MARVEL_EXTENSION.toUpperCase();
   private final ExtensionModel marvelExtension = loadExtension(MarvelExtension.class);

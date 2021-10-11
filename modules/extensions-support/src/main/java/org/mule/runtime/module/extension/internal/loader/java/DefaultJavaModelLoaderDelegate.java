@@ -12,7 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
+import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
@@ -53,7 +53,8 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final SourceModelLoaderDelegate sourceModelLoaderDelegate = new SourceModelLoaderDelegate(this);
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
-  private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate = new ParameterModelsLoaderDelegate(this::getStereotypeModelLoaderDelegate);
+  private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate =
+      new ParameterModelsLoaderDelegate(this::getStereotypeModelLoaderDelegate);
   private StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate;
 
   private Supplier<ErrorsModelFactory> errorsModelFactorySupplier;
