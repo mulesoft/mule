@@ -56,7 +56,7 @@ public class StereotypeModelLoaderDelegate {
   private String namespace;
 
   public StereotypeModelLoaderDelegate(ExtensionLoadingContext extensionLoadingContext) {
-    stereotypeModelFactory = new DefaultStereotypeModelFactory(extensionLoadingContext);
+    stereotypeModelFactory = new DefaultStereotypeModelFactory();
     dslResolvingContext = extensionLoadingContext.getDslResolvingContext();
   }
 

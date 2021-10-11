@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.stereotype
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.computeIfAbsent;
-import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
@@ -17,10 +16,8 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATO
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.asDefinition;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.VALIDATOR;
 
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
@@ -32,16 +29,11 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
 
   private final Map<StereotypeDefinition, StereotypeModel> stereotypesCache = new HashMap<>();
-  private final DslResolvingContext dslResolvingContext;
 
   private String namespace;
   private StereotypeModel sourceParent;
   private StereotypeModel processorParent;
   private StereotypeModel validatorStereotype;
-
-  public DefaultStereotypeModelFactory(ExtensionLoadingContext extensionLoadingContext) {
-    dslResolvingContext = extensionLoadingContext.getDslResolvingContext();
-  }
 
   @Override
   public StereotypeModel createStereotype(StereotypeDefinition stereotypeDefinition) {
@@ -67,7 +59,7 @@ public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
   @Override
   public StereotypeModel createStereotype(String name, StereotypeModel parent) {
-    return createStereotype(name, EMPTY, parent);
+    return createStereotype(name, namespace, parent);
   }
 
   @Override

@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
@@ -20,7 +21,6 @@ import org.mule.runtime.extension.api.annotation.param.stereotype.Validator;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
-import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
@@ -41,7 +41,7 @@ public final class JavaStereotypeModelParserUtils {
                                                             String elementType,
                                                             String elementName,
                                                             StereotypeModelFactory factory) {
-    StereotypeDefinition stereotypeDefinition = MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
+    StereotypeDefinition stereotypeDefinition = mapReduceSingleAnnotation(
                                                                                                         annotatedElement,
                                                                                                         elementType,
                                                                                                         elementName,
