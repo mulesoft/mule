@@ -10,6 +10,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.api.config.MuleProperties.MULE_DISABLE_COMPOUND_CORRELATION_ID;
+import static org.mule.api.config.MuleProperties.MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -75,6 +76,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     private volatile boolean messageProcessorInitialized;
 
     private boolean compoundCorrelationIdDisabled = parseBoolean(getProperty(MULE_DISABLE_COMPOUND_CORRELATION_ID, "false"));
+    private boolean forEachCompoundCorrelationIdDisabled = parseBoolean(getProperty(MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID, "false"));
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -241,7 +243,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
 
     private void initExpressionSplitter(final ExpressionConfig expressionConfig) {
-        if (!compoundCorrelationIdDisabled)
+        if (!compoundCorrelationIdDisabled && !forEachCompoundCorrelationIdDisabled)
         {
             //Default behaviour
             splitter = new ExpressionSplitter(expressionConfig)

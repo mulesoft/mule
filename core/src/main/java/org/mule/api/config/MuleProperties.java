@@ -218,4 +218,6 @@ public class MuleProperties
     public static final String DYNAMIC_OUTBOUND_STATIC_ENDPOINT_SIZE = SYSTEM_PROPERTY_PREFIX + "dynamic.outbound.static.endpoint.size";
     public static final String COMPUTE_CONNECTION_ERRORS_IN_STATS = SYSTEM_PROPERTY_PREFIX + "compute.connection.errors.in.stats";;
     public static final String MULE_DISABLE_COMPOUND_CORRELATION_ID = SYSTEM_PROPERTY_PREFIX + "compoundCorrelationId.disable";
+    public static final String MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID = SYSTEM_PROPERTY_PREFIX + "forEachCompoundCorrelationId.disable";
+
 }
