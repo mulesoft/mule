@@ -15,6 +15,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addPrimaryNodeParameter;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -36,6 +37,7 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
+import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 import java.util.HashMap;
 import java.util.List;
@@ -91,8 +93,9 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .hasResponse(parser.emitsResponse())
           .requiresConnection(parser.isConnected())
           .transactional(parser.isTransactional())
-          .supportsStreaming(parser.supportsStreaming())
-          .runsOnPrimaryNodeOnly(parser.runsOnPrimaryNodeOnly());
+          .supportsStreaming(parser.supportsStreaming());
+
+      declareClusterSupport(sourceDeclarer, parser.getSourceClusterSupport());
 
       parser.getDeprecationModel().ifPresent(sourceDeclarer::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> sourceDeclarer.getDeclaration().setDisplayModel(d));
@@ -126,6 +129,26 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       sourceDeclarers.put(parser, sourceDeclarer);
     }
+  }
+
+  private void declareClusterSupport(SourceDeclarer sourceDeclarer, Optional<SourceClusterSupport> sourceClusterSupport) {
+    boolean runsOnPrimaryNodeOnly;
+    switch (sourceClusterSupport.orElse(SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY)) {
+      case DEFAULT_PRIMARY_NODE_ONLY:
+        runsOnPrimaryNodeOnly = false;
+        addPrimaryNodeParameter(sourceDeclarer.getDeclaration(), true);
+        break;
+      case DEFAULT_ALL_NODES:
+        runsOnPrimaryNodeOnly = false;
+        addPrimaryNodeParameter(sourceDeclarer.getDeclaration(), false);
+        break;
+      case NOT_SUPPORTED:
+        runsOnPrimaryNodeOnly = true;
+        break;
+      default:
+        runsOnPrimaryNodeOnly = true;
+    }
+    sourceDeclarer.runsOnPrimaryNodeOnly(runsOnPrimaryNodeOnly);
   }
 
   private void declareBackPressureSupport(ExtensionDeclarer extensionDeclarer, SourceDeclarer sourceDeclarer,

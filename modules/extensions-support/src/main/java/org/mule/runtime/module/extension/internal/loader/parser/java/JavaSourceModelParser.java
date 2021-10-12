@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
@@ -23,6 +22,9 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Para
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.source.BackPressureSourceUtils.fromSdkBackPressureMode;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaParserSourceUtils.fromLegacySourceClusterSupport;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaParserSourceUtils.fromSdkBackPressureMode;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -34,7 +36,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.source.BackPressure;
-import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
+import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -58,8 +60,11 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.source.BackPressureSourceUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaParserSourceUtils;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -104,7 +109,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public boolean emitsResponse() {
-    return sourceElement.isAnnotatedWith(EmitsResponse.class);
+    return JavaModelLoaderUtils.emitsResponse(sourceElement);
   }
 
   @Override
@@ -139,12 +144,6 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   @Override
   public Optional<SourceCallbackModelParser> getOnBackPressureCallbackParser() {
     return parseSourceCallback(sourceElement.getOnBackPressureMethod());
-  }
-
-  @Override
-  public boolean runsOnPrimaryNodeOnly() {
-    // TODO: This should partially replace ClusterSupportEnricher
-    return false;
   }
 
   @Override
@@ -273,8 +272,18 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
                                                                                           new HashSet<BackPressureMode>(sdkAnnotation
                                                                                               .getArrayValue(org.mule.sdk.api.annotation.source.BackPressure::supportedModes)
                                                                                               .stream()
-                                                                                              .map(BackPressureSourceUtils::fromSdkBackPressureMode)
+                                                                                              .map(JavaParserSourceUtils::fromSdkBackPressureMode)
                                                                                               .collect(toList()))));
+  }
+
+  @Override
+  public Optional<SourceClusterSupport> getSourceClusterSupport() {
+    return getInfoFromAnnotation(sourceElement, "source", sourceElement.getName(), ClusterSupport.class,
+                                 org.mule.sdk.api.annotation.source.ClusterSupport.class,
+                                 legacyAnnotation -> fromLegacySourceClusterSupport(legacyAnnotation
+                                     .getEnumValue(ClusterSupport::value)),
+                                 sdkAnnotation -> sdkAnnotation
+                                     .getEnumValue(org.mule.sdk.api.annotation.source.ClusterSupport::value));
   }
 
   @Override
