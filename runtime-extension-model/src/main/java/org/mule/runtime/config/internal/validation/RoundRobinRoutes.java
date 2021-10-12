@@ -34,12 +34,12 @@ public class RoundRobinRoutes implements Validation {
 
   @Override
   public String getName() {
-    return "'first-successful' has at least 2 routes";
+    return "'round-robin' has at least 2 routes";
   }
 
   @Override
   public String getDescription() {
-    return "'first-successful' has at least 2 routes";
+    return "'round-robin' has at least 2 routes";
   }
 
   @Override
