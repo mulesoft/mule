@@ -20,7 +20,7 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
-import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
+import org.mule.sdk.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.test.heisenberg.extension.model.Methylamine;
