@@ -317,8 +317,6 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
         } finally {
             setProperty(MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID, "false");
         }
-
-
     }
     
     protected void assertAddedPathElements(List<MessageProcessor> processors, MessageProcessorPathElement mpPathElement)
