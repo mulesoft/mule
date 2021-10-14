@@ -123,6 +123,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
       parseExports(parser, declarer);
       parseImportedTypes(parser, declarer, context);
       parseSubTypes(parser, declarer, context);
+
       getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
 
       return declarer;
@@ -196,6 +197,8 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
     registerType(declaration.getOutput().getType());
     registerType(declaration.getOutputAttributes().getType());
+    // TODO:
+    // declaration.getNotificationModels().forEach(notification -> registerType(declarer, notification.getType()));
   }
 
   public void registerType(MetadataType type) {
