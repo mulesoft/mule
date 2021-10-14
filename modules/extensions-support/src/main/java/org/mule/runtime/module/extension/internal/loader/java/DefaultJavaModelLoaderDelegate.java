@@ -10,7 +10,9 @@ import static java.lang.String.format;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 
@@ -21,9 +23,13 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -54,10 +60,11 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
   private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate =
-      new ParameterModelsLoaderDelegate(this::getStereotypeModelLoaderDelegate);
-  private StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate;
+      new ParameterModelsLoaderDelegate(this, this::getStereotypeModelLoaderDelegate);
 
+  private StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate;
   private Supplier<ErrorsModelFactory> errorsModelFactorySupplier;
+  private ExtensionDeclarer declarer;
 
   public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
@@ -70,47 +77,58 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     this.extensionType = extensionType;
   }
 
+  private void reset() {
+    stereotypeModelLoaderDelegate = null;
+    declarer = null;
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
-    ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, context);
-    ExtensionDeclarer declarer =
-        context.getExtensionDeclarer()
-            .named(parser.getName())
-            .onVersion(version)
-            .fromVendor(parser.getVendor())
-            .withCategory(parser.getCategory())
-            .withModelProperty(parser.getLicenseModelProperty())
-            .withXmlDsl(getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
+    try {
+      stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
+      ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, context);
+      ExtensionDeclarer declarer =
+          context.getExtensionDeclarer()
+              .named(parser.getName())
+              .onVersion(version)
+              .fromVendor(parser.getVendor())
+              .withCategory(parser.getCategory())
+              .withModelProperty(parser.getLicenseModelProperty())
+              .withXmlDsl(getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
 
-    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
-    context.getParameter("COMPILATION_MODE")
-        .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
+      // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+      context.getParameter("COMPILATION_MODE")
+          .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
-    parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
-    parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
-    parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
-    parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
+      this.declarer = declarer;
+      
+      parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
+      parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
+      parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
+      parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
-    parseErrorModels(parser, declarer);
-    parseExports(parser, declarer);
-    parseImportedTypes(parser, declarer, context);
-    parseSubTypes(parser, declarer, context);
-    getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
+      configLoaderDelegate.declareConfigurations(declarer, parser);
+      connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
-    configLoaderDelegate.declareConfigurations(declarer, parser);
-    connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
+      if (!extensionElement.getConfigurations().isEmpty()) {
+        operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
+        functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
+        sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
+      }
 
-    if (!extensionElement.getConfigurations().isEmpty()) {
-      operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
-      functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
-      sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
+      parseErrorModels(parser, declarer);
+      parseExports(parser, declarer);
+      parseImportedTypes(parser, declarer, context);
+      parseSubTypes(parser, declarer, context);
+      getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
+
+      return declarer;
+    } finally {
+      reset();
     }
-
-    return declarer;
   }
 
   private void parseErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
@@ -119,7 +137,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   private void parseExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
-    parser.getExportedTypes().forEach(type -> registerType(declarer, type));
+    parser.getExportedTypes().forEach(type -> registerExportedType(declarer, type));
     parser.getExportedResources().forEach(declarer::withResource);
     parser.getPrivilegedExportedArtifacts().forEach(declarer::withPrivilegedArtifact);
     parser.getPrivilegedExportedPackages().forEach(declarer::withPrivilegedPackage);
@@ -147,6 +165,9 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
       // For subtypes that reference types from other artifacts, auto-import them.
       autoImportReferencedTypes(declarer, base, context);
       subTypes.forEach(subTypeEntry -> autoImportReferencedTypes(declarer, subTypeEntry, context));
+
+      registerType(base);
+      subTypes.forEach(sub -> registerType(sub));
     });
   }
 
@@ -162,7 +183,62 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .ifPresent(declarer::withImportedType));
   }
 
-  private void registerType(ExtensionDeclarer declarer, MetadataType type) {
+  public void registerOutputTypes(ExecutableComponentDeclaration<?> declaration) {
+    if (declaration.getOutput() == null) {
+      throw new IllegalModelDefinitionException(format("%s '%s' doesn't specify an output type",
+          getComponentDeclarationTypeName(declaration), declaration.getName()));
+    }
+
+    if (declaration.getOutputAttributes() == null) {
+      throw new IllegalModelDefinitionException(format("%s '%s' doesn't specify output attributes types",
+          getComponentDeclarationTypeName(declaration), declaration.getName()));
+    }
+
+    registerType(declaration.getOutput().getType());
+    registerType(declaration.getOutputAttributes().getType());
+  }
+
+  public void registerType(MetadataType type) {
+    if (!getId(type).isPresent() || type.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
+      return;
+    }
+
+    type.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (objectType instanceof MessageMetadataType) {
+          MessageMetadataType messageType = (MessageMetadataType) objectType;
+          messageType.getPayloadType().ifPresent(type -> type.accept(this));
+          messageType.getAttributesType().ifPresent(type -> type.accept(this));
+        }
+        declarer.withType(objectType);
+        objectType.getOpenRestriction().ifPresent(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        arrayType.getType().accept(this);
+      }
+
+      @Override
+      public void visitIntersection(IntersectionType intersectionType) {
+        intersectionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        unionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitObjectField(ObjectFieldType objectFieldType) {
+        objectFieldType.getValue().accept(this);
+      }
+    });
+  }
+
+  private void registerExportedType(ExtensionDeclarer declarer, MetadataType type) {
     type.accept(new MetadataTypeVisitor() {
 
       @Override

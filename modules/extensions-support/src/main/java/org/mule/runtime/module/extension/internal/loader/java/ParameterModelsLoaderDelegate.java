@@ -22,17 +22,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public final class ParameterModelsLoaderDelegate {
+public final class ParameterModelsLoaderDelegate extends AbstractModelLoaderDelegate  {
 
   private final Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader;
 
-  public ParameterModelsLoaderDelegate(Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader) {
+  public ParameterModelsLoaderDelegate(DefaultJavaModelLoaderDelegate loader,
+                                       Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader) {
+    super(loader);
     this.stereotypeModelLoader = stereotypeModelLoader;
   }
 
   public List<ParameterDeclarer> declare(HasParametersDeclarer component, List<ParameterGroupModelParser> groupParsers) {
-
     final List<ParameterDeclarer> declarerList = new LinkedList<>();
+
     groupParsers.forEach(group -> {
       ParameterGroupDeclarer groupDeclarer;
 
@@ -65,6 +67,8 @@ public final class ParameterModelsLoaderDelegate {
             .describedAs(parameterParser.getDescription())
             .withRole(parameterParser.getRole())
             .withExpressionSupport(parameterParser.getExpressionSupport());
+
+        loader.registerType(metadataType);
 
         if (parameterParser.isComponentId()) {
           parameter.asComponentId();
