@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
@@ -298,6 +299,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnableProfilingService();
       configureSetVariableWithNullVale();
       configureStartExtensionComponentsWithArtifactClassloader();
+      configureRemoveShadowedImplicitInputs();
     }
   }
 
@@ -1260,6 +1262,19 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureStartExtensionComponentsWithArtifactClassloader() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER,
+                                                featureContext -> featureContext
+                                                    .getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#DW_REMOVE_SHADOWED_IMPLICIT_INPUTS} feature flag.
+   *
+   * @since 4.4.0
+   */
+  private static void configureRemoveShadowedImplicitInputs() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DW_REMOVE_SHADOWED_IMPLICIT_INPUTS,
                                                 featureContext -> featureContext
                                                     .getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
