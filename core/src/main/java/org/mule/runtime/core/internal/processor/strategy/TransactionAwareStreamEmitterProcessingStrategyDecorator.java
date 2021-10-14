@@ -88,10 +88,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
     Sink delegateSink = delegate.createSink(flowConstruct, pipeline);
-    Sink syncSink = new StreamPerThreadSink(p -> from(p)
+    Sink syncSink = new StreamPerThreadSink(flowConstruct, new DefaultCacheSinkProvider(p -> from(p)
         .subscriberContext(popTxFromSubscriberContext())
         .transform(pipeline)
-        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER, flowConstruct);
+        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER));
     return new TransactionalDelegateSink(syncSink, delegateSink);
   }
 
