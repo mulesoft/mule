@@ -9,12 +9,14 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.registerType;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_GROUP;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -43,9 +45,10 @@ public class SoapServiceProviderDeclarer {
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final StereotypeModelLoaderDelegate stereotypeDelegate;
 
-  SoapServiceProviderDeclarer(Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader,
+  SoapServiceProviderDeclarer(ExtensionDeclarer extensionDeclarer,
+                              Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader,
                               StereotypeModelLoaderDelegate stereotypeDelegate) {
-    parametersLoader = new ParameterModelsLoaderDelegate(stereotypeModelLoader);
+    parametersLoader = new ParameterModelsLoaderDelegate(stereotypeModelLoader, type -> registerType(extensionDeclarer, type));
     this.stereotypeDelegate = stereotypeDelegate;
   }
 

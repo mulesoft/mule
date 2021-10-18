@@ -107,13 +107,13 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       });
 
       loader.registerOutputTypes(operation.getDeclaration());
+      declareErrorModels(operation, parser);
       getStereotypeModelLoaderDelegate().addStereotypes(
                                                         parser,
                                                         operation,
                                                         of(() -> getStereotypeModelLoaderDelegate()
                                                             .getDefaultOperationStereotype(parser.getName())));
 
-      declareErrorModels(operation, parser);
       declareEmittedNotifications(parser, operation, loader::getNotificationModel);
 
       operationDeclarers.put(parser, operation);

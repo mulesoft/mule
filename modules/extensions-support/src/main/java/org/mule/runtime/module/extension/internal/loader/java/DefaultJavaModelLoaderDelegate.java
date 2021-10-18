@@ -11,11 +11,10 @@ import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
-import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
@@ -24,13 +23,11 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
-import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
@@ -40,6 +37,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.CompileTi
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -112,6 +110,12 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
       parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
       parser.getNotificationModels().forEach(declarer::withNotificationModel);
 
+      declareErrorModels(parser, declarer);
+      declareExports(parser, declarer);
+      declareImportedTypes(parser, declarer, context);
+      declareSubTypes(parser, declarer, context);
+      declareNotifications(parser, declarer);
+
       configLoaderDelegate.declareConfigurations(declarer, parser);
       connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
@@ -120,12 +124,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
         functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
         sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
       }
-
-      declareErrorModels(parser, declarer);
-      declareExports(parser, declarer);
-      declareImportedTypes(parser, declarer, context);
-      declareSubTypes(parser, declarer, context);
-      declareNotifications(parser, declarer);
 
       getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
 
@@ -208,43 +206,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   public void registerType(MetadataType type) {
-    if (!getId(type).isPresent() || type.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
-      return;
-    }
-
-    type.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (objectType instanceof MessageMetadataType) {
-          MessageMetadataType messageType = (MessageMetadataType) objectType;
-          messageType.getPayloadType().ifPresent(type -> type.accept(this));
-          messageType.getAttributesType().ifPresent(type -> type.accept(this));
-        }
-        declarer.withType(objectType);
-        objectType.getOpenRestriction().ifPresent(type -> type.accept(this));
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
-      }
-
-      @Override
-      public void visitIntersection(IntersectionType intersectionType) {
-        intersectionType.getTypes().forEach(type -> type.accept(this));
-      }
-
-      @Override
-      public void visitUnion(UnionType unionType) {
-        unionType.getTypes().forEach(type -> type.accept(this));
-      }
-
-      @Override
-      public void visitObjectField(ObjectFieldType objectFieldType) {
-        objectFieldType.getValue().accept(this);
-      }
-    });
+    ModelLoaderUtils.registerType(declarer, type);
   }
 
   public Optional<NotificationModel> getNotificationModel(String identifier) {
