@@ -314,16 +314,7 @@
                 "query": false,
                 "order": 4
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "HEALTHY_FOOD",
-                  "namespace": "VEGAN",
-                  "parent": {
-                    "type": "FARMED_FOOD",
-                    "namespace": "VEGAN"
-                  }
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "sample",
               "description": "",
@@ -1296,16 +1287,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "HEALTHY_FOOD",
-                      "namespace": "VEGAN",
-                      "parent": {
-                        "type": "FARMED_FOOD",
-                        "namespace": "VEGAN"
-                      }
-                    }
-                  ],
+                  "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "sample",
                   "description": "",
@@ -4906,12 +4888,7 @@
                     "query": false,
                     "order": 5
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "GROUPED_FOOD",
-                      "namespace": "VEGAN"
-                    }
-                  ],
+                  "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "pojoGroupedFood",
                   "description": "",
@@ -5193,16 +5170,7 @@
                     "query": false,
                     "order": 8
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "HEALTHY_FOOD",
-                      "namespace": "VEGAN",
-                      "parent": {
-                        "type": "FARMED_FOOD",
-                        "namespace": "VEGAN"
-                      }
-                    }
-                  ],
+                  "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "sample",
                   "description": "",
@@ -5246,12 +5214,7 @@
                     "query": false,
                     "order": 9
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "FARMED_FOOD",
-                      "namespace": "VEGAN"
-                    }
-                  ],
+                  "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "food",
                   "description": "",
@@ -5512,16 +5475,7 @@
                 "query": false,
                 "order": 4
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "HEALTHY_FOOD",
-                  "namespace": "VEGAN",
-                  "parent": {
-                    "type": "FARMED_FOOD",
-                    "namespace": "VEGAN"
-                  }
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "sample",
               "description": "",
@@ -5579,16 +5533,7 @@
                 "query": false,
                 "order": 6
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "HEALTHY_FOOD",
-                  "namespace": "VEGAN",
-                  "parent": {
-                    "type": "FARMED_FOOD",
-                    "namespace": "VEGAN"
-                  }
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "healthyFood",
               "description": "",
@@ -7385,16 +7330,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "HEALTHY_FOOD",
-                      "namespace": "VEGAN",
-                      "parent": {
-                        "type": "FARMED_FOOD",
-                        "namespace": "VEGAN"
-                      }
-                    }
-                  ],
+                  "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "sample",
                   "description": "",
@@ -14632,12 +14568,7 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "GROUPED_FOOD",
-                  "namespace": "VEGAN"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "pojoGroupedFood",
               "description": "",
@@ -14681,12 +14612,7 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "FARMED_FOOD",
-                  "namespace": "VEGAN"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "food",
               "description": "",
@@ -16155,16 +16081,7 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "HEALTHY_FOOD",
-                  "namespace": "VEGAN",
-                  "parent": {
-                    "type": "FARMED_FOOD",
-                    "namespace": "VEGAN"
-                  }
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "healthyFood",
               "description": "",
@@ -16525,12 +16442,7 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [
-                {
-                  "type": "FARMED_FOOD",
-                  "namespace": "VEGAN"
-                }
-              ],
+              "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "food",
               "description": "",
@@ -18727,12 +18639,7 @@
                 "value": "FruitCleaner"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "FRUIT_CLEANER",
-                    "namespace": "VEGAN"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": []
@@ -18950,12 +18857,7 @@
                       "value": "Fruit"
                     },
                     "stereotype": {
-                      "allowedStereotypes": [
-                        {
-                          "type": "FRUIT",
-                          "namespace": "VEGAN"
-                        }
-                      ]
+                      "allowedStereotypes": []
                     }
                   },
                   "fields": []
@@ -19062,12 +18964,7 @@
           "value": "Fruit"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "FRUIT",
-              "namespace": "VEGAN"
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": []
@@ -19275,12 +19172,7 @@
                 "value": "HealthyFood"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "HEALTHY_FOOD",
-                    "namespace": "VEGAN"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [
@@ -19474,12 +19366,7 @@
                 "value": "HealthyFood"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "HEALTHY_FOOD",
-                    "namespace": "VEGAN"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [
@@ -19577,12 +19464,7 @@
           "value": "FarmedFood"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "FARMED_FOOD",
-              "namespace": "VEGAN"
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": []
@@ -19612,12 +19494,7 @@
           "value": "GroupedFood"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "GROUPED_FOOD",
-              "namespace": "VEGAN"
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": [
@@ -19645,12 +19522,7 @@
                 "value": "FarmedFood"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "FARMED_FOOD",
-                    "namespace": "VEGAN"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": []
@@ -19792,16 +19664,7 @@
           "value": "HealthyFood"
         },
         "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "HEALTHY_FOOD",
-              "namespace": "VEGAN",
-              "parent": {
-                "type": "FARMED_FOOD",
-                "namespace": "VEGAN"
-              }
-            }
-          ]
+          "allowedStereotypes": []
         }
       },
       "fields": [

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
@@ -28,6 +29,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -39,6 +41,8 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Exten
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -60,11 +64,13 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
   private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate =
-      new ParameterModelsLoaderDelegate(this, this::getStereotypeModelLoaderDelegate);
+      new ParameterModelsLoaderDelegate(this::getStereotypeModelLoaderDelegate, this::registerType);
+  private final Map<String, NotificationModel> notificationModels = new HashMap<>();
 
   private StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate;
   private Supplier<ErrorsModelFactory> errorsModelFactorySupplier;
   private ExtensionDeclarer declarer;
+  private String namespace;
 
   public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
@@ -77,17 +83,11 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     this.extensionType = extensionType;
   }
 
-  private void reset() {
-    stereotypeModelLoaderDelegate = null;
-    declarer = null;
-  }
-
   /**
    * {@inheritDoc}
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    try {
       stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
       ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, context);
       ExtensionDeclarer declarer =
@@ -104,11 +104,13 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
           .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
       this.declarer = declarer;
-      
+      namespace = getExtensionsNamespace(declarer.getDeclaration());
+
       parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
       parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
       parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
       parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
+      parser.getNotificationModels().forEach(declarer::withNotificationModel);
 
       configLoaderDelegate.declareConfigurations(declarer, parser);
       connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
@@ -119,32 +121,38 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
         sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
       }
 
-      parseErrorModels(parser, declarer);
-      parseExports(parser, declarer);
-      parseImportedTypes(parser, declarer, context);
-      parseSubTypes(parser, declarer, context);
+      declareErrorModels(parser, declarer);
+      declareExports(parser, declarer);
+      declareImportedTypes(parser, declarer, context);
+      declareSubTypes(parser, declarer, context);
+      declareNotifications(parser, declarer);
 
       getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
 
       return declarer;
-    } finally {
-      reset();
-    }
   }
 
-  private void parseErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
-    initErrorModelFactorySupplier(parser, getExtensionsNamespace(declarer.getDeclaration()));
+  private void declareNotifications(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+    parser.getNotificationModels().forEach(notification -> {
+      declarer.withNotificationModel(notification);
+      registerType(notification.getType());
+      notificationModels.put(notification.getIdentifier(), notification);
+    });
+  }
+
+  private void declareErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+    initErrorModelFactorySupplier(parser);
     declarer.getDeclaration().getErrorModels().addAll(createErrorModelFactory().getErrorModels());
   }
 
-  private void parseExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+  private void declareExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
     parser.getExportedTypes().forEach(type -> registerExportedType(declarer, type));
     parser.getExportedResources().forEach(declarer::withResource);
     parser.getPrivilegedExportedArtifacts().forEach(declarer::withPrivilegedArtifact);
     parser.getPrivilegedExportedPackages().forEach(declarer::withPrivilegedPackage);
   }
 
-  private void parseImportedTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
+  private void declareImportedTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
     parser.getImportedTypes().forEach(importedType -> {
       final Optional<String> typeId = getTypeId(importedType);
 
@@ -159,7 +167,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     });
   }
 
-  private void parseSubTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
+  private void declareSubTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
     parser.getSubTypes().forEach((base, subTypes) -> {
       declarer.withSubTypes(base, subTypes);
 
@@ -197,8 +205,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
     registerType(declaration.getOutput().getType());
     registerType(declaration.getOutputAttributes().getType());
-    // TODO:
-    // declaration.getNotificationModels().forEach(notification -> registerType(declarer, notification.getType()));
   }
 
   public void registerType(MetadataType type) {
@@ -241,6 +247,10 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     });
   }
 
+  public Optional<NotificationModel> getNotificationModel(String identifier) {
+    return ofNullable(notificationModels.get(identifier));
+  }
+
   private void registerExportedType(ExtensionDeclarer declarer, MetadataType type) {
     type.accept(new MetadataTypeVisitor() {
 
@@ -275,7 +285,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     });
   }
 
-  private void initErrorModelFactorySupplier(ExtensionModelParser parser, String namespace) {
+  private void initErrorModelFactorySupplier(ExtensionModelParser parser) {
     errorsModelFactorySupplier = () -> new ErrorsModelFactory(parser.getErrorModelParsers(), namespace);
   }
 

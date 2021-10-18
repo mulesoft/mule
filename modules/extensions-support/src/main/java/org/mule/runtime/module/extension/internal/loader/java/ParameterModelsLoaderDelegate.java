@@ -20,16 +20,18 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public final class ParameterModelsLoaderDelegate extends AbstractModelLoaderDelegate  {
+public final class ParameterModelsLoaderDelegate {
 
   private final Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader;
+  private final Consumer<MetadataType> typeRegisterer;
 
-  public ParameterModelsLoaderDelegate(DefaultJavaModelLoaderDelegate loader,
-                                       Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader) {
-    super(loader);
+  public ParameterModelsLoaderDelegate(Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader,
+                                       Consumer<MetadataType> typeRegisterer) {
     this.stereotypeModelLoader = stereotypeModelLoader;
+    this.typeRegisterer = typeRegisterer;
   }
 
   public List<ParameterDeclarer> declare(HasParametersDeclarer component, List<ParameterGroupModelParser> groupParsers) {
@@ -68,7 +70,7 @@ public final class ParameterModelsLoaderDelegate extends AbstractModelLoaderDele
             .withRole(parameterParser.getRole())
             .withExpressionSupport(parameterParser.getExpressionSupport());
 
-        loader.registerType(metadataType);
+        typeRegisterer.accept(metadataType);
 
         if (parameterParser.isComponentId()) {
           parameter.asComponentId();

@@ -63,6 +63,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -431,6 +432,16 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
     addCustomTerms(operationElement, terms);
 
     return terms;
+  }
+
+  @Override
+  public List<String> getEmittedNotifications() {
+    List<String> notifications = NotificationModelParserUtils.getEmittedNotifications(operationElement, getComponentTypeName(), getName());
+    if (notifications.isEmpty()) {
+      notifications = NotificationModelParserUtils.getEmittedNotifications(operationContainer, getComponentTypeName(), getName());
+    }
+
+    return notifications;
   }
 
   private void checkOperationIsNotAnExtension() {

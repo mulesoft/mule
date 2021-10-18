@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -89,6 +90,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       loader.registerOutputTypes(sourceDeclarer.getDeclaration());
 
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
+      declareEmittedNotifications(parser, sourceDeclarer, loader::getNotificationModel);
       getStereotypeModelLoaderDelegate().addStereotypes(
                                                         parser,
                                                         sourceDeclarer,

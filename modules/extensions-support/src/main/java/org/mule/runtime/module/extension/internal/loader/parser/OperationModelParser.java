@@ -26,7 +26,8 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface OperationModelParser extends SemanticTermsParser, AdditionalPropertiesModelParser, StereotypeModelParser {
+public interface OperationModelParser extends SemanticTermsParser, AdditionalPropertiesModelParser, StereotypeModelParser,
+    NotificationEmitterParser {
 
   /**
    * @return the operation's name

@@ -48,6 +48,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -180,6 +181,11 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   private Optional<Method> extractJavaMethod(Optional<MethodElement> method) {
     return method.flatMap(MethodElement::getMethod);
+  }
+
+  @Override
+  public List<String> getEmittedNotifications() {
+    return NotificationModelParserUtils.getEmittedNotifications(sourceElement, getComponentTypeName(), getName());
   }
 
   @Override
