@@ -6,12 +6,6 @@
  */
 package org.mule.functional.junit4;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
@@ -20,6 +14,14 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.get
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -127,7 +129,18 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(TYPE_PROPERTY_NAME, extension.getName());
     ctx.put(VERSION, getProductVersion());
+    ctx.putAll(getExtensionLoaderContextAdditionalParameters());
     return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
+  }
+
+  /**
+   * Subclasses can override this method so that extension models are generated with an extension loading context that contains
+   * the parameters returned by this method.
+   *
+   * @return a map with parameters to be added to the extension loader context.
+   */
+  protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
+    return emptyMap();
   }
 
 }
