@@ -44,7 +44,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new RoundRobinRoutes(),
                   new FirstSuccessfulRoutes(),
                   new ScatterGatherRoutes(),
-                  new ParseTemplateResourceExist(artifactRegionClassLoader)
+                  new ParseTemplateResourceExist(artifactRegionClassLoader),
+                  new SourcePositiveMaxItemsPerPoll()
     // Commented out because this causes failures because of a lying extension model for munit, in the 'ignore' parameter
     // new NoExpressionsInNoExpressionsSupportedParams()
     // validate expressions!

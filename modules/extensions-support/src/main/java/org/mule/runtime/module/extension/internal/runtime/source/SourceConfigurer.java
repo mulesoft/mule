@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
@@ -16,6 +15,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRuntimeVersion;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -165,7 +166,6 @@ public final class SourceConfigurer {
     } else {
       int maxItemsPerPoll = (Integer) valueResolver.resolve(context);
       if (maxItemsPerPoll < 1) {
-        // TODO MULE-19351 have this validated previously
         throw new IllegalArgumentException(format("The %s parameter must have a value greater than 1",
                                                   POLLING_SOURCE_LIMIT_PARAMETER_NAME));
       }
