@@ -436,7 +436,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public List<String> getEmittedNotifications() {
-    List<String> notifications = NotificationModelParserUtils.getEmittedNotifications(operationElement, getComponentTypeName(), getName());
+    List<String> notifications =
+        NotificationModelParserUtils.getEmittedNotifications(operationElement, getComponentTypeName(), getName());
     if (notifications.isEmpty()) {
       notifications = NotificationModelParserUtils.getEmittedNotifications(operationContainer, getComponentTypeName(), getName());
     }

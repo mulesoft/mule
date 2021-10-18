@@ -86,48 +86,48 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-      stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
-      ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, context);
-      ExtensionDeclarer declarer =
-          context.getExtensionDeclarer()
-              .named(parser.getName())
-              .onVersion(version)
-              .fromVendor(parser.getVendor())
-              .withCategory(parser.getCategory())
-              .withModelProperty(parser.getLicenseModelProperty())
-              .withXmlDsl(getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
+    stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
+    ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, context);
+    ExtensionDeclarer declarer =
+        context.getExtensionDeclarer()
+            .named(parser.getName())
+            .onVersion(version)
+            .fromVendor(parser.getVendor())
+            .withCategory(parser.getCategory())
+            .withModelProperty(parser.getLicenseModelProperty())
+            .withXmlDsl(getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
 
-      // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
-      context.getParameter("COMPILATION_MODE")
-          .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    context.getParameter("COMPILATION_MODE")
+        .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
-      this.declarer = declarer;
-      namespace = getExtensionsNamespace(declarer.getDeclaration());
+    this.declarer = declarer;
+    namespace = getExtensionsNamespace(declarer.getDeclaration());
 
-      parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
-      parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
-      parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
-      parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
-      parser.getNotificationModels().forEach(declarer::withNotificationModel);
+    parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
+    parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
+    parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
+    parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
+    parser.getNotificationModels().forEach(declarer::withNotificationModel);
 
-      declareErrorModels(parser, declarer);
-      declareExports(parser, declarer);
-      declareImportedTypes(parser, declarer, context);
-      declareSubTypes(parser, declarer, context);
-      declareNotifications(parser, declarer);
+    declareErrorModels(parser, declarer);
+    declareExports(parser, declarer);
+    declareImportedTypes(parser, declarer, context);
+    declareSubTypes(parser, declarer, context);
+    declareNotifications(parser, declarer);
 
-      configLoaderDelegate.declareConfigurations(declarer, parser);
-      connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
+    configLoaderDelegate.declareConfigurations(declarer, parser);
+    connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
-      if (!extensionElement.getConfigurations().isEmpty()) {
-        operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
-        functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
-        sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
-      }
+    if (!extensionElement.getConfigurations().isEmpty()) {
+      operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
+      functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
+      sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
+    }
 
-      getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
+    getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
 
-      return declarer;
+    return declarer;
   }
 
   private void declareNotifications(ExtensionModelParser parser, ExtensionDeclarer declarer) {
@@ -193,12 +193,12 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   public void registerOutputTypes(ExecutableComponentDeclaration<?> declaration) {
     if (declaration.getOutput() == null) {
       throw new IllegalModelDefinitionException(format("%s '%s' doesn't specify an output type",
-          getComponentDeclarationTypeName(declaration), declaration.getName()));
+                                                       getComponentDeclarationTypeName(declaration), declaration.getName()));
     }
 
     if (declaration.getOutputAttributes() == null) {
       throw new IllegalModelDefinitionException(format("%s '%s' doesn't specify output attributes types",
-          getComponentDeclarationTypeName(declaration), declaration.getName()));
+                                                       getComponentDeclarationTypeName(declaration), declaration.getName()));
     }
 
     registerType(declaration.getOutput().getType());

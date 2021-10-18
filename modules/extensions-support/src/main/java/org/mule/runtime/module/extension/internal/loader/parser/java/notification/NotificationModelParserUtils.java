@@ -43,22 +43,24 @@ public final class NotificationModelParserUtils {
 
     return Stream.of((NotificationActionDefinition<?>[]) enumType.getEnumConstants())
         .map(action -> new ImmutableNotificationModel(extensionNamespace, ((Enum) action).name(),
-            typeLoader.load(action.getDataType().getType())))
+                                                      typeLoader.load(action.getDataType().getType())))
         .collect(toList());
   }
 
   public static List<NotificationModel> parseLegacyNotifications(AnnotationValueFetcher<org.mule.runtime.extension.api.annotation.notification.NotificationActions> value,
                                                                  String extensionNamespace,
                                                                  ClassTypeLoader typeLoader) {
-    Class<Enum> enumType = (Class<Enum>) value.getClassValue(org.mule.runtime.extension.api.annotation.notification.NotificationActions::value).getDeclaringClass().orElse(null);
+    Class<Enum> enumType =
+        (Class<Enum>) value.getClassValue(org.mule.runtime.extension.api.annotation.notification.NotificationActions::value)
+            .getDeclaringClass().orElse(null);
     if (enumType == null) {
       return new LinkedList<>();
     }
 
     return Stream.of(
-            (org.mule.runtime.extension.api.notification.NotificationActionDefinition<?>[]) enumType.getEnumConstants())
+                     (org.mule.runtime.extension.api.notification.NotificationActionDefinition<?>[]) enumType.getEnumConstants())
         .map(action -> new ImmutableNotificationModel(extensionNamespace, ((Enum) action).name(),
-            typeLoader.load(action.getDataType().getType())))
+                                                      typeLoader.load(action.getDataType().getType())))
         .collect(toList());
   }
 
@@ -66,14 +68,15 @@ public final class NotificationModelParserUtils {
                                                      String componentType,
                                                      String componentName) {
     return mapReduceSingleAnnotation(
-        element,
-        componentType,
-        componentName,
-        Fires.class,
-        org.mule.sdk.api.annotation.notification.Fires.class,
-        value -> getEmittedNotifications(value.getClassArrayValue(Fires::value)),
-        value -> getEmittedNotifications(value.getClassArrayValue(org.mule.sdk.api.annotation.notification.Fires::value))
-    ).orElse(emptyList());
+                                     element,
+                                     componentType,
+                                     componentName,
+                                     Fires.class,
+                                     org.mule.sdk.api.annotation.notification.Fires.class,
+                                     value -> getEmittedNotifications(value.getClassArrayValue(Fires::value)),
+                                     value -> getEmittedNotifications(value
+                                         .getClassArrayValue(org.mule.sdk.api.annotation.notification.Fires::value)))
+                                             .orElse(emptyList());
   }
 
   public static void declareEmittedNotifications(NotificationEmitterParser parser,
@@ -99,6 +102,5 @@ public final class NotificationModelParserUtils {
         }).collect(toList());
   }
 
-  private NotificationModelParserUtils() {
-  }
+  private NotificationModelParserUtils() {}
 }

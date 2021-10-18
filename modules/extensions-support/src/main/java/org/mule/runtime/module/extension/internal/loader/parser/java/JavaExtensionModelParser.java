@@ -160,11 +160,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   private void parseNotificationModels() {
     notificationModels = mapReduceSingleAnnotation(extensionElement,
-        NotificationActions.class,
-        org.mule.sdk.api.annotation.notification.NotificationActions.class,
-        value -> parseLegacyNotifications(value, namespace, typeLoader),
-        value -> parseNotifications(value, namespace, typeLoader)
-    ).orElse(new LinkedList<>());
+                                                   NotificationActions.class,
+                                                   org.mule.sdk.api.annotation.notification.NotificationActions.class,
+                                                   value -> parseLegacyNotifications(value, namespace, typeLoader),
+                                                   value -> parseNotifications(value, namespace, typeLoader))
+                                                       .orElse(new LinkedList<>());
   }
 
   private void parseImportedTypes() {
