@@ -38,24 +38,24 @@ public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameter
   public static Collection<Object[]> data() {
     List<ResourceExtensionUnitTest> extensions;
     extensions = asList(
-        newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.json")//,
-//                        newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.json"),
-//                        newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
-//                        newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.json"),
-//                        newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.json"),
-//                        newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.json"),
-//                        newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.json"),
-//                        newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.json"),
-//                        newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.json"),
-//                        newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.json"),
-//                        newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.json"),
-//                        newUnitTest(JAVA_LOADER, WeaveFunctionExtension.class, "test-fn.json"),
-//                        newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.json"),
-//                        newUnitTest(JAVA_LOADER, SampleDataExtension.class, "sample-data.json"),
-//                        newUnitTest(JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.json"),
-//                        newUnitTest(JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.json"),
-//                        newUnitTest(JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.json"),
-//                        newUnitTest(JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.json")
+                        newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.json")// ,
+    // newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.json"),
+    // newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
+    // newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.json"),
+    // newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.json"),
+    // newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.json"),
+    // newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.json"),
+    // newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.json"),
+    // newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.json"),
+    // newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.json"),
+    // newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.json"),
+    // newUnitTest(JAVA_LOADER, WeaveFunctionExtension.class, "test-fn.json"),
+    // newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.json"),
+    // newUnitTest(JAVA_LOADER, SampleDataExtension.class, "sample-data.json"),
+    // newUnitTest(JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.json"),
+    // newUnitTest(JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.json"),
+    // newUnitTest(JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.json"),
+    // newUnitTest(JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.json")
     );
 
     return createExtensionModels(extensions);
