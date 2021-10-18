@@ -38,8 +38,8 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
           .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
   public void dispose() {
-    sinks.asMap().values().forEach(sink -> sink.complete());
-    sinksNestedTx.asMap().values().forEach(sink -> sink.complete());
+    sinks.asMap().values().forEach(FluxSink::complete);
+    sinksNestedTx.asMap().values().forEach(FluxSink::complete);
   }
 
   protected void invalidateAll() {
@@ -47,12 +47,15 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
     sinksNestedTx.invalidateAll();
   }
 
-  public void accept(CoreEvent event) {
+  @Override
+  public FluxSink<CoreEvent> getSink() {
     TransactionCoordination txCoord = TransactionCoordination.getInstance();
     if (txCoord.runningNestedTransaction()) {
-      sinksNestedTx.get(txCoord.getTransaction(), tx -> getSink()).next(event);
+      return sinksNestedTx.get(txCoord.getTransaction(), tx -> createSink());
     } else {
-      sinks.get(currentThread(), t -> getSink()).next(event);
+      return sinks.get(currentThread(), t -> createSink());
     }
-  };
+  }
+
+  protected abstract FluxSink<CoreEvent> createSink();
 }

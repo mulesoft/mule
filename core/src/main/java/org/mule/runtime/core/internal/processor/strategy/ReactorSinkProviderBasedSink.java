@@ -24,6 +24,7 @@ public class ReactorSinkProviderBasedSink implements Sink, Disposable {
 
   /**
    * creates a {@link ReactorSinkProviderBasedSink}.
+   * 
    * @param sinkProvider the provider of {@link FluxSink<CoreEvent>}.
    */
   public ReactorSinkProviderBasedSink(ReactorSinkProvider sinkProvider) {
@@ -36,7 +37,7 @@ public class ReactorSinkProviderBasedSink implements Sink, Disposable {
       throw new IllegalStateException("Already disposed");
     }
 
-    sinkProvider.accept(event);
+    sinkProvider.getSink().next(event);
   }
 
   @Override

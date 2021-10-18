@@ -41,7 +41,7 @@ public class ReactorSinkProviderBasedSinkTestCase {
     ReactorSinkProvider sinkProvider = new AbstractCachedThreadReactorSinkProvider() {
 
       @Override
-      public FluxSink<CoreEvent> getSink() {
+      protected FluxSink<CoreEvent> createSink() {
         return fluxSink;
       }
     };

@@ -27,7 +27,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 /**
- * Default implementation of {@link AbstractCachedThreadReactorSinkProvider} that uses a {@link Flux} for each thread that dispatches events to it.
+ * Default implementation of {@link AbstractCachedThreadReactorSinkProvider} that uses a {@link Flux} for each thread that
+ * dispatches events to it.
  */
 public class DefaultCachedThreadReactorSinkProvider extends AbstractCachedThreadReactorSinkProvider {
 
@@ -48,14 +49,15 @@ public class DefaultCachedThreadReactorSinkProvider extends AbstractCachedThread
    *                      pipeline.
    * @param eventConsumer event consumer called just before {@link CoreEvent}'s emission.
    */
-  public DefaultCachedThreadReactorSinkProvider(FlowConstruct flowConstruct, ReactiveProcessor processor, Consumer<CoreEvent> eventConsumer) {
+  public DefaultCachedThreadReactorSinkProvider(FlowConstruct flowConstruct, ReactiveProcessor processor,
+                                                Consumer<CoreEvent> eventConsumer) {
     this.flowConstruct = flowConstruct;
     this.processor = processor;
     this.eventConsumer = eventConsumer;
   }
 
   @Override
-  public FluxSink<org.mule.runtime.core.api.event.CoreEvent> getSink() {
+  public FluxSink<CoreEvent> createSink() {
     disposableSinks.incrementAndGet();
     final FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
     recorder.flux()
