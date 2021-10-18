@@ -11,11 +11,10 @@ import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Sink;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 /**
- * {@link Sink} implementation that uses a {@link Flux} for each thread that dispatches events to it.
+ * {@link Sink} that delegates the retrieval of a sink to a ReactorSinkProvider .
  */
 public class ReactorSinkProviderBasedSink implements Sink, Disposable {
 
@@ -23,12 +22,12 @@ public class ReactorSinkProviderBasedSink implements Sink, Disposable {
 
   private final ReactorSinkProvider sinkProvider;
 
+  /**
+   * creates a {@link ReactorSinkProviderBasedSink}.
+   * @param sinkProvider the provider of {@link FluxSink<CoreEvent>}.
+   */
   public ReactorSinkProviderBasedSink(ReactorSinkProvider sinkProvider) {
     this.sinkProvider = sinkProvider;
-  }
-
-  FluxSink<CoreEvent> createSink() {
-    return sinkProvider.getSink();
   }
 
   @Override
@@ -37,7 +36,7 @@ public class ReactorSinkProviderBasedSink implements Sink, Disposable {
       throw new IllegalStateException("Already disposed");
     }
 
-    sinkProvider.accept(this, event);
+    sinkProvider.accept(event);
   }
 
   @Override

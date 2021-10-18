@@ -18,7 +18,10 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import reactor.core.publisher.FluxSink;
 
-public abstract class AbstractReactorSinkProvider implements ReactorSinkProvider {
+/**
+ * Abstract implementation of {@link ReactorSinkProvider} that uses a cache for the {@link FluxSink}s per thread.
+ */
+public abstract class AbstractCachedThreadReactorSinkProvider implements ReactorSinkProvider {
 
   private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
   private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
@@ -39,17 +42,17 @@ public abstract class AbstractReactorSinkProvider implements ReactorSinkProvider
     sinksNestedTx.asMap().values().forEach(sink -> sink.complete());
   }
 
-  public void invalidateAll() {
+  protected void invalidateAll() {
     sinks.invalidateAll();
     sinksNestedTx.invalidateAll();
   }
 
-  public void accept(ReactorSinkProviderBasedSink reactorSinkProviderBasedSink, CoreEvent event) {
+  public void accept(CoreEvent event) {
     TransactionCoordination txCoord = TransactionCoordination.getInstance();
     if (txCoord.runningNestedTransaction()) {
-      sinksNestedTx.get(txCoord.getTransaction(), tx -> reactorSinkProviderBasedSink.createSink()).next(event);
+      sinksNestedTx.get(txCoord.getTransaction(), tx -> getSink()).next(event);
     } else {
-      sinks.get(currentThread(), t -> reactorSinkProviderBasedSink.createSink()).next(event);
+      sinks.get(currentThread(), t -> getSink()).next(event);
     }
   };
 }

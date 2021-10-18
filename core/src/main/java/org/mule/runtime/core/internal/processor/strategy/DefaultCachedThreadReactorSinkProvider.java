@@ -23,11 +23,15 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
-public class DefaultReactorSinkProvider extends AbstractReactorSinkProvider {
+/**
+ * Default implementation of {@link AbstractCachedThreadReactorSinkProvider} that uses a {@link Flux} for each thread that dispatches events to it.
+ */
+public class DefaultCachedThreadReactorSinkProvider extends AbstractCachedThreadReactorSinkProvider {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultReactorSinkProvider.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCachedThreadReactorSinkProvider.class);
 
   // We add this counter so we can count the amount of finished sinks when disposing
   // The previous way involved having a strong reference to the thread, which caused MULE-19209
@@ -38,13 +42,13 @@ public class DefaultReactorSinkProvider extends AbstractReactorSinkProvider {
   private final ReactiveProcessor processor;
 
   /**
-   * Creates a {@link DefaultReactorSinkProvider}.
+   * Creates a {@link DefaultCachedThreadReactorSinkProvider}.
    *
    * @param processor     the processor to process events emitted onto stream, typically this processor will represent the flow
    *                      pipeline.
    * @param eventConsumer event consumer called just before {@link CoreEvent}'s emission.
    */
-  public DefaultReactorSinkProvider(FlowConstruct flowConstruct, ReactiveProcessor processor, Consumer<CoreEvent> eventConsumer) {
+  public DefaultCachedThreadReactorSinkProvider(FlowConstruct flowConstruct, ReactiveProcessor processor, Consumer<CoreEvent> eventConsumer) {
     this.flowConstruct = flowConstruct;
     this.processor = processor;
     this.eventConsumer = eventConsumer;

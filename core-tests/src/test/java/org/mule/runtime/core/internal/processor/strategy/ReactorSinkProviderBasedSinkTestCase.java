@@ -11,7 +11,12 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.EXECUTION_ENGINE;
+import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.REACTOR;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -22,15 +27,18 @@ import java.lang.ref.ReferenceQueue;
 import org.junit.Test;
 import reactor.core.publisher.FluxSink;
 
+@Feature(EXECUTION_ENGINE)
+@Story(REACTOR)
 public class ReactorSinkProviderBasedSinkTestCase {
 
   private static final long GC_POLLING_TIMEOUT = 10000;
 
   @Test
+  @Issue("MULE-19846")
   public void sinkCompletedAfterThreadTermination() throws InterruptedException {
 
     FluxSink<CoreEvent> fluxSink = (FluxSink<CoreEvent>) mock(FluxSink.class);
-    ReactorSinkProvider sinkProvider = new AbstractReactorSinkProvider() {
+    ReactorSinkProvider sinkProvider = new AbstractCachedThreadReactorSinkProvider() {
 
       @Override
       public FluxSink<CoreEvent> getSink() {
@@ -58,12 +66,8 @@ public class ReactorSinkProviderBasedSinkTestCase {
     }, "A hard reference is being mantained to the thread."));
 
     // we add another value to the cache so that the removal listener be called
-    thread = new Thread(() -> {
-      reactorSinkProviderBasedSink.accept(mock(CoreEvent.class));
-    });
+    reactorSinkProviderBasedSink.accept(mock(CoreEvent.class));
 
-    thread.start();
-    thread.join();
 
     new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       verify(fluxSink).complete();
