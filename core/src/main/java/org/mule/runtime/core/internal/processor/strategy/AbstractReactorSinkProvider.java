@@ -15,12 +15,10 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import reactor.core.publisher.FluxSink;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
-public abstract class AbstractCacheSinkProvider {
+public abstract class AbstractReactorSinkProvider implements ReactorSinkProvider {
 
   private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
   private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
@@ -36,24 +34,22 @@ public abstract class AbstractCacheSinkProvider {
                                                                                 removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
-  public abstract FluxSink<CoreEvent> getSink(AtomicLong disposableSinks, FlowConstruct flowConstruct);
-
   public void dispose() {
     sinks.asMap().values().forEach(sink -> sink.complete());
     sinksNestedTx.asMap().values().forEach(sink -> sink.complete());
   }
 
-  public void invalidateAll() {
+  protected void invalidateAll() {
     sinks.invalidateAll();
     sinksNestedTx.invalidateAll();
   }
 
-  public void accept(StreamPerThreadSink streamPerThreadSink, CoreEvent event) {
+  public void accept(ReactorSinkProviderBasedSink reactorSinkProviderBasedSink, CoreEvent event) {
     TransactionCoordination txCoord = TransactionCoordination.getInstance();
     if (txCoord.runningNestedTransaction()) {
-      sinksNestedTx.get(txCoord.getTransaction(), tx -> streamPerThreadSink.createSink()).next(event);
+      sinksNestedTx.get(txCoord.getTransaction(), tx -> reactorSinkProviderBasedSink.createSink()).next(event);
     } else {
-      sinks.get(currentThread(), t -> streamPerThreadSink.createSink()).next(event);
+      sinks.get(currentThread(), t -> reactorSinkProviderBasedSink.createSink()).next(event);
     }
   };
 }
