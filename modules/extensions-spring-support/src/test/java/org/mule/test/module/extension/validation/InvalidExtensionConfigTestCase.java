@@ -190,6 +190,15 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
     loadConfiguration("source/zero-polling-source-limiting-config.xml");
   }
 
+  @Test
+  public void dynamicStatefulOverride() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("[validation/dynamic-stateful-override-config.xml:9]");
+    expectedException
+        .expectMessage("Component uses a dynamic configuration and defines configuration override parameter 'optionalWithDefault' which is assigned on initialization. That combination is not supported. Please use a non dynamic configuration or don't set the parameter.");
+    loadConfiguration("validation/dynamic-stateful-override-config.xml");
+  }
+
   @Override
   protected List<ExtensionModel> getRequiredExtensions() {
     ExtensionModel petStore = loadExtension(PetStoreConnector.class, emptySet());

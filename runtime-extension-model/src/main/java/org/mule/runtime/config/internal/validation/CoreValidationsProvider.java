@@ -40,6 +40,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new RequiredParametersPresent(),
                   new ParameterGroupExclusiveness(),
                   new ExpressionsInRequiredExpressionsParams(),
+                  new DynamicConfigWithStatefulOperationConfigurationOverride(),
                   new PollingSourceHasSchedulingStrategy(),
                   new RoundRobinRoutes(),
                   new FirstSuccessfulRoutes(),
