@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
@@ -31,8 +32,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Test;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
+@Feature(XML_SDK)
 public class ExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
