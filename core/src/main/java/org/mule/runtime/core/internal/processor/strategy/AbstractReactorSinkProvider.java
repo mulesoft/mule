@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalListener;
+import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import reactor.core.publisher.FluxSink;
 
-import static java.lang.Thread.currentThread;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import reactor.core.publisher.FluxSink;
 
 public abstract class AbstractReactorSinkProvider implements ReactorSinkProvider {
 

@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import org.junit.Test;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
-import reactor.core.publisher.FluxSink;
-
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+
+import org.junit.Test;
+import reactor.core.publisher.FluxSink;
 
 public class ReactorSinkProviderBasedSinkTestCase {
 
