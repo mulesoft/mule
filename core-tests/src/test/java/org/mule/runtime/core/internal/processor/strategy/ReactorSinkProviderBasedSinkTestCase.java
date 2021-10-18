@@ -24,51 +24,52 @@ import reactor.core.publisher.FluxSink;
 
 public class ReactorSinkProviderBasedSinkTestCase {
 
-    private static final long GC_POLLING_TIMEOUT = 10000;
+  private static final long GC_POLLING_TIMEOUT = 10000;
 
-    @Test
-    public void sinkCompletedAfterThreadTermination() throws InterruptedException {
+  @Test
+  public void sinkCompletedAfterThreadTermination() throws InterruptedException {
 
-        FluxSink<CoreEvent> fluxSink = (FluxSink<CoreEvent>) mock(FluxSink.class);
-        ReactorSinkProvider sinkProvider = new AbstractReactorSinkProvider() {
-            @Override
-            public FluxSink<CoreEvent> getSink() {
-                return fluxSink;
-            }
-        };
-        ReactorSinkProviderBasedSink reactorSinkProviderBasedSink = new ReactorSinkProviderBasedSink(sinkProvider);
+    FluxSink<CoreEvent> fluxSink = (FluxSink<CoreEvent>) mock(FluxSink.class);
+    ReactorSinkProvider sinkProvider = new AbstractReactorSinkProvider() {
 
-        Thread thread = new Thread(() -> {
-            reactorSinkProviderBasedSink.accept(mock(CoreEvent.class));
-        });
+      @Override
+      public FluxSink<CoreEvent> getSink() {
+        return fluxSink;
+      }
+    };
+    ReactorSinkProviderBasedSink reactorSinkProviderBasedSink = new ReactorSinkProviderBasedSink(sinkProvider);
 
-        thread.start();
+    Thread thread = new Thread(() -> {
+      reactorSinkProviderBasedSink.accept(mock(CoreEvent.class));
+    });
 
-        ReferenceQueue referenceQueue = new ReferenceQueue<>();
+    thread.start();
 
-        PhantomReference<CoreEvent> bindingValueRef = new PhantomReference<>(thread, referenceQueue);
+    ReferenceQueue referenceQueue = new ReferenceQueue<>();
 
-        thread.join();
+    PhantomReference<CoreEvent> bindingValueRef = new PhantomReference<>(thread, referenceQueue);
 
-        thread = null;
+    thread.join();
 
-        new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-            System.gc();
-            assertThat(bindingValueRef.isEnqueued(), is(true));
-            return true;
-        }, "A hard reference is being mantained to the thread."));
+    thread = null;
 
-        // we add another value to the cache so that the removal listener be called
-        thread = new Thread(() -> {
-            reactorSinkProviderBasedSink.accept(mock(CoreEvent.class));
-        });
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      System.gc();
+      assertThat(bindingValueRef.isEnqueued(), is(true));
+      return true;
+    }, "A hard reference is being mantained to the thread."));
 
-        thread.start();
-        thread.join();
+    // we add another value to the cache so that the removal listener be called
+    thread = new Thread(() -> {
+      reactorSinkProviderBasedSink.accept(mock(CoreEvent.class));
+    });
 
-        new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-            verify(fluxSink).complete();
-            return true;
-        }, "The sink was not completed."));
-    }
+    thread.start();
+    thread.join();
+
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      verify(fluxSink).complete();
+      return true;
+    }, "The sink was not completed."));
+  }
 }
