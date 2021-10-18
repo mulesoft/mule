@@ -387,7 +387,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
-                                            failingTransformer);
+                                            failingTransformer,
+                                            threadReleaseDataProducer);
     execute();
   }
 
@@ -449,7 +450,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
-                                            failingTransformer);
+                                            failingTransformer,
+                                            threadReleaseDataProducer);
     execute();
   }
 
