@@ -167,7 +167,7 @@ public abstract class ExtensionDefinitionParser {
 
   /**
    * Creates a list of {@link ComponentBuildingDefinition} built on copies of {@link #definitionBuilder}. It also sets the parsed
-   * parsed parameters on the backing {@link AbstractExtensionObjectFactory}
+   * parameters on the backing {@link AbstractExtensionObjectFactory}
    *
    * @return a list with the generated {@link ComponentBuildingDefinition}
    * @throws ConfigurationException if a parsing error occurs
