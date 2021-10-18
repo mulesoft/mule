@@ -124,8 +124,8 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private List<Processor> processors;
 
   private final List<ParameterModel> allProperties;
-  private final Map<String, Pair<String, MetadataType>> properties;
-  private final Map<String, Pair<String, MetadataType>> parameters;
+  private final Map<String, Pair<Object, MetadataType>> properties;
+  private final Map<String, Pair<Object, MetadataType>> parameters;
   private final boolean returnsVoid;
   private final Optional<String> target;
   private final String targetValue;
@@ -187,17 +187,16 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
    * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(CoreEvent, String, MetadataType)}
    */
-  private Map<String, Pair<String, MetadataType>> parseParameters(Map<String, ?> parameters,
+  private Map<String, Pair<Object, MetadataType>> parseParameters(Map<String, ?> parameters,
                                                                   List<ParameterModel> parameterModels) {
-    final Map<String, Pair<String, MetadataType>> result = new HashMap<>();
+    final Map<String, Pair<Object, MetadataType>> result = new HashMap<>();
 
     for (ParameterModel parameterModel : parameterModels) {
       final String parameterName = parameterModel.getName();
       if (parameterName.equals(TARGET_PARAMETER_NAME) || parameterName.equals(TARGET_VALUE_PARAMETER_NAME)) {
         // nothing to do, these are not forwarded to the event for the inner chain
       } else if (parameters.containsKey(parameterName)) {
-        final String xmlValue = parameters.get(parameterName).toString().trim();
-        result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
+        result.put(parameterName, new Pair<>(getXmlParameterValue(parameters, parameterName), parameterModel.getType()));
       } else if (parameterModel.getDefaultValue() != null
           && (PRIMARY_CONTENT.equals(parameterModel.getRole())
               || CONTENT.equals(parameterModel.getRole()))) {
@@ -205,6 +204,11 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
       }
     }
     return result;
+  }
+
+  private Object getXmlParameterValue(Map<String, ?> parameters, String parameterName) {
+    Object xmlValue = parameters.get(parameterName);
+    return (xmlValue instanceof String ? ((String) xmlValue).trim() : xmlValue);
   }
 
   @Override
@@ -354,7 +358,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     InternalEvent.Builder builder = InternalEvent.builder(event.getContext());
     builder.message(builder().nullValue().build());
 
-    Map<String, Pair<String, MetadataType>> resolvedProperties;
+    Map<String, Pair<Object, MetadataType>> resolvedProperties;
     // If this operation is called from an outer operation, we need to obtain the config from the previous caller in order to
     // populate the event variables as expected.
     if (properties.isEmpty() && event.getVariables().containsKey(MODULE_OPERATION_CONFIG_REF)) {
@@ -375,13 +379,13 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   }
 
   private void addVariables(CoreEvent event, CoreEvent.Builder builder,
-                            Map<String, Pair<String, MetadataType>> unevaluatedMap) {
+                            Map<String, Pair<Object, MetadataType>> unevaluatedMap) {
     unevaluatedMap.entrySet().stream()
         .forEach(entry -> {
-          final boolean isExpression = expressionManager.isExpression(entry.getValue().getFirst());
+          final boolean isExpression = expressionManager.isExpression(entry.getValue().getFirst().toString());
           if (isExpression) {
             final TypedValue<?> evaluatedValue =
-                getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond());
+                getEvaluatedValue(event, entry.getValue().getFirst().toString(), entry.getValue().getSecond());
             builder.addVariable(entry.getKey(), evaluatedValue);
           } else {
             builder.addVariable(entry.getKey(), entry.getValue().getFirst());

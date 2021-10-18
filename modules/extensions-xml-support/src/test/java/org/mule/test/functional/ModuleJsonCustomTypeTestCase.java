@@ -120,6 +120,13 @@ public class ModuleJsonCustomTypeTestCase extends AbstractCeXmlExtensionMuleArti
     assertThat(content, equalTo("1-2_a-b"));
   }
 
+  @Test
+  public void testJoinInlineStringArray() throws Exception {
+    CoreEvent event = flowRunner("testJoinInlineStringArray").run();
+    String content = (String) event.getMessage().getPayload().getValue();
+    assertThat(content, equalTo("1-2_a-b"));
+  }
+
   /**
    * Validations are done with DW scripts within the module being consumed here. (the module is targeted by the method
    * {@link #getModulePath()})
