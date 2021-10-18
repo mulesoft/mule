@@ -12,8 +12,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -56,8 +54,8 @@ public class ExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
       @Override
       protected void declareExtension(ExtensionLoadingContext context) {
         extensionDeclared.set(true);
-        assertThat(context.getDslResolvingContext().getExtension("mule"), not(nullValue()));
-        assertThat(context.getDslResolvingContext().getExtension("testRuntime"), not(nullValue()));
+        assertThat(context.getDslResolvingContext().getExtension("mule").isPresent(), is(true));
+        assertThat(context.getDslResolvingContext().getExtension("testRuntime").isPresent(), is(true));
 
         context.getExtensionDeclarer()
             .named("test")

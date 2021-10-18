@@ -152,8 +152,7 @@ public class ExtensionModelDiscoverer {
     ExtensionModelLoader loader = extensionModelLoaderRepository.getExtensionModelLoader(loaderDescriber)
         .orElseThrow(() -> new IllegalArgumentException(format("The identifier '%s' does not match with the describers available "
             + "to generate an ExtensionModel (working with the plugin '%s')", loaderDescriber.getId(), artifactName)));
-    ExtensionModel coreModel = MuleExtensionModelProvider.getExtensionModel();
-    if (!extensions.contains(coreModel)) {
+    if (!extensions.contains(MuleExtensionModelProvider.getExtensionModel())) {
       extensions = ImmutableSet.<ExtensionModel>builder().addAll(extensions).addAll(discoverRuntimeExtensionModels()).build();
     }
     Map<String, Object> attributes = new HashMap<>(loaderDescriber.getAttributes());
