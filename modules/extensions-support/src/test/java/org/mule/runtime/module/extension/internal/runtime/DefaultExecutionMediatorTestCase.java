@@ -39,6 +39,7 @@ import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.MuleTestUtils.stubFailingComponentExecutor;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.CONNECTIVITY;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
+import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static reactor.core.Exceptions.unwrap;
 
@@ -370,8 +371,30 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  public void enrichThrownModuleExceptionInValueTransformer() throws Throwable {
-    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, HEALTH, exception);
+  public void enrichThrownSdkModuleExceptionInValueTransformer() throws Throwable {
+    final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
+        new org.mule.sdk.api.exception.ModuleException(ERROR, HEALTH, exception);
+    expectedException.expect(instanceOf(HeisenbergException.class));
+    expectedException.expectCause(sameInstance(moduleExceptionToThrow));
+    mockExceptionEnricher(operationModel, () -> exceptionEnricher);
+    final ResultTransformer failingTransformer = mock(ResultTransformer.class);
+    when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
+
+    ErrorTypeRepository errorTypeRepository = mockErrorModel();
+
+    mediator = new DefaultExecutionMediator(extensionModel,
+                                            operationModel,
+                                            interceptorChain,
+                                            errorTypeRepository,
+                                            muleContext.getExecutionClassLoader(),
+                                            failingTransformer);
+    execute();
+  }
+
+  @Test
+  public void enrichThrownLegacyModuleExceptionInValueTransformer() throws Throwable {
+    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, CUSTOM_ERROR, exception);
+    expectedException.expect(instanceOf(HeisenbergException.class));
     expectedException.expectCause(sameInstance(moduleExceptionToThrow));
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
@@ -410,11 +433,32 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  public void notEnrichThrownModuleExceptionInValueTransformer() throws Throwable {
-    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, HEALTH, exception);
+  public void notEnrichThrownSdkModuleExceptionInValueTransformer() throws Throwable {
+    final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
+        new org.mule.sdk.api.exception.ModuleException(ERROR, HEALTH, exception);
     expectedException.expect(instanceOf(TypedException.class));
     expectedException.expectCause(sameInstance(exception));
-    mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
+    mockExceptionEnricher(operationModel, NullExceptionEnricher::new);
+    final ResultTransformer failingTransformer = mock(ResultTransformer.class);
+    when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
+
+    ErrorTypeRepository errorTypeRepository = mockErrorModel();
+
+    mediator = new DefaultExecutionMediator(extensionModel,
+                                            operationModel,
+                                            interceptorChain,
+                                            errorTypeRepository,
+                                            muleContext.getExecutionClassLoader(),
+                                            failingTransformer);
+    execute();
+  }
+
+  @Test
+  public void notEnrichThrownLegacyModuleExceptionInValueTransformer() throws Throwable {
+    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, CUSTOM_ERROR, exception);
+    expectedException.expect(instanceOf(TypedException.class));
+    expectedException.expectCause(sameInstance(exception));
+    mockExceptionEnricher(operationModel, NullExceptionEnricher::new);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
 
@@ -452,10 +496,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   @Test
   public void notReconnectInValueTransformerWhenVariableIsSet() {
     int expectedRetries = retryPolicy.isEnabled() ? 1 : 0;
-    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, CONNECTIVITY, connectionException);
+    final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
+        new org.mule.sdk.api.exception.ModuleException(ERROR, CONNECTIVITY, connectionException);
     when(operationContext.getVariable(DO_NOT_RETRY)).thenReturn("true");
     clearInvocations(operationContext);
-    mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
+    mockExceptionEnricher(operationModel, NullExceptionEnricher::new);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(eq(operationContext), any())).thenThrow(moduleExceptionToThrow);
 
