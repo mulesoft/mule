@@ -45,9 +45,7 @@ public class ReactorSinkProviderBasedSinkTestCase {
 
     thread.start();
 
-    ReferenceQueue referenceQueue = new ReferenceQueue<>();
-
-    PhantomReference<CoreEvent> bindingValueRef = new PhantomReference<>(thread, referenceQueue);
+    PhantomReference<Thread> bindingValueRef = new PhantomReference<>(thread, new ReferenceQueue<>());
 
     thread.join();
 

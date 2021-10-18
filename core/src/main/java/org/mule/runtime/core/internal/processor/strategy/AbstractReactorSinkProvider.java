@@ -26,9 +26,7 @@ public abstract class AbstractReactorSinkProvider implements ReactorSinkProvider
   private final Cache<Thread, FluxSink<CoreEvent>> sinks =
       Caffeine.newBuilder().weakKeys()
           .removalListener((RemovalListener<Thread, FluxSink<CoreEvent>>) (thread, coreEventFluxSink,
-                                                                           removalCause) -> {
-            coreEventFluxSink.complete();
-          })
+                                                                           removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
   private final Cache<Transaction, FluxSink<CoreEvent>> sinksNestedTx =
       Caffeine.newBuilder().weakKeys()
