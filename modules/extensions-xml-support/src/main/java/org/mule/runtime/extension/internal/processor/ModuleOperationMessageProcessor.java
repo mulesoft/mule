@@ -114,28 +114,23 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private static final Logger LOGGER = getLogger(ModuleOperationMessageProcessor.class);
 
   private static final String ORIGINAL_EVENT_KEY = "mule.xmlSdk.originalEvent";
-
-  @Inject
-  private ExpressionManager expressionManager;
-
-  @Inject
-  private Collection<ExceptionContextProvider> exceptionContextProviders;
-
   private final ExtensionManager extensionManager;
-
-  private MessageProcessorChain nestedChain;
-  private List<Processor> processors;
-
   private final List<ParameterModel> allProperties;
-  private final Map<String, Pair<String, MetadataType>> properties;
-  private final Map<String, Pair<String, MetadataType>> parameters;
+  private final Map<String, Pair<Object, MetadataType>> properties;
+  private final Map<String, Pair<Object, MetadataType>> parameters;
   private final boolean returnsVoid;
   private final Optional<String> target;
   private final String targetValue;
+  @Inject
+  private ExpressionManager expressionManager;
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
+  private MessageProcessorChain nestedChain;
+  private List<Processor> processors;
   private CompiledExpression targetValueExpression;
   private List<ErrorMapping> errorMappings = emptyList();
 
-  public ModuleOperationMessageProcessor(Map<String, String> parameters,
+  public ModuleOperationMessageProcessor(Map<String, Object> parameters,
                                          ExtensionManager extensionManager, ExtensionModel extensionModel,
                                          OperationModel operationModel) {
     this.extensionManager = extensionManager;
@@ -144,14 +139,14 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     this.properties = parseParameters(getProperties(parameters), allProperties);
     this.parameters = parseParameters(parameters, operationModel.getAllParameterModels());
     this.returnsVoid = MetadataTypeUtils.isVoid(operationModel.getOutput().getType());
-    this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
-    this.targetValue = parameters.remove(TARGET_VALUE_PARAMETER_NAME);
+    this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of((String) parameters.remove(TARGET_PARAMETER_NAME)) : empty();
+    this.targetValue = (String) parameters.remove(TARGET_VALUE_PARAMETER_NAME);
   }
 
-  public Map<String, String> getProperties(Map<String, String> parameters) {
+  public Map<String, String> getProperties(Map<String, Object> parameters) {
     // `properties` in the scope of a Xml-Sdk operation means the parameters of the config.
     if (parameters.containsKey(MODULE_OPERATION_CONFIG_REF)) {
-      return createPropertiesFromConfigName(parameters.get(MODULE_OPERATION_CONFIG_REF));
+      return createPropertiesFromConfigName((String) parameters.get(MODULE_OPERATION_CONFIG_REF));
     } else {
       return emptyMap();
     }
@@ -186,19 +181,23 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    *
    * @param parameters list of parameters taken from the XML
    * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
-   * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(CoreEvent, String, MetadataType)}
+   * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(CoreEvent, Object, MetadataType)}
    */
-  private Map<String, Pair<String, MetadataType>> parseParameters(Map<String, String> parameters,
+  private Map<String, Pair<Object, MetadataType>> parseParameters(Map<String, ?> parameters,
                                                                   List<ParameterModel> parameterModels) {
-    final Map<String, Pair<String, MetadataType>> result = new HashMap<>();
+    final Map<String, Pair<Object, MetadataType>> result = new HashMap<>();
 
     for (ParameterModel parameterModel : parameterModels) {
       final String parameterName = parameterModel.getName();
       if (parameterName.equals(TARGET_PARAMETER_NAME) || parameterName.equals(TARGET_VALUE_PARAMETER_NAME)) {
         // nothing to do, these are not forwarded to the event for the inner chain
       } else if (parameters.containsKey(parameterName)) {
-        final String xmlValue = parameters.get(parameterName).trim();
-        result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
+        final Object xmlValue = parameters.get(parameterName);
+        if (xmlValue instanceof String) {
+          result.put(parameterName, new Pair<>(((String) xmlValue).trim(), parameterModel.getType()));
+        } else {
+          result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
+        }
       } else if (parameterModel.getDefaultValue() != null
           && (PRIMARY_CONTENT.equals(parameterModel.getRole())
               || CONTENT.equals(parameterModel.getRole()))) {
@@ -355,7 +354,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     InternalEvent.Builder builder = InternalEvent.builder(event.getContext());
     builder.message(builder().nullValue().build());
 
-    Map<String, Pair<String, MetadataType>> resolvedProperties;
+    Map<String, Pair<Object, MetadataType>> resolvedProperties;
     // If this operation is called from an outer operation, we need to obtain the config from the previous caller in order to
     // populate the event variables as expected.
     if (properties.isEmpty() && event.getVariables().containsKey(MODULE_OPERATION_CONFIG_REF)) {
@@ -376,10 +375,10 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   }
 
   private void addVariables(CoreEvent event, CoreEvent.Builder builder,
-                            Map<String, Pair<String, MetadataType>> unevaluatedMap) {
+                            Map<String, Pair<Object, MetadataType>> unevaluatedMap) {
     unevaluatedMap.entrySet().stream()
         .forEach(entry -> {
-          final boolean isExpression = expressionManager.isExpression(entry.getValue().getFirst());
+          final boolean isExpression = expressionManager.isExpression(entry.getValue().getFirst().toString());
           if (isExpression) {
             final TypedValue<?> evaluatedValue =
                 getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond());
@@ -390,14 +389,14 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         });
   }
 
-  private TypedValue<?> getEvaluatedValue(CoreEvent event, String value, MetadataType metadataType) {
+  private TypedValue<?> getEvaluatedValue(CoreEvent event, Object value, MetadataType metadataType) {
     ComponentLocation headLocation;
     final Processor head = nestedChain.getMessageProcessors().get(0);
     headLocation = ((Component) head).getLocation();
 
     TypedValue<?> evaluatedResult;
     if (JAVA.equals(metadataType.getMetadataFormat())) {
-      evaluatedResult = expressionManager.evaluate(value, event, headLocation);
+      evaluatedResult = expressionManager.evaluate(value.toString(), event, headLocation);
     } else {
       final String mediaType = metadataType.getMetadataFormat().getValidMimeTypes().iterator().next();
       final DataType expectedOutputType =
@@ -407,7 +406,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
               .charset(UTF_8)
               .build();
       evaluatedResult = expressionManager
-          .evaluate(value, expectedOutputType, NULL_BINDING_CONTEXT, event, headLocation, false);
+          .evaluate(value.toString(), expectedOutputType, NULL_BINDING_CONTEXT, event, headLocation, false);
     }
     return evaluatedResult;
   }

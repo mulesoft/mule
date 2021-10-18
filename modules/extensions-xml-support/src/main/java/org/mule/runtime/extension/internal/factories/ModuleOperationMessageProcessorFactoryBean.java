@@ -28,7 +28,7 @@ import org.springframework.beans.factory.FactoryBean;
 public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponent
     implements FactoryBean<ModuleOperationMessageProcessor> {
 
-  private Map<String, String> parameters = emptyMap();
+  private Map<String, Object> parameters = emptyMap();
 
   private List<Processor> processors;
 
@@ -59,7 +59,7 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
     return messageProcessorChain;
   }
 
-  public void setParameters(Map<String, String> parameters) {
+  public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
 
