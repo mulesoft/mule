@@ -71,28 +71,28 @@ public class DefaultReactorSinkProvider extends AbstractReactorSinkProvider {
     long startMillis = currentTimeMillis();
 
     while (disposableSinks.get() != 0
-            && currentTimeMillis() <= shutdownTimeout + startMillis
-            && !currentThread().isInterrupted()) {
+        && currentTimeMillis() <= shutdownTimeout + startMillis
+        && !currentThread().isInterrupted()) {
       yield();
     }
 
     if (currentThread().isInterrupted()) {
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
         throw new IllegalStateException(format("TX Subscribers of ProcessingStrategy for flow '%s' not completed before thread interruption",
-                flowConstruct.getName()));
+                                               flowConstruct.getName()));
       } else {
         LOGGER.warn("TX Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
-                flowConstruct.getName());
+                    flowConstruct.getName());
       }
       invalidateAll();
     } else if (disposableSinks.get() != 0) {
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
         throw new IllegalStateException(format("TX Subscribers of ProcessingStrategy for flow '%s' not completed in %d ms",
-                flowConstruct.getName(),
-                shutdownTimeout));
+                                               flowConstruct.getName(),
+                                               shutdownTimeout));
       } else {
         LOGGER.warn("TX Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
-                shutdownTimeout);
+                    shutdownTimeout);
       }
       invalidateAll();
     }

@@ -8,12 +8,22 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import org.junit.Test;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import reactor.core.publisher.FluxSink;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
 public class ReactorSinkProviderBasedSinkTestCase {
+
+    private static final long GC_POLLING_TIMEOUT = 10000;
 
     @Test
     public void sinkCompletedAfterThreadTermination() throws InterruptedException {
@@ -33,8 +43,31 @@ public class ReactorSinkProviderBasedSinkTestCase {
 
         thread.start();
 
+        ReferenceQueue referenceQueue = new ReferenceQueue<>();
+
+        PhantomReference<CoreEvent> bindingValueRef = new PhantomReference<>(thread, referenceQueue);
+
         thread.join();
 
-        verify(fluxSink).complete();
+        thread = null;
+
+        new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+            System.gc();
+            assertThat(bindingValueRef.isEnqueued(), is(true));
+            return true;
+        }, "A hard reference is being mantained to the thread."));
+
+        // we add another value to the cache so that the removal listener be called
+        thread = new Thread(() -> {
+            reactorSinkProviderBasedSink.accept(mock(CoreEvent.class));
+        });
+
+        thread.start();
+        thread.join();
+
+        new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+            verify(fluxSink).complete();
+            return true;
+        }, "The sink was not completed."));
     }
 }

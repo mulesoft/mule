@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.processor.strategy;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -26,7 +25,9 @@ public abstract class AbstractReactorSinkProvider implements ReactorSinkProvider
   private final Cache<Thread, FluxSink<CoreEvent>> sinks =
       Caffeine.newBuilder().weakKeys()
           .removalListener((RemovalListener<Thread, FluxSink<CoreEvent>>) (thread, coreEventFluxSink,
-                                                                           removalCause) -> coreEventFluxSink.complete())
+                                                                           removalCause) -> {
+            coreEventFluxSink.complete();
+          })
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
   private final Cache<Transaction, FluxSink<CoreEvent>> sinksNestedTx =
       Caffeine.newBuilder().weakKeys()
@@ -39,7 +40,7 @@ public abstract class AbstractReactorSinkProvider implements ReactorSinkProvider
     sinksNestedTx.asMap().values().forEach(sink -> sink.complete());
   }
 
-  protected void invalidateAll() {
+  public void invalidateAll() {
     sinks.invalidateAll();
     sinksNestedTx.invalidateAll();
   }
