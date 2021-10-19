@@ -10,6 +10,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SE
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
@@ -31,6 +32,7 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBloc
 import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.util.concurrent.RejectedExecutionException;
@@ -42,10 +44,17 @@ import java.util.function.Supplier;
 public abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy
     implements Lifecycle {
 
+  private static final Logger LOGGER = getLogger(AbstractReactorStreamProcessingStrategy.class);
+
   private final Supplier<Scheduler> cpuLightSchedulerSupplier;
   private final int parallelism;
   private final AtomicInteger inFlightEvents = new AtomicInteger();
-  private final BiConsumer<CoreEvent, Throwable> inFlightDecrementCallback = (e, t) -> inFlightEvents.decrementAndGet();
+  private final BiConsumer<CoreEvent, Throwable> inFlightDecrementCallback = (e, t) -> {
+    int decremented = inFlightEvents.decrementAndGet();
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("decremented inFlightEvents={}", decremented);
+    }
+  };
 
   private Scheduler cpuLightScheduler;
   private ReactiveProcessorEnricher processorEnricher = null;
@@ -99,8 +108,15 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
    */
   protected BackPressureReason checkCapacity(CoreEvent event) {
     if (maxConcurrencyEagerCheck) {
-      if (inFlightEvents.incrementAndGet() > maxConcurrency) {
-        inFlightEvents.decrementAndGet();
+      int incremented = inFlightEvents.incrementAndGet();
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("incremented inFlightEvents={}", incremented);
+      }
+      if (incremented > maxConcurrency) {
+        int decremented = inFlightEvents.decrementAndGet();
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("decremented due to too large maxConcurrency={} inFlightEvents={}", maxConcurrency, decremented);
+        }
         return MAX_CONCURRENCY_EXCEEDED;
       }
 
