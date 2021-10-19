@@ -75,7 +75,10 @@ public class ParameterExtractor implements ParameterValueVisitor {
   public void visitSimpleValue(ParameterSimpleValue text) {
     String value = text.getValue();
     if (!isExpression(value)) {
-      value = enrichedWithType("'" + value + "'");
+      value = enrichedWithType(
+                               "\"" +
+                                   escapingQuotes(value) +
+                                   "\"");
     }
     this.value = value;
   }
@@ -94,7 +97,7 @@ public class ParameterExtractor implements ParameterValueVisitor {
             .getParameters()
             .entrySet()
             .stream()
-            .map((e) -> "'" + e.getKey() + "'" + ":" + extractAsDataWeave(e.getValue(), getObjectFieldType(e.getKey())))
+            .map((e) -> "\"" + e.getKey() + "\"" + ":" + extractAsDataWeave(e.getValue(), getObjectFieldType(e.getKey())))
             .collect(joining(","))
         + "}";
   }
@@ -166,6 +169,28 @@ public class ParameterExtractor implements ParameterValueVisitor {
       });
     }
     return value + explicitType.get();
+  }
+
+  /**
+   * Escapes double quotes in the value so that DW can process them without failing.
+   * <p/>
+   * First, we need to escape all backslashes found. This is so that the backslash we add to scape our quotes, does not collide
+   * with the ones already in the string.
+   * <p/>
+   * If the input is: This is a \"String\" , we need to transform it in a way that if the DW script is evaluated it returns the
+   * same string. If we only escape the double quotes, the new string would be: This is a \\"String\\" , which is actually
+   * escaping the backslash and not the quotes, causing DW to fail.
+   * <p/>
+   * If we first escape the backslashes, we get: This is a \\"String\\". Then, when the quotes are escaped, the result is: This is
+   * a \\\"String\\\". Which as a String, translates to: This is a \"String\", that is the same as the input.
+   */
+  private String escapingQuotes(String value) {
+    return value
+        // Four backlashes in a regex translates into 2 as a Java String and only one as text.
+        // Hence, this replaces each backslash for 2 backslashes
+        .replaceAll("\\\\", "\\\\\\\\")
+        // Replace each double quote by \"
+        .replaceAll("\"", "\\\\\"");
   }
 
 }
