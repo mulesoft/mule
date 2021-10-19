@@ -25,11 +25,6 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
 
   private final ServiceResolver serviceResolver;
   private final ServiceProviderDiscoverer serviceProviderDiscoverer;
-
-  public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer) {
-    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new ServiceRegistry()));
-  }
-
   /**
    * Creates a new instance.
    *
@@ -41,6 +36,10 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
     checkArgument(serviceResolver != null, "serviceDependencyResolver cannot be null");
     this.serviceResolver = serviceResolver;
     this.serviceProviderDiscoverer = serviceProviderDiscoverer;
+  }
+
+  public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer) {
+    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new ServiceRegistry(), null));
   }
 
   @Override

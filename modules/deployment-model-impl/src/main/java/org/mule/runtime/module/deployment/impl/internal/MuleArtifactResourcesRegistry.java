@@ -17,11 +17,16 @@ import static org.mule.runtime.module.license.api.LicenseValidatorProvider.disco
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
+import org.mule.runtime.core.internal.registry.SimpleRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
@@ -72,7 +77,7 @@ import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
  *
  * @since 4.0
  */
-public class MuleArtifactResourcesRegistry {
+public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
   private final DefaultDomainManager domainManager;
@@ -93,6 +98,7 @@ public class MuleArtifactResourcesRegistry {
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
   private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
   private final ServerLockFactory runtimeLockFactory;
+  private ServerNotificationHandler serverNotificationHandler;
 
   /**
    * Builds a {@link MuleArtifactResourcesRegistry} instance
@@ -119,7 +125,7 @@ public class MuleArtifactResourcesRegistry {
      *
      * @return a new {@link MuleArtifactResourcesRegistry} with the provided configuration.
      */
-    public MuleArtifactResourcesRegistry build() {
+    public MuleArtifactResourcesRegistry build() throws RegistrationException {
       if (moduleRepository == null) {
         moduleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(getClass().getClassLoader()));
       }
@@ -131,7 +137,29 @@ public class MuleArtifactResourcesRegistry {
   /**
    * Creates a repository for resources required for mule artifacts.
    */
-  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) {
+  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) throws RegistrationException {
+    super(null, null);
+    registerObject("zarazazaza", new ServerNotificationHandler() {
+      @Override
+      public void fireNotification(Notification notification) {
+
+      }
+
+      @Override
+      public boolean isNotificationDynamic() {
+        return false;
+      }
+
+      @Override
+      public boolean isListenerRegistered(NotificationListener listener) {
+        return false;
+      }
+
+      @Override
+      public boolean isNotificationEnabled(Class<? extends Notification> notfnClass) {
+        return false;
+      }
+    });
     runtimeLockFactory = new ServerLockFactory();
 
     containerClassLoader = createContainerClassLoader(moduleRepository, getClass().getClassLoader());
@@ -172,7 +200,7 @@ public class MuleArtifactResourcesRegistry {
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
-                                                           new ReflectionServiceResolver(new ServiceRegistry())));
+                                                           new ReflectionServiceResolver(new ServiceRegistry(), this)));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
 
     pluginDependenciesResolver =
