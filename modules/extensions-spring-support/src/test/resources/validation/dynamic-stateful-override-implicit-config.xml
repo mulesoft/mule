@@ -5,10 +5,8 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/implicit http://www.mulesoft.org/schema/mule/implicit/current/mule-implicit.xsd">
 
-    <implicit:config name="explicit" optionalWithDefault="#[vars.anotherNumber]"/>
-
     <flow name="implicitConfig">
-        <implicit:get-enriched-name config-ref="explicit"/>
+        <implicit:get-enriched-name />
     </flow>
 
 </mule>
