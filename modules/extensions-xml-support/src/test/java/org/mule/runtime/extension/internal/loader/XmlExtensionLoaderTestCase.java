@@ -207,7 +207,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getName(), is("module-json-custom-types"));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
-    assertThat(extensionModel.getOperationModels().size(), is(9));
+    assertThat(extensionModel.getOperationModels().size(), is(10));
 
     Optional<OperationModel> operationModel = extensionModel.getOperationModel("operation-with-custom-types");
     assertThat(operationModel.isPresent(), is(true));
