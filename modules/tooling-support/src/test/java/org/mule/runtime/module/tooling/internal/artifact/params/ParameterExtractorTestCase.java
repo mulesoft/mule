@@ -81,7 +81,7 @@ public class ParameterExtractorTestCase {
     ParameterValue level0 = ParameterObjectValue.builder().withParameter("field", plain("value")).build();
     ParameterValue parameterValue = ParameterObjectValue.builder().withParameter("level0", level0).build();
     TypedValue<?> extracted = asDataWeaveExpression(parameterValue, metadataType);
-    checkContains(extracted, "{'level0':{'field':'value'}}");
+    checkContains(extracted, "{\"level0\":{\"field\":\"value\"}}");
   }
 
   @Test
