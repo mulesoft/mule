@@ -22,6 +22,7 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 
+import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -350,11 +351,12 @@ public class MuleContainer {
       toolingService.stop();
     }
 
-    if (LogManager.getFactory() instanceof MuleLog4jContextFactory) {
-      ((MuleLog4jContextFactory) LogManager.getFactory()).dispose();
+    LoggerContextFactory defaultLogManagerFactory = LogManager.getFactory();
+    if (defaultLogManagerFactory instanceof MuleLog4jContextFactory) {
+      ((MuleLog4jContextFactory) defaultLogManagerFactory).dispose();
     }
 
-    if (log4jContextFactory != null) {
+    if (log4jContextFactory != null && log4jContextFactory != defaultLogManagerFactory) {
       log4jContextFactory.dispose();
     }
   }
