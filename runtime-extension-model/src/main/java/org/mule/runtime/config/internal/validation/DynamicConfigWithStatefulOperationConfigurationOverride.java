@@ -47,13 +47,22 @@ public class DynamicConfigWithStatefulOperationConfigurationOverride implements 
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(component -> !getConfigOverrideParams1(component).isEmpty());
+    return currentElemement(component -> !getConfigOverrideParams(component).isEmpty());
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    return getConfigOverrideParams(component, artifact)
+    return getConfigOverrideParams(component)
         .stream()
+        .filter(param -> {
+          ComponentParameterAst configRefParam = component.getParameter(DEFAULT_GROUP_NAME, "config-ref");
+          String explicitConfigName = (String) configRefParam.getValue().getRight();
+          if (explicitConfigName == null) {
+            return hasImplicitOverriddenDynamicParameter(component, param, configRefParam);
+          } else {
+            return hasOverriddenDynamicParameter(artifact, param, explicitConfigName);
+          }
+        })
         .filter(parameter -> parameter.getValue().equals(Either.empty()))
         .findFirst()
         .map(parameter -> create(component, parameter, this,
@@ -62,59 +71,49 @@ public class DynamicConfigWithStatefulOperationConfigurationOverride implements 
                                      + "' which is assigned on initialization. That combination is not supported. Please use a non dynamic configuration or don't set the parameter."));
   }
 
-  protected List<ComponentParameterAst> getConfigOverrideParams1(ComponentAst component) {
-    return component.getModel(ParameterizedModel.class)
-        .map(pmzd -> pmzd.getParameterGroupModels()
+  private boolean hasImplicitOverriddenDynamicParameter(ComponentAst component, ComponentParameterAst param,
+                                                        ComponentParameterAst configRefParam) {
+    Optional<ParameterModel> implicitOverriddenDynamicParameter =
+        component.getExtensionModel().getConfigurationModels()
             .stream()
-            .flatMap(pmg -> pmg.getParameterModels().stream()
-                .filter(ParameterModel::isOverrideFromConfig)
-                .map(pm -> component.getParameter(pmg.getName(), pm.getName())))
-            .collect(toList()))
-        .orElse(emptyList());
+            .filter(cfgModel -> configRefParam.getModel().getAllowedStereotypes()
+                .stream()
+                .anyMatch(allwedStereotype -> cfgModel.getStereotype().isAssignableTo(allwedStereotype)))
+            .findFirst()
+            .flatMap(cfgModel -> cfgModel.getParameterGroupModels()
+                .stream()
+                .filter(cfgPmg -> cfgPmg.getName().equals(param.getGroupModel().getName()))
+                .map(cfgPmg -> cfgPmg.getParameter(param.getModel().getName()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(ExtensionModelUtils::hasExpressionDefaultValue)
+                .findFirst());
 
+    return implicitOverriddenDynamicParameter.isPresent();
   }
 
-  protected List<ComponentParameterAst> getConfigOverrideParams(ComponentAst component, ArtifactAst artifact) {
+  private boolean hasOverriddenDynamicParameter(ArtifactAst artifact, ComponentParameterAst param, String explicitConfigName) {
+    return artifact.topLevelComponentsStream()
+        .filter(topLevel -> topLevel.getComponentId().map(explicitConfigName::equals)
+            .orElse(false))
+        .anyMatch(config -> {
+          ComponentParameterAst overriddenDynamicParameter =
+              config.getParameter(param.getGroupModel().getName(), param.getModel().getName());
+          return overriddenDynamicParameter != null
+              && overriddenDynamicParameter.getValue().isLeft();
+        });
+  }
+
+  protected List<ComponentParameterAst> getConfigOverrideParams(ComponentAst component) {
     return component.getModel(ParameterizedModel.class)
         .map(pmzd -> pmzd.getParameterGroupModels()
             .stream()
             .flatMap(pmg -> pmg.getParameterModels().stream()
                 .filter(ParameterModel::isOverrideFromConfig)
-                .filter(pm -> {
-                  ComponentParameterAst configRefParam = component.getParameter(DEFAULT_GROUP_NAME, "config-ref");
-                  String explicitConfigName = (String) configRefParam.getValue().getRight();
-                  if (explicitConfigName == null) {
-                    Optional<ParameterModel> implicitOverriddenDynamicParameter =
-                        component.getExtensionModel().getConfigurationModels()
-                            .stream()
-                            .filter(cfgModel -> configRefParam.getModel().getAllowedStereotypes()
-                                .stream()
-                                .anyMatch(allwedStereotype -> cfgModel.getStereotype().isAssignableTo(allwedStereotype)))
-                            .findFirst()
-                            .flatMap(cfgModel -> cfgModel.getParameterGroupModels()
-                                .stream()
-                                .filter(cfgPmg -> cfgPmg.getName().equals(pmg.getName()))
-                                .map(cfgPmg -> cfgPmg.getParameter(pm.getName()))
-                                .filter(Optional::isPresent)
-                                .map(Optional::get)
-                                .filter(ExtensionModelUtils::hasExpressionDefaultValue)
-                                .findFirst());
-
-                    return implicitOverriddenDynamicParameter.isPresent();
-                  } else {
-                    return artifact.topLevelComponentsStream()
-                        .filter(topLevel -> topLevel.getComponentId().map(explicitConfigName::equals)
-                            .orElse(false))
-                        .anyMatch(config -> {
-                          ComponentParameterAst overriddenDynamicParameter = config.getParameter(pmg.getName(), pm.getName());
-                          return overriddenDynamicParameter != null
-                              && overriddenDynamicParameter.getValue().isLeft();
-                        });
-                  }
-                })
                 .map(pm -> component.getParameter(pmg.getName(), pm.getName())))
             .collect(toList()))
         .orElse(emptyList());
+
   }
 
 }
