@@ -7,8 +7,11 @@
 package org.mule.runtime.extension.internal.config.dsl;
 
 import static java.util.Collections.emptySet;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
@@ -19,6 +22,10 @@ import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_P
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
 
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -37,9 +44,11 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.ast.property.PrivateOperationsModelProperty;
 import org.mule.runtime.extension.internal.factories.ModuleOperationMessageProcessorFactoryBean;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
@@ -47,6 +56,7 @@ import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefini
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -172,15 +182,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
     final List<ParameterModel> allParameterModels = operationModel.getAllParameterModels();
     for (ParameterModel parameterModel : allParameterModels) {
       if (parameterModel.getDslConfiguration().allowsInlineDefinition()) {
-        paramsDefinitions.add(newBuilder()
-            .withKey(parameterModel.getName())
-            .withAttributeDefinition(fromSimpleParameter(parameterModel.getName()).build())
-            .build());
-
-        definitions.add(baseDefinition
-            .withIdentifier(dslSyntaxResolver.resolve(parameterModel).getElementName())
-            .withTypeDefinition(fromType(String.class))
-            .build());
+        processInlineParameterDefinition(baseDefinition, dslSyntaxResolver, paramsDefinitions, parameterModel);
       } else {
         paramsDefinitions.add(newBuilder()
             .withKey(parameterModel.getName())
@@ -199,5 +201,62 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
   @Override
   public void setDslResolvingContext(DslResolvingContext dslResolvingContext) {
     this.dslResolvingContext = dslResolvingContext;
+  }
+
+  private void processInlineParameterDefinition(Builder baseDefinition, DslSyntaxResolver dslSyntaxResolver,
+                                                List<KeyAttributeDefinitionPair> paramsDefinitions,
+                                                ParameterModel parameterModel) {
+    Class type = isBehaviour(parameterModel) ? getType(parameterModel.getType()) : String.class;
+    DslElementSyntax elementSyntax = dslSyntaxResolver.resolve(parameterModel);
+
+    // Adds the inline parameter definition including its child configuration
+    paramsDefinitions.add(newBuilder()
+        .withKey(parameterModel.getName())
+        .withAttributeDefinition(fromChildConfiguration(type)
+            .withIdentifier(elementSyntax.getElementName()).build())
+        .build());
+
+    // Adds the parameter definition parser
+    definitions.add(baseDefinition
+        .withIdentifier(elementSyntax.getElementName())
+        .withTypeDefinition(fromType(type)).build());
+
+    if (isBehaviour(parameterModel)) {
+      paramsDefinitions.add(newBuilder()
+          .withKey(parameterModel.getName())
+          .withAttributeDefinition(fromSimpleParameter(elementSyntax.getAttributeName()).build())
+          .build());
+
+      // For behaviour inline parameters, also add the definition parser associated to its type
+      registerComponentBuildingDefinitionType(baseDefinition, parameterModel, elementSyntax);
+    }
+  }
+
+  private boolean isBehaviour(ParameterModel parameterModel) {
+    return parameterModel.getRole() == BEHAVIOUR;
+  }
+
+  private void registerComponentBuildingDefinitionType(Builder baseDefinition, ParameterModel parameterModel,
+                                                       DslElementSyntax parameterDsl) {
+    parameterModel.getType().accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        Optional<DslElementSyntax> itemDsl = parameterDsl.getGeneric(arrayType.getType());
+        if (parameterDsl.supportsChildDeclaration() && itemDsl.isPresent()) {
+          arrayType.getType().accept(new BasicTypeMetadataVisitor() {
+
+            @Override
+            protected void visitBasicType(MetadataType metadataType) {
+              definitions.add(baseDefinition
+                  .withIdentifier(itemDsl.get().getElementName())
+                  .withNamespace(itemDsl.get().getPrefix())
+                  .withTypeDefinition(fromType(ExtensionMetadataTypeUtils.getType(metadataType).orElse(Object.class)))
+                  .build());
+            }
+          });
+        }
+      }
+    });
   }
 }
