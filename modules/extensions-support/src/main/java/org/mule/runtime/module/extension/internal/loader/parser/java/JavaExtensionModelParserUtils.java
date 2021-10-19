@@ -20,7 +20,9 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
+import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
+import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -72,6 +74,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
+import com.google.common.base.Enums;
 
 /**
  * Utility class for {@link ModelLoaderDelegate model loaders}
@@ -397,6 +401,21 @@ public final class JavaExtensionModelParserUtils {
     return displayModel;
   }
 
+  public static Optional<ExecutionType> getExecutionType(OperationElement operationElement) {
+    return getInfoFromAnnotation(operationElement,
+                                 "Operation",
+                                 operationElement.getName(),
+                                 Execution.class,
+                                 org.mule.sdk.api.annotation.execution.Execution.class,
+                                 value -> value.getEnumValue(Execution::value),
+                                 value -> mapEnumTo(value.getEnumValue(
+                                                                       org.mule.sdk.api.annotation.execution.Execution::value),
+                                                    ExecutionType.class));
+  }
+
+  private static <T extends Enum<T>> T mapEnumTo(Enum fromEnum, Class<T> toEnumClass) {
+    return Enums.getIfPresent(toEnumClass, fromEnum.name()).orNull();
+  }
 
   private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
     return getInfoFromAnnotation(
