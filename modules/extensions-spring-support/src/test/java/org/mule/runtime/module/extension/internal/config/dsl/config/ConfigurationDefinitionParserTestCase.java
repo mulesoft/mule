@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.internal.el.datetime.Date;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.TypeConverter;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
+import org.mockito.internal.invocation.InterceptedInvocation;
 
 public class ConfigurationDefinitionParserTestCase {
 
@@ -74,14 +76,17 @@ public class ConfigurationDefinitionParserTestCase {
 
     int testClassLoaderInvocations = mockingDetails(classLoader).getInvocations().size();
     typeConverter.get().convert(null);
+    List<?> invocations = ((List<?>) mockingDetails(classLoader).getInvocations());
+    String invocation = ((InterceptedInvocation) invocations.get(invocations.size() - 1)).getArgument(0);
 
-    assertThat(testClassLoaderInvocations + 2, is(mockingDetails(classLoader).getInvocations().size()));
+    assertThat(testClassLoaderInvocations + 2, is(invocations.size()));
+    assertThat(invocation, is("org.mule.runtime.core.internal.el.datetime.Date"));
   }
 
   private TestClassLoader getTestClassLoader() {
     TestClassLoader classLoader = new TestClassLoader(null);
     classLoader.addClass("java.util.Map", Map.class);
-    classLoader.addClass("java.lang.Long", Long.class);
+    classLoader.addClass("org.mule.runtime.core.internal.el.datetime.Date", Date.class);
     return classLoader;
   }
 

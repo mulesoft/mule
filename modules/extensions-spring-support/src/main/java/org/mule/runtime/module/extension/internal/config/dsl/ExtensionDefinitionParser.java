@@ -950,7 +950,7 @@ public abstract class ExtensionDefinitionParser {
         return valueResolverFactory.of(name, type, value, defaultValue, expressionSupport, required, modelProperties,
                                        acceptsReferences, content);
       } finally {
-        setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
+        setContextClassLoader(thread, compositeClassLoader, currentClassLoader);
       }
     };
 
