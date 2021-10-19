@@ -251,7 +251,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     } catch (ExecutionException exception) {
       throw new RetryPolicyExhaustedException(exception.getCause(), ExtensionMessageSource.this);
     } catch (InterruptedException e) {
-      throw new MuleRuntimeException(e);
+      throw new MuleRuntimeException(createStaticMessage(format("Found exception starting source '%s' on flow '%s'",
+                                                                sourceModel.getName(), getLocation().getRootContainerName())),
+                                     e);
     }
   }
 
