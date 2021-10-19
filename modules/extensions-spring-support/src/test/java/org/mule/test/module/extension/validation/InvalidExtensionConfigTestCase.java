@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 /**
@@ -192,6 +193,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   }
 
   @Test
+  @Issue("MULE-17906")
   public void dynamicStatefulOverride() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException.expectMessage("[validation/dynamic-stateful-override-config.xml:11]");
@@ -201,6 +203,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   }
 
   @Test
+  @Issue("MULE-17906")
   public void dynamicStatefulOverrideImplicit() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException.expectMessage("[validation/dynamic-stateful-override-implicit-config.xml:9]");
