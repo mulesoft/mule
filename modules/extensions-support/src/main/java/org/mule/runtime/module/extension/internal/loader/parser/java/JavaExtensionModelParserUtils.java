@@ -406,15 +406,15 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static Optional<ExecutionType> getExecutionType(OperationElement operationElement) {
-    return getInfoFromAnnotation(operationElement,
-                                 "Operation",
-                                 operationElement.getName(),
-                                 Execution.class,
-                                 org.mule.sdk.api.annotation.execution.Execution.class,
-                                 value -> value.getEnumValue(Execution::value),
-                                 value -> mapEnumTo(value.getEnumValue(
-                                                                       org.mule.sdk.api.annotation.execution.Execution::value),
-                                                    ExecutionType.class));
+    return mapReduceSingleAnnotation(operationElement,
+                                     "Operation",
+                                     operationElement.getName(),
+                                     Execution.class,
+                                     org.mule.sdk.api.annotation.execution.Execution.class,
+                                     value -> value.getEnumValue(Execution::value),
+                                     value -> mapEnumTo(value.getEnumValue(
+                                                                           org.mule.sdk.api.annotation.execution.Execution::value),
+                                                        ExecutionType.class));
   }
 
   private static <T extends Enum<T>> T mapEnumTo(Enum fromEnum, Class<T> toEnumClass) {

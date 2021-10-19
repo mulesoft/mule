@@ -33,6 +33,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
@@ -62,6 +63,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModel
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
+import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
@@ -479,13 +481,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public ParsedStereotype getParsedStereotype() {
-    ParsedStereotype stereotype = extensionModelParser.getStereotypeLoaderDelegate()
-        .resolveStereotype(operationElement, "Operation", getName());
+  public Optional<StereotypeModel> getStereotype(StereotypeModelFactory factory) {
+    Optional<StereotypeModel> stereotype = resolveStereotype(operationElement, "Operation", getName(), factory);
 
-    if (!stereotype.getStereotypeModel().isPresent() && !stereotype.isValidator()) {
-      stereotype = extensionModelParser.getStereotypeLoaderDelegate()
-          .resolveStereotype(operationElement.getEnclosingType(), "Operation", getName());
+    if (!stereotype.isPresent()) {
+      stereotype = resolveStereotype(operationContainer, "Operation", getName(), factory);
     }
 
     return stereotype;
