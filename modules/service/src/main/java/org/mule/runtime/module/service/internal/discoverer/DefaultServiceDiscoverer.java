@@ -25,6 +25,7 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
 
   private final ServiceResolver serviceResolver;
   private final ServiceProviderDiscoverer serviceProviderDiscoverer;
+
   /**
    * Creates a new instance.
    *

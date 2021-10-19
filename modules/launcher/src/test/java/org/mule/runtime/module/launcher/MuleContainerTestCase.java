@@ -20,6 +20,8 @@ import static org.mule.runtime.module.launcher.MuleContainer.APP_COMMAND_LINE_OP
 import static org.mule.runtime.module.launcher.MuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
@@ -78,7 +80,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
     FileUtils.deleteDirectory(getExecutionFolder());
   }
 
-  private MuleContainer createMuleContainer() {
+  private MuleContainer createMuleContainer() throws RegistrationException, InitialisationException {
     return new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
                              extensionModelLoaderManager) {
 

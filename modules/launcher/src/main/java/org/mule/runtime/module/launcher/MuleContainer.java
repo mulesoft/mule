@@ -25,11 +25,13 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -124,7 +126,7 @@ public class MuleContainer {
     container.start(true);
   }
 
-  public MuleContainer(String[] args) {
+  public MuleContainer(String[] args) throws RegistrationException, InitialisationException {
     init(args);
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
@@ -151,7 +153,8 @@ public class MuleContainer {
 
   public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
                        MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager,
-                       ExtensionModelLoaderManager extensionModelLoaderManager) {
+                       ExtensionModelLoaderManager extensionModelLoaderManager)
+      throws RegistrationException, InitialisationException {
     this(new String[0], deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
          extensionModelLoaderManager);
   }
@@ -162,7 +165,7 @@ public class MuleContainer {
   public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService,
                        ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
                        ServiceManager serviceManager, ExtensionModelLoaderManager extensionModelLoaderManager)
-      throws IllegalArgumentException {
+      throws IllegalArgumentException, RegistrationException, InitialisationException {
     // TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
     init(args);
 

@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.SERVER_NOTIFICATION_MANAGER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
@@ -17,12 +18,14 @@ import static org.mule.runtime.module.license.api.LicenseValidatorProvider.disco
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
@@ -125,7 +128,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
      *
      * @return a new {@link MuleArtifactResourcesRegistry} with the provided configuration.
      */
-    public MuleArtifactResourcesRegistry build() throws RegistrationException {
+    public MuleArtifactResourcesRegistry build() throws RegistrationException, InitialisationException {
       if (moduleRepository == null) {
         moduleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(getClass().getClassLoader()));
       }
@@ -135,31 +138,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   }
 
   /**
-   * Creates a repository for resources required for mule artifacts.
+   * Creates a registry for resources required for mule artifacts.
    */
-  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) throws RegistrationException {
+  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) throws RegistrationException, InitialisationException {
     super(null, null);
-    registerObject("zarazazaza", new ServerNotificationHandler() {
-      @Override
-      public void fireNotification(Notification notification) {
 
-      }
-
-      @Override
-      public boolean isNotificationDynamic() {
-        return false;
-      }
-
-      @Override
-      public boolean isListenerRegistered(NotificationListener listener) {
-        return false;
-      }
-
-      @Override
-      public boolean isNotificationEnabled(Class<? extends Notification> notfnClass) {
-        return false;
-      }
-    });
     runtimeLockFactory = new ServerLockFactory();
 
     containerClassLoader = createContainerClassLoader(moduleRepository, getClass().getClassLoader());
@@ -195,12 +178,23 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
         new DomainClassLoaderBuilderFactory(containerClassLoader, domainClassLoaderFactory,
                                             pluginClassLoadersFactory);
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
+
+    // A notification server is created in order to be injectable by the different services.
+    ServerNotificationManager serverNotificationManager = ServerNotificationManager
+        .createDefaultNotificationManager(new LazyValue<>(this::getSchedulerService),
+                                          new LazyValue<>(() -> "containerServerNotificationManager"));
+    registerObject(SERVER_NOTIFICATION_MANAGER, serverNotificationManager);
+
     serviceManager =
         ServiceManager.create(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader,
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new ServiceRegistry(), this)));
+
+    // The notification server cannot implement Initialisable, so it's manually initialized after construction
+    serverNotificationManager.initialise();
+
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
 
     pluginDependenciesResolver =
@@ -227,6 +221,10 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          artifactDescriptorValidatorBuilder);
+  }
+
+  private SchedulerService getSchedulerService() {
+    return (SchedulerService) serviceManager.getServices().stream().filter(s -> s instanceof SchedulerService).findFirst().get();
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {

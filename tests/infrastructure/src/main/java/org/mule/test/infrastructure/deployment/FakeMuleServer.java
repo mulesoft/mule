@@ -30,7 +30,9 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -90,11 +92,12 @@ public class FakeMuleServer {
   private ServiceManager serviceManager;
   private ExtensionModelLoaderManager extensionModelLoaderManager;
 
-  public FakeMuleServer(String muleHomePath) {
+  public FakeMuleServer(String muleHomePath) throws RegistrationException, InitialisationException {
     this(muleHomePath, new LinkedList<>());
   }
 
-  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions) {
+  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions)
+      throws RegistrationException, InitialisationException {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
