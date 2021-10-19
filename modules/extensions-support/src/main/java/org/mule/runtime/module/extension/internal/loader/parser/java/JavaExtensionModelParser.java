@@ -11,6 +11,7 @@ import static java.util.Collections.singletonList;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
@@ -110,7 +111,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     xmlDslConfiguration = parseXmlDslConfiguration();
 
     // use dummy version since this is just for obtaining the namespace
-    namespace = getXmlDslModel(extensionElement, "1.0.0", xmlDslConfiguration).getPrefix();
+    namespace = getExtensionsNamespace(getXmlDslModel(extensionElement, "1.0.0", xmlDslConfiguration));
     stereotypeLoaderDelegate.setNamespace(namespace);
     errorModelParsers = fetchErrorModelParsers();
 
