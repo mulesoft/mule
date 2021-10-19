@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -23,6 +24,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.slf4j.Logger;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,10 +35,17 @@ import java.util.function.Supplier;
 abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy
     implements Startable, Stoppable, Disposable {
 
+  private static final Logger LOGGER = getLogger(AbstractReactorStreamProcessingStrategy.class);
+
   private final Supplier<Scheduler> cpuLightSchedulerSupplier;
   private final int parallelism;
   private final AtomicInteger inFlightEvents = new AtomicInteger();
-  private final BiConsumer<CoreEvent, Throwable> inFlightDecrementCallback = (e, t) -> inFlightEvents.decrementAndGet();
+  private final BiConsumer<CoreEvent, Throwable> inFlightDecrementCallback = (e, t) -> {
+    int decremented = inFlightEvents.decrementAndGet();
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("decremented inFlightEvents={}", decremented);
+    }
+  };
 
   private Scheduler cpuLightScheduler;
 
@@ -90,8 +99,15 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
    */
   protected BackPressureReason checkCapacity(CoreEvent event) {
     if (maxConcurrencyEagerCheck) {
-      if (inFlightEvents.incrementAndGet() > maxConcurrency) {
-        inFlightEvents.decrementAndGet();
+      int incremented = inFlightEvents.incrementAndGet();
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("incremented inFlightEvents={}", incremented);
+      }
+      if (incremented > maxConcurrency) {
+        int decremented = inFlightEvents.decrementAndGet();
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("decremented due to too large maxConcurrency={} inFlightEvents={}", maxConcurrency, decremented);
+        }
         return MAX_CONCURRENCY_EXCEEDED;
       }
 
