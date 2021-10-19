@@ -24,7 +24,6 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
@@ -101,7 +100,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
   private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
   private final ServerLockFactory runtimeLockFactory;
-  private ServerNotificationHandler serverNotificationHandler;
+  private final ServerNotificationManager serverNotificationManager;
 
   /**
    * Builds a {@link MuleArtifactResourcesRegistry} instance
@@ -142,6 +141,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) throws RegistrationException, InitialisationException {
     super(null, null);
+    // A "container level" notification server is created and registered in order to be injectable
+    serverNotificationManager = ServerNotificationManager
+        .createDefaultNotificationManager(new LazyValue<>(this::getSchedulerService),
+                                          new LazyValue<>(() -> "containerServerNotificationManager"));
+    registerObject(SERVER_NOTIFICATION_MANAGER, serverNotificationManager);
 
     runtimeLockFactory = new ServerLockFactory();
 
@@ -179,21 +183,12 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                             pluginClassLoadersFactory);
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
 
-    // A notification server is created in order to be injectable by the different services.
-    ServerNotificationManager serverNotificationManager = ServerNotificationManager
-        .createDefaultNotificationManager(new LazyValue<>(this::getSchedulerService),
-                                          new LazyValue<>(() -> "containerServerNotificationManager"));
-    registerObject(SERVER_NOTIFICATION_MANAGER, serverNotificationManager);
-
     serviceManager =
         ServiceManager.create(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader,
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new ServiceRegistry(), this)));
-
-    // The notification server cannot implement Initialisable, so it's manually initialized after construction
-    serverNotificationManager.initialise();
 
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
 
@@ -334,4 +329,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     return runtimeLockFactory;
   }
 
+  public ServerNotificationManager getServerNotificationManager() {
+    return serverNotificationManager;
+  }
 }

@@ -177,7 +177,7 @@ public class MuleContainer {
     this.toolingService = toolingService;
   }
 
-  protected void init(String[] args) throws IllegalArgumentException {
+  protected void init(String[] args) throws IllegalArgumentException, InitialisationException {
     // TODO(pablo.kraan): move initialization of others classes outside this method
     Map<String, Object> commandlineOptions = getCommandLineOptions(args);
 
@@ -256,6 +256,8 @@ public class MuleContainer {
 
       extensionModelLoaderManager.start();
       deploymentService.start();
+
+      artifactResourcesRegistry.getServerNotificationManager().initialise();
     } catch (Throwable e) {
       shutdown(e);
     }
@@ -360,6 +362,8 @@ public class MuleContainer {
     if (log4jContextFactory != null) {
       log4jContextFactory.dispose();
     }
+
+    artifactResourcesRegistry.getServerNotificationManager().dispose();
   }
 
   public Logger getLogger() {
