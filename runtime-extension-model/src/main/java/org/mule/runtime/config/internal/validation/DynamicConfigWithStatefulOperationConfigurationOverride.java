@@ -15,6 +15,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -29,6 +30,20 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class DynamicConfigWithStatefulOperationConfigurationOverride implements Validation {
+
+  private static final Class<? extends ModelProperty> fieldOperationParameterModelProperty;
+
+  static {
+    Class<? extends ModelProperty> foundClass = null;
+    try {
+      foundClass = (Class<? extends ModelProperty>) Class
+          .forName("org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty");
+    } catch (ClassNotFoundException | SecurityException e) {
+      // No validation processing
+    }
+    fieldOperationParameterModelProperty = foundClass;
+
+  }
 
   @Override
   public String getName() {
@@ -47,6 +62,11 @@ public class DynamicConfigWithStatefulOperationConfigurationOverride implements 
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
+    // Cannot enforce this validation if we have no access to the corresponding model property
+    if (fieldOperationParameterModelProperty == null) {
+      return v -> false;
+    }
+
     return currentElemement(component -> !getConfigOverrideParams(component).isEmpty());
   }
 
@@ -110,6 +130,7 @@ public class DynamicConfigWithStatefulOperationConfigurationOverride implements 
             .stream()
             .flatMap(pmg -> pmg.getParameterModels().stream()
                 .filter(ParameterModel::isOverrideFromConfig)
+                .filter(pm -> pm.getModelProperty(fieldOperationParameterModelProperty).isPresent())
                 .map(pm -> component.getParameter(pmg.getName(), pm.getName())))
             .collect(toList()))
         .orElse(emptyList());

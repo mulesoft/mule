@@ -177,6 +177,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   @Test
   @Feature(SOURCES)
   @Story(POLLING)
+  @Issue("MULE-18631")
   public void negativePollingSourceLimitingValidation() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException.expectMessage("The 'maxItemsPerPoll' parameter must have a value greater than 1");
@@ -186,6 +187,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   @Test
   @Feature(SOURCES)
   @Story(POLLING)
+  @Issue("MULE-18631")
   public void zeroPollingSourceLimitingValidation() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException.expectMessage("The 'maxItemsPerPoll' parameter must have a value greater than 1");
