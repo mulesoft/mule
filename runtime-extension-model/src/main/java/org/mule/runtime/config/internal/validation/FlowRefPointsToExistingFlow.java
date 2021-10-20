@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
@@ -16,6 +14,9 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equals
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -38,7 +39,7 @@ public class FlowRefPointsToExistingFlow implements Validation {
   private static final String DEFAULT_EXPRESSION_PREFIX = "#[";
   private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
 
-  private static final ComponentIdentifier FLOW_REF_IDENTIFIER =
+  public static final ComponentIdentifier FLOW_REF_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
 
   @Override
