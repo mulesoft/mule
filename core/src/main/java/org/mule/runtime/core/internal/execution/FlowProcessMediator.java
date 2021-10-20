@@ -62,7 +62,6 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -101,7 +100,6 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
@@ -196,43 +194,6 @@ public class FlowProcessMediator implements Initialisable {
                                              this);
   }
 
-  private static class MyNamedClass implements ReactiveProcessor {
-
-    private FlowProcessTemplate template;
-
-    public MyNamedClass(FlowProcessTemplate template) {
-      this.template = template;
-    }
-
-    @Override
-    public Publisher<CoreEvent> apply(Publisher<CoreEvent> coreEventPublisher) {
-      try {
-        return template.routeEventAsync(coreEventPublisher);
-      } finally {
-        template = null;
-      }
-    }
-  }
-
-  private static class MyNamedClass2 implements ReactiveProcessor {
-
-    private FlowProcessTemplate template;
-
-    public MyNamedClass2(FlowProcessTemplate template) {
-      this.template = template;
-    }
-
-    @Override
-    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      try {
-        return applyWithChildContext(from(publisher), new MyNamedClass(template), empty());
-      } finally {
-        template = null;
-      }
-    }
-  }
-
-
   public void process(FlowProcessTemplate template,
                       MessageProcessContext messageProcessContext) {
     try {
@@ -240,8 +201,9 @@ public class FlowProcessMediator implements Initialisable {
       final MessageSource messageSource = messageProcessContext.getMessageSource();
       final Pipeline flowConstruct = (Pipeline) messageProcessContext.getFlowConstruct();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
-      final FlowProcessor flowExecutionProcessor = new FlowProcessor(new MyNamedClass2(template), flowConstruct);
-
+      final FlowProcessor flowExecutionProcessor =
+          new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, empty()),
+                            flowConstruct);
       final CursorComponentDecoratorFactory componentDecoratorFactory = messageProcessContext.getComponentDecoratorFactory();
       final CoreEvent event = createEvent(template, componentDecoratorFactory, messageSource,
                                           responseCompletion, flowConstruct);
