@@ -20,6 +20,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.VeganExtension;
 
@@ -32,6 +33,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 /**
@@ -175,6 +177,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   @Test
   @Feature(SOURCES)
   @Story(POLLING)
+  @Issue("MULE-18631")
   public void negativePollingSourceLimitingValidation() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException.expectMessage("The 'maxItemsPerPoll' parameter must have a value greater than 1");
@@ -184,10 +187,31 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   @Test
   @Feature(SOURCES)
   @Story(POLLING)
+  @Issue("MULE-18631")
   public void zeroPollingSourceLimitingValidation() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException.expectMessage("The 'maxItemsPerPoll' parameter must have a value greater than 1");
     loadConfiguration("source/zero-polling-source-limiting-config.xml");
+  }
+
+  @Test
+  @Issue("MULE-17906")
+  public void dynamicStatefulOverride() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("[validation/dynamic-stateful-override-config.xml:11]");
+    expectedException
+        .expectMessage("Component uses a dynamic configuration and defines configuration override parameter 'optionalWithDefault' which is assigned on initialization. That combination is not supported. Please use a non dynamic configuration or don't set the parameter.");
+    loadConfiguration("validation/dynamic-stateful-override-config.xml");
+  }
+
+  @Test
+  @Issue("MULE-17906")
+  public void dynamicStatefulOverrideImplicit() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("[validation/dynamic-stateful-override-implicit-config.xml:9]");
+    expectedException
+        .expectMessage("Component uses a dynamic configuration and defines configuration override parameter 'optionalWithDefault' which is assigned on initialization. That combination is not supported. Please use a non dynamic configuration or don't set the parameter.");
+    loadConfiguration("validation/dynamic-stateful-override-implicit-config.xml");
   }
 
   @Override
@@ -195,12 +219,14 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
     ExtensionModel petStore = loadExtension(PetStoreConnector.class, emptySet());
     ExtensionModel heisenberg = loadExtension(HeisenbergExtension.class, emptySet());
     ExtensionModel vegan = loadExtension(VeganExtension.class, emptySet());
+    ExtensionModel implicit = loadExtension(ImplicitConfigExtension.class, emptySet());
 
     final List<ExtensionModel> extensions = new ArrayList<>();
     extensions.addAll(super.getRequiredExtensions());
     extensions.add(petStore);
     extensions.add(heisenberg);
     extensions.add(vegan);
+    extensions.add(implicit);
 
     return extensions;
   }
