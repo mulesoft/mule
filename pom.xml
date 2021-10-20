@@ -165,7 +165,7 @@
         <muleDslApiVersion>1.5.0-SNAPSHOT</muleDslApiVersion>
         <muleAstVersion>1.1.0-20211019</muleAstVersion>
         <mulePropertiesApiVersion>1.1.0-20211019</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.5.0-SNAPSHOT</muleExtensionsApiVersion>
+        <muleExtensionsApiVersion>1.5.0-20211019</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-20211019</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.5.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.7.0-SNAPSHOT</muleMavenClientApi>
