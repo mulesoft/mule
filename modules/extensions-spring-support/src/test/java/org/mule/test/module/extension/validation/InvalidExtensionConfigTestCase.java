@@ -6,9 +6,14 @@
  */
 package org.mule.test.module.extension.validation;
 
-import static java.util.Collections.emptySet;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
+
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonMap;
 
 import org.mule.functional.junit4.AbstractConfigurationFailuresTestCase;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,6 +25,7 @@ import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -166,6 +172,24 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
     loadConfiguration("scopes/heisenberg-stereotype-validation-config.xml");
   }
 
+  @Test
+  @Feature(SOURCES)
+  @Story(POLLING)
+  public void negativePollingSourceLimitingValidation() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("The 'maxItemsPerPoll' parameter must have a value greater than 1");
+    loadConfiguration("source/negative-polling-source-limiting-config.xml");
+  }
+
+  @Test
+  @Feature(SOURCES)
+  @Story(POLLING)
+  public void zeroPollingSourceLimitingValidation() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("The 'maxItemsPerPoll' parameter must have a value greater than 1");
+    loadConfiguration("source/zero-polling-source-limiting-config.xml");
+  }
+
   @Override
   protected List<ExtensionModel> getRequiredExtensions() {
     ExtensionModel petStore = loadExtension(PetStoreConnector.class, emptySet());
@@ -179,5 +203,10 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
     extensions.add(vegan);
 
     return extensions;
+  }
+
+  @Override
+  protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
+    return singletonMap(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
   }
 }

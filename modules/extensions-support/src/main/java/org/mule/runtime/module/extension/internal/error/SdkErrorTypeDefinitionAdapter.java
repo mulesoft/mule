@@ -69,6 +69,11 @@ public class SdkErrorTypeDefinitionAdapter<E extends Enum<E>> implements ErrorTy
   }
 
   @Override
+  public String toString() {
+    return delegate.toString();
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

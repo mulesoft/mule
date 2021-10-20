@@ -30,7 +30,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.test.heisenberg.extension.AsyncHeisenbergSource;
 import org.mule.test.heisenberg.extension.DEARadioSource;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;

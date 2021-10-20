@@ -6,14 +6,16 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+
+
+import org.mule.sdk.api.annotation.error.ErrorTypeProvider;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
-public class HeisenbergErrorTyperProvider implements ErrorTypeProvider {
+public class HeisenbergErrorTypeProvider implements ErrorTypeProvider {
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.deployment.model.api.artifact.extension;
+
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -152,9 +152,8 @@ public class ExtensionModelDiscoverer {
     ExtensionModelLoader loader = extensionModelLoaderRepository.getExtensionModelLoader(loaderDescriber)
         .orElseThrow(() -> new IllegalArgumentException(format("The identifier '%s' does not match with the describers available "
             + "to generate an ExtensionModel (working with the plugin '%s')", loaderDescriber.getId(), artifactName)));
-    ExtensionModel coreModel = MuleExtensionModelProvider.getExtensionModel();
-    if (!extensions.contains(coreModel)) {
-      extensions = ImmutableSet.<ExtensionModel>builder().addAll(extensions).add(coreModel).build();
+    if (!extensions.contains(MuleExtensionModelProvider.getExtensionModel())) {
+      extensions = ImmutableSet.<ExtensionModel>builder().addAll(extensions).addAll(discoverRuntimeExtensionModels()).build();
     }
     Map<String, Object> attributes = new HashMap<>(loaderDescriber.getAttributes());
     attributes.putAll(additionalAttributes);

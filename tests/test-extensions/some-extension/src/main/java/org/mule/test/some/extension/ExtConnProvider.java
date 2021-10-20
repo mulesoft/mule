@@ -15,7 +15,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.sdk.api.exception.ModuleException;
 
 public class ExtConnProvider implements CachedConnectionProvider<String> {
 

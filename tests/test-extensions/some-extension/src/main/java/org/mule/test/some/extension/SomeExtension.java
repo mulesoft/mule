@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.test.heisenberg.extension.HeisenbergErrors;
 
 @Extension(name = "SomeExtension")

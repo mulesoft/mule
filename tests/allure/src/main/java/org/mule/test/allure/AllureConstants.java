@@ -498,6 +498,7 @@ public interface AllureConstants {
     interface ExecutionEngineStory {
 
       String BACKPRESSURE = "Backpressure";
+      String REACTOR = "Reactor";
     }
 
   }

@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * {@link TypeWrapper} specification for {@link Source} types.
@@ -64,17 +65,17 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
 
   @Override
   public Optional<MethodElement> getOnResponseMethod() {
-    return getMethodAnnotatedWith(OnSuccess.class);
+    return getMethodAnnotatedWith(OnSuccess.class, org.mule.sdk.api.annotation.execution.OnSuccess.class);
   }
 
   @Override
   public Optional<MethodElement> getOnErrorMethod() {
-    return getMethodAnnotatedWith(OnError.class);
+    return getMethodAnnotatedWith(OnError.class, org.mule.sdk.api.annotation.execution.OnError.class);
   }
 
   @Override
   public Optional<MethodElement> getOnTerminateMethod() {
-    return getMethodAnnotatedWith(OnTerminate.class);
+    return getMethodAnnotatedWith(OnTerminate.class, org.mule.sdk.api.annotation.execution.OnTerminate.class);
   }
 
   @Override
@@ -82,11 +83,11 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
     return getMethodAnnotatedWith(OnBackPressure.class);
   }
 
-  private Optional<MethodElement> getMethodAnnotatedWith(Class<? extends Annotation> annotationType) {
+  private Optional<MethodElement> getMethodAnnotatedWith(Class<? extends Annotation>... annotationTypes) {
     Class<?> searchClass = aClass;
     Collection<Method> methods = null;
     while (!Object.class.equals(searchClass)) {
-      methods = getMethodsAnnotatedWith(searchClass, annotationType, false);
+      methods = getMethodAnnotatedWith(searchClass, annotationTypes);
       if (methods.isEmpty()) {
         searchClass = searchClass.getSuperclass();
       } else {
@@ -99,9 +100,14 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
     } else if (methods.size() > 1) {
       throw new IllegalSourceModelDefinitionException(
                                                       format("Source declared in class '%s' declares more than one method annotated with '%s'",
-                                                             aClass.getName(), annotationType.getSimpleName()));
+                                                             aClass.getName(), annotationTypes[0].getSimpleName()));
     } else {
       return of(new MethodWrapper(methods.iterator().next(), typeLoader));
     }
+  }
+
+  private Collection<Method> getMethodAnnotatedWith(Class<?> searchClass, Class<? extends Annotation>... annotationTypes) {
+    return Stream.of(annotationTypes).map(annotationType -> getMethodsAnnotatedWith(searchClass, annotationType, false))
+        .flatMap(Collection::stream).collect(toList());
   }
 }
