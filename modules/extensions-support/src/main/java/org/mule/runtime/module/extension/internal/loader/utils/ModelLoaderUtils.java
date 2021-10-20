@@ -41,44 +41,4 @@ public final class ModelLoaderUtils {
   public static void addSemanticTerms(WithSemanticTermsDeclaration declaration, SemanticTermsParser parser) {
     declaration.getSemanticTerms().addAll(parser.getSemanticTerms());
   }
-
-  public static void registerType(ExtensionDeclarer declarer, MetadataType type) {
-    if (!getId(type).isPresent() || type.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
-      return;
-    }
-
-    type.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (objectType instanceof MessageMetadataType) {
-          MessageMetadataType messageType = (MessageMetadataType) objectType;
-          messageType.getPayloadType().ifPresent(type -> type.accept(this));
-          messageType.getAttributesType().ifPresent(type -> type.accept(this));
-        }
-        declarer.withType(objectType);
-        objectType.getOpenRestriction().ifPresent(type -> type.accept(this));
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
-      }
-
-      @Override
-      public void visitIntersection(IntersectionType intersectionType) {
-        intersectionType.getTypes().forEach(type -> type.accept(this));
-      }
-
-      @Override
-      public void visitUnion(UnionType unionType) {
-        unionType.getTypes().forEach(type -> type.accept(this));
-      }
-
-      @Override
-      public void visitObjectField(ObjectFieldType objectFieldType) {
-        objectFieldType.getValue().accept(this);
-      }
-    });
-  }
 }

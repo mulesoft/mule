@@ -30,6 +30,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
@@ -37,9 +38,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.CompileTi
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -63,7 +63,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
       new ConnectionProviderModelLoaderDelegate(this);
   private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate =
       new ParameterModelsLoaderDelegate(this::getStereotypeModelLoaderDelegate, this::registerType);
-  private final Map<String, NotificationModel> notificationModels = new HashMap<>();
+  private final Map<String, NotificationModel> notificationModels = new LinkedHashMap<>();
 
   private StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate;
   private Supplier<ErrorsModelFactory> errorsModelFactorySupplier;
@@ -108,7 +108,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
-    parser.getNotificationModels().forEach(declarer::withNotificationModel);
 
     declareErrorModels(parser, declarer);
     declareExports(parser, declarer);
@@ -206,7 +205,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   public void registerType(MetadataType type) {
-    ModelLoaderUtils.registerType(declarer, type);
+    ExtensionMetadataTypeUtils.registerType(declarer, type);
   }
 
   public Optional<NotificationModel> getNotificationModel(String identifier) {
