@@ -190,7 +190,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .withDslInlineRepresentation(true);
 
     ObjectTypeBuilder summaryInfoType = BASE_TYPE_BUILDER.objectType()
-        .id("Cause")
+        .id("SummaryInfo")
         .with(new TypeDslAnnotation(true, false, null, null));
     summaryInfoType.addField()
         .key("key")
