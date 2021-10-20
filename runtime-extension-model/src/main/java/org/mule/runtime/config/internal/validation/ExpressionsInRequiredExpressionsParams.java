@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -26,9 +27,7 @@ import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Expressions are provided for parameters that require expressions.
@@ -73,7 +72,7 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
   }
 
   @Override
-  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+  public List<ValidationResultItem> validateMany(ComponentAst component, ArtifactAst artifact) {
     return component.getModel(ParameterizedModel.class)
         .map(pmz -> getGroupAndParametersPairs(pmz)
             .filter(gnp -> REQUIRED.equals(gnp.getSecond().getExpressionSupport())
@@ -97,7 +96,7 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
         .map(param -> create(component, param, this,
                              format("A static value ('%s') was given for parameter '%s' but it requires an expression",
                                     param.getRawValue(), param.getModel().getName())))
-        .findFirst();
+        .collect(toList());
   }
 
 }

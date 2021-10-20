@@ -55,7 +55,9 @@ public class CoreValidationsProvider implements ValidationsProvider {
 
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
-    return asList(new ImportValidTarget());
+    return asList(new ImportValidTarget(),
+                  new ConfigReferenceParametersStereotypesValidations(),
+                  new ReferenceParametersStereotypesValidations());
   }
 
   @Override
