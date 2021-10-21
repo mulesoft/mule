@@ -20,11 +20,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_INTERVAL;
 import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
 import static org.mule.sdk.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
 import static org.mule.sdk.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
 import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.TRACE;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -116,7 +120,6 @@ public class PollingSourceWrapperTestCase {
 
     when(lockFactoryMock.createLock(anyString()).tryLock()).thenReturn(true);
 
-    logger = createMockLogger();
     debugMessages = new ArrayList<>();
     traceMessages = new ArrayList<>();
   }
@@ -138,6 +141,7 @@ public class PollingSourceWrapperTestCase {
   @Test
   public void loggingOnAcceptedItem() throws MuleException, Exception {
     stubPollItem(Collections.singletonList(null), Collections.singletonList(null));
+    logger = createMockLogger(debugMessages, DEBUG);
     startSourcePollWithMockedLogger();
     verifyLogMessage(debugMessages, PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, "");
   }
@@ -146,6 +150,7 @@ public class PollingSourceWrapperTestCase {
   public void loggingOnRejectedItem() throws Exception {
     when(lockFactoryMock.createLock(anyString()).tryLock()).thenReturn(false);
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(null));
+    logger = createMockLogger(debugMessages, DEBUG);
     startSourcePollWithMockedLogger();
     verifyLogMessage(debugMessages, PollingSourceWrapper.REJECTED_ITEM_MESSAGE, POLL_ITEM_ID, ALREADY_IN_PROCESS);
   }
@@ -154,6 +159,7 @@ public class PollingSourceWrapperTestCase {
   public void loggingOnCreatedWatermark() throws Exception {
     String watermark = "5";
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(watermark));
+    logger = createMockLogger(traceMessages, TRACE);
     startSourcePollWithMockedLogger();
     verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
     verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
@@ -164,6 +170,7 @@ public class PollingSourceWrapperTestCase {
     List<String> ids = Arrays.asList("id1", "id2", "id3", "id4");
     List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8);
     stubPollItem(ids, watermarks);
+    logger = createMockLogger(traceMessages, TRACE);
     startSourcePollWithMockedLogger();
     verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
     verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3,
@@ -184,6 +191,7 @@ public class PollingSourceWrapperTestCase {
     List<String> ids = Arrays.asList("id1", "id2", "id3", "id4", "id5");
     List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8, 4);
     stubPollItem(ids, watermarks);
+    logger = createMockLogger(traceMessages, TRACE);
     startSourcePollWithMockedLogger();
     verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
     verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3,
@@ -223,30 +231,6 @@ public class PollingSourceWrapperTestCase {
     setFieldValue(pollingSourceWrapper, "componentLocation", componentLocationMock, false);
   }
 
-  private Logger createMockLogger() {
-    Logger logger = mock(Logger.class);
-    Answer answer = new Answer() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        String method = invocation.getMethod().getName();
-        String message = invocation.getArgument(0, String.class);
-        Object[] messageArgs = Arrays.copyOfRange(invocation.getArguments(), 1, invocation.getArguments().length);
-        if (method.equals("debug")) {
-          debugMessages.add(formatMessage(message, messageArgs));
-        } else {
-          traceMessages.add(formatMessage(message, messageArgs));
-        }
-        return null;
-      }
-    };
-    doAnswer(answer).when(logger).debug(anyString(), (Object) any());
-    doAnswer(answer).when(logger).debug(anyString(), any(), any());
-    doAnswer(answer).when(logger).trace(anyString(), any(), any());
-    doAnswer(answer).when(logger).trace(anyString(), (Object[]) any());
-    return logger;
-  }
-
   private String formatMessage(String message, Object... args) {
     String newMessage = message.replaceAll("\\{\\}", "%s");
     return String.format(newMessage, args);
@@ -260,29 +244,6 @@ public class PollingSourceWrapperTestCase {
       // restore original logger
       setLogger(pollingSourceWrapper, "LOGGER", origLogger);
     }
-  }
-
-  private Logger setLogger(Object object, String fieldName, Logger newLogger) throws Exception {
-    Field field = object.getClass().getDeclaredField(fieldName);
-    field.setAccessible(true);
-    Logger oldLogger;
-    try {
-      Field modifiersField = Field.class.getDeclaredField("modifiers");
-      modifiersField.setAccessible(true);
-      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-      try {
-        oldLogger = (Logger) field.get(null);
-        field.set(null, newLogger);
-      } finally {
-        // undo accessibility changes
-        modifiersField.setInt(field, field.getModifiers());
-        modifiersField.setAccessible(false);
-      }
-    } finally {
-      // undo accessibility changes
-      field.setAccessible(false);
-    }
-    return oldLogger;
   }
 
   private void stubPollItem(List<String> pollItemIds, List<Serializable> pollItemWatermarks) {

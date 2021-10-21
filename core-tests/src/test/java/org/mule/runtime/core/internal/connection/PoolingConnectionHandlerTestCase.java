@@ -19,6 +19,7 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
+import static org.slf4j.event.Level.DEBUG;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
@@ -70,7 +71,7 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   public void before() throws Exception {
     managedConnection = new PoolingConnectionHandler<>(connection, pool, poolId, poolingListener, connectionProvider);
     debugMessages = new ArrayList<>();
-    logger = createMockLogger(debugMessages, new ArrayList<>());
+    logger = createMockLogger(debugMessages, DEBUG);
     oldLogger = setLogger(PoolingConnectionHandler.class, LOGGER_FIELD_NAME, logger);
   }
 
