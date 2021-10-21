@@ -63,8 +63,8 @@ import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
-import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -276,7 +276,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
     startIfNeeded(flowProcessMediator);
 
     AbstractPipeline flow = mock(AbstractPipeline.class, withSettings().extraInterfaces(Component.class));
-    when(flow.getLocation()).thenReturn(DefaultComponentLocation.from("flow"));
+    when(flow.getLocation()).thenReturn(DefaultComponentLocation.fromSingleComponent("flow"));
     FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
 
     // Call routeError failure callback for success response sending error test cases
