@@ -20472,7 +20472,12 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "PHONE_NUMBER",
+                  "namespace": "PETSTORE"
+                }
+              ],
               "semanticTerms": [],
               "name": "phoneNumber",
               "description": "",
@@ -23574,7 +23579,12 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "PHONE_NUMBER",
+                  "namespace": "PETSTORE"
+                }
+              ],
               "semanticTerms": [],
               "name": "phoneNumber",
               "description": "",
@@ -40570,7 +40580,12 @@
           "value": "PhoneNumber"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "PHONE_NUMBER",
+              "namespace": "PETSTORE"
+            }
+          ]
         }
       },
       "fields": [

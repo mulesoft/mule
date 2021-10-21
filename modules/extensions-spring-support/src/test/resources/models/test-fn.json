@@ -44,7 +44,12 @@
           "value": "door"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "KNOCKEABLE_DOOR",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": [
@@ -1268,53 +1273,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.test.function.extension.SimplePojo",
-                  "classInformation": {
-                    "classname": "org.mule.test.function.extension.SimplePojo",
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "typeAlias": {
-                    "value": "SimplePojo"
-                  }
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "user"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "pass"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:org.mule.test.function.extension.SimplePojo"
               },
               "hasDynamicType": false,
               "required": true,
@@ -1833,5 +1792,56 @@
     }
   ],
   "modelProperties": {},
-  "types": []
+  "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.function.extension.SimplePojo",
+        "classInformation": {
+          "classname": "org.mule.test.function.extension.SimplePojo",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "SimplePojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "user"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "pass"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
+  ]
 }
