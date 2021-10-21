@@ -6,19 +6,6 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -28,6 +15,20 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -40,7 +41,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
+import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -55,6 +57,7 @@ import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+
 import reactor.core.publisher.Flux;
 
 @Feature(ERROR_HANDLING)
@@ -77,7 +80,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   @Override
-  protected AbstractExceptionListener getErrorHandler() {
+  protected AbstractDeclaredExceptionListener getErrorHandler() {
     return onErrorContinueHandler;
   }
 
@@ -94,7 +97,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setAnnotations(getFlowComponentLocationAnnotations(flow.getName()));
     onErrorContinueHandler.setMuleContext(muleContext);
-    onErrorContinueHandler.setNotificationFirer(mock(NotificationDispatcher.class));
+    onErrorContinueHandler.setExceptionListener(new DefaultExceptionListener());
 
     NotificationDispatcher notificationDispatcher = getNotificationDispatcher(muleContext);
     mockTransaction =

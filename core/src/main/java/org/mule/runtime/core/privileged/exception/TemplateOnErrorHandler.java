@@ -6,17 +6,6 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.stream;
-import static java.util.Collections.newSetFromMap;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.function.Function.identity;
-import static java.util.regex.Pattern.compile;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -30,14 +19,25 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.upda
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.stream;
+import static java.util.Collections.newSetFromMap;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.function.Function.identity;
+import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -88,15 +88,12 @@ import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 @NoExtend
-public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
+public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionListener
     implements MessagingExceptionHandlerAcceptor {
 
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
-
-  @Inject
-  protected ConfigurationComponentLocator locator;
 
   @Inject
   private ExpressionManager expressionManager;
@@ -118,7 +115,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private String errorHandlerLocation;
   private boolean isLocalErrorHandlerLocation;
-  private ComponentLocation location;
 
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
 
@@ -224,7 +220,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return (me, event) -> {
       try {
         logger.error("Exception during exception strategy execution");
-        resolveAndLogException(me);
+        getExceptionListener().resolveAndLogException(me);
         if (isOwnedTransaction()) {
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
@@ -240,10 +236,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private void fireEndNotification(CoreEvent event, CoreEvent result, Throwable throwable) {
-    notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
+    getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
         : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
-                                                                       configuredMessageProcessors),
-                                                            location, PROCESS_END));
+                                                                            configuredMessageProcessors),
+                                                                 getLocation(), PROCESS_END));
   }
 
   protected Publisher<CoreEvent> route(Publisher<CoreEvent> eventPublisher) {
@@ -281,20 +277,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  private void processStatistics() {
-    if (statistics != null && statistics.isEnabled()) {
-      statistics.incExecutionError();
-    }
-  }
-
   @Override
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
-    this.location = this.getLocation();
     Optional<ProcessingStrategy> processingStrategy = empty();
     if (flowLocation.isPresent()) {
       processingStrategy = getProcessingStrategy(locator, flowLocation.get());
-    } else if (location != null) {
+    } else if (getLocation() != null) {
       processingStrategy = getProcessingStrategy(locator, this);
     }
     configuredMessageProcessors =
@@ -304,7 +293,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
     errorTypeMatcher = createErrorType(errorTypeRepository, errorType, configurationProperties);
     if (!inDefaultErrorHandler()) {
-      errorHandlerLocation = this.location.getLocation();
+      errorHandlerLocation = getLocation().getLocation();
       isLocalErrorHandlerLocation = ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find();
       if (isLocalErrorHandlerLocation) {
         errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
@@ -445,11 +434,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return event -> {
       Exception exception = getException(event);
 
-      notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
-                                                              location, PROCESS_START));
-      fireNotification(exception, event);
+      getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
+
+                                                                   getLocation(), PROCESS_START));
+      getExceptionListener().fireNotification(exception, event);
       logException(exception, event);
-      processStatistics();
+      getExceptionListener().processStatistics();
       markExceptionAsHandledIfRequired(exception);
       return event;
     };
@@ -464,11 +454,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    *
    * @param t the exception thrown
    */
-  protected void logException(Throwable t, CoreEvent event) {
-    if (TRUE.toString().equals(logException)
-        || (!FALSE.toString().equals(logException)
-            && expressionManager.evaluateBoolean(logException, event, location, true, true))) {
-      resolveAndLogException(t);
+  protected boolean logException(Throwable t, CoreEvent event) {
+    if (TRUE.toString().equals(getLogException())
+        || (!FALSE.toString().equals(getLogException())
+            && expressionManager.evaluateBoolean(getLogException(), event, getLocation(), true, true))) {
+      return getExceptionListener().resolveAndLogException(t);
+    } else {
+      return false;
     }
   }
 
@@ -541,7 +533,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private boolean inDefaultErrorHandler() {
-    return location == null;
+    return getLocation() == null;
   }
 
   private boolean defaultErrorHandlerOwnsTransaction(TransactionAdapter transaction) {
