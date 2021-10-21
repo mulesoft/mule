@@ -152,47 +152,47 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-metadata-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-vegan-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-heisenberg-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-marvel-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-subtypes-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-petstore-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-values-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
@@ -214,6 +214,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-core-tests</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.testing.compile</groupId>
             <artifactId>compile-testing</artifactId>
             <version>0.14</version>
@@ -228,14 +234,14 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-test-oauth-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-sample-data-extension</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

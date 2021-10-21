@@ -8,25 +8,29 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.function.Function.identity;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.notification.ConnectionNotification.CONNECTION_CONNECTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.cluster.ClusterService;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -50,10 +54,12 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
+import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.retry.RetryCallback;
-import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryNotifier;
+import org.mule.runtime.core.api.retry.policy.ConnectNotifier;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -65,6 +71,7 @@ import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
+import org.mule.runtime.core.internal.retry.DefaultRetryContext;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -90,6 +97,8 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -97,6 +106,7 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import java.util.function.Supplier;
 
 import reactor.core.publisher.Mono;
 
@@ -131,6 +141,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private CursorDecoratorFactory cursorDecoratorFactory;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -204,20 +217,43 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean restarting, RestartContext restartContext)
-      throws MuleException {
+  private void startSource(boolean restarting, RestartContext restartContext) throws MuleException {
+    Runnable onSuccess;
+    Consumer<Throwable> onFailure;
+    if (retryPolicyTemplate.isAsync()) {
+      onSuccess = this::onReconnectionSuccessful;
+      onFailure = this::onReconnectionFailed;
+    } else {
+      onSuccess = () -> {
+      };
+      onFailure = (t) -> {
+      };
+    }
+    Supplier<CompletableFuture<Void>> futureSupplier = () -> {
+      CompletableFuture<Void> future = new CompletableFuture<>();
+      retryScheduler.execute(() -> doWork(restarting, restartContext, future));
+      return future;
+    };
+    CompletableFuture<Void> future = retryPolicyTemplate
+        .applyPolicy(futureSupplier, t -> true, t -> computeStats(), NULL_THROWABLE_CONSUMER, identity(), retryScheduler)
+        .whenComplete((v, e) -> {
+          if (e != null) {
+            onFailure.accept(e);
+          } else {
+            onSuccess.run();
+          }
+        });
     try {
-      if (restarting && retryPolicyTemplate.isAsync()) {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), IMMEDIATE_SCHEDULER);
-      } else {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), retryScheduler);
+      if (!retryPolicyTemplate.isAsync()) {
+        future.get();
+        this.onReconnectionSuccessful();
       }
-    } catch (Throwable e) {
-      if (e instanceof MuleException) {
-        throw (MuleException) e;
-      } else {
-        throw new MuleRuntimeException(e);
-      }
+    } catch (ExecutionException exception) {
+      throw new RetryPolicyExhaustedException(exception.getCause(), ExtensionMessageSource.this);
+    } catch (InterruptedException e) {
+      throw new MuleRuntimeException(createStaticMessage(format("Found exception starting source '%s' on flow '%s'",
+                                                                sourceModel.getName(), getLocation().getRootContainerName())),
+                                     e);
     }
   }
 
@@ -317,26 +353,22 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     Optional<Publisher<Void>> action = sourceAdapter.getReconnectionAction(exception);
     if (!action.isPresent()) {
       invalidateConnection(exception);
+      retryScheduler.execute(() -> {
+        try {
+          restart();
+        } catch (MuleException e) {
+          this.onReconnectionFailed(e);
+        }
+      });
+    } else {
+      retryScheduler.execute(() -> {
+        Mono<Void> reconnectionAction = action.map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler))).get();
+        reconnectionAction
+            .doOnSuccess(v -> onReconnectionSuccessful())
+            .doOnError(this::onReconnectionFailed)
+            .subscribe();
+      });
     }
-
-    retryScheduler.execute(() -> {
-      Mono<Void> reconnectionAction = action
-          .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
-          .orElseGet(() -> create(sink -> {
-            try {
-              restart();
-              sink.success();
-            } catch (Exception e) {
-              sink.error(e);
-            }
-          }));
-
-      reconnectionAction
-          .doAfterTerminate(() -> reconnecting.set(false))
-          .doOnSuccess(v -> onReconnectionSuccessful())
-          .doOnError(this::onReconnectionFailed)
-          .subscribe();
-    });
   }
 
   private void onReconnectionSuccessful() {
@@ -344,6 +376,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       LOGGER.warn("Message source '{}' on flow '{}' successfully reconnected",
                   sourceModel.getName(), getLocation().getRootContainerName());
     }
+    reconnecting.set(false);
   }
 
   private void onReconnectionFailed(Throwable exception) {
@@ -351,6 +384,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                         sourceModel.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
     shutdown();
+    reconnecting.set(false);
   }
 
   private void restart() throws MuleException {
@@ -542,58 +576,50 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     };
   }
 
-  private class StartSourceCallback implements RetryCallback {
-
-    boolean restarting;
-    RestartContext restartContext;
-
-    StartSourceCallback(boolean restarting, RestartContext restartContext) {
-      this.restarting = restarting;
-      this.restartContext = restartContext;
-    }
-
-    @Override
-    public void doWork(RetryContext context) throws Exception {
-      try {
-        createSource(restarting);
-        initialiseIfNeeded(sourceAdapter);
-        if (restarting) {
-          sourceAdapter.finishRestart(restartContext);
-        }
-        sourceAdapter.start();
-      } catch (Exception e) {
-        try {
-          // On connection exception, if the failed connection is present, it must be invalidated before stopping the source. This
-          // warranties that a possible call to connectionProvider.disconnect made on the onStop method of the source, does not
-          // affect the connection's invalidation
-          extractConnectionException(e).ifPresent(connectionException -> invalidateConnection(connectionException));
-          stopSource();
-        } catch (Exception eStop) {
-          e.addSuppressed(eStop);
-        }
-        try {
-          disposeSource();
-        } catch (Exception eDispose) {
-          e.addSuppressed(eDispose);
-        }
-        Throwable throwable = exceptionEnricherManager.process(e);
-        Optional<ConnectionException> connectionException = extractConnectionException(throwable);
-        if (connectionException.isPresent()) {
-          throwable = connectionException.get();
-        }
-        throw throwable instanceof Exception ? ((Exception) throwable) : new MuleRuntimeException(throwable);
+  private void doWork(boolean restarting, RestartContext restartContext, CompletableFuture<Void> future) {
+    try {
+      createSource(restarting);
+      initialiseIfNeeded(sourceAdapter);
+      if (restarting) {
+        sourceAdapter.finishRestart(restartContext);
       }
+      sourceAdapter.start();
+      future.complete(null);
+    } catch (Exception e) {
+      try {
+        // On connection exception, if the failed connection is present, it must be invalidated before stopping the source. This
+        // warranties that a possible call to connectionProvider.disconnect made on the onStop method of the source, does not
+        // affect the connection's invalidation
+        extractConnectionException(e).ifPresent(connectionException -> invalidateConnection(connectionException));
+        stopSource();
+      } catch (Exception eStop) {
+        e.addSuppressed(eStop);
+      }
+      try {
+        disposeSource();
+      } catch (Exception eDispose) {
+        e.addSuppressed(eDispose);
+      }
+      Throwable throwable = exceptionEnricherManager.process(e);
+      Optional<ConnectionException> connectionException = extractConnectionException(throwable);
+      if (connectionException.isPresent()) {
+        throwable = connectionException.get();
+      }
+      throwable = throwable instanceof Exception ? ((Exception) throwable) : new MuleRuntimeException(throwable);
+      future.completeExceptionally(throwable);
     }
+  }
 
-    @Override
-    public String getWorkDescription() {
-      return "Message Source Reconnection";
-    }
+  private void computeStats() {
+    AllStatistics statistics = muleContext.getStatistics();
 
-    @Override
-    public Object getWorkOwner() {
-      return ExtensionMessageSource.this;
+    if (statistics != null && statistics.isEnabled() && computeConnectionErrorsInStats()) {
+      statistics.getApplicationStatistics().incConnectionErrors();
     }
+  }
+
+  private boolean computeConnectionErrorsInStats() {
+    return featureFlaggingService.isEnabled(COMPUTE_CONNECTION_ERRORS_IN_STATS);
   }
 
   @Override
