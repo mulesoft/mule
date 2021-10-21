@@ -117,7 +117,17 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
                       return null;
                     }
                   })
-                  .orElseGet(() -> Integer.valueOf(rawValue)));
+                  .orElseGet(() -> {
+                    try {
+                      Long longValue = Long.valueOf(rawValue);
+                      if (longValue <= Integer.MAX_VALUE && longValue >= Integer.MIN_VALUE) {
+                        return longValue.intValue();
+                      }
+                      return longValue;
+                    } catch (NumberFormatException e) {
+                      return Double.valueOf(rawValue);
+                    }
+                  }));
             }
           }
 
