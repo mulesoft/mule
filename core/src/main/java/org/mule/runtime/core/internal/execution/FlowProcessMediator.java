@@ -204,6 +204,7 @@ public class FlowProcessMediator implements Initialisable {
       final FlowProcessor flowExecutionProcessor =
           new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, empty()),
                             flowConstruct);
+
       final CursorComponentDecoratorFactory componentDecoratorFactory = messageProcessContext.getComponentDecoratorFactory();
       final CoreEvent event = createEvent(template, componentDecoratorFactory, messageSource,
                                           responseCompletion, flowConstruct);
