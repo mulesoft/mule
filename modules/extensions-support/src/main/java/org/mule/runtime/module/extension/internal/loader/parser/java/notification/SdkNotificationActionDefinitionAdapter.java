@@ -9,8 +9,22 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.notificati
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 
+/**
+ * Adapts a {@link org.mule.runtime.extension.api.notification.NotificationActionDefinition} into a
+ * {@link NotificationActionDefinition}
+ *
+ * @since 4.5.0
+ */
 public class SdkNotificationActionDefinitionAdapter implements NotificationActionDefinition {
 
+  /**
+   * Returns a new instance from the given {@code value}.
+   *
+   * @param value either a {@link NotificationActionDefinition} or a
+   *              {@link org.mule.runtime.extension.api.notification.NotificationActionDefinition}
+   * @return a {@link NotificationActionDefinition}
+   * @throws IllegalArgumentException if the value is not an instance of the expected types.
+   */
   public static NotificationActionDefinition from(Object value) {
     if (value instanceof NotificationActionDefinition) {
       return (NotificationActionDefinition) value;

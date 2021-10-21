@@ -31,6 +31,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Utilities for parsing Java defined {@link NotificationModel notification models}
+ *
+ * @since 4.5.0
+ */
 public final class NotificationModelParserUtils {
 
   public static List<NotificationModel> parseNotifications(AnnotationValueFetcher<NotificationActions> value,
@@ -82,9 +87,8 @@ public final class NotificationModelParserUtils {
   public static void declareEmittedNotifications(NotificationEmitterParser parser,
                                                  ExecutableComponentDeclarer declarer,
                                                  Function<String, Optional<NotificationModel>> notificationMapper) {
-    parser.getEmittedNotifications().forEach(action -> {
-      notificationMapper.apply(action).ifPresent(declarer::withNotificationModel);
-    });
+    parser.getEmittedNotifications()
+        .forEach(action -> notificationMapper.apply(action).ifPresent(declarer::withNotificationModel));
   }
 
   private static List<String> getEmittedNotifications(List<Type> types) {

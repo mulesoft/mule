@@ -16,10 +16,24 @@ import org.mule.sdk.api.stereotype.StereotypeDefinition;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Adapts a {@link org.mule.runtime.extension.api.stereotype.StereotypeDefinition} into a {@link StereotypeDefinition}
+ *
+ * @since 4.5.0
+ */
 public class SdkStereotypeDefinitionAdapter implements StereotypeDefinition {
 
   private final org.mule.runtime.extension.api.stereotype.StereotypeDefinition delegate;
 
+  /**
+   * Returns a {@link StereotypeDefinition} defined by the {@code definitionClass}
+   *
+   * The definition class can a subclass of either {@link StereotypeDefinition} or
+   * {@link org.mule.runtime.extension.api.stereotype.StereotypeDefinition}
+   *
+   * @param definitionClass the class defining the stereotype
+   * @return a {@link StereotypeDefinition}
+   */
   public static StereotypeDefinition from(Class<?> definitionClass) {
     Object instance;
     try {

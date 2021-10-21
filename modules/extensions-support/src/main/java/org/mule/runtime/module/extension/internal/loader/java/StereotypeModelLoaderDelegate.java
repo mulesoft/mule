@@ -40,7 +40,7 @@ import org.mule.sdk.api.stereotype.ImplicitStereotypeDefinition;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,6 +48,11 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+/**
+ * Helper class for declaring sources through a {@link StereotypeModelLoaderDelegate}
+ *
+ * @since 4.5
+ */
 public class StereotypeModelLoaderDelegate {
 
   private final DslResolvingContext dslResolvingContext;
@@ -155,7 +160,7 @@ public class StereotypeModelLoaderDelegate {
     type.accept(new MetadataTypeVisitor() {
 
       // This is created to avoid a recursive types infinite loop, producing an StackOverflow when resolving the stereotypes.
-      private final Set<MetadataType> registeredTypes = new HashSet<>();
+      private final Set<MetadataType> registeredTypes = new LinkedHashSet<>();
 
       @Override
       public void visitObject(ObjectType objectType) {

@@ -147,5 +147,8 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    */
   Map<MetadataType, List<MetadataType>> getSubTypes();
 
+  /**
+   * @return the notifications the extension emits.
+   */
   List<NotificationModel> getNotificationModels();
 }

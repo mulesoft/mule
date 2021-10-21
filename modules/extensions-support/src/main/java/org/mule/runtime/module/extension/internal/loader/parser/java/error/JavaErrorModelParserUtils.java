@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -33,7 +34,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.error.AstElementErrorTypeDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeProviderAdapter;
-import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
@@ -83,17 +83,16 @@ public final class JavaErrorModelParserUtils {
                                                                  ExtensionElement extensionElement,
                                                                  OperationElement operation) {
     return getThrowsDeclaration(operation, extensionElement)
-        .flatMap(withThrows -> MuleExtensionAnnotationParser.mapReduceAnnotation(
-                                                                                 withThrows,
-                                                                                 Throws.class,
-                                                                                 org.mule.sdk.api.annotation.error.Throws.class,
-                                                                                 ann -> parseErrorTypeProviders(ann
-                                                                                     .getClassArrayValue(Throws::value),
-                                                                                                                extensionParser),
-                                                                                 ann -> parseErrorTypeProviders(ann
-                                                                                     .getClassArrayValue(org.mule.sdk.api.annotation.error.Throws::value),
-                                                                                                                extensionParser),
-                                                                                 dualThrowsException(operation)))
+        .flatMap(withThrows -> mapReduceAnnotation(
+                                                   withThrows,
+                                                   Throws.class,
+                                                   org.mule.sdk.api.annotation.error.Throws.class,
+                                                   ann -> parseErrorTypeProviders(ann.getClassArrayValue(Throws::value),
+                                                                                  extensionParser),
+                                                   ann -> parseErrorTypeProviders(ann
+                                                       .getClassArrayValue(org.mule.sdk.api.annotation.error.Throws::value),
+                                                                                  extensionParser),
+                                                   dualThrowsException(operation)))
         .orElse(new LinkedList<>());
   }
 

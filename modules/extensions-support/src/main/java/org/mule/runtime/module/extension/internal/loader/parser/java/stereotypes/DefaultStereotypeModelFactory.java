@@ -25,6 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Default implementation for {@link StereotypeModelFactory}
+ *
+ * @since 4.5.0
+ */
 public class DefaultStereotypeModelFactory implements StereotypeModelFactory {
 
 

@@ -14,6 +14,12 @@ import org.mule.sdk.api.notification.NotificationActionDefinition;
 
 import java.util.Set;
 
+/**
+ * Adapts a {@link org.mule.runtime.extension.api.annotation.notification.NotificationActionProvider} into a
+ * {@link NotificationActionProvider}
+ *
+ * @since 4.5.0
+ */
 public class SdkNotificationActionProviderAdapter implements NotificationActionProvider {
 
   public static NotificationActionProvider from(Object provider) {

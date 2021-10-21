@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -56,7 +57,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
-import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
@@ -275,63 +275,60 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static Optional<RequiresEnterpriseLicenseInfo> getRequiresEnterpriseLicenseInfo(ExtensionElement extensionElement) {
-    return MuleExtensionAnnotationParser.mapReduceSingleAnnotation(extensionElement, RequiresEnterpriseLicense.class,
-                                                                   org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class,
-                                                                   value -> new RequiresEnterpriseLicenseInfo(value
-                                                                       .getBooleanValue(RequiresEnterpriseLicense::allowEvaluationLicense)),
-                                                                   value -> new RequiresEnterpriseLicenseInfo(value
-                                                                       .getBooleanValue(org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense::allowEvaluationLicense)));
+    return mapReduceSingleAnnotation(extensionElement, RequiresEnterpriseLicense.class,
+                                     org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense.class,
+                                     value -> new RequiresEnterpriseLicenseInfo(value
+                                         .getBooleanValue(RequiresEnterpriseLicense::allowEvaluationLicense)),
+                                     value -> new RequiresEnterpriseLicenseInfo(value
+                                         .getBooleanValue(org.mule.sdk.api.annotation.license.RequiresEnterpriseLicense::allowEvaluationLicense)));
   }
 
   public static Optional<RequiresEntitlementInfo> getRequiresEntitlementInfo(ExtensionElement extensionElement) {
-    return MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
-                                                                   extensionElement,
-                                                                   RequiresEntitlement.class,
-                                                                   org.mule.sdk.api.annotation.license.RequiresEntitlement.class,
-                                                                   value -> new RequiresEntitlementInfo(value
-                                                                       .getStringValue(RequiresEntitlement::name),
-                                                                                                        value
-                                                                                                            .getStringValue(RequiresEntitlement::description)),
-                                                                   value -> new RequiresEntitlementInfo(
-                                                                                                        value
-                                                                                                            .getStringValue(org.mule.sdk.api.annotation.license.RequiresEntitlement::name),
-                                                                                                        value
-                                                                                                            .getStringValue(org.mule.sdk.api.annotation.license.RequiresEntitlement::description)));
+    return mapReduceSingleAnnotation(
+                                     extensionElement,
+                                     RequiresEntitlement.class,
+                                     org.mule.sdk.api.annotation.license.RequiresEntitlement.class,
+                                     value -> new RequiresEntitlementInfo(
+                                                                          value.getStringValue(RequiresEntitlement::name),
+                                                                          value.getStringValue(RequiresEntitlement::description)),
+                                     value -> new RequiresEntitlementInfo(
+                                                                          value
+                                                                              .getStringValue(org.mule.sdk.api.annotation.license.RequiresEntitlement::name),
+                                                                          value
+                                                                              .getStringValue(org.mule.sdk.api.annotation.license.RequiresEntitlement::description)));
   }
 
   public static Optional<DisplayModel> getDisplayModel(WithAnnotations element, String elementType, String elementName) {
-    Optional<String> summary = MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
-                                                                                       element,
-                                                                                       elementType,
-                                                                                       elementName,
-                                                                                       Summary.class,
-                                                                                       org.mule.sdk.api.annotation.param.display.Summary.class,
-                                                                                       value -> value
-                                                                                           .getStringValue(Summary::value),
-                                                                                       value -> value
-                                                                                           .getStringValue(org.mule.sdk.api.annotation.param.display.Summary::value));
+    Optional<String> summary = mapReduceSingleAnnotation(
+                                                         element,
+                                                         elementType,
+                                                         elementName,
+                                                         Summary.class,
+                                                         org.mule.sdk.api.annotation.param.display.Summary.class,
+                                                         value -> value
+                                                             .getStringValue(Summary::value),
+                                                         value -> value
+                                                             .getStringValue(org.mule.sdk.api.annotation.param.display.Summary::value));
 
-    Optional<String> displayName = MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
-                                                                                           element,
-                                                                                           elementType,
-                                                                                           elementName,
-                                                                                           DisplayName.class,
-                                                                                           org.mule.sdk.api.annotation.param.display.DisplayName.class,
-                                                                                           value -> value
-                                                                                               .getStringValue(DisplayName::value),
-                                                                                           value -> value
-                                                                                               .getStringValue(org.mule.sdk.api.annotation.param.display.DisplayName::value));
+    Optional<String> displayName = mapReduceSingleAnnotation(
+                                                             element,
+                                                             elementType,
+                                                             elementName,
+                                                             DisplayName.class,
+                                                             org.mule.sdk.api.annotation.param.display.DisplayName.class,
+                                                             value -> value.getStringValue(DisplayName::value),
+                                                             value -> value
+                                                                 .getStringValue(org.mule.sdk.api.annotation.param.display.DisplayName::value));
 
-    Optional<String> example = MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
-                                                                                       element,
-                                                                                       elementType,
-                                                                                       elementName,
-                                                                                       Example.class,
-                                                                                       org.mule.sdk.api.annotation.param.display.Example.class,
-                                                                                       value -> value
-                                                                                           .getStringValue(Example::value),
-                                                                                       value -> value
-                                                                                           .getStringValue(org.mule.sdk.api.annotation.param.display.Example::value));
+    Optional<String> example = mapReduceSingleAnnotation(
+                                                         element,
+                                                         elementType,
+                                                         elementName,
+                                                         Example.class,
+                                                         org.mule.sdk.api.annotation.param.display.Example.class,
+                                                         value -> value.getStringValue(Example::value),
+                                                         value -> value
+                                                             .getStringValue(org.mule.sdk.api.annotation.param.display.Example::value));
 
     Function<AnnotationValueFetcher<ClassValue>, ClassValueModel> valueFromLegacyAnnotation =
         classValue -> new ClassValueModel(classValue.getArrayValue(ClassValue::extendsOrImplements).stream()
@@ -345,46 +342,37 @@ public final class JavaExtensionModelParserUtils {
             .filter(p -> !isBlank(p))
             .collect(toList()));
 
-    Optional<ClassValueModel> classValueModel = MuleExtensionAnnotationParser.mapReduceSingleAnnotation(
-                                                                                                        element,
-                                                                                                        elementType,
-                                                                                                        elementName,
-                                                                                                        ClassValue.class,
-                                                                                                        org.mule.sdk.api.annotation.param.display.ClassValue.class,
-                                                                                                        valueFromLegacyAnnotation,
-                                                                                                        valueFromSdkAnnotation);
+    Optional<ClassValueModel> classValueModel = mapReduceSingleAnnotation(
+                                                                          element,
+                                                                          elementType,
+                                                                          elementName,
+                                                                          ClassValue.class,
+                                                                          org.mule.sdk.api.annotation.param.display.ClassValue.class,
+                                                                          valueFromLegacyAnnotation,
+                                                                          valueFromSdkAnnotation);
 
-    Function<AnnotationValueFetcher<Path>, PathModel> pathModelFromLegacyAnnotation = value -> new PathModel(
-                                                                                                             value
-                                                                                                                 .getEnumValue(Path::type),
-                                                                                                             value
-                                                                                                                 .getBooleanValue(Path::acceptsUrls),
-                                                                                                             value
-                                                                                                                 .getEnumValue(Path::location),
-                                                                                                             value
-                                                                                                                 .getArrayValue(Path::acceptedFileExtensions)
-                                                                                                                 .stream()
-                                                                                                                 .toArray(String[]::new));
+    Function<AnnotationValueFetcher<Path>, PathModel> pathModelFromLegacyAnnotation =
+        value -> new PathModel(
+                               value.getEnumValue(Path::type),
+                               value.getBooleanValue(Path::acceptsUrls),
+                               value.getEnumValue(Path::location),
+                               value.getArrayValue(Path::acceptedFileExtensions).stream().toArray(String[]::new));
 
-    Function<AnnotationValueFetcher<FilePath>, PathModel> pathModelFromSdkAnnotation = value -> new PathModel(
-                                                                                                              value
-                                                                                                                  .getEnumValue(FilePath::type),
-                                                                                                              value
-                                                                                                                  .getBooleanValue(FilePath::acceptsUrls),
-                                                                                                              value
-                                                                                                                  .getEnumValue(FilePath::location),
-                                                                                                              value
-                                                                                                                  .getArrayValue(FilePath::acceptedFileExtensions)
-                                                                                                                  .stream()
-                                                                                                                  .toArray(String[]::new));
+    Function<AnnotationValueFetcher<FilePath>, PathModel> pathModelFromSdkAnnotation =
+        value -> new PathModel(
+                               value.getEnumValue(FilePath::type),
+                               value.getBooleanValue(FilePath::acceptsUrls),
+                               value.getEnumValue(FilePath::location),
+                               value.getArrayValue(FilePath::acceptedFileExtensions).stream().toArray(String[]::new));
 
-    Optional<PathModel> pathModel = MuleExtensionAnnotationParser.mapReduceSingleAnnotation(element,
-                                                                                            elementType,
-                                                                                            elementName,
-                                                                                            Path.class,
-                                                                                            FilePath.class,
-                                                                                            pathModelFromLegacyAnnotation,
-                                                                                            pathModelFromSdkAnnotation);
+    Optional<PathModel> pathModel = mapReduceSingleAnnotation(
+                                                              element,
+                                                              elementType,
+                                                              elementName,
+                                                              Path.class,
+                                                              FilePath.class,
+                                                              pathModelFromLegacyAnnotation,
+                                                              pathModelFromSdkAnnotation);
 
     Optional<DisplayModel> displayModel;
     if (summary.isPresent() || displayName.isPresent() || example.isPresent() || classValueModel.isPresent()
@@ -422,29 +410,27 @@ public final class JavaExtensionModelParserUtils {
   }
 
   private static Optional<DeprecationModel> getDeprecationModel(WithAnnotations element, String elementType, String elementName) {
-    return MuleExtensionAnnotationParser.mapReduceAnnotation(
-                                                             element,
-                                                             Deprecated.class,
-                                                             org.mule.sdk.api.annotation.deprecated.Deprecated.class,
-                                                             value -> buildDeprecationModel(value
-                                                                 .getStringValue(Deprecated::message),
-                                                                                            value
-                                                                                                .getStringValue(Deprecated::since),
-                                                                                            value
-                                                                                                .getStringValue(Deprecated::toRemoveIn)),
-                                                             value -> buildDeprecationModel(value
-                                                                 .getStringValue(org.mule.sdk.api.annotation.deprecated.Deprecated::message),
-                                                                                            value
-                                                                                                .getStringValue(org.mule.sdk.api.annotation.deprecated.Deprecated::since),
-                                                                                            value
-                                                                                                .getStringValue(org.mule.sdk.api.annotation.deprecated.Deprecated::toRemoveIn)),
-                                                             () -> new IllegalParameterModelDefinitionException(format("%s '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                                                                       elementType,
-                                                                                                                       elementName,
-                                                                                                                       Deprecated.class
-                                                                                                                           .getName(),
-                                                                                                                       org.mule.sdk.api.annotation.deprecated.Deprecated.class
-                                                                                                                           .getName())));
+    return mapReduceAnnotation(
+                               element,
+                               Deprecated.class,
+                               org.mule.sdk.api.annotation.deprecated.Deprecated.class,
+                               value -> buildDeprecationModel(
+                                                              value.getStringValue(Deprecated::message),
+                                                              value.getStringValue(Deprecated::since),
+                                                              value.getStringValue(Deprecated::toRemoveIn)),
+                               value -> buildDeprecationModel(
+                                                              value
+                                                                  .getStringValue(org.mule.sdk.api.annotation.deprecated.Deprecated::message),
+                                                              value
+                                                                  .getStringValue(org.mule.sdk.api.annotation.deprecated.Deprecated::since),
+                                                              value
+                                                                  .getStringValue(org.mule.sdk.api.annotation.deprecated.Deprecated::toRemoveIn)),
+                               () -> new IllegalParameterModelDefinitionException(format("%s '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                         elementType,
+                                                                                         elementName,
+                                                                                         Deprecated.class.getName(),
+                                                                                         org.mule.sdk.api.annotation.deprecated.Deprecated.class
+                                                                                             .getName())));
   }
 
   private static DeprecationModel buildDeprecationModel(String message, String since, String toRemoveIn) {

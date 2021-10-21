@@ -30,13 +30,31 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Utils for parsing Java defined Stereotypes
+ *
+ * @since 4.5.0
+ */
 public final class JavaStereotypeModelParserUtils {
 
+  /**
+   * @param element an element
+   * @return whether the {@code element} is a validator or not
+   */
   public static boolean isValidator(WithAnnotations element) {
     return element.isAnnotatedWith(Validator.class) ||
         element.isAnnotatedWith(org.mule.sdk.api.annotation.param.stereotype.Validator.class);
   }
 
+  /**
+   * Returns the {@code annotatedElement} {@link StereotypeModel} if one is defined
+   *
+   * @param annotatedElement an element
+   * @param elementType      the type of element
+   * @param elementName      the name of the element
+   * @param factory          the factory used to create the stereotype
+   * @return an {@link StereotypeModel} if one is defined
+   */
   public static Optional<StereotypeModel> resolveStereotype(WithAnnotations annotatedElement,
                                                             String elementType,
                                                             String elementName,
@@ -71,18 +89,33 @@ public final class JavaStereotypeModelParserUtils {
         : empty();
   }
 
+  /**
+   * Returns The element's allowed stereotypes. If none is defined, the {@code fallbackElement} is tested instead.
+   *
+   * @param element         an element
+   * @param fallbackElement the fallback element
+   * @param factory         the factory used to create the stereotype
+   * @return a {@link List} of {@link StereotypeModel}. Might be empty but will never be {@code null}
+   */
   public static List<StereotypeModel> getAllowedStereotypes(WithAnnotations element,
                                                             WithAnnotations fallbackElement,
                                                             StereotypeModelFactory factory) {
 
     List<StereotypeModel> stereotypes = getAllowedStereotypes(element, factory);
     if (stereotypes.isEmpty()) {
-      stereotypes = JavaStereotypeModelParserUtils.getAllowedStereotypes(fallbackElement, factory);
+      stereotypes = getAllowedStereotypes(fallbackElement, factory);
     }
 
     return stereotypes;
   }
 
+  /**
+   * Returns The element's allowed stereotypes. If none is defined, the {@code fallbackElement} is tested instead.
+   *
+   * @param element an element
+   * @param factory the factory used to create the stereotype
+   * @return a {@link List} of {@link StereotypeModel}. Might be empty but will never be {@code null}
+   */
   public static List<StereotypeModel> getAllowedStereotypes(WithAnnotations element, StereotypeModelFactory factory) {
     return concat(
                   getAllowedTypeStream(element,
@@ -95,6 +128,12 @@ public final class JavaStereotypeModelParserUtils {
                                            .collect(toList());
   }
 
+  /**
+   * Translates the given {@code model} into a {@link StereotypeDefinition}
+   *
+   * @param model a {@link StereotypeModel}
+   * @return a {@link StereotypeDefinition}
+   */
   public static StereotypeDefinition asDefinition(StereotypeModel model) {
     return new StereotypeDefinition() {
 
