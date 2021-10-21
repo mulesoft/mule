@@ -10,7 +10,6 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.config.internal.validation.FlowRefPointsToExistingFlow.FLOW_REF_IDENTIFIER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
@@ -41,7 +40,6 @@ public class ReferenceParametersStereotypesValidations extends AbstractReference
     !missing.getComponent().getIdentifier().equals(FLOW_REF_IDENTIFIER)
         && missing.getAllowedStereotypes().stream()
             .noneMatch(st -> st.isAssignableTo(CONFIG)
-                || st.isAssignableTo(OBJECT_STORE)
                 || st.isAssignableTo(APP_CONFIG));
   }
 

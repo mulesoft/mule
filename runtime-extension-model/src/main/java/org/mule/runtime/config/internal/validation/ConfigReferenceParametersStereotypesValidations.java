@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
@@ -36,7 +35,6 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
   protected Predicate<? super ComponentAstDependency> filter() {
     return missing -> missing.getAllowedStereotypes().stream()
         .anyMatch(st -> st.isAssignableTo(CONFIG)
-            || st.isAssignableTo(OBJECT_STORE)
             || st.isAssignableTo(APP_CONFIG));
   }
 
