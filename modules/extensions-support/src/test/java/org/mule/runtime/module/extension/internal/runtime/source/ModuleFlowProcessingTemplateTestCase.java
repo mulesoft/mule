@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -32,11 +34,12 @@ import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onC
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static reactor.core.publisher.Mono.just;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.mockito.ArgumentCaptor;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -48,7 +51,6 @@ import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessMediator;
-import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
@@ -64,9 +66,9 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -228,6 +230,8 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
   }
 
   @Test
+  @Issue("MULE-19869")
+  @Description("Set template field to null after phase execution to avoid a leak when creating reactor chains")
   public void templateSetToNullAfterPhaseExecution() throws Exception {
     initFlowProcessMediator();
     flowProcessMediator.process(template, context);
@@ -249,12 +253,12 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
     });
     SourcePolicySuccessResult successResult = mock(SourcePolicySuccessResult.class);
     when(successResult.getResult()).then(invocation -> atomicEvent.get());
-    when(successResult.getResponseParameters()).thenReturn(() -> emptyMap());
+    when(successResult.getResponseParameters()).thenReturn(Collections::emptyMap);
     when(successResult.createErrorResponseParameters()).thenReturn(event -> emptyMap());
     SourcePolicyFailureResult failureResult = mock(SourcePolicyFailureResult.class);
     when(failureResult.getMessagingException()).then(invocation -> messagingException);
     when(failureResult.getResult()).then(invocation -> messagingException.getEvent());
-    when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
+    when(failureResult.getErrorResponseParameters()).thenReturn(Collections::emptyMap);
     doAnswer(inv -> {
       CoreEvent event = inv.getArgument(0);
       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback = inv.getArgument(2);
@@ -276,7 +280,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
     FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
 
     // Call routeError failure callback for success response sending error test cases
-    final ArgumentCaptor<Consumer> propagateConsumerCaptor = ArgumentCaptor.forClass(Consumer.class);
+    final ArgumentCaptor<Consumer> propagateConsumerCaptor = forClass(Consumer.class);
     ExceptionRouter flowErrorHandlerRouter = mock(ExceptionRouter.class);
     doAnswer(inv -> {
       propagateConsumerCaptor.getValue().accept(inv.getArgument(0));
@@ -287,7 +291,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
         .thenReturn(flowErrorHandlerRouter);
 
     final MessageSource source = mock(MessageSource.class);
-    when(source.getRootContainerLocation()).thenReturn(Location.builder().globalName("root").build());
+    when(source.getRootContainerLocation()).thenReturn(builder().globalName("root").build());
     when(source.getLocation()).thenReturn(mock(ComponentLocation.class));
 
     when(flow.errorRouterForSourceResponseError(any())).thenAnswer(inv -> exceptionHandler
