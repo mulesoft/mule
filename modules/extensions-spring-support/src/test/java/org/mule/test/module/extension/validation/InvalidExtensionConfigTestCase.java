@@ -16,7 +16,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 
 import org.mule.functional.junit4.AbstractConfigurationFailuresTestCase;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -149,21 +148,30 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
   }
 
   @Test
-  // TODO MULE-19350 migrate and adapt this test
   public void configLevelOperationNegative() throws Exception {
-    expectedException.expect(InitialisationException.class);
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("[validation/vegan-invalid-config-for-operations.xml:16]");
     expectedException
-        .expectMessage("Root component 'appleEatsBanana' defines an usage of operation 'eatBanana' which points to configuration 'apple'. The selected config does not support that operation.");
+        .expectMessage("Referenced component 'apple' must be one of stereotypes [VEGAN:BANANA-CONFIG]");
     loadConfiguration("validation/vegan-invalid-config-for-operations.xml");
   }
 
   @Test
-  // TODO MULE-19350 migrate and adapt this test
   public void configLevelSourceNegative() throws Exception {
-    expectedException.expect(InitialisationException.class);
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("[validation/vegan-invalid-config-for-sources.xml:16]");
     expectedException
-        .expectMessage("Root component 'harvest-apples' defines an usage of operation 'harvest-apples' which points to configuration 'banana'. The selected config does not support that operation.");
+        .expectMessage("Referenced component 'banana' must be one of stereotypes [VEGAN:APPLE_CONFIG].");
     loadConfiguration("validation/vegan-invalid-config-for-sources.xml");
+  }
+
+  @Test
+  public void configRefPointsToNonExistant() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("[validation/config-ref-points-to-non-existant-config.xml:9]");
+    expectedException
+        .expectMessage("Referenced component 'nonExistant' must be one of stereotypes [PETSTORE:CONFIG].");
+    loadConfiguration("validation/config-ref-points-to-non-existant-config.xml");
   }
 
   @Test

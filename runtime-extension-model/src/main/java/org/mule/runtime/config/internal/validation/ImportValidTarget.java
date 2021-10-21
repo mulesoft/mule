@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -61,12 +63,12 @@ public class ImportValidTarget implements ArtifactValidation {
   }
 
   @Override
-  public Optional<ValidationResultItem> validate(ArtifactAst artifact) {
+  public List<ValidationResultItem> validateMany(ArtifactAst artifact) {
     return artifact.getImportedResources()
         .stream()
         .filter(imp -> imp.getResolutionFailure().isPresent())
-        .findFirst()
-        .map(imp -> create(new ImportComponentAst(imp.getMetadata()), this, imp.getResolutionFailure().get()));
+        .map(imp -> create(new ImportComponentAst(imp.getMetadata()), this, imp.getResolutionFailure().get()))
+        .collect(toList());
   }
 
   @Override

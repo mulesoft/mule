@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.lang.String.format;
-import static java.util.Optional.of;
-import static java.util.stream.Stream.concat;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
+
+import static java.lang.String.format;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -58,7 +60,7 @@ public class RequiredParametersPresent implements Validation {
   }
 
   @Override
-  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+  public List<ValidationResultItem> validateMany(ComponentAst component, ArtifactAst artifact) {
     return requiredParamsStream(component)
         .map(param -> {
           if (param.getSecond() == null || !param.getSecond().getValue().getValue().isPresent()) {
@@ -75,7 +77,7 @@ public class RequiredParametersPresent implements Validation {
         })
         .filter(Optional::isPresent)
         .map(Optional::get)
-        .findFirst();
+        .collect(toList());
   }
 
   /**
