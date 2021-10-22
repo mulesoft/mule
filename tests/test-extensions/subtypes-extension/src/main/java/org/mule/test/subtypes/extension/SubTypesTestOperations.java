@@ -8,9 +8,11 @@ package org.mule.test.subtypes.extension;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.sdk.api.annotation.dsl.xml.ParameterDsl;
@@ -52,4 +54,10 @@ public class SubTypesTestOperations {
   public Map<Door, Map<String, Door>> processDoor(Door door, @Optional Map<String, Door> doorRegistry) {
     return singletonMap(door, doorRegistry);
   }
+
+  @MediaType(TEXT_PLAIN)
+  public String pojosWithCommonNameInnerField(HasDoor hasDoor, HasShape hasShape) {
+    return hasDoor.getCommonName().getHandle().concat(hasShape.getCommonName().getArea().toString());
+  }
+
 }
