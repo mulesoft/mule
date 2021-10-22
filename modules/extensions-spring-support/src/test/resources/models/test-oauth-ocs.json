@@ -8908,7 +8908,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "CONNECTION",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -21165,7 +21169,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "CONNECTION",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -29529,7 +29537,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "CONNECTION",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -36275,7 +36287,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "CONNECTION",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -44149,7 +44165,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "CONNECTION",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
