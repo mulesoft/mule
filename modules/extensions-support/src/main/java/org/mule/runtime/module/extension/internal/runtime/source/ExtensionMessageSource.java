@@ -27,7 +27,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.cluster.ClusterService;
-import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
