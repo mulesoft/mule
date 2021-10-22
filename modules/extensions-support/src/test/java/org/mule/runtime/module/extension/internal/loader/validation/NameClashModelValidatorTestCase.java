@@ -924,7 +924,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testy() {
+  public void wrappedTypesCanStillDefinePojoChildsOfDifferentType() {
     ParameterModel firstParam = getParameter("SomePojo", SomePojo.class);
     ParameterModel secondParam = getParameter("SomeOtherPojo", SomeOtherPojo.class);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam, secondParam));

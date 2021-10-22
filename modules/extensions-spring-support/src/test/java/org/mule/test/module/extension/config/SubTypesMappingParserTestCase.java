@@ -228,7 +228,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   }
 
   @Test
-  public void pojosWithCommonNameInnerField() throws Exception {
+  public void valuesAreCorrectlyParsedForPojosWithCommonNameInnerField() throws Exception {
     final Object payload = flowRunner("pojosWithCommonNameInnerField").run().getMessage().getPayload().getValue();
 
     assertThat(payload, is("pull2"));
