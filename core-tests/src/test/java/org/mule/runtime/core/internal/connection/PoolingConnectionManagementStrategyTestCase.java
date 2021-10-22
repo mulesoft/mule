@@ -28,10 +28,7 @@ import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-import static org.slf4j.event.Level.DEBUG;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -43,12 +40,6 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -70,9 +61,6 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   private ConnectionHandler<Object> connection1;
   private ConnectionHandler<Object> connection2;
-  private List<String> debugMessages;
-  protected Logger logger;
-  private Logger oldLogger;
 
   @Before
   public void before() throws Exception {
@@ -80,14 +68,6 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     injector = spyInjector(muleContext);
     muleContext.start();
     resetConnectionProvider();
-    debugMessages = new ArrayList<>();
-    logger = createMockLogger(debugMessages, DEBUG);
-    oldLogger = setLogger(PoolingConnectionManagementStrategy.class, LOGGER_FIELD_NAME, logger);
-  }
-
-  @After
-  public void restoreLogger() throws Exception {
-    setLogger(PoolingConnectionManagementStrategy.class, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test

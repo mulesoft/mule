@@ -31,15 +31,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
-import static org.slf4j.event.Level.ERROR;
-import static org.slf4j.event.Level.DEBUG;
-import static org.slf4j.event.Level.WARN;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -62,7 +55,6 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -76,7 +68,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
-import org.slf4j.Logger;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
@@ -537,72 +528,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       assertThat(muleContext.getStatistics().getApplicationStatistics().getExecutionErrors(), equalTo(2l));
       return true;
     }));
-  }
-
-  @Test
-  public void sourceInitializedLogMessage() throws Exception {
-    ArrayList<String> debugMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
-    messageSource.initialise();
-    if (primaryNodeOnly) {
-      verifyLogMessage(debugMessages,
-                       "Message source 'source' on flow 'appleFlow' running on the primary node is initializing. Note that this Message source must run on the primary node only.");
-    } else {
-      verifyLogMessage(debugMessages,
-                       "Message source 'source' on flow 'appleFlow' is initializing. This is the primary node of the cluster.");
-    }
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
-  }
-
-  @Test
-  public void sourceStartedLogMessage() throws Exception {
-    ArrayList<String> debugMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
-    messageSource.initialise();
-    messageSource.start();
-    verifyLogMessage(debugMessages, "Message source 'source' on flow 'appleFlow' is starting");
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
-  }
-
-  @Test
-  public void sourceStoppedLogMessage() throws Exception {
-    ArrayList<String> debugMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
-    messageSource.initialise();
-    messageSource.start();
-    messageSource.stop();
-    verifyLogMessage(debugMessages, "Message source 'source' on flow 'appleFlow' is stopping");
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
-  }
-
-
-  @Test
-  public void getRetryPolicyExhaustedAndLogShutdownMessage() throws Exception {
-    ArrayList<String> errorMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(errorMessages, ERROR));
-    start();
-    ConnectionException e = new ConnectionException(ERROR_MESSAGE);
-    doThrow(e).when(source).onStart(any());
-    messageSource.onException(e);
-    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogRegex(errorMessages,
-                     "Message source 'source' on flow 'appleFlow' could not be reconnected. Will be shutdown. (.*)");
-      return true;
-    }));
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
-  }
-
-  public void reconnectAndLogSuccessMessage() throws Exception {
-    ArrayList<String> warnMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(warnMessages, WARN));
-    start();
-    ConnectionException e = new ConnectionException(ERROR_MESSAGE);
-    messageSource.onException(e);
-    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogMessage(warnMessages, "Message source 'source' on flow 'appleFlow' successfully reconnected");
-      return true;
-    }));
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   private class DummySource extends Source {

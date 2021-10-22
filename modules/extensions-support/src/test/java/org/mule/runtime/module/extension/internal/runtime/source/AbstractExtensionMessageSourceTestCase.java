@@ -95,7 +95,6 @@ import org.mockito.Mock;
 
 public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
 
-  protected static final String LOGGER_FIELD_NAME = "LOGGER";
   protected static final String CONFIG_NAME = "myConfig";
   protected static final String ERROR_MESSAGE = "ERROR";
   protected static final String SOURCE_NAME = "source";
