@@ -7,11 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.notification;
 
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toCollection;
 
 import org.mule.sdk.api.annotation.notification.NotificationActionProvider;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -42,7 +43,7 @@ public class SdkNotificationActionProviderAdapter implements NotificationActionP
   public Set<NotificationActionDefinition> getNotificationActions() {
     return delegate.getNotificationActions().stream()
         .map(SdkNotificationActionDefinitionAdapter::from)
-        .collect(toSet());
+        .collect(toCollection(LinkedHashSet::new));
   }
 
   @Override

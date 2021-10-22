@@ -20241,10 +20241,10 @@
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [
+            "HEISENBERG:NEW_BATCH",
+            "HEISENBERG:NEXT_BATCH",
             "HEISENBERG:BATCH_DELIVERED",
             "HEISENBERG:BATCH_DELIVERY_FAILED",
-            "HEISENBERG:NEXT_BATCH",
-            "HEISENBERG:NEW_BATCH",
             "HEISENBERG:BATCH_FAILED",
             "HEISENBERG:BATCH_TERMINATED"
           ],
@@ -22549,10 +22549,10 @@
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [
+            "HEISENBERG:NEW_BATCH",
+            "HEISENBERG:NEXT_BATCH",
             "HEISENBERG:BATCH_DELIVERED",
             "HEISENBERG:BATCH_DELIVERY_FAILED",
-            "HEISENBERG:NEXT_BATCH",
-            "HEISENBERG:NEW_BATCH",
             "HEISENBERG:BATCH_FAILED",
             "HEISENBERG:BATCH_TERMINATED"
           ],
@@ -24396,10 +24396,10 @@
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [
+            "HEISENBERG:NEW_BATCH",
+            "HEISENBERG:NEXT_BATCH",
             "HEISENBERG:BATCH_DELIVERED",
             "HEISENBERG:BATCH_DELIVERY_FAILED",
-            "HEISENBERG:NEXT_BATCH",
-            "HEISENBERG:NEW_BATCH",
             "HEISENBERG:BATCH_FAILED",
             "HEISENBERG:BATCH_TERMINATED"
           ],
@@ -26507,10 +26507,10 @@
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [
+            "HEISENBERG:NEW_BATCH",
+            "HEISENBERG:NEXT_BATCH",
             "HEISENBERG:BATCH_DELIVERED",
             "HEISENBERG:BATCH_DELIVERY_FAILED",
-            "HEISENBERG:NEXT_BATCH",
-            "HEISENBERG:NEW_BATCH",
             "HEISENBERG:BATCH_FAILED",
             "HEISENBERG:BATCH_TERMINATED"
           ],
@@ -28852,10 +28852,10 @@
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [
+            "HEISENBERG:NEW_BATCH",
+            "HEISENBERG:NEXT_BATCH",
             "HEISENBERG:BATCH_DELIVERED",
             "HEISENBERG:BATCH_DELIVERY_FAILED",
-            "HEISENBERG:NEXT_BATCH",
-            "HEISENBERG:NEW_BATCH",
             "HEISENBERG:BATCH_FAILED",
             "HEISENBERG:BATCH_TERMINATED"
           ],
