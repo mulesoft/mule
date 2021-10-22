@@ -52,4 +52,9 @@ public class SubTypesTestOperations {
   public Map<Door, Map<String, Door>> processDoor(Door door, @Optional Map<String, Door> doorRegistry) {
     return singletonMap(door, doorRegistry);
   }
+
+  public String pojosWithCommonNameInnerField(HasDoor hasDoor, HasShape hasShape) {
+    return hasDoor.getCommonName().getHandle().concat(hasShape.getCommonName().getArea().toString());
+  }
+
 }

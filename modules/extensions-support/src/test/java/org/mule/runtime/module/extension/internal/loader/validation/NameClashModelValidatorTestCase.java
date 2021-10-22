@@ -15,12 +15,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -51,10 +47,10 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.internal.loader.validator.NameClashModelValidator;
@@ -928,6 +924,16 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void testy() {
+    ParameterModel firstParam = getParameter("SomePojo", SomePojo.class);
+    ParameterModel secondParam = getParameter("SomeOtherPojo", SomeOtherPojo.class);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam, secondParam));
+    mockParameterGroup(operationModel, asList(firstParam, secondParam));
+
+    validate();
+  }
+
+  @Test
   public void classLoaderIsNoLongerUsedToValidateSingularizedChildNames() {
     ClassInformationAnnotation annotation = new ClassInformationAnnotation("Nonexistent", false, false, true, false, false,
                                                                            emptyList(), "Nonexistantparent", emptyList(), false);
@@ -1106,6 +1112,20 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     String anotherParameterName;
     @Parameter
     String anotherParameterName2;
+  }
+
+  @Extensible // Annotated so that the type requires wrapping
+  public static class SomePojo {
+
+    @Parameter
+    ChildTest commonName;
+  }
+
+  @Extensible
+  public static class SomeOtherPojo {
+
+    @Parameter
+    Pojo commonName;
   }
 
 }

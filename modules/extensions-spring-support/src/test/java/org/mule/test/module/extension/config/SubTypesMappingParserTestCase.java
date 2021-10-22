@@ -227,6 +227,13 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertThat(payload, hasValue(allOf(hasKey(is("rightDoor")), hasValue(instanceOf(CarDoor.class)))));
   }
 
+  @Test
+  public void pojosWithCommonNameInnerField() throws Exception {
+    final Object payload = flowRunner("pojosWithCommonNameInnerField").run().getMessage().getPayload().getValue();
+
+    assertThat(payload, is("pull2"));
+  }
+
   private void assertRicin(Object payload, Long micrograms, String victim) {
     assertThat(payload, instanceOf(Ricin.class));
     assertThat(((Ricin) payload).getMicrogramsPerKilo(), is(micrograms));
