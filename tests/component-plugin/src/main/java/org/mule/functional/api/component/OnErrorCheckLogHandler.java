@@ -48,6 +48,7 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
   protected void doInitialise() throws InitialisationException {
     // Add a dummy processor to force the routing logic into the execution chain
     setMessageProcessors(singletonList(event -> event));
+    super.doInitialise();
   }
 
   @Override
