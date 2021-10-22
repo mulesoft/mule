@@ -65,6 +65,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
+import org.mule.sdk.api.annotation.Alias;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -288,7 +289,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getWildCardFieldsDataTypes() {
-
     Collection<Field> exposedFields = getFieldsWithGetters(FruitBox.class, reflectionCache);
     assertNotNull(exposedFields);
     assertEquals(6, exposedFields.size());
@@ -506,6 +506,14 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     AccessibleObject object = mock(AccessibleObject.class);
     when(object.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class)).thenReturn(optional);
     assertThat(IntrospectionUtils.isRequired(object), is(false));
+  }
+
+  @Test
+  public void getAlias() throws Exception {
+    Field sdkField = WithFieldsWithAlias.class.getDeclaredField("sdkField");
+    Field legacyField = WithFieldsWithAlias.class.getDeclaredField("legacyField");
+    assertThat(IntrospectionUtils.getAlias(sdkField), is("newSdkField"));
+    assertThat(IntrospectionUtils.getAlias(legacyField), is("oldLegacyField"));
   }
 
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
@@ -786,5 +794,15 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
         throw new RuntimeException();
       }
     }
+  }
+
+  private static class WithFieldsWithAlias {
+
+    @Alias("newSdkField")
+    public String sdkField;
+
+    @org.mule.runtime.extension.api.annotation.Alias("oldLegacyField")
+    public String legacyField;
+
   }
 }
