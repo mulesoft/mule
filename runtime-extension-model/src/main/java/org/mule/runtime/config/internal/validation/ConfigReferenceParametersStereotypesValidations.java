@@ -6,15 +6,21 @@
  */
 package org.mule.runtime.config.internal.validation;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
 import java.util.function.Predicate;
 
 public class ConfigReferenceParametersStereotypesValidations extends AbstractReferenceParametersStereotypesValidations {
+
+  public static final ComponentIdentifier CACHE_IDENTIFIER =
+      builder().namespace(EE_PREFIX).name("cache").build();
 
   @Override
   public String getName() {
@@ -33,9 +39,12 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
 
   @Override
   protected Predicate<? super ComponentAstDependency> filter() {
-    return missing -> missing.getAllowedStereotypes().stream()
-        .anyMatch(st -> st.isAssignableTo(CONFIG)
-            || st.isAssignableTo(APP_CONFIG));
+    return missing ->
+    // Keep backwards compatibility with custom defined cachingStrategies
+    !missing.getComponent().getIdentifier().equals(CACHE_IDENTIFIER)
+        && missing.getAllowedStereotypes().stream()
+            .anyMatch(st -> st.isAssignableTo(CONFIG)
+                || st.isAssignableTo(APP_CONFIG));
   }
 
 }
