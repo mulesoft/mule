@@ -42,6 +42,10 @@ interface ComponentInterceptorAdapter {
 
   void after(ComponentLocation location, DefaultInterceptionEvent interceptionEvent, Optional<Throwable> thrown);
 
+  default boolean isErrorMappingRequired(ComponentLocation location) {
+    return false;
+  }
+
   /**
    * @return The classLoader to use as TCCL when executing the adapted interceptor.
    */
