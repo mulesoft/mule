@@ -928,6 +928,8 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     ParameterModel firstParam = getParameter("SomePojo", SomePojo.class);
     ParameterModel secondParam = getParameter("SomeOtherPojo", SomeOtherPojo.class);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam, secondParam));
+    when(extensionModel.getSubTypes()).thenReturn(ImmutableSet
+        .of(new SubTypesModel(toMetadataType(ChildTest.class), ImmutableSet.of(toMetadataType(Pojo.class)))));
     mockParameterGroup(operationModel, asList(firstParam, secondParam));
 
     validate();
@@ -1114,14 +1116,12 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     String anotherParameterName2;
   }
 
-  @Extensible // Annotated so that the type requires wrapping
   public static class SomePojo {
 
     @Parameter
     ChildTest commonName;
   }
 
-  @Extensible
   public static class SomeOtherPojo {
 
     @Parameter
