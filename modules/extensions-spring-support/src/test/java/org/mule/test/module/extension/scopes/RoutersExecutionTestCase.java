@@ -16,6 +16,10 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.DISPOSE_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.INITIALIZE_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.START_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.STOP_CALL_COUNT;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.event.Event;
@@ -27,7 +31,6 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -66,7 +69,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Before
   public void before() {
-    HeisenbergOperationLifecycleValidator.resetCounters();
+    resetExtensionLifecycleCounters();
   }
 
   @After
@@ -261,23 +264,27 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     FlowConstruct flow = getFlowConstruct("routerLifecycleIsAttachedToFlowLifecycle");
     assertThat(flow.getLifecycleState().isStopped(), is(true));
 
-    HeisenbergOperationLifecycleValidator.resetCounters();
+    resetExtensionLifecycleCounters();
     ((Startable) flow).start();
     assertLifecycleMethodsCalls(0, 2, 0, 0);
 
-    HeisenbergOperationLifecycleValidator.resetCounters();
+    resetExtensionLifecycleCounters();
     ((Stoppable) flow).stop();
     assertLifecycleMethodsCalls(0, 0, 2, 0);
 
-    HeisenbergOperationLifecycleValidator.resetCounters();
+    resetExtensionLifecycleCounters();
     ((Disposable) flow).dispose();
     assertLifecycleMethodsCalls(0, 0, 0, 2);
   }
 
   private void assertLifecycleMethodsCalls(int initializeCalls, int startCalls, int stopCalls, int disposeCalls) {
-    assertThat(HeisenbergOperationLifecycleValidator.INITIALIZE_CALL_COUNT, is(initializeCalls));
-    assertThat(HeisenbergOperationLifecycleValidator.START_CALL_COUNT, is(startCalls));
-    assertThat(HeisenbergOperationLifecycleValidator.STOP_CALL_COUNT, is(stopCalls));
-    assertThat(HeisenbergOperationLifecycleValidator.DISPOSE_CALL_COUNT, is(disposeCalls));
+    assertThat(INITIALIZE_CALL_COUNT, is(initializeCalls));
+    assertThat(START_CALL_COUNT, is(startCalls));
+    assertThat(STOP_CALL_COUNT, is(stopCalls));
+    assertThat(DISPOSE_CALL_COUNT, is(disposeCalls));
+  }
+
+  private void resetExtensionLifecycleCounters() {
+    INITIALIZE_CALL_COUNT = START_CALL_COUNT = STOP_CALL_COUNT = DISPOSE_CALL_COUNT = 0;
   }
 }

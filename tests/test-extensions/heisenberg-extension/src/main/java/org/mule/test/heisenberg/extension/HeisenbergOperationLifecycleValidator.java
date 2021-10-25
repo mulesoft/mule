@@ -27,10 +27,6 @@ public class HeisenbergOperationLifecycleValidator implements Initialisable, Sta
 
   private String state = NOT_INITIALISED;
 
-  public static void resetCounters() {
-    INITIALIZE_CALL_COUNT = START_CALL_COUNT = STOP_CALL_COUNT = DISPOSE_CALL_COUNT = 0;
-  }
-
   @MediaType(ANY)
   public void lifecycleValidator(String expected) {
     if (!expected.equals(state)) {

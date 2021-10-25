@@ -1120,9 +1120,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private List<ValueResolver> getRoutes() {
-    return resolverSet.getResolvers().values().stream()
-        .filter(resolver -> resolver instanceof RouteBuilderValueResolver).collect(toList());
+  private Collection<RouteBuilderValueResolver> getRoutes() {
+    return resolverSet.getResolvers().values().stream().filter(resolver -> resolver instanceof RouteBuilderValueResolver)
+        .map(resolver -> (RouteBuilderValueResolver) resolver).collect(toList());
   }
 
   private void outerPublisherSubscribedTo() {
