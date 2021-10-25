@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.doProcessMuleProperties;
+import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.PROPERTY_ELEMENT;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.ast.api.ComponentAst;
@@ -37,14 +40,14 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
  */
 class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> {
 
-  private static final String REF_PARAMETER = "ref";
-  private static final String CLASS_PARAMETER = "class";
+  static final String REF_PARAMETER = "ref";
+  static final String CLASS_PARAMETER = "class";
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateComponentBeanDefinitionRequest createBeanDefinitionRequest) {
     ComponentAst component = createBeanDefinitionRequest.getComponent();
-    if (component == null || !component.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
+    if (component == null || !component.getIdentifier().equals(OBJECT_IDENTIFIER)) {
       return false;
     }
 
@@ -88,10 +91,13 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentB
                                      BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
     // TODO (MULE-19608) remove this method, by having a component building definition that
     // allows to have the properties being set as any other component
-    doProcessMuleProperties(beanDefinitionBuilder,
-                            ((List<ComponentAst>) component.getParameter("General", "property")
-                                .getValue().getRight())
-                                    .stream());
+    List<ComponentAst> properties = (List<ComponentAst>) component
+        .getParameter(DEFAULT_GROUP_NAME, PROPERTY_ELEMENT)
+        .getValue().getRight();
+
+    if (properties != null) {
+      doProcessMuleProperties(beanDefinitionBuilder, properties.stream());
+    }
   }
 
 }
