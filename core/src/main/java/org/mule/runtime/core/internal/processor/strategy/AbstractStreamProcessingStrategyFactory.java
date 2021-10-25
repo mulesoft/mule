@@ -10,6 +10,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.getInteger;
 import static java.lang.Integer.max;
 import static java.lang.Long.max;
+import static java.lang.Math.min;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
@@ -102,7 +103,7 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
   }
 
   protected int resolveParallelism() {
-    return max(CORES, getMaxConcurrency());
+    return min(CORES, getMaxConcurrency());
   }
 
   /**
