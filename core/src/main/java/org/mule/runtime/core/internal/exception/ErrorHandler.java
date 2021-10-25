@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.location.Location;
@@ -22,7 +24,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
@@ -30,7 +31,8 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
+import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -61,9 +63,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private ErrorType anyErrorType;
   protected String name;
-
-  @Inject
-  private NotificationDispatcher notificationDispatcher;
 
   @Inject
   private ErrorTypeRepository errorTypeRepository;
@@ -187,7 +186,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       }
       OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
       acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerLocation().toString());
-      acceptsAllOnErrorPropagate.setNotificationFirer(notificationDispatcher);
+      acceptsAllOnErrorPropagate.setExceptionListener(new DefaultExceptionListener());
       initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
       this.exceptionListeners.add(acceptsAllOnErrorPropagate);
     }
@@ -246,8 +245,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   public void setStatistics(FlowConstructStatistics flowStatistics) {
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
-      if (exceptionListener instanceof AbstractExceptionListener) {
-        ((AbstractExceptionListener) exceptionListener).setStatistics(flowStatistics);
+      if (exceptionListener instanceof AbstractDeclaredExceptionListener) {
+        ((AbstractDeclaredExceptionListener) exceptionListener).getExceptionListener().setStatistics(flowStatistics);
+      }
+      if (exceptionListener instanceof OnCriticalErrorHandler) {
+        ((OnCriticalErrorHandler) exceptionListener).getExceptionListener().setStatistics(flowStatistics);
       }
     }
   }

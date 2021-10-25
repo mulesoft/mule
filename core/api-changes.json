@@ -3,6 +3,26 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.noLongerInheritsFromClass",
+          "old": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "new": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "superClass": "org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "elementKind": "class",
+          "justification": "MULE-19595: Used only by OnErrorCheckLogHandler, already adapted."
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "new": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "superClass": "org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "elementKind": "class",
+          "justification": "MULE-19595: Used only by OnErrorCheckLogHandler, already adapted."
+        },
+        {
           "code": "java.class.removed",
           "old": "class org.mule.runtime.core.privileged.el.context.EventVariablesMapContext",
           "package": "org.mule.runtime.core.privileged.el.context",

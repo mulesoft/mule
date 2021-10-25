@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
@@ -29,7 +31,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -72,7 +74,7 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
 
   protected CoreEvent muleEvent;
 
-  protected abstract AbstractExceptionListener getErrorHandler();
+  protected abstract AbstractDeclaredExceptionListener getErrorHandler();
 
   @Before
   public void before() throws Exception {
@@ -93,25 +95,21 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
   @Test
   @Issue("MULE-18562")
   public void testUnsuppressedErrorMustBeAccepted() throws InitialisationException {
-    if (getErrorHandler() instanceof TemplateOnErrorHandler) {
-      TemplateOnErrorHandler onErrorHandler = (TemplateOnErrorHandler) getErrorHandler();
-      CoreEvent event = getCoreEventWithSuppressedError(onErrorHandler.getMuleContext());
-      onErrorHandler.setErrorType("MULE:UNSUPPRESSED");
-      initialiseIfNeeded(onErrorHandler, onErrorHandler.getMuleContext());
-      assertThat(onErrorHandler.accept(event), is(true));
-    }
+    TemplateOnErrorHandler onErrorHandler = (TemplateOnErrorHandler) getErrorHandler();
+    CoreEvent event = getCoreEventWithSuppressedError(onErrorHandler.getMuleContext());
+    onErrorHandler.setErrorType("MULE:UNSUPPRESSED");
+    initialiseIfNeeded(onErrorHandler, onErrorHandler.getMuleContext());
+    assertThat(onErrorHandler.accept(event), is(true));
   }
 
   @Test
   @Issue("MULE-18562")
   public void testSuppressedErrorMustBeAccepted() throws InitialisationException {
-    if (getErrorHandler() instanceof TemplateOnErrorHandler) {
-      TemplateOnErrorHandler onErrorHandler = (TemplateOnErrorHandler) getErrorHandler();
-      CoreEvent event = getCoreEventWithSuppressedError(onErrorHandler.getMuleContext());
-      onErrorHandler.setErrorType("MULE:SUPPRESSED");
-      initialiseIfNeeded(onErrorHandler, onErrorHandler.getMuleContext());
-      assertThat(onErrorHandler.accept(event), is(true));
-    }
+    TemplateOnErrorHandler onErrorHandler = (TemplateOnErrorHandler) getErrorHandler();
+    CoreEvent event = getCoreEventWithSuppressedError(onErrorHandler.getMuleContext());
+    onErrorHandler.setErrorType("MULE:SUPPRESSED");
+    initialiseIfNeeded(onErrorHandler, onErrorHandler.getMuleContext());
+    assertThat(onErrorHandler.accept(event), is(true));
   }
 
   private CoreEvent getCoreEventWithSuppressedError(MuleContext muleContext) {

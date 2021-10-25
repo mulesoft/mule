@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
 import java.util.ArrayList;
@@ -22,7 +23,11 @@ public class ErrorHandlerFactory {
   public ErrorHandler createDefault(NotificationDispatcher notificationFirer) {
     ErrorHandler errorHandler = new ErrorHandler();
     final OnErrorPropagateHandler propagate = new OnErrorPropagateHandler();
-    propagate.setNotificationFirer(notificationFirer);
+
+    DefaultExceptionListener exceptionListener = new DefaultExceptionListener();
+    exceptionListener.setNotificationFirer(notificationFirer);
+    propagate.setExceptionListener(exceptionListener);
+
     List<MessagingExceptionHandlerAcceptor> exceptionListeners = new ArrayList<>();
     exceptionListeners.add(propagate);
     errorHandler.setExceptionListeners(exceptionListeners);

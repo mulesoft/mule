@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
@@ -31,7 +32,6 @@ import java.util.Optional;
 public class OnErrorContinueHandler extends TemplateOnErrorHandler {
 
   private ErrorTypeMatcher sourceErrorMatcher;
-
 
   public OnErrorContinueHandler() {
     setHandleException(true);
@@ -95,9 +95,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
     cpy.setHandleException(this.handleException);
     cpy.setErrorType(this.errorType);
     cpy.setMessageProcessors(this.getMessageProcessors());
-    cpy.setEnableNotifications(this.isEnableNotifications());
-    cpy.setLogException(this.logException);
-    cpy.setNotificationFirer(this.notificationFirer);
+    cpy.setExceptionListener(this.getExceptionListener());
     cpy.setAnnotations(this.getAnnotations());
     return cpy;
   }

@@ -10,6 +10,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
@@ -49,6 +50,10 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     };
   }
 
+  public void rollback(Exception ex) {
+    TransactionCoordination.getInstance().rollbackCurrentTransaction();
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -60,9 +65,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     cpy.setHandleException(this.handleException);
     cpy.setErrorType(this.errorType);
     cpy.setMessageProcessors(this.getMessageProcessors());
-    cpy.setEnableNotifications(this.isEnableNotifications());
-    cpy.setLogException(this.logException);
-    cpy.setNotificationFirer(this.notificationFirer);
+    cpy.setExceptionListener(this.getExceptionListener());
     cpy.setAnnotations(this.getAnnotations());
     return cpy;
   }

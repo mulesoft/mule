@@ -7,44 +7,38 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.Collections.singletonList;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 
 import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import io.qameta.allure.Issue;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(OnCriticalErrorHandler.class)
-@PowerMockIgnore("javax.management.*")
 public class ExceptionListenerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void setSingleGoodProcessorEndpoint() throws Exception {
-    AbstractExceptionListener router = new OnErrorPropagateHandler();
+    AbstractDeclaredExceptionListener router = new OnErrorPropagateHandler();
     Processor messageProcessor = mock(Processor.class);
     router.setMessageProcessors(singletonList(messageProcessor));
     assertNotNull(router.getMessageProcessors());
@@ -57,7 +51,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
     list.add(mock(Processor.class));
     list.add(mock(Processor.class));
 
-    AbstractExceptionListener router = new OnErrorPropagateHandler();
+    AbstractDeclaredExceptionListener router = new OnErrorPropagateHandler();
     assertNotNull(router.getMessageProcessors());
     assertEquals(0, router.getMessageProcessors().size());
 
@@ -73,6 +67,8 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
   @Issue("MULE-19344")
   public void alwaysLogFlowBackPressureExceptions() throws Exception {
     OnCriticalErrorHandler handler = spy(new OnCriticalErrorHandler(mock(ErrorTypeMatcher.class)));
+    Logger logger = mock(Logger.class);
+    handler.getExceptionListener().setLogger(logger);
     FlowBackPressureException flowBackPressureException = mock(FlowBackPressureException.class);
     MuleExceptionInfo muleExceptionInfo = new MuleExceptionInfo();
     when(flowBackPressureException.getDetailedMessage()).thenReturn("Detail");
@@ -81,7 +77,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
     handler.logException(flowBackPressureException);
     assertTrue(muleExceptionInfo.isAlreadyLogged());
     handler.logException(flowBackPressureException);
-    verifyPrivate(handler, times(2)).invoke("doLogException", anyString(), isNull());
+    verify(logger, times(2)).error(anyString());
   }
 
 }

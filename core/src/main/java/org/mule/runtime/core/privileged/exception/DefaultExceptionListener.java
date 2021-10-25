@@ -14,16 +14,15 @@ import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AU
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 
-import static java.lang.Boolean.TRUE;
 import static java.text.MessageFormat.format;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
-import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
@@ -32,66 +31,27 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.SecurityNotification;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This is the base class for exception strategies which contains several helper methods. However, you should probably inherit
- * from <code>AbstractMessagingExceptionStrategy</code> (if you are creating a Messaging Exception Strategy) or
- * <code>AbstractSystemExceptionStrategy</code> (if you are creating a System Exception Strategy) rather than directly from this
- * class.
- * 
- * @deprecated Use either {@link AbstractDeclaredExceptionListener} or {@link DefaultExceptionListener}.
- */
-@NoExtend
-@Deprecated
-public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner {
+public final class DefaultExceptionListener implements Initialisable {
 
-  protected static final String NOT_SET = "<not set>";
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExceptionListener.class);
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  private static final String NOT_SET = "<not set>";
 
-  @Inject
-  protected NotificationDispatcher notificationFirer;
+  private Logger logger = LOGGER;
 
-  private final List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
+  private NotificationDispatcher notificationFirer;
 
-  private final AtomicBoolean initialised = new AtomicBoolean(false);
-
-  private boolean enableNotifications = true;
-  protected String logException = TRUE.toString();
-
-  protected FlowConstructStatistics statistics;
+  private FlowConstructStatistics statistics;
 
   private String representation;
-
-  public List<Processor> getMessageProcessors() {
-    return messageProcessors;
-  }
-
-  public void setMessageProcessors(List<Processor> processors) {
-    if (processors != null) {
-      this.messageProcessors.clear();
-      this.messageProcessors.addAll(processors);
-    } else {
-      throw new IllegalArgumentException("List of targets = null");
-    }
-  }
 
   /**
    * The initialise method is call every time the Exception strategy is assigned to a service or connector. This implementation
@@ -102,45 +62,28 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    */
   @Override
   public final synchronized void initialise() throws InitialisationException {
-    if (!initialised.get()) {
-      doInitialise();
-      super.initialise();
-      representation = this.getClass().getSimpleName() + (getLocation() != null ? " @ " + getLocation().getLocation() : "");
-      initialised.set(true);
-    }
-  }
-
-  protected void doInitialise() throws InitialisationException {
     if (logger.isDebugEnabled()) {
       logger.debug("Initialising exception listener: " + toString());
     }
-    doInitialise(muleContext);
-  }
-
-  /**
-   * @deprecated Implement {@link #doInitialise()} instead.
-   */
-  @Deprecated
-  protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    // nothing to do
-  }
-
-  protected void fireNotification(Exception ex, CoreEvent event, ComponentLocation componentLocation) {
-    if (enableNotifications) {
-      if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
-        fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
-      } else {
-        Component component = null;
-        if (ex instanceof MessagingException) {
-          component = ((MessagingException) ex).getFailingComponent();
-        }
-        fireNotification(new ExceptionNotification(createInfo(event, ex, component),
-                                                   componentLocation != null ? componentLocation : getLocation()));
-      }
+    if (representation == null) {
+      representation = this.getClass().getSimpleName();
     }
   }
 
-  protected void fireNotification(Exception ex, CoreEvent event) {
+  private void fireNotification(Exception ex, CoreEvent event, ComponentLocation componentLocation) {
+    if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
+      fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
+    } else {
+      Component component = null;
+      if (ex instanceof MessagingException) {
+        component = ((MessagingException) ex).getFailingComponent();
+      }
+      fireNotification(new ExceptionNotification(createInfo(event, ex, component),
+                                                 componentLocation != null ? componentLocation : componentLocation));
+    }
+  }
+
+  public void fireNotification(Exception ex, CoreEvent event) {
     fireNotification(ex, event, null);
   }
 
@@ -148,7 +91,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
   }
 
-  protected Pair<MuleException, String> resolveExceptionAndMessageToLog(Throwable t) {
+  public Pair<MuleException, String> resolveExceptionAndMessageToLog(Throwable t) {
     MuleException muleException = getRootMuleException(t);
     String logMessage = null;
     if (muleException != null) {
@@ -165,21 +108,22 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     return new Pair<>(muleException, logMessage);
   }
 
-  protected void resolveAndLogException(Throwable t) {
+  public boolean resolveAndLogException(Throwable t) {
     Pair<MuleException, String> resolvedException = resolveExceptionAndMessageToLog(t);
     if (resolvedException.getSecond() == null) {
       doLogException("Caught exception in Exception Strategy: " + t.getMessage(), t);
-      return;
+      return true;
     }
     // First check if exception was not logged already
     // MULE-19344: Always log FlowBackPressureExceptions because they are created as a single instance.
     if (resolvedException.getFirst().getExceptionInfo().isAlreadyLogged()
         && !(resolvedException.getFirst() instanceof FlowBackPressureException)) {
       // Don't log anything, error while getting root or exception already logged.
-      return;
+      return false;
     }
     doLogException(resolvedException.getSecond(), null);
     resolvedException.getFirst().getExceptionInfo().setAlreadyLogged(true);
+    return true;
   }
 
   protected void doLogException(String message, Throwable t) {
@@ -187,6 +131,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       logger.error(message);
     } else {
       logger.error(message, t);
+    }
+  }
+
+  public void processStatistics() {
+    if (statistics != null && statistics.isEnabled()) {
+      statistics.incExecutionError();
     }
   }
 
@@ -211,10 +161,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         + (event.getMessage() == null ? "" : printableLogMessage), t);
   }
 
-  public boolean isInitialised() {
-    return initialised.get();
-  }
-
   /**
    * Fires a server notification to all registered {@link ExceptionNotificationListener} eventManager.
    *
@@ -228,31 +174,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  public boolean isEnableNotifications() {
-    return enableNotifications;
-  }
-
-  public void setEnableNotifications(boolean enableNotifications) {
-    this.enableNotifications = enableNotifications;
-  }
-
-  public void setLogException(String logException) {
-    this.logException = logException;
-  }
-
-  @Override
-  protected List<Processor> getOwnedMessageProcessors() {
-    return messageProcessors;
-  }
-
-  protected void commit() {
-    TransactionCoordination.getInstance().commitCurrentTransaction();
-  }
-
-  protected void rollback(Exception ex) {
-    TransactionCoordination.getInstance().rollbackCurrentTransaction();
-  }
-
   public void setNotificationFirer(NotificationDispatcher notificationFirer) {
     this.notificationFirer = notificationFirer;
   }
@@ -261,8 +182,16 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     this.statistics = statistics;
   }
 
+  public void setRepresentation(String representation) {
+    this.representation = representation;
+  }
+
   @Override
   public String toString() {
     return representation;
+  }
+
+  public void setLogger(Logger logger) {
+    this.logger = logger;
   }
 }
