@@ -102,6 +102,7 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
             .withName(schedulersNamePrefix + "." + CPU_LITE.name()));
   }
 
+  // This method is only added for testing purposes (see MULE-19878)
   protected int resolveParallelism() {
     return min(CORES, getMaxConcurrency());
   }
