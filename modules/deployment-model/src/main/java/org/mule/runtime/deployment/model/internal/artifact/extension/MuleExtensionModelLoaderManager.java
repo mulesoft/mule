@@ -7,16 +7,19 @@
 
 package org.mule.runtime.deployment.model.internal.artifact.extension;
 
-import static com.google.common.collect.Maps.newHashMap;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
+
+import static com.google.common.collect.Maps.newHashMap;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
@@ -27,6 +30,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -42,8 +46,11 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private final ArtifactClassLoader containerClassLoader;
+  private static final Class<ExtensionModelLoader> PROVIDER_CLASS = ExtensionModelLoader.class;
+
   private final Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
+
+  private Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup;
 
   /**
    * Creates an instance of the manager.
@@ -51,9 +58,13 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
    * @param containerClassLoader {@link ClassLoader} from the container.
    */
   public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader) {
-    checkNotNull(containerClassLoader, "containerClassLoader cannot be null");
+    requireNonNull(containerClassLoader, "containerClassLoader cannot be null");
+    this.extModelLoadersLookup =
+        () -> new SpiServiceRegistry().lookupProviders(PROVIDER_CLASS, containerClassLoader.getClassLoader());
+  }
 
-    this.containerClassLoader = containerClassLoader;
+  public void setExtensionModelLoadersLookup(Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
+    this.extModelLoadersLookup = extModelLoadersLookup;
   }
 
   /**
@@ -72,12 +83,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
    */
   @Override
   public void start() throws MuleException {
-    final Class<ExtensionModelLoader> providerClass = ExtensionModelLoader.class;
-    final SpiServiceRegistry spiServiceRegistry = new SpiServiceRegistry();
-    final ClassLoader classLoader = containerClassLoader.getClassLoader();
-
-    final Collection<ExtensionModelLoader> extensionModelLoaders =
-        spiServiceRegistry.lookupProviders(providerClass, classLoader);
+    final Collection<ExtensionModelLoader> extensionModelLoaders = extModelLoadersLookup.get();
     final StringBuilder sb = new StringBuilder();
     extensionModelLoaders.stream().collect(groupingBy(ExtensionModelLoader::getId))
         .entrySet().stream().filter(entry -> entry.getValue().size() > 1)
@@ -93,7 +99,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
     if (isNotBlank(sb.toString())) {
       throw new MuleRuntimeException(createStaticMessage(format(
                                                                 "There are several loaders that return the same identifier when looking up providers for '%s'. Full error list: %s",
-                                                                providerClass.getName(), sb.toString())));
+                                                                PROVIDER_CLASS.getName(), sb.toString())));
     }
 
     extensionModelLoaders.stream()
