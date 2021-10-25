@@ -104,7 +104,7 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
   }
 
   /**
-   * This method is only added for testing purposes, it should be the same as using getSinksCount in
+   * This method is only added for being able to change it in tests, it should be the same as using getSinksCount in
    * {@link ProactorStreamEmitterProcessingStrategy} (see MULE-19878).
    */
   protected int resolveParallelism() {
