@@ -21,11 +21,11 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,6 +44,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
+  private static final String TMP_FOLDER_SUFFIX = "tmp";
+
   private static Logger logger = LoggerFactory.getLogger(ClasspathModuleDiscoverer.class);
 
   public static final String MODULE_PROPERTIES = "META-INF/mule-module.properties";
@@ -54,58 +56,40 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   public static final String EXPORTED_SERVICES_PROPERTY = "artifact.export.services";
 
   private final ClassLoader classLoader;
-  private final File temporaryFolder;
   private final Function<String, File> serviceInterfaceToServiceFile;
   private final BiFunction<String, File, URL> fileToResource;
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader) {
-    this.classLoader = classLoader;
-    this.temporaryFolder = createModulesTemporaryFolder();
-    this.serviceInterfaceToServiceFile = serviceInterface -> {
-      try {
-        return createTempFile(temporaryFolder.toPath(), serviceInterface, "tmp").toFile();
-      } catch (IOException e) {
-        throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
-      }
-    };
-    this.fileToResource = (serviceInterface, serviceFile) -> {
-      try {
-        return serviceFile.toURI().toURL();
-      } catch (MalformedURLException e) {
-        throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
-      }
-    };
+    this(classLoader, createModulesTemporaryFolder());
   }
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder) {
     this.classLoader = classLoader;
-    this.temporaryFolder = temporaryFolder;
-    this.serviceInterfaceToServiceFile = serviceInterface -> {
-      try {
-        return createTempFile(temporaryFolder.toPath(), serviceInterface, "tmp").toFile();
-      } catch (IOException e) {
-        throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
-      }
-    };
-    this.fileToResource = (serviceInterface, serviceFile) -> {
-      try {
-        return serviceFile.toURI().toURL();
-      } catch (MalformedURLException e) {
-        throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
-      }
-    };
+    this.serviceInterfaceToServiceFile =
+        serviceInterface -> wrappingInIllegalStateException(() -> createTempFile(temporaryFolder.toPath(), serviceInterface,
+                                                                                 TMP_FOLDER_SUFFIX).toFile(),
+                                                            serviceInterface);
+    this.fileToResource =
+        (serviceInterface, serviceFile) -> wrappingInIllegalStateException(() -> serviceFile.toURI().toURL(), serviceInterface);
   }
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder,
+  private <T> T wrappingInIllegalStateException(CheckedSupplier<T> supplier, String serviceInterface) {
+    try {
+      return supplier.get();
+    } catch (Exception e) {
+      throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
+    }
+  }
+
+  public ClasspathModuleDiscoverer(ClassLoader classLoader,
                                    Function<String, File> serviceInterfaceToServiceFile,
                                    BiFunction<String, File, URL> fileToResource) {
     this.classLoader = classLoader;
-    this.temporaryFolder = temporaryFolder;
     this.serviceInterfaceToServiceFile = serviceInterfaceToServiceFile;
     this.fileToResource = fileToResource;
   }
 
-  protected File createModulesTemporaryFolder() {
+  protected static File createModulesTemporaryFolder() {
     File modulesTempFolder = getModulesTempFolder();
     if (modulesTempFolder.exists()) {
       try {
