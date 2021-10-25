@@ -190,5 +190,15 @@
         </subtypes:pojos-with-common-name-inner-field>
     </flow>
 
+    <flow name="kill">
+        <subtypes:kill>
+            <subtypes:deadly>
+                <subtypes:weapon>
+                    <subtypes:revolver bullets="6"/>
+                </subtypes:weapon>
+            </subtypes:deadly>
+        </subtypes:kill>
+    </flow>
+
     <subtypes:revolver name="sledgeHammer's" bullets="1" />
 </mule>
