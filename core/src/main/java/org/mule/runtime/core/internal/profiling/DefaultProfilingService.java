@@ -17,12 +17,14 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
+import org.mule.runtime.api.profiling.tracing.TaskTracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
+import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTaskTracingService;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
-  private final TaskTracingService taskTracingService = null;
+  private final TaskTracingService taskTracingService = new ThreadLocalTaskTracingService();
 
   private ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 
@@ -91,6 +93,11 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
     return threadSnapshotCollector;
+  }
+
+  @Override
+  public TaskTracingService getTaskTracingService() {
+    return taskTracingService;
   }
 
   @Override
