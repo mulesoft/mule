@@ -76,6 +76,11 @@
             <artifactId>mule-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
+            <version>${muleSdkApiVersion}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-profiling-api</artifactId>
         </dependency>

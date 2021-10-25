@@ -163,6 +163,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.5.0-SNAPSHOT</muleDslApiVersion>
+        <muleSdkApiVersion>1.0.0-SNAPSHOT</muleSdkApiVersion>
         <muleAstVersion>1.1.0-SNAPSHOT</muleAstVersion>
         <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.5.0-SNAPSHOT</muleExtensionsApiVersion>
