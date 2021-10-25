@@ -13,7 +13,10 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -26,13 +29,6 @@ import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolic
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -50,27 +46,35 @@ import org.mule.runtime.module.extension.api.loader.java.property.CompletableCom
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RouteBuilderValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComponentMessageProcessorTestCase.class);
-
-  private ComponentMessageProcessor<ComponentModel> processor;
-
-  private ExtensionModel extensionModel;
-  private ComponentModel componentModel;
-
-  private ResolverSet resolverSet;
-  private ExtensionManager extensionManager;
-
-  private PolicyManager mockPolicyManager;
-
   @Rule
   public ExpectedException expected = ExpectedException.none();
+  private ComponentMessageProcessor<ComponentModel> processor;
+  private ExtensionModel extensionModel;
+  private ComponentModel componentModel;
+  private ResolverSet resolverSet;
+  private ExtensionManager extensionManager;
+  private PolicyManager mockPolicyManager;
 
   @Before
   public void before() throws MuleException {
@@ -154,6 +158,29 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     expectWrapped(thrown);
     from(processor.apply(just(testEvent()))).block();
+  }
+
+  @Test
+  public void messageProcessorLifecycleIsPropagatedToRouteChains() throws MuleException {
+    clearInvocations(resolverSet);
+
+    Map<String, ValueResolver<?>> valueResolvers = new HashMap<>();
+    RouteBuilderValueResolver routeBuilderValueResolver = mock(RouteBuilderValueResolver.class);
+    valueResolvers.put("resolver", routeBuilderValueResolver);
+    when(resolverSet.getResolvers()).thenReturn(valueResolvers);
+
+    processor.stop();
+    verify(routeBuilderValueResolver, times(1)).stop();
+
+    processor.dispose();
+    verify(routeBuilderValueResolver, times(1)).dispose();
+
+    // initialization of the route chains is done within the initialization of the whole value resolvers set
+    processor.initialise();
+    verify(resolverSet, times(1)).initialise();
+
+    processor.start();
+    verify(routeBuilderValueResolver, times(1)).start();
   }
 
   private void expectWrapped(Exception expect) {

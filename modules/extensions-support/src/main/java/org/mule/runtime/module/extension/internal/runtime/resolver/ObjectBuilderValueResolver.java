@@ -35,8 +35,8 @@ import java.util.Map;
 public class ObjectBuilderValueResolver<T> extends AbstractComponent
     implements ValueResolver<T>, Initialisable, ParameterValueResolver {
 
+  protected final MuleContext muleContext;
   private final ObjectBuilder<T> builder;
-  private final MuleContext muleContext;
 
   public ObjectBuilderValueResolver(ObjectBuilder<T> builder, MuleContext muleContext) {
     checkArgument(builder != null, "builder cannot be null");
