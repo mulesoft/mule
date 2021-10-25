@@ -11,6 +11,7 @@ import static org.mule.runtime.config.internal.validation.FlowRefPointsToExistin
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
 import java.util.function.Predicate;
@@ -34,7 +35,7 @@ public class ReferenceParametersStereotypesValidations extends AbstractReference
   }
 
   @Override
-  protected Predicate<? super ComponentAstDependency> filter() {
+  protected Predicate<? super ComponentAstDependency> filter(ArtifactAst artifact) {
     return missing ->
     // flow-ref is already validated by FlowRefPointsToExistingFlow
     !missing.getComponent().getIdentifier().equals(FLOW_REF_IDENTIFIER)
