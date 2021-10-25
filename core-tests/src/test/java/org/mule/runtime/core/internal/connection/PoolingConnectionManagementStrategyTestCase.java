@@ -29,6 +29,7 @@ import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -48,6 +49,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase {
 
   private static final int MAX_ACTIVE = 2;
+  private static final String LOGGER_FIELD_NAME = "LOGGER";
 
   private ConnectionProvider<Object> connectionProvider;
 
