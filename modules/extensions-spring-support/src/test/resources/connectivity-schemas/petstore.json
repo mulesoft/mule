@@ -20,6 +20,7 @@
         "Connection": {
           "mapping": {
             "password": {
+              "propertyTerm": "connectivity.password",
               "range": "string",
               "mandatory": true
             },
@@ -66,6 +67,7 @@
         "Connection": {
           "mapping": {
             "password": {
+              "propertyTerm": "connectivity.password",
               "range": "string",
               "mandatory": true
             },
@@ -112,6 +114,7 @@
         "Connection": {
           "mapping": {
             "password": {
+              "propertyTerm": "connectivity.password",
               "range": "string",
               "mandatory": true
             },
@@ -158,6 +161,7 @@
         "Connection": {
           "mapping": {
             "password": {
+              "propertyTerm": "connectivity.password",
               "range": "string",
               "mandatory": true
             },
@@ -204,6 +208,7 @@
         "Connection": {
           "mapping": {
             "password": {
+              "propertyTerm": "connectivity.password",
               "range": "string",
               "mandatory": true
             },
