@@ -12,7 +12,9 @@ import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensi
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Provides access to the {@link ExtensionModelLoader} available in the container.
@@ -29,6 +31,18 @@ public interface ExtensionModelLoaderRepository {
    */
   public static ExtensionModelLoaderRepository getExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader) {
     return new MuleExtensionModelLoaderManager(containerClassLoader);
+  }
+
+  /**
+   * @return a repository that manages the lifecycle of the {@link ExtensionModelLoader} available in the
+   *         {@link ExtensionModelLoaderRepository}.
+   * @since 4.5
+   */
+  public static ExtensionModelLoaderRepository getExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader,
+                                                                              Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
+    MuleExtensionModelLoaderManager muleExtensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
+    muleExtensionModelLoaderManager.setExtensionModelLoadersLookup(extModelLoadersLookup);
+    return muleExtensionModelLoaderManager;
   }
 
   /**

@@ -13,7 +13,10 @@ import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * Provides access to all Mule modules available on the container.
@@ -31,6 +34,22 @@ public interface ModuleRepository {
     return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
                                                                      new ClasspathModuleDiscoverer(classLoader,
                                                                                                    temporaryFolder)));
+  }
+
+  /**
+   * Creates a ModuleRepository based on the modules available on the provided {@code classLoader}.
+   * 
+   * @param classLoader     where to look for modules.
+   * @param temporaryFolder
+   * @return
+   */
+  public static ModuleRepository createModuleRepository(ClassLoader classLoader, File temporaryFolder,
+                                                        Function<String, File> serviceInterfaceToServiceFile,
+                                                        BiFunction<String, File, URL> fileToResource) {
+    return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
+                                                                     new ClasspathModuleDiscoverer(classLoader, temporaryFolder,
+                                                                                                   serviceInterfaceToServiceFile,
+                                                                                                   fileToResource)));
   }
 
   /**
