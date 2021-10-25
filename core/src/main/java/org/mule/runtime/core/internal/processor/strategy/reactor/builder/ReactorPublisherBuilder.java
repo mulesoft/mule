@@ -16,16 +16,17 @@ import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.profiling.OperationMetadata;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 /**
  * Builder of a {@link Publisher} with common operations in {@link Mono} and {@link Flux}.
@@ -81,9 +82,14 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    */
   ReactorPublisherBuilder<T> doOnSubscribe(Consumer<? super Subscription> onSubscribe);
 
-  ReactorPublisherBuilder<T> profileProcessingStrategyEvent(CoreProfilingService profilingService,
-                                                            ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
+  ReactorPublisherBuilder<T> profileProcessingStrategyEvent(CoreProfilingService profilingService, ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                             Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer);
+  ReactorPublisherBuilder<T> setTaskContext(TaskTracingService taskTracingService, ComponentLocation location);
+
+  ReactorPublisherBuilder<T> profileProcessingStrategyEvent(ComponentLocation location,
+                                                            Optional<? extends ProfilingDataProducer> dataProducer,
+                                                            String artifactId,
+                                                            String artifactType);
 
   T build();
 
@@ -134,20 +140,22 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
+    public ReactorPublisherBuilder<Mono<CoreEvent>> setTaskContext(TaskTracingService taskTracingService,
+                                                                   ComponentLocation location) {
+      TaskTracingContext taskTracingContext = new DefaultTaskTracingContext(new DefaultComponentMetadata(location));
+      mono = mono.doOnNext(coreEvent -> taskTracingService.setCurrentTaskTracingContext(taskTracingContext));
+      return this;
+    }
+
+    @Override
     public ReactorPublisherBuilder<Mono<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
                                                                                    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                                                    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
-      // TODO: This could be done only once but might need refactoring (better to leave it for the granularity discussion).
-      // TODO: Add a feature flag ever "thread traceability" or something like that (always false by default).
-      if (getCurrentThreadProfilingContext() != null) {
-        getCurrentThreadProfilingContext().setRunningComponentMetadata(new ComponentMetadata(location));
-      }
       mono = profilingService.enrichWithProfilingEventMono(mono, dataProducer, transformer);
       return this;
     }
 
   }
-
 
   /**
    * Builder for a {@link Flux}.
@@ -192,6 +200,14 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> doOnSubscribe(Consumer<? super Subscription> onSubscribe) {
       flux = flux.doOnSubscribe(onSubscribe);
+      return this;
+    }
+
+    @Override
+    public ReactorPublisherBuilder<Flux<CoreEvent>> setTaskContext(TaskTracingService taskTracingService,
+                                                                   ComponentLocation location) {
+      TaskTracingContext taskTracingContext = new DefaultTaskTracingContext(new DefaultComponentMetadata(location));
+      flux = flux.doOnNext(coreEvent -> taskTracingService.setCurrentTaskTracingContext(taskTracingContext));
       return this;
     }
 
