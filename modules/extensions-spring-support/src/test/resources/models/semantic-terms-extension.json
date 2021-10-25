@@ -5024,7 +5024,9 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.password"
+              ],
               "name": "password",
               "description": "",
               "modelProperties": {}
