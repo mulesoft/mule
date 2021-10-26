@@ -10,6 +10,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.getInteger;
 import static java.lang.Integer.max;
 import static java.lang.Long.max;
+import static java.lang.Math.min;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
@@ -19,6 +20,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.*;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.util.concurrent.Queues.isPowerOfTwo;
 
@@ -101,8 +103,12 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
             .withName(schedulersNamePrefix + "." + CPU_LITE.name()));
   }
 
+  /**
+   * This method is only added for being able to change it in tests, it should be the same as using getSinksCount in
+   * {@link ProactorStreamEmitterProcessingStrategy} (see MULE-19878).
+   */
   protected int resolveParallelism() {
-    return max(CORES, getMaxConcurrency());
+    return min(CORES, getMaxConcurrency());
   }
 
   /**
