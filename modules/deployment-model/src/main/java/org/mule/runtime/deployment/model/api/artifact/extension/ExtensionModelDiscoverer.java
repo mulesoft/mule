@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.synchronizedSet;
 import static java.util.stream.Collectors.toSet;
 
 import static com.google.common.collect.ImmutableSet.of;
@@ -96,7 +97,7 @@ public class ExtensionModelDiscoverer {
    *         {@link ExtensionModel}.
    */
   public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionDiscoveryRequest discoveryRequest) {
-    final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = new HashSet<>();
+    final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = synchronizedSet(new HashSet<>());
 
     if (discoveryRequest.isParallelDiscovery()) {
       discoveryRequest.getArtifactPlugins()
