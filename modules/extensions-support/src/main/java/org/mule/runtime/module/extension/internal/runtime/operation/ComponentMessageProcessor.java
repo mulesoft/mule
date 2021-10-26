@@ -143,6 +143,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.retry.RetryP
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigOverrideValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RouteBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.result.PayloadTargetReturnDelegate;
@@ -178,7 +179,6 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -1079,6 +1079,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       startIfNeeded(nestedChain);
     }
 
+    startIfNeeded(getRoutes());
+
     if (ownedProcessingStrategy) {
       LOGGER.debug("Starting own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       startIfNeeded(processingStrategy);
@@ -1099,6 +1101,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       LOGGER.debug("Sttopping nested chain ({}) of component '{}'...", nestedChain, processorPath);
       stopIfNeeded(nestedChain);
     }
+
+    stopIfNeeded(getRoutes());
+
     stopIfNeeded(componentExecutor);
     LOGGER.debug("Stopping inner flux of component '{}'...", processorPath);
     stopInnerFlux();
@@ -1114,6 +1119,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       outerFluxCompletionScheduler.stop();
       outerFluxCompletionScheduler = null;
     }
+  }
+
+  private Collection<RouteBuilderValueResolver> getRoutes() {
+    return resolverSet.getResolvers().values().stream().filter(resolver -> resolver instanceof RouteBuilderValueResolver)
+        .map(resolver -> (RouteBuilderValueResolver) resolver).collect(toList());
   }
 
   private void outerPublisherSubscribedTo() {
@@ -1143,6 +1153,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       LOGGER.debug("Disposing nested chain ({}) of component '{}'...", nestedChain, processorPath);
       disposeIfNeeded(nestedChain, LOGGER);
     }
+
+    disposeIfNeeded(getRoutes(), LOGGER);
+
     disposeIfNeeded(componentExecutor, LOGGER);
     if (ownedProcessingStrategy) {
       LOGGER.debug("Disposing own processing strategy ({}) of component '{}'...", ownedProcessingStrategy, processorPath);
