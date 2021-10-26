@@ -79,6 +79,7 @@ public class ExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
                                                                              singletonList(new Pair<>(descriptor,
                                                                                                       artifactClassLoader)),
                                                                              emptySet(),
+                                                                             false,
                                                                              false));
 
     assertThat(extensionDeclared.get(), is(true));

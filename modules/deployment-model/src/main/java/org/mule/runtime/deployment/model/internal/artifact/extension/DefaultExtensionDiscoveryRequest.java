@@ -21,15 +21,18 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   private final ExtensionModelLoaderRepository loaderRepository;
   private final List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins;
   private final Set<ExtensionModel> parentArtifactExtensions;
+  private final boolean parallelDiscovery;
   private final boolean enrichDescriptions;
 
   public DefaultExtensionDiscoveryRequest(ExtensionModelLoaderRepository loaderRepository,
                                           List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
+                                          boolean parallelDiscovery,
                                           boolean enrichDescriptions) {
     this.loaderRepository = loaderRepository;
     this.artifactPlugins = artifactPlugins;
     this.parentArtifactExtensions = parentArtifactExtensions;
+    this.parallelDiscovery = parallelDiscovery;
     this.enrichDescriptions = enrichDescriptions;
   }
 
@@ -46,6 +49,11 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   @Override
   public Set<ExtensionModel> getParentArtifactExtensions() {
     return parentArtifactExtensions;
+  }
+
+  @Override
+  public boolean isParallelDiscovery() {
+    return parallelDiscovery;
   }
 
   @Override
