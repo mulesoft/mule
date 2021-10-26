@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
+
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -37,9 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.io.input.ReaderInputStream;
-
 import com.google.common.collect.ImmutableList;
+
+import org.apache.commons.io.input.ReaderInputStream;
 
 public abstract class AbstractCoreValidationTestCase {
 

@@ -29,7 +29,7 @@ public abstract class AbstractReferenceParametersStereotypesValidations implemen
     ArtifactAstDependencyGraph dependencyGraph = ArtifactAstDependencyGraphFactory.generateFor(artifact);
     return dependencyGraph.getMissingDependencies()
         .stream()
-        .filter(filter())
+        .filter(filter(artifact))
         .map(missing -> create(missing.getComponent(), missing.getParameter(), this,
                                format("Referenced component '%s' must be one of stereotypes %s.",
                                       missing.getName(),
@@ -39,6 +39,6 @@ public abstract class AbstractReferenceParametersStereotypesValidations implemen
         .collect(toList());
   }
 
-  protected abstract Predicate<? super ComponentAstDependency> filter();
+  protected abstract Predicate<? super ComponentAstDependency> filter(ArtifactAst artifact);
 
 }

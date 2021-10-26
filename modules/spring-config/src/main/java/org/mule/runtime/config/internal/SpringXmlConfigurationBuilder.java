@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
@@ -25,6 +17,16 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+
+import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -274,6 +276,21 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (disableXmlValidations) {
       builder.withSchemaValidationsDisabled();
     }
+
+    switch (artifactType) {
+      case APP:
+        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.APPLICATION);
+        break;
+      case DOMAIN:
+        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.DOMAIN);
+        break;
+      case POLICY:
+        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.POLICY);
+        break;
+      default:
+        break;
+    }
+
     return builder.build();
   }
 
@@ -284,6 +301,16 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         return parentArtifactAst;
       } else {
         return new BaseArtifactAst() {
+
+          @Override
+          public String getArtifactName() {
+            return muleArtifactContext.getApplicationName();
+          }
+
+          @Override
+          public org.mule.runtime.ast.api.ArtifactType getArtifactType() {
+            return org.mule.runtime.ast.api.ArtifactType.POLICY;
+          }
 
           @Override
           public Set<ExtensionModel> dependencies() {
