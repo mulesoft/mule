@@ -10,6 +10,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.getInteger;
 import static java.lang.Integer.max;
 import static java.lang.Long.max;
+import static java.lang.Math.min;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
@@ -101,8 +103,12 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
             .withName(schedulersNamePrefix + "." + CPU_LITE.name()));
   }
 
+  /**
+   * This method is only added for being able to change it in tests, it should be the same as using getSinksCount in
+   * {@link ProactorStreamEmitterProcessingStrategy} (see MULE-19878).
+   */
   protected int resolveParallelism() {
-    return max(CORES, getMaxConcurrency());
+    return min(CORES, getMaxConcurrency());
   }
 
   /**
