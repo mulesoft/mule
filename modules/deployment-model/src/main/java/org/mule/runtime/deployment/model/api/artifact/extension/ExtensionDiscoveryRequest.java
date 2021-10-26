@@ -72,7 +72,7 @@ public interface ExtensionDiscoveryRequest {
     private ExtensionModelLoaderRepository loaderRepository;
     private List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins;
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
-    private boolean parallelDiscovery = true;
+    private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
 
     public ExtensionDiscoveryRequestBuilder setLoaderRepository(ExtensionModelLoaderRepository loaderRepository) {
