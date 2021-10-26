@@ -14,6 +14,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toSet;
 
+import static com.google.common.collect.ImmutableSet.of;
+
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
@@ -25,7 +27,6 @@ import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +42,8 @@ import com.google.common.collect.ImmutableSet;
  * @since 4.0
  */
 public class ExtensionModelDiscoverer {
+
+  private static final Set<String> LOADER_IDS_NOT_REQUIRING_DEPENDENCIES_DSL = of("crafted", "java", "soap");
 
   /**
    * For each artifactPlugin discovers the {@link ExtensionModel}.
@@ -94,27 +97,63 @@ public class ExtensionModelDiscoverer {
    */
   public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionDiscoveryRequest discoveryRequest) {
     final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = new HashSet<>();
-    discoveryRequest.getArtifactPlugins().forEach(artifactPlugin -> {
-      Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
-      extensions.addAll(discoveryRequest.getParentArtifactExtensions());
-      final ArtifactPluginDescriptor artifactPluginDescriptor = artifactPlugin.getFirst();
-      Optional<LoaderDescriber> loaderDescriber = artifactPluginDescriptor.getExtensionModelDescriptorProperty();
-      ClassLoader artifactClassloader = artifactPlugin.getSecond().getClassLoader();
-      String artifactName = artifactPluginDescriptor.getName();
-      ExtensionModel extension = loaderDescriber
-          .map(describer -> discoverExtensionThroughJsonDescriber(discoveryRequest.getLoaderRepository(), describer,
-                                                                  extensions, artifactClassloader,
-                                                                  artifactName,
-                                                                  discoveryRequest.isEnrichDescriptions()
-                                                                      ? emptyMap()
-                                                                      : singletonMap("EXTENSION_LOADER_DISABLE_DESCRIPTIONS_ENRICHMENT",
-                                                                                     true)))
-          .orElse(null);
-      if (extension != null) {
-        descriptorsWithExtensions.add(new Pair<>(artifactPluginDescriptor, extension));
-      }
-    });
+
+    if (discoveryRequest.isParallelDiscovery()) {
+      discoveryRequest.getArtifactPlugins()
+          .parallelStream()
+          .filter(artifactPlugin -> !requiresDependencyDsl(artifactPlugin))
+          .forEach(artifactPlugin -> discoverPluginExtensionModel(discoveryRequest,
+                                                                  discoveryRequest.getParentArtifactExtensions(),
+                                                                  descriptorsWithExtensions, artifactPlugin));
+
+      discoveryRequest.getArtifactPlugins()
+          // an xml-sdk extension may use the dsl of another xml-sdk extension, so these cannot be parallelized
+          .stream()
+          .filter(artifactPlugin -> requiresDependencyDsl(artifactPlugin))
+          .forEach(artifactPlugin -> {
+            Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
+            extensions.addAll(discoveryRequest.getParentArtifactExtensions());
+            discoverPluginExtensionModel(discoveryRequest, extensions, descriptorsWithExtensions, artifactPlugin);
+          });
+    } else {
+      discoveryRequest.getArtifactPlugins()
+          .stream()
+          .forEach(artifactPlugin -> {
+            Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
+            extensions.addAll(discoveryRequest.getParentArtifactExtensions());
+            discoverPluginExtensionModel(discoveryRequest, extensions, descriptorsWithExtensions, artifactPlugin);
+          });
+    }
+
     return descriptorsWithExtensions;
+  }
+
+  protected boolean requiresDependencyDsl(Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
+    return artifactPlugin.getFirst().getExtensionModelDescriptorProperty()
+        .map(extModelDescriptorProperty -> extModelDescriptorProperty.getId())
+        .map(loaderId -> !LOADER_IDS_NOT_REQUIRING_DEPENDENCIES_DSL.contains(loaderId))
+        .orElse(true);
+  }
+
+  protected void discoverPluginExtensionModel(ExtensionDiscoveryRequest discoveryRequest, Set<ExtensionModel> extensions,
+                                              final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions,
+                                              Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
+    final ArtifactPluginDescriptor artifactPluginDescriptor = artifactPlugin.getFirst();
+    Optional<LoaderDescriber> loaderDescriber = artifactPluginDescriptor.getExtensionModelDescriptorProperty();
+    ClassLoader artifactClassloader = artifactPlugin.getSecond().getClassLoader();
+    String artifactName = artifactPluginDescriptor.getName();
+    ExtensionModel extension = loaderDescriber
+        .map(describer -> discoverExtensionThroughJsonDescriber(discoveryRequest.getLoaderRepository(), describer,
+                                                                extensions, artifactClassloader,
+                                                                artifactName,
+                                                                discoveryRequest.isEnrichDescriptions()
+                                                                    ? emptyMap()
+                                                                    : singletonMap("EXTENSION_LOADER_DISABLE_DESCRIPTIONS_ENRICHMENT",
+                                                                                   true)))
+        .orElse(null);
+    if (extension != null) {
+      descriptorsWithExtensions.add(new Pair<>(artifactPluginDescriptor, extension));
+    }
   }
 
   /**
@@ -123,14 +162,11 @@ public class ExtensionModelDiscoverer {
    * @return {@link Set} of the runtime provided {@link ExtensionModel}s.
    */
   public Set<ExtensionModel> discoverRuntimeExtensionModels() {
-    final Set<ExtensionModel> extensionModels = new HashSet<>();
-
-    Collection<RuntimeExtensionModelProvider> runtimeExtensionModelProviders = new SpiServiceRegistry()
-        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader());
-    for (RuntimeExtensionModelProvider runtimeExtensionModelProvider : runtimeExtensionModelProviders) {
-      extensionModels.add(runtimeExtensionModelProvider.createExtensionModel());
-    }
-    return extensionModels;
+    return new SpiServiceRegistry()
+        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
+        .stream()
+        .map(RuntimeExtensionModelProvider::createExtensionModel)
+        .collect(toSet());
   }
 
   /**

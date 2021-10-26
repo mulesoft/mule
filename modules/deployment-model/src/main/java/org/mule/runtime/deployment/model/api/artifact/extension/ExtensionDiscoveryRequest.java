@@ -51,6 +51,17 @@ public interface ExtensionDiscoveryRequest {
   Set<ExtensionModel> getParentArtifactExtensions();
 
   /**
+   * Parallel discovery will try to parallelize only the discovery for extensions that do not depend on the DSL of other
+   * extensions.
+   * <p>
+   * Parallelism is achieved using the {@code fork-join} pool.
+   * 
+   * @return {@code true} if the extension model discovery process will attempt to discover an extension model from the
+   *         classloaders in parallel instead of sequentially.
+   */
+  boolean isParallelDiscovery();
+
+  /**
    * @return {@code true} if any {@link DeclarationEnricher} that adds descriptions to a {@link ExtensionDeclaration} must be
    *         executed, {@code false} it if must be skipped.
    */
@@ -61,6 +72,7 @@ public interface ExtensionDiscoveryRequest {
     private ExtensionModelLoaderRepository loaderRepository;
     private List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins;
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
+    private boolean parallelDiscovery = true;
     private boolean enrichDescriptions = true;
 
     public ExtensionDiscoveryRequestBuilder setLoaderRepository(ExtensionModelLoaderRepository loaderRepository) {
@@ -83,9 +95,14 @@ public interface ExtensionDiscoveryRequest {
       return this;
     }
 
+    public ExtensionDiscoveryRequestBuilder setParallelDiscovery(boolean parallelDiscovery) {
+      this.parallelDiscovery = parallelDiscovery;
+      return this;
+    }
+
     public ExtensionDiscoveryRequest build() {
       return new DefaultExtensionDiscoveryRequest(loaderRepository, artifactPlugins, parentArtifactExtensions,
-                                                  enrichDescriptions);
+                                                  parallelDiscovery, enrichDescriptions);
     }
   }
 }
