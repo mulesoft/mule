@@ -167,7 +167,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     initialiseIfNeeded(this, muleContext);
 
+    final BaseMuleArtifactContext baseMuleArtifactContext = createBaseApplicationContext(muleContext);
+    createBaseSpringRegistry(muleContext, baseMuleArtifactContext);
+
     muleArtifactContext = createApplicationContext(muleContext);
+    muleArtifactContext.setParent(baseMuleArtifactContext);
     createSpringRegistry(muleContext, muleArtifactContext);
   }
 
@@ -177,6 +181,24 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
    * @param allResources the list of {@link ConfigResource} to be loaded
    */
   protected void addResources(List<ConfigResource> allResources) {}
+
+  private BaseMuleArtifactContext createBaseApplicationContext(MuleContext muleContext) {
+    // OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
+    // OptionalObjectsController parentObjectController = null;
+    //
+    // if (parentContext instanceof MuleArtifactContext) {
+    // parentObjectController = ((MuleArtifactContext) parentContext).getOptionalObjectsController();
+    // }
+    //
+    // if (parentObjectController != null) {
+    // applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
+    // }
+
+    final BaseMuleArtifactContext baseMuleArtifactContext =
+        new BaseMuleArtifactContext(muleContext/* , applicationObjectcontroller */, artifactType);
+    // serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
+    return baseMuleArtifactContext;
+  }
 
   private MuleArtifactContext createApplicationContext(MuleContext muleContext) throws Exception {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
@@ -382,6 +404,39 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     return parentLazyComponentInitializer;
   }
 
+  private void createBaseSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception {
+    SpringRegistry registry;
+
+    // Note: The SpringRegistry must be created before
+    // muleArtifactContext.refresh() gets called because
+    // some beans may try to look up other beans via the Registry during
+    // preInstantiateSingletons().
+    if (parentContext != null) {
+      registry = createRegistryWithParentContext(muleContext, applicationContext, parentContext);
+
+      if ((parentContext instanceof MuleArtifactContext &&
+          ((MuleArtifactContext) parentContext).getMuleContext().getRegistry() instanceof MuleRegistryHelper)) {
+        MuleRegistryHelper parentMuleRegistryHelper =
+            (MuleRegistryHelper) ((MuleArtifactContext) parentContext).getMuleContext().getRegistry();
+
+        CompositeMuleRegistryHelper compositeMuleRegistryHelper =
+            new CompositeMuleRegistryHelper(registry, muleContext, parentMuleRegistryHelper);
+        // ((MuleContextWithRegistry) muleContext).setRegistry(compositeMuleRegistryHelper);
+        // } else {
+        // ((MuleContextWithRegistry) muleContext).setRegistry(registry);
+      }
+
+    } else {
+      registry = new SpringRegistry(applicationContext, muleContext, null,
+                                    ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
+
+      // ((MuleContextWithRegistry) muleContext).setRegistry(registry);
+    }
+
+    registry.initialise();
+    // ((DefaultMuleContext) muleContext).setInjector(registry);
+  }
+
   private void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception {
     // Note: The SpringRegistry must be created before
     // muleArtifactContext.refresh() gets called because
@@ -404,7 +459,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     } else {
       registry = new SpringRegistry(applicationContext, muleContext,
-                                    new ConfigurationDependencyResolver(muleArtifactContext.getApplicationModel()),
+                                    new ConfigurationDependencyResolver(((MuleArtifactContext) applicationContext)
+                                        .getApplicationModel()),
                                     ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
 
       ((MuleContextWithRegistry) muleContext).setRegistry(registry);
@@ -413,14 +469,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     ((DefaultMuleContext) muleContext).setInjector(registry);
   }
 
-  private void createRegistryWithParentContext(MuleContext muleContext, ApplicationContext applicationContext,
-                                               ApplicationContext parentContext)
+  private SpringRegistry createRegistryWithParentContext(MuleContext muleContext, ApplicationContext applicationContext,
+                                                         ApplicationContext parentContext)
       throws ConfigurationException {
     if (applicationContext instanceof ConfigurableApplicationContext) {
       ((ConfigurableApplicationContext) applicationContext).setParent(parentContext);
       registry = new SpringRegistry(applicationContext, muleContext,
                                     new ConfigurationDependencyResolver(muleArtifactContext.getApplicationModel()),
                                     ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
+      return registry;
     } else {
       throw new ConfigurationException(createStaticMessage("Cannot set a parent context if the ApplicationContext does not implement ConfigurableApplicationContext"));
     }
