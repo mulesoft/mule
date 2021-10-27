@@ -20,6 +20,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManag
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.ToolingService;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +114,12 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
 
   public T withEventContextService(EventContextService eventContextService) {
     registerObject(EventContextService.class.getName(), eventContextService);
+
+    return getThis();
+  }
+
+  public T withTroubleshootingService(TroubleshootingService troubleshootingService) {
+    registerObject(TroubleshootingService.class.getName(), troubleshootingService);
 
     return getThis();
   }

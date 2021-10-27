@@ -57,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
+import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +94,7 @@ public class MuleContainer {
   private final RepositoryService repositoryService;
   private final ToolingService toolingService;
   private final MuleCoreExtensionManagerServer coreExtensionManager;
+  private final TroubleshootingService troubleshootingService;
   private ServerLockFactory muleLockFactory;
   private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
   private static MuleLog4jContextFactory log4jContextFactory;
@@ -135,6 +138,7 @@ public class MuleContainer {
     this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
                                                        artifactResourcesRegistry.getApplicationFactory(),
                                                        () -> findSchedulerService(serviceManager));
+    this.troubleshootingService = new DefaultTroubleshootingService(deploymentService);
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
     this.toolingService = new DefaultToolingService(artifactResourcesRegistry.getDomainRepository(),
@@ -152,9 +156,9 @@ public class MuleContainer {
 
   public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
                        MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager,
-                       ExtensionModelLoaderManager extensionModelLoaderManager) {
+                       ExtensionModelLoaderManager extensionModelLoaderManager, TroubleshootingService troubleshootingService) {
     this(new String[0], deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-         extensionModelLoaderManager);
+         extensionModelLoaderManager, troubleshootingService);
   }
 
   /**
@@ -162,7 +166,8 @@ public class MuleContainer {
    */
   public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService,
                        ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
-                       ServiceManager serviceManager, ExtensionModelLoaderManager extensionModelLoaderManager)
+                       ServiceManager serviceManager, ExtensionModelLoaderManager extensionModelLoaderManager,
+                       TroubleshootingService troubleshootingService)
       throws IllegalArgumentException {
     // TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
     init(args);
@@ -173,6 +178,7 @@ public class MuleContainer {
     this.serviceManager = serviceManager;
     this.extensionModelLoaderManager = extensionModelLoaderManager;
     this.toolingService = toolingService;
+    this.troubleshootingService = troubleshootingService;
   }
 
   protected void init(String[] args) throws IllegalArgumentException {
@@ -201,7 +207,7 @@ public class MuleContainer {
 
   /**
    * Allows subclasses to obtain command line options differently.
-   * <p/>
+   * <p>
    * Useful for testing purposes
    *
    * @param args arguments received from command line
@@ -244,6 +250,7 @@ public class MuleContainer {
       coreExtensionManager.setArtifactClassLoaderManager(artifactResourcesRegistry.getArtifactClassLoaderManager());
       coreExtensionManager.setToolingService(toolingService);
       coreExtensionManager.setServiceRepository(serviceManager);
+      coreExtensionManager.setTroubleshootingService(troubleshootingService);
 
       validateLicense();
       showSplashScreen();

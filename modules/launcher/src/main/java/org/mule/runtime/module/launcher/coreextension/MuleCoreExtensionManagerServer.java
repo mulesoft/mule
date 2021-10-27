@@ -14,12 +14,14 @@ import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingServiceAware;
 
 /**
  * Manages lifecycle and dependency injection for {@link MuleCoreExtension}
  */
 public interface MuleCoreExtensionManagerServer
-    extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ToolingServiceAware, ArtifactClassLoaderManagerAware {
+    extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ToolingServiceAware, ArtifactClassLoaderManagerAware,
+    TroubleshootingServiceAware {
 
   /**
    * Allows {@link EventContextService} injection.

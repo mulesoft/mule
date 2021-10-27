@@ -27,6 +27,7 @@ import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
@@ -68,6 +69,8 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
 
   private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
 
+  private final TroubleshootingService troubleshootingService = mock(TroubleshootingService.class);
+
   private ToolingService toolingService = mock(ToolingService.class);
   private Map<String, Object> commandLineOptions = new HashMap<>();
 
@@ -80,7 +83,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
 
   private MuleContainer createMuleContainer() {
     return new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-                             extensionModelLoaderManager) {
+                             extensionModelLoaderManager, troubleshootingService) {
 
       @Override
       Map<String, Object> getCommandLineOptions(String[] args) {

@@ -30,6 +30,7 @@ import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private ServiceRepository serviceRepository;
   private EventContextService eventContextService;
+  private TroubleshootingService troubleshootingService;
 
   private List<MuleCoreExtension> initializedCoreExtensions = new ArrayList<>();
   private List<MuleCoreExtension> startedCoreExtensions = new ArrayList<>();
@@ -186,6 +188,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private Injector createContainerInjector() {
     return new ContainerInjectorBuilder()
         .withDeploymentService(deploymentService)
+        .withTroubleshootingService(troubleshootingService)
         .withRepositoryService(repositoryService)
         .withServiceRepository(serviceRepository)
         .withCoreExtensions(coreExtensions)
@@ -223,6 +226,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   @Override
   public void setServiceRepository(ServiceRepository serviceRepository) {
     this.serviceRepository = serviceRepository;
+  }
+
+  @Override
+  public void setTroubleshootingService(TroubleshootingService troubleshootingService) {
+    this.troubleshootingService = troubleshootingService;
   }
 
   /**
