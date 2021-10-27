@@ -72,7 +72,6 @@ public final class JavaStereotypeModelParserUtils {
                                                                                   .map(SdkStereotypeDefinitionAdapter::from)
                                                                                   .orElse(null);
 
-
     if (isValidator(annotatedElement)) {
       if (stereotypeDefinition != null) {
         throw new IllegalModelDefinitionException(format("%s '%s' is annotated with both @%s and @%s. Only one can "
@@ -84,9 +83,16 @@ public final class JavaStereotypeModelParserUtils {
       return of(factory.getValidatorStereotype());
     }
 
-    return stereotypeDefinition != null
-        ? of(factory.createStereotype(stereotypeDefinition))
-        : empty();
+    if (stereotypeDefinition != null) {
+      return of(factory.createStereotype(stereotypeDefinition));
+    }
+
+    if (annotatedElement instanceof Type) {
+      return ((Type) annotatedElement).getSuperType()
+          .flatMap(type -> resolveStereotype(type, elementType, elementName, factory));
+    } else {
+      return empty();
+    }
   }
 
   /**

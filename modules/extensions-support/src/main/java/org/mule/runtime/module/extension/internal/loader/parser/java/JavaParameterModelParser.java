@@ -249,10 +249,12 @@ public class JavaParameterModelParser implements ParameterModelParser {
                                               AllowedStereotypes.class,
                                               org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes.class,
                                               value -> value.getClassArrayValue(AllowedStereotypes::value).stream()
+                                                  .filter(type -> type.getDeclaringClass().isPresent())
                                                   .map(type -> from(type.getDeclaringClass().get())),
                                               value -> value
                                                   .getClassArrayValue(org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes::value)
                                                   .stream()
+                                                  .filter(type -> type.getDeclaringClass().isPresent())
                                                   .map(type -> from(type.getDeclaringClass().get())))
                                                       .map(stream -> stream.map(def -> factory.createStereotype(def))
                                                           .collect(toList()))

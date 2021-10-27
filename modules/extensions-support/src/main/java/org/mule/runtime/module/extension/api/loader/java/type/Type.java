@@ -134,6 +134,8 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
 
   String getTypeName();
 
+  Optional<Type> getSuperType();
+
   /**
    * @return The {@link ClassInformationAnnotation} describing the current {@link Type}
    * @since 4.1
