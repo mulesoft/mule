@@ -228,6 +228,7 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
         <oldMuleArtifactVersion>4.4.0</oldMuleArtifactVersion>
+        <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         
         <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
@@ -1116,7 +1117,7 @@
                         </dependencies>
                         <configuration>
                             <oldVersion>${oldMuleArtifactVersion}</oldVersion>
-                            <failOnUnresolvedArtifacts>true</failOnUnresolvedArtifacts>
+                            <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
                             <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
                             <analysisConfiguration><![CDATA[
                                 {
