@@ -80,7 +80,7 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
 
   @Override
   public Optional<MethodElement> getOnBackPressureMethod() {
-    return getMethodAnnotatedWith(OnBackPressure.class);
+    return getMethodAnnotatedWith(OnBackPressure.class, org.mule.sdk.api.annotation.source.OnBackPressure.class);
   }
 
   private Optional<MethodElement> getMethodAnnotatedWith(Class<? extends Annotation>... annotationTypes) {

@@ -9,9 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -32,6 +34,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
@@ -47,6 +50,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 
+import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.builder.NumberTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
@@ -416,6 +420,48 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
         .collect(toList());
 
     assertThat(ignoredSources, hasSize(1));
+  }
+
+  @Test
+  public void defaultClusterSupport() {
+    SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("ListenPayments");
+
+    ParameterDeclaration clusterSupportParameter = sourceDeclaration.getAllParameters().stream()
+        .filter(parameterDeclaration -> parameterDeclaration.getName().equals("primaryNodeOnly")).findFirst().get();
+
+    assertThat(clusterSupportParameter.getDefaultValue(), is(true));
+  }
+
+  @Test
+  public void clusterSupportDefaultingPrimaryNodeOnly() {
+    SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("listen-payments-cluster");
+
+    ParameterDeclaration clusterSupportParameter = sourceDeclaration.getAllParameters().stream()
+        .filter(parameterDeclaration -> parameterDeclaration.getName().equals("primaryNodeOnly")).findFirst().get();
+
+    assertThat(clusterSupportParameter.getDefaultValue(), is(true));
+  }
+
+  @Test
+  public void backPressureSupport() {
+    SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("ListenPaymentsAllOptional");
+    ParameterDeclaration backPressureSupportParameter = sourceDeclaration.getAllParameters().stream()
+        .filter(parameterDeclaration -> parameterDeclaration.getName().equals("onCapacityOverload")).findFirst().get();
+
+    assertThat(backPressureSupportParameter.getDefaultValue(), is(FAIL));
+    assertThat(stream(backPressureSupportParameter.getType().getAnnotation(EnumAnnotation.class).get().getValues())
+        .collect(toList()), hasItems("FAIL", "DROP"));
+
+  }
+
+  private SourceDeclaration getSourceDeclarationWithName(String sourceName) {
+    ExtensionDeclarer declarer = declareExtension();
+    ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
+
+    ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
+
+    return config.getMessageSources().stream().filter(sourceDeclaration -> sourceDeclaration.getName().equals(sourceName))
+        .findFirst().get();
   }
 
   private DefaultExtensionLoadingContext createLoadingContext() {
@@ -815,20 +861,25 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
     assertThat(config.getMessageSources(), hasSize(5));
-    assertHeisenbergSource(config.getMessageSources().get(0), ASYNC_SOURCE_NAME, AsyncHeisenbergSource.class, false);
-    assertHeisenbergSource(config.getMessageSources().get(1), SOURCE_NAME, HeisenbergSource.class, true);
+    assertHeisenbergSource(config.getMessageSources().get(0), ASYNC_SOURCE_NAME, AsyncHeisenbergSource.class, false, true);
+    assertHeisenbergSource(config.getMessageSources().get(1), SOURCE_NAME, HeisenbergSource.class, true, true);
   }
 
   private void assertHeisenbergSource(SourceDeclaration source, String sourceName, Class<? extends Source> type,
-                                      boolean hasBackpressureOptions) {
+                                      boolean hasBackpressureOptions, boolean hasClusterSupport) {
     assertThat(source.getName(), is(sourceName));
 
     List<ParameterDeclaration> parameters = source.getAllParameters();
+    int sourceParameters = 33;
     if (hasBackpressureOptions) {
-      assertThat(parameters, hasSize(34));
-    } else {
-      assertThat(parameters, hasSize(33));
+      sourceParameters++;
     }
+
+    if (hasClusterSupport) {
+      sourceParameters++;
+    }
+
+    assertThat(parameters, hasSize(sourceParameters));
 
     assertParameter(parameters, SOURCE_PARAMETER, "", INT_TYPE, true, NOT_SUPPORTED, null);
     assertParameter(parameters, SOURCE_CALLBACK_PARAMETER, "", toMetadataType(Long.class), false, SUPPORTED, "#[payload]");

@@ -13,6 +13,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.tck.size.SmallTest;
@@ -34,6 +35,7 @@ public class SourceTypeWrapperTestCase {
   private static final String ON_SUCCESS_METHOD_NAME = "onSuccessMethod";
   private static final String ON_ERROR_METHOD_NAME = "onErrorMethod";
   private static final String ON_TERMINATE_METHOD_NAME = "onTerminateMethod";
+  private static final String ON_BACK_PRESSURE_METHOD_NAME = "onBackPressureMethod";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -45,6 +47,7 @@ public class SourceTypeWrapperTestCase {
   private SourceTypeWrapper sourceTypeWrapperForSdkApi;
   private SourceTypeWrapper sourceTypeWrapperWithMixedApis;
   private SourceTypeWrapper sourceTypeWrapperWithInvalidApiUsage;
+  private SourceTypeWrapper sourceTypeWrapperWithInvalidOnBackPressureApiUsage;
 
   @Before
   public void before() {
@@ -53,6 +56,9 @@ public class SourceTypeWrapperTestCase {
     sourceTypeWrapperWithMixedApis = new SourceTypeWrapper(SourceTestWithMixedApiAnnotations.class, classTypeLoader);
     sourceTypeWrapperWithInvalidApiUsage =
         new SourceTypeWrapper(SourceTestWithInvalidAnnotationsUsage.class, classTypeLoader);
+    sourceTypeWrapperWithInvalidOnBackPressureApiUsage =
+        new SourceTypeWrapper(SourceTestWithInvalidOnBackPressureAnnotationsUsage.class, classTypeLoader);
+
   }
 
   @Test
@@ -86,16 +92,33 @@ public class SourceTypeWrapperTestCase {
   }
 
   @Test
+  public void methodWithOnBackPressureLegacyAnnotation() {
+    verifyMethod(sourceTypeWrapperForLegacyApi.getOnBackPressureMethod(), ON_BACK_PRESSURE_METHOD_NAME);
+  }
+
+  @Test
+  public void methodWithOnBackPressureSdkApiAnnotation() {
+    verifyMethod(sourceTypeWrapperForSdkApi.getOnBackPressureMethod(), ON_BACK_PRESSURE_METHOD_NAME);
+  }
+
+  @Test
   public void methodsWithMixedApiAnnotations() {
     verifyMethod(sourceTypeWrapperWithMixedApis.getOnResponseMethod(), ON_SUCCESS_METHOD_NAME);
     verifyMethod(sourceTypeWrapperWithMixedApis.getOnErrorMethod(), ON_ERROR_METHOD_NAME);
     verifyMethod(sourceTypeWrapperWithMixedApis.getOnTerminateMethod(), ON_TERMINATE_METHOD_NAME);
+    verifyMethod(sourceTypeWrapperWithMixedApis.getOnBackPressureMethod(), ON_BACK_PRESSURE_METHOD_NAME);
   }
 
   @Test
   public void methodsWithInvalidAnnotationUsage() {
     expectedException.expect(IllegalSourceModelDefinitionException.class);
     sourceTypeWrapperWithInvalidApiUsage.getOnResponseMethod();
+  }
+
+  @Test
+  public void methodsWithInvalidOnBackPressureAnnotationUsage() {
+    expectedException.expect(IllegalSourceModelDefinitionException.class);
+    sourceTypeWrapperWithInvalidOnBackPressureApiUsage.getOnBackPressureMethod();
   }
 
   private void verifyMethod(Optional<MethodElement> method, String methodName) {
@@ -113,6 +136,9 @@ public class SourceTypeWrapperTestCase {
 
     @OnTerminate
     public void onTerminateMethod() {}
+
+    @OnBackPressure
+    public void onBackPressureMethod() {}
   }
 
 
@@ -126,6 +152,9 @@ public class SourceTypeWrapperTestCase {
 
     @org.mule.sdk.api.annotation.execution.OnTerminate
     public void onTerminateMethod() {}
+
+    @org.mule.sdk.api.annotation.source.OnBackPressure
+    public void onBackPressureMethod() {}
   }
 
 
@@ -139,6 +168,9 @@ public class SourceTypeWrapperTestCase {
 
     @OnTerminate
     public void onTerminateMethod() {}
+
+    @org.mule.sdk.api.annotation.source.OnBackPressure
+    public void onBackPressureMethod() {}
   }
 
 
@@ -147,5 +179,12 @@ public class SourceTypeWrapperTestCase {
     @OnSuccess
     @org.mule.sdk.api.annotation.execution.OnSuccess
     public void onSuccessMethod() {}
+  }
+
+  private class SourceTestWithInvalidOnBackPressureAnnotationsUsage {
+
+    @OnBackPressure
+    @org.mule.sdk.api.annotation.source.OnBackPressure
+    public void onBackPressure() {}
   }
 }
