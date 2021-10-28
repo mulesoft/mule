@@ -161,6 +161,11 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.apache.cxf</groupId>
+            <artifactId>cxf-api</artifactId>
+            <version>${cxfVersion}</version>
+        </dependency>
     </dependencies>
 
 </project>
