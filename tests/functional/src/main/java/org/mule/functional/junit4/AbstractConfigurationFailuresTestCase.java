@@ -136,12 +136,14 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     return loadExtensionWithLoader(extension, deps, loader);
   }
 
-  protected ExtensionModel loadExtensionWithLoader(Class extension, Set<ExtensionModel> deps, ExtensionModelLoader extensionModelLoader) {
+  protected ExtensionModel loadExtensionWithLoader(Class extension, Set<ExtensionModel> deps,
+                                                   ExtensionModelLoader extensionModelLoader) {
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(TYPE_PROPERTY_NAME, extension.getName());
     ctx.put(VERSION, getProductVersion());
     ctx.putAll(getExtensionLoaderContextAdditionalParameters());
-    return extensionModelLoader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
+    return extensionModelLoader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps),
+                                                   ctx);
   }
 
   /**
