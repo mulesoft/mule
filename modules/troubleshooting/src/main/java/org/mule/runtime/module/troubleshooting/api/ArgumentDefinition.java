@@ -9,15 +9,13 @@ package org.mule.runtime.module.troubleshooting.api;
 import org.mule.api.annotation.Experimental;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Experimental
-public interface TroubleshootingOperationDefinition extends Serializable {
+public interface ArgumentDefinition extends Serializable {
 
   String getName();
 
   String getDescription();
 
-  // TODO: Mark everything as experimental
-  List<ArgumentDefinition> getArgumentDefinitions();
+  boolean isRequired();
 }

@@ -10,6 +10,7 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 
 import java.util.List;
@@ -19,11 +20,13 @@ public class DefaultTroubleshootingOperationDefinition implements Troubleshootin
   private static final long serialVersionUID = -1540639676860149452L;
 
   private final String name;
-  private final List<String> argumentNames;
+  private final String description;
+  private final List<ArgumentDefinition> argumentDefinitions;
 
-  public DefaultTroubleshootingOperationDefinition(String name, String... argumentNames) {
+  public DefaultTroubleshootingOperationDefinition(String name, String description, ArgumentDefinition... argumentDefinitions) {
     this.name = name;
-    this.argumentNames = stream(argumentNames).collect(toList());
+    this.description = description;
+    this.argumentDefinitions = stream(argumentDefinitions).collect(toList());
   }
 
   @Override
@@ -32,7 +35,12 @@ public class DefaultTroubleshootingOperationDefinition implements Troubleshootin
   }
 
   @Override
-  public List<String> getArgumentNames() {
-    return unmodifiableList(argumentNames);
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public List<ArgumentDefinition> getArgumentDefinitions() {
+    return unmodifiableList(argumentDefinitions);
   }
 }

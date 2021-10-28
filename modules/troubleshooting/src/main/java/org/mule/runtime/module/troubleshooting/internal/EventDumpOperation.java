@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.troubleshooting.internal;
 
+import static java.lang.String.format;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -14,24 +16,48 @@ import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 
 import java.util.List;
 
 public class EventDumpOperation implements TroubleshootingOperation {
 
-  public static final String EVENT_DUMP_OPERATION_NAME = "events";
-  public static final String APPLICATION_ARGUMENT_NAME = "application";
-  private static final TroubleshootingOperationDefinition definition =
-      new DefaultTroubleshootingOperationDefinition(EVENT_DUMP_OPERATION_NAME, APPLICATION_ARGUMENT_NAME);
+  private static final String EVENT_DUMP_OPERATION_NAME = "events";
+  private static final String EVENT_DUMP_OPERATION_DESCRIPTION = "Collects an EventDump in JSON format";
+
+  private static final String APPLICATION_ARGUMENT_NAME = "application";
+  private static final String APPLICATION_ARGUMENT_DESCRIPTION = "Application to collect the event dump from";
+
+  private static final TroubleshootingOperationDefinition definition = createOperationDefinition();
 
   private final DeploymentService deploymentService;
 
-  public EventDumpOperation(DeploymentService deploymentService) {
+  EventDumpOperation(DeploymentService deploymentService) {
     this.deploymentService = deploymentService;
   }
 
-  private void addFlowStacksFor(Application application, JSONObject flowStacks) {
+  @Override
+  public TroubleshootingOperationDefinition getDefinition() {
+    return definition;
+  }
+
+  @Override
+  public TroubleshootingOperationCallback getCallback() {
+    return arguments -> {
+      JSONObject flowStacks = new JSONObject();
+      final String applicationName = arguments.get(APPLICATION_ARGUMENT_NAME);
+      if (applicationName == null) {
+        addFlowStacksForAllApplications(flowStacks);
+      } else {
+        Application application = deploymentService.findApplication(applicationName);
+        addFlowStacksFor(application, flowStacks);
+      }
+      return flowStacks.toString(2);
+    };
+  }
+
+  private static void addFlowStacksFor(Application application, JSONObject flowStacks) {
     flowStacks.put(application.getArtifactName(), getFlowStackEntries(application));
   }
 
@@ -47,9 +73,8 @@ public class EventDumpOperation implements TroubleshootingOperation {
         .getRegistry()
         .lookupByName(EventContextService.REGISTRY_KEY)
         .map(EventContextService.class::cast)
-        .orElseThrow(() -> new IllegalArgumentException(
-                                                        String.format("Could not get EventContextService for application %s.",
-                                                                      application.getArtifactName())));
+        .orElseThrow(() -> new IllegalArgumentException(format("Could not get EventContextService for application %s.",
+                                                               application.getArtifactName())));
 
     return flowStackEntriesToJSON(eventContextService.getCurrentlyActiveFlowStacks());
   }
@@ -78,23 +103,12 @@ public class EventDumpOperation implements TroubleshootingOperation {
     return callStackAsJSON;
   }
 
-  @Override
-  public TroubleshootingOperationDefinition getDefinition() {
-    return definition;
+  private static TroubleshootingOperationDefinition createOperationDefinition() {
+    return new DefaultTroubleshootingOperationDefinition(EVENT_DUMP_OPERATION_NAME, EVENT_DUMP_OPERATION_DESCRIPTION,
+                                                         createApplicationArgumentDefinition());
   }
 
-  @Override
-  public TroubleshootingOperationCallback getCallback() {
-    return arguments -> {
-      JSONObject flowStacks = new JSONObject();
-      final String applicationName = arguments.get(APPLICATION_ARGUMENT_NAME);
-      if (applicationName == null) {
-        addFlowStacksForAllApplications(flowStacks);
-      } else {
-        Application application = deploymentService.findApplication(applicationName);
-        addFlowStacksFor(application, flowStacks);
-      }
-      return flowStacks.toString(2);
-    };
+  private static ArgumentDefinition createApplicationArgumentDefinition() {
+    return new DefaultArgumentDefinition(APPLICATION_ARGUMENT_NAME, APPLICATION_ARGUMENT_DESCRIPTION, false);
   }
 }
