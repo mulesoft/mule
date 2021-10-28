@@ -165,6 +165,12 @@
             <groupId>org.mule.apache.cxf</groupId>
             <artifactId>cxf-api</artifactId>
             <version>${cxfVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
