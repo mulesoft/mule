@@ -11,13 +11,24 @@ import org.mule.api.annotation.Experimental;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Defines an operation and its metadata.
+ */
 @Experimental
 public interface TroubleshootingOperationDefinition extends Serializable {
 
+  /**
+   * @return the operation name.
+   */
   String getName();
 
+  /**
+   * @return the operation description.
+   */
   String getDescription();
 
-  // TODO: Mark everything as experimental
+  /**
+   * @return the operation argument definitions.
+   */
   List<ArgumentDefinition> getArgumentDefinitions();
 }

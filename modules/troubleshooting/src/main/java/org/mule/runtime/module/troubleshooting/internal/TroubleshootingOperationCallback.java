@@ -9,7 +9,17 @@ package org.mule.runtime.module.troubleshooting.internal;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * Internal interface to the troubleshooting operation callbacks.
+ * <p>
+ * <b>Important:</b> Return externalizable objects to avoid marshalling errors when using it in an external tool.
+ */
 public interface TroubleshootingOperationCallback {
 
+  /**
+   * The operation behaviour.
+   * @param arguments A dictionary with the argument names and values.
+   * @return an externalizable object, which is the operation result.
+   */
   Serializable execute(Map<String, String> arguments);
 }

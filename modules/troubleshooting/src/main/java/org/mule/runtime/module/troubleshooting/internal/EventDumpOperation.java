@@ -21,6 +21,16 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefin
 
 import java.util.List;
 
+/**
+ * Operation used to collect an event dump in JSON format.
+ * <p>
+ * The name of the operation is "events".
+ * <p>
+ * Arguments:
+ * <ul>
+ *   <li>application (Optional): The application to collect the event dump from</li>
+ * </ul>
+ */
 public class EventDumpOperation implements TroubleshootingOperation {
 
   private static final String EVENT_DUMP_OPERATION_NAME = "events";

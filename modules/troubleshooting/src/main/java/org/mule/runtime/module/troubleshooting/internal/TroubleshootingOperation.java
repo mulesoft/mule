@@ -8,9 +8,18 @@ package org.mule.runtime.module.troubleshooting.internal;
 
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 
+/**
+ * Internal interface that has the definition and the callback for a given operation.
+ */
 public interface TroubleshootingOperation {
 
+  /**
+   * @return the operation definition.
+   */
   TroubleshootingOperationDefinition getDefinition();
 
+  /**
+   * @return the operation callback.
+   */
   TroubleshootingOperationCallback getCallback();
 }

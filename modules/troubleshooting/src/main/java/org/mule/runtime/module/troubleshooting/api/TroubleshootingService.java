@@ -6,15 +6,34 @@
  */
 package org.mule.runtime.module.troubleshooting.api;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A container level object that can be used to execute troubleshooting related operations.
+ */
 @NoImplement
+@Experimental
 public interface TroubleshootingService {
 
+  /**
+   * Gets the available operation definitions. User should retrieve these definitions to know what are the possible
+   * parameters for {@link #executeOperation(String, Map)}.
+   *
+   * @return the available operation definitions.
+   */
   List<TroubleshootingOperationDefinition> getAvailableOperations();
 
+  /**
+   * Invokes an operation with the given parameters. User must respect the definitions retrieved with
+   * {@link #getAvailableOperations()}
+   *
+   * @param name The name of the operation to execute.
+   * @param arguments A dictionary with the arguments.
+   * @return the return value of the operation.
+   */
   Object executeOperation(String name, Map<String, String> arguments);
 }

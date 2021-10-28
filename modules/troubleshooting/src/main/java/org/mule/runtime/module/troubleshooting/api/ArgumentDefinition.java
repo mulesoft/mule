@@ -10,12 +10,24 @@ import org.mule.api.annotation.Experimental;
 
 import java.io.Serializable;
 
+/**
+ * Defines an argument.
+ */
 @Experimental
 public interface ArgumentDefinition extends Serializable {
 
+  /**
+   * @return the argument name.
+   */
   String getName();
 
+  /**
+   * @return the argument description.
+   */
   String getDescription();
 
+  /**
+   * @return whether the argument is required or not.
+   */
   boolean isRequired();
 }
