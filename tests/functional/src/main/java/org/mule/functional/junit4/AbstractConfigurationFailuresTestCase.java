@@ -39,6 +39,8 @@ import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.api.loader.java.CraftedExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.tck.config.TestNotificationListenerRegistryConfigurationBuilder;
@@ -126,11 +128,20 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
 
   protected ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {
     DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
+    return loadExtensionWithLoader(extension, deps, loader);
+  }
+
+  protected ExtensionModel loadExtensionWithDelegate(Class extension, Set<ExtensionModel> deps) {
+    CraftedExtensionModelLoader loader = new CraftedExtensionModelLoader();
+    return loadExtensionWithLoader(extension, deps, loader);
+  }
+
+  protected ExtensionModel loadExtensionWithLoader(Class extension, Set<ExtensionModel> deps, ExtensionModelLoader extensionModelLoader) {
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(TYPE_PROPERTY_NAME, extension.getName());
     ctx.put(VERSION, getProductVersion());
     ctx.putAll(getExtensionLoaderContextAdditionalParameters());
-    return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
+    return extensionModelLoader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
   }
 
   /**
