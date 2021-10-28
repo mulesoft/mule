@@ -351,11 +351,7 @@
             "namespace": "MODULE-STEREOTYPES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-STEREOTYPES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -693,11 +689,7 @@
             "namespace": "MODULE-STEREOTYPES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-STEREOTYPES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -1005,11 +997,7 @@
             "namespace": "MODULE-STEREOTYPES",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MODULE-STEREOTYPES",
-              "parent": {
-                "type": "CONNECTION",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [

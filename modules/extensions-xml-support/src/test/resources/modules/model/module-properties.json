@@ -348,11 +348,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -681,11 +677,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -1014,11 +1006,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -1317,11 +1305,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -1620,11 +1604,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -1923,11 +1903,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -2226,11 +2202,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -2529,11 +2501,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -2832,11 +2800,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -3135,11 +3099,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -3438,11 +3398,7 @@
             "namespace": "MODULE-PROPERTIES",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-PROPERTIES",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [

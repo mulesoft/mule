@@ -52,11 +52,7 @@
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-XSD-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -337,11 +333,7 @@
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-XSD-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -583,11 +575,7 @@
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-XSD-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -868,11 +856,7 @@
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-XSD-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [

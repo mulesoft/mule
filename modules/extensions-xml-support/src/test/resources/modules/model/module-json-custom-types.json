@@ -52,11 +52,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -365,11 +361,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -706,11 +698,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -980,11 +968,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -1226,11 +1210,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -1539,11 +1519,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -1853,11 +1829,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -2178,11 +2150,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -2500,11 +2468,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [
@@ -2862,11 +2826,7 @@
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MODULE-JSON-CUSTOM-TYPES",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
       },
       "parameterGroupModels": [

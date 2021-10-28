@@ -354,11 +354,7 @@
             "namespace": "MODULE-DOCUMENTATION",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-DOCUMENTATION",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -789,11 +785,7 @@
             "namespace": "MODULE-DOCUMENTATION",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MODULE-DOCUMENTATION",
-              "parent": {
-                "type": "PROCESSOR",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
