@@ -17,6 +17,11 @@ import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+
+/**
+ * This test sends a message to a CXF proxy client with wsse:Security.
+ * The flow finish with a mulexml:dom-to-xml-transformer. It should transform the payload and return an empty body.
+ */
 public class CxfProxyClientWithXmlTransformerTestCase extends FunctionalTestCase {
 
     private static final String SOAP_REQUEST_WITH_SECURITY =
@@ -48,7 +53,7 @@ public class CxfProxyClientWithXmlTransformerTestCase extends FunctionalTestCase
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
     @Test
-    public void testDecryptedPayloadAvailableWithXml() throws Exception
+    public void testProxyClientWithXmlTransformer() throws Exception
     {
         MuleMessage msg = getTestMuleMessage(SOAP_REQUEST_WITH_SECURITY);
         MuleMessage muleMessage = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/test-xml", msg, HTTP_REQUEST_OPTIONS);
