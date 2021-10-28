@@ -5054,6 +5054,37 @@
             {
               "type": {
                 "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.Door"
               },
               "hasDynamicType": false,
@@ -5072,7 +5103,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "allowedStereotypeModels": [
                 {
@@ -5083,37 +5114,6 @@
               "semanticTerms": [],
               "name": "doorParam",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
             },
             {
@@ -5249,7 +5249,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],

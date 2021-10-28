@@ -2810,6 +2810,37 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
@@ -2859,37 +2890,6 @@
                   "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 4,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -3051,7 +3051,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 0
+                "order": 1
               },
               "showInDsl": false,
               "name": "General",
@@ -3216,7 +3216,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3242,7 +3242,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "showInDsl": false,
               "name": "Connection",
@@ -3301,6 +3301,37 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
@@ -3350,37 +3381,6 @@
                   "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 4,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -3542,7 +3542,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 0
+                "order": 1
               },
               "showInDsl": false,
               "name": "General",
@@ -3707,7 +3707,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3733,7 +3733,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "showInDsl": false,
               "name": "Connection",
@@ -3792,6 +3792,37 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
@@ -3841,37 +3872,6 @@
                   "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 4,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -4033,7 +4033,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 0
+                "order": 1
               },
               "showInDsl": false,
               "name": "General",
@@ -4198,7 +4198,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4224,7 +4224,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "showInDsl": false,
               "name": "Connection",
@@ -4621,6 +4621,37 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
@@ -4670,37 +4701,6 @@
                   "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 4,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -4862,7 +4862,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 0
+                "order": 1
               },
               "showInDsl": false,
               "name": "General",
@@ -5027,7 +5027,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5053,7 +5053,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "showInDsl": false,
               "name": "Connection",
@@ -5600,7 +5600,7 @@
       "messageSources": [
         {
           "hasResponse": false,
-          "runsOnPrimaryNodeOnly": false,
+          "runsOnPrimaryNodeOnly": true,
           "output": {
             "type": {
               "format": {
@@ -5650,6 +5650,37 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
@@ -5684,7 +5715,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2
+                    "order": 3
                   },
                   "allowedStereotypeModels": [
                     {
@@ -5699,37 +5730,6 @@
                   "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 5,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -5753,7 +5753,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1
+                    "order": 2
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -5905,7 +5905,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -6096,7 +6096,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],

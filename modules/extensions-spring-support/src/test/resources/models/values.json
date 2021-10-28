@@ -7440,6 +7440,37 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "String"
                   },
                   "hasDynamicType": false,
@@ -7472,7 +7503,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1
+                    "order": 2
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -7517,7 +7548,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2
+                    "order": 3
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7532,37 +7563,6 @@
                   "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 4,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -7698,7 +7698,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -7789,6 +7789,37 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "String"
                   },
                   "hasDynamicType": false,
@@ -7821,7 +7852,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1
+                    "order": 2
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -7866,7 +7897,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2
+                    "order": 3
                   },
                   "allowedStereotypeModels": [
                     {
@@ -7881,37 +7912,6 @@
                   "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 5,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -8047,7 +8047,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -8238,7 +8238,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -23276,6 +23276,37 @@
             {
               "type": {
                 "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "String"
               },
               "hasDynamicType": false,
@@ -23308,43 +23339,12 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "channel",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
             },
             {
@@ -23480,7 +23480,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -23571,6 +23571,37 @@
             {
               "type": {
                 "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "String"
               },
               "hasDynamicType": false,
@@ -23601,43 +23632,12 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "channel",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
             },
             {
@@ -23773,7 +23773,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -23864,6 +23864,37 @@
             {
               "type": {
                 "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "String"
               },
               "hasDynamicType": false,
@@ -23896,43 +23927,12 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "hasBeenStarted",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
             },
             {
@@ -24068,7 +24068,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -24159,6 +24159,37 @@
             {
               "type": {
                 "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "String"
               },
               "hasDynamicType": false,
@@ -24222,43 +24253,12 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "xmlBodyTemplate",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
             },
             {
@@ -24394,7 +24394,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -24493,7 +24493,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
+              "defaultValue": true,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -24504,13 +24504,1270 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 6,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "RedeliveryPolicy",
+                  "infrastructureType": {}
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "maxRedeliveryCount"
+                    },
+                    "model": {
+                      "type": "Number",
+                      "annotations": {
+                        "int": {},
+                        "default": "5"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "messageDigestAlgorithm"
+                    },
+                    "model": {
+                      "type": "String"
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "MessageIdentifier"
+                    },
+                    "model": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "flattened": {},
+                      "description": {
+                        "value": "Defines which strategy is used to identify the messages."
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "objectStore"
+                    },
+                    "model": {
+                      "type": "@ref:org.mule.runtime.api.store.ObjectStore"
+                    },
+                    "annotations": {
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "OBJECT_STORE",
+                            "namespace": "OS"
+                          }
+                        ]
+                      },
+                      "description": {
+                        "value": "The object store where the redelivery counter for each message is going to be stored."
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Redelivery"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "redeliveryPolicy",
+              "description": "Defines a policy for processing the redelivery of the same message",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-redelivery-policy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 1
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "some value",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "required",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "parameters": [],
+                "partOrder": 1,
+                "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true,
+                "modelProperties": {}
+              },
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "AMERICA",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "continent",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "parameters": [],
+                "partOrder": 2,
+                "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true,
+                "modelProperties": {}
+              },
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "USA",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "country",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "parameters": [],
+                "partOrder": 3,
+                "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true,
+                "modelProperties": {}
+              },
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "SFO",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "city",
+              "displayModel": {
+                "displayName": "State | City"
+              },
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "values",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "SourceWithMultiLevelValue",
+      "description": "",
+      "modelProperties": {},
+      "kind": "source"
+    },
+    {
+      "hasResponse": false,
+      "runsOnPrimaryNodeOnly": false,
+      "output": {
+        "type": {
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "semanticTerms": [],
+      "stereotype": {
+        "type": "SOURCE_WITH_REQUIRED_PARAMETER_INSIDE_SHOW_IN_DSL_GROUP",
+        "namespace": "VALUES",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "VALUES",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "parameters": [
+                  {
+                    "name": "anyParameter",
+                    "required": true,
+                    "extractionExpression": "anyParameter"
+                  }
+                ],
+                "partOrder": 1,
+                "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true,
+                "modelProperties": {}
+              },
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "values",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "RedeliveryPolicy",
+                  "infrastructureType": {}
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "maxRedeliveryCount"
+                    },
+                    "model": {
+                      "type": "Number",
+                      "annotations": {
+                        "int": {},
+                        "default": "5"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "messageDigestAlgorithm"
+                    },
+                    "model": {
+                      "type": "String"
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "MessageIdentifier"
+                    },
+                    "model": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "flattened": {},
+                      "description": {
+                        "value": "Defines which strategy is used to identify the messages."
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "objectStore"
+                    },
+                    "model": {
+                      "type": "@ref:org.mule.runtime.api.store.ObjectStore"
+                    },
+                    "annotations": {
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "OBJECT_STORE",
+                            "namespace": "OS"
+                          }
+                        ]
+                      },
+                      "description": {
+                        "value": "The object store where the redelivery counter for each message is going to be stored."
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Redelivery"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "redeliveryPolicy",
+              "description": "Defines a policy for processing the redelivery of the same message",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-redelivery-policy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 1
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "parameters": [],
+                "partOrder": 1,
+                "providerName": "channels",
+                "providerId": "Simple value provider",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
+              },
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "channels",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "anyParameter",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": true,
+          "name": "ValuesGroup",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "SourceWithRequiredParameterInsideShowInDslGroup",
+      "description": "",
+      "modelProperties": {},
+      "kind": "source"
+    },
+    {
+      "hasResponse": false,
+      "runsOnPrimaryNodeOnly": false,
+      "output": {
+        "type": {
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "semanticTerms": [],
+      "stereotype": {
+        "type": "SOURCE_WITH_REQUIRED_PARAMETER_WITH_ALIAS",
+        "namespace": "VALUES",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "VALUES",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "RedeliveryPolicy",
+                  "infrastructureType": {}
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "maxRedeliveryCount"
+                    },
+                    "model": {
+                      "type": "Number",
+                      "annotations": {
+                        "int": {},
+                        "default": "5"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "messageDigestAlgorithm"
+                    },
+                    "model": {
+                      "type": "String"
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "MessageIdentifier"
+                    },
+                    "model": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "flattened": {},
+                      "description": {
+                        "value": "Defines which strategy is used to identify the messages."
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "objectStore"
+                    },
+                    "model": {
+                      "type": "@ref:org.mule.runtime.api.store.ObjectStore"
+                    },
+                    "annotations": {
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "OBJECT_STORE",
+                            "namespace": "OS"
+                          }
+                        ]
+                      },
+                      "description": {
+                        "value": "The object store where the redelivery counter for each message is going to be stored."
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Redelivery"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "redeliveryPolicy",
+              "description": "Defines a policy for processing the redelivery of the same message",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-redelivery-policy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 1
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "superString",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "parameters": [
+                  {
+                    "name": "superString",
+                    "required": true,
+                    "extractionExpression": "superString"
+                  }
+                ],
+                "partOrder": 1,
+                "providerName": "channels",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true,
+                "modelProperties": {}
+              },
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "channels",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "someGroup",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "SourceWithRequiredParameterWithAlias",
+      "description": "",
+      "modelProperties": {},
+      "kind": "source"
+    },
+    {
+      "hasResponse": false,
+      "runsOnPrimaryNodeOnly": false,
+      "output": {
+        "type": {
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "semanticTerms": [],
+      "stereotype": {
+        "type": "SOURCE_WITH_TWO_BOUND_ACTING_PARAMETERS",
+        "namespace": "VALUES",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "VALUES",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "parameters": [
+                  {
+                    "name": "scalarActingParameter",
+                    "required": true,
+                    "extractionExpression": "someParameter"
+                  },
+                  {
+                    "name": "requiredValue",
+                    "required": true,
+                    "extractionExpression": "oneParameter"
+                  }
+                ],
+                "partOrder": 1,
+                "providerName": "parameterWithValue",
+                "providerId": "org.mule.test.values.extension.resolver.WithTwoActingParametersValueProvider",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true,
+                "modelProperties": {
+                  "sinceMuleVersion": {
+                    "version": "4.4.0"
+                  }
+                }
+              },
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "parameterWithValue",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "oneParameter",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "someParameter",
+              "description": "",
               "modelProperties": {}
             },
             {
@@ -24672,183 +25929,15 @@
             "password": false,
             "text": false,
             "query": false,
-            "order": 0
+            "order": 1
           },
           "showInDsl": false,
           "name": "General",
           "description": "",
           "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "some value",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "required",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "valueProviderModel": {
-                "parameters": [],
-                "partOrder": 1,
-                "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
-                "requiresConfiguration": false,
-                "requiresConnection": false,
-                "isOpen": true,
-                "modelProperties": {}
-              },
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "AMERICA",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "continent",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "valueProviderModel": {
-                "parameters": [],
-                "partOrder": 2,
-                "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
-                "requiresConfiguration": false,
-                "requiresConnection": false,
-                "isOpen": true,
-                "modelProperties": {}
-              },
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "USA",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "country",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "valueProviderModel": {
-                "parameters": [],
-                "partOrder": 3,
-                "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
-                "requiresConfiguration": false,
-                "requiresConnection": false,
-                "isOpen": true,
-                "modelProperties": {}
-              },
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "SFO",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "city",
-              "displayModel": {
-                "displayName": "State | City"
-              },
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 1
-          },
-          "showInDsl": false,
-          "name": "values",
-          "description": "",
-          "modelProperties": {}
         }
       ],
-      "name": "SourceWithMultiLevelValue",
+      "name": "SourceWithTwoBoundActingParameters",
       "description": "",
       "modelProperties": {},
       "kind": "source"
@@ -24888,7 +25977,7 @@
       "errors": [],
       "semanticTerms": [],
       "stereotype": {
-        "type": "SOURCE_WITH_REQUIRED_PARAMETER_INSIDE_SHOW_IN_DSL_GROUP",
+        "type": "SOURCE_WITH_VALUES_WITH_REQUIRED_PARAMETER_INSIDE_PARAM_GROUP",
         "namespace": "VALUES",
         "parent": {
           "type": "SOURCE",
@@ -24905,51 +25994,6 @@
             {
               "type": {
                 "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "valueProviderModel": {
-                "parameters": [
-                  {
-                    "name": "anyParameter",
-                    "required": true,
-                    "extractionExpression": "anyParameter"
-                  }
-                ],
-                "partOrder": 1,
-                "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
-                "requiresConfiguration": false,
-                "requiresConnection": false,
-                "isOpen": true,
-                "modelProperties": {}
-              },
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "values",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
                 "type": "Boolean"
               },
               "hasDynamicType": false,
@@ -24958,7 +26002,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
+              "defaultValue": true,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -24969,7 +26013,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -25226,1050 +26270,6 @@
             "query": false,
             "order": 2
           },
-          "showInDsl": true,
-          "name": "ValuesGroup",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "SourceWithRequiredParameterInsideShowInDslGroup",
-      "description": "",
-      "modelProperties": {},
-      "kind": "source"
-    },
-    {
-      "hasResponse": false,
-      "runsOnPrimaryNodeOnly": false,
-      "output": {
-        "type": {
-          "format": {
-            "id": "text/plain",
-            "label": "text/plain",
-            "validMimeTypes": [
-              "text/plain"
-            ]
-          },
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
-      "notifications": [],
-      "nestedComponents": [],
-      "errors": [],
-      "semanticTerms": [],
-      "stereotype": {
-        "type": "SOURCE_WITH_REQUIRED_PARAMETER_WITH_ALIAS",
-        "namespace": "VALUES",
-        "parent": {
-          "type": "SOURCE",
-          "namespace": "VALUES",
-          "parent": {
-            "type": "SOURCE",
-            "namespace": "MULE"
-          }
-        }
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "RedeliveryPolicy",
-                  "infrastructureType": {}
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "maxRedeliveryCount"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "int": {},
-                        "default": "5"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "messageDigestAlgorithm"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "MessageIdentifier"
-                    },
-                    "model": {
-                      "type": "Object",
-                      "annotations": {
-                        "typeId": "RedeliveryPolicyMessageIdentifier",
-                        "exclusiveOptionals": {
-                          "exclusiveParameterNames": [
-                            "useSecureHash",
-                            "idExpression"
-                          ],
-                          "isOneRequired": true
-                        }
-                      },
-                      "fields": [
-                        {
-                          "key": {
-                            "name": "useSecureHash"
-                          },
-                          "model": {
-                            "type": "Boolean",
-                            "annotations": {
-                              "default": "true"
-                            }
-                          },
-                          "annotations": {
-                            "description": {
-                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                            }
-                          }
-                        },
-                        {
-                          "key": {
-                            "name": "idExpression"
-                          },
-                          "model": {
-                            "type": "String"
-                          },
-                          "annotations": {
-                            "description": {
-                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
-                            }
-                          }
-                        }
-                      ]
-                    },
-                    "annotations": {
-                      "flattened": {},
-                      "description": {
-                        "value": "Defines which strategy is used to identify the messages."
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "objectStore"
-                    },
-                    "model": {
-                      "type": "@ref:org.mule.runtime.api.store.ObjectStore"
-                    },
-                    "annotations": {
-                      "stereotype": {
-                        "allowedStereotypes": [
-                          {
-                            "type": "OBJECT_STORE",
-                            "namespace": "OS"
-                          }
-                        ]
-                      },
-                      "description": {
-                        "value": "The object store where the redelivery counter for each message is going to be stored."
-                      }
-                    }
-                  }
-                ]
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Redelivery"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "redeliveryPolicy",
-              "description": "Defines a policy for processing the redelivery of the same message",
-              "modelProperties": {
-                "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-redelivery-policy",
-                    "prefix": "mule"
-                  }
-                },
-                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                  "sequence": 1
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 0
-          },
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "superString",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "valueProviderModel": {
-                "parameters": [
-                  {
-                    "name": "superString",
-                    "required": true,
-                    "extractionExpression": "superString"
-                  }
-                ],
-                "partOrder": 1,
-                "providerName": "channels",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider",
-                "requiresConfiguration": false,
-                "requiresConnection": false,
-                "isOpen": true,
-                "modelProperties": {}
-              },
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "channels",
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 1
-          },
-          "showInDsl": false,
-          "name": "someGroup",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "SourceWithRequiredParameterWithAlias",
-      "description": "",
-      "modelProperties": {},
-      "kind": "source"
-    },
-    {
-      "hasResponse": false,
-      "runsOnPrimaryNodeOnly": false,
-      "output": {
-        "type": {
-          "format": {
-            "id": "text/plain",
-            "label": "text/plain",
-            "validMimeTypes": [
-              "text/plain"
-            ]
-          },
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
-      "notifications": [],
-      "nestedComponents": [],
-      "errors": [],
-      "semanticTerms": [],
-      "stereotype": {
-        "type": "SOURCE_WITH_TWO_BOUND_ACTING_PARAMETERS",
-        "namespace": "VALUES",
-        "parent": {
-          "type": "SOURCE",
-          "namespace": "VALUES",
-          "parent": {
-            "type": "SOURCE",
-            "namespace": "MULE"
-          }
-        }
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "valueProviderModel": {
-                "parameters": [
-                  {
-                    "name": "scalarActingParameter",
-                    "required": true,
-                    "extractionExpression": "someParameter"
-                  },
-                  {
-                    "name": "requiredValue",
-                    "required": true,
-                    "extractionExpression": "oneParameter"
-                  }
-                ],
-                "partOrder": 1,
-                "providerName": "parameterWithValue",
-                "providerId": "org.mule.test.values.extension.resolver.WithTwoActingParametersValueProvider",
-                "requiresConfiguration": false,
-                "requiresConnection": false,
-                "isOpen": true,
-                "modelProperties": {
-                  "sinceMuleVersion": {
-                    "version": "4.4.0"
-                  }
-                }
-              },
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "parameterWithValue",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "oneParameter",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "someParameter",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 5,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "RedeliveryPolicy",
-                  "infrastructureType": {}
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "maxRedeliveryCount"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "int": {},
-                        "default": "5"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "messageDigestAlgorithm"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "MessageIdentifier"
-                    },
-                    "model": {
-                      "type": "Object",
-                      "annotations": {
-                        "typeId": "RedeliveryPolicyMessageIdentifier",
-                        "exclusiveOptionals": {
-                          "exclusiveParameterNames": [
-                            "useSecureHash",
-                            "idExpression"
-                          ],
-                          "isOneRequired": true
-                        }
-                      },
-                      "fields": [
-                        {
-                          "key": {
-                            "name": "useSecureHash"
-                          },
-                          "model": {
-                            "type": "Boolean",
-                            "annotations": {
-                              "default": "true"
-                            }
-                          },
-                          "annotations": {
-                            "description": {
-                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                            }
-                          }
-                        },
-                        {
-                          "key": {
-                            "name": "idExpression"
-                          },
-                          "model": {
-                            "type": "String"
-                          },
-                          "annotations": {
-                            "description": {
-                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
-                            }
-                          }
-                        }
-                      ]
-                    },
-                    "annotations": {
-                      "flattened": {},
-                      "description": {
-                        "value": "Defines which strategy is used to identify the messages."
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "objectStore"
-                    },
-                    "model": {
-                      "type": "@ref:org.mule.runtime.api.store.ObjectStore"
-                    },
-                    "annotations": {
-                      "stereotype": {
-                        "allowedStereotypes": [
-                          {
-                            "type": "OBJECT_STORE",
-                            "namespace": "OS"
-                          }
-                        ]
-                      },
-                      "description": {
-                        "value": "The object store where the redelivery counter for each message is going to be stored."
-                      }
-                    }
-                  }
-                ]
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4,
-                "tabName": "Redelivery"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "redeliveryPolicy",
-              "description": "Defines a policy for processing the redelivery of the same message",
-              "modelProperties": {
-                "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-redelivery-policy",
-                    "prefix": "mule"
-                  }
-                },
-                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                  "sequence": 1
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 1
-          },
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "SourceWithTwoBoundActingParameters",
-      "description": "",
-      "modelProperties": {},
-      "kind": "source"
-    },
-    {
-      "hasResponse": false,
-      "runsOnPrimaryNodeOnly": false,
-      "output": {
-        "type": {
-          "format": {
-            "id": "text/plain",
-            "label": "text/plain",
-            "validMimeTypes": [
-              "text/plain"
-            ]
-          },
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
-      "notifications": [],
-      "nestedComponents": [],
-      "errors": [],
-      "semanticTerms": [],
-      "stereotype": {
-        "type": "SOURCE_WITH_VALUES_WITH_REQUIRED_PARAMETER_INSIDE_PARAM_GROUP",
-        "namespace": "VALUES",
-        "parent": {
-          "type": "SOURCE",
-          "namespace": "VALUES",
-          "parent": {
-            "type": "SOURCE",
-            "namespace": "MULE"
-          }
-        }
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "RedeliveryPolicy",
-                  "infrastructureType": {}
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "maxRedeliveryCount"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "int": {},
-                        "default": "5"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "messageDigestAlgorithm"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "MessageIdentifier"
-                    },
-                    "model": {
-                      "type": "Object",
-                      "annotations": {
-                        "typeId": "RedeliveryPolicyMessageIdentifier",
-                        "exclusiveOptionals": {
-                          "exclusiveParameterNames": [
-                            "useSecureHash",
-                            "idExpression"
-                          ],
-                          "isOneRequired": true
-                        }
-                      },
-                      "fields": [
-                        {
-                          "key": {
-                            "name": "useSecureHash"
-                          },
-                          "model": {
-                            "type": "Boolean",
-                            "annotations": {
-                              "default": "true"
-                            }
-                          },
-                          "annotations": {
-                            "description": {
-                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                            }
-                          }
-                        },
-                        {
-                          "key": {
-                            "name": "idExpression"
-                          },
-                          "model": {
-                            "type": "String"
-                          },
-                          "annotations": {
-                            "description": {
-                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
-                            }
-                          }
-                        }
-                      ]
-                    },
-                    "annotations": {
-                      "flattened": {},
-                      "description": {
-                        "value": "Defines which strategy is used to identify the messages."
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "objectStore"
-                    },
-                    "model": {
-                      "type": "@ref:org.mule.runtime.api.store.ObjectStore"
-                    },
-                    "annotations": {
-                      "stereotype": {
-                        "allowedStereotypes": [
-                          {
-                            "type": "OBJECT_STORE",
-                            "namespace": "OS"
-                          }
-                        ]
-                      },
-                      "description": {
-                        "value": "The object store where the redelivery counter for each message is going to be stored."
-                      }
-                    }
-                  }
-                ]
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Redelivery"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "redeliveryPolicy",
-              "description": "Defines a policy for processing the redelivery of the same message",
-              "modelProperties": {
-                "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-redelivery-policy",
-                    "prefix": "mule"
-                  }
-                },
-                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                  "sequence": 1
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 0
-          },
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "valueProviderModel": {
-                "parameters": [],
-                "partOrder": 1,
-                "providerName": "channels",
-                "providerId": "Simple value provider",
-                "requiresConfiguration": false,
-                "requiresConnection": false,
-                "isOpen": true,
-                "modelProperties": {
-                  "sinceMuleVersion": {
-                    "version": "4.4.0"
-                  }
-                }
-              },
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "channels",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "anyParameter",
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 1
-          },
           "showInDsl": false,
           "name": "ValuesGroup",
           "description": "",
@@ -26333,6 +26333,37 @@
             {
               "type": {
                 "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": true,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "String"
               },
               "hasDynamicType": false,
@@ -26382,7 +26413,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -26411,7 +26442,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -26444,7 +26475,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3
+                "order": 4
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -26488,7 +26519,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4
+                "order": 5
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -26538,43 +26569,12 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 6
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "strings",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 7,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "primaryNodeOnly",
-              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
             },
             {
@@ -26710,7 +26710,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 6,
+                "order": 7,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],

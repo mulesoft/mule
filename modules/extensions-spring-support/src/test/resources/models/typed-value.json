@@ -5849,7 +5849,7 @@
                   "password": false,
                   "text": false,
                   "query": false,
-                  "order": 2
+                  "order": 3
                 },
                 "allowedStereotypeModels": [],
                 "semanticTerms": [],
@@ -5950,7 +5950,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": false,
+              "defaultValue": true,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -5961,7 +5961,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -6103,7 +6103,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1,
+                "order": 2,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
