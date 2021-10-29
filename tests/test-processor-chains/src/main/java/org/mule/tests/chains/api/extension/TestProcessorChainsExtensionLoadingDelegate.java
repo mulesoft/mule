@@ -66,7 +66,7 @@ public class TestProcessorChainsExtensionLoadingDelegate implements ExtensionLoa
         .ofType(typeLoader.load(String.class))
         .asComponentId();
 
-    final ConstructDeclarer chain = extensionDeclarer.withConstruct("chain");
+    compositeProcessorChainRouter.withChain("chain").withMinOccurs(1);
 
   }
 
