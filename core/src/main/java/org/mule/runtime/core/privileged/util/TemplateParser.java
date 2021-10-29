@@ -318,7 +318,13 @@ public final class TemplateParser {
           break;
       }
       lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
-      lastIsBackSlash = c == '\\';
+      if (c == '\\') {
+        if (lastIsBackSlash) {
+          lastIsBackSlash = false;
+        } else {
+          lastIsBackSlash = true;
+        }
+      }
       column++;
     }
     return stack;
