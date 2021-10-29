@@ -429,7 +429,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     ParameterDeclaration clusterSupportParameter = sourceDeclaration.getAllParameters().stream()
         .filter(parameterDeclaration -> parameterDeclaration.getName().equals("primaryNodeOnly")).findFirst().get();
 
-    assertThat(clusterSupportParameter.getDefaultValue(), is(true));
+    assertThat(clusterSupportParameter.getDefaultValue(), is(false));
   }
 
   @Test
