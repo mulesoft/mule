@@ -7,7 +7,7 @@
 
     <description>Empty Mule Application</description>
 
-    <http:listener-config name="listenerConfig" host="localhost" port="9999"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${httpPort}"/>
 
     <flow name="echo-service">
         <http:listener path="*" config-ref="listenerConfig"/>
