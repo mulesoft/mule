@@ -7,9 +7,6 @@
 
 package org.mule.runtime.module.extension.internal.manager;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -20,6 +17,10 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresCo
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -138,9 +139,17 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     } else {
       withContextClassLoader(getClassLoader(extensionModel), () -> {
         extensionRegistry.registerExtension(extensionName, extensionModel);
-        extensionActivator.activateExtension(extensionModel);
+        // extensionActivator.activateExtension(extensionModel);
       });
     }
+  }
+
+  public void activateAllExtensions() {
+    getExtensions().forEach(extensionModel -> {
+      withContextClassLoader(getClassLoader(extensionModel), () -> {
+        extensionActivator.activateExtension(extensionModel);
+      });
+    });
   }
 
   /**

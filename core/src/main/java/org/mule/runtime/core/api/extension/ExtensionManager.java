@@ -41,6 +41,13 @@ public interface ExtensionManager {
   void registerExtension(ExtensionModel extensionModel);
 
   /**
+   * Activates all previously registered {@link ExtensionModel}s.
+   * 
+   * @since 4.5
+   */
+  void activateAllExtensions();
+
+  /**
    * Returns an immutable {@link Set} listing all the discovered {@link ExtensionModel extensionModels}.
    *
    * @return an immutable {@link Set}. Will not be {@code null} but might be empty

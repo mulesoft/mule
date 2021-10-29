@@ -7,12 +7,13 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -65,6 +66,12 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
   @Override
   public void registerExtension(ExtensionModel extensionModel) {
     throw new UnsupportedOperationException("Composite extension manager cannot register extensions");
+  }
+
+  @Override
+  public void activateAllExtensions() {
+    parentExtensionManager.activateAllExtensions();
+    childExtensionManager.activateAllExtensions();
   }
 
   @Override
@@ -129,6 +136,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
     return configurationProvider;
   }
 
+  @Override
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
     Optional<ConfigurationProvider> configurationModel =
         childExtensionManager.getConfigurationProvider(extensionModel, componentModel);
