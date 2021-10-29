@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
+
 import static java.lang.System.getProperty;
+import static java.util.Collections.emptyList;
+
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.compression.InvalidZipFileException;
@@ -353,6 +356,19 @@ public class FileUtils {
    * @param verify    whether to verify all entries before extractions
    */
   public static void unzip(InputStream archive, File directory, boolean verify) throws IOException {
+    unzip(archive, directory, verify, true);
+  }
+
+  /**
+   * Unzip the specified {@code archive} to the given {@code directory}.
+   *
+   * @param archive          the contents of the archive to be unzipped
+   * @param directory        the target directory
+   * @param verify           whether to verify all entries before extractions
+   * @param cleanUpOnFailure whether to remove all generated files on an error. Only use this if {@code directory} is a temporary
+   *                         folder.
+   */
+  public static void unzip(InputStream archive, File directory, boolean verify, boolean cleanUpOnFailure) throws IOException {
     if (directory.exists()) {
       if (!directory.isDirectory()) {
         throw new IOException("Directory is not a directory: " + directory);
@@ -363,10 +379,19 @@ public class FileUtils {
       }
     }
 
-    List<File> createdFiles = new ArrayList<>();
+    List<File> createdFiles;
+    if (cleanUpOnFailure) {
+      createdFiles = new ArrayList<>();
+    } else {
+      createdFiles = emptyList();
+    }
     try (ZipInputStream zis = new ZipInputStream(archive)) {
       ZipEntry entry;
       while ((entry = zis.getNextEntry()) != null) {
+        if (entry.getName().contains("..")) {
+          continue;
+        }
+
         if (verify) {
           verifyZipEntryPath(entry);
         }
@@ -377,15 +402,20 @@ public class FileUtils {
           if (!file.exists() && !file.mkdirs()) {
             throw new IOException("Could not create directory: " + file);
           }
-          createdFiles.add(file);
         } else {
           if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
             throw new IOException("Unable to create folders for zip entry: " + entry.getName());
           }
 
           OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-          copy(zis, os);
-          IOUtils.closeQuietly(os);
+          try {
+            copy(zis, os);
+          } finally {
+            IOUtils.closeQuietly(os);
+          }
+        }
+
+        if (cleanUpOnFailure) {
           createdFiles.add(file);
         }
       }
