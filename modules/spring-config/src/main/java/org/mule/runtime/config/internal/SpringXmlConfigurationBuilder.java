@@ -169,8 +169,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     muleArtifactContext = createApplicationContext(muleContext);
     createSpringRegistry(muleContext, muleArtifactContext);
-
-    muleContext.getExtensionManager().activateAllExtensions();
   }
 
   /**
