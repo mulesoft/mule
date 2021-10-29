@@ -22887,8 +22887,8 @@
                       "enum": {
                         "type": "[Ljava.lang.String;",
                         "values": [
-                          "DROP",
-                          "FAIL"
+                          "FAIL",
+                          "DROP"
                         ]
                       },
                       "classInformation": {
@@ -24477,8 +24477,8 @@
                       "enum": {
                         "type": "[Ljava.lang.String;",
                         "values": [
-                          "DROP",
-                          "FAIL"
+                          "FAIL",
+                          "DROP"
                         ]
                       },
                       "classInformation": {
@@ -29197,8 +29197,8 @@
                       "enum": {
                         "type": "[Ljava.lang.String;",
                         "values": [
-                          "DROP",
-                          "FAIL"
+                          "FAIL",
+                          "DROP"
                         ]
                       },
                       "classInformation": {
