@@ -6,10 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -27,20 +44,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -71,7 +74,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -81,9 +83,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -134,7 +138,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private ConfigurationProvider extension1ConfigurationProvider;
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
-  private ConfigurationInstance extension1ConfigurationInstance = mock(ConfigurationInstance.class);
+  private final ConfigurationInstance extension1ConfigurationInstance = mock(ConfigurationInstance.class);
 
   @Mock(lenient = true)
   private CompletableComponentExecutorFactory executorFactory;
@@ -224,9 +228,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   private void registerExtensions(ExtensionModel... extensionModels) {
-    Arrays.stream(extensionModels).forEach(extension -> {
+    stream(extensionModels).forEach(extension -> {
       when(extension.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(empty());
-      extensionsManager.registerExtension(extension);
+      extensionsManager.registerExtension(extension, true);
     });
   }
 
@@ -252,7 +256,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = mock(ExtensionModel.class);
     when(extensionModel.getName()).thenThrow(new RuntimeException());
     try {
-      extensionsManager.registerExtension(extensionModel);
+      extensionsManager.registerExtension(extensionModel, true);
       fail("was expecting an exception");
     } catch (RuntimeException e) {
       assertThat(classLoader, sameInstance(Thread.currentThread().getContextClassLoader()));
@@ -351,7 +355,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(parameterOfRepeatedEnumType.getType()).thenReturn(toMetadataType(TimeUnit.class));
 
     mockParameters(extension1ConfigurationModel, parameter, parameterOfRepeatedEnumType);
-    extensionsManager.registerExtension(extensionModel1);
+    extensionsManager.registerExtension(extensionModel1, false);
+    extensionsManager.activateAllExtensions();
 
     verify(muleContext.getRegistry()).registerObject(anyString(), any(StringToEnum.class), eq(Transformer.class));
   }
@@ -367,7 +372,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
         .thenReturn(create(JAVA).arrayType().of(toMetadataType(TimeUnit.class)).build());
 
     mockParameters(extension1ConfigurationModel, parameter);
-    extensionsManager.registerExtension(extensionModel1);
+    extensionsManager.registerExtension(extensionModel1, false);
+    extensionsManager.activateAllExtensions();
 
     verify(muleContext.getRegistry()).registerObject(anyString(), any(StringToEnum.class), eq(Transformer.class));
   }

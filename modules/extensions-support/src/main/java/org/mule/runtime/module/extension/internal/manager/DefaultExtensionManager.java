@@ -118,11 +118,16 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     configurationExpirationMonitor.stopMonitoring();
   }
 
+  @Override
+  public void registerExtension(ExtensionModel extensionModel) {
+    registerExtension(extensionModel, true);
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public void registerExtension(ExtensionModel extensionModel) {
+  public void registerExtension(ExtensionModel extensionModel, boolean activate) {
     final String extensionName = extensionModel.getName();
     final String extensionVersion = extensionModel.getVersion();
     final String extensionVendor = extensionModel.getVendor();
@@ -139,11 +144,14 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     } else {
       withContextClassLoader(getClassLoader(extensionModel), () -> {
         extensionRegistry.registerExtension(extensionName, extensionModel);
-        // extensionActivator.activateExtension(extensionModel);
+        if (activate) {
+          extensionActivator.activateExtension(extensionModel);
+        }
       });
     }
   }
 
+  @Override
   public void activateAllExtensions() {
     getExtensions().forEach(extensionModel -> {
       withContextClassLoader(getClassLoader(extensionModel), () -> {

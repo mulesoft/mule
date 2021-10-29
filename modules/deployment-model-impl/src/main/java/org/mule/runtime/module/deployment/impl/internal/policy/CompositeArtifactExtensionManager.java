@@ -65,6 +65,11 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
 
   @Override
   public void registerExtension(ExtensionModel extensionModel) {
+    registerExtension(extensionModel, true);
+  }
+
+  @Override
+  public void registerExtension(ExtensionModel extensionModel, boolean activate) {
     throw new UnsupportedOperationException("Composite extension manager cannot register extensions");
   }
 

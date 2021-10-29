@@ -7,14 +7,17 @@
 
 package org.mule.test.runner.infrastructure;
 
-import static com.google.common.collect.ImmutableList.copyOf;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+
+import static com.google.common.collect.ImmutableList.copyOf;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.MuleManifest;
@@ -84,7 +87,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
     params.put(VERSION, getProductVersion());
     DslResolvingContext dslResolvingContext = getDefault(singleton(MuleExtensionModelProvider.getExtensionModel()));
     ExtensionModel model = loader.loadExtensionModel(annotatedClass.getClassLoader(), dslResolvingContext, params);
-    extensionManager.registerExtension(model);
+    extensionManager.registerExtension(model, false);
     return model;
   }
 

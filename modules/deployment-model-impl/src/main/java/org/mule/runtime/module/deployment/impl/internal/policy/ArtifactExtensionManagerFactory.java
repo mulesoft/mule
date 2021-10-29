@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
@@ -65,11 +66,11 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
     final ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
     final Set<ExtensionModel> extensions = new HashSet<>();
     extensionModelDiscoverer.discoverRuntimeExtensionModels()
-        .forEach(extensionManager::registerExtension);
+        .forEach(extModel -> extensionManager.registerExtension(extModel, false));
     extensions.addAll(extensionModelDiscoverer
         .discoverPluginsExtensionModels(extensionModelLoaderRepository, artifactPlugins, parentArtifactExtensions)
         .stream().map(Pair::getSecond).collect(toSet()));
-    extensions.forEach(extensionManager::registerExtension);
+    extensions.forEach(extModel -> extensionManager.registerExtension(extModel, false));
     return extensionManager;
   }
 
