@@ -16,7 +16,7 @@ public class DefaultArgumentDefinition implements ArgumentDefinition {
   private final String description;
   private final boolean required;
 
-  DefaultArgumentDefinition(String name, String description, boolean required) {
+  public DefaultArgumentDefinition(String name, String description, boolean required) {
     this.name = name;
     this.description = description;
     this.required = required;

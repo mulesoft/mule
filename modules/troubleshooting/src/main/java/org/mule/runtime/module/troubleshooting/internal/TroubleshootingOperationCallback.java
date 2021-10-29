@@ -18,6 +18,7 @@ public interface TroubleshootingOperationCallback {
 
   /**
    * The operation behaviour.
+   * 
    * @param arguments A dictionary with the argument names and values.
    * @return an externalizable object, which is the operation result.
    */

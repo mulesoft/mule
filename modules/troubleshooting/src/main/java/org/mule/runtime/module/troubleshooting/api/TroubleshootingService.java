@@ -20,8 +20,8 @@ import java.util.Map;
 public interface TroubleshootingService {
 
   /**
-   * Gets the available operation definitions. User should retrieve these definitions to know what are the possible
-   * parameters for {@link #executeOperation(String, Map)}.
+   * Gets the available operation definitions. User should retrieve these definitions to know what are the possible parameters for
+   * {@link #executeOperation(String, Map)}.
    *
    * @return the available operation definitions.
    */
@@ -31,7 +31,7 @@ public interface TroubleshootingService {
    * Invokes an operation with the given parameters. User must respect the definitions retrieved with
    * {@link #getAvailableOperations()}
    *
-   * @param name The name of the operation to execute.
+   * @param name      The name of the operation to execute.
    * @param arguments A dictionary with the arguments.
    * @return the return value of the operation.
    */

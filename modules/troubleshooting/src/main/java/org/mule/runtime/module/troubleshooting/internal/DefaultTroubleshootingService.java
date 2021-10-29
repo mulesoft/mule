@@ -9,6 +9,7 @@ package org.mule.runtime.module.troubleshooting.internal;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
+import org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

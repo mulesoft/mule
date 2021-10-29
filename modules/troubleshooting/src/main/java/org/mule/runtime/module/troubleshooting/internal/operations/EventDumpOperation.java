@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.troubleshooting.internal;
+package org.mule.runtime.module.troubleshooting.internal.operations;
 
 import static java.lang.String.format;
 
@@ -18,6 +18,10 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
+import org.mule.runtime.module.troubleshooting.internal.DefaultArgumentDefinition;
+import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingOperationDefinition;
+import org.mule.runtime.module.troubleshooting.internal.TroubleshootingOperation;
+import org.mule.runtime.module.troubleshooting.internal.TroubleshootingOperationCallback;
 
 import java.util.List;
 
@@ -28,22 +32,22 @@ import java.util.List;
  * <p>
  * Arguments:
  * <ul>
- *   <li>application (Optional): The application to collect the event dump from</li>
+ * <li>application (Optional): The application to collect the event dump from</li>
  * </ul>
  */
 public class EventDumpOperation implements TroubleshootingOperation {
 
-  private static final String EVENT_DUMP_OPERATION_NAME = "events";
-  private static final String EVENT_DUMP_OPERATION_DESCRIPTION = "Collects an EventDump in JSON format";
+  static final String EVENT_DUMP_OPERATION_NAME = "events";
+  static final String EVENT_DUMP_OPERATION_DESCRIPTION = "Collects an EventDump in JSON format";
 
-  private static final String APPLICATION_ARGUMENT_NAME = "application";
-  private static final String APPLICATION_ARGUMENT_DESCRIPTION = "Application to collect the event dump from";
+  static final String APPLICATION_ARGUMENT_NAME = "application";
+  static final String APPLICATION_ARGUMENT_DESCRIPTION = "Application to collect the event dump from";
 
   private static final TroubleshootingOperationDefinition definition = createOperationDefinition();
 
   private final DeploymentService deploymentService;
 
-  EventDumpOperation(DeploymentService deploymentService) {
+  public EventDumpOperation(DeploymentService deploymentService) {
     this.deploymentService = deploymentService;
   }
 
@@ -108,7 +112,7 @@ public class EventDumpOperation implements TroubleshootingOperation {
   private static JSONArray flowCallStackToJSON(FlowCallStack flowCallStack) {
     JSONArray callStackAsJSON = new JSONArray();
     for (FlowStackElement element : flowCallStack.getElements()) {
-      callStackAsJSON.put(element.toStringWithElapsedTime());
+      callStackAsJSON.put(element.toString());
     }
     return callStackAsJSON;
   }
