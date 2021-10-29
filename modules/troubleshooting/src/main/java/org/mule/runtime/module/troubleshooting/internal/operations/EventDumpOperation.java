@@ -20,8 +20,8 @@ import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.internal.DefaultArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingOperationDefinition;
-import org.mule.runtime.module.troubleshooting.internal.TroubleshootingOperation;
-import org.mule.runtime.module.troubleshooting.internal.TroubleshootingOperationCallback;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperation;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback;
 
 import java.util.List;
 

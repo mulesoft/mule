@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.troubleshooting.internal;
+package org.mule.runtime.module.troubleshooting.api;
 
 import java.io.Serializable;
 import java.util.Map;

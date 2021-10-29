@@ -10,19 +10,19 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingServiceTestCase.TestTroubleshootingOperation.REQUIRED_ARGUMENT_NAME;
-import static org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingServiceTestCase.TestTroubleshootingOperation.TEST_OPERATION_NAME;
+import static org.mule.runtime.module.troubleshooting.internal.TestTroubleshootingOperation.REQUIRED_ARGUMENT_NAME;
+import static org.mule.runtime.module.troubleshooting.internal.TestTroubleshootingOperation.TEST_OPERATION_NAME;
 import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTestUtils.mockApplication;
 import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTestUtils.mockDeploymentService;
 import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTestUtils.mockFlowStackEntry;
 import static org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation.EVENT_DUMP_OPERATION_NAME;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentService;
-import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationException;
 
@@ -35,13 +35,18 @@ public class DefaultTroubleshootingServiceTestCase {
   private DefaultTroubleshootingService troubleshootingService;
 
   @Before
-  public void setup() {
+  public void setUp() {
     FlowStackEntry flowStackEntry = mockFlowStackEntry();
     Application app1 = mockApplication("app1", flowStackEntry);
     Application app2 = mockApplication("app2");
     DeploymentService deploymentService = mockDeploymentService(app1, app2);
     troubleshootingService = new DefaultTroubleshootingService(deploymentService);
     troubleshootingService.registerOperation(new TestTroubleshootingOperation());
+  }
+
+  @After
+  public void tearDown() {
+    troubleshootingService.unregisterOperation(TEST_OPERATION_NAME);
   }
 
   @Test
@@ -78,35 +83,4 @@ public class DefaultTroubleshootingServiceTestCase {
     troubleshootingService.executeOperation(TEST_OPERATION_NAME, onlyRequired);
   }
 
-  static class TestTroubleshootingOperation implements TroubleshootingOperation {
-
-    private static final TroubleshootingOperationDefinition definition = createDefinition();
-    static final String TEST_OPERATION_NAME = "test";
-    private static final String TEST_OPERATION_DESCRIPTION = "This is a test troubleshooting operation";
-
-    static final String REQUIRED_ARGUMENT_NAME = "required";
-    private static final String REQUIRED_ARGUMENT_DESCRIPTION = "This is a required argument";
-
-    private static final String OPTIONAL_ARGUMENT_NAME = "optional";
-    private static final String OPTIONAL_ARGUMENT_DESCRIPTION = "This is an optional argument";
-
-    private static TroubleshootingOperationDefinition createDefinition() {
-      ArgumentDefinition requiredArgument =
-          new DefaultArgumentDefinition(REQUIRED_ARGUMENT_NAME, REQUIRED_ARGUMENT_DESCRIPTION, true);
-      ArgumentDefinition optionalArgument =
-          new DefaultArgumentDefinition(OPTIONAL_ARGUMENT_NAME, OPTIONAL_ARGUMENT_DESCRIPTION, false);
-      return new DefaultTroubleshootingOperationDefinition(TEST_OPERATION_NAME, TEST_OPERATION_DESCRIPTION, requiredArgument,
-                                                           optionalArgument);
-    }
-
-    @Override
-    public TroubleshootingOperationDefinition getDefinition() {
-      return definition;
-    }
-
-    @Override
-    public TroubleshootingOperationCallback getCallback() {
-      return (args) -> String.format("%s with these arguments: %s", TEST_OPERATION_DESCRIPTION, args);
-    }
-  }
 }

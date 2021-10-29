@@ -10,6 +10,8 @@ import static java.lang.String.format;
 
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperation;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationException;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
@@ -29,7 +31,7 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
     registerOperation(new EventDumpOperation(deploymentService));
   }
 
-  // TODO: Create an interface for this so that a module can register one troubleshooting operation.
+  @Override
   public void registerOperation(TroubleshootingOperation operation) {
     TroubleshootingOperationDefinition definition = operation.getDefinition();
     String operationName = definition.getName();
@@ -37,6 +39,12 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
 
     TroubleshootingOperationCallback callback = operation.getCallback();
     this.callbacksByName.put(operationName, callback);
+  }
+
+  @Override
+  public void unregisterOperation(String name) {
+    this.definitionsByName.remove(name);
+    this.callbacksByName.remove(name);
   }
 
   @Override

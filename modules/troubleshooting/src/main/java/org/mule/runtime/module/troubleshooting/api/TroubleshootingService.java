@@ -38,4 +38,18 @@ public interface TroubleshootingService {
    *                                           error in the arguments.
    */
   Object executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException;
+
+  /**
+   * Registers a new {@link TroubleshootingOperation}.
+   * 
+   * @param operation the operation to be registered.
+   */
+  void registerOperation(TroubleshootingOperation operation);
+
+  /**
+   * Unregisters a new {@link TroubleshootingOperation}.
+   * 
+   * @param name the name of the operation to be registered.
+   */
+  void unregisterOperation(String name);
 }

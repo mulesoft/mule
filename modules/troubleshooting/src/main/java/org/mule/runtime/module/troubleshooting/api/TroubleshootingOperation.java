@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.troubleshooting.internal;
-
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
+package org.mule.runtime.module.troubleshooting.api;
 
 /**
  * Internal interface that has the definition and the callback for a given operation.
