@@ -7,20 +7,29 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.ArtifactType.DOMAIN;
+import static org.mule.runtime.ast.api.ArtifactType.POLICY;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.APP_CONFIG;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
 import java.util.function.Predicate;
 
 public class ConfigReferenceParametersStereotypesValidations extends AbstractReferenceParametersStereotypesValidations {
+
+  private final FeatureFlaggingService featureFlaggingService;
+
+  public ConfigReferenceParametersStereotypesValidations(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
+  }
 
   public static final ComponentIdentifier CACHE_IDENTIFIER =
       builder().namespace(EE_PREFIX).name("cache").build();
@@ -41,12 +50,7 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
   }
 
   private Predicate<? super ComponentAstDependency> dependencyNotInDomainFilter(ArtifactAst artifact) {
-    // Only domains expose their configs to apps
-    if (artifact.getArtifactType().equals(APPLICATION)
-        && artifact.getParent()
-            .map(p -> p.getArtifactType().equals(DOMAIN))
-            .orElse(false)) {
-
+    if (domainFromApp(artifact)) {
       return missing -> artifact.getParent().get().topLevelComponentsStream()
           .noneMatch(parentTopLevel -> parentTopLevel.getComponentId()
               .map(id -> id.equals(missing.getName()))
@@ -54,6 +58,34 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
     } else {
       return missing -> true;
     }
+  }
+
+  protected boolean domainFromApp(ArtifactAst artifact) {
+    // Only domains expose their configs to apps...
+    return artifact.getArtifactType().equals(APPLICATION)
+        && artifact.getParent()
+            .map(p -> p.getArtifactType().equals(DOMAIN))
+            .orElse(false);
+  }
+
+  private Predicate<? super ComponentAstDependency> dependencyNotInAppFilter(ArtifactAst artifact) {
+    if (appFromPolicy(artifact)) {
+      return missing -> artifact.getParent().get().topLevelComponentsStream()
+          .noneMatch(parentTopLevel -> parentTopLevel.getComponentId()
+              .map(id -> id.equals(missing.getName()))
+              .orElse(false));
+    } else {
+      return missing -> true;
+    }
+  }
+
+  protected boolean appFromPolicy(ArtifactAst artifact) {
+    // ... or apps to policies if explicitely enabled
+    return artifact.getArtifactType().equals(POLICY)
+        && !featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)
+        && artifact.getParent()
+            .map(p -> p.getArtifactType().equals(APPLICATION))
+            .orElse(false);
   }
 
   @Override
@@ -64,7 +96,10 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
         && missing.getAllowedStereotypes().stream()
             .anyMatch(st -> st.isAssignableTo(CONFIG)
                 || st.isAssignableTo(APP_CONFIG));
-    return configPredicate.and(dependencyNotInDomainFilter(artifact));
+
+    return configPredicate
+        .and(dependencyNotInDomainFilter(artifact))
+        .and(dependencyNotInAppFilter(artifact));
   }
 
 }
