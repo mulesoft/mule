@@ -132,7 +132,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private void declareClusterSupport(SourceDeclarer sourceDeclarer, Optional<SourceClusterSupport> sourceClusterSupport) {
     boolean runsOnPrimaryNodeOnly;
-    switch (sourceClusterSupport.orElse(SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY)) {
+    switch (sourceClusterSupport.orElse(SourceClusterSupport.DEFAULT_ALL_NODES)) {
       case DEFAULT_PRIMARY_NODE_ONLY:
         runsOnPrimaryNodeOnly = false;
         addPrimaryNodeParameter(sourceDeclarer.getDeclaration(), true);
