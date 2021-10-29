@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.module.troubleshooting.internal;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationException;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation;
 
@@ -22,10 +26,11 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
   private final Map<String, TroubleshootingOperationCallback> callbacksByName = new HashMap<>();
 
   public DefaultTroubleshootingService(DeploymentService deploymentService) {
-    addOperation(new EventDumpOperation(deploymentService));
+    registerOperation(new EventDumpOperation(deploymentService));
   }
 
-  private void addOperation(TroubleshootingOperation operation) {
+  // TODO: Create an interface for this so that a module can register one troubleshooting operation.
+  public void registerOperation(TroubleshootingOperation operation) {
     TroubleshootingOperationDefinition definition = operation.getDefinition();
     String operationName = definition.getName();
     this.definitionsByName.put(operationName, definition);
@@ -40,7 +45,46 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
   }
 
   @Override
-  public Object executeOperation(String name, Map<String, String> arguments) {
-    return callbacksByName.get(name).execute(arguments);
+  public Object executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException {
+    TroubleshootingOperationCallback callback = getCallback(name, arguments);
+    return callback.execute(arguments);
+  }
+
+  private TroubleshootingOperationCallback getCallback(String operationName, Map<String, String> receivedArguments)
+      throws TroubleshootingOperationException {
+    TroubleshootingOperationCallback callback = callbacksByName.get(operationName);
+    TroubleshootingOperationDefinition operationDefinition = definitionsByName.get(operationName);
+    if (callback == null || operationDefinition == null) {
+      throw new TroubleshootingOperationException(format("The operation '%s' is not supported or not available", operationName));
+    }
+
+    checkRequiredParametersArePresent(operationName, receivedArguments, operationDefinition);
+    checkReceivedArgumentsAreExpected(operationName, receivedArguments, operationDefinition);
+    return callback;
+  }
+
+  private void checkReceivedArgumentsAreExpected(String operationName, Map<String, String> receivedArguments,
+                                                 TroubleshootingOperationDefinition operationDefinition)
+      throws TroubleshootingOperationException {
+    for (String receivedArgument : receivedArguments.keySet()) {
+      operationDefinition.getArgumentDefinitions().stream()
+          .map(ArgumentDefinition::getName)
+          .filter(receivedArgument::equals)
+          .findAny()
+          .orElseThrow(() -> new TroubleshootingOperationException(format("Received unexpected argument '%s' when invoking operation '%s'",
+                                                                          receivedArgument, operationName)));
+    }
+  }
+
+  private void checkRequiredParametersArePresent(String operationName, Map<String, String> receivedArguments,
+                                                 TroubleshootingOperationDefinition operationDefinition)
+      throws TroubleshootingOperationException {
+    for (ArgumentDefinition argumentDefinition : operationDefinition.getArgumentDefinitions()) {
+      String argumentName = argumentDefinition.getName();
+      if (argumentDefinition.isRequired() && !receivedArguments.containsKey(argumentName)) {
+        throw new TroubleshootingOperationException(format("Missing required argument '%s' when invoking operation '%s'",
+                                                           argumentName, operationName));
+      }
+    }
   }
 }

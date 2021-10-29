@@ -34,6 +34,8 @@ public interface TroubleshootingService {
    * @param name      The name of the operation to execute.
    * @param arguments A dictionary with the arguments.
    * @return the return value of the operation.
+   * @throws TroubleshootingOperationException if it couldn't execute the operation because it wasn't available or there is an
+   *                                           error in the arguments.
    */
-  Object executeOperation(String name, Map<String, String> arguments);
+  Object executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException;
 }

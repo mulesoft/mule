@@ -37,11 +37,11 @@ import java.util.List;
  */
 public class EventDumpOperation implements TroubleshootingOperation {
 
-  static final String EVENT_DUMP_OPERATION_NAME = "events";
-  static final String EVENT_DUMP_OPERATION_DESCRIPTION = "Collects an EventDump in JSON format";
+  public static final String EVENT_DUMP_OPERATION_NAME = "events";
+  public static final String EVENT_DUMP_OPERATION_DESCRIPTION = "Collects an EventDump in JSON format";
 
-  static final String APPLICATION_ARGUMENT_NAME = "application";
-  static final String APPLICATION_ARGUMENT_DESCRIPTION = "Application to collect the event dump from";
+  public static final String APPLICATION_ARGUMENT_NAME = "application";
+  public static final String APPLICATION_ARGUMENT_DESCRIPTION = "Application to collect the event dump from";
 
   private static final TroubleshootingOperationDefinition definition = createOperationDefinition();
 
