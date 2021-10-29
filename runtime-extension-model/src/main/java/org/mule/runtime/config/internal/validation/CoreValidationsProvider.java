@@ -8,15 +8,21 @@ package org.mule.runtime.config.internal.validation;
 
 import static java.util.Arrays.asList;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.validation.ArtifactValidation;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class CoreValidationsProvider implements ValidationsProvider {
 
   private ClassLoader artifactRegionClassLoader;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   @Override
   public List<Validation> get() {
@@ -57,7 +63,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
     return asList(new ImportValidTarget(),
-                  new ConfigReferenceParametersStereotypesValidations(),
+                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService),
                   new ReferenceParametersStereotypesValidations());
   }
 
