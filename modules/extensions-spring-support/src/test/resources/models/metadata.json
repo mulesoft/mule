@@ -21370,6 +21370,40 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "type",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
+                      "order": 1,
+                      "providedByKeyResolver": true
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Boolean"
                   },
                   "hasDynamicType": false,
@@ -21389,7 +21423,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -21397,40 +21431,6 @@
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "type",
-                  "description": "",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1,
-                      "providedByKeyResolver": true
-                    }
-                  }
                 },
                 {
                   "type": {
@@ -22328,6 +22328,40 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "type",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
+                      "order": 1,
+                      "providedByKeyResolver": true
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Boolean"
                   },
                   "hasDynamicType": false,
@@ -22347,7 +22381,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -22355,40 +22389,6 @@
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "type",
-                  "description": "",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1,
-                      "providedByKeyResolver": true
-                    }
-                  }
                 },
                 {
                   "type": {
@@ -38638,7 +38638,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -38780,7 +38780,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 5,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -38806,7 +38806,7 @@
             "password": false,
             "text": false,
             "query": false,
-            "order": 1
+            "order": 0
           },
           "showInDsl": false,
           "name": "General",
@@ -38836,7 +38836,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3
+                "order": 1
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -38870,7 +38870,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -38904,7 +38904,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -38926,7 +38926,7 @@
             "password": false,
             "text": false,
             "query": false,
-            "order": 2
+            "order": 1
           },
           "showInDsl": false,
           "name": "Location",
@@ -39067,7 +39067,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -39209,7 +39209,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 5,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -39235,7 +39235,7 @@
             "password": false,
             "text": false,
             "query": false,
-            "order": 1
+            "order": 0
           },
           "showInDsl": false,
           "name": "General",
@@ -39265,7 +39265,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3
+                "order": 1
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -39299,7 +39299,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -39333,7 +39333,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -39355,7 +39355,7 @@
             "password": false,
             "text": false,
             "query": false,
-            "order": 2
+            "order": 1
           },
           "showInDsl": true,
           "name": "Location",
@@ -39496,7 +39496,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -39638,7 +39638,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 5,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -39664,7 +39664,7 @@
             "password": false,
             "text": false,
             "query": false,
-            "order": 1
+            "order": 0
           },
           "showInDsl": false,
           "name": "General",
@@ -39694,7 +39694,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3
+                "order": 1
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -39728,7 +39728,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -39762,7 +39762,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -39784,7 +39784,7 @@
             "password": false,
             "text": false,
             "query": false,
-            "order": 2
+            "order": 1
           },
           "showInDsl": false,
           "name": "Location",

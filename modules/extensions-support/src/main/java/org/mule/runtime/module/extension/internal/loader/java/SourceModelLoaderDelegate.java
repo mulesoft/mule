@@ -95,8 +95,6 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .transactional(parser.isTransactional())
           .supportsStreaming(parser.supportsStreaming());
 
-      declareClusterSupport(sourceDeclarer, parser.getSourceClusterSupport());
-
       parser.getDeprecationModel().ifPresent(sourceDeclarer::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> sourceDeclarer.getDeclaration().setDisplayModel(d));
       parser.getSourceFactoryModelProperty().ifPresent(sourceDeclarer::withModelProperty);
@@ -125,6 +123,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate);
       declareSourceCallbackParameters(parser.getOnBackPressureCallbackParser(), sourceDeclarer::onBackPressure);
 
+      declareClusterSupport(sourceDeclarer, parser.getSourceClusterSupport());
       declareBackPressureSupport(extensionDeclarer, sourceDeclarer, parser.getBackPressureStrategyModelProperty());
 
       sourceDeclarers.put(parser, sourceDeclarer);
