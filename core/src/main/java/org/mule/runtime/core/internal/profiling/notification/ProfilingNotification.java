@@ -22,9 +22,12 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.SCHEDULING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TASK_EXECUTED;
 
 /**
  * A {@link Notification} that produces data for troubleshooting. This is extended for using notifications for producing profiling
@@ -44,6 +47,10 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   private static final int STARTING_OPERATION_EXECUTION_EVENT_ID = PROFILING_ACTION_START_RANGE + 10;
   private static final int OPERATION_EXECUTED_EVENT_ID = PROFILING_ACTION_START_RANGE + 11;
   private static final int OPERATION_THREAD_RELEASE_EVENT_ID = PROFILING_ACTION_START_RANGE + 12;
+  private static final int SCHEDULING_TASK_EXECUTION_EVENT_ID = PROFILING_ACTION_START_RANGE + 13;
+  private static final int STARTING_TASK_EXECUTION_EVENT_ID = PROFILING_ACTION_START_RANGE + 14;
+  private static final int TASK_EXECUTED_EVENT_ID = PROFILING_ACTION_START_RANGE + 15;
+
 
   /**
    * The separator between the profiling identifier and the namespace.
@@ -77,6 +84,10 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
                    STARTING_OPERATION_EXECUTION_EVENT_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(OPERATION_EXECUTED), OPERATION_EXECUTED_EVENT_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(OPERATION_THREAD_RELEASE), OPERATION_THREAD_RELEASE_EVENT_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(SCHEDULING_TASK_EXECUTION),
+                   SCHEDULING_TASK_EXECUTION_EVENT_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(STARTING_TASK_EXECUTION), STARTING_TASK_EXECUTION_EVENT_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TASK_EXECUTED), TASK_EXECUTED_EVENT_ID);
   }
 
   private final ProfilingEventType<T> profilingEventType;

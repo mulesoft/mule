@@ -76,7 +76,6 @@ public class ComponentProfilingUtils {
     profilingEventContext.getLocation().ifPresent(loc -> addLocationInfo(eventMap, loc));
   }
 
-
   private static void addLocationInfo(Map<String, String> eventMap, ComponentLocation location) {
     eventMap.put(LOCATION, location.getLocation());
     ComponentIdentifier identifier = location.getComponentIdentifier().getIdentifier();

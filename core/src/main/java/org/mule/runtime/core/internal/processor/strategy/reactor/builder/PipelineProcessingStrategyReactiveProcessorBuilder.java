@@ -12,7 +12,6 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
-
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
@@ -109,6 +108,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
                                                                                  artifactType, currentTimeMillis());
 
     return publisher
+        .setTaskContext(profilingService.getTaskTracingService(), location)
         .profileProcessingStrategyEvent(profilingService, psSchedulingFlowExecutionDataProducer, transfomer)
         .publishOn(ofNullable(scheduler))
         .profileProcessingStrategyEvent(profilingService, startingFlowExecutionDataproducer, transfomer)

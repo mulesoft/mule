@@ -104,6 +104,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
+                .setTaskContext(profilingService.getTaskTracingService(), location)
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(PS_SCHEDULING_FLOW_EXECUTION),
                                                 transfomer)
@@ -145,6 +146,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
+                .setTaskContext(profilingService.getTaskTracingService(), location)
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION),
                                                 transfomer)
