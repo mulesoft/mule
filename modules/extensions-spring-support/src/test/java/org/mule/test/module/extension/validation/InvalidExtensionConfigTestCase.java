@@ -15,6 +15,7 @@ import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 
+import org.mule.functional.api.extension.TestComponentExtensionLoadingDelegate;
 import org.mule.functional.junit4.AbstractConfigurationFailuresTestCase;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -22,6 +23,7 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.VeganExtension;
+import org.mule.tests.api.TestComponentsExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -228,6 +230,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
     ExtensionModel heisenberg = loadExtension(HeisenbergExtension.class, emptySet());
     ExtensionModel vegan = loadExtension(VeganExtension.class, emptySet());
     ExtensionModel implicit = loadExtension(ImplicitConfigExtension.class, emptySet());
+    ExtensionModel testComponents = loadExtensionWithDelegate(TestComponentExtensionLoadingDelegate.class, emptySet());
 
     final List<ExtensionModel> extensions = new ArrayList<>();
     extensions.addAll(super.getRequiredExtensions());
@@ -235,6 +238,7 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
     extensions.add(heisenberg);
     extensions.add(vegan);
     extensions.add(implicit);
+    extensions.add(testComponents);
 
     return extensions;
   }
