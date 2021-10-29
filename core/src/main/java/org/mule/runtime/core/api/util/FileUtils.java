@@ -388,12 +388,10 @@ public class FileUtils {
     try (ZipInputStream zis = new ZipInputStream(archive)) {
       ZipEntry entry;
       while ((entry = zis.getNextEntry()) != null) {
-        if (entry.getName().contains("..")) {
-          continue;
-        }
-
         if (verify) {
           verifyZipEntryPath(entry);
+        } else if (entry.getName().contains("..")) {
+          continue;
         }
 
         File file = newFile(directory, entry.getName());
