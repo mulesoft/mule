@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.troubleshooting.api;
 
+import org.mule.api.annotation.Experimental;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ import java.util.Map;
  * <p>
  * <b>Important:</b> Return externalizable objects to avoid marshalling errors when using it in an external tool.
  */
+@Experimental
 public interface TroubleshootingOperationCallback {
 
   /**

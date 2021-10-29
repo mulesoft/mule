@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.troubleshooting.api;
 
+import org.mule.api.annotation.Experimental;
+
 /**
  * Exception used to the troubleshooting operations related errors.
  */
+@Experimental
 public class TroubleshootingOperationException extends Exception {
 
   private static final long serialVersionUID = -6535704838521318202L;

@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.troubleshooting.api;
 
+import org.mule.api.annotation.Experimental;
+
 /**
  * Internal interface that has the definition and the callback for a given operation.
  */
+@Experimental
 public interface TroubleshootingOperation {
 
   /**
