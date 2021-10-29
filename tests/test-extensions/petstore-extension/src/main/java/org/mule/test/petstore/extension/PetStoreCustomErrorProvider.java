@@ -11,6 +11,7 @@ import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_E
 
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+
 import java.util.Collections;
 import java.util.Set;
 
