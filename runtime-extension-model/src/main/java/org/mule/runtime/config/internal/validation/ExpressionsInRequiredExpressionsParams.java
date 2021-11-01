@@ -82,8 +82,8 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
         .orElse(emptyList())
         .stream()
         .filter(param -> {
-          if (param.getValue().isRight() && param.getValue().getRight() instanceof String) {
-            final String stringValue = (String) param.getValue().getRight();
+          if (param.getValueOrResolutionError().isRight() && param.getResolvedRawValue() instanceof String) {
+            final String stringValue = param.getResolvedRawValue();
 
             if (!stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX)
                 || !stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX)) {

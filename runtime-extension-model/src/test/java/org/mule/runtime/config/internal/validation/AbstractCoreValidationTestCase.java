@@ -66,6 +66,9 @@ public abstract class AbstractCoreValidationTestCase {
             .build());
 
     final ConfigurationDeclarer config = extensionDeclarer.withConfig("config");
+    final ConfigurationDeclarer otherConfig = extensionDeclarer.withConfig("otherConfig");
+    otherConfig.onDefaultParameterGroup().withRequiredParameter("count").ofType(ExtensionsTypeLoaderFactory.getDefault()
+        .createTypeLoader(MuleExtensionModelProvider.class.getClassLoader()).load(Integer.class));
 
     final OperationDeclarer operation = extensionDeclarer.withOperation("operation");
     operation.withOutput().ofType(typeLoader.load(void.class));
