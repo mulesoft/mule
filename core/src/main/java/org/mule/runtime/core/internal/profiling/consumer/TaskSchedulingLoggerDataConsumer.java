@@ -19,6 +19,7 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.SCHEDULING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TASK_EXECUTED;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getTaskSchedulingInfoMap;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<TaskSchedulingProfilingEventContext> {
@@ -31,7 +32,7 @@ public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<T
   public void onProfilingEvent(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType,
                                TaskSchedulingProfilingEventContext profilingEventContext) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(gson.toJson(profilingEventContext));
+      LOGGER.debug(gson.toJson(getTaskSchedulingInfoMap(profilingEventType, profilingEventContext)));
     }
   }
 
@@ -42,6 +43,6 @@ public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<T
 
   @Override
   public Predicate<TaskSchedulingProfilingEventContext> getEventContextFilter() {
-    return taskSchedulingProfilingEventContext -> true;
+    return taskSchedulingProfilingEventContext -> taskSchedulingProfilingEventContext.getTaskTracingContext() != null;
   }
 }

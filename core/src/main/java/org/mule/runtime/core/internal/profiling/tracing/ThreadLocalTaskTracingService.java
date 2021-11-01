@@ -6,29 +6,29 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing;
 
-import org.mule.runtime.api.profiling.tracing.TaskTracingContext;
-import org.mule.runtime.api.profiling.tracing.TaskTracingService;
+import org.mule.runtime.api.profiling.tracing.TracingContext;
+import org.mule.runtime.api.profiling.tracing.TracingService;
 
-public class ThreadLocalTaskTracingService implements TaskTracingService {
+public class ThreadLocalTaskTracingService implements TracingService {
 
-  private static final ThreadLocal<TaskTracingContext> currentTaskTracingContext = new ThreadLocal<>();
+  private static final ThreadLocal<TracingContext> currentTracingContext = new ThreadLocal<>();
 
   public ThreadLocalTaskTracingService() {}
 
   @Override
-  public TaskTracingContext getCurrentTaskTracingContext() {
-    return currentTaskTracingContext.get();
+  public TracingContext getCurrentTracingContext() {
+    return currentTracingContext.get();
   }
 
   @Override
-  public void deleteCurrentTaskTracingContext() {
-    currentTaskTracingContext.remove();
+  public void deleteCurrentTracingContext() {
+    currentTracingContext.remove();
   }
 
   @Override
-  public TaskTracingContext setCurrentTaskTracingContext(TaskTracingContext taskTracingContext) {
-    // Since TaskTracingContext is immutable, it can be set as is (it would require creating a copy otherwise).
-    currentTaskTracingContext.set(taskTracingContext);
-    return taskTracingContext;
+  public TracingContext setCurrentTracingContext(TracingContext tracingContext) {
+    // Since TracingContext is immutable, it can be set as is (it would require creating a copy otherwise).
+    currentTracingContext.set(tracingContext);
+    return tracingContext;
   }
 }

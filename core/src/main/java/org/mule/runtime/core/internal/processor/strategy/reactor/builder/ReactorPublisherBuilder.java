@@ -13,6 +13,9 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.CoreProfilingService;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.tracing.TracingContext;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.profiling.OperationMetadata;
@@ -82,9 +85,8 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    */
   ReactorPublisherBuilder<T> doOnSubscribe(Consumer<? super Subscription> onSubscribe);
 
-  ReactorPublisherBuilder<T> profileProcessingStrategyEvent(CoreProfilingService profilingService, ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
-                                                            Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer);
-  ReactorPublisherBuilder<T> setTaskContext(TaskTracingService taskTracingService, ComponentLocation location);
+  ReactorPublisherBuilder<T> setTaskContext(ProfilingService profilingService, String artifactId, String artifactType,
+                                            ComponentLocation componentLocation);
 
   ReactorPublisherBuilder<T> profileProcessingStrategyEvent(ComponentLocation location,
                                                             Optional<? extends ProfilingDataProducer> dataProducer,
@@ -140,10 +142,18 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Mono<CoreEvent>> setTaskContext(TaskTracingService taskTracingService,
-                                                                   ComponentLocation location) {
-      TaskTracingContext taskTracingContext = new DefaultTaskTracingContext(new DefaultComponentMetadata(location));
-      mono = mono.doOnNext(coreEvent -> taskTracingService.setCurrentTaskTracingContext(taskTracingContext));
+    public ReactorPublisherBuilder<Mono<CoreEvent>> setTaskContext(ProfilingService profilingService,
+                                                                   String artifactId, String artifactType,
+                                                                   ComponentLocation componentLocation) {
+      if (profilingService != null) {
+        mono =
+            mono.doOnNext(coreEvent -> {
+              TracingContext taskTracingContext =
+                  new DefaultTaskTracingContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(), artifactId,
+                                                                             artifactType, componentLocation));
+              profilingService.getTracingService().setCurrentTracingContext(taskTracingContext);
+            });
+      }
       return this;
     }
 
@@ -204,10 +214,18 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> setTaskContext(TaskTracingService taskTracingService,
+    public ReactorPublisherBuilder<Flux<CoreEvent>> setTaskContext(ProfilingService profilingService, String artifactId,
+                                                                   String artifactType,
                                                                    ComponentLocation location) {
-      TaskTracingContext taskTracingContext = new DefaultTaskTracingContext(new DefaultComponentMetadata(location));
-      flux = flux.doOnNext(coreEvent -> taskTracingService.setCurrentTaskTracingContext(taskTracingContext));
+      if (profilingService != null) {
+        flux =
+            flux.doOnNext(coreEvent -> {
+              TracingContext taskTracingContext =
+                  new DefaultTaskTracingContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(), artifactId,
+                                                                             artifactType, location));
+              profilingService.getTracingService().setCurrentTracingContext(taskTracingContext);
+            });
+      }
       return this;
     }
 

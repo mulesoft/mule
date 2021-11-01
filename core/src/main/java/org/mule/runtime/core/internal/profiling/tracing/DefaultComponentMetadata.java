@@ -13,12 +13,35 @@ import java.util.Optional;
 
 public class DefaultComponentMetadata implements ComponentMetadata {
 
+  private final String correlationId;
+  private final String artifactId;
+  private final String artifactType;
   private final ComponentLocation componentLocation;
 
-  public DefaultComponentMetadata(ComponentLocation componentLocation) {
+  public DefaultComponentMetadata(String correlationId, String artifactId, String artifactType,
+                                  ComponentLocation componentLocation) {
+    this.correlationId = correlationId;
+    this.artifactId = artifactId;
+    this.artifactType = artifactType;
     this.componentLocation = componentLocation;
   }
 
+  @Override
+  public String getCorrelationId() {
+    return correlationId;
+  }
+
+  @Override
+  public String getArtifactId() {
+    return artifactId;
+  }
+
+  @Override
+  public String getArtifactType() {
+    return artifactType;
+  }
+
+  @Override
   public Optional<ComponentLocation> getComponentLocation() {
     return Optional.ofNullable(componentLocation);
   }

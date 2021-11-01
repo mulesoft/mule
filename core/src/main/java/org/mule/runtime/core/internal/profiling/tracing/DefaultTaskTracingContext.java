@@ -7,13 +7,13 @@
 package org.mule.runtime.core.internal.profiling.tracing;
 
 import org.mule.runtime.api.profiling.tracing.ComponentMetadata;
-import org.mule.runtime.api.profiling.tracing.TaskTracingContext;
+import org.mule.runtime.api.profiling.tracing.TracingContext;
 
 import java.util.Optional;
 
-public class DefaultTaskTracingContext implements TaskTracingContext {
+public class DefaultTaskTracingContext implements TracingContext {
 
-  private ComponentMetadata componentMetadata;
+  private final ComponentMetadata componentMetadata;
 
   public DefaultTaskTracingContext(ComponentMetadata componentMetadata) {
     this.componentMetadata = componentMetadata;
