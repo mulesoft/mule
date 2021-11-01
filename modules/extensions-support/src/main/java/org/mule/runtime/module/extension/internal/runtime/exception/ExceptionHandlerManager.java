@@ -50,7 +50,7 @@ public final class ExceptionHandlerManager {
   }
 
   private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
-    String extensionNamespace = extensionModel.getName().toUpperCase();
+    String extensionNamespace = (extensionModel.getName() != null ? extensionModel.getName().toUpperCase() : null);
     Predicate<ErrorModel> connectivityErrorCondition = errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER);
     Predicate<ErrorModel> extensionConnectivityErrorCondition =
         connectivityErrorCondition.and(errorModel -> errorModel.getNamespace().equals(extensionNamespace));

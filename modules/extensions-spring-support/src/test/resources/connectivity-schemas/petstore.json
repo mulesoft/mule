@@ -118,6 +118,10 @@
               "range": "string",
               "mandatory": true
             },
+            "forceConnectionError": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "username": {
               "propertyTerm": "connectivity.username",
               "range": "string",
