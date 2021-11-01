@@ -71,6 +71,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.junit.Assert;
 import org.mockito.InOrder;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -81,6 +82,8 @@ import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -98,6 +101,7 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -232,6 +236,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     @Override
     public ProcessingType getProcessingType() {
       return IO_RW;
+    }
+  };
+
+  protected final ProfilingService profilingService = new DefaultProfilingService() {
+
+    @Override
+    public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+      return () -> singleton(profilingDataConsumer);
     }
   };
 
@@ -699,6 +711,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
           .onProfilingEvent(eq(FLOW_EXECUTED), any(ComponentProcessingStrategyProfilingEventContext.class));
     } else {
       verify(profilingDataConsumer, never()).onProfilingEvent(any(), any());
+    }
+  }
+
+  protected void assertProcessingStrategyTracing() {
+    if (enableProfilingServiceProperty.getValue().equals("true")) {
+      Assert.assertThat(profilingService.getTracingService().getCurrentTracingContext(), notNullValue());
+    } else {
+      Assert.assertThat(profilingService.getTracingService().getCurrentTracingContext(), nullValue());
     }
   }
 
