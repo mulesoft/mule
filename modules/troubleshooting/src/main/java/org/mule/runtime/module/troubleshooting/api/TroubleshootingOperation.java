@@ -9,8 +9,8 @@ package org.mule.runtime.module.troubleshooting.api;
 import org.mule.api.annotation.Experimental;
 
 /**
- * Interface that has the {@link TroubleshootingOperationDefinition} and the {@link TroubleshootingOperationCallback}
- * for a given operation.
+ * Interface that has the {@link TroubleshootingOperationDefinition} and the {@link TroubleshootingOperationCallback} for a given
+ * operation.
  *
  * @since 4.5
  */

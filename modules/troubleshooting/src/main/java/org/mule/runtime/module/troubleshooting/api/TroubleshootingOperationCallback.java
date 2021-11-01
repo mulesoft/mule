@@ -22,8 +22,8 @@ import java.util.Map;
 public interface TroubleshootingOperationCallback {
 
   /**
-   * The operation logic. The troubleshooting operations should be able to be triggered from an external client,
-   * so the implementation of each operation callback should return an object that can be marshaled and un-marshaled.
+   * The operation logic. The troubleshooting operations should be able to be triggered from an external client, so the
+   * implementation of each operation callback should return an object that can be marshaled and un-marshaled.
    *
    * @param arguments A dictionary with the argument names and values.
    * @return a {@link Serializable} object, which is the operation result.
