@@ -12537,6 +12537,39 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "false",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 7
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "forceConnectionError",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -13326,7 +13359,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 7,
+                    "order": 8,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -13542,7 +13575,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 8,
+                    "order": 9,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -13585,7 +13618,8 @@
                 "password",
                 "openingDate",
                 "closedForHolidays",
-                "discountDates"
+                "discountDates",
+                "forceConnectionError"
               ]
             }
           }
@@ -28027,6 +28061,39 @@
             {
               "type": {
                 "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "false",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 7
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "forceConnectionError",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -28816,7 +28883,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 7,
+                "order": 8,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -29032,7 +29099,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 8,
+                "order": 9,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -29075,7 +29142,8 @@
             "password",
             "openingDate",
             "closedForHolidays",
-            "discountDates"
+            "discountDates",
+            "forceConnectionError"
           ]
         }
       }
@@ -36052,6 +36120,11 @@
     },
     {
       "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "PETSTORE:PET_STORE_CONNECTIVITY",
+      "parent": "PETSTORE:CONNECTIVITY",
       "handleable": true
     },
     {
