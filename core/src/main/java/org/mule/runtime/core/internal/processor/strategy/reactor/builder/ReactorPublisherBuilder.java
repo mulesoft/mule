@@ -85,8 +85,8 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    */
   ReactorPublisherBuilder<T> doOnSubscribe(Consumer<? super Subscription> onSubscribe);
 
-  ReactorPublisherBuilder<T> setTaskContext(ProfilingService profilingService, String artifactId, String artifactType,
-                                            ComponentLocation componentLocation);
+  ReactorPublisherBuilder<T> setTracingContext(ProfilingService profilingService, String artifactId, String artifactType,
+                                               ComponentLocation componentLocation);
 
   ReactorPublisherBuilder<T> profileProcessingStrategyEvent(ComponentLocation location,
                                                             Optional<? extends ProfilingDataProducer> dataProducer,
@@ -142,9 +142,9 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Mono<CoreEvent>> setTaskContext(ProfilingService profilingService,
-                                                                   String artifactId, String artifactType,
-                                                                   ComponentLocation componentLocation) {
+    public ReactorPublisherBuilder<Mono<CoreEvent>> setTracingContext(ProfilingService profilingService,
+                                                                      String artifactId, String artifactType,
+                                                                      ComponentLocation componentLocation) {
       if (profilingService != null) {
         mono =
             mono.doOnNext(coreEvent -> {
@@ -214,9 +214,9 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> setTaskContext(ProfilingService profilingService, String artifactId,
-                                                                   String artifactType,
-                                                                   ComponentLocation location) {
+    public ReactorPublisherBuilder<Flux<CoreEvent>> setTracingContext(ProfilingService profilingService, String artifactId,
+                                                                      String artifactType,
+                                                                      ComponentLocation location) {
       if (profilingService != null) {
         flux =
             flux.doOnNext(coreEvent -> {

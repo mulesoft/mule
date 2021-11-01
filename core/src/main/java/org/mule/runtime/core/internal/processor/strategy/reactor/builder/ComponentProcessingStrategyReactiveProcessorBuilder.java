@@ -156,7 +156,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
 
     // General structure of processing strategy publishOn -> operation -> publishOn
     return builder
-        .setTaskContext(profilingService.getTaskTracingService(), location)
+        .setTracingContext(profilingService, artifactId, artifactType, location)
         .profileProcessingStrategyEvent(profilingService, psSchedulingOperationExecutionDataProducer, transfomer)
         .publishOn(ofNullable(dispatcherScheduler))
         .profileProcessingStrategyEvent(profilingService, startingOperationExecutionDataProducer, transfomer)

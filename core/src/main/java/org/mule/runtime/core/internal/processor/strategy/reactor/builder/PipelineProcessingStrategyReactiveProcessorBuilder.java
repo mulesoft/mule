@@ -108,7 +108,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
                                                                                  artifactType, currentTimeMillis());
 
     return publisher
-        .setTaskContext(profilingService.getTaskTracingService(), location)
+        .setTracingContext(profilingService, artifactId, artifactType, location)
         .profileProcessingStrategyEvent(profilingService, psSchedulingFlowExecutionDataProducer, transfomer)
         .publishOn(ofNullable(scheduler))
         .profileProcessingStrategyEvent(profilingService, startingFlowExecutionDataproducer, transfomer)
