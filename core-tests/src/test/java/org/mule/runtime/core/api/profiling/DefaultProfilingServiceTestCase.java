@@ -134,7 +134,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     assertThat(profilingService.getDiscoveryStrategy(), instanceOf(CompositeProfilingDataConsumerDiscoveryStrategy.class));
     Set<ProfilingDataConsumer<? extends ProfilingEventContext>> profilingDataConsumers =
         profilingService.getDiscoveryStrategy().discover();
-    assertThat(profilingDataConsumers, hasSize(3));
+    assertThat(profilingDataConsumers, hasSize(4));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentProcessingStrategyDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentThreadingDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(testProfilingDataConsumer));
@@ -143,7 +143,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Test
   @Description("The notification listener is correctly set so that the notifications are managed")
   public void correctNotificationListenerSet() {
-    verify(notificationManager, times(3)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
+    verify(notificationManager, times(4)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
   }
 
   @Test

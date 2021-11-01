@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import static java.lang.Thread.currentThread;
+import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -52,8 +53,8 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
   @Mock
   private CoreEvent coreEvent;
 
-  @Mock
-  private CoreProfilingService profilingService;
+  @Mock(answer = RETURNS_MOCKS)
+  private ProfilingService profilingService;
 
   @Mock
   private ProfilingDataProducer profilingDataProducer;

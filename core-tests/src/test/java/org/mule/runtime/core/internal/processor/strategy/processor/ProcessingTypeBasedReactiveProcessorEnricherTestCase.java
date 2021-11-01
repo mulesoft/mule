@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.processor.strategy.processor;
 import static java.util.Arrays.asList;
 import static java.util.function.UnaryOperator.identity;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -73,7 +74,7 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
   @Spy
   private ImmediateScheduler cpuLiteAsyncScheduler;
 
-  @Mock
+  @Mock(answer = RETURNS_MOCKS)
   private CoreProfilingService profilingService;
 
   @Mock
