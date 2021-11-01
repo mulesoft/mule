@@ -13,6 +13,8 @@ import java.util.List;
 
 /**
  * Defines an operation and its metadata.
+ *
+ * @since 4.5
  */
 @Experimental
 public interface TroubleshootingOperationDefinition extends Serializable {

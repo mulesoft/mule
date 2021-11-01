@@ -10,6 +10,8 @@ import org.mule.api.annotation.Experimental;
 
 /**
  * Exception used to the troubleshooting operations related errors.
+ *
+ * @since 4.5
  */
 @Experimental
 public class TroubleshootingOperationException extends Exception {

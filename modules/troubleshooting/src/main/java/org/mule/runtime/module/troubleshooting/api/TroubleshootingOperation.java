@@ -9,18 +9,26 @@ package org.mule.runtime.module.troubleshooting.api;
 import org.mule.api.annotation.Experimental;
 
 /**
- * Internal interface that has the definition and the callback for a given operation.
+ * Interface that has the {@link TroubleshootingOperationDefinition} and the {@link TroubleshootingOperationCallback}
+ * for a given operation.
+ *
+ * @since 4.5
  */
 @Experimental
 public interface TroubleshootingOperation {
 
   /**
-   * @return the operation definition.
+   * Returns the {@link TroubleshootingOperationDefinition} for this operation.
+   *
+   * @return the {@link TroubleshootingOperationDefinition} for this operation.
    */
   TroubleshootingOperationDefinition getDefinition();
 
   /**
-   * @return the operation callback.
+   * Returns the {@link TroubleshootingOperationCallback} for this operation.
+   *
+   * @return the {@link TroubleshootingOperationCallback} for this operation.
    */
+
   TroubleshootingOperationCallback getCallback();
 }

@@ -22,6 +22,7 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -50,17 +51,15 @@ import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.internal.DefaultToolingService;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
+import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
-import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MuleContainer {
 

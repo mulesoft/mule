@@ -11,7 +11,10 @@ import org.mule.api.annotation.Experimental;
 import java.io.Serializable;
 
 /**
- * Defines an argument.
+ * Defines an argument for the troubleshooting command interpreter.
+ *
+ * @since 4.5
+ * @see TroubleshootingOperationDefinition
  */
 @Experimental
 public interface ArgumentDefinition extends Serializable {
