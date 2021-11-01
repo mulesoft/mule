@@ -9,6 +9,11 @@ package org.mule.runtime.core.api.config.builders;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
+/**
+ * Activates all the extensions used by the artifact being configured.
+ * 
+ * @since 4.5
+ */
 public final class ExtensionActivatorConfigurationBuilder extends AbstractConfigurationBuilder {
 
   @Override

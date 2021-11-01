@@ -153,10 +153,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   @Override
   public void activateAllExtensions() {
-    getExtensions().forEach(extensionModel -> {
-      withContextClassLoader(getClassLoader(extensionModel),
-                             () -> extensionActivator.activateExtension(extensionModel));
-    });
+    getExtensions().forEach(extensionModel -> withContextClassLoader(getClassLoader(extensionModel),
+                                                                     () -> extensionActivator.activateExtension(extensionModel)));
   }
 
   /**

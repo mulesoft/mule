@@ -38,7 +38,8 @@ public interface ExtensionManager {
    *
    * @param extensionModel the {@link ExtensionModel} to be registered. Cannot be {@code null}
    * 
-   * @deprecated Use {@link #registerExtension(ExtensionModel, boolean)} and {@link #activateAllExtensions()} combined instead.
+   * @deprecated From 4.5, use {@link #registerExtension(ExtensionModel, boolean)} and {@link #activateAllExtensions()} combined
+   *             instead.
    */
   @Deprecated
   void registerExtension(ExtensionModel extensionModel);
