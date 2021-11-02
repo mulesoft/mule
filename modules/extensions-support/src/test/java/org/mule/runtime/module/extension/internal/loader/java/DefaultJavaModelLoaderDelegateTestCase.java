@@ -12,12 +12,22 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.meta.model.ImportedTypeModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
+import org.mule.sdk.api.annotation.Export;
+import org.mule.sdk.api.annotation.Extension;
+import org.mule.sdk.api.annotation.Import;
+import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.module.extension.internal.util.extension.SimpleExportedType;
 import org.mule.test.module.extension.internal.util.extension.SimpleExtensionUsingLegacyApi;
 import org.mule.test.module.extension.internal.util.extension.SimpleExtensionUsingSdkApi;
+
+import java.util.TreeSet;
 
 import org.junit.Test;
 
@@ -59,5 +69,36 @@ public class DefaultJavaModelLoaderDelegateTestCase {
                equalTo("org.mule.test.module.extension.internal.util.extension.SimpleExportedType"));
   }
 
+  @Test
+  public void verifyImportedTypesFromExtensionUsingTheSdkApi() {
+    DefaultJavaModelLoaderDelegate defaultJavaModelLoaderDelegate =
+        new DefaultJavaModelLoaderDelegate(SimpleExtensionUsingSdkApi.class, "1.0.0-dev");
+
+    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentClassLoader, getDefault(emptySet()));
+
+    ExtensionDeclaration extensionDeclaration = defaultJavaModelLoaderDelegate.declare(ctx).getDeclaration();
+    ObjectType importedType = ((ImportedTypeModel) ((TreeSet) extensionDeclaration.getImportedTypes()).first()).getImportedType();
+
+    assertThat(extensionDeclaration.getImportedTypes().size(), is(1));
+    assertThat(importedType.getAnnotation(ClassInformationAnnotation.class).get().getClassname(),
+               is("org.mule.test.heisenberg.extension.model.KnockeableDoor"));
+  }
+
+  @Test
+  public void verifyImportedTypesFromExtensionUsingTheLegacyApi() {
+    DefaultJavaModelLoaderDelegate defaultJavaModelLoaderDelegate =
+        new DefaultJavaModelLoaderDelegate(SimpleExtensionUsingLegacyApi.class, "1.0.0-dev");
+
+    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentClassLoader, getDefault(emptySet()));
+
+    ExtensionDeclaration extensionDeclaration = defaultJavaModelLoaderDelegate.declare(ctx).getDeclaration();
+    ObjectType importedType = ((ImportedTypeModel) ((TreeSet) extensionDeclaration.getImportedTypes()).first()).getImportedType();
+
+    assertThat(extensionDeclaration.getImportedTypes().size(), is(1));
+    assertThat(importedType.getAnnotation(ClassInformationAnnotation.class).get().getClassname(),
+               is("org.mule.test.heisenberg.extension.model.KnockeableDoor"));
+  }
 
 }
