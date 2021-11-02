@@ -1204,11 +1204,7 @@
             "namespace": "MODULE-GLOBAL-ELEMENT",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MODULE-GLOBAL-ELEMENT",
-              "parent": {
-                "type": "CONNECTION",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [],

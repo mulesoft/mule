@@ -1005,11 +1005,7 @@
             "namespace": "MODULE-STEREOTYPES",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MODULE-STEREOTYPES",
-              "parent": {
-                "type": "CONNECTION",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
