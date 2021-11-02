@@ -29,13 +29,13 @@ import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
-
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.slf4j.Logger;
 
 public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionManagerServer {
 
