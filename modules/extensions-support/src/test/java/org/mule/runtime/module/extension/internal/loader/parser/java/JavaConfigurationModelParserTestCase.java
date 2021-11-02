@@ -25,6 +25,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
 import org.mule.sdk.api.annotation.Configuration;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
+import org.mule.sdk.api.annotation.NoImplicit;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,6 +59,20 @@ public class JavaConfigurationModelParserTestCase {
     javaConfigurationModelParser.getName();
   }
 
+  @Test
+  public void isForceNoImplicitOnConfigurationUsingTheSdkApi() {
+    JavaConfigurationModelParser javaConfigurationModelParser = getParser(SimpleSdkExtension.class);
+
+    assertThat(javaConfigurationModelParser.isForceNoExplicit(), is(true));
+  }
+
+  @Test
+  public void isForceNoImplicitOnConfigurationUsingTheLegacyApi() {
+    JavaConfigurationModelParser javaConfigurationModelParser = getParser(SimpleLegacyExtension.class);
+
+    assertThat(javaConfigurationModelParser.isForceNoExplicit(), is(true));
+  }
+
   private JavaConfigurationModelParser getParser(Class<?> extension) {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
@@ -75,6 +90,7 @@ public class JavaConfigurationModelParserTestCase {
   }
 
   @Configuration(name = "newSdkConfiguration")
+  @NoImplicit
   private static class SimpleSdkConfiguration {
   }
 
@@ -84,6 +100,7 @@ public class JavaConfigurationModelParserTestCase {
   }
 
   @org.mule.runtime.extension.api.annotation.Configuration(name = "oldLegacyConfiguration")
+  @org.mule.runtime.extension.api.annotation.NoImplicit
   private static class SimpleLegacyConfiguration {
   }
 
