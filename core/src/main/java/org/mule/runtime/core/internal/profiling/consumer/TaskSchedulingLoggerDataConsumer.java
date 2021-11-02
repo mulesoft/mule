@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.core.internal.profiling.consumer;
 
-import com.google.gson.Gson;
-import org.mule.runtime.api.profiling.ProfilingDataConsumer;
-import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
-import org.slf4j.Logger;
-
-import java.util.Set;
-import java.util.function.Predicate;
-
 import static com.google.common.collect.ImmutableSet.of;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.SCHEDULING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TASK_EXECUTED;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getTaskSchedulingInfoMap;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
+
+import java.util.Set;
+import java.util.function.Predicate;
+
+import org.slf4j.Logger;
+import com.google.gson.Gson;
 
 public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<TaskSchedulingProfilingEventContext> {
 
@@ -31,8 +32,9 @@ public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<T
   @Override
   public void onProfilingEvent(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType,
                                TaskSchedulingProfilingEventContext profilingEventContext) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(gson.toJson(getTaskSchedulingInfoMap(profilingEventType, profilingEventContext)));
+    Logger logger = getDataConsumerLogger();
+    if (logger.isDebugEnabled()) {
+      logger.debug(gson.toJson(getTaskSchedulingInfoMap(profilingEventType, profilingEventContext)));
     }
   }
 
@@ -45,4 +47,9 @@ public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<T
   public Predicate<TaskSchedulingProfilingEventContext> getEventContextFilter() {
     return taskSchedulingProfilingEventContext -> taskSchedulingProfilingEventContext.getTaskTracingContext() != null;
   }
+
+  protected Logger getDataConsumerLogger() {
+    return LOGGER;
+  }
+
 }

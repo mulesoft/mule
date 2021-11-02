@@ -54,6 +54,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   private ScheduledExecutorService dispatcherScheduler;
   private ScheduledExecutorService callbackScheduler;
   private CoreProfilingService profilingService;
+  private boolean taskTracing;
 
   public ComponentProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor processor, Scheduler contextScheduler,
                                                              String artifactId, String artifactType) {
@@ -116,6 +117,15 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
     return this;
   }
 
+  /**
+   * @param profilingService {@link ProfilingService} for profiling processing strategy logic.
+   * @return the builder being created.
+   */
+  public ComponentProcessingStrategyReactiveProcessorBuilder withTaskTracing(boolean taskTracing) {
+    this.taskTracing = taskTracing;
+    return this;
+  }
+
   public ReactiveProcessor build() {
     if (parallelism == 1) {
       return publisher -> baseProcessingStrategyPublisherBuilder(buildFlux(publisher)).build();
@@ -142,6 +152,10 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
 
     // location
     ComponentLocation location = getLocation(processor);
+
+    if (taskTracing) {
+      builder.setTracingContext(profilingService, artifactId, artifactType, location);
+    }
 
     Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transfomer =
         new Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext>() {

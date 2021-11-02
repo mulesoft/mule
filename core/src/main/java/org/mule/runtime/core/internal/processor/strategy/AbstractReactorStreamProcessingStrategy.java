@@ -145,11 +145,11 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
     String artifactType = getArtifactType(muleContext);
 
     CpuLiteNonBlockingProcessingStrategyEnricher cpuLiteEnricher =
-        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLightScheduler, getProfilingService(), artifactId,
+        new CpuLiteNonBlockingProcessingStrategyEnricher(() -> cpuLightScheduler, getProfilingService(), featureFlags, artifactId,
                                                          artifactType);
     CpuLiteAsyncNonBlockingProcessingStrategyEnricher cpuLiteAsyncEnricher =
         new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> cpuLightScheduler, this::getNonBlockingTaskScheduler,
-                                                              getProfilingService(), artifactId, artifactType);
+                                                              getProfilingService(), featureFlags, artifactId, artifactType);
 
     return new ProcessingTypeBasedReactiveProcessorEnricher(cpuLiteEnricher)
         .register(CPU_LITE, cpuLiteEnricher)

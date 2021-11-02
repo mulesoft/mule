@@ -146,6 +146,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
       return new ProactorProcessingStrategyEnricher(() -> blockingScheduler,
                                                     getSchedulerDecorator().compose(this::getRetryScheduler),
                                                     getProfilingService(),
+                                                    featureFlags,
                                                     getArtifactId(muleContext),
                                                     getArtifactType(muleContext),
                                                     maxConcurrency,
