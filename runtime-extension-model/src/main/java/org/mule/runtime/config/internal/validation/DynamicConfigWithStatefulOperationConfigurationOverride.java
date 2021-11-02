@@ -83,7 +83,7 @@ public class DynamicConfigWithStatefulOperationConfigurationOverride implements 
             return hasOverriddenDynamicParameter(artifact, param, explicitConfigName);
           }
         })
-        .filter(parameter -> parameter.getValue().equals(Either.empty()))
+        .filter(parameter -> parameter.getValueOrResolutionError().equals(Either.empty()))
         .findFirst()
         .map(parameter -> create(component, parameter, this,
                                  "Component uses a dynamic configuration and defines configuration override parameter '"
@@ -120,7 +120,7 @@ public class DynamicConfigWithStatefulOperationConfigurationOverride implements 
           ComponentParameterAst overriddenDynamicParameter =
               config.getParameter(param.getGroupModel().getName(), param.getModel().getName());
           return overriddenDynamicParameter != null
-              && overriddenDynamicParameter.getValue().isLeft();
+              && overriddenDynamicParameter.getValueOrResolutionError().isLeft();
         });
   }
 

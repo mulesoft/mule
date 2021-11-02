@@ -63,14 +63,15 @@ public class RequiredParametersPresent implements Validation {
   public List<ValidationResultItem> validateMany(ComponentAst component, ArtifactAst artifact) {
     return requiredParamsStream(component)
         .map(param -> {
-          if (param.getSecond() == null || !param.getSecond().getValue().getValue().isPresent()) {
+          if (param.getSecond() == null || !param.getSecond().getValueOrResolutionError().getValue().isPresent()) {
             return of(create(component, this,
                              format("Element <%s> is missing required parameter '%s'.",
                                     component.getIdentifier().toString(),
                                     param.getFirst().getName())));
-          } else if (param.getSecond().getValue().getRight() instanceof ComponentAst) {
+          } else if (param.getSecond().getValueOrResolutionError().isRight()
+              && param.getSecond().getValueOrResolutionError().getRight().getRight() instanceof ComponentAst) {
             // validate any nested pojos as well...
-            return validate((ComponentAst) param.getSecond().getValue().getRight(), artifact);
+            return validate((ComponentAst) param.getSecond().getValueOrResolutionError().getRight().getRight(), artifact);
           } else {
             return Optional.<ValidationResultItem>empty();
           }

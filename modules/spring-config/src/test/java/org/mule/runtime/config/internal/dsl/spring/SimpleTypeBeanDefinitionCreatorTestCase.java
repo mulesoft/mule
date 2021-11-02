@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -15,14 +18,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
-import org.mule.runtime.api.functional.Either;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentGenerationInformation;
-import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -32,10 +29,12 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.config.BeanDefinition;
 
 public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCase {
 
@@ -71,7 +70,8 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     SpringComponentModel springComponentModel = createBeanDefinitionRequest.getSpringComponentModel();
     springComponentModel.setType(String.class);
 
-    ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
+    ComponentParameterAst paramInOwnerComponent = mock(ComponentParameterAst.class);
+    when(paramInOwnerComponent.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
     ComponentAst componentModel = mock(ComponentAst.class);
     when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(paramInOwnerComponent);
@@ -93,7 +93,8 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(springComponentModel.getType()).then(inv -> String.class);
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
 
-    ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
+    ComponentParameterAst paramInOwnerComponent = mock(ComponentParameterAst.class);
+    when(paramInOwnerComponent.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
     ComponentAst componentModel = mock(ComponentAst.class);
     when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(paramInOwnerComponent);
@@ -119,7 +120,8 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(springComponentModel.getType()).then(inv -> String.class);
     when(createBeanDefinitionRequest.getSpringComponentModel()).thenReturn(springComponentModel);
 
-    ComponentParameterAst paramInOwnerComponent = new MyComponentParameterAst();
+    ComponentParameterAst paramInOwnerComponent = mock(ComponentParameterAst.class);
+    when(paramInOwnerComponent.getResolvedRawValue()).thenReturn(TEST_STRING_RAW_VALUE);
 
     ComponentAst componentModel = mock(ComponentAst.class);
     when(componentModel.getParameter(DEFAULT_GROUP_NAME, "value")).thenReturn(paramInOwnerComponent);
@@ -221,46 +223,4 @@ public class SimpleTypeBeanDefinitionCreatorTestCase extends AbstractMuleTestCas
     when(createBeanDefinitionRequest.getComponentBuildingDefinition()).thenReturn(componentBuildingDefinition);
   }
 
-  private static class MyComponentParameterAst implements ComponentParameterAst {
-
-    @Override
-    public ParameterModel getModel() {
-      return null;
-    }
-
-    @Override
-    public ParameterGroupModel getGroupModel() {
-      return null;
-    }
-
-    @Override
-    public <T> Either<String, T> getValue() {
-      return null;
-    }
-
-    @Override
-    public String getRawValue() {
-      return null;
-    }
-
-    @Override
-    public String getResolvedRawValue() {
-      return TEST_STRING_RAW_VALUE;
-    }
-
-    @Override
-    public Optional<ComponentMetadataAst> getMetadata() {
-      return empty();
-    }
-
-    @Override
-    public ComponentGenerationInformation getGenerationInformation() {
-      return null;
-    }
-
-    @Override
-    public boolean isDefaultValue() {
-      return false;
-    }
-  }
 }
