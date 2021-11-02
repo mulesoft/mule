@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  *
  * @since 4.5.0
  */
-public final class JavaExternalLIbModelParserUtils {
+public final class JavaExternalLibModelParserUtils {
 
   public static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {
     List<ExternalLibraryModel> libraries = new LinkedList<>();
@@ -89,5 +89,5 @@ public final class JavaExternalLIbModelParserUtils {
         .ifPresent(accumulator::addAll);
   }
 
-  private JavaExternalLIbModelParserUtils() {}
+  private JavaExternalLibModelParserUtils() {}
 }

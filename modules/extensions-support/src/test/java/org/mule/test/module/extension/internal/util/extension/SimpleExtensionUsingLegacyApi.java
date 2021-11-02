@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.module.extension.internal.util.extension;
-
 
 import org.mule.sdk.api.annotation.Export;
 import org.mule.sdk.api.annotation.Extension;
