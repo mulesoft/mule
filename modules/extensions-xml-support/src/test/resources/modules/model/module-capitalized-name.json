@@ -286,7 +286,11 @@
             "namespace": "CAPITALIZEDWITHSPACESINTHENAME",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "CAPITALIZEDWITHSPACESINTHENAME",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -615,7 +619,11 @@
             "namespace": "CAPITALIZEDWITHSPACESINTHENAME",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "CAPITALIZEDWITHSPACESINTHENAME",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -914,7 +922,11 @@
             "namespace": "CAPITALIZEDWITHSPACESINTHENAME",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "CAPITALIZEDWITHSPACESINTHENAME",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [

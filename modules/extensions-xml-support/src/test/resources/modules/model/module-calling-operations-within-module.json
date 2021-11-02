@@ -52,7 +52,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -334,7 +338,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -616,7 +624,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -858,7 +870,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -1100,7 +1116,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -1381,7 +1401,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -1723,7 +1747,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -2004,7 +2032,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -2285,7 +2317,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -2566,7 +2602,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -2847,7 +2887,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -3128,7 +3172,11 @@
         "namespace": "MODIFIED-PREFIX",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE"
+          "namespace": "MODIFIED-PREFIX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [

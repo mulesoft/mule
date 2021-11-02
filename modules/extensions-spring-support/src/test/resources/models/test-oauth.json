@@ -6193,7 +6193,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -19483,7 +19487,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -26844,7 +26852,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -35119,7 +35131,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -42904,7 +42920,11 @@
             "namespace": "TEST-OAUTH",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [

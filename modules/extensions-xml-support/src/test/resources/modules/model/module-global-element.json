@@ -286,7 +286,11 @@
             "namespace": "MODULE-GLOBAL-ELEMENT",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "MODULE-GLOBAL-ELEMENT",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -585,7 +589,11 @@
             "namespace": "MODULE-GLOBAL-ELEMENT",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "MODULE-GLOBAL-ELEMENT",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -884,7 +892,11 @@
             "namespace": "MODULE-GLOBAL-ELEMENT",
             "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE"
+              "namespace": "MODULE-GLOBAL-ELEMENT",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -1192,7 +1204,11 @@
             "namespace": "MODULE-GLOBAL-ELEMENT",
             "parent": {
               "type": "CONNECTION",
-              "namespace": "MULE"
+              "namespace": "MODULE-GLOBAL-ELEMENT",
+              "parent": {
+                "type": "CONNECTION",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [],
