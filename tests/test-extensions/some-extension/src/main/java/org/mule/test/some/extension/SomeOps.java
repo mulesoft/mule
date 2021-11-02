@@ -7,12 +7,15 @@
 
 package org.mule.test.some.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -119,5 +122,19 @@ public class SomeOps {
   public SomeAliasedParameterGroupOneRequiredConfig oneRequiredAliasedParameterResolverOperation(@ParameterGroup(
       name = "Aliased Parameter Group") SomeAliasedParameterGroupOneRequiredConfig oneAliasedParameterGroup) {
     return oneAliasedParameterGroup;
+  }
+
+  @MediaType(value = TEXT_PLAIN)
+  public String sayHi(String person) {
+    return buildHelloMessage(person);
+  }
+
+  @MediaType(value = TEXT_PLAIN)
+  public String sayHiContent(@Content String person) {
+    return buildHelloMessage(person);
+  }
+
+  private String buildHelloMessage(String person) {
+    return "Hello " + person + "!";
   }
 }
