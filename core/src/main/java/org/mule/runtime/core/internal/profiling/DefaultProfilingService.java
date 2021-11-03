@@ -25,6 +25,7 @@ import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataP
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTaskTracingService;
+import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTracingService;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
-  private final TracingService tracingService = new ThreadLocalTaskTracingService();
+  private final TracingService tracingService = new ThreadLocalTracingService();
 
   private ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 

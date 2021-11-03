@@ -12,7 +12,7 @@ import static java.lang.String.valueOf;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
-import org.mule.runtime.api.profiling.tracing.TracingContext;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
@@ -69,8 +69,8 @@ public class ComponentProfilingUtils {
     return eventMap;
   }
 
-  private static void addTracingContextData(TracingContext taskTracingContext, Map<String, String> eventMap) {
-    taskTracingContext.getRunningComponentMetadata().ifPresent(componentMetadata -> {
+  private static void addTracingContextData(ExecutionContext executionContext, Map<String, String> eventMap) {
+    executionContext.getCurrentComponentMetadata().ifPresent(componentMetadata -> {
       eventMap.put(ARTIFACT_ID_KEY, componentMetadata.getArtifactId());
       eventMap.put(ARTIFACT_TYPE_KEY, componentMetadata.getArtifactType());
       eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, componentMetadata.getCorrelationId());

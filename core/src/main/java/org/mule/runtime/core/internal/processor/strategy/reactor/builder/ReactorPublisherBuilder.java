@@ -16,12 +16,13 @@ import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.tracing.TracingContext;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.profiling.OperationMetadata;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
-import org.mule.runtime.core.internal.profiling.tracing.DefaultTaskTracingContext;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -236,10 +237,10 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
   default void setTracingContext(ProfilingService profilingService, String artifactId, String artifactType,
                                  ComponentLocation componentLocation, CoreEvent coreEvent) {
-    TracingContext taskTracingContext =
-        new DefaultTaskTracingContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(), artifactId,
-                                                                   artifactType, componentLocation));
-    profilingService.getTracingService().setCurrentTracingContext(taskTracingContext);
+    ExecutionContext executionContext =
+        new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(), artifactId,
+                                                                 artifactType, componentLocation));
+    profilingService.getTracingService().setCurrentExecutionContext(executionContext);
   }
 
   static void doProfileProcessingStrategyEvent(ComponentLocation componentLocation, String artifactId, String artifactType,

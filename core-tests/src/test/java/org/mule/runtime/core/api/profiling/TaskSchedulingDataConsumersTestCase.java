@@ -35,7 +35,7 @@ import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventC
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.TaskSchedulingLoggerDataConsumer;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
-import org.mule.runtime.core.internal.profiling.tracing.DefaultTaskTracingContext;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Collection;
@@ -106,11 +106,11 @@ public class TaskSchedulingDataConsumersTestCase extends AbstractMuleContextTest
     when(profilingEventContext.getTriggerTimestamp()).thenReturn(PROFILING_EVENT_TIMESTAMP);
     when(profilingEventContext.getThreadName()).thenReturn((THREAD_NAME));
     when(profilingEventContext.getTaskId()).thenReturn(TASK_ID);
-    when(profilingEventContext.getTaskTracingContext()).thenReturn(new DefaultTaskTracingContext(
-                                                                                                 new DefaultComponentMetadata(CORRELATION_ID,
-                                                                                                                              ARTIFACT_ID,
-                                                                                                                              ARTIFACT_TYPE,
-                                                                                                                              location)));
+    when(profilingEventContext.getTaskTracingContext()).thenReturn(new DefaultExecutionContext(
+                                                                                               new DefaultComponentMetadata(CORRELATION_ID,
+                                                                                                                            ARTIFACT_ID,
+                                                                                                                            ARTIFACT_TYPE,
+                                                                                                                            location)));
   }
 
   private ProfilingService getTestProfilingService() throws MuleException {

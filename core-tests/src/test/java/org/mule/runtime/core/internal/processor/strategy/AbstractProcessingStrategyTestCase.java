@@ -71,8 +71,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.junit.Assert;
-import org.mockito.InOrder;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -149,7 +147,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
+import org.junit.Assert;
+import org.mockito.InOrder;
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
