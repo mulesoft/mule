@@ -11,6 +11,8 @@ import org.mule.runtime.api.profiling.tracing.ComponentMetadata;
 
 import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
+
 public class DefaultComponentMetadata implements ComponentMetadata {
 
   private final String correlationId;
@@ -43,6 +45,6 @@ public class DefaultComponentMetadata implements ComponentMetadata {
 
   @Override
   public Optional<ComponentLocation> getComponentLocation() {
-    return Optional.ofNullable(componentLocation);
+    return ofNullable(componentLocation);
   }
 }

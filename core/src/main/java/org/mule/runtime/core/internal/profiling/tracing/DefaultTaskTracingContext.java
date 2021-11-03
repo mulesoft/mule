@@ -11,6 +11,8 @@ import org.mule.runtime.api.profiling.tracing.TracingContext;
 
 import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
+
 public class DefaultTaskTracingContext implements TracingContext {
 
   private final ComponentMetadata componentMetadata;
@@ -21,6 +23,6 @@ public class DefaultTaskTracingContext implements TracingContext {
 
   @Override
   public Optional<ComponentMetadata> getRunningComponentMetadata() {
-    return Optional.ofNullable(componentMetadata);
+    return ofNullable(componentMetadata);
   }
 }

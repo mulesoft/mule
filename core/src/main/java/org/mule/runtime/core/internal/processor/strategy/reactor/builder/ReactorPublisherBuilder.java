@@ -19,6 +19,9 @@ import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessi
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.profiling.OperationMetadata;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultTaskTracingContext;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -147,12 +150,8 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
                                                                       ComponentLocation componentLocation) {
       if (profilingService != null) {
         mono =
-            mono.doOnNext(coreEvent -> {
-              TracingContext taskTracingContext =
-                  new DefaultTaskTracingContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(), artifactId,
-                                                                             artifactType, componentLocation));
-              profilingService.getTracingService().setCurrentTracingContext(taskTracingContext);
-            });
+            mono.doOnNext(coreEvent -> setTracingContext(profilingService, artifactId, artifactType, componentLocation,
+                                                         coreEvent));
       }
       return this;
     }
@@ -216,15 +215,11 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> setTracingContext(ProfilingService profilingService, String artifactId,
                                                                       String artifactType,
-                                                                      ComponentLocation location) {
+                                                                      ComponentLocation componentLocation) {
       if (profilingService != null) {
         flux =
-            flux.doOnNext(coreEvent -> {
-              TracingContext taskTracingContext =
-                  new DefaultTaskTracingContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(), artifactId,
-                                                                             artifactType, location));
-              profilingService.getTracingService().setCurrentTracingContext(taskTracingContext);
-            });
+            flux.doOnNext(coreEvent -> setTracingContext(profilingService, artifactId, artifactType, componentLocation,
+                                                         coreEvent));
       }
       return this;
     }
@@ -239,5 +234,23 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
       return this;
     }
 
+  default void setTracingContext(ProfilingService profilingService, String artifactId, String artifactType,
+                                 ComponentLocation componentLocation, CoreEvent coreEvent) {
+    TracingContext taskTracingContext =
+        new DefaultTaskTracingContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(), artifactId,
+                                                                   artifactType, componentLocation));
+    profilingService.getTracingService().setCurrentTracingContext(taskTracingContext);
+  }
+
+  static void doProfileProcessingStrategyEvent(ComponentLocation componentLocation, String artifactId, String artifactType,
+                                               ProfilingDataProducer dp,
+                                               CoreEvent e) {
+    dp.triggerProfilingEvent(new DefaultComponentProcessingStrategyProfilingEventContext(e,
+                                                                                         componentLocation,
+                                                                                         currentThread()
+                                                                                             .getName(),
+                                                                                         artifactId,
+                                                                                         artifactType,
+                                                                                         currentTimeMillis()));
   }
 }
