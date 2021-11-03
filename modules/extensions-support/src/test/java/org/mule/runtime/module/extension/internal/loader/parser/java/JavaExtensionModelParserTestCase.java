@@ -20,11 +20,13 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.Import;
+import org.mule.sdk.api.annotation.PrivilegedExport;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganCookBook;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -84,13 +86,31 @@ public class JavaExtensionModelParserTestCase {
                is("org.mule.test.vegan.extension.VeganCookBook"));
   }
 
+  @Test
+  @Ignore
+  public void getExportedTypesFromExtensionUsingTheSdkApi() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ExtensionTypeWrapper<SimpleExtensionUsingSdkApi> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(SimpleExtensionUsingSdkApi.class, typeLoader);
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionTypeWrapper, ctx);
+
+    List<String> exportedTypes = javaExtensionModelParser.getPrivilegedExportedPackages();
+
+    assertThat(exportedTypes.size(), is(1));
+  }
+
   @Extension(name = "SimpleExtension")
   @Import(type = KnockeableDoor.class)
+  @PrivilegedExport(packages = {"org.mule.runtime.module.extension.internal.loader.parser.java"})
   private static class SimpleExtensionUsingSdkApi {
   }
 
   @Extension(name = "SimpleExtension")
   @org.mule.runtime.extension.api.annotation.Import(type = KnockeableDoor.class)
+  @org.mule.runtime.extension.api.annotation.PrivilegedExport(
+      packages = {"org.mule.runtime.module.extension.internal.loader.parser.java"})
   private static class SimpleExtensionUsingLegacyApi {
   }
 
