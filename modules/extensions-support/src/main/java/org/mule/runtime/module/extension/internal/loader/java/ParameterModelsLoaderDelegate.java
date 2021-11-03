@@ -20,12 +20,23 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class ParameterModelsLoaderDelegate {
 
-  public List<ParameterDeclarer> declare(HasParametersDeclarer component, List<ParameterGroupModelParser> groupParsers) {
+  private final Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader;
+  private final Consumer<MetadataType> typeRegisterer;
 
+  public ParameterModelsLoaderDelegate(Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader,
+                                       Consumer<MetadataType> typeRegisterer) {
+    this.stereotypeModelLoader = stereotypeModelLoader;
+    this.typeRegisterer = typeRegisterer;
+  }
+
+  public List<ParameterDeclarer> declare(HasParametersDeclarer component, List<ParameterGroupModelParser> groupParsers) {
     final List<ParameterDeclarer> declarerList = new LinkedList<>();
+
     groupParsers.forEach(group -> {
       ParameterGroupDeclarer groupDeclarer;
 
@@ -56,9 +67,10 @@ public final class ParameterModelsLoaderDelegate {
         final MetadataType metadataType = parameterParser.getType();
         parameter.ofType(metadataType)
             .describedAs(parameterParser.getDescription())
-            .withAllowedStereotypes(parameterParser.getAllowedStereotypes())
             .withRole(parameterParser.getRole())
             .withExpressionSupport(parameterParser.getExpressionSupport());
+
+        typeRegisterer.accept(metadataType);
 
         if (parameterParser.isComponentId()) {
           parameter.asComponentId();
@@ -77,7 +89,9 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getDeprecationModel().ifPresent(parameter::withDeprecation);
         parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
+
         addSemanticTerms(parameter.getDeclaration(), parameterParser);
+        stereotypeModelLoader.get().addStereotypes(parameterParser, parameter);
         declarerList.add(parameter);
       });
 

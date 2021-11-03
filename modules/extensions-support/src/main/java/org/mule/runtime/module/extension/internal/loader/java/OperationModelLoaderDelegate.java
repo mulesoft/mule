@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -101,14 +103,24 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
             .describedAs(chain.getDescription())
             .setRequired(chain.isRequired());
         addSemanticTerms(chainDeclarer.getDeclaration(), chain);
+        getStereotypeModelLoaderDelegate().addAllowedStereotypes(chain, chainDeclarer);
       });
 
-      parseErrorModels(operation, parser);
+      loader.registerOutputTypes(operation.getDeclaration());
+      declareErrorModels(operation, parser);
+      getStereotypeModelLoaderDelegate().addStereotypes(
+                                                        parser,
+                                                        operation,
+                                                        of(() -> getStereotypeModelLoaderDelegate()
+                                                            .getDefaultOperationStereotype(parser.getName())));
+
+      declareEmittedNotifications(parser, operation, loader::getNotificationModel);
+
       operationDeclarers.put(parser, operation);
     }
   }
 
-  private void parseErrorModels(OperationDeclarer operation, OperationModelParser parser) {
+  private void declareErrorModels(OperationDeclarer operation, OperationModelParser parser) {
     final ErrorsModelFactory errorsModelFactory = loader.createErrorModelFactory();
     parser.getErrorModelParsers().stream()
         .map(errorsModelFactory::getErrorModel)

@@ -88,6 +88,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     pluginCtx = mock(ExtensionLoadingContext.class);
     when(pluginCtx.getExtensionDeclarer()).thenReturn(pluginDeclarer);
     when(pluginCtx.getDslResolvingContext()).thenReturn(dslResolvingCtx);
+    when(pluginCtx.getExtensionClassLoader()).thenReturn(getClass().getClassLoader());
 
     loader = new DefaultJavaModelLoaderDelegate(extensionElement, "1.0.0");
   }

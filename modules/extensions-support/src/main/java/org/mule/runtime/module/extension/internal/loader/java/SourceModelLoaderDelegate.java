@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -85,7 +87,15 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       parser.getMediaTypeModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
+      loader.registerOutputTypes(sourceDeclarer.getDeclaration());
+
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
+      declareEmittedNotifications(parser, sourceDeclarer, loader::getNotificationModel);
+      getStereotypeModelLoaderDelegate().addStereotypes(
+                                                        parser,
+                                                        sourceDeclarer,
+                                                        of(() -> getStereotypeModelLoaderDelegate()
+                                                            .getDefaultSourceStereotype(parser.getName())));
       parser.getAdditionalModelProperties().forEach(sourceDeclarer::withModelProperty);
 
       // TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection

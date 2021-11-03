@@ -7,13 +7,14 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
+import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
@@ -24,8 +25,12 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
@@ -34,6 +39,8 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Exten
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -54,9 +61,14 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final SourceModelLoaderDelegate sourceModelLoaderDelegate = new SourceModelLoaderDelegate(this);
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
-  private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate = new ParameterModelsLoaderDelegate();
+  private final ParameterModelsLoaderDelegate parameterModelsLoaderDelegate =
+      new ParameterModelsLoaderDelegate(this::getStereotypeModelLoaderDelegate, this::registerType);
+  private final Map<String, NotificationModel> notificationModels = new LinkedHashMap<>();
 
+  private StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate;
   private Supplier<ErrorsModelFactory> errorsModelFactorySupplier;
+  private ExtensionDeclarer declarer;
+  private String namespace;
 
   public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
@@ -74,7 +86,8 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, context);
+    stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
+    ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, context);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
             .named(parser.getName())
@@ -88,15 +101,19 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     context.getParameter("COMPILATION_MODE")
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
+    this.declarer = declarer;
+    namespace = getExtensionsNamespace(declarer.getDeclaration());
+
     parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
-    parseErrorModels(parser, declarer);
-    parseExports(parser, declarer);
-    parseImportedTypes(parser, declarer, context);
-    parseSubTypes(parser, declarer, context);
+    declareErrorModels(parser, declarer);
+    declareExports(parser, declarer);
+    declareImportedTypes(parser, declarer, context);
+    declareSubTypes(parser, declarer, context);
+    declareNotifications(parser, declarer);
 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
@@ -107,22 +124,32 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
       sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
     }
 
+    getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
+
     return declarer;
   }
 
-  private void parseErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
-    initErrorModelFactorySupplier(parser, getExtensionsNamespace(declarer.getDeclaration()));
+  private void declareNotifications(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+    parser.getNotificationModels().forEach(notification -> {
+      declarer.withNotificationModel(notification);
+      registerType(notification.getType());
+      notificationModels.put(notification.getIdentifier(), notification);
+    });
+  }
+
+  private void declareErrorModels(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+    initErrorModelFactorySupplier(parser);
     declarer.getDeclaration().getErrorModels().addAll(createErrorModelFactory().getErrorModels());
   }
 
-  private void parseExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
-    parser.getExportedTypes().forEach(type -> registerType(declarer, type));
+  private void declareExports(ExtensionModelParser parser, ExtensionDeclarer declarer) {
+    parser.getExportedTypes().forEach(type -> registerExportedType(declarer, type));
     parser.getExportedResources().forEach(declarer::withResource);
     parser.getPrivilegedExportedArtifacts().forEach(declarer::withPrivilegedArtifact);
     parser.getPrivilegedExportedPackages().forEach(declarer::withPrivilegedPackage);
   }
 
-  private void parseImportedTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
+  private void declareImportedTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
     parser.getImportedTypes().forEach(importedType -> {
       final Optional<String> typeId = getTypeId(importedType);
 
@@ -137,13 +164,16 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     });
   }
 
-  private void parseSubTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
+  private void declareSubTypes(ExtensionModelParser parser, ExtensionDeclarer declarer, ExtensionLoadingContext context) {
     parser.getSubTypes().forEach((base, subTypes) -> {
       declarer.withSubTypes(base, subTypes);
 
       // For subtypes that reference types from other artifacts, auto-import them.
       autoImportReferencedTypes(declarer, base, context);
       subTypes.forEach(subTypeEntry -> autoImportReferencedTypes(declarer, subTypeEntry, context));
+
+      registerType(base);
+      subTypes.forEach(sub -> registerType(sub));
     });
   }
 
@@ -159,7 +189,30 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .ifPresent(declarer::withImportedType));
   }
 
-  private void registerType(ExtensionDeclarer declarer, MetadataType type) {
+  public void registerOutputTypes(ExecutableComponentDeclaration<?> declaration) {
+    if (declaration.getOutput() == null) {
+      throw new IllegalModelDefinitionException(format("%s '%s' doesn't specify an output type",
+                                                       getComponentDeclarationTypeName(declaration), declaration.getName()));
+    }
+
+    if (declaration.getOutputAttributes() == null) {
+      throw new IllegalModelDefinitionException(format("%s '%s' doesn't specify output attributes types",
+                                                       getComponentDeclarationTypeName(declaration), declaration.getName()));
+    }
+
+    registerType(declaration.getOutput().getType());
+    registerType(declaration.getOutputAttributes().getType());
+  }
+
+  public void registerType(MetadataType type) {
+    ExtensionMetadataTypeUtils.registerType(declarer, type);
+  }
+
+  public Optional<NotificationModel> getNotificationModel(String identifier) {
+    return ofNullable(notificationModels.get(identifier));
+  }
+
+  private void registerExportedType(ExtensionDeclarer declarer, MetadataType type) {
     type.accept(new MetadataTypeVisitor() {
 
       @Override
@@ -193,7 +246,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     });
   }
 
-  private void initErrorModelFactorySupplier(ExtensionModelParser parser, String namespace) {
+  private void initErrorModelFactorySupplier(ExtensionModelParser parser) {
     errorsModelFactorySupplier = () -> new ErrorsModelFactory(parser.getErrorModelParsers(), namespace);
   }
 
@@ -211,6 +264,11 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   ConnectionProviderModelLoaderDelegate getConnectionProviderModelLoaderDelegate() {
     return connectionProviderModelLoaderDelegate;
+  }
+
+  StereotypeModelLoaderDelegate getStereotypeModelLoaderDelegate() {
+    checkState(stereotypeModelLoaderDelegate != null, "stereotypeDelegate not yet initialized");
+    return stereotypeModelLoaderDelegate;
   }
 
   ErrorsModelFactory createErrorModelFactory() {

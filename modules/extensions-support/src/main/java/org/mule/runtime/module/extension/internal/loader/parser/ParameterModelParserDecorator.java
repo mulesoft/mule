@@ -87,11 +87,6 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   }
 
   @Override
-  public List<StereotypeModel> getAllowedStereotypes() {
-    return decoratee.getAllowedStereotypes();
-  }
-
-  @Override
   public boolean isExcludedFromConnectivitySchema() {
     return decoratee.isExcludedFromConnectivitySchema();
   }
@@ -119,5 +114,10 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   @Override
   public Set<String> getSemanticTerms() {
     return decoratee.getSemanticTerms();
+  }
+
+  @Override
+  public List<StereotypeModel> getAllowedStereotypes(StereotypeModelFactory factory) {
+    return decoratee.getAllowedStereotypes(factory);
   }
 }

@@ -22471,7 +22471,29 @@
       "output": {
         "type": {
           "format": "java",
-          "type": "@ref:org.mule.sdk.api.runtime.parameter.CorrelationInfo"
+          "type": "Object",
+          "annotations": {
+            "typeId": "org.mule.sdk.api.runtime.parameter.CorrelationInfo",
+            "classInformation": {
+              "classname": "org.mule.sdk.api.runtime.parameter.CorrelationInfo",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            },
+            "typeAlias": {
+              "value": "CorrelationInfo"
+            },
+            "stereotype": {
+              "allowedStereotypes": []
+            }
+          },
+          "fields": []
         },
         "hasDynamicType": true,
         "description": "",
@@ -36145,37 +36167,6 @@
   ],
   "modelProperties": {},
   "types": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.sdk.api.runtime.parameter.CorrelationInfo",
-        "classInformation": {
-          "classname": "org.mule.sdk.api.runtime.parameter.CorrelationInfo",
-          "hasDefaultConstructor": false,
-          "isInterface": true,
-          "isInstantiable": false,
-          "isAbstract": true,
-          "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeAlias": {
-          "value": "CorrelationInfo"
-        },
-        "stereotype": {
-          "allowedStereotypes": [
-            {
-              "type": "CORRELATION_INFO",
-              "namespace": "PETSTORE"
-            }
-          ]
-        }
-      },
-      "fields": []
-    },
     {
       "format": "java",
       "type": "Object",

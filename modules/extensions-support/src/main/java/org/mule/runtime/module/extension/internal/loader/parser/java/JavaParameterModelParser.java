@@ -8,8 +8,10 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION;
@@ -20,13 +22,19 @@ import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVoca
 import static org.mule.runtime.connectivity.api.platform.schema.ConnectivityVocabulary.SECRET;
 import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getParameterTermsFromAnnotations;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addTermIfPresent;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -42,11 +50,16 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.extension.api.annotation.ConfigReferences;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
+import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
+import org.mule.runtime.extension.api.annotation.param.reference.ObjectStoreReference;
+import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -65,6 +78,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeM
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
@@ -134,13 +148,6 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   @Override
-  public List<StereotypeModel> getAllowedStereotypes() {
-    return type.getAnnotation(StereotypeTypeAnnotation.class)
-        .map(StereotypeTypeAnnotation::getAllowedStereotypes)
-        .orElse(emptyList());
-  }
-
-  @Override
   public ParameterRole getRole() {
     return roleOf(parameter.getAnnotation(Content.class));
   }
@@ -203,6 +210,62 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public boolean isComponentId() {
     return parameter.getAnnotation(ComponentId.class).isPresent();
+  }
+
+  @Override
+  public List<StereotypeModel> getAllowedStereotypes(StereotypeModelFactory factory) {
+    if (parameter.isAnnotatedWith(FlowReference.class)
+        || parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.reference.FlowReference.class)) {
+      return singletonList(FLOW);
+    }
+
+    if (parameter.isAnnotatedWith(ObjectStoreReference.class)
+        || parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.reference.ObjectStoreReference.class)) {
+      return singletonList(OBJECT_STORE);
+    }
+
+    List<StereotypeModel> stereotypes =
+        mapReduceRepeatableAnnotation(
+                                      parameter,
+                                      ConfigReference.class,
+                                      org.mule.sdk.api.annotation.param.reference.ConfigReference.class,
+                                      container -> ((ConfigReferences) container).value(),
+                                      container -> ((org.mule.sdk.api.annotation.ConfigReferences) container).value(),
+                                      value -> factory.createStereotype(value.getStringValue(ConfigReference::name),
+                                                                        value.getStringValue(ConfigReference::namespace), CONFIG),
+                                      value -> factory.createStereotype(
+                                                                        value
+                                                                            .getStringValue(org.mule.sdk.api.annotation.param.reference.ConfigReference::name),
+                                                                        value
+                                                                            .getStringValue(org.mule.sdk.api.annotation.param.reference.ConfigReference::namespace),
+                                                                        CONFIG))
+                                                                            .collect(toList());
+
+    if (stereotypes.isEmpty()) {
+      stereotypes = mapReduceSingleAnnotation(
+                                              parameter,
+                                              "parameter",
+                                              parameter.getName(),
+                                              AllowedStereotypes.class,
+                                              org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes.class,
+                                              value -> value.getClassArrayValue(AllowedStereotypes::value).stream()
+                                                  .filter(type -> type.getDeclaringClass().isPresent())
+                                                  .map(type -> from(type.getDeclaringClass().get())),
+                                              value -> value
+                                                  .getClassArrayValue(org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes::value)
+                                                  .stream()
+                                                  .filter(type -> type.getDeclaringClass().isPresent())
+                                                  .map(type -> from(type.getDeclaringClass().get())))
+                                                      .map(stream -> stream.map(def -> factory.createStereotype(def))
+                                                          .collect(toList()))
+                                                      .orElse(new LinkedList<>());
+    }
+
+    stereotypes.addAll(type.getAnnotation(StereotypeTypeAnnotation.class)
+        .map(StereotypeTypeAnnotation::getAllowedStereotypes)
+        .orElse(emptyList()));
+
+    return stereotypes;
   }
 
   @Override

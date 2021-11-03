@@ -71,23 +71,23 @@ public final class MuleExtensionAnnotationParser {
                                                             org.mule.sdk.api.annotation.Extension.class.getName()));
   }
 
-  public static <L extends Annotation, A extends Annotation, T> Stream<T> parseRepeatableAnnotation(
-                                                                                                    WithAnnotations element,
-                                                                                                    Class<L> legacyAnnotationType,
-                                                                                                    Class<A> sdkApiAnnotationType,
-                                                                                                    Function<Annotation, L[]> legacyContainerMapping,
-                                                                                                    Function<Annotation, A[]> sdkApiContainerMapping,
-                                                                                                    Function<AnnotationValueFetcher<L>, T> legacyMapping,
-                                                                                                    Function<AnnotationValueFetcher<A>, T> sdkApiMapping) {
+  public static <L extends Annotation, A extends Annotation, T> Stream<T> mapReduceRepeatableAnnotation(
+                                                                                                        WithAnnotations element,
+                                                                                                        Class<L> legacyAnnotationType,
+                                                                                                        Class<A> sdkApiAnnotationType,
+                                                                                                        Function<Annotation, L[]> legacyContainerMapping,
+                                                                                                        Function<Annotation, A[]> sdkApiContainerMapping,
+                                                                                                        Function<AnnotationValueFetcher<L>, T> legacyMapping,
+                                                                                                        Function<AnnotationValueFetcher<A>, T> sdkApiMapping) {
 
     return Stream.concat(
-                         parseRepeatableAnnotation(element, legacyAnnotationType, legacyContainerMapping).map(legacyMapping),
-                         parseRepeatableAnnotation(element, sdkApiAnnotationType, sdkApiContainerMapping).map(sdkApiMapping));
+                         mapReduceRepeatableAnnotation(element, legacyAnnotationType, legacyContainerMapping).map(legacyMapping),
+                         mapReduceRepeatableAnnotation(element, sdkApiAnnotationType, sdkApiContainerMapping).map(sdkApiMapping));
   }
 
-  public static <T extends Annotation> Stream<AnnotationValueFetcher<T>> parseRepeatableAnnotation(WithAnnotations element,
-                                                                                                   Class<T> annotation,
-                                                                                                   Function<Annotation, T[]> containerMapper) {
+  public static <T extends Annotation> Stream<AnnotationValueFetcher<T>> mapReduceRepeatableAnnotation(WithAnnotations element,
+                                                                                                       Class<T> annotation,
+                                                                                                       Function<Annotation, T[]> containerMapper) {
 
     Stream<AnnotationValueFetcher<T>> singleElementStream = element.getValueFromAnnotation(annotation)
         .map(Stream::of)
@@ -257,44 +257,44 @@ public final class MuleExtensionAnnotationParser {
    * @param <T>                     Output generic type
    * @return a reduced value
    */
-  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromExtension(
-                                                                                                 ExtensionElement extensionElement,
-                                                                                                 Class<R> legacyAnnotationClass,
-                                                                                                 Class<S> sdkAnnotationClass,
-                                                                                                 Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
-                                                                                                 Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> mapReduceSingleAnnotation(
+                                                                                                      ExtensionElement extensionElement,
+                                                                                                      Class<R> legacyAnnotationClass,
+                                                                                                      Class<S> sdkAnnotationClass,
+                                                                                                      Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+                                                                                                      Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
 
-    return getInfoFromAnnotation(
-                                 extensionElement,
-                                 legacyAnnotationClass,
-                                 sdkAnnotationClass,
-                                 legacyAnnotationMapping,
-                                 sdkAnnotationMapping,
-                                 () -> new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                                           extensionElement.getName(),
-                                                                                           legacyAnnotationClass.getName(),
-                                                                                           sdkAnnotationClass.getName())));
+    return mapReduceAnnotation(
+                               extensionElement,
+                               legacyAnnotationClass,
+                               sdkAnnotationClass,
+                               legacyAnnotationMapping,
+                               sdkAnnotationMapping,
+                               () -> new IllegalParameterModelDefinitionException(format("Extension '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                         extensionElement.getName(),
+                                                                                         legacyAnnotationClass.getName(),
+                                                                                         sdkAnnotationClass.getName())));
   }
 
-  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
-                                                                                                  WithAnnotations element,
-                                                                                                  String elementType,
-                                                                                                  String elementName,
-                                                                                                  Class<R> legacyAnnotationClass,
-                                                                                                  Class<S> sdkAnnotationClass,
-                                                                                                  Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
-                                                                                                  Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> mapReduceSingleAnnotation(
+                                                                                                      WithAnnotations element,
+                                                                                                      String elementType,
+                                                                                                      String elementName,
+                                                                                                      Class<R> legacyAnnotationClass,
+                                                                                                      Class<S> sdkAnnotationClass,
+                                                                                                      Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+                                                                                                      Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping) {
 
-    return getInfoFromAnnotation(
-                                 element,
-                                 legacyAnnotationClass,
-                                 sdkAnnotationClass,
-                                 legacyAnnotationMapping,
-                                 sdkAnnotationMapping,
-                                 () -> new IllegalParameterModelDefinitionException(format("Annotations %s and %s are both present at the same time on %s %s",
-                                                                                           legacyAnnotationClass.getName(),
-                                                                                           sdkAnnotationClass.getName(),
-                                                                                           elementType, elementName)));
+    return mapReduceAnnotation(
+                               element,
+                               legacyAnnotationClass,
+                               sdkAnnotationClass,
+                               legacyAnnotationMapping,
+                               sdkAnnotationMapping,
+                               () -> new IllegalParameterModelDefinitionException(format("Annotations %s and %s are both present at the same time on %s %s",
+                                                                                         legacyAnnotationClass.getName(),
+                                                                                         sdkAnnotationClass.getName(),
+                                                                                         elementType, elementName)));
   }
 
   /**
@@ -313,13 +313,13 @@ public final class MuleExtensionAnnotationParser {
    * @param <T>                     Output generic type
    * @return a reduced value
    */
-  public static <R extends Annotation, S extends Annotation, T> Optional<T> getInfoFromAnnotation(
-                                                                                                  WithAnnotations element,
-                                                                                                  Class<R> legacyAnnotationClass,
-                                                                                                  Class<S> sdkAnnotationClass,
-                                                                                                  Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
-                                                                                                  Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping,
-                                                                                                  Supplier<? extends IllegalModelDefinitionException> dualDefinitionExceptionFactory) {
+  public static <R extends Annotation, S extends Annotation, T> Optional<T> mapReduceAnnotation(
+                                                                                                WithAnnotations element,
+                                                                                                Class<R> legacyAnnotationClass,
+                                                                                                Class<S> sdkAnnotationClass,
+                                                                                                Function<AnnotationValueFetcher<R>, T> legacyAnnotationMapping,
+                                                                                                Function<AnnotationValueFetcher<S>, T> sdkAnnotationMapping,
+                                                                                                Supplier<? extends IllegalModelDefinitionException> dualDefinitionExceptionFactory) {
 
     Optional<AnnotationValueFetcher<R>> legacyAnnotation = element.getValueFromAnnotation(legacyAnnotationClass);
     Optional<AnnotationValueFetcher<S>> sdkAnnotation = element.getValueFromAnnotation(sdkAnnotationClass);

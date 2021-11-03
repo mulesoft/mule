@@ -34,4 +34,8 @@ abstract class AbstractModelLoaderDelegate {
   FunctionModelLoaderDelegate getFunctionModelLoaderDelegate() {
     return loader.getFunctionModelLoaderDelegate();
   }
+
+  StereotypeModelLoaderDelegate getStereotypeModelLoaderDelegate() {
+    return loader.getStereotypeModelLoaderDelegate();
+  }
 }

@@ -83,6 +83,7 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
@@ -871,7 +872,15 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertOutputType(OutputDeclaration output, MetadataType type, boolean isDynamic) {
-    assertThat(output.getType(), equalTo(type));
+    MetadataType outputType = output.getType();
+    String outputTypeId = ExtensionMetadataTypeUtils.getId(outputType).orElse(null);
+    String actualTypeId = ExtensionMetadataTypeUtils.getId(type).orElse(null);
+
+    if (outputTypeId != null && type instanceof ObjectType) {
+      assertThat(actualTypeId, equalTo(actualTypeId));
+    } else {
+      assertThat(outputType, equalTo(type));
+    }
     assertThat(output.hasDynamicType(), is(isDynamic));
   }
 

@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -38,6 +42,11 @@ public class JavaNestedChainModelParser implements NestedChainModelParser {
   @Override
   public boolean isRequired() {
     return extensionParameter.isRequired();
+  }
+
+  @Override
+  public List<StereotypeModel> getAllowedStereotypes(StereotypeModelFactory factory) {
+    return JavaStereotypeModelParserUtils.getAllowedStereotypes(extensionParameter, extensionParameter.getType(), factory);
   }
 
   @Override

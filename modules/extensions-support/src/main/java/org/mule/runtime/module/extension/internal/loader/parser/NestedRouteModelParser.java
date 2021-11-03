@@ -20,7 +20,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface NestedRouteModelParser extends SemanticTermsParser {
+public interface NestedRouteModelParser extends SemanticTermsParser, AllowedStereotypesModelParser {
 
   /**
    * @return the route's name

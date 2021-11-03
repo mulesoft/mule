@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.registerType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_GROUP;
@@ -15,17 +16,21 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.module.extension.internal.loader.java.ParameterModelsLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.java.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapServiceProviderWrapper;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
+
+import java.util.function.Supplier;
 
 /**
  * Declares a Connection Provider of {@link ForwardingSoapClient} instances given a {@link SoapServiceProvider}.
@@ -38,9 +43,13 @@ public class SoapServiceProviderDeclarer {
 
   private final ParameterModelsLoaderDelegate parametersLoader;
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final StereotypeModelLoaderDelegate stereotypeDelegate;
 
-  SoapServiceProviderDeclarer() {
-    parametersLoader = new ParameterModelsLoaderDelegate();
+  SoapServiceProviderDeclarer(ExtensionDeclarer extensionDeclarer,
+                              Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader,
+                              StereotypeModelLoaderDelegate stereotypeDelegate) {
+    parametersLoader = new ParameterModelsLoaderDelegate(stereotypeModelLoader, type -> registerType(extensionDeclarer, type));
+    this.stereotypeDelegate = stereotypeDelegate;
   }
 
   /**
@@ -54,15 +63,17 @@ public class SoapServiceProviderDeclarer {
     String description = provider.getDescription();
 
     // Declares the Service Provider as a Connection Provider.
-    ConnectionProviderDeclarer providerDeclarer = configDeclarer.withConnectionProvider(provider.getAlias())
+    final String providerName = provider.getAlias();
+    ConnectionProviderDeclarer providerDeclarer = configDeclarer.withConnectionProvider(providerName)
         .describedAs(description)
         .withModelProperty(new ConnectionTypeModelProperty(ForwardingSoapClient.class))
         // TODO - MULE-14311 - Make loader work in compile time
         .withModelProperty(new ImplementingTypeModelProperty(provider.getDeclaringClass().get()))
         .withConnectionManagementType(POOLING)
-        .supportsConnectivityTesting(provider.supportsConnectivityTesting());
+        .supportsConnectivityTesting(provider.supportsConnectivityTesting())
+        .withStereotype(stereotypeDelegate.getDefaultConnectionProviderStereotype(providerName));
 
-    ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", provider.getAlias());
+    ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerName);
 
     parametersLoader.declare(providerDeclarer, getParameterGroupParsers(provider.getParameters(), context));
     if (hasCustomTransports) {

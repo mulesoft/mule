@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
@@ -51,6 +52,11 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
       getConnectionProviderModelLoaderDelegate().declareConnectionProviders(
                                                                             configurationDeclarer,
                                                                             configParser.getConnectionProviderModelParsers());
+
+      getStereotypeModelLoaderDelegate().addStereotypes(configParser,
+                                                        configurationDeclarer,
+                                                        of(() -> getStereotypeModelLoaderDelegate()
+                                                            .getDefaultConfigStereotype(configParser.getName())));
     }
   }
 

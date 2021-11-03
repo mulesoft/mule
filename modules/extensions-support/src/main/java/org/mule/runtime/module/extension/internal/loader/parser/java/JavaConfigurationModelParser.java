@@ -9,12 +9,14 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getInfoFromAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLIbModelParserUtils.parseExternalLibraryModels;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
@@ -28,11 +30,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +47,10 @@ import java.util.Optional;
  */
 public class JavaConfigurationModelParser extends AbstractJavaModelParser implements ConfigurationModelParser {
 
-  private final ExtensionModelParser extensionModelParser;
+  private final JavaExtensionModelParser extensionModelParser;
   private final ComponentElement configElement;
 
-  public JavaConfigurationModelParser(ExtensionModelParser extensionModelParser,
+  public JavaConfigurationModelParser(JavaExtensionModelParser extensionModelParser,
                                       ExtensionElement extensionElement,
                                       ComponentElement configElement,
                                       ExtensionLoadingContext loadingContext) {
@@ -67,14 +69,15 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public String getName() {
-    return getInfoFromAnnotation(configElement,
-                                 "Configuration", configElement.getName(),
-                                 Configuration.class,
-                                 org.mule.sdk.api.annotation.Configuration.class,
-                                 value -> value.getStringValue(Configuration::name),
-                                 value -> value.getStringValue(org.mule.sdk.api.annotation.Configuration::name))
-                                     .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
-                                     .orElse(DEFAULT_CONFIG_NAME);
+    return mapReduceSingleAnnotation(configElement,
+                                     "Configuration", configElement.getName(),
+                                     Configuration.class,
+                                     org.mule.sdk.api.annotation.Configuration.class,
+                                     value -> value.getStringValue(Configuration::name),
+                                     value -> value
+                                         .getStringValue(org.mule.sdk.api.annotation.Configuration::name))
+                                             .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
+                                             .orElse(DEFAULT_CONFIG_NAME);
   }
 
   @Override
@@ -102,7 +105,9 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
-    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(extensionElement,
+    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
+                                                                           extensionModelParser,
+                                                                           extensionElement,
                                                                            configElement.getConnectionProviders());
   }
 
@@ -137,6 +142,11 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public List<ExternalLibraryModel> getExternalLibraryModels() {
     return parseExternalLibraryModels(configElement);
+  }
+
+  @Override
+  public Optional<StereotypeModel> getStereotype(StereotypeModelFactory factory) {
+    return resolveStereotype(configElement, "Configuration", getName(), factory);
   }
 
   private void checkConfigurationIsNotAnOperation(ExtensionElement extensionElement, ComponentElement componentElement) {

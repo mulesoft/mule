@@ -135,7 +135,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
   }
 
   /**
-   * @return The {@link AnnotatedElement} form which {@code this} instance was derived
+   * @return The {@link AnnotatedElement} from which {@code this} instance was derived
    */
   java.util.Optional<? extends AnnotatedElement> getDeclaringElement();
 

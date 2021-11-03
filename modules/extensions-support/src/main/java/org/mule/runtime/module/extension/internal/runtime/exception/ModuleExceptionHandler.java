@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
+import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter.from;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
+import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -22,7 +22,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.Optional;

@@ -208,6 +208,16 @@ public class TypeWrapper implements Type {
   }
 
   @Override
+  public Optional<Type> getSuperType() {
+    Class<?> superClass = aClass.getSuperclass();
+    if (superClass == null || Object.class.equals(superClass)) {
+      return empty();
+    }
+
+    return Optional.of(new TypeWrapper(superClass, typeLoader));
+  }
+
+  @Override
   public ClassInformationAnnotation getClassInformation() {
     return new ClassInformationAnnotation(aClass, of(resolvableTypeGenerics)
         .map(ResolvableType::getType)

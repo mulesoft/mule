@@ -38,7 +38,8 @@ public class JavaModelLoaderUtils {
    *                                      {@link org.mule.sdk.api.annotation.dsl.xml.Xml}
    * @return the {@link XmlDslModel}
    */
-  public static XmlDslModel getXmlDslModel(ExtensionElement extensionElement, String version,
+  public static XmlDslModel getXmlDslModel(ExtensionElement extensionElement,
+                                           String version,
                                            Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration) {
     String extensionName = extensionElement.getName();
     Optional<String> prefix = empty();

@@ -135,6 +135,16 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
   String getTypeName();
 
   /**
+   * Returns a {@link Type} representing the class that {@code this} type directly extends.
+   *
+   * If either {@code this} or the resolved super type match the {@link Object} type then {@link Optional#empty()} is returned
+   *
+   * @return the super type
+   * @since 4.5.0
+   */
+  Optional<Type> getSuperType();
+
+  /**
    * @return The {@link ClassInformationAnnotation} describing the current {@link Type}
    * @since 4.1
    */

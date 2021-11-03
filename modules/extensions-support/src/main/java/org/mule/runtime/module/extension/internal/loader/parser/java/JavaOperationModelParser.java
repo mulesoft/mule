@@ -23,6 +23,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forOperation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseOperationErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
@@ -32,6 +33,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
@@ -56,13 +58,14 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
+import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -84,7 +87,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                                VoidCompletionCallback.class,
                                                                                org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
 
-  private final ExtensionModelParser extensionModelParser;
+  private final JavaExtensionModelParser extensionModelParser;
   private final OperationElement operationElement;
   private final OperationContainerElement operationContainer;
   private final OperationContainerElement enclosingType;
@@ -99,7 +102,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private boolean autoPaging = false;
   private List<ExtensionParameter> routes = emptyList();
 
-  public JavaOperationModelParser(ExtensionModelParser extensionModelParser,
+  public JavaOperationModelParser(JavaExtensionModelParser extensionModelParser,
                                   ExtensionElement extensionElement,
                                   OperationContainerElement operationContainer,
                                   OperationElement operationElement,
@@ -357,7 +360,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public List<NestedRouteModelParser> getNestedRouteParsers() {
-    return routes.stream().map(r -> new JavaNestedRouteModelParser(r)).collect(toList());
+    return routes.stream().map(JavaNestedRouteModelParser::new).collect(toList());
   }
 
   @Override
@@ -433,6 +436,17 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
     return terms;
   }
 
+  @Override
+  public List<String> getEmittedNotifications() {
+    List<String> notifications =
+        NotificationModelParserUtils.getEmittedNotifications(operationElement, getComponentTypeName(), getName());
+    if (notifications.isEmpty()) {
+      notifications = NotificationModelParserUtils.getEmittedNotifications(operationContainer, getComponentTypeName(), getName());
+    }
+
+    return notifications;
+  }
+
   private void checkOperationIsNotAnExtension() {
     if (operationContainer.isAssignableFrom(extensionElement) || extensionElement.isAssignableFrom(operationContainer)) {
       throw new IllegalOperationModelDefinitionException(
@@ -464,6 +478,17 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public Optional<DisplayModel> getDisplayModel() {
     return JavaExtensionModelParserUtils.getDisplayModel(operationElement, "operation", operationElement.getName());
+  }
+
+  @Override
+  public Optional<StereotypeModel> getStereotype(StereotypeModelFactory factory) {
+    Optional<StereotypeModel> stereotype = resolveStereotype(operationElement, "Operation", getName(), factory);
+
+    if (!stereotype.isPresent()) {
+      stereotype = resolveStereotype(operationContainer, "Operation", getName(), factory);
+    }
+
+    return stereotype;
   }
 
   @Override

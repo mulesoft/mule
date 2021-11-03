@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
@@ -52,6 +54,12 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     addSemanticTerms(router.getDeclaration(), parser);
     declareRoutes(router, parser);
 
+    getStereotypeModelLoaderDelegate().addStereotypes(
+                                                      parser,
+                                                      router,
+                                                      of(() -> getStereotypeModelLoaderDelegate()
+                                                          .getDefaultOperationStereotype(parser.getName())));
+
     constructDeclarers.put(parser, router);
   }
 
@@ -63,7 +71,8 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .withMinOccurs(route.getMinOccurs())
           .withMaxOccurs(route.getMaxOccurs().orElse(null));
 
-      routeDeclarer.withChain();
+      NestedChainDeclarer chain = routeDeclarer.withChain();
+      getStereotypeModelLoaderDelegate().addAllowedStereotypes(route, chain);
       route.getAdditionalModelProperties().forEach(routeDeclarer::withModelProperty);
       loader.getParameterModelsLoaderDelegate().declare(routeDeclarer, route.getParameterGroupModelParsers());
     });
