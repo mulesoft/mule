@@ -11,6 +11,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static org.mule.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.module.launcher.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
 import org.mule.ArtifactStoppedPersistenceListener;
@@ -39,6 +40,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         {
             doNotPersistArtifactStop(artifact);
             tryToStopArtifact(artifact);
+            deletePersistence(artifact);
             tryToDisposeArtifact(artifact);
         }
         catch (Throwable t)
@@ -86,7 +88,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         {
             artifact.install();
             artifact.init();
-            if (shouldStartArtifact(artifact))
+            if (startArtifact && shouldStartArtifact(artifact))
             {
                 artifact.start();
             }
@@ -125,7 +127,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         try
         {
             Optional<Properties> properties = absent();
-            deploymentProperties = resolveDeploymentProperties(artifact.getArtifactName(), properties);
+            deploymentProperties = resolveArtifactStatusDeploymentProperties(artifact.getArtifactName(), properties);
         }
         catch (IOException e)
         {
@@ -148,6 +150,21 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : listeners)
         {
             artifactStoppedPersistenceListener.doNotPersist();
+        }
+    }
+
+    public void deletePersistence(Artifact artifact)
+    {
+        if (artifact.getMuleContext() == null || artifact.getMuleContext().getRegistry() == null)
+        {
+            return;
+        }
+        Registry artifactRegistry = artifact.getMuleContext().getRegistry();
+        Collection<ArtifactStoppedPersistenceListener> listeners =
+            artifactRegistry.lookupObjects(ArtifactStoppedPersistenceListener.class);
+        for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : listeners)
+        {
+            artifactStoppedPersistenceListener.deletePersistenceProperties();
         }
     }
 

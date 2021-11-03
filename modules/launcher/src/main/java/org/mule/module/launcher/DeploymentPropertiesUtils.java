@@ -28,8 +28,10 @@ import java.util.Properties;
 public class DeploymentPropertiesUtils
 {
     private static final String DEPLOYMENT_PROPERTIES_FILE_NAME = "deployment.properties";
-    
-    private static final String DEPLOYTMENT_PROPERTIES_DIRECTORY = "deployment-properties";
+
+    private static final String DEPLOYMENT_PROPERTIES_DIRECTORY = "deployment-properties";
+
+    private static final String ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME = "artifact.status.deployment.properties";
 
     /**
      * This method resolves the deploymentProperties for a new deploy/redeploy considering
@@ -38,7 +40,7 @@ public class DeploymentPropertiesUtils
      * In case no new deployment properties are passed, the previous persisted properties
      * are returned.
      * Otherwise, the new deployment properties are used and persisted in 
-     * .mule/app/deployment-properties/deployment.properties
+     * .mule/app/deployment-properties/<fileName>
      * There is one deployment.properties file for each artifact (domain/app).
      * 
      * @param artifactName name of the artifact. 
@@ -47,19 +49,20 @@ public class DeploymentPropertiesUtils
      * @return deployment properties 
      * @throws IOException
      */
-    public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties) throws IOException
+    public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties,
+                                                         String fileName) throws IOException
     {
         File file = new File(getExecutionFolder(), artifactName);
         String workingDirectory = file.getAbsolutePath();
-        String deploymentPropertiesPath = workingDirectory + separator + DEPLOYTMENT_PROPERTIES_DIRECTORY;
+        String deploymentPropertiesPath = workingDirectory + separator + DEPLOYMENT_PROPERTIES_DIRECTORY;
 
         if (!deploymentProperties.isPresent())
         {
-            return getDeploymentProperties(deploymentPropertiesPath);
+            return getDeploymentProperties(deploymentPropertiesPath, fileName);
         }
 
         initDeploymentPropertiesDirectory(deploymentPropertiesPath);
-        persistDeploymentPropertiesFile(deploymentPropertiesPath, deploymentProperties.get());
+        persistDeploymentPropertiesFile(deploymentPropertiesPath, deploymentProperties.get(), fileName);
         
         return deploymentProperties.get(); 
     }
@@ -73,9 +76,9 @@ public class DeploymentPropertiesUtils
      * 
      * @throws IOException
      */
-    private static Properties getDeploymentProperties(String deploymentPropertiesPath) throws IOException
+    private static Properties getDeploymentProperties(String deploymentPropertiesPath, String fileName) throws IOException
     {
-        File configFile = new File(deploymentPropertiesPath + separator + DEPLOYMENT_PROPERTIES_FILE_NAME);
+        File configFile = new File(deploymentPropertiesPath + separator + fileName);
         Properties props = new Properties();
         
         if (!configFile.exists())
@@ -121,11 +124,39 @@ public class DeploymentPropertiesUtils
         }
     }
 
-    private static void persistDeploymentPropertiesFile(String deploymentPropertiesPath, Properties deploymentProperties) throws IOException
+    private static void persistDeploymentPropertiesFile(String deploymentPropertiesPath, Properties deploymentProperties, String fileName) throws IOException
     {
-        File deploymentPropertiesFile = new File(deploymentPropertiesPath, DEPLOYMENT_PROPERTIES_FILE_NAME);
+        File deploymentPropertiesFile = new File(deploymentPropertiesPath, fileName);
         FileWriter fileWriter = new FileWriter(deploymentPropertiesFile.getAbsolutePath(), false);
         deploymentProperties.store(fileWriter, "deployment properties");
         fileWriter.close();
+    }
+
+    /**
+     * This method resolves the deploymentProperties for a certain artifact. There is one deployment.properties file for each
+     * artifact (domain/app).
+     *
+     * @param artifactName         name of the artifact.
+     * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
+     * @return deployment properties
+     * @throws IOException
+     */
+    public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties)
+        throws IOException {
+        return resolveDeploymentProperties(artifactName, deploymentProperties, DEPLOYMENT_PROPERTIES_FILE_NAME);
+    }
+
+    /**
+     * This method resolves the statusProperties for the status (started, stopped) of a certain artifact. There is one artifact.status.deployment.properties file for each
+     * artifact (domain/app).
+     *
+     * @param artifactName         name of the artifact.
+     * @param statusProperties status deployment properties set in the new deploy/redeploy as parameters.
+     * @return deployment properties
+     * @throws IOException
+     */
+    public static Properties resolveArtifactStatusDeploymentProperties(String artifactName, Optional<Properties> statusProperties)
+        throws IOException {
+        return resolveDeploymentProperties(artifactName, statusProperties, ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME);
     }
 }

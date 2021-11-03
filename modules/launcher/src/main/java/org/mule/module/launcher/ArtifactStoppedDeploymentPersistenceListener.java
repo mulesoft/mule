@@ -9,6 +9,7 @@ package org.mule.module.launcher;
 import static com.google.common.base.Optional.of;
 import static java.lang.String.valueOf;
 import static org.mule.module.launcher.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
 import org.mule.ArtifactStoppedPersistenceListener;
@@ -47,7 +48,7 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(true));
     try
     {
-      resolveDeploymentProperties(artifactName, of(properties));
+      resolveArtifactStatusDeploymentProperties(artifactName, of(properties));
     }
     catch (IOException e)
     {
@@ -67,7 +68,7 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(false));
     try
     {
-      resolveDeploymentProperties(artifactName, of(properties));
+      resolveArtifactStatusDeploymentProperties(artifactName, of(properties));
     }
     catch (IOException e)
     {
@@ -80,5 +81,18 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
   public void doNotPersist()
   {
     shouldPersist.set(false);
+  }
+
+  @Override
+  public void deletePersistenceProperties() {
+    try
+    {
+      resolveArtifactStatusDeploymentProperties(artifactName, of(new Properties()));
+    }
+    catch (IOException e)
+    {
+      logger.error("ArtifactStoppedDeploymentPersistenceListener failed to delete persistence for artifact {}",
+          artifactName, e);
+    }
   }
 }

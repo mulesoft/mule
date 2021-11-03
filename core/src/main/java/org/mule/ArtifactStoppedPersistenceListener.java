@@ -6,6 +6,8 @@
  */
 package org.mule;
 
+import java.io.IOException;
+
 /**
  * Defines a listener to persist stop events of Mule artifacts.
  */
@@ -32,4 +34,6 @@ public interface ArtifactStoppedPersistenceListener
    * to prevent persistence when the artifact is stopped for other reasons.
    */
   void doNotPersist();
+
+  void deletePersistenceProperties();
 }
