@@ -32,7 +32,7 @@ public interface WithAlias extends WithAnnotations, WithName {
                                org.mule.sdk.api.annotation.Alias.class,
                                value -> value.getStringValue(Alias::value),
                                value -> value.getStringValue(org.mule.sdk.api.annotation.Alias::value),
-                               () -> new IllegalModelDefinitionException(format("Both %s and %s annotations are present on element '%s",
+                               () -> new IllegalModelDefinitionException(format("Both %s and %s annotations are present on element '%s'",
                                                                                 Alias.class.getName(),
                                                                                 org.mule.sdk.api.annotation.Alias.class.getName(),
                                                                                 getName())))

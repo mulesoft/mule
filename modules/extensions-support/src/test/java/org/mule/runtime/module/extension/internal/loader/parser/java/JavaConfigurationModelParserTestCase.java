@@ -21,7 +21,6 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.sdk.api.annotation.Configuration;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
@@ -79,9 +78,9 @@ public class JavaConfigurationModelParserTestCase {
     ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
     ExtensionElement extensionElement = new ExtensionTypeWrapper<>(extension, typeLoader);
     ConfigurationElement configurationElement = extensionElement.getConfigurations().get(0);
-    ExtensionModelParser extensionModelParser = new JavaExtensionModelParser(extensionElement, ctx);
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionElement, ctx);
 
-    return new JavaConfigurationModelParser(extensionModelParser, extensionElement, configurationElement, ctx);
+    return new JavaConfigurationModelParser(javaExtensionModelParser, extensionElement, configurationElement, ctx);
   }
 
   @Extension(name = "SimpleSdkExtension")
