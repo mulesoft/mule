@@ -24,6 +24,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPagingProviderTypes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+import static org.mule.sdk.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.sdk.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.sdk.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
@@ -47,6 +50,7 @@ import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
@@ -62,9 +66,12 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
+import org.mule.sdk.api.annotation.Alias;
+import org.mule.sdk.api.annotation.Expression;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -96,14 +103,12 @@ import java.util.function.Function;
 import javax.annotation.processing.ProcessingEnvironment;
 
 import com.google.testing.compile.CompilationRule;
-
-import org.springframework.core.ResolvableType;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.springframework.core.ResolvableType;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -288,7 +293,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getWildCardFieldsDataTypes() {
-
     Collection<Field> exposedFields = getFieldsWithGetters(FruitBox.class, reflectionCache);
     assertNotNull(exposedFields);
     assertEquals(6, exposedFields.size());
@@ -506,6 +510,62 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     AccessibleObject object = mock(AccessibleObject.class);
     when(object.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class)).thenReturn(optional);
     assertThat(IntrospectionUtils.isRequired(object), is(false));
+  }
+
+  @Test
+  public void getAlias() throws Exception {
+    Field sdkField = WithFields.class.getDeclaredField("sdkField");
+    Field legacyField = WithFields.class.getDeclaredField("legacyField");
+    assertThat(IntrospectionUtils.getAlias(sdkField), is("newSdkField"));
+    assertThat(IntrospectionUtils.getAlias(legacyField), is("oldLegacyField"));
+  }
+
+  @Test
+  public void getRequiredExpressionSupportFromFieldUsingTheSdkApi() throws Exception {
+    Field sdkField = WithFields.class.getDeclaredField("sdkExpressionRequired");
+    FieldWrapper fieldWrapper = new FieldWrapper(sdkField, typeLoader);
+    assertThat(IntrospectionUtils.getExpressionSupport(fieldWrapper, "parameter", "sdkExpressionRequired").get(),
+               is(ExpressionSupport.REQUIRED));
+  }
+
+  @Test
+  public void getNotSupportedExpressionSupportFromFieldUsingTheSdkApi() throws Exception {
+    Field sdkField = WithFields.class.getDeclaredField("sdkExpressionNotSupported");
+    FieldWrapper fieldWrapper = new FieldWrapper(sdkField, typeLoader);
+    assertThat(IntrospectionUtils.getExpressionSupport(fieldWrapper, "parameter", "sdkExpressionNotSupported").get(),
+               is(ExpressionSupport.NOT_SUPPORTED));
+  }
+
+  @Test
+  public void getSupportedExpressionSupportFromFieldUsingTheSdkApi() throws Exception {
+    Field sdkField = WithFields.class.getDeclaredField("sdkExpressionSupported");
+    FieldWrapper fieldWrapper = new FieldWrapper(sdkField, typeLoader);
+    assertThat(IntrospectionUtils.getExpressionSupport(fieldWrapper, "parameter", "sdkExpressionSupported").get(),
+               is(ExpressionSupport.SUPPORTED));
+  }
+
+  @Test
+  public void getRequiredExpressionSupportFromFieldUsingTheLegacyApi() throws Exception {
+    Field sdkField = WithFields.class.getDeclaredField("legacyExpressionRequired");
+    FieldWrapper fieldWrapper = new FieldWrapper(sdkField, typeLoader);
+    assertThat(IntrospectionUtils.getExpressionSupport(fieldWrapper, "parameter", "legacyExpressionRequired").get(),
+               is(ExpressionSupport.REQUIRED));
+  }
+
+  @Test
+  public void getNotSupportedExpressionSupportFromFieldUsingTheLegacyApi() throws Exception {
+    Field sdkField = WithFields.class.getDeclaredField("legacyExpressionNotSupported");
+    FieldWrapper fieldWrapper = new FieldWrapper(sdkField, typeLoader);
+    assertThat(IntrospectionUtils.getExpressionSupport(fieldWrapper, "parameter", "legacyExpressionNotSupported").get(),
+               is(ExpressionSupport.NOT_SUPPORTED));
+  }
+
+  @Test
+  public void getSupportedExpressionSupportFromFieldUsingTheLegacyApi() throws Exception {
+    Field sdkField = WithFields.class.getDeclaredField("legacyExpressionSupported");
+    FieldWrapper fieldWrapper = new FieldWrapper(sdkField, typeLoader);
+    assertThat(IntrospectionUtils.getExpressionSupport(fieldWrapper, "parameter", "legacyExpressionSupported").get(),
+               is(ExpressionSupport.SUPPORTED));
   }
 
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
@@ -787,4 +847,32 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
       }
     }
   }
+
+  private static class WithFields {
+
+    @Alias("newSdkField")
+    public String sdkField;
+
+    @org.mule.runtime.extension.api.annotation.Alias("oldLegacyField")
+    public String legacyField;
+
+    @Expression(REQUIRED)
+    public String sdkExpressionRequired;
+
+    @Expression(NOT_SUPPORTED)
+    public String sdkExpressionNotSupported;
+
+    @Expression(SUPPORTED)
+    public String sdkExpressionSupported;
+
+    @org.mule.runtime.extension.api.annotation.Expression(ExpressionSupport.REQUIRED)
+    public String legacyExpressionRequired;
+
+    @org.mule.runtime.extension.api.annotation.Expression(ExpressionSupport.NOT_SUPPORTED)
+    public String legacyExpressionNotSupported;
+
+    @org.mule.runtime.extension.api.annotation.Expression(ExpressionSupport.SUPPORTED)
+    public String legacyExpressionSupported;
+  }
+
 }

@@ -7,10 +7,9 @@
 package org.mule.test.heisenberg.extension;
 
 import static com.google.common.collect.ImmutableList.copyOf;
-import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
+import static org.mule.sdk.api.meta.Category.SELECT;
+import static org.mule.sdk.api.meta.ExternalLibraryType.NATIVE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -18,10 +17,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
@@ -36,8 +32,12 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
+import org.mule.sdk.api.annotation.Export;
+import org.mule.sdk.api.annotation.Extension;
+import org.mule.sdk.api.annotation.ExternalLib;
 import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.sdk.api.annotation.param.display.Example;
+import org.mule.sdk.api.meta.ExpressionSupport;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
@@ -181,7 +181,7 @@ public class HeisenbergExtension implements Lifecycle {
   private HealthStatus endingHealth;
 
   @Parameter
-  @Expression(REQUIRED)
+  @org.mule.sdk.api.annotation.Expression(ExpressionSupport.REQUIRED)
   @Optional
   @Example(LAB_ADDRESS_EXAMPLE)
   private String labAddress;
