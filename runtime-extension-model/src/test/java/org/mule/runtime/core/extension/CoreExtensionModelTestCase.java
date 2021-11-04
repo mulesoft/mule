@@ -229,7 +229,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void scheduler() {
     final SourceModel schedulerModel = coreExtensionModel.getSourceModel("scheduler").get();
-    assertSteretorype(schedulerModel.getStereotype(), "SCHEDULER",  SOURCE);
+    assertSteretorype(schedulerModel.getStereotype(), "SCHEDULER", SOURCE);
 
     assertOutputTypes(schedulerModel, ANY_TYPE, ANY_TYPE);
     assertThat(schedulerModel.getErrorModels(), empty());
@@ -244,8 +244,8 @@ public class CoreExtensionModelTestCase {
   private void assertSteretorype(StereotypeModel stereotypeModel, String type, StereotypeModel parent) {
     assertThat(stereotypeModel.getType(), equalTo(type));
     assertThat(stereotypeModel.getNamespace(), equalTo("MULE"));
-    if (parent != null)  {
-    assertThat(stereotypeModel.getParent().get(), is(parent));
+    if (parent != null) {
+      assertThat(stereotypeModel.getParent().get(), is(parent));
     } else {
       assertThat(stereotypeModel.getParent().isPresent(), is(false));
     }
