@@ -137,13 +137,17 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   }
 
   public ReactiveProcessor buildRxJava() {
-    return publisher -> Flowable.fromPublisher(publisher)
-        .flatMap(e -> getRxJavaChain(e));
+    if (parallelism == 1) {
+      return publisher -> getRxJavaChain(Flowable.fromPublisher(publisher));
+    } else {
+      return publisher -> Flowable.fromPublisher(publisher)
+          .flatMap(e -> getRxJavaChain(Flowable.fromArray(e)), parallelism);
+    }
   }
 
-  private Flowable<CoreEvent> getRxJavaChain(CoreEvent e) {
+  private Flowable<CoreEvent> getRxJavaChain(Flowable baseFlowable) {
     Flowable baseProcessingStrategyFlowable =
-        Flowable.fromArray(e).doOnNext(coreEvent -> LOGGER.info("Reactor is melting!!! Before Applying Processing Strategy"));
+        baseFlowable.doOnNext(coreEvent -> LOGGER.info("Reactor is melting!!! Before Applying Processing Strategy"));
 
     Flowable<CoreEvent> beforeApplicationOfProcessingStrategy = ofNullable(dispatcherScheduler)
         .map(scheduler -> baseProcessingStrategyFlowable.observeOn(Schedulers.from(scheduler)))
