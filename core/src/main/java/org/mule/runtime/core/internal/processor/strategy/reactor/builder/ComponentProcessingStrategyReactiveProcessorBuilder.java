@@ -17,6 +17,7 @@ import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUt
 import static org.slf4j.LoggerFactory.getLogger;
 
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
 
@@ -75,7 +77,8 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
    * @param artifactType     the artifact type of the artifact corresponding to the component.
    * @return the builder being created.
    */
-  public static ComponentProcessingStrategyReactiveProcessorBuilder processingStrategyReactiveProcessorFrom(ReactiveProcessor processor,
+  public static ComponentProcessingStrategyReactiveProcessorBuilder processingStrategyReactiveProcessorFrom(
+                                                                                                            ReactiveProcessor processor,
                                                                                                             Scheduler contextScheduler,
                                                                                                             String artifactId,
                                                                                                             String artifactType) {
@@ -123,7 +126,6 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   // if (parallelism == 1) {
   // return publisher -> baseProcessingStrategyPublisherBuilder(buildFlux(publisher)).build();
   // } else {
-  // // FlatMap is the way reactor has to do parallel processing.
   // return publisher -> Flux.from(publisher)
   // .flatMap(e -> baseProcessingStrategyPublisherBuilder(ReactorPublisherBuilder.buildMono(e)).build(),
   // parallelism);
@@ -135,8 +137,29 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   }
 
   public ReactiveProcessor buildRxJava() {
-    return publisher -> Flowable.fromPublisher(publisher).doOnNext(coreEvent -> LOGGER.info("Reactor is melting"))
-        .compose(processor::apply).doOnNext(coreEvent -> LOGGER.info("Reactor is melted"));
+    return publisher -> Flowable.fromPublisher(publisher)
+        .flatMap(e -> getRxJavaChain(e));
+  }
+
+  private Flowable<CoreEvent> getRxJavaChain(CoreEvent e) {
+    Flowable baseProcessingStrategyFlowable =
+        Flowable.fromArray(e).doOnNext(coreEvent -> LOGGER.info("Reactor is melting!!! Before Applying Processing Strategy"));
+
+    Flowable<CoreEvent> beforeApplicationOfProcessingStrategy = ofNullable(dispatcherScheduler)
+        .map(scheduler -> baseProcessingStrategyFlowable.observeOn(Schedulers.from(scheduler)))
+        .orElse(baseProcessingStrategyFlowable);
+
+    Flowable<CoreEvent> processorFlowable = beforeApplicationOfProcessingStrategy
+        .doOnNext(coreEvent -> LOGGER.info("Reactor is melting!!! Before execution of processor"))
+        .compose(processor::apply)
+        .doOnNext(coreEvent -> LOGGER.info("Reactor is melting!!! After execution of processor"));
+
+    Flowable<CoreEvent> afterApplicationOfProcessingStrategy = ofNullable(callbackScheduler)
+        .map(scheduler -> processorFlowable.observeOn(Schedulers.from(scheduler)))
+        .orElse(processorFlowable);
+
+    return afterApplicationOfProcessingStrategy
+        .doOnNext(coreEvent -> LOGGER.info("Reactor is melting!!! After Response Processing Strategy"));
   }
 
   private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyPublisherBuilder(
@@ -167,7 +190,8 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
         .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, contextScheduler));
   }
 
-  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromProfilingService(ProfilingEventType<T> profilingEventType) {
+  private <T extends ProfilingEventContext> Optional<ProfilingDataProducer<T>> dataProducerFromProfilingService(
+                                                                                                                ProfilingEventType<T> profilingEventType) {
     return ofNullable(profilingService).map(ds -> ds.getProfilingDataProducer(profilingEventType));
   }
 }
