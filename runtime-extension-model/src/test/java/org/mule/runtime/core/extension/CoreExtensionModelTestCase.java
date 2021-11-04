@@ -69,6 +69,7 @@ import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
@@ -228,7 +229,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void scheduler() {
     final SourceModel schedulerModel = coreExtensionModel.getSourceModel("scheduler").get();
-    assertThat(schedulerModel.getStereotype(), is(SOURCE));
+    assertSteretorype(schedulerModel.getStereotype(), "SCHEDULER",  SOURCE);
 
     assertOutputTypes(schedulerModel, ANY_TYPE, ANY_TYPE);
     assertThat(schedulerModel.getErrorModels(), empty());
@@ -240,10 +241,20 @@ public class CoreExtensionModelTestCase {
     assertSchedulingDisallowConcurrentExecution(paramModels.get(1));
   }
 
+  private void assertSteretorype(StereotypeModel stereotypeModel, String type, StereotypeModel parent) {
+    assertThat(stereotypeModel.getType(), equalTo(type));
+    assertThat(stereotypeModel.getNamespace(), equalTo("MULE"));
+    if (parent != null)  {
+    assertThat(stereotypeModel.getParent().get(), is(parent));
+    } else {
+      assertThat(stereotypeModel.getParent().isPresent(), is(false));
+    }
+  }
+
   @Test
   public void logger() {
     final OperationModel loggerModel = coreExtensionModel.getOperationModel("logger").get();
-    assertThat(loggerModel.getStereotype(), is(PROCESSOR));
+    assertSteretorype(loggerModel.getStereotype(), "LOGGER", PROCESSOR);
 
     assertThat(loggerModel.getErrorModels(), empty());
     assertThat(loggerModel.getExecutionType(), is(CPU_LITE));
@@ -315,7 +326,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void raiseError() {
     final OperationModel raiseErrorModel = coreExtensionModel.getOperationModel("raiseError").get();
-    assertThat(raiseErrorModel.getStereotype(), is(PROCESSOR));
+    assertSteretorype(raiseErrorModel.getStereotype(), "RAISE_ERROR", PROCESSOR);
 
     assertThat(raiseErrorModel.getErrorModels(), empty());
     assertThat(raiseErrorModel.getExecutionType(), is(CPU_LITE));
@@ -378,7 +389,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void flowRef() {
     final OperationModel flowRefModel = coreExtensionModel.getOperationModel("flowRef").get();
-    assertThat(flowRefModel.getStereotype(), is(PROCESSOR));
+    assertSteretorype(flowRefModel.getStereotype(), "FLOW_REF", PROCESSOR);
 
     assertAssociatedProcessorsChangeOutput(flowRefModel);
 
@@ -396,7 +407,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void idempotentMessageValidator() {
     final OperationModel filterModel = coreExtensionModel.getOperationModel("idempotentMessageValidator").get();
-    assertThat(filterModel.getStereotype(), is(PROCESSOR));
+    assertSteretorype(filterModel.getStereotype(), "IDEMPOTENT_MESSAGE_VALIDATOR", PROCESSOR);
 
     assertOutputSameAsInput(filterModel);
 
