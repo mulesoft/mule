@@ -14,7 +14,9 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import io.reactivex.rxjava3.core.Flowable;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
@@ -27,6 +29,8 @@ import org.reactivestreams.Publisher;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
+
+import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 
@@ -51,6 +55,8 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   private ScheduledExecutorService dispatcherScheduler;
   private ScheduledExecutorService callbackScheduler;
   private ProfilingService profilingService;
+
+  private static Logger LOGGER = getLogger(ComponentProcessingStrategyReactiveProcessorBuilder.class);
 
   public ComponentProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor processor, Scheduler contextScheduler,
                                                              String artifactId, String artifactType) {
@@ -113,15 +119,24 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
     return this;
   }
 
+  // public ReactiveProcessor build() {
+  // if (parallelism == 1) {
+  // return publisher -> baseProcessingStrategyPublisherBuilder(buildFlux(publisher)).build();
+  // } else {
+  // // FlatMap is the way reactor has to do parallel processing.
+  // return publisher -> Flux.from(publisher)
+  // .flatMap(e -> baseProcessingStrategyPublisherBuilder(ReactorPublisherBuilder.buildMono(e)).build(),
+  // parallelism);
+  // }
+  // }
+
   public ReactiveProcessor build() {
-    if (parallelism == 1) {
-      return publisher -> baseProcessingStrategyPublisherBuilder(buildFlux(publisher)).build();
-    } else {
-      // FlatMap is the way reactor has to do parallel processing.
-      return publisher -> Flux.from(publisher)
-          .flatMap(e -> baseProcessingStrategyPublisherBuilder(ReactorPublisherBuilder.buildMono(e)).build(),
-                   parallelism);
-    }
+    return buildRxJava();
+  }
+
+  public ReactiveProcessor buildRxJava() {
+    return publisher -> Flowable.fromPublisher(publisher).doOnNext(coreEvent -> LOGGER.info("Reactor is melting"))
+        .compose(processor::apply).doOnNext(coreEvent -> LOGGER.info("Reactor is melted"));
   }
 
   private <T extends Publisher> ReactorPublisherBuilder<T> baseProcessingStrategyPublisherBuilder(
