@@ -20,6 +20,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isConfigOverride;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -153,7 +154,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
                                                               expressionManager, muleContext, parametersResolver);
             }
 
-            if (field.getAnnotation(ConfigOverride.class) != null) {
+            if (isConfigOverride(field)) {
               ValueResolver<?> fieldDelegate = fieldResolver != null ? fieldResolver : new StaticValueResolver<>(null);
               fieldResolver = ConfigOverrideValueResolverWrapper.of(fieldDelegate, field.getName(), field.getType(),
                                                                     reflectionCache, muleContext, clazz.getName());

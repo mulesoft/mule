@@ -204,7 +204,8 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public boolean isConfigOverride() {
-    return parameter.getAnnotation(ConfigOverride.class).isPresent();
+    return parameter.isAnnotatedWith(ConfigOverride.class) ||
+            parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.ConfigOverride.class);
   }
 
   @Override
@@ -354,7 +355,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   private void collectNullSafeProperties() {
     if (parameter.isAnnotatedWith(NullSafe.class)) {
-      if (parameter.isAnnotatedWith(ConfigOverride.class)) {
+      if (isConfigOverride()) {
         throw new IllegalParameterModelDefinitionException(
                                                            format("Parameter '%s' is annotated with '@%s' and also marked as a config override, which is redundant. "
                                                                + "The default value for this parameter will come from the configuration parameter",

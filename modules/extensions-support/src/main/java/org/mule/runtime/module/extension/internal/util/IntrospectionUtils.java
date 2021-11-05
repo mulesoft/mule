@@ -1043,6 +1043,14 @@ public final class IntrospectionUtils {
     return JavaParserUtils.getAlias(field);
   }
 
+  /**
+   * @param field a field
+   * @return whether the given {@code field} is a config override
+   */
+  public static boolean isConfigOverride(Field field) {
+    return JavaParserUtils.isConfigOverride(field);
+  }
+
   private static List<Class<?>> getDescendingHierarchy(Class<?> type) {
     List<Class<?>> types = new LinkedList<>();
     types.add(type);
