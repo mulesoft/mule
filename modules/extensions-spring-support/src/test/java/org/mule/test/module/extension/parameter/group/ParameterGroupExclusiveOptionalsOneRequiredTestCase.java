@@ -248,9 +248,27 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
   }
 
   @Test
+  public void whitespacesAreTrimmedForParameterValueExpression() throws Exception {
+    Object value = flowRunner("whitespaceValueForParameterExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
   public void whitespacesAreTrimmedForContentParameterValue() throws Exception {
     Object value = flowRunner("whitespaceValueForParameter").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello Max Mule!"));
+  }
+
+  @Test
+  public void whitespacesAreTrimmedForContentParameterValueExpression() throws Exception {
+    Object value = flowRunner("whitespaceValueForContentParameterExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreTrimmedForContentParameterValueCDATA() throws Exception {
+    Object value = flowRunner("whitespaceValueForContentParameterCDATA").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
   }
 
   private <T> T runFlowAndGetConfig(String flowName) throws Exception {
