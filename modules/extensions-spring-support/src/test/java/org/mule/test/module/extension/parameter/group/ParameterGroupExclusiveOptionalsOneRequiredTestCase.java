@@ -34,7 +34,7 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
 
   @Test
   public void whitespacesAreTrimmedForContentParameterValue() throws Exception {
-    Object value = flowRunner("whitespaceValueForParameter").run().getMessage().getPayload().getValue();
+    Object value = flowRunner("whitespaceValueForContentParameter").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello Max Mule!"));
   }
 
