@@ -9,10 +9,30 @@
         <some:say-hi person="   Max Mule   "/>
     </flow>
 
+    <flow name="whitespaceValueForParameterExpression">
+        <some:say-hi person="#['   Max Mule   ']"/>
+    </flow>
+
     <flow name="whitespaceValueForContentParameter">
         <some:say-hi-content>
             <some:person>
-                   Max Mule
+                Max Mule
+            </some:person>
+        </some:say-hi-content>
+    </flow>
+
+    <flow name="whitespaceValueForContentParameterExpression">
+        <some:say-hi-content>
+            <some:person>
+                #['   Max Mule   ']
+            </some:person>
+        </some:say-hi-content>
+    </flow>
+
+    <flow name="whitespaceValueForContentParameterCDATA">
+        <some:say-hi-content>
+            <some:person>
+                <![CDATA[   Max Mule   ]]>
             </some:person>
         </some:say-hi-content>
     </flow>
