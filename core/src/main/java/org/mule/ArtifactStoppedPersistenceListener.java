@@ -6,8 +6,6 @@
  */
 package org.mule;
 
-import java.io.IOException;
-
 /**
  * Defines a listener to persist stop events of Mule artifacts.
  */
