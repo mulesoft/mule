@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 /**
  * <code>MessagingException</code> is a general message exception thrown when errors
@@ -390,7 +391,7 @@ public class MessagingException extends MuleException
     private void writeObject(ObjectOutputStream out) throws Exception
     {
         out.defaultWriteObject();
-        if (this.failingMessageProcessor instanceof Serializable)
+        if (isSerializable(this.failingMessageProcessor))
         {
             out.writeBoolean(true);
             out.writeObject(this.failingMessageProcessor);
@@ -399,6 +400,34 @@ public class MessagingException extends MuleException
         {
             out.writeBoolean(false);
         }
+    }
+
+    private boolean isSerializable(Object object)
+    {
+        if (!(object instanceof Serializable))
+        {
+            return false;
+        }
+
+        Serializable serializableObject = (Serializable) object;
+        try
+        {
+            Field[] fields = serializableObject.getClass().getDeclaredFields();
+            for (Field field : fields)
+            {
+                field.setAccessible(true);
+                // only comparing fields because a recursive call could create an infinite loop
+                if (!(field.get(serializableObject) instanceof Serializable))
+                {
+                    return false;
+                }
+            }
+        }
+        catch (IllegalAccessException illegalAccessException)
+        {
+            return false;
+        }
+        return true;
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException

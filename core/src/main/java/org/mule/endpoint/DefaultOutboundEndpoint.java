@@ -6,6 +6,11 @@
  */
 package org.mule.endpoint;
 
+import static org.mule.api.transaction.TransactionConfig.ACTION_DEFAULT;
+import static org.mule.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
+import static org.mule.api.transaction.TransactionConfig.ACTION_NEVER;
+import static org.mule.api.transaction.TransactionConfig.ACTION_NONE;
+import static org.mule.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
@@ -28,15 +33,17 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.RequestResponseOutboundEndpointCantRunTransacted;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
+public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint, Serializable
 {
     private static final long serialVersionUID = 8860985949279708638L;
     private List<String> responseProperties;
@@ -107,13 +114,27 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         else
         {
-            if(getConnector() instanceof RequestResponseOutboundEndpointCantRunTransacted)
+            if(getConnector() instanceof RequestResponseOutboundEndpointCantRunTransacted && isRunningTx())
             {
                 throw new DefaultMuleException("Request-reply in a transactional context " +
                         "will never commit the transaction. " +
                         "Either use no-transaction or one-way.");
             }
             return result;
+        }
+    }
+
+    private boolean isRunningTx() {
+        switch (getTransactionConfig().getAction()) {
+            case ACTION_NONE:
+            case ACTION_NEVER:
+            case ACTION_DEFAULT:
+            case ACTION_NOT_SUPPORTED:
+                return false;
+            case ACTION_JOIN_IF_POSSIBLE:
+                return TransactionCoordination.getInstance().getTransaction() != null;
+            default:
+                return true;
         }
     }
 

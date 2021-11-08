@@ -6,6 +6,7 @@
  */
 package org.mule.routing;
 
+import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -16,6 +17,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.api.config.MuleProperties.MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
@@ -291,6 +293,30 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
         assertThat(processedEvents, hasSize(2));
         assertThat(processedEvents.get(0).getMessageAsString(), is("[1, 2]:foo:zas"));
         assertThat(processedEvents.get(1).getMessageAsString(), is("[3]:foo:zas"));
+    }
+
+    @Test
+    public void disableCompoundCorrelationId() throws Exception
+    {
+        try {
+            setProperty(MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID, "true");
+            Foreach foreachMp = new Foreach();
+            foreachMp.setMuleContext(muleContext);
+            List<MessageProcessor> processors = getSimpleMessageProcessors();
+            foreachMp.setMessageProcessors(processors);
+            foreachMp.setBatchSize(2);
+            foreachMp.setCollectionExpression("flowVars.collection");
+            foreachMp.initialise();
+
+            MuleEvent event = getTestEvent(null);
+            event.setFlowVariable("collection", asList(1, 2, 3));
+            foreachMp.process(event);
+
+            String correlationId = processedEvents.get(0).getMessage().getCorrelationId();
+            assertThat(processedEvents.get(1).getMessage().getCorrelationId(), is(correlationId));
+        } finally {
+            setProperty(MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID, "false");
+        }
     }
     
     protected void assertAddedPathElements(List<MessageProcessor> processors, MessageProcessorPathElement mpPathElement)

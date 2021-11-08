@@ -227,7 +227,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
-        <muleMvelVersion>2.1.9-MULE-025</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-027</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>3.1.28</ognlVersion>
@@ -243,7 +243,7 @@
         <slf4jVersion>1.7.24</slf4jVersion>
         <smackVersion>3.4.1</smackVersion>
         <springVersion>4.3.29.RELEASE</springVersion>
-        <springSecurityVersion>4.2.18.RELEASE</springSecurityVersion>
+        <springSecurityVersion>4.2.20.RELEASE</springSecurityVersion>
         <springLdapVersion>2.3.2.RELEASE</springLdapVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>

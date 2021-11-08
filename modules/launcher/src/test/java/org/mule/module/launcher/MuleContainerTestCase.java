@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleFoldersUtil.getExecutionFolder;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManager;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
 import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -82,6 +83,21 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
         InOrder inOrder = inOrder(coreExtensionManager, deploymentService);
         inOrder.verify(coreExtensionManager).start();
         inOrder.verify(deploymentService).start();
+    }
+
+    @Test
+    public void stopsServiceAwareExtensionsBeforeDeploymentService() throws Exception
+    {
+        coreExtensionManager = mock(DefaultMuleCoreExtensionManager.class);
+
+        container = new MuleContainer(deploymentService, coreExtensionManager);
+
+        container.start(false);
+        container.stop();
+
+        InOrder inOrder = inOrder(coreExtensionManager, deploymentService);
+        inOrder.verify((DefaultMuleCoreExtensionManager)coreExtensionManager).stopDeploymentServiceAwareExtensions();
+        inOrder.verify(deploymentService).stop();
     }
 
     @Test

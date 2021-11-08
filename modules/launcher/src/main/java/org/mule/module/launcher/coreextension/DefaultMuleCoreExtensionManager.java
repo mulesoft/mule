@@ -123,6 +123,24 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
         }
     }
 
+    public void stopDeploymentServiceAwareExtensions() {
+        for (MuleCoreExtension extension: orderedCoreExtensions)
+        {
+            if (extension instanceof DeploymentServiceAware)
+            {
+                try
+                {
+                    extension.stop();
+                    logger.debug("Core extension '" + extension.toString() + "' stopped");
+                }
+                catch (Throwable e)
+                {
+                    logger.warn("Error stopping core extension: " + extension.getName(), e);
+                }
+            }
+        }
+    }
+
     private void initializeCoreExtensions() throws InitialisationException, DefaultMuleException
     {
         logger.info("Initializing core extensions");

@@ -234,6 +234,12 @@ public class MuleContainer
 
     public void stop() throws MuleException
     {
+        if (coreExtensionManager instanceof DefaultMuleCoreExtensionManager) {
+            // (MULE-19783) avoid getting "undeploying" status stuck in runtime manager,
+            // the PluginCoreExtension needs to be stopped before the deploymentService.
+            ((DefaultMuleCoreExtensionManager) coreExtensionManager).stopDeploymentServiceAwareExtensions();
+        }
+
         if (deploymentService != null)
         {
             deploymentService.stop();

@@ -8,6 +8,8 @@ package org.mule.module.xml.transformer;
 
 import static org.mule.module.xml.util.XMLUtils.createWstxXmlInputFactory;
 
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -26,6 +28,7 @@ import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -37,6 +40,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dom4j.Node;
 import org.dom4j.io.DocumentResult;
+import org.w3c.dom.Element;
 
 /**
  * <code>AbstractXmlTransformer</code> offers some XSLT transform on a DOM (or
@@ -255,6 +259,13 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         {
             return ((Node) obj).asXML();
         }
+
+        if (obj instanceof DepthXMLStreamReader && ((DepthXMLStreamReader)obj).getReader().getEventType() == XMLStreamConstants.END_DOCUMENT)
+        {
+            obj = new DepthXMLStreamReader(
+                    new W3CDOMStreamReader((Element)((W3CDOMStreamReader) ((DepthXMLStreamReader) obj).getReader()).getCurrentNode()));
+        }
+
         // No easy fix, so use the transformer.
         Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
         if (src == null)

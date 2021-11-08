@@ -64,7 +64,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             }
             else
             {
-                if (!StringUtils.isEmpty(mimeType) || !StringUtils.isEmpty(encoding))
+                if (isMimeTypeSet() || !StringUtils.isEmpty(encoding))
                 {
                     DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType());
                     dataType.setEncoding(getEncoding());

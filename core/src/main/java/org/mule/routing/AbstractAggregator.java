@@ -39,6 +39,8 @@ import org.mule.util.store.ProvidedPartitionableObjectStoreWrapper;
 
 import org.apache.commons.collections.Factory;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a
  * single message. <b>EIP Reference:</b> <a
@@ -49,6 +51,8 @@ import org.apache.commons.collections.Factory;
 public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
     implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable, Disposable
 {
+
+    private static AtomicInteger currentId = new AtomicInteger(0);
 
     public static final int MAX_PROCESSED_GROUPS = 50000;
     public static final String EVENTS_STORE_REGISTRY_KEY_PREFIX = "aggregator.eventsObjectStore.";
@@ -119,7 +123,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
             public Object create()
             {
                 ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
-                return objectStoreManager.getObjectStore(storePrefix + ".processedGroups", persistentStores, MAX_PROCESSED_GROUPS, -1, 1000);
+                return objectStoreManager.getObjectStore(storePrefix + ".processedGroups-" + currentId.getAndIncrement(), persistentStores, MAX_PROCESSED_GROUPS, -1, 1000);
             }
         };
     }
