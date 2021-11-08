@@ -6,9 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution.executor;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+
+import static java.lang.Character.isJavaIdentifierPart;
+import static java.lang.Character.isJavaIdentifierStart;
 import static java.lang.Class.forName;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+
 import static net.bytebuddy.description.modifier.FieldManifestation.FINAL;
 import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
 import static net.bytebuddy.description.modifier.Visibility.PUBLIC;
@@ -20,11 +26,10 @@ import static net.bytebuddy.implementation.bytecode.member.MethodReturn.VOID;
 import static net.bytebuddy.matcher.ElementMatchers.isConstructor;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
@@ -40,6 +45,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -72,6 +79,8 @@ public class MethodExecutorGenerator {
 
   private static final String TARGET_INSTANCE_FIELD_NAME = "__targetInstance";
   private final Map<String, Class<MethodExecutor>> executorClasses = new ConcurrentHashMap<>();
+
+  private String artifactId;
 
   /**
    * Instantiates a dynamic {@link MethodExecutor} that executes the given {@code method}.
@@ -132,9 +141,28 @@ public class MethodExecutorGenerator {
   }
 
   private Class<MethodExecutor> getExecutorClass(Method method, File generatedByteCodeFile) {
-    String executorName = getExecutorName(method);
+    String executorName = getExecutorName(method) + "_" + getExecutorClassSuffix();
     return executorClasses.computeIfAbsent(executorName, key -> generateExecutorClass(key, method, generatedByteCodeFile));
 
+  }
+
+  /**
+   * If the extension is in a domain, disambiguate the generated class with the name of the application.
+   */
+  private String getExecutorClassSuffix() {
+    StringBuilder sb = new StringBuilder();
+    if (!isJavaIdentifierStart(artifactId.charAt(0))) {
+      sb.append("_");
+    }
+    for (char c : artifactId.toCharArray()) {
+      if (!isJavaIdentifierPart(c)) {
+        sb.append("_");
+      } else {
+        sb.append(c);
+      }
+    }
+
+    return sb.toString();
   }
 
   private Class<MethodExecutor> generateExecutorClass(String executorName, Method method, File generatedByteCodeFile) {
@@ -308,5 +336,14 @@ public class MethodExecutorGenerator {
 
   private String getParameterFieldName(Parameter parameter) {
     return parameter.getName() + "Resolver";
+  }
+
+  @Inject
+  public void setContext(MuleContext context) {
+    this.setArtifactId(context.getConfiguration().getId());
+  }
+
+  public void setArtifactId(String artifactId) {
+    this.artifactId = artifactId;
   }
 }

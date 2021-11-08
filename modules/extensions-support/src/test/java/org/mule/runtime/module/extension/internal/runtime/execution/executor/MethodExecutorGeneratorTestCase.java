@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution.executor;
 
+import static java.util.concurrent.Executors.newFixedThreadPool;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -14,22 +16,37 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+import org.junit.Before;
 import org.junit.Test;
 
-public class MethodExecutorGeneratorTestCase {
+import io.qameta.allure.Issue;
 
-  private MethodExecutorGenerator generator = new MethodExecutorGenerator();
+public class MethodExecutorGeneratorTestCase extends AbstractMuleContextTestCase {
+
+  private final MethodExecutorGenerator generator = new MethodExecutorGenerator();
+
+  @Before
+  public void before() throws InitialisationException {
+    generator.setContext(muleContext);
+  }
 
   @Test
   public void sameMethodGeneratesUniqueClass() {
@@ -42,6 +59,33 @@ public class MethodExecutorGeneratorTestCase {
     assertThat(executor1, is(not(sameInstance(executor2))));
 
     assertThat(executor1.getClass(), is(sameInstance(executor2.getClass())));
+  }
+
+  @Test
+  @Issue("MULE-19912")
+  public void sameMethodGeneratesUniqueClassConcurrently() throws InterruptedException, ExecutionException {
+    Method method = getMethod("sampleOperation");
+
+    ExecutorService threadPool = newFixedThreadPool(4);
+    try {
+      Collection<Future<MethodExecutor>> results = new HashSet<>();
+      for (int i = 0; i < 4 * 16; ++i) {
+        String ctxId = muleContext.getConfiguration().getId() + i;
+        results.add(threadPool
+            .submit(() -> {
+              // Simulate the case for domains, where the extension is in the domain but this generator exists per app.
+              MethodExecutorGenerator generator = new MethodExecutorGenerator();
+              generator.setArtifactId(ctxId);
+              return generator.generate(this, method, mockArgumentResolverDelegate(method));
+            }));
+      }
+
+      for (Future<MethodExecutor> result : results) {
+        result.get();
+      }
+    } finally {
+      threadPool.shutdown();
+    }
   }
 
   @Test
