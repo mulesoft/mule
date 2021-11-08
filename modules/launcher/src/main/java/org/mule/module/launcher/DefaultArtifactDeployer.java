@@ -22,7 +22,9 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.artifact.Artifact;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Properties;
 
 import com.google.common.base.Optional;
@@ -140,14 +142,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
 
     public void doNotPersistArtifactStop(Artifact artifact)
     {
-        if (artifact.getMuleContext() == null || artifact.getMuleContext().getRegistry() == null)
-        {
-            return;
-        }
-        Registry artifactRegistry = artifact.getMuleContext().getRegistry();
-        Collection<ArtifactStoppedPersistenceListener> listeners =
-            artifactRegistry.lookupObjects(ArtifactStoppedPersistenceListener.class);
-        for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : listeners)
+        for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : getArtifactStoppedPersistenceListeners(artifact))
         {
             artifactStoppedPersistenceListener.doNotPersist();
         }
@@ -155,17 +150,21 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
 
     public void deletePersistence(Artifact artifact)
     {
+        for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : getArtifactStoppedPersistenceListeners(artifact))
+        {
+            artifactStoppedPersistenceListener.deletePersistenceProperties();
+        }
+    }
+
+    private Collection<ArtifactStoppedPersistenceListener> getArtifactStoppedPersistenceListeners(Artifact artifact) {
         if (artifact.getMuleContext() == null || artifact.getMuleContext().getRegistry() == null)
         {
-            return;
+            return new ArrayList<>();
         }
         Registry artifactRegistry = artifact.getMuleContext().getRegistry();
         Collection<ArtifactStoppedPersistenceListener> listeners =
             artifactRegistry.lookupObjects(ArtifactStoppedPersistenceListener.class);
-        for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : listeners)
-        {
-            artifactStoppedPersistenceListener.deletePersistenceProperties();
-        }
+        return listeners;
     }
 
 }
