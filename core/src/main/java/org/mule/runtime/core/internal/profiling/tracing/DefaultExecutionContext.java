@@ -13,6 +13,9 @@ import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 
 import java.util.Optional;
 
+/**
+ * Immutable implementation of {@link ExecutionContext}
+ */
 public class DefaultExecutionContext implements ExecutionContext {
 
   private final ComponentMetadata componentMetadata;

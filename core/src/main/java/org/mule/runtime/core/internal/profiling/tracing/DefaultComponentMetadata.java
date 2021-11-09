@@ -13,6 +13,9 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Immutable implementation of {@link ComponentMetadata}.
+ */
 public class DefaultComponentMetadata implements ComponentMetadata {
 
   private final String correlationId;
