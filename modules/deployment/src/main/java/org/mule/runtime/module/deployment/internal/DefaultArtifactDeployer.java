@@ -59,7 +59,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       artifact.install();
       doInit(artifact);
       addFlowStoppedListeners(artifact);
-      if (shouldStartArtifact(artifact)) {
+      if (startArtifact && shouldStartArtifact(artifact)) {
         // The purpose of dispatching this to a separate thread is to have a clean call stack when starting the app.
         // This is needed in order to prevent an StackOverflowError when starting apps with really long flows.
         final Future<?> startTask = artifactStartExecutor.get().submit(() -> {
