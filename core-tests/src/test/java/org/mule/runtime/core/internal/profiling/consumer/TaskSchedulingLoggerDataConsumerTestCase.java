@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.profiling.consumer;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.SCHEDULING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
@@ -148,7 +148,7 @@ public class TaskSchedulingLoggerDataConsumerTestCase extends AbstractMuleContex
     ProfilingDataProducer<TaskSchedulingProfilingEventContext> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
     dataProducer.triggerProfilingEvent(profilingEventContext);
-    verifyNoMoreInteractions(logger);
+    verifyZeroInteractions(logger);
   }
 
   private String jsonToLog(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType,
