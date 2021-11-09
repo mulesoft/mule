@@ -37,7 +37,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.module.launcher.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
-import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.module.launcher.application.ApplicationStatus.CREATED;
 import static org.mule.module.launcher.application.ApplicationStatus.DESTROYED;
@@ -1175,9 +1175,28 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat(defaultMuleContext.getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
         Optional<Properties> properties = absent();
-        Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
         assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
         assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
+    }
+
+    @Test
+    public void whenAppIsUndeployedStoppedPersistenceIsDeleted() throws Exception
+    {
+        final Application app = deployApplication();
+        app.stop();
+        assertStatus(app, STOPPED);
+
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
+
+        deploymentService.undeploy(app);
+
+        properties = absent();
+        deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
     @Test
@@ -1190,7 +1209,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.undeploy(app);
 
         Optional<Properties> properties = absent();
-        Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
         assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
@@ -1248,7 +1267,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception
+    public void runtimeWithStoppedAppRestartsAndDoesNotStartAppOnDeployBecauseOfStatusDeploymentProperties() throws Exception
     {
         final Application app = deployApplication();
         app.stop();
@@ -1257,10 +1276,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         restartServer();
 
         assertAppDeploymentAndStatus(emptyAppFileBuilder, CREATED);
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
     }
 
     @Test
-    public void undeploysStoppedAppDoesNotStartItOnDeployButCanBeStartedManually() throws Exception
+    public void runtimeWithStoppedAppRestartsAndDoesNotStartAppOnDeployButItCanBeStartedManually() throws Exception
     {
         final Application app = deployApplication();
         app.stop();
@@ -1271,12 +1294,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
         assertStatus(app_2, CREATED);
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
+
         app_2.start();
         assertStatus(app_2, STARTED);
     }
 
     @Test
-    public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception
+    public void runtimeWithStartedAppRestartsAndStartsAppOnDeploy() throws Exception
     {
         final Application app = deployApplication();
         assertStatus(app, STARTED);
@@ -1284,6 +1312,31 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         restartServer();
 
         assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    }
+
+    @Test
+    public void redeploysStoppedAppAndStartsItOnDeployBecauseStatusPersistenceGetsDeleted() throws Exception
+    {
+        deploymentService.deploy(emptyAppFileBuilder.getArtifactFile().toURI().toURL());
+        final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+        app.stop();
+        assertStatus(app, STOPPED);
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
+
+        reset(applicationDeploymentListener);
+
+        deploymentService.redeploy(emptyAppFileBuilder.getId());
+
+        assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
+        properties = absent();
+        deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
     @Test
@@ -1296,7 +1349,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat(app.getMuleContext().getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
         Optional<Properties> properties = absent();
-        Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
         assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
@@ -2130,7 +2183,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void redeploysDomainZipRefreshesAppsButIfTheyWereStoppedTheyDoNotStart() throws Exception
+    public void redeploysDomainZipRefreshesAppsButIfTheyWereStoppedTheyDoNotStartAndNoStatusPersistenceWasSaved() throws Exception
     {
         addPackedDomainFromBuilder(dummyDomainFileBuilder);
         File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
@@ -2156,6 +2209,40 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
         assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
         assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    }
+
+    @Test
+    public void redeploysDomainZipRefreshesAppsAndStartsThemAndNoStatusPersistenceWasSaved() throws Exception
+    {
+        addPackedDomainFromBuilder(dummyDomainFileBuilder);
+        File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
+        long firstFileTimestamp = dummyDomainFile.lastModified();
+
+        addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+
+        final Application app = findApp(dummyDomainApp1FileBuilder.getId(), 1);
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        addPackedDomainFromBuilder(dummyDomainFileBuilder);
+        alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
+
+        assertUndeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+        assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+        assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
     @Test
@@ -2378,6 +2465,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void undeploysStoppedDomainAndDoesNotPersistStatus() throws Exception
+    {
+        addPackedDomainFromBuilder(emptyAppFileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+        final Domain domain = findADomain(emptyAppFileBuilder.getId(), 1);
+        domain.stop();
+
+        deploymentService.undeploy(domain);
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    }
+
+    @Test
     public void whenDomainIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception
     {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
@@ -2391,7 +2495,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat(domain.getMuleContext().getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
         Optional<Properties> properties = absent();
-        Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
         assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
         assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
     }
@@ -2410,7 +2514,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.undeploy(domain);
 
         Optional<Properties> properties = absent();
-        Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
         assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
@@ -2907,7 +3011,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void redeployDomainWithStoppedAppsShouldPersistStoppedStateAndDoNotStartApps() throws Exception
+    public void redeployDomainWithStoppedAppsShouldNotPersistStoppedStateAndShouldNotStartApps() throws Exception
     {
         addPackedDomainFromBuilder(dummyDomainFileBuilder);
 
@@ -2927,10 +3031,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
 
         Optional<Properties> properties = absent();
-        Properties deploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), properties);
+        Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(dummyDomainApp1FileBuilder.getId(), properties);
         assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
-        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
-        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
     @Test

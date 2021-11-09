@@ -32,4 +32,9 @@ public interface ArtifactStoppedPersistenceListener
    * to prevent persistence when the artifact is stopped for other reasons.
    */
   void doNotPersist();
+
+  /**
+   * Deletes stopped persistence properties
+   */
+  void deletePersistenceProperties();
 }

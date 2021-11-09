@@ -7,15 +7,19 @@
 package org.mule.module.launcher;
 
 import static com.google.common.base.Optional.absent;
+import static java.lang.Boolean.valueOf;
 import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
 import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.util.SplashScreen.miniSplash;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.NullDeploymentListener;
 import org.mule.module.launcher.artifact.Artifact;
 import org.mule.module.launcher.artifact.ArtifactFactory;
+import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.util.CollectionUtils;
 
@@ -279,15 +283,28 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
         // check if this artifact is running first, undeployArtifact it then
         T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+        Map<Application, ApplicationStatus> appStatusPreRedeployment = new HashMap<>();
         if (artifact != null)
         {
+            if (artifact instanceof Domain){
+                Collection<Application> domainApplications = findAssociatedApplications((Domain) artifact);
+                for (Application domainApplication : domainApplications)
+                {
+                    appStatusPreRedeployment.put(domainApplication, domainApplication.getStatus());
+                }
+            }
             deploymentTemplate.preRedeploy(artifact);
             undeployArtifact(artifactName);
         }
 
         T deployedArtifact = deployPackagedArtifact(artifactUrl, deploymentProperties);
-        deploymentTemplate.postRedeploy(deployedArtifact);
+        deploymentTemplate.postRedeploy(deployedArtifact, appStatusPreRedeployment);
         return deployedArtifact;
+    }
+
+    private Collection<Application> findAssociatedApplications(Domain domain)
+    {
+        return deploymentService.findDomainApplications(domain.getArtifactName());
     }
 
     private T deployExplodedApp(String addedApp, Optional<Properties> properties) throws DeploymentException
@@ -558,7 +575,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             trackArtifact(artifact);
 
             deploymentListener.onDeploymentStart(artifact.getArtifactName());
-            deployer.deploy(artifact);
+            deployer.deploy(artifact, shouldStartArtifact(artifact, deploymentProperties.orNull()));
             artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
             deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
             artifactZombieMap.remove(artifact.getArtifactName());
@@ -582,6 +599,16 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
                 throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
             }
         }
+    }
+
+    private boolean shouldStartArtifact(T artifact, Properties deploymentProperties)
+    {
+        if (!(artifact instanceof Application) || deploymentProperties == null)
+        {
+            return true;
+        }
+
+        return valueOf(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
     }
 
     @Override
