@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -16,7 +17,10 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -76,7 +80,14 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   private boolean isRedeliveryExhausted(Exception exception) {
-    return (exception instanceof MessageRedeliveredException);
+    if (exception instanceof MessagingException) {
+      Optional<Error> error = ((MessagingException) exception).getEvent().getError();
+      if (error.isPresent()) {
+        String errorIdentifier = error.get().getErrorType().getIdentifier();
+        return errorIdentifier.equals(REDELIVERY_EXHAUSTED.getName());
+      }
+    }
+    return false;
   }
 
 }

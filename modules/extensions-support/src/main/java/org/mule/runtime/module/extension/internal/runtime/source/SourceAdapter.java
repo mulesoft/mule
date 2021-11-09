@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -333,6 +334,9 @@ public class SourceAdapter implements Lifecycle, Restartable {
       final boolean isBackPressureError = event.getError()
           .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
           .orElse(false);
+      final boolean isRedeliveryExhaustedError = event.getError()
+          .map(e -> REDELIVERY_EXHAUSTED.getName().equals(e.getErrorType().getIdentifier()))
+          .orElse(false);
 
       SourceCallbackExecutor executor;
       if (isBackPressureError) {
@@ -345,7 +349,11 @@ public class SourceAdapter implements Lifecycle, Restartable {
       }
 
       if (context.getTransactionHandle().isTransacted()) {
-        callback = callback.finallyBefore(this::rollback);
+        if (isRedeliveryExhaustedError) {
+          callback = callback.finallyBefore(this::commit);
+        } else {
+          callback = callback.finallyBefore(this::rollback);
+        }
       }
 
       executor.execute(event, parameters, context, callback);
