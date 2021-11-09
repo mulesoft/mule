@@ -21,13 +21,10 @@ import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
-import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.IOException;
 
@@ -42,96 +39,30 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 
 /**
- * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
- * Classpath of file system using the MuleBeanDefinitionReader.
+ * Spring context specialization that contains just some standard constant beans for every Mule deployable artifact.
+ * 
+ * @since 4.5
  */
-public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicationContext {
+class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicationContext {
 
   private static final Logger LOGGER = getLogger(BaseMuleArtifactContext.class);
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
-  // private final OptionalObjectsController optionalObjectsController;
   private final DefaultRegistry serviceDiscoverer;
-  // private final DefaultResourceLocator resourceLocator;
-  // private final PropertiesResolverConfigurationProperties configurationProperties;
-  // private ArtifactAst applicationModel;
   private final MuleContextWithRegistry muleContext;
-  // private final BeanDefinitionFactory beanDefinitionFactory;
-  private final ArtifactType artifactType;
-  // protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
-  // try {
-  // BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(componentName);
-  // return beanDefinition.isPrototype();
-  // } catch (NoSuchBeanDefinitionException e) {
-  // return false;
-  // }
-  // });
-  // protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
-  private org.mule.runtime.core.internal.registry.Registry originalRegistry;
-  // private final ExtensionManager extensionManager;
 
   /**
-   * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
-   * registry implementation to wraps the spring ApplicationContext
+   * Configures the context.
    *
-   * @param muleContext                                the {@link MuleContext} that own this context
-   * @param artifactAst                                the definition of the artifact to create a context for
-   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *                                                   org.mule.runtime.config.internal.SpringRegistry
-   * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
-   *                                                   in this artifact.
-   * @param artifactProperties                         map of properties that can be referenced from the
-   *                                                   {@code artifactConfigResources} as external configuration values
-   * @param artifactType                               the type of artifact to determine the base objects of the created context.
-   * @param componentBuildingDefinitionRegistryFactory
-   * @since 3.7.0
+   * @param muleContext  the {@link MuleContext} that own this context
+   * @param artifactType the type of artifact to determine the base objects of the created context.
    */
-  public BaseMuleArtifactContext(MuleContext muleContext,
-                                 // OptionalObjectsController optionalObjectsController,
-                                 // Optional<ConfigurationProperties> parentConfigurationProperties,
-                                 // Map<String, String> artifactProperties,
-                                 ArtifactType artifactType
-  // ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory
-  ) {
-    // checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
+  public BaseMuleArtifactContext(MuleContext muleContext) {
     this.muleContext = (MuleContextWithRegistry) muleContext;
-    // this.optionalObjectsController = optionalObjectsController;
-    this.artifactType = artifactType;
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
-    // this.resourceLocator = new DefaultResourceLocator();
-    originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
-
-    // extensionManager = muleContext.getExtensionManager();
-
-    // TODO (MULE-19608) remove this and make it into a component building definition
-    // this.beanDefinitionFactory =
-    // new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
-    // componentBuildingDefinitionRegistryFactory.create(getExtensions()));
-    //
-    // this.applicationModel = artifactAst;
-    //
-    // this.configurationProperties = createConfigurationAttributeResolver(applicationModel, parentConfigurationProperties,
-    // artifactProperties,
-    // new ClassLoaderResourceProvider(muleContext
-    // .getExecutionClassLoader()),
-    // ofNullable(getMuleRegistry()
-    // .lookupObject(FEATURE_FLAGGING_SERVICE_KEY)));
-    //
-    // try {
-    // initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
-    // applicationModel.updatePropertiesResolver(configurationProperties.getConfigurationPropertiesResolver());
-    //
-    // validateArtifact(applicationModel);
-    // } catch (ConfigurationException | InitialisationException e) {
-    // throw new MuleRuntimeException(e);
-    // }
-    // registerErrors(applicationModel);
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -152,47 +83,11 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
                           new MuleContextPostProcessor(muleContext),
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext
                               .getRegistry(), beanFactory),
-                          // new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
-                          // (DefaultListableBeanFactory) beanFactory),
                           new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())// ,
-    // new ComponentLocatorCreatePostProcessor(componentLocator)
     );
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
-
-    // prepareObjectProviders();
   }
-
-  // protected void prepareObjectProviders() {
-  // MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
-  // ImmutableObjectProviderConfiguration providerConfiguration =
-  // new ImmutableObjectProviderConfiguration(configurationProperties, muleArtifactObjectProvider);
-  // for (ConfigurableObjectProvider objectProvider : objectProviders) {
-  // objectProvider.configure(providerConfiguration);
-  // }
-  // }
-  //
-  // /**
-  // * Process all the {@link ObjectProvider}s from the {@link ApplicationModel} to get their beans and register them inside the
-  // * spring bean factory so they can be used for dependency injection.
-  // *
-  // * @param beanFactory the spring bean factory where the objects will be registered.
-  // */
-  // protected void registerObjectFromObjectProviders(ConfigurableListableBeanFactory beanFactory) {
-  // ((ObjectProviderAwareBeanFactory) beanFactory).setObjectProviders(objectProviders);
-  // }
-  //
-  // private List<Pair<ComponentAst, Optional<String>>> lookObjectProvidersComponentModels(ArtifactAst applicationModel,
-  // Map<ComponentAst, SpringComponentModel> springComponentModels) {
-  // return applicationModel.topLevelComponentsStream()
-  // .filter(componentModel -> {
-  // final SpringComponentModel springModel = springComponentModels.get(componentModel);
-  // return springModel != null && springModel.getType() != null
-  // && ConfigurableObjectProvider.class.isAssignableFrom(springModel.getType());
-  // })
-  // .map(componentModel -> new Pair<>(componentModel, componentModel.getComponentId()))
-  // .collect(toList());
-  // }
 
   private void registerEditors(ConfigurableListableBeanFactory beanFactory) {
     MulePropertyEditorRegistrar registrar = new MulePropertyEditorRegistrar();
@@ -210,71 +105,21 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   public void close() {
     if (isRunning()) {
       super.close();
-      // disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
     }
-  }
-
-  public static Resource[] convert(ConfigResource[] resources) {
-    Resource[] configResources = new Resource[resources.length];
-    for (int i = 0; i < resources.length; i++) {
-      ConfigResource resource = resources[i];
-      if (resource.getUrl() != null) {
-        configResources[i] = new UrlResource(resource.getUrl());
-      } else {
-        try {
-          configResources[i] = new ByteArrayResource(IOUtils.toByteArray(resource.getInputStream()), resource.getResourceName());
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-    return configResources;
   }
 
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-    // createApplicationComponents(beanFactory, applicationModel, true);
-  }
-
-  @Override
-  public void destroy() {
-    // try {
-    super.destroy();
-    // } catch (Exception e) {
-    // for (ObjectProvider objectProvider : objectProviders) {
-    // disposeIfNeeded(objectProvider, LOGGER);
-    // }
-    // throw new MuleRuntimeException(e);
-    // }
+    // Nothing to do
   }
 
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
     new BaseSpringMuleContextServiceConfigurator(muleContext,
-                                                 // configurationProperties,
-                                                 artifactType,
-                                                 // optionalObjectsController,
                                                  beanFactory,
-                                                 // componentLocator,
-                                                 serviceDiscoverer,
-                                                 originalRegistry// ,
-    // resourceLocator
-    ).createArtifactServices();
-
-    originalRegistry = null;
+                                                 serviceDiscoverer).createArtifactServices();
   }
-
-  // @Override
-  // protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-  // Optional<ComponentAst> configurationOptional = findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER);
-  // if (configurationOptional.isPresent()) {
-  // return;
-  // }
-  // BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-  // beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
-  // genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
-  // }
 
   private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
     registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME,
@@ -306,9 +151,6 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
     // Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
     DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
-    // beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
-    // optionalObjectsController));
-
     return beanFactory;
   }
 
@@ -325,26 +167,9 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
     }
   }
 
-  // /**
-  // * Forces the registration of instances of {@link TransformerResolver} and {@link Converter} to be created, so that
-  // * {@link PostRegistrationActionsPostProcessor} can work its magic and add them to the transformation graph
-  // */
-  // protected static void postProcessBeanDefinition(SpringComponentModel resolvedComponent, BeanDefinitionRegistry registry,
-  // String beanName) {
-  // if (Converter.class.isAssignableFrom(resolvedComponent.getType())) {
-  // GenericBeanDefinition converterBeanDefinitionCopy = new GenericBeanDefinition(resolvedComponent.getBeanDefinition());
-  // converterBeanDefinitionCopy.setScope(SPRING_SINGLETON_OBJECT);
-  // registry.registerBeanDefinition(beanName + "-" + "converter", converterBeanDefinitionCopy);
-  // }
-  // }
-
   public MuleContextWithRegistry getMuleContext() {
     return muleContext;
   }
-
-  // public OptionalObjectsController getOptionalObjectsController() {
-  // return optionalObjectsController;
-  // }
 
   public Registry getRegistry() {
     return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
