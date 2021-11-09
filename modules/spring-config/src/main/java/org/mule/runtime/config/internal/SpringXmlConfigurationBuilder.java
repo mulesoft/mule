@@ -75,8 +75,6 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -99,9 +97,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
   private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
-
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
 
   private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                         ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
@@ -168,9 +163,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     initialiseIfNeeded(this, muleContext);
 
     final BaseMuleArtifactContext baseMuleArtifactContext = createBaseApplicationContext(muleContext);
-    createBaseSpringRegistry(muleContext, baseMuleArtifactContext);
+    SpringRegistry baseSpringRegistry = createBaseSpringRegistry(muleContext, baseMuleArtifactContext);
 
-    muleArtifactContext = createApplicationContext(muleContext);
+    muleArtifactContext = createApplicationContext(muleContext, baseSpringRegistry.lookupObject(FeatureFlaggingService.class));
     muleArtifactContext.setParent(baseMuleArtifactContext);
     createSpringRegistry(muleContext, muleArtifactContext);
   }
@@ -200,7 +195,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     return baseMuleArtifactContext;
   }
 
-  private MuleArtifactContext createApplicationContext(MuleContext muleContext) throws Exception {
+  private MuleArtifactContext createApplicationContext(MuleContext muleContext,
+                                                       FeatureFlaggingService featureFlaggingService)
+      throws Exception {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
     OptionalObjectsController parentObjectController = null;
 
@@ -214,14 +211,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
     final MuleArtifactContext muleArtifactContext =
-        doCreateApplicationContext(muleContext, artifactDeclaration, applicationObjectcontroller);
+        doCreateApplicationContext(muleContext, artifactDeclaration, applicationObjectcontroller, featureFlaggingService);
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
     return muleArtifactContext;
   }
 
   private MuleArtifactContext doCreateApplicationContext(MuleContext muleContext,
                                                          ArtifactDeclaration artifactDeclaration,
-                                                         OptionalObjectsController optionalObjectsController) {
+                                                         OptionalObjectsController optionalObjectsController,
+                                                         FeatureFlaggingService featureFlaggingService) {
     ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
         this.componentBuildingDefinitionRegistryFactory
             .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
@@ -229,7 +227,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     final ArtifactAst artifactAst =
         createApplicationModel(getExtensions(muleContext.getExtensionManager()),
                                artifactDeclaration, resolveArtifactConfigResources(), getArtifactProperties(),
-                               disableXmlValidations);
+                               disableXmlValidations, featureFlaggingService);
 
     MuleArtifactContext muleArtifactContext;
     if (enableLazyInit) {
@@ -239,13 +237,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         getArtifactProperties(), artifactType,
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
-                                                        componentBuildingDefinitionRegistryFactory);
+                                                        componentBuildingDefinitionRegistryFactory,
+                                                        featureFlaggingService);
     } else {
       muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
                                                     optionalObjectsController,
                                                     resolveParentConfigurationProperties(),
                                                     getArtifactProperties(), artifactType,
-                                                    componentBuildingDefinitionRegistryFactory);
+                                                    componentBuildingDefinitionRegistryFactory,
+                                                    featureFlaggingService);
       muleArtifactContext.initialize();
     }
 
@@ -260,7 +260,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                              ArtifactDeclaration artifactDeclaration,
                                              ConfigResource[] artifactConfigResources,
                                              Map<String, String> artifactProperties,
-                                             boolean disableXmlValidations) {
+                                             boolean disableXmlValidations,
+                                             FeatureFlaggingService featureFlaggingService) {
     try {
       final ArtifactAst artifactAst;
 
@@ -268,7 +269,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         if (artifactConfigResources.length == 0) {
           artifactAst = emptyArtifact();
         } else {
-          final AstXmlParser parser = createMuleXmlParser(extensions, artifactProperties, disableXmlValidations);
+          final AstXmlParser parser =
+              createMuleXmlParser(extensions, artifactProperties, disableXmlValidations, featureFlaggingService);
           artifactAst = parser.parse(artifactConfigResources);
         }
       } else {
@@ -284,7 +286,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
-                                           Map<String, String> artifactProperties, boolean disableXmlValidations) {
+                                           Map<String, String> artifactProperties, boolean disableXmlValidations,
+                                           FeatureFlaggingService featureFlaggingService) {
     ConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
 
@@ -404,37 +407,39 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     return parentLazyComponentInitializer;
   }
 
-  private void createBaseSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception {
+  private SpringRegistry createBaseSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext)
+      throws Exception {
     SpringRegistry registry;
 
     // Note: The SpringRegistry must be created before
     // muleArtifactContext.refresh() gets called because
     // some beans may try to look up other beans via the Registry during
     // preInstantiateSingletons().
-    if (parentContext != null) {
-      registry = createRegistryWithParentContext(muleContext, applicationContext, parentContext);
+    // if (parentContext != null) {
+    // registry = createRegistryWithParentContext(muleContext, applicationContext, parentContext);
+    //
+    // if ((parentContext instanceof MuleArtifactContext &&
+    // ((MuleArtifactContext) parentContext).getMuleContext().getRegistry() instanceof MuleRegistryHelper)) {
+    // MuleRegistryHelper parentMuleRegistryHelper =
+    // (MuleRegistryHelper) ((MuleArtifactContext) parentContext).getMuleContext().getRegistry();
+    //
+    // CompositeMuleRegistryHelper compositeMuleRegistryHelper =
+    // new CompositeMuleRegistryHelper(registry, muleContext, parentMuleRegistryHelper);
+    // // ((MuleContextWithRegistry) muleContext).setRegistry(compositeMuleRegistryHelper);
+    // // } else {
+    // // ((MuleContextWithRegistry) muleContext).setRegistry(registry);
+    // }
+    //
+    // } else {
+    registry = new SpringRegistry(applicationContext, muleContext, null,
+                                  ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
 
-      if ((parentContext instanceof MuleArtifactContext &&
-          ((MuleArtifactContext) parentContext).getMuleContext().getRegistry() instanceof MuleRegistryHelper)) {
-        MuleRegistryHelper parentMuleRegistryHelper =
-            (MuleRegistryHelper) ((MuleArtifactContext) parentContext).getMuleContext().getRegistry();
-
-        CompositeMuleRegistryHelper compositeMuleRegistryHelper =
-            new CompositeMuleRegistryHelper(registry, muleContext, parentMuleRegistryHelper);
-        // ((MuleContextWithRegistry) muleContext).setRegistry(compositeMuleRegistryHelper);
-        // } else {
-        // ((MuleContextWithRegistry) muleContext).setRegistry(registry);
-      }
-
-    } else {
-      registry = new SpringRegistry(applicationContext, muleContext, null,
-                                    ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
-
-      // ((MuleContextWithRegistry) muleContext).setRegistry(registry);
-    }
+    // ((MuleContextWithRegistry) muleContext).setRegistry(registry);
+    // }
 
     registry.initialise();
     // ((DefaultMuleContext) muleContext).setInjector(registry);
+    return registry;
   }
 
   private void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception {

@@ -35,6 +35,7 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -123,6 +124,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @param parentComponentModelInitializer
    * @param runtimeLockFactory
    * @param componentBuildingDefinitionRegistryFactory
+   * @param featureFlaggingService
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
@@ -131,10 +133,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  LockFactory runtimeLockFactory,
-                                 ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory)
+                                 ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
+                                 FeatureFlaggingService featureFlaggingService)
       throws BeansException {
     super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
-          artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory);
+          artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory, featureFlaggingService);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();

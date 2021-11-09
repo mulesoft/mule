@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
 import static org.mule.runtime.config.internal.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
+import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
@@ -53,6 +55,7 @@ import static java.lang.reflect.Proxy.isProxyClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.notification.ConnectionNotification;
 import org.mule.runtime.api.notification.ConnectionNotificationListener;
@@ -81,6 +84,8 @@ import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
 import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.FeatureContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
@@ -90,6 +95,7 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.connection.DelegateConnectionManagerAdapter;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
@@ -243,6 +249,15 @@ class BaseSpringMuleContextServiceConfigurator {
   }
 
   void createArtifactServices() {
+    // Initial feature flagging service setup
+    FeatureFlaggingRegistry ffRegistry = getInstance();
+    FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
+        .withContext(muleContext)
+        .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null), muleContext.getId()))
+        .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
+        .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
+        .build();
+    registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
 
     // registerBeanDefinition(OBJECT_MULE_CONTEXT, createMuleContextDefinition());
     // registerConstantBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME, muleContext.getObjectSerializer());
