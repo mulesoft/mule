@@ -60,7 +60,7 @@ public final class ExtensionActivator implements Startable, Stoppable {
   }
 
   void activateExtension(ExtensionModel extensionModel) {
-    registerEnumTransformers(extensionModel);
+    // registerEnumTransformers(extensionModel);
     registerExpressionFunctions(extensionModel);
   }
 
