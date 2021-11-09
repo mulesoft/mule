@@ -12,7 +12,6 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.ArrayList;
