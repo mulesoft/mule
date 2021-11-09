@@ -15,7 +15,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
@@ -75,7 +74,7 @@ class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicationContex
     beanFactory.setBeanExpressionResolver(null);
 
     // TODO base or not base?
-    registerEditors(beanFactory);
+    // registerEditors(beanFactory);
 
     registerAnnotationConfigProcessors((BeanDefinitionRegistry) beanFactory, beanFactory);
 
@@ -154,26 +153,26 @@ class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicationContex
     return beanFactory;
   }
 
-  /**
-   * {@inheritDoc} This implementation returns {@code false} if the context hasn't been initialised yet, in opposition to the
-   * default implementation which throws an exception
-   */
-  @Override
-  public boolean isRunning() {
-    try {
-      return super.isRunning();
-    } catch (IllegalStateException e) {
-      return false;
-    }
-  }
-
-  public MuleContextWithRegistry getMuleContext() {
-    return muleContext;
-  }
-
-  public Registry getRegistry() {
-    return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
-  }
+  // /**
+  // * {@inheritDoc} This implementation returns {@code false} if the context hasn't been initialised yet, in opposition to the
+  // * default implementation which throws an exception
+  // */
+  // @Override
+  // public boolean isRunning() {
+  // try {
+  // return super.isRunning();
+  // } catch (IllegalStateException e) {
+  // return false;
+  // }
+  // }
+  //
+  // public MuleContextWithRegistry getMuleContext() {
+  // return muleContext;
+  // }
+  //
+  // public Registry getRegistry() {
+  // return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
+  // }
 
   @Override
   public String toString() {

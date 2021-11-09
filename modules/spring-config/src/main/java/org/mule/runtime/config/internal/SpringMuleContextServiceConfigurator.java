@@ -13,7 +13,6 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJEC
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
-import static org.mule.runtime.config.internal.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
@@ -64,11 +63,6 @@ import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DAT
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 
-import static java.lang.reflect.Proxy.getInvocationHandler;
-import static java.lang.reflect.Proxy.isProxyClass;
-
-import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -99,7 +93,6 @@ import org.mule.runtime.config.internal.NotificationConfig.EnabledNotificationCo
 import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
-import org.mule.runtime.config.internal.factories.FixedTypeConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
 import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
@@ -141,7 +134,6 @@ import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
-import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
@@ -149,11 +141,8 @@ import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
-import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 
-import java.lang.reflect.InvocationHandler;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -164,7 +153,6 @@ import com.google.common.collect.ImmutableSet;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
@@ -178,7 +166,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  *
  * @since 4.0
  */
-class SpringMuleContextServiceConfigurator {
+class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
 
   private final MuleContextWithRegistry muleContext;
   private final ArtifactType artifactType;
@@ -274,6 +262,8 @@ class SpringMuleContextServiceConfigurator {
                                               Registry serviceLocator,
                                               org.mule.runtime.core.internal.registry.Registry originalRegistry,
                                               ResourceLocator resourceLocator) {
+    super((CustomServiceRegistry) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
+
     this.muleContext = muleContext;
     this.configurationProperties = configurationProperties;
     this.customServiceRegistry = (CustomServiceRegistry) muleContext.getCustomizationService();
@@ -332,57 +322,6 @@ class SpringMuleContextServiceConfigurator {
 
       registerBeanDefinition(serviceName, beanDefinition);
     }
-  }
-
-  protected void registerConstantBeanDefinition(String serviceId, Object impl) {
-    registerBeanDefinition(serviceId, getConstantObjectBeanDefinition(impl));
-  }
-
-  protected void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
-    beanDefinition = customServiceRegistry.getOverriddenService(serviceId)
-        .map(customService -> getCustomServiceBeanDefinition(customService, serviceId))
-        .orElse(beanDefinition);
-
-    beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
-  }
-
-  private BeanDefinition getCustomServiceBeanDefinition(CustomService customService, String serviceId) {
-    BeanDefinition beanDefinition;
-
-    Optional<Class> customServiceClass = customService.getServiceClass();
-    Optional<Object> customServiceImpl = customService.getServiceImpl();
-    if (customServiceClass.isPresent()) {
-      beanDefinition = getBeanDefinitionBuilder(customServiceClass.get()).getBeanDefinition();
-    } else if (customServiceImpl.isPresent()) {
-      Object servImpl = customServiceImpl.get();
-      if (servImpl instanceof Service) {
-        if (isProxyClass(servImpl.getClass())) {
-          InvocationHandler handler = getInvocationHandler(servImpl);
-          if (handler instanceof LazyServiceProxy) {
-            servImpl = ((LazyServiceProxy) handler)
-                .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
-          }
-
-          beanDefinition = servImpl instanceof TypeSupplier
-              ? getFixedTypeConstantObjectBeanDefinition(servImpl, (Class<?>) ((TypeSupplier) servImpl).getType())
-              : getConstantObjectBeanDefinition(servImpl);
-
-        } else {
-          beanDefinition =
-              getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator));
-        }
-      } else {
-        beanDefinition = getConstantObjectBeanDefinition(servImpl);
-      }
-    } else {
-      throw new IllegalStateException("A custom service must define a service class or instance");
-    }
-
-    if (OBJECT_STORE_MANAGER.equals(serviceId)) {
-      beanDefinition.setPrimary(true);
-    }
-
-    return beanDefinition;
   }
 
   private void createQueueManagerBeanDefinitions() {
@@ -488,21 +427,6 @@ class SpringMuleContextServiceConfigurator {
     beanDefinition.setPrimary(true);
 
     return beanDefinition;
-  }
-
-  private static BeanDefinition getConstantObjectBeanDefinition(Object impl) {
-    return getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgValue(impl).getBeanDefinition();
-  }
-
-  private static BeanDefinition getFixedTypeConstantObjectBeanDefinition(Object object, Class<?> type) {
-    return getBeanDefinitionBuilder(FixedTypeConstantFactoryBean.class)
-        .addConstructorArgValue(object)
-        .addConstructorArgValue(type)
-        .getBeanDefinition();
-  }
-
-  private static BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType) {
-    return genericBeanDefinition(beanType);
   }
 
   private static BeanDefinition getBeanDefinition(Class<?> beanType, String factoryMethodName) {

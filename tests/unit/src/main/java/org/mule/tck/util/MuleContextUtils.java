@@ -59,6 +59,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
@@ -220,6 +221,7 @@ public class MuleContextUtils {
 
     final ExtensionManager extensionManager = mock(ExtensionManager.class, withSettings().lenient());
     when(extensionManager.getExtensions()).thenReturn(emptySet());
+    when(muleContext.getCustomizationService()).thenReturn(mock(CustomServiceRegistry.class));
     when(muleContext.getExtensionManager()).thenReturn(extensionManager);
 
     SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());
