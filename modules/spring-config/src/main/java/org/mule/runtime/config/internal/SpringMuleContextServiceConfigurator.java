@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.lang.reflect.Proxy.getInvocationHandler;
-import static java.lang.reflect.Proxy.isProxyClass;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -65,6 +63,10 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
+
+import static java.lang.reflect.Proxy.getInvocationHandler;
+import static java.lang.reflect.Proxy.isProxyClass;
+
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -101,12 +103,10 @@ import org.mule.runtime.config.internal.factories.FixedTypeConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
 import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
@@ -116,6 +116,7 @@ import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.connection.DelegateConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
@@ -133,6 +134,7 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
@@ -156,14 +158,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * This class configured all the services available in a {@code MuleContext}.
@@ -178,7 +180,7 @@ import com.google.common.collect.ImmutableSet;
  */
 class SpringMuleContextServiceConfigurator {
 
-  private final MuleContext muleContext;
+  private final MuleContextWithRegistry muleContext;
   private final ArtifactType artifactType;
   private final OptionalObjectsController optionalObjectsController;
   private final CustomServiceRegistry customServiceRegistry;
@@ -263,7 +265,7 @@ class SpringMuleContextServiceConfigurator {
   private final ConfigurationProperties configurationProperties;
   private final Registry serviceLocator;
 
-  public SpringMuleContextServiceConfigurator(MuleContext muleContext,
+  public SpringMuleContextServiceConfigurator(MuleContextWithRegistry muleContext,
                                               ConfigurationProperties configurationProperties,
                                               ArtifactType artifactType,
                                               OptionalObjectsController optionalObjectsController,
@@ -332,11 +334,11 @@ class SpringMuleContextServiceConfigurator {
     }
   }
 
-  private void registerConstantBeanDefinition(String serviceId, Object impl) {
+  protected void registerConstantBeanDefinition(String serviceId, Object impl) {
     registerBeanDefinition(serviceId, getConstantObjectBeanDefinition(impl));
   }
 
-  private void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
+  protected void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
     beanDefinition = customServiceRegistry.getOverriddenService(serviceId)
         .map(customService -> getCustomServiceBeanDefinition(customService, serviceId))
         .orElse(beanDefinition);
@@ -467,7 +469,7 @@ class SpringMuleContextServiceConfigurator {
         .getBeanDefinition();
   }
 
-  private void createBootstrapBeanDefinitions() {
+  protected void createBootstrapBeanDefinitions() {
     try {
       SpringRegistryBootstrap springRegistryBootstrap =
           new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, this::registerBeanDefinition);
@@ -477,7 +479,7 @@ class SpringMuleContextServiceConfigurator {
     }
   }
 
-  private static BeanDefinition getBeanDefinition(Class<?> beanType) {
+  protected static BeanDefinition getBeanDefinition(Class<?> beanType) {
     return getBeanDefinitionBuilder(beanType).getBeanDefinition();
   }
 
@@ -507,4 +509,7 @@ class SpringMuleContextServiceConfigurator {
     return getBeanDefinitionBuilder(beanType).setFactoryMethod(factoryMethodName).getBeanDefinition();
   }
 
+  protected MuleContextWithRegistry getMuleContext() {
+    return muleContext;
+  }
 }

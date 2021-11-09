@@ -518,17 +518,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext,
-                                             configurationProperties,
-                                             artifactType,
-                                             optionalObjectsController,
-                                             beanFactory,
-                                             componentLocator,
-                                             serviceDiscoverer,
-                                             originalRegistry,
-                                             resourceLocator).createArtifactServices();
+    createServiceConfigurator(beanFactory).createArtifactServices();
 
     originalRegistry = null;
+  }
+
+  protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
+    return new SpringMuleContextServiceConfigurator(muleContext,
+                                                    getConfigurationProperties(),
+                                                    getArtifactType(),
+                                                    getOptionalObjectsController(),
+                                                    beanFactory,
+                                                    componentLocator,
+                                                    getServiceDiscoverer(),
+                                                    originalRegistry,
+                                                    getResourceLocator());
   }
 
   @Override
@@ -613,12 +617,24 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return muleContext;
   }
 
+  protected PropertiesResolverConfigurationProperties getConfigurationProperties() {
+    return configurationProperties;
+  }
+
+  protected ArtifactType getArtifactType() {
+    return artifactType;
+  }
+
   public OptionalObjectsController getOptionalObjectsController() {
     return optionalObjectsController;
   }
 
   public Registry getRegistry() {
     return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
+  }
+
+  protected org.mule.runtime.core.internal.registry.Registry getOriginalRegistry() {
+    return originalRegistry;
   }
 
   @Override
@@ -634,4 +650,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return applicationModel;
   }
 
+  protected DefaultRegistry getServiceDiscoverer() {
+    return serviceDiscoverer;
+  }
+
+  protected DefaultResourceLocator getResourceLocator() {
+    return resourceLocator;
+  }
 }

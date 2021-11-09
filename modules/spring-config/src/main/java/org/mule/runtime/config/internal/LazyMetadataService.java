@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -41,12 +43,13 @@ import java.util.function.Supplier;
  */
 public class LazyMetadataService implements MetadataService, Initialisable {
 
-  private final LazyMuleArtifactContext lazyMuleArtifactContext;
+  private final LazyComponentInitializerAdapter lazyMuleArtifactContext;
   private final Supplier<MetadataService> metadataServiceSupplier;
 
   private MetadataService metadataService;
 
-  public LazyMetadataService(LazyMuleArtifactContext lazyMuleArtifactContext, Supplier<MetadataService> metadataServiceSupplier) {
+  public LazyMetadataService(LazyComponentInitializerAdapter lazyMuleArtifactContext,
+                             Supplier<MetadataService> metadataServiceSupplier) {
     this.lazyMuleArtifactContext = lazyMuleArtifactContext;
     this.metadataServiceSupplier = metadataServiceSupplier;
   }

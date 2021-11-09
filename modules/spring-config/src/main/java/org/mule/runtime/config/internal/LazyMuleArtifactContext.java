@@ -6,8 +6,21 @@
  */
 package org.mule.runtime.config.internal;
 
-import static com.google.common.collect.ImmutableSet.copyOf;
-import static com.google.common.collect.Sets.newHashSet;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
+import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
+import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
@@ -16,38 +29,12 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
-import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SERVICE_KEY;
-import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
-import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
-import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
-import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
-import static org.mule.runtime.config.internal.LazySampleDataService.NON_LAZY_SAMPLE_DATA_SERVICE;
-import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
-import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
-import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
-import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
+
+import static com.google.common.collect.ImmutableSet.copyOf;
+import static com.google.common.collect.Sets.newHashSet;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.config.custom.CustomizationService;
-import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -56,38 +43,23 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
-import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.lazy.LazyExpressionManagerFactoryBean;
-import org.mule.runtime.config.internal.lazy.NoOpConnectivityTesterFactory;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
-import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
-import org.mule.runtime.core.internal.metadata.cache.DelegateMetadataCacheManager;
-import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
-import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
-import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -120,8 +92,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   public static final String SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH = "_sharedPartitionatedPersistentObjectStorePath";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
-  private static final String DEFAULT_METADATA_CACHE_MANAGER_KEY = "_defaultPersistentMetadataCacheManager";
-  private static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
 
   private final boolean dslDeclarationValidationEnabled;
 
@@ -133,6 +103,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private final Set<String> currentComponentLocationsRequested = new HashSet<>();
   private boolean appliedStartedPhaseRequest = false;
+
+  private final Map<String, String> artifactProperties;
+  private final LockFactory runtimeLockFactory;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -168,77 +141,32 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
-    final CustomizationService customizationService = muleContext.getCustomizationService();
-
-    customizationService.overrideDefaultServiceClass(OBJECT_EXPRESSION_MANAGER, LazyExpressionManagerFactoryBean.class);
-    customizationService.overrideDefaultServiceImpl(OBJECT_CONNECTIVITY_TESTER_FACTORY, new NoOpConnectivityTesterFactory());
-    customizationService.overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
-                                                    new LazyConnectivityTestingService(this, () -> getRegistry()
-                                                        .<ConnectivityTestingService>lookupByName(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
-                                                        .get()));
-    customizationService.registerCustomServiceClass(NON_LAZY_CONNECTIVITY_TESTING_SERVICE,
-                                                    DefaultConnectivityTestingService.class);
-    customizationService.overrideDefaultServiceImpl(METADATA_SERVICE_KEY,
-                                                    new LazyMetadataService(this, () -> getRegistry()
-                                                        .<MetadataService>lookupByName(NON_LAZY_METADATA_SERVICE_KEY)
-                                                        .get()));
-    customizationService.registerCustomServiceClass(NON_LAZY_METADATA_SERVICE_KEY, MuleMetadataService.class);
-    customizationService.overrideDefaultServiceImpl(VALUE_PROVIDER_SERVICE_KEY,
-                                                    new LazyValueProviderService(this, () -> getRegistry()
-                                                        .<ValueProviderService>lookupByName(NON_LAZY_VALUE_PROVIDER_SERVICE)
-                                                        .get(), muleContext::getConfigurationComponentLocator));
-    customizationService.registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
-                                                    MuleValueProviderService.class);
-    customizationService.overrideDefaultServiceImpl(SAMPLE_DATA_SERVICE_KEY,
-                                                    new LazySampleDataService(this, () -> getRegistry()
-                                                        .<SampleDataService>lookupByName(NON_LAZY_SAMPLE_DATA_SERVICE).get()));
-    customizationService.registerCustomServiceClass(NON_LAZY_SAMPLE_DATA_SERVICE,
-                                                    MuleSampleDataService.class);
-
-    customizationService.overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
-
-    dslDeclarationValidationEnabled = Boolean.valueOf(artifactProperties
+    this.dslDeclarationValidationEnabled = Boolean.valueOf(artifactProperties
         .getOrDefault(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY, Boolean.FALSE.toString()));
 
-    String sharedPartitionedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
-    if (sharedPartitionedPersistentObjectStorePath != null) {
-      // We need to first define this service so it would be later initialized
-      muleContext.getCustomizationService().registerCustomServiceClass(SHARED_PERSISTENT_OBJECT_STORE_KEY,
-                                                                       SharedPartitionedPersistentObjectStore.class);
-      muleContext.getCustomizationService().overrideDefaultServiceImpl(SHARED_PERSISTENT_OBJECT_STORE_KEY,
-                                                                       new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionedPersistentObjectStorePath),
-                                                                                                                    runtimeLockFactory));
-      MuleObjectStoreManager osm = new MuleObjectStoreManager();
-      osm.setBasePersistentStoreKey(SHARED_PERSISTENT_OBJECT_STORE_KEY);
-      osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
-      try {
-        getMuleRegistry().registerObject(LAZY_MULE_OBJECT_STORE_MANAGER, osm);
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
-
-      muleContext.getCustomizationService().registerCustomServiceClass(DEFAULT_METADATA_CACHE_MANAGER_KEY,
-                                                                       DefaultPersistentMetadataCacheManager.class);
-      muleContext.getCustomizationService().overrideDefaultServiceImpl(METADATA_CACHE_MANAGER_KEY,
-                                                                       new DelegateMetadataCacheManager(() -> {
-                                                                         DefaultPersistentMetadataCacheManager defaultPersistentMetadataCacheManager =
-                                                                             (DefaultPersistentMetadataCacheManager) getRegistry()
-                                                                                 .lookupByName(DEFAULT_METADATA_CACHE_MANAGER_KEY)
-                                                                                 .get();
-                                                                         defaultPersistentMetadataCacheManager
-                                                                             .setLockFactory(runtimeLockFactory);
-                                                                         defaultPersistentMetadataCacheManager
-                                                                             .setObjectStoreManager(getRegistry()
-                                                                                 .<ObjectStoreManager>lookupByName(LAZY_MULE_OBJECT_STORE_MANAGER)
-                                                                                 .get());
-                                                                         return defaultPersistentMetadataCacheManager;
-                                                                       }));
-    }
+    this.artifactProperties = artifactProperties;
+    this.runtimeLockFactory = runtimeLockFactory;
 
     initialize();
     // Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk
     // components.
     this.graph = generateFor(getApplicationModel());
+  }
+
+  @Override
+  protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
+    return new LazySpringMuleContextServiceConfigurator(this,
+                                                        artifactProperties,
+                                                        runtimeLockFactory,
+                                                        getMuleContext(),
+                                                        getConfigurationProperties(),
+                                                        getArtifactType(),
+                                                        getOptionalObjectsController(),
+                                                        beanFactory,
+                                                        componentLocator,
+                                                        getServiceDiscoverer(),
+                                                        getOriginalRegistry(),
+                                                        getResourceLocator());
   }
 
   @Override
