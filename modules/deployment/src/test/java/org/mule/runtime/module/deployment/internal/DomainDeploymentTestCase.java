@@ -1218,7 +1218,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
@@ -1237,7 +1237,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(domain);
 
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
@@ -1474,7 +1474,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
 
     Properties deploymentProperties =
-        resolveArtifactStatusDeploymentProperties(dummyDomainApp1FileBuilder.getId(), Optional.empty());
+        resolveArtifactStatusDeploymentProperties(dummyDomainApp1FileBuilder.getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
