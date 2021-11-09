@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.profiling;
+package org.mule.runtime.core.internal.profiling.consumer;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.SCHEDULING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
@@ -33,7 +34,6 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
-import org.mule.runtime.core.internal.profiling.consumer.TaskSchedulingLoggerDataConsumer;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -59,7 +59,7 @@ import org.mockito.junit.MockitoRule;
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
 @RunWith(Parameterized.class)
-public class TaskSchedulingDataConsumersTestCase extends AbstractMuleContextTestCase {
+public class TaskSchedulingLoggerDataConsumerTestCase extends AbstractMuleContextTestCase {
 
   private static final String TASK_ID = "taskId";
   private static final String CORRELATION_ID = "correlationId";
@@ -86,7 +86,7 @@ public class TaskSchedulingDataConsumersTestCase extends AbstractMuleContextTest
   private ComponentLocation location;
 
 
-  public TaskSchedulingDataConsumersTestCase(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType) {
+  public TaskSchedulingLoggerDataConsumerTestCase(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType) {
     this.profilingEventType = profilingEventType;
   }
 
@@ -133,12 +133,22 @@ public class TaskSchedulingDataConsumersTestCase extends AbstractMuleContextTest
   }
 
   @Test
-  @Description("When a profiling event related to task scheduling is triggered, the data consumers process the data accordingly.")
-  public void dataConsumersForTaskSchedulingProfilingEventTypesConsumeDataAccordingly() {
+  @Description("When a profiling event related to task scheduling is triggered, the data consumer logs the data accordingly.")
+  public void dataConsumerLogs() {
     ProfilingDataProducer<TaskSchedulingProfilingEventContext> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
     dataProducer.triggerProfilingEvent(profilingEventContext);
     verify(logger).debug(jsonToLog(profilingEventType, profilingEventContext));
+  }
+
+  @Test
+  @Description("When a profiling event related to task scheduling is triggered, the data consumer filter events with empty execution context.")
+  public void dataConsumerFilter() {
+    when(profilingEventContext.getTaskTracingContext()).thenReturn(null);
+    ProfilingDataProducer<TaskSchedulingProfilingEventContext> dataProducer =
+        profilingService.getProfilingDataProducer(profilingEventType);
+    dataProducer.triggerProfilingEvent(profilingEventContext);
+    verifyNoMoreInteractions(logger);
   }
 
   private String jsonToLog(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType,
