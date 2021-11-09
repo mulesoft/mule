@@ -715,9 +715,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   protected void assertProcessingStrategyTracing() {
     if (enableProfilingServiceProperty.getValue().equals("true")) {
-      Assert.assertThat(profilingService.getTracingService().getCurrentTracingContext(), notNullValue());
+      Assert.assertThat(profilingService.getTracingService().getCurrentExecutionContext(), notNullValue());
     } else {
-      Assert.assertThat(profilingService.getTracingService().getCurrentTracingContext(), nullValue());
+      Assert.assertThat(profilingService.getTracingService().getCurrentExecutionContext(), nullValue());
     }
   }
 
