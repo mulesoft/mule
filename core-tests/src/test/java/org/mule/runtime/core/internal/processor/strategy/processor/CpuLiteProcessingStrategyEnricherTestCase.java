@@ -11,15 +11,17 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.internal.processor.rector.profiling.ReactorProfilingUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
-import org.mule.runtime.api.profiling.ProfilingService;
+import org.junit.Before;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
 import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteAsyncNonBlockingProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBlockingProcessingStrategyEnricher;
+import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 
 import io.qameta.allure.Description;
@@ -31,8 +33,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(ENRICHER)
@@ -48,7 +53,12 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   private CoreEvent coreEvent;
 
   @Mock
-  private ProfilingService profilingService;
+  private CoreProfilingService profilingService;
+
+  @Before
+  public void before() {
+    mockProcessingStrategyProfilingChainWithoutTriggeringEvent(profilingService);
+  }
 
   @Test
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with CPU_LITE enricher")

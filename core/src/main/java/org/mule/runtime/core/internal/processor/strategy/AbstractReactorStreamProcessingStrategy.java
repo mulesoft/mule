@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
@@ -15,11 +14,9 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamPr
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.BackPressureReason;
@@ -31,6 +28,7 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteAsyncNo
 import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBlockingProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
+import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.slf4j.Logger;
 
@@ -60,13 +58,10 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
   private ReactiveProcessorEnricher processorEnricher = null;
 
   @Inject
-  ProfilingService profilingService;
+  CoreProfilingService profilingService;
 
   @Inject
   MuleContext muleContext;
-
-  @Inject
-  FeatureFlaggingService featureFlags;
 
   AbstractReactorStreamProcessingStrategy(int subscribers,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier,
@@ -93,6 +88,11 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
     if (reason != null) {
       throw new FromFlowRejectedExecutionException(reason);
     }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    // Nothing to do.
   }
 
   @Override
@@ -133,9 +133,6 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
   }
 
   @Override
-  public void initialise() throws InitialisationException {}
-
-  @Override
   public void start() throws MuleException {
     processorEnricher = getProcessingStrategyEnricher();
   }
@@ -159,8 +156,8 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
         .register(CPU_LITE_ASYNC, cpuLiteAsyncEnricher);
   }
 
-  protected ProfilingService getProfilingService() {
-    return featureFlags.isEnabled(ENABLE_PROFILING_SERVICE) ? profilingService : null;
+  protected CoreProfilingService getProfilingService() {
+    return profilingService;
   }
 
   @Override

@@ -7,35 +7,43 @@
 
 package org.mule.runtime.core.internal.config;
 
-import java.util.Map;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 
 import org.mule.runtime.api.config.Feature;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
+import org.togglz.core.user.FeatureUser;
 
-import static java.util.Collections.emptyMap;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
  * Default implementation of {@code FeatureFlaggingService}
  */
-public class DefaultFeatureFlaggingService implements FeatureFlaggingService {
+public class DefaultFeatureFlaggingService implements FeatureFlaggingService, Disposable {
 
-  private final Map<Feature, Boolean> features;
+  private final FeatureUser featureUser;
+  private final String artifactId;
+  private final MuleTogglzManagedArtifactFeatures features;
 
-  public DefaultFeatureFlaggingService() {
-    this(emptyMap());
-  }
-
-  public DefaultFeatureFlaggingService(Map<Feature, Boolean> features) {
+  public DefaultFeatureFlaggingService(String artifactId, MuleTogglzManagedArtifactFeatures features) {
+    featureUser = new MuleTogglzArtifactFeatureUser(artifactId);
     this.features = features;
+    this.artifactId = artifactId;
   }
 
   @Override
   public boolean isEnabled(Feature feature) {
-    if (!features.containsKey(feature)) {
+    if (!features.containsKey(FEATURE_PROVIDER.getOrRegisterRuntimeTogglzFeatureFrom(feature))) {
       throw new MuleRuntimeException(createStaticMessage("Feature %s not registered", feature));
     }
-    return features.get(feature);
+
+    return features.get(FEATURE_PROVIDER.getRuntimeTogglzFeature(feature)).isEnabled();
+  }
+
+  @Override
+  public void dispose() {
+    features.dispose();
   }
 }

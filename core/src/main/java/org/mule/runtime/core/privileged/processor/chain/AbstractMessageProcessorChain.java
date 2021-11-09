@@ -11,7 +11,6 @@ import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.replace;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -46,7 +45,6 @@ import static reactor.core.publisher.Operators.lift;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -64,6 +62,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
@@ -71,6 +70,7 @@ import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
+import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -98,6 +98,7 @@ import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
+import org.togglz.core.user.FeatureUser;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
@@ -161,11 +162,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   @Inject
   private ProfilingService profilingService;
 
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
-
-  private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext> startingOperationExecutionDataProducer;
-  private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext> endOperationExecutionDataProducer;
+  private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> startingOperationExecutionDataProducer;
+  private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
+  private FeatureUser featureUser;
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
@@ -584,26 +583,20 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Override
   public void initialise() throws InitialisationException {
+    featureUser = new MuleTogglzArtifactFeatureUser(ProfilingUtils.getArtifactId(muleContext));
     additionalInterceptors.addAll(createInterceptors(processorInterceptorManager.getInterceptorFactories()
         .stream()
         .map(ProcessorInterceptorFactoryAdapter::new)
         .collect(toList()), muleContext.getInjector()));
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
-
-    if (isProfilingEnabled()) {
-      startingOperationExecutionDataProducer = profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
-      endOperationExecutionDataProducer = profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
-    }
-  }
-
-  private boolean isProfilingEnabled() {
-    return profilingService != null && featureFlaggingService != null
-        && featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE);
   }
 
   @Override
   public void start() throws MuleException {
+    ;
+    startingOperationExecutionDataProducer = profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
+    endOperationExecutionDataProducer = profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
     List<Processor> startedProcessors = new ArrayList<>();
     try {
       for (Processor processor : getMessageProcessorsForLifecycle()) {

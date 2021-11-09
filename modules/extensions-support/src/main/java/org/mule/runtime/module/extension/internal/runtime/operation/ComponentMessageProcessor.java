@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
+import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -28,6 +34,7 @@ import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolic
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
@@ -95,6 +102,8 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.config.FeatureFlaggingUtils;
+import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -179,6 +188,10 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
+
+
+import org.togglz.core.user.FeatureUser;
+
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -275,6 +288,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   private String processorPath = null;
+  private FeatureUser featureUser;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -615,6 +629,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       valueReturnDelegate = getValueReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor(componentDecoratorFactory);
+      featureUser = new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext));
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
@@ -672,7 +687,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               });
         }
 
-        private Consumer<? super CoreEvent> innerEventDispatcher(final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
+        private Consumer<? super CoreEvent> innerEventDispatcher(
+                                                                 final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
           return event -> prepareAndExecuteOperation(event,
                                                      // The callback must be listened to within the
                                                      // processingStrategy's onProcessor, so that any thread
@@ -1087,7 +1103,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
     if (outerFluxTerminationTimeout >= 0) {
       outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
-          .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
+          .withMaxConcurrentTasks(1)
+          .withName(toString() + ".outer.flux."));
       LOGGER.debug("Created outerFluxCompletionScheduler ({}) of component '{}'", outerFluxCompletionScheduler, processorPath);
     }
 
@@ -1171,20 +1188,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
-                                        getThreadReleaseDataProducer());
-  }
-
-  private boolean isProfilingEnabled() {
-    return profilingService != null && featureFlaggingService != null
-        && featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE);
-  }
-
-  private ProfilingDataProducer<ComponentThreadingProfilingEventContext> getThreadReleaseDataProducer() {
-    if (isProfilingEnabled()) {
-      return profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE);
-    } else {
-      return null;
-    }
+                                        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
   }
 
   protected InterceptorChain createInterceptorChain() {

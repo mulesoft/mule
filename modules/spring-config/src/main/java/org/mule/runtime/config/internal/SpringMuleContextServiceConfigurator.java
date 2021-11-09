@@ -62,6 +62,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
+import static org.mule.runtime.core.internal.config.management.MuleTogglzProfilingFeatures.PROFILING_SERVICE_FEATURE;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -128,6 +129,7 @@ import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCa
 import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
@@ -243,7 +245,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
       .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
-      .put(MULE_PROFILING_SERVICE_KEY, getBeanDefinition(DefaultProfilingService.class))
+      .put(MULE_PROFILING_SERVICE_KEY, getBeanDefinitionForProfilingService())
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;
@@ -271,6 +273,14 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     this.serviceLocator = serviceLocator;
     this.originalRegistry = originalRegistry;
     this.resourceLocator = resourceLocator;
+  }
+
+  private BeanDefinition getBeanDefinitionForProfilingService() {
+    if (PROFILING_SERVICE_FEATURE.isActive()) {
+      return getBeanDefinition(DefaultProfilingService.class);
+    } else {
+      return getBeanDefinition(NoOpProfilingService.class);
+    }
   }
 
   void createArtifactServices() {

@@ -59,6 +59,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEv
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
@@ -169,7 +170,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private ConnectionManagerAdapter connectionManagerAdapter;
 
   @Mock
-  private ProfilingDataProducer<ComponentThreadingProfilingEventContext> threadReleaseDataProducer;
+  private ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
 
   private final String name;
   private final Object result = new Object();

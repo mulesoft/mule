@@ -17,6 +17,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.togglz.core.repository.FeatureState;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.TestingFeatures.TESTING_FEATURE;
+import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
@@ -36,6 +38,7 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.Featu
 @Story(FEATURE_FLAGGING)
 public class DefaultFeatureFlaggingServiceTestCase {
 
+  public static final String ARTIFACT_ID = "artifactId";
   private final FeatureFlaggingService featureFlaggingService;
 
   private final Feature feature;
@@ -62,7 +65,14 @@ public class DefaultFeatureFlaggingServiceTestCase {
     this.feature = feature;
     this.enabled = enabled;
 
-    featureFlaggingService = new DefaultFeatureFlaggingService(featureConfigurations);
+    Map<org.togglz.core.Feature, FeatureState> featureStates = new HashMap<>();
+    featureConfigurations
+        .forEach((feat, enbld) -> featureStates
+            .put(FEATURE_PROVIDER.getOrRegisterRuntimeTogglzFeatureFrom(feat),
+                 new FeatureState(FEATURE_PROVIDER.getOrRegisterRuntimeTogglzFeatureFrom(feat), enbld)));
+
+    featureFlaggingService =
+        new DefaultFeatureFlaggingService(ARTIFACT_ID, new MuleTogglzManagedArtifactFeatures(ARTIFACT_ID, featureStates));
     if (configureExpected != null) {
       configureExpected.accept(expectedException);
     }

@@ -11,19 +11,19 @@ import static java.lang.Thread.currentThread;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
+import static org.mule.runtime.core.internal.processor.rector.profiling.ReactorProfilingUtils.mockProcessingStrategyProfilingChain;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.pipelineProcessingStrategyReactiveProcessorFrom;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
+import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 
 import java.util.concurrent.Callable;
@@ -53,15 +53,16 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
   private CoreEvent coreEvent;
 
   @Mock
-  private ProfilingService profilingService;
+  private CoreProfilingService profilingService;
 
   @Mock
-  private ProfilingDataProducer profilingProducer;
+  private ProfilingDataProducer profilingDataProducer;
 
   @Before
   public void before() {
-    when(profilingService.getProfilingDataProducer(any())).thenReturn(profilingProducer);
+    mockProcessingStrategyProfilingChain(profilingService, profilingDataProducer);
   }
+
 
   @Test
   @Description("The reactive processor created by the builder uses the set scheduler and emits the core events")
@@ -81,6 +82,6 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
     verify(profilingService, atLeastOnce()).getProfilingDataProducer(PS_SCHEDULING_FLOW_EXECUTION);
     verify(profilingService, atLeastOnce()).getProfilingDataProducer(STARTING_FLOW_EXECUTION);
     verify(profilingService, atLeastOnce()).getProfilingDataProducer(FLOW_EXECUTED);
-    verify(profilingProducer, atLeastOnce()).triggerProfilingEvent(any());
+    verify(profilingDataProducer, atLeastOnce()).triggerProfilingEvent(any());
   }
 }

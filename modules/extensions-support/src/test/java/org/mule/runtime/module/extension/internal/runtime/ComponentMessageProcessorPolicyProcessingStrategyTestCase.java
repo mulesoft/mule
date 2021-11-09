@@ -55,6 +55,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.config.DefaultFeatureFlaggingService;
+import org.mule.runtime.core.internal.config.MuleTogglzManagedArtifactFeatures;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -137,10 +138,14 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
         muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY,
-                                                                         new DefaultFeatureFlaggingService());
+                                                                         new DefaultFeatureFlaggingService("artifacctId",
+                                                                                                           new MuleTogglzManagedArtifactFeatures(
+                                                                                                                                                 "artifactId",
+                                                                                                                                                 new HashMap<>())));
       }
     });
   }
+
 
   @Before
   public void before() throws MuleException {

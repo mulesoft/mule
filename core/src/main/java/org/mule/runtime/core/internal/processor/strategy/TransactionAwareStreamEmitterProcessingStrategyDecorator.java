@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -27,26 +25,28 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingEventContext;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
+import org.mule.runtime.core.internal.profiling.CoreProfilingService;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.togglz.core.user.FeatureUser;
 import reactor.util.context.Context;
 
 import javax.inject.Inject;
@@ -65,13 +65,20 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   };
 
   @Inject
-  private ProfilingService profilingService;
-
-  @Inject
-  private FeatureFlaggingService featureFlags;
+  private CoreProfilingService profilingService;
 
   @Inject
   private MuleContext muleContext;
+
+  private FeatureUser featureUser;
+
+
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.featureUser = new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext));
+    super.initialise();
+  }
 
   public TransactionAwareStreamEmitterProcessingStrategyDecorator(ProcessingStrategy delegate) {
     super(delegate);
@@ -101,16 +108,29 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     String artifactId = getArtifactId(muleContext);
     String artifactType = getArtifactType(muleContext);
 
+    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transfomer =
+        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, getLocation(pipeline),
+                                                                                 Thread.currentThread().getName(), artifactId,
+                                                                                 artifactType, currentTimeMillis());
+
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
           if (isTxActive(ctx)) {
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
-                .profileProcessingStrategyEvent(location, getDataProducer(PS_SCHEDULING_FLOW_EXECUTION), artifactId, artifactType)
-                .profileProcessingStrategyEvent(location, getDataProducer(STARTING_FLOW_EXECUTION), artifactId, artifactType)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(PS_SCHEDULING_FLOW_EXECUTION),
+                                                transfomer)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(
+                                                                STARTING_FLOW_EXECUTION),
+                                                transfomer)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
-                .profileProcessingStrategyEvent(location, getDataProducer(FLOW_EXECUTED), artifactId, artifactType)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(
+                                                                FLOW_EXECUTED),
+                                                transfomer)
                 .build();
           } else {
             return from(pub).transform(delegate.onPipeline(pipeline));
@@ -118,14 +138,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
         });
   }
 
-  private Optional<ProfilingDataProducer<? extends ProfilingEventContext>> getDataProducer(
-                                                                                           ProfilingEventType<? extends ProfilingEventContext> eventType) {
-    if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
-      return of(profilingService.getProfilingDataProducer(eventType));
-    }
-
-    // In case the profiling feature is not enabled there is no data producer.
-    return empty();
+  private ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> getDataProducer(
+                                                                                                             ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> eventType) {
+    return profilingService.getProfilingDataProducer(eventType);
   }
 
   @Override
@@ -134,19 +149,38 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     String artifactId = muleContext.getConfiguration().getId();
     String artifactType = muleContext.getArtifactType().getAsString();
 
+    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transfomer =
+        new Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext>() {
+
+          @Override
+          public ComponentProcessingStrategyProfilingEventContext apply(CoreEvent coreEvent) {
+            return new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, getLocation(processor),
+                                                                               Thread.currentThread().getName(), artifactId,
+                                                                               artifactType, currentTimeMillis());
+          }
+        };
+
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
           if (isTxActive(ctx)) {
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
-                .profileProcessingStrategyEvent(location, getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION), artifactId,
-                                                artifactType)
-                .profileProcessingStrategyEvent(location, getDataProducer(PS_STARTING_OPERATION_EXECUTION), artifactId,
-                                                artifactType)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION),
+                                                transfomer)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(PS_STARTING_OPERATION_EXECUTION),
+                                                transfomer)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
-                .profileProcessingStrategyEvent(location, getDataProducer(PS_OPERATION_EXECUTED), artifactId, artifactType)
-                .profileProcessingStrategyEvent(location, getDataProducer(PS_FLOW_MESSAGE_PASSING), artifactId, artifactType)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(
+                                                                PS_OPERATION_EXECUTED),
+                                                transfomer)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(
+                                                                PS_FLOW_MESSAGE_PASSING),
+                                                transfomer)
                 .build();
           } else {
             return from(pub).transform(delegate.onProcessor(processor));

@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.config;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
+import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.getTogglzManagedArtifactFeatures;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.HashMap;
@@ -99,21 +101,26 @@ public final class FeatureFlaggingServiceBuilder {
    * @return The {@link FeatureFlaggingService} instance.
    */
   public FeatureFlaggingService build() {
+    String artifactUserId = null;
     Map<Feature, Boolean> features = new HashMap<>();
     LOGGER.debug("Configuring feature flags...");
     if (muleContext != null) {
+      artifactUserId = getArtifactId(muleContext);
       muleContextFlags.forEach((feature, artifactDescriptorPredicate) -> features
           .put(feature, isFeatureFlagEnabled(feature, muleContext, artifactDescriptorPredicate)));
     }
     if (featureContext != null) {
+      artifactUserId = featureContext.getArtifactName();
       featureContextFlags.forEach((feature, artifactDescriptorPredicate) -> features
           .put(feature, isFeatureFlagEnabled(feature, featureContext, artifactDescriptorPredicate)));
     }
-    return new DefaultFeatureFlaggingService(features);
+
+    return new DefaultFeatureFlaggingService(artifactUserId,
+                                             getTogglzManagedArtifactFeatures(artifactUserId, features));
   }
 
   /**
-   * True if a feature flag is enabled under a determined feature context.
+   * True if a feature flag is enabled under a determined feature context.\
    *
    * @param feature          The feature whose feature flag must be evaluated.
    * @param featureContext   The feature context that must be used to set the feature flag.

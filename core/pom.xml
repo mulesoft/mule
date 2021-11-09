@@ -16,6 +16,7 @@
     <properties>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
+        <togglezCoreVersion>2.6.1.Final</togglezCoreVersion>
     </properties>
 
     <build>
@@ -78,6 +79,10 @@
         <dependency>
             <groupId>org.mule.sdk</groupId>
             <artifactId>mule-sdk-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.togglz</groupId>
+            <artifactId>togglz-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

@@ -21,7 +21,11 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.setFeatureState;
+import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.withFeatureUser;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
+import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
@@ -36,6 +40,7 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
@@ -59,6 +64,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.togglz.core.repository.FeatureState;
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
@@ -105,6 +111,51 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     when(identifier.getName()).thenReturn("test");
     when(identifier.getNamespace()).thenReturn("test");
     profilingService = getTestProfilingService();
+    enableProfilingFeatures();
+  }
+
+  private void enableProfilingFeatures() {
+    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
+      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_SCHEDULING_OPERATION_EXECUTION,
+                                                                                                "TEST_CONSUMER"),
+                                       true));
+    });
+
+    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
+      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_STARTING_OPERATION_EXECUTION,
+                                                                                                "TEST_CONSUMER"),
+                                       true));
+    });
+
+    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
+      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_OPERATION_EXECUTED,
+                                                                                                "TEST_CONSUMER"),
+                                       true));
+    });
+
+    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
+      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_FLOW_MESSAGE_PASSING,
+                                                                                                "TEST_CONSUMER"),
+                                       true));
+    });
+
+    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
+      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_SCHEDULING_FLOW_EXECUTION,
+                                                                                                "TEST_CONSUMER"),
+                                       true));
+    });
+
+    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
+      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(STARTING_FLOW_EXECUTION,
+                                                                                                "TEST_CONSUMER"),
+                                       true));
+    });
+
+    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
+      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(FLOW_EXECUTED,
+                                                                                                "TEST_CONSUMER"),
+                                       true));
+    });
   }
 
   private ProfilingService getTestProfilingService() throws MuleException {
@@ -128,7 +179,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   @Test
   @Description("When a profiling event related to processing strategy is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForProcessingStrategiesProfilingEventTypesConsumeDataAccordingly() {
-    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext> dataProducer =
+    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, Object> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
     ComponentProcessingStrategyProfilingEventContext profilerEventContext =
