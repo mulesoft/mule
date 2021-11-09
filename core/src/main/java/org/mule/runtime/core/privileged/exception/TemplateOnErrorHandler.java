@@ -476,7 +476,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     updateRootContainerName(rootContainerName, this);
   }
 
-  protected void setFlowLocation(Location location) {
+  public void setFlowLocation(Location location) {
     this.flowLocation = ofNullable(location);
   }
 

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.component.location.Location.ERROR_HANDLER;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -178,18 +180,26 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   private void addDefaultErrorHandlerIfRequired() throws InitialisationException {
     MessagingExceptionHandlerAcceptor lastAcceptor = exceptionListeners.get(exceptionListeners.size() - 1);
-    if (!lastAcceptor.acceptsAll() && !matchesAny(lastAcceptor)) {
-      String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
-      if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
-        logger
-            .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
-      }
-      OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
-      acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerLocation().toString());
-      acceptsAllOnErrorPropagate.setExceptionListener(new DefaultExceptionListener());
-      initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
-      this.exceptionListeners.add(acceptsAllOnErrorPropagate);
+    if (lastAcceptor.acceptsAll() || matchesAny(lastAcceptor)) {
+      return;
     }
+
+    String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
+    if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
+      logger
+          .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
+    }
+
+    OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
+    acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerLocation().toString());
+    acceptsAllOnErrorPropagate.setExceptionListener(new DefaultExceptionListener());
+    initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
+    if (this.getLocation() != null) {
+      String location = this.getLocation().getLocation();
+      String containerLocation = location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
+      acceptsAllOnErrorPropagate.setFlowLocation(builderFromStringRepresentation(containerLocation).build());
+    }
+    this.exceptionListeners.add(acceptsAllOnErrorPropagate);
   }
 
   /**
