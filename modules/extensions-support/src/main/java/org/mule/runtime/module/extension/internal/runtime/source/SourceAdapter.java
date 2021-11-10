@@ -126,6 +126,8 @@ public class SourceAdapter implements Lifecycle, Restartable {
   private final Supplier<Object> sourceInvokationTarget;
 
   private ErrorType flowBackPressueErrorType;
+  private ErrorType redeliveryExhaustedErrorType;
+  private ErrorType expressionErrorType;
   private boolean initialised = false;
 
   @Inject
@@ -256,6 +258,8 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
     flowBackPressueErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)
         .orElseThrow(() -> new IllegalStateException("FLOW_BACK_PRESSURE error type not found"));
+    redeliveryExhaustedErrorType = errorTypeRepository.getErrorType(REDELIVERY_EXHAUSTED)
+        .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
 
     initialiseIfNeeded(nonCallbackParameters, true, muleContext);
     initialiseIfNeeded(errorCallbackParameters, true, muleContext);
@@ -335,7 +339,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
           .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
           .orElse(false);
       final boolean isRedeliveryExhaustedError = event.getError()
-          .map(e -> REDELIVERY_EXHAUSTED.getName().equals(e.getErrorType().getIdentifier()))
+          .map(e -> redeliveryExhaustedErrorType.equals(e.getErrorType()))
           .orElse(false);
 
       SourceCallbackExecutor executor;
