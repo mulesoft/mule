@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
@@ -26,7 +27,6 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +36,10 @@ import org.junit.Test;
 public class ThreadLocalTracingServiceTestCase {
 
   @Rule
-  public MockitoRule mockitoRule = MockitoJUnit.rule();
+  public MockitoRule mockitoRule = rule();
 
   private TracingService threadLocalTracingService;
+
   @Mock
   private ExecutionContext executionContext;
 
