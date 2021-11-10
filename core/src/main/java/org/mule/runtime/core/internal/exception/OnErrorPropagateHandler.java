@@ -33,8 +33,6 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
 
   public OnErrorPropagateHandler() {
-    super();
-
     ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
 
