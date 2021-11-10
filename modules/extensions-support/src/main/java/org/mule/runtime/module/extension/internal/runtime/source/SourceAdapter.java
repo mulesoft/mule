@@ -127,7 +127,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
   private ErrorType flowBackPressueErrorType;
   private ErrorType redeliveryExhaustedErrorType;
-  private ErrorType expressionErrorType;
   private boolean initialised = false;
 
   @Inject
