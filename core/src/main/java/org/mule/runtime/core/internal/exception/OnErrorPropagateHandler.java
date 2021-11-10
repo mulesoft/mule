@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 
 /**
@@ -31,12 +32,16 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
+  private final SingleErrorTypeMatcher expressionMatcher;
 
   public OnErrorPropagateHandler() {
     ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
+    ErrorType expressionErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(EXPRESSION)
+        .orElseThrow(() -> new IllegalStateException("EXPRESSION error type not found"));
 
     redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
+    expressionMatcher = new SingleErrorTypeMatcher(expressionErrorType);
   }
 
   @Override
@@ -92,7 +97,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   private boolean isRedeliveryExhausted(Exception exception) {
     if (exception instanceof MessagingException) {
       Optional<Error> error = ((MessagingException) exception).getEvent().getError();
-      return error.map(e -> redeliveryExhaustedMatcher.match(e.getErrorType()))
+      return error.map(e -> redeliveryExhaustedMatcher.match(e.getErrorType()) || expressionMatcher.match(e.getErrorType()))
           .orElse(false);
     }
     return false;

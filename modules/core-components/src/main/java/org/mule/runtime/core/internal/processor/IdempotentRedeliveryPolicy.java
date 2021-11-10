@@ -66,7 +66,7 @@ import reactor.core.publisher.Mono;
 @NoExtend
 public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
-  private static final String EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG =
+  private static final String EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG =
       "The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.";
 
   public static final String SECURE_HASH_EXPR_FORMAT = "" +
@@ -224,11 +224,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       messageId = getIdForEvent(event);
     } catch (ExpressionRuntimeException e) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG, e);
-      } else {
-        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG);
+        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG, e);
       }
-      return null;
+      throw new ExpressionRuntimeException(createStaticMessage(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG), e);
     } catch (Exception ex) {
       exceptionSeen = of(ex);
     }
