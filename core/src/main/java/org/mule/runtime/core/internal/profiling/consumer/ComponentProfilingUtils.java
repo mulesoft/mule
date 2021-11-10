@@ -65,7 +65,8 @@ public class ComponentProfilingUtils {
     eventMap.put(PROCESSING_THREAD_KEY, profilingEventContext.getThreadName());
     eventMap.put(TASK_ID_KEY, profilingEventContext.getTaskId());
     addProfilingEventTypeData(profilingEventType, eventMap);
-    addTracingContextData(profilingEventContext.getTaskTracingContext(), eventMap);
+    profilingEventContext.getTaskTracingContext()
+        .ifPresent(executionContext -> addTracingContextData(executionContext, eventMap));
     return eventMap;
   }
 
@@ -76,7 +77,6 @@ public class ComponentProfilingUtils {
       eventMap.put(RUNTIME_CORE_EVENT_CORRELATION_ID, componentMetadata.getCorrelationId());
       componentMetadata.getComponentLocation().ifPresent(componentLocation -> addLocationData(eventMap, componentLocation));
     });
-
   }
 
   private static void addThreadingData(ComponentThreadingProfilingEventContext profilingEventContext,

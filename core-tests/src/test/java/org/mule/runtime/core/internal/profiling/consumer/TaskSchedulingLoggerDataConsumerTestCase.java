@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.profiling.consumer;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -106,11 +107,11 @@ public class TaskSchedulingLoggerDataConsumerTestCase extends AbstractMuleContex
     when(profilingEventContext.getTriggerTimestamp()).thenReturn(PROFILING_EVENT_TIMESTAMP);
     when(profilingEventContext.getThreadName()).thenReturn((THREAD_NAME));
     when(profilingEventContext.getTaskId()).thenReturn(TASK_ID);
-    when(profilingEventContext.getTaskTracingContext()).thenReturn(new DefaultExecutionContext(
-                                                                                               new DefaultComponentMetadata(CORRELATION_ID,
-                                                                                                                            ARTIFACT_ID,
-                                                                                                                            ARTIFACT_TYPE,
-                                                                                                                            location)));
+    when(profilingEventContext.getTaskTracingContext()).thenReturn(of(new DefaultExecutionContext(
+                                                                                                  new DefaultComponentMetadata(CORRELATION_ID,
+                                                                                                                               ARTIFACT_ID,
+                                                                                                                               ARTIFACT_TYPE,
+                                                                                                                               location))));
   }
 
   private ProfilingService getTestProfilingService() throws MuleException {
