@@ -110,4 +110,11 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     return genericBeanDefinition(beanType);
   }
 
+  protected boolean containsBeanDefinition(String beanName) {
+    return beanDefinitionRegistry.containsBeanDefinition(beanName);
+  }
+
+  protected CustomServiceRegistry getCustomServiceRegistry() {
+    return customServiceRegistry;
+  }
 }

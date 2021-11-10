@@ -163,7 +163,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     initialiseIfNeeded(this, muleContext);
 
     final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext);
+    serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
     SpringRegistry baseSpringRegistry = createBaseSpringRegistry(muleContext, baseMuleArtifactContext);
+    baseSpringRegistry.initialise();
 
     muleArtifactContext = createApplicationContext(muleContext, baseSpringRegistry.lookupObject(FeatureFlaggingService.class));
     muleArtifactContext.setParent(baseMuleArtifactContext);
@@ -192,10 +194,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
 
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
-    final MuleArtifactContext muleArtifactContext =
-        doCreateApplicationContext(muleContext, artifactDeclaration, applicationObjectcontroller, featureFlaggingService);
-    serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
-    return muleArtifactContext;
+    return doCreateApplicationContext(muleContext, artifactDeclaration, applicationObjectcontroller, featureFlaggingService);
   }
 
   private MuleArtifactContext doCreateApplicationContext(MuleContext muleContext,
@@ -391,13 +390,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   private SpringRegistry createBaseSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext)
       throws Exception {
-    SpringRegistry registry;
-
-    registry = new SpringRegistry(applicationContext, muleContext, null,
-                                  ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
-    registry.initialise();
-
-    return registry;
+    return new SpringRegistry(applicationContext, muleContext, null,
+                              ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
   }
 
   private void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception {

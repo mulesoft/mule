@@ -6,13 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
@@ -20,7 +15,16 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -38,7 +42,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -48,13 +52,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 @SmallTest
-public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
+public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestCase {
 
   private final List<Object> startStopOrder = new ArrayList<>();
   private final RecordingTQM rtqm = new RecordingTQM();
@@ -67,6 +72,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws InitialisationException, ConfigurationException {
     Map<String, Object> objects = new HashMap<>();
+    objects.put(FEATURE_FLAGGING_SERVICE_KEY, mock(FeatureFlaggingService.class));
     objects.put(OBJECT_QUEUE_MANAGER, rtqm);
     objects.put(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
     objects.put(INTERCEPTOR_MANAGER_REGISTRY_KEY, mock(InterceptorManager.class));

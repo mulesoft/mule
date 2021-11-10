@@ -14,11 +14,15 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
+import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
@@ -53,6 +57,23 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
         .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
         .build();
     registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
+
+    createCustomServices();
+  }
+
+  private void createCustomServices() {
+    final Map<String, CustomService> customServices = getCustomServiceRegistry().getCustomServices();
+    for (String serviceName : customServices.keySet()) {
+
+      if (containsBeanDefinition(serviceName)) {
+        throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
+      }
+
+      final CustomService customService = customServices.get(serviceName);
+      final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
+
+      registerBeanDefinition(serviceName, beanDefinition);
+    }
   }
 
 }

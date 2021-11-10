@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.Thread.currentThread;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL;
@@ -25,9 +20,13 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-import org.junit.BeforeClass;
+import static java.lang.Thread.currentThread;
+
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
@@ -36,11 +35,15 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
 
@@ -122,9 +125,10 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Story(FEATURE_FLAGGING)
   @Issue("MULE-19402")
   public void buildSettingLegacyFeatureFlag() throws Exception {
-    ArtifactContext artifactContext =
-        newBuilder(new TestServicesConfigurationBuilder()).setExecutionClassloader(currentThread().getContextClassLoader())
-            .setClassLoaderRepository(mock(ClassLoaderRepository.class)).build();
+    ArtifactContext artifactContext = newBuilder(new TestServicesConfigurationBuilder())
+        .setExecutionClassloader(currentThread().getContextClassLoader())
+        .setClassLoaderRepository(mock(ClassLoaderRepository.class))
+        .build();
     FeatureFlaggingService featureFlaggingService = (FeatureFlaggingService) artifactContext.getRegistry()
         .lookupByName(FEATURE_FLAGGING_SERVICE_KEY).get();
     assertThat(featureFlaggingService.isEnabled(ALWAYS_ON_FEATURE), is(true));
