@@ -11,6 +11,8 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import static org.springframework.beans.factory.BeanFactoryUtils.beansOfTypeIncludingAncestors;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
@@ -28,7 +30,6 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.util.ClassUtils;
@@ -138,7 +139,7 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
   public void autowireBean(Object existingBean) {
     // Use non-singleton bean definition, to avoid registering bean as dependent bean.
     RootBeanDefinition bd = new RootBeanDefinition(ClassUtils.getUserClass(existingBean));
-    bd.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+    bd.setScope(SCOPE_PROTOTYPE);
     // Same as superclass, but not calling ClassUtils.isCacheSafe
     // bd.allowCaching = ClassUtils.isCacheSafe(bd.getBeanClass(), getBeanClassLoader());
     BeanWrapper bw = new BeanWrapperImpl(existingBean);
@@ -150,6 +151,12 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
                                                                     boolean allowEagerInit)
       throws BeansException {
     return super.getBeansOfType(type, includeNonSingletons, allowEagerInit);
+  }
+
+  public <T> Map<String, T> getBeansOfTypeWithObjectProviderObjectsIncludingAncestors(Class<T> type, boolean includeNonSingletons,
+                                                                                      boolean allowEagerInit)
+      throws BeansException {
+    return beansOfTypeIncludingAncestors(this, type, includeNonSingletons, allowEagerInit);
   }
 
   private <T> Optional<T> doWithFallbackInObjectProvider(CheckedSupplier<T> thisSupplier,

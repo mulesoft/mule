@@ -53,10 +53,13 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   }
 
   protected void registerPhases(Registry registry) {
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(),
+                  new EmptyLifecycleCallback<>());
+    registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(),
+                  new OnlyChildSpringContextLifecycleCallback<>(this));
+
     final RegistryLifecycleCallback<Object> callback = new RegistryLifecycleCallback<>(this);
 
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), new EmptyLifecycleCallback<>());
-    registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), callback);
     registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
     registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
     registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), callback);
@@ -187,7 +190,19 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     return sorter.getSortedObjects();
   }
 
+  protected List<Object> getObjectsForPhaseIncludingAncestors(LifecyclePhase phase) {
+    LifecycleObjectSorter sorter = phase.newLifecycleObjectSorter();
+
+    lookupObjectsForLifecycleIncludingAncestors().forEach((key, value) -> sorter.addObject(key, value));
+    return sorter.getSortedObjects();
+  }
+
   protected Map<String, Object> lookupObjectsForLifecycle() {
+    return getLifecycleObject().lookupByType(Object.class);
+  }
+
+
+  protected Map<String, Object> lookupObjectsForLifecycleIncludingAncestors() {
     return getLifecycleObject().lookupByType(Object.class);
   }
 }
