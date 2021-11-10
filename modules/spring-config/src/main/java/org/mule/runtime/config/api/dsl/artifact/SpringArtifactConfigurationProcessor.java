@@ -6,21 +6,11 @@
  */
 package org.mule.runtime.config.api.dsl.artifact;
 
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-
-import org.mule.runtime.config.internal.BaseMuleArtifactContext;
-import org.mule.runtime.config.internal.SpringRegistry;
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
-import org.mule.runtime.deployment.model.internal.artifact.ImmutableArtifactContext;
-
-import org.springframework.context.ApplicationContext;
 
 /**
  * Spring implementation of {@link ArtifactConfigurationProcessor} that parses the XML configuration files and generates the
@@ -35,22 +25,6 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
       throws ConfigurationException {
     final String[] configResources = artifactContextConfiguration.getConfigResources();
 
-    MuleContext muleContext = artifactContextConfiguration.getMuleContext();
-    if (isEmpty(configResources)) {
-      final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext);
-
-      try {
-        SpringRegistry baseSpringRegistry = createBaseSpringRegistry(muleContext, baseMuleArtifactContext);
-        ((DefaultMuleContext) muleContext).setRegistry(baseSpringRegistry);
-      } catch (Exception e) {
-        throw new ConfigurationException(e);
-      }
-
-      ((DefaultMuleContext) muleContext)
-          .setLifecycleStrategy(new NullDomainMuleContextLifecycleStrategy());
-      return new ImmutableArtifactContext(muleContext);
-    }
-
     SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
         new SpringXmlConfigurationBuilder(configResources,
                                           artifactContextConfiguration.getArtifactDeclaration(),
@@ -64,14 +38,7 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
                                                                                    parentContext.getArtifactAst()));
     artifactContextConfiguration.getServiceConfigurators().stream()
         .forEach(springXmlConfigurationBuilder::addServiceConfigurator);
-    springXmlConfigurationBuilder.configure(muleContext);
+    springXmlConfigurationBuilder.configure(artifactContextConfiguration.getMuleContext());
     return springXmlConfigurationBuilder.createArtifactContext();
   }
-
-  private SpringRegistry createBaseSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext)
-      throws Exception {
-    return new SpringRegistry(applicationContext, muleContext, null,
-                              ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
-  }
-
 }

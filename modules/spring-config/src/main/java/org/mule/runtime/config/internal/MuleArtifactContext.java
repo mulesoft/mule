@@ -191,7 +191,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     // TODO (MULE-19608) remove this and make it into a component building definition
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
-                                  componentBuildingDefinitionRegistryFactory.create(getExtensions()));
+                                  componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies()));
 
     this.applicationModel = artifactAst;
 
@@ -270,7 +270,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   public void initialize() {
-    applicationModel = prepareAstForRuntime(applicationModel, getExtensions());
+    applicationModel = prepareAstForRuntime(applicationModel, applicationModel.dependencies());
   }
 
   @Override

@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
+import static org.mule.runtime.config.internal.SpringRegistry.SPRING_APPLICATION_CONTEXT;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
@@ -455,7 +456,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   @Override
   public void setParentContext(MuleContext domainContext, ArtifactAst parentAst) {
-    this.parentContext = ((MuleContextWithRegistry) domainContext).getRegistry().get("springApplicationContext");
+    this.parentContext = ((MuleContextWithRegistry) domainContext).getRegistry().get(SPRING_APPLICATION_CONTEXT);
     this.parentArtifactAst = parentAst;
   }
 
