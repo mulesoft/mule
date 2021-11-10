@@ -196,7 +196,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
     OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
     acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerLocation().toString());
-    acceptsAllOnErrorPropagate.setExceptionListener(new DefaultExceptionListener());
+    acceptsAllOnErrorPropagate.setNotificationFirer(notificationDispatcher);
     initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
     if (this.getLocation() != null) {
       String location = this.getLocation().getLocation();
