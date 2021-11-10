@@ -188,7 +188,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
     if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
       logger
-              .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
+          .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
     }
 
     OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
