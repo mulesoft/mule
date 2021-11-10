@@ -10,6 +10,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 
 /**
@@ -27,6 +29,17 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
  * @since 4.0
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
+
+  private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
+
+  public OnErrorPropagateHandler() {
+    super();
+
+    ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
+        .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
+
+    redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
+  }
 
   @Override
   public boolean acceptsAll() {
@@ -81,10 +94,8 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   private boolean isRedeliveryExhausted(Exception exception) {
     if (exception instanceof MessagingException) {
       Optional<Error> error = ((MessagingException) exception).getEvent().getError();
-      if (error.isPresent()) {
-        String errorIdentifier = error.get().getErrorType().getIdentifier();
-        return errorIdentifier.equals(REDELIVERY_EXHAUSTED.getName());
-      }
+      return error.map(e -> redeliveryExhaustedMatcher.match(e.getErrorType()))
+          .orElse(false);
     }
     return false;
   }
