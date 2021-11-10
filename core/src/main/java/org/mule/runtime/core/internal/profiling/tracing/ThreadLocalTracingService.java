@@ -9,6 +9,9 @@ package org.mule.runtime.core.internal.profiling.tracing;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 
+/**
+ * {@link TracingService} implementation that stores the tracing data as {@link ThreadLocal} values.
+ */
 public class ThreadLocalTracingService implements TracingService {
 
   private static final ThreadLocal<ExecutionContext> currentExecutionContext = new ThreadLocal<>();

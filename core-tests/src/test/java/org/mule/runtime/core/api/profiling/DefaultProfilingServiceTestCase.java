@@ -47,6 +47,7 @@ import org.mule.runtime.core.internal.profiling.DefaultProfilingNotificationList
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducerDelegate;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.TaskSchedulingLoggerDataConsumer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -137,6 +138,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     assertThat(profilingDataConsumers, hasSize(4));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentProcessingStrategyDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentThreadingDataConsumer.class))));
+    assertThat(profilingDataConsumers, hasItem(is(instanceOf(TaskSchedulingLoggerDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(testProfilingDataConsumer));
   }
 
