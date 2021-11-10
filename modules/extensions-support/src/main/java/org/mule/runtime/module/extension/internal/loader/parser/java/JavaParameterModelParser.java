@@ -205,7 +205,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public boolean isConfigOverride() {
     return parameter.isAnnotatedWith(ConfigOverride.class) ||
-            parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.ConfigOverride.class);
+        parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.ConfigOverride.class);
   }
 
   @Override
