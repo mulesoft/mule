@@ -6,14 +6,11 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-<<<<<<< HEAD
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-=======
 import static org.mule.runtime.api.component.location.Location.ERROR_HANDLER;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
->>>>>>> 8e36d7b2c1c... MULE-19919: Implicit on-error-propagate is not having the flowLocation, making an incorrect try scope rollback tx (#10953)
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
