@@ -209,15 +209,15 @@
         </some:one-required-aliased-parameter-resolver-operation>
     </flow>
 
-    <flow name="whitespaceValueForParameter">
+    <flow name="value">
         <some:say-hi person="   Max Mule   "/>
     </flow>
 
-    <flow name="whitespaceValueForParameterExpression">
+    <flow name="expression">
         <some:say-hi person="#['   Max Mule   ']"/>
     </flow>
 
-    <flow name="whitespaceValueForContentParameter">
+    <flow name="content">
         <some:say-hi-content>
             <some:person>
                 Max Mule
@@ -225,7 +225,7 @@
         </some:say-hi-content>
     </flow>
 
-    <flow name="whitespaceValueForContentParameterExpression">
+    <flow name="contentExpression">
         <some:say-hi-content>
             <some:person>
                 #['   Max Mule   ']
@@ -233,12 +233,36 @@
         </some:say-hi-content>
     </flow>
 
-    <flow name="whitespaceValueForContentParameterCDATA">
+    <flow name="contentCDATA">
         <some:say-hi-content>
             <some:person>
                 <![CDATA[   Max Mule   ]]>
             </some:person>
         </some:say-hi-content>
+    </flow>
+
+    <flow name="text">
+        <some:say-hi-text>
+            <some:persona>
+                Max Mule
+            </some:persona>
+        </some:say-hi-text>
+    </flow>
+
+    <flow name="textExpression">
+        <some:say-hi-text>
+            <some:persona>
+                #['   Max Mule   ']
+            </some:persona>
+        </some:say-hi-text>
+    </flow>
+
+    <flow name="textCDATA">
+        <some:say-hi-text>
+            <some:persona>
+                <![CDATA[   Max Mule   ]]>
+            </some:persona>
+        </some:say-hi-text>
     </flow>
 
 </mule>
