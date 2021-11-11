@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -59,7 +60,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       artifact.install();
       doInit(artifact);
       addFlowStoppedListeners(artifact);
-      if (shouldStartArtifact(artifact)) {
+      if (startArtifact && shouldStartArtifact(artifact)) {
         // The purpose of dispatching this to a separate thread is to have a clean call stack when starting the app.
         // This is needed in order to prevent an StackOverflowError when starting apps with really long flows.
         final Future<?> startTask = artifactStartExecutor.get().submit(() -> {
@@ -139,6 +140,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     try {
       doNotPersistArtifactStop(artifact);
       tryToStopArtifact(artifact);
+      deletePersistence(artifact);
       tryToDisposeArtifact(artifact);
     } catch (Throwable t) {
       if (t instanceof DeploymentException) {
@@ -174,7 +176,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   private Boolean shouldStartArtifact(T artifact) {
     Properties deploymentProperties = null;
     try {
-      deploymentProperties = resolveDeploymentProperties(artifact.getArtifactName(), empty());
+      deploymentProperties = resolveArtifactStatusDeploymentProperties(artifact.getArtifactName(), empty());
     } catch (IOException e) {
       logger.error("Failed to load deployment property for artifact "
           + artifact.getArtifactName(), e);
@@ -189,6 +191,14 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
           artifact.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
       optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
+    }
+  }
+
+  private void deletePersistence(T artifact) {
+    if (artifact.getArtifactContext() != null && artifact.getArtifactContext().getRegistry() != null) {
+      Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
+          artifact.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
+      optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::deletePersistenceProperties);
     }
   }
 

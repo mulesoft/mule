@@ -32,6 +32,8 @@ public class DeploymentPropertiesUtils {
 
   private static final String DEPLOYMENT_PROPERTIES_DIRECTORY = "deployment-properties";
 
+  private static final String ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME = "artifact.status.deployment.properties";
+
   /**
    * This method resolves the deploymentProperties for a new deploy/redeploy considering the new deployment properties passed by
    * the user as parameter and the deployment properties persisted in a previous deploy. In case no new deployment properties are
@@ -147,5 +149,19 @@ public class DeploymentPropertiesUtils {
   public static Properties resolveFlowDeploymentProperties(String appName, Optional<Properties> deploymentProperties)
       throws IOException {
     return resolveDeploymentProperties(appName, deploymentProperties, FLOWS_DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  /**
+   * This method resolves the statusProperties for the status (started, stopped) of a certain artifact. There is one
+   * artifact.status.deployment.properties file for each artifact (domain/app).
+   *
+   * @param artifactName     name of the artifact.
+   * @param statusProperties status deployment properties set in the new deploy/redeploy as parameters.
+   * @return deployment properties
+   * @throws IOException
+   */
+  public static Properties resolveArtifactStatusDeploymentProperties(String artifactName, Optional<Properties> statusProperties)
+      throws IOException {
+    return resolveDeploymentProperties(artifactName, statusProperties, ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME);
   }
 }
