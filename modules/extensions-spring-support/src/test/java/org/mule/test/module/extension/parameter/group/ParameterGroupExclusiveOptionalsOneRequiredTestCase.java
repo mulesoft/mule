@@ -21,32 +21,50 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
   }
 
   @Test
-  public void whitespacesAreTrimmedForParameterValue() throws Exception {
-    Object value = flowRunner("whitespaceValueForParameter").run().getMessage().getPayload().getValue();
-    assertThat(value, is("Hello Max Mule!"));
-  }
-
-  @Test
-  public void whitespacesAreTrimmedForParameterValueExpression() throws Exception {
-    Object value = flowRunner("whitespaceValueForParameterExpression").run().getMessage().getPayload().getValue();
+  public void whitespacesAreNotTrimmedForParameterValue() throws Exception {
+    Object value = flowRunner("value").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
   }
 
   @Test
-  public void whitespacesAreTrimmedForContentParameterValue() throws Exception {
-    Object value = flowRunner("whitespaceValueForContentParameter").run().getMessage().getPayload().getValue();
-    assertThat(value, is("Hello Max Mule!"));
-  }
-
-  @Test
-  public void whitespacesAreTrimmedForContentParameterValueExpression() throws Exception {
-    Object value = flowRunner("whitespaceValueForContentParameterExpression").run().getMessage().getPayload().getValue();
+  public void whitespacesAreNotTrimmedForParameterValueExpression() throws Exception {
+    Object value = flowRunner("expression").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
   }
 
   @Test
-  public void whitespacesAreTrimmedForContentParameterValueCDATA() throws Exception {
-    Object value = flowRunner("whitespaceValueForContentParameterCDATA").run().getMessage().getPayload().getValue();
+  public void whitespacesAreNotTrimmedForContentParameterValue() throws Exception {
+    Object value = flowRunner("content").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello \n                Max Mule\n            !"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForContentParameterValueExpression() throws Exception {
+    Object value = flowRunner("contentExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForContentParameterValueCDATA() throws Exception {
+    Object value = flowRunner("contentCDATA").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedFortextParameterValue() throws Exception {
+    Object value = flowRunner("text").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello \n                Max Mule\n            !"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForTextParameterValueExpression() throws Exception {
+    Object value = flowRunner("textExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForTextParameterValueCDATA() throws Exception {
+    Object value = flowRunner("textCDATA").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
   }
 }
