@@ -91,6 +91,10 @@ public class SystemUtils {
     return JAVA_VM_VENDOR.toLowerCase().contains("adoptopenjdk") || JAVA_VENDOR.toLowerCase().contains("adoptopenjdk");
   }
 
+  public static boolean isAdoptiumTemurinJDK() {
+    return JAVA_VM_VENDOR.toLowerCase().contains("temurin") || JAVA_VENDOR.toLowerCase().contains("temurin");
+  }
+
   // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
 
   private static CommandLine parseCommandLine(String args[], String opts[][]) throws MuleException {
