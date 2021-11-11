@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.exception;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -14,13 +16,13 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -29,10 +31,16 @@ import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactor
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
-  private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
 
-  public OnErrorPropagateHandler() {
-    ErrorType redeliveryExhaustedErrorType = createDefaultErrorTypeRepository().getErrorType(REDELIVERY_EXHAUSTED)
+  private SingleErrorTypeMatcher redeliveryExhaustedMatcher;
+
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    super.doInitialise();
+
+    ErrorType redeliveryExhaustedErrorType = errorTypeRepository.getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
 
     redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
