@@ -9,6 +9,7 @@ package org.mule.util;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang.SystemUtils.JAVA_VENDOR;
 import static org.mule.util.SystemUtils.isAdoptOpenJDK;
+import static org.mule.util.SystemUtils.isAdoptiumTemurinJDK;
 import static org.mule.util.SystemUtils.isAppleJDK;
 import static org.mule.util.SystemUtils.isIbmJDK;
 import static org.mule.util.SystemUtils.isOpenJDK;
@@ -266,7 +267,8 @@ public class JdkVersionUtils
         
     public static boolean isSupportedJdkVendor()
     {
-    	return isSunJDK() || isAppleJDK() || isIbmJDK() || isAdoptOpenJDK() || isOpenJDK();
+    	return isSunJDK() || isAppleJDK() || isIbmJDK() || isAdoptOpenJDK()
+				|| isOpenJDK() || isAdoptiumTemurinJDK();
     }
     
     public static String getRecommendedJdks()
