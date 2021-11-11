@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
@@ -47,10 +48,10 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
     registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, ((MuleContextWithRegistry) muleContext).getRegistry()
         .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
 
-    createCustomServices();
+    createRuntimeServices();
   }
 
-  private void createCustomServices() {
+  private void createRuntimeServices() {
     final Map<String, CustomService> customServices = getCustomServiceRegistry().getCustomServices();
     for (String serviceName : customServices.keySet()) {
 
@@ -59,9 +60,12 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
       }
 
       final CustomService customService = customServices.get(serviceName);
-      final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
+      if (customService.getServiceImpl().map(impl -> impl instanceof Service).orElse(false)
+          || customService.getServiceClass().map(cls -> Service.class.isAssignableFrom(cls)).orElse(false)) {
+        final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
 
-      registerBeanDefinition(serviceName, beanDefinition);
+        registerBeanDefinition(serviceName, beanDefinition);
+      }
     }
   }
 

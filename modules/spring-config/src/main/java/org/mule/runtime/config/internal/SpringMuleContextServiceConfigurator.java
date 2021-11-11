@@ -104,6 +104,7 @@ import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
+import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.connection.DelegateConnectionManagerAdapter;
@@ -141,6 +142,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -294,6 +296,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     createLocalObjectStoreBeanDefinitions();
     createLocalLockFactoryBeanDefinitions();
     createQueueManagerBeanDefinitions();
+    createCustomServices();
     absorbOriginalRegistry();
   }
 
@@ -301,6 +304,25 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     new SpiServiceRegistry()
         .lookupProviders(ServiceConfigurator.class, Service.class.getClassLoader())
         .forEach(customizer -> customizer.configure(customServiceRegistry));
+  }
+
+  private void createCustomServices() {
+    final Map<String, CustomService> customServices = customServiceRegistry.getCustomServices();
+    for (String serviceName : customServices.keySet()) {
+
+      if (beanDefinitionRegistry.containsBeanDefinition(serviceName)) {
+        throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
+      }
+
+      final CustomService customService = customServices.get(serviceName);
+
+      if (!customService.getServiceImpl().map(impl -> impl instanceof Service).orElse(false)
+          && !customService.getServiceClass().map(cls -> Service.class.isAssignableFrom(cls)).orElse(false)) {
+        final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
+
+        registerBeanDefinition(serviceName, beanDefinition);
+      }
+    }
   }
 
   private void createQueueManagerBeanDefinitions() {
