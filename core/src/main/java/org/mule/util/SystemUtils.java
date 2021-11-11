@@ -170,6 +170,10 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     public static boolean isOpenJDK() {
         return JAVA_VM_VENDOR.toLowerCase().contains("openjdk");
     }
+
+    public static boolean isAdoptiumTemurinJDK() {
+        return JAVA_VM_VENDOR.toLowerCase().contains("temurin");
+    }
     
     public static final boolean IS_JAVA_1_7 = (JAVA_VERSION_TRIMMED != null) 
     		&& JAVA_VERSION_TRIMMED.startsWith("1.7");
