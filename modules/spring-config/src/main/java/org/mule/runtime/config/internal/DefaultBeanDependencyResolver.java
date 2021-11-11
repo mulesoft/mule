@@ -100,15 +100,17 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
    */
   private void addConfigurationDependencies(String key, Set<String> processedKeys,
                                             DependencyNode node) {
-    if (configurationDependencyResolver != null) {
-      for (String dependency : configurationDependencyResolver.resolveComponentDependencies(key)) {
-        try {
-          if (springRegistry.isSingleton(dependency)) {
-            addDependency(node, dependency, springRegistry.get(dependency), processedKeys);
-          }
-        } catch (NoSuchBeanDefinitionException e) {
-          // we're starting in lazy mode... disregard.
+    if (configurationDependencyResolver == null) {
+      return;
+    }
+
+    for (String dependency : configurationDependencyResolver.resolveComponentDependencies(key)) {
+      try {
+        if (springRegistry.isSingleton(dependency)) {
+          addDependency(node, dependency, springRegistry.get(dependency), processedKeys);
         }
+      } catch (NoSuchBeanDefinitionException e) {
+        // we're starting in lazy mode... disregard.
       }
     }
   }

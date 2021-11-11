@@ -156,9 +156,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 /**
  * This class configured all the services available in a {@code MuleContext}.
  * <p>
- * There's a predefined set of services plus a configurable set of services provided by
- * {@code MuleContext#getCustomizationService}.
- * <p>
  * This class takes cares of registering bean definitions for each of the provided services so dependency injection can be
  * properly done through the use of {@link Inject}.
  *

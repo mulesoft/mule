@@ -22,7 +22,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
- * This class configured all the services available in a {@code MuleContext} that are independent of the artifact config.
+ * This class configures the basic services available in a {@code MuleContext} that are independent of the artifact config.
  * <p>
  * There's a predefined set of services plus a configurable set of services provided by
  * {@code MuleContext#getCustomizationService}.
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  * This class takes cares of registering bean definitions for each of the provided services so dependency injection can be
  * properly done through the use of {@link Inject}.
  *
- * @since 4.0
+ * @since 4.5
  */
 class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
 
