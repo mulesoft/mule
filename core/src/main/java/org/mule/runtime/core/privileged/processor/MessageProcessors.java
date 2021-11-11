@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
@@ -687,7 +688,9 @@ public class MessageProcessors {
         // This filter is consistent with the types that implement ProcessingStrategySupplier
         .filter(id -> id.getType().equals(FLOW)
             // a top level router is a policy...
-            || id.getType().equals(ROUTER))
+            || id.getType().equals(ROUTER)
+            // a top level scope should only be a subflow
+            || id.getType().equals(SCOPE))
         .flatMap(id -> getProcessingStrategy(locator, component.getRootContainerLocation()));
   }
 
