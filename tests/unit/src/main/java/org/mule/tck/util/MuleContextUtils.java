@@ -6,6 +6,7 @@
  */
 package org.mule.tck.util;
 
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -196,6 +197,7 @@ public class MuleContextUtils {
           mock(ComponentInitialStateManager.class, withSettings().lenient());
       when(componentInitialStateManager.mustStartMessageSource(any())).thenReturn(true);
       when(registry.lookupObject(ComponentInitialStateManager.SERVICE_ID)).thenReturn(componentInitialStateManager);
+      when(registry.lookupObject(FEATURE_FLAGGING_SERVICE_KEY)).thenReturn(mock(FeatureFlaggingService.class));
       doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);
       doReturn(mock(NotificationDispatcher.class)).when(registry).lookupObject(NotificationDispatcher.class);
       doReturn(mock(InterceptorManager.class)).when(registry).lookupObject(InterceptorManager.class);

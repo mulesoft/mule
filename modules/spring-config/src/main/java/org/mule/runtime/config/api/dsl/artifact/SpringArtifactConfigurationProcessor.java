@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.config.api.dsl.artifact;
 
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
+import org.mule.runtime.deployment.model.internal.artifact.ImmutableArtifactContext;
 
 /**
  * Spring implementation of {@link ArtifactConfigurationProcessor} that parses the XML configuration files and generates the
@@ -24,6 +29,12 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
   public ArtifactContext createArtifactContext(ArtifactContextConfiguration artifactContextConfiguration)
       throws ConfigurationException {
     final String[] configResources = artifactContextConfiguration.getConfigResources();
+
+    if (isEmpty(configResources)) {
+      ((DefaultMuleContext) artifactContextConfiguration.getMuleContext())
+          .setLifecycleStrategy(new NullDomainMuleContextLifecycleStrategy());
+      return new ImmutableArtifactContext(artifactContextConfiguration.getMuleContext());
+    }
 
     SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
         new SpringXmlConfigurationBuilder(configResources,

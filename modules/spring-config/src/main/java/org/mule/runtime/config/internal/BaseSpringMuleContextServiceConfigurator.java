@@ -7,16 +7,12 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
-import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.FeatureContext;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
-import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import java.util.Map;
 
@@ -48,15 +44,8 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
   }
 
   void createArtifactServices() {
-    // Initial feature flagging service setup
-    FeatureFlaggingRegistry ffRegistry = getInstance();
-    FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
-        .withContext(muleContext)
-        .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null), muleContext.getId()))
-        .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
-        .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
-        .build();
-    registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
+    registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, ((MuleContextWithRegistry) muleContext).getRegistry()
+        .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
 
     createCustomServices();
   }

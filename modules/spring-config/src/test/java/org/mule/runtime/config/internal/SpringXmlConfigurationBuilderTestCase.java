@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import static java.util.Optional.of;
+
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -15,9 +21,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -25,10 +28,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,14 +41,15 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 
-import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-public class SpringXmlConfigurationBuilderTestCase {
+import io.qameta.allure.Issue;
+
+public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase {
 
   @Rule
   public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -67,9 +71,9 @@ public class SpringXmlConfigurationBuilderTestCase {
     muleContext = mockContextWithServices();
     muleContext.getInjector().inject(this);
     configurationBuilderWithUsedInvalidSchema =
-        new SpringXmlConfigurationBuilder(new String[] {"invalid-schema.xml"}, new HashMap<>(), ArtifactType.APP, false, false);
+        new SpringXmlConfigurationBuilder(new String[] {"invalid-schema.xml"}, new HashMap<>(), APP, false, false);
     configurationBuilderWitUnusedInvalidSchema =
-        new SpringXmlConfigurationBuilder(new String[] {"invalid-schema-not-used.xml"}, new HashMap<>(), ArtifactType.APP, false,
+        new SpringXmlConfigurationBuilder(new String[] {"invalid-schema-not-used.xml"}, new HashMap<>(), APP, false,
                                           false);
   }
 
@@ -127,7 +131,7 @@ public class SpringXmlConfigurationBuilderTestCase {
   private SpringXmlConfigurationBuilder xmlConfigurationBuilderRelativeToPath(File basePath, String[] resources)
       throws IOException {
     return withContextClassLoader(new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null),
-                                  () -> new SpringXmlConfigurationBuilder(resources, new HashMap<>(), ArtifactType.APP, false,
+                                  () -> new SpringXmlConfigurationBuilder(resources, new HashMap<>(), APP, false,
                                                                           false));
   }
 
