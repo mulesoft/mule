@@ -6,13 +6,10 @@
  */
 package org.mule.runtime.config.internal;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
-
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.springframework.beans.factory.BeanFactoryUtils.beansOfTypeIncludingAncestors;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -38,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -325,7 +323,7 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
 
   protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit) {
     try {
-      Map<String, T> beans = beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
+      Map<String, T> beans = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
       if (nonSingletons && eagerInit) {
         beans.forEach((key, value) -> applyLifecycleIfPrototype(value, key, true));
       }
@@ -349,36 +347,14 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
     try {
       Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationContext.getAutowireCapableBeanFactory())
           .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
-
-      return internalLookupByTypeWithObjectProvidersPrototypeLifecycle(beans, nonSingletons, eagerInit);
-    } catch (FatalBeanException fbex) {
-      // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
-      String message = format("Failed to lookup beans of type %s from the Spring registry", type);
-      throw new MuleRuntimeException(createStaticMessage(message), fbex);
-    }
-  }
-
-  protected <T> Map<String, T> internalLookupByTypeWithObjectProvidersIncludingAncestors(Class<T> type, boolean nonSingletons,
-                                                                                         boolean eagerInit) {
-    try {
-      Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationContext.getAutowireCapableBeanFactory())
-          .getBeansOfTypeWithObjectProviderObjectsIncludingAncestors(type, nonSingletons, eagerInit);
-
-      return internalLookupByTypeWithObjectProvidersPrototypeLifecycle(beans, nonSingletons, eagerInit);
-    } catch (FatalBeanException fbex) {
-      // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
-      String message = format("Failed to lookup beans of type %s from the Spring registry", type);
-      throw new MuleRuntimeException(createStaticMessage(message), fbex);
-    }
-  }
-
-  private <T> Map<String, T> internalLookupByTypeWithObjectProvidersPrototypeLifecycle(Map<String, T> beans,
-                                                                                       boolean nonSingletons, boolean eagerInit) {
-    try {
       if (nonSingletons && eagerInit) {
         beans.forEach((key, value) -> applyLifecycleIfPrototype(value, key, true));
       }
       return beans;
+    } catch (FatalBeanException fbex) {
+      // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
+      String message = format("Failed to lookup beans of type %s from the Spring registry", type);
+      throw new MuleRuntimeException(createStaticMessage(message), fbex);
     } catch (Exception e) {
       if (logger.isTraceEnabled()) {
         logger.trace(e.getMessage(), e);
@@ -392,10 +368,6 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
   // TODO(pablo.kraan): MULE-12609 - making public to be able to use it from a different package
   public <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
     return internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false);
-  }
-
-  public <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
-    return internalLookupByTypeWithObjectProvidersIncludingAncestors(type, false, false);
   }
 
   // TODO(pablo.kraan): MULE-12609 - making public to be able to use it from a different package

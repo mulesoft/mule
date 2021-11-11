@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
-import org.mule.runtime.core.internal.lifecycle.OnlyChildSpringContextLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
@@ -59,13 +58,10 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   @Override
   protected void registerPhases(Registry registry) {
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(),
-                  new EmptyLifecycleCallback<>());
-    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(),
-                  new OnlyChildSpringContextLifecycleCallback<>(this));
+    final RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
 
-    final RegistryLifecycleCallback<Registry> callback = new RegistryLifecycleCallback<>(this);
-
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), new EmptyLifecycleCallback<>());
+    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), callback);
     registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
     registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
     registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase(), callback);
@@ -74,11 +70,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   @Override
   protected Map<String, Object> lookupObjectsForLifecycle() {
     return getSpringRegistry().lookupEntriesForLifecycle(Object.class);
-  }
-
-  @Override
-  protected Map<String, Object> lookupObjectsForLifecycleIncludingAncestors() {
-    return getSpringRegistry().lookupEntriesForLifecycleIncludingAncestors(Object.class);
   }
 
   // ///////////////////////////////////////////////////////////////////////////////////
