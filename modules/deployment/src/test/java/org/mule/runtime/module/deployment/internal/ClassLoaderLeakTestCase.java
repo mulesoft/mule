@@ -157,7 +157,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
       return true;
     }));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT * 1000, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       System.gc();
       assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
       return true;

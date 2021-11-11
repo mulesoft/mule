@@ -73,6 +73,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     }
 
     doApplyLifecycle(phase, new HashSet<>(), registryLifecycleManager.getObjectsForPhase(phase));
+
     interceptor.onPhaseCompleted(phase);
   }
 
