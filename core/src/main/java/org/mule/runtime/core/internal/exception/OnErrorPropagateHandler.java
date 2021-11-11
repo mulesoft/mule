@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -31,7 +32,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
 
   public OnErrorPropagateHandler() {
-    ErrorType redeliveryExhaustedErrorType = muleContext.getErrorTypeRepository().getErrorType(REDELIVERY_EXHAUSTED)
+    ErrorType redeliveryExhaustedErrorType = createDefaultErrorTypeRepository().getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
 
     redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
