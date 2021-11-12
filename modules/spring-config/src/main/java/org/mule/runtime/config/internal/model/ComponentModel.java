@@ -29,17 +29,12 @@ import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.cr
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 import static org.mule.runtime.core.api.util.StringUtils.trim;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.*;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
-import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.MetadataFormat;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.SimpleType;
+import org.mule.metadata.api.model.*;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -68,14 +63,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -411,6 +399,29 @@ public abstract class ComponentModel {
                                       Multimap<ComponentIdentifier, ComponentModel> nestedComponents,
                                       ExtensionModelHelper extensionModelHelper,
                                       ParameterizedModel model, Predicate<ParameterModel> parameterModelFilter) {
+
+    componentModel.getParent().getInnerComponents().stream()
+        .filter(innerComponentModel -> innerComponentModel.getIdentifier().getName().equals("redelivery-policy")).findAny()
+        .ifPresent(redeliveryModel -> {
+          model.getAllParameterModels().stream().filter(parameterModel -> parameterModel.getName().equals("redeliveryPolicy"))
+              .findAny().ifPresent(
+                                   redeliveryComponentModel -> {
+                                     nestedComponents.put(redeliveryModel.getIdentifier(), redeliveryModel);
+
+                                     redeliveryComponentModel.getType().accept(new MetadataTypeVisitor() {
+
+                                       @Override
+                                       public void visitObject(ObjectType objectType) {
+                                         enrichComponentModels(componentModel, nestedComponents,
+                                                               extensionModelHelper.resolveDslElementModel(objectType,
+                                                                                                           CORE_PREFIX),
+                                                               redeliveryComponentModel, extensionModelHelper);
+                                       }
+                                     });
+                                   });
+        });
+
+
     childrenComponentModels
         .forEach(childComp -> {
           extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
