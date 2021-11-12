@@ -121,6 +121,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.sdk.api.annotation.param.NullSafe;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.sdk.api.runtime.parameter.ParameterResolver;
@@ -1049,6 +1050,16 @@ public final class IntrospectionUtils {
    */
   public static boolean isConfigOverride(Field field) {
     return JavaParserUtils.isConfigOverride(field);
+  }
+
+  /**
+   * @param field a field
+   * @return {@link NullSafe#defaultImplementingType()} {@link Optional} or
+   *         {@link org.mule.runtime.extension.api.annotation.param.NullSafe#defaultImplementingType()} {@link Optional} in case
+   *         the given {@link Field field} is annotated.
+   */
+  public static Optional<Class<?>> getNullSafeDefaultImplementedType(Field field) {
+    return JavaParserUtils.getNullSafeDefaultImplementedType(field);
   }
 
   private static List<Class<?>> getDescendingHierarchy(Class<?> type) {
