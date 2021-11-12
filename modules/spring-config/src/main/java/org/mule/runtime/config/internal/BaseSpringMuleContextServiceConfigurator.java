@@ -60,6 +60,7 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
       }
 
       final CustomService customService = customServices.get(serviceName);
+      // TODO MULE-19927 get these form a more specific place and avoid this filter
       if (customService.getServiceImpl().map(impl -> impl instanceof Service).orElse(false)
           || customService.getServiceClass().map(cls -> Service.class.isAssignableFrom(cls)).orElse(false)) {
         final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);

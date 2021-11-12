@@ -26,7 +26,6 @@ import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentOb
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.store.ObjectStoreManager;
@@ -44,7 +43,6 @@ import org.mule.runtime.core.internal.metadata.cache.DelegateMetadataCacheManage
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
 import java.io.File;
@@ -135,11 +133,7 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
       MuleObjectStoreManager osm = new MuleObjectStoreManager();
       osm.setBasePersistentStoreKey(SHARED_PERSISTENT_OBJECT_STORE_KEY);
       osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
-      try {
-        getMuleContext().getRegistry().registerObject(LAZY_MULE_OBJECT_STORE_MANAGER, osm);
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
+      registerConstantBeanDefinition(LAZY_MULE_OBJECT_STORE_MANAGER, osm);
 
       registerBeanDefinition(DEFAULT_METADATA_CACHE_MANAGER_KEY,
                              getBeanDefinition(DefaultPersistentMetadataCacheManager.class));
