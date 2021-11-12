@@ -6,25 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
+
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.notification.ClusterNodeNotification;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
 
-@RunWith(FlakinessDetectorTestRunner.class)
+import org.junit.Test;
+
 public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
   public ClusterExtensionMessageSourceTestCase() {
@@ -52,7 +48,6 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
   }
 
   @Test
-  @FlakyTest(times = 150)
   public void startWhenPrimaryNode() throws Exception {
     dontStartIfNotPrimaryNode();
 
