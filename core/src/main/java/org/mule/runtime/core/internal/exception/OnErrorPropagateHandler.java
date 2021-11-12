@@ -57,7 +57,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return event -> {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
-      if (errorRequiresRollback(exception) && isOwnedTransaction()) {
+      if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
         rollback(exception);
       }
       return event;
@@ -89,13 +89,13 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return new ArrayList<>(super.getOwnedMessageProcessors());
   }
 
-  private boolean errorRequiresRollback(Exception exception) {
+  private boolean isRedeliveryExhausted(Exception exception) {
     if (exception instanceof MessagingException) {
       Optional<Error> error = ((MessagingException) exception).getEvent().getError();
-      return error.map(e -> !(redeliveryExhaustedMatcher.match(e.getErrorType())))
-          .orElse(true);
+      return error.map(e -> redeliveryExhaustedMatcher.match(e.getErrorType()))
+          .orElse(false);
     }
-    return true;
+    return false;
   }
 
 }
