@@ -4,6 +4,15 @@
       "ignore": [
         {
           "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isAdoptiumTemurinJDK()",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "methodName": "isAdoptiumTemurinJDK",
+          "elementKind": "method",
+          "justification": "MULE-19917: Add Adoptium Temurin JDK as a recommended JDK vendor"
+        },
+        {
+          "code": "java.method.added",
           "new": "method org.mule.runtime.http.api.server.HttpServerConfiguration.Builder org.mule.runtime.http.api.server.HttpServerConfiguration.Builder::setReadTimeout(long)",
           "package": "org.mule.runtime.http.api.server",
           "classSimpleName": "Builder",
