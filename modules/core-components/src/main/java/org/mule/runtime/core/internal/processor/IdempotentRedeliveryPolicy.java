@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -224,8 +225,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       messageId = getIdForEvent(event);
     } catch (ExpressionRuntimeException e) {
       if (LOGGER.isDebugEnabled()) {
+        // Logs the details of the error.
         LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG, e);
       }
+
+      // The current transaction needs to be committed, so it's not rolled back, what would cause an infinite loop.
+      TransactionCoordination.getInstance().commitCurrentTransaction();
+
       throw new ExpressionRuntimeException(createStaticMessage(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG), e);
     } catch (Exception ex) {
       exceptionSeen = of(ex);

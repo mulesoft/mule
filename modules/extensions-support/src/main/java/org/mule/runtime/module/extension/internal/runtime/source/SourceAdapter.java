@@ -14,7 +14,6 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -128,7 +127,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
   private ErrorType flowBackPressueErrorType;
   private ErrorType redeliveryExhaustedErrorType;
-  private ErrorType expressionErrorType;
   private boolean initialised = false;
 
   @Inject
@@ -261,8 +259,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
         .orElseThrow(() -> new IllegalStateException("FLOW_BACK_PRESSURE error type not found"));
     redeliveryExhaustedErrorType = errorTypeRepository.getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
-    expressionErrorType = errorTypeRepository.getErrorType(EXPRESSION)
-        .orElseThrow(() -> new IllegalStateException("EXPRESSION error type not found"));
 
     initialiseIfNeeded(nonCallbackParameters, true, muleContext);
     initialiseIfNeeded(errorCallbackParameters, true, muleContext);
@@ -344,9 +340,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
       final boolean isRedeliveryExhaustedError = event.getError()
           .map(e -> redeliveryExhaustedErrorType.equals(e.getErrorType()))
           .orElse(false);
-      final boolean isExpressionError = event.getError()
-          .map(e -> expressionErrorType.equals(e.getErrorType()))
-          .orElse(false);
 
       SourceCallbackExecutor executor;
       if (isBackPressureError) {
@@ -359,7 +352,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
       }
 
       if (context.getTransactionHandle().isTransacted()) {
-        if (isRedeliveryExhaustedError || isExpressionError) {
+        if (isRedeliveryExhaustedError) {
           callback = callback.finallyBefore(this::commit);
         } else {
           callback = callback.finallyBefore(this::rollback);
