@@ -78,7 +78,6 @@
         <dependency>
             <groupId>org.mule.sdk</groupId>
             <artifactId>mule-sdk-api</artifactId>
-            <version>${muleSdkApiVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
