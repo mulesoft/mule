@@ -402,23 +402,22 @@ public abstract class ComponentModel {
 
     componentModel.getParent().getInnerComponents().stream()
         .filter(innerComponentModel -> innerComponentModel.getIdentifier().getName().equals("redelivery-policy")).findAny()
-        .ifPresent(redeliveryModel -> {
-          model.getAllParameterModels().stream().filter(parameterModel -> parameterModel.getName().equals("redeliveryPolicy"))
-              .findAny().ifPresent(
-                                   redeliveryComponentModel -> {
-                                     nestedComponents.put(redeliveryModel.getIdentifier(), redeliveryModel);
+        .ifPresent(redeliveryComponentModel -> {
+          model.getAllParameterModels().stream()
+              .filter(parameterModel -> parameterModel.getName().equals("redeliveryPolicy")).findAny()
+              .ifPresent(redeliveryParameterModel -> {
+                nestedComponents.put(redeliveryComponentModel.getIdentifier(), redeliveryComponentModel);
+                redeliveryParameterModel.getType().accept(new MetadataTypeVisitor() {
 
-                                     redeliveryComponentModel.getType().accept(new MetadataTypeVisitor() {
-
-                                       @Override
-                                       public void visitObject(ObjectType objectType) {
-                                         enrichComponentModels(componentModel, nestedComponents,
-                                                               extensionModelHelper.resolveDslElementModel(objectType,
-                                                                                                           CORE_PREFIX),
-                                                               redeliveryComponentModel, extensionModelHelper);
-                                       }
-                                     });
-                                   });
+                  @Override
+                  public void visitObject(ObjectType objectType) {
+                    enrichComponentModels(componentModel, nestedComponents,
+                                          extensionModelHelper.resolveDslElementModel(objectType,
+                                                                                      CORE_PREFIX),
+                                          redeliveryParameterModel, extensionModelHelper);
+                  }
+                });
+              });
         });
 
 
