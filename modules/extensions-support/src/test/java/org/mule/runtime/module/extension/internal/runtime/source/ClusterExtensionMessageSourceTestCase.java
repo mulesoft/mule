@@ -54,7 +54,7 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
     muleContext.getNotificationManager()
         .fireNotification(new ClusterNodeNotification("you're up", PRIMARY_CLUSTER_NODE_SELECTED));
     verify(sourceAdapter, atLeastOnce()).initialise();
-    verify(sourceAdapter, timeout(RECEIVE_TIMEOUT)).start();
+    verify(sourceAdapter, timeout(RECEIVE_TIMEOUT).times(1)).start();
   }
 
   private static class TestClusterService implements ClusterService {
