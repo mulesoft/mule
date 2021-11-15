@@ -35,7 +35,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   /**
    * Configures the context.
    *
-   * @param muleContext  the {@link MuleContext} that own this context
+   * @param muleContext the {@link MuleContext} that own this context
    */
   public BaseMuleArtifactContext(MuleContext muleContext) {
     this.muleContext = (MuleContextWithRegistry) muleContext;
