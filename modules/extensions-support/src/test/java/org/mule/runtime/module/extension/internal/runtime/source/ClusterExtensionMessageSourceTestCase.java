@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 
-import org.junit.Test;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.notification.ClusterNodeNotification;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+
+import org.junit.Test;
 
 public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
@@ -53,7 +54,7 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
     muleContext.getNotificationManager()
         .fireNotification(new ClusterNodeNotification("you're up", PRIMARY_CLUSTER_NODE_SELECTED));
     verify(sourceAdapter, atLeastOnce()).initialise();
-    verify(sourceAdapter, times(1)).start();
+    verify(sourceAdapter, timeout(RECEIVE_TIMEOUT).times(1)).start();
   }
 
   private static class TestClusterService implements ClusterService {
