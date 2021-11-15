@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -38,7 +37,7 @@ import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptySet;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -51,6 +50,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.REQUI
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
@@ -176,7 +176,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              OptionalObjectsController optionalObjectsController,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
-                             ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
+                             ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
+                             FeatureFlaggingService featureFlaggingService) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
     this.optionalObjectsController = optionalObjectsController;
@@ -190,7 +191,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     // TODO (MULE-19608) remove this and make it into a component building definition
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
-                                  componentBuildingDefinitionRegistryFactory.create(getExtensions()));
+                                  componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies()));
 
     this.applicationModel = artifactAst;
 
@@ -198,8 +199,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                                         artifactProperties,
                                                                         new ClassLoaderResourceProvider(muleContext
                                                                             .getExecutionClassLoader()),
-                                                                        ofNullable(getMuleRegistry()
-                                                                            .lookupObject(FEATURE_FLAGGING_SERVICE_KEY)));
+                                                                        of(featureFlaggingService));
 
     try {
       initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
@@ -270,7 +270,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   public void initialize() {
-    applicationModel = prepareAstForRuntime(applicationModel, getExtensions());
+    applicationModel = prepareAstForRuntime(applicationModel, applicationModel.dependencies());
   }
 
   @Override
@@ -518,17 +518,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext,
-                                             configurationProperties,
-                                             artifactType,
-                                             optionalObjectsController,
-                                             beanFactory,
-                                             componentLocator,
-                                             serviceDiscoverer,
-                                             originalRegistry,
-                                             resourceLocator).createArtifactServices();
+    createServiceConfigurator(beanFactory).createArtifactServices();
 
     originalRegistry = null;
+  }
+
+  protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
+    return new SpringMuleContextServiceConfigurator(muleContext,
+                                                    getConfigurationProperties(),
+                                                    getArtifactType(),
+                                                    getOptionalObjectsController(),
+                                                    beanFactory,
+                                                    componentLocator,
+                                                    getServiceDiscoverer(),
+                                                    originalRegistry,
+                                                    getResourceLocator());
   }
 
   @Override
@@ -613,12 +617,24 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return muleContext;
   }
 
+  protected PropertiesResolverConfigurationProperties getConfigurationProperties() {
+    return configurationProperties;
+  }
+
+  protected ArtifactType getArtifactType() {
+    return artifactType;
+  }
+
   public OptionalObjectsController getOptionalObjectsController() {
     return optionalObjectsController;
   }
 
   public Registry getRegistry() {
     return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
+  }
+
+  protected org.mule.runtime.core.internal.registry.Registry getOriginalRegistry() {
+    return originalRegistry;
   }
 
   @Override
@@ -634,4 +650,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return applicationModel;
   }
 
+  protected DefaultRegistry getServiceDiscoverer() {
+    return serviceDiscoverer;
+  }
+
+  protected DefaultResourceLocator getResourceLocator() {
+    return resourceLocator;
+  }
 }

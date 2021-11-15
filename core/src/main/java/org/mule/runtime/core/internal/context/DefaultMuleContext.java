@@ -6,15 +6,12 @@
  */
 package org.mule.runtime.core.internal.context;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -51,11 +48,16 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
-import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
+import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+
+import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -332,19 +334,15 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
         getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
         final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
-        listeners.forEach(l -> {
-          l.onInitialization(this, apiRegistry);
-        });
+        listeners.forEach(l -> l.onInitialization(this, apiRegistry));
 
         lifecycleStrategy.initialise(this);
 
         // TODO (MULE-19231): remove this from here after ExpressionManager is available in the validations
         // (this won't be more necessary here anymore). If there is an error in the expression, it will be detected here
-        getConfiguration().getDefaultCorrelationIdGenerator().ifPresent(generator -> {
-          if (generator instanceof ExpressionCorrelationIdGenerator) {
-            ((ExpressionCorrelationIdGenerator) generator).initializeGenerator();
-          }
-        });
+        getConfiguration().getDefaultCorrelationIdGenerator()
+            .filter(generator -> generator instanceof ExpressionCorrelationIdGenerator)
+            .ifPresent(generator -> ((ExpressionCorrelationIdGenerator) generator).initializeGenerator());
 
       } catch (InitialisationException e) {
         dispose();

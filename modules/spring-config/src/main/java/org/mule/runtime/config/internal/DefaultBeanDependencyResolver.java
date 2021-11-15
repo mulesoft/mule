@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.config.internal;
 
-import static com.google.common.graph.Traverser.forTree;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
+
+import static com.google.common.graph.Traverser.forTree;
 
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
@@ -99,6 +100,10 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
    */
   private void addConfigurationDependencies(String key, Set<String> processedKeys,
                                             DependencyNode node) {
+    if (configurationDependencyResolver == null) {
+      return;
+    }
+
     for (String dependency : configurationDependencyResolver.resolveComponentDependencies(key)) {
       try {
         if (springRegistry.isSingleton(dependency)) {

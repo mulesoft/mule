@@ -58,7 +58,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   @Override
   protected void registerPhases(Registry registry) {
-    final RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
+    final RegistryLifecycleCallback<Registry> callback = new RegistryLifecycleCallback<>(this);
 
     registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), new EmptyLifecycleCallback<>());
     registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), callback);
@@ -69,7 +69,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   @Override
   protected Map<String, Object> lookupObjectsForLifecycle() {
-    return getSpringRegistry().lookupEntriesForLifecycle(Object.class);
+    return getSpringRegistry().lookupEntriesForLifecycleIncludingAncestors(Object.class);
   }
 
   // ///////////////////////////////////////////////////////////////////////////////////

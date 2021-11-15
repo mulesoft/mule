@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
+
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
@@ -21,7 +24,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 import org.mule.runtime.core.internal.registry.Registry;
@@ -53,7 +55,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     try {
       registryLifecycleManager.muleContext.withLifecycleLock((CheckedRunnable) () -> doOnTransition(phaseName, object));
     } catch (RuntimeException e) {
-      MuleException muleException = ExceptionUtils.extractOfType(e, MuleException.class).orElse(null);
+      MuleException muleException = extractOfType(e, MuleException.class).orElse(null);
       if (muleException != null) {
         throw muleException;
       }
@@ -66,9 +68,12 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
     LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
 
-    LOGGER.debug("Applying lifecycle phase: {} for registry: {}", phase, object.getClass().getSimpleName());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Applying lifecycle phase: {} for registry: {}", phase, object.getClass().getSimpleName());
+    }
 
     doApplyLifecycle(phase, new HashSet<>(), registryLifecycleManager.getObjectsForPhase(phase));
+
     interceptor.onPhaseCompleted(phase);
   }
 
@@ -78,7 +83,9 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       if (target == null || duplicates.contains(target)) {
         continue;
       }
-      LOGGER.debug("lifecycle phase: {} for object: {}", phase.getName(), target.getClass().getSimpleName());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("lifecycle phase: {} for object: {}", phase.getName(), target.getClass().getSimpleName());
+      }
       applyLifecycle(phase, duplicates, target);
     }
   }
@@ -91,9 +98,8 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
         interceptor.afterPhaseExecution(phase, target, empty());
       } else {
         if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(format(
-                              "Skipping the application of the '%s' lifecycle phase over a certain object "
-                                  + "because a %s interceptor of type [%s] indicated so. Object is: %s",
+          LOGGER.debug(format("Skipping the application of the '%s' lifecycle phase over a certain object "
+              + "because a %s interceptor of type [%s] indicated so. Object is: %s",
                               phase.getName(), LifecycleInterceptor.class.getSimpleName(),
                               interceptor.getClass().getName(), target.getClass().getSimpleName()));
         }

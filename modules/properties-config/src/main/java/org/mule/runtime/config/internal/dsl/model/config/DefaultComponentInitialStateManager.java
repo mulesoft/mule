@@ -9,10 +9,7 @@ package org.mule.runtime.config.internal.dsl.model.config;
 import static org.mule.runtime.api.source.SchedulerMessageSource.SCHEDULER_MESSAGE_SOURCE_IDENTIFIER;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
 
@@ -31,11 +28,7 @@ public class DefaultComponentInitialStateManager implements ComponentInitialStat
     if (!configurationProperties.resolveProperty(MuleSystemProperties.DISABLE_SCHEDULER_SOURCES_PROPERTY).isPresent()) {
       return true;
     }
-    ComponentLocation tempLocation = component.getLocation();
-    TypedComponentIdentifier tempComponentIdentifier = tempLocation.getComponentIdentifier();
-    ComponentIdentifier tempIdentifier = tempComponentIdentifier.getIdentifier();
-
-    if (tempIdentifier.equals(SCHEDULER_MESSAGE_SOURCE_IDENTIFIER)) {
+    if (component.getIdentifier().equals(SCHEDULER_MESSAGE_SOURCE_IDENTIFIER)) {
       return !configurationProperties.resolveBooleanProperty(MuleSystemProperties.DISABLE_SCHEDULER_SOURCES_PROPERTY)
           .orElse(false);
     } else {

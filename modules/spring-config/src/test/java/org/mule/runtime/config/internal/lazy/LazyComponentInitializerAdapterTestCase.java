@@ -7,19 +7,6 @@
 
 package org.mule.runtime.config.internal.lazy;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
@@ -35,7 +22,24 @@ import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocator
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.COMPONENT_LIFE_CYCLE;
 import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -66,12 +70,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
+import com.google.common.collect.ImmutableSet;
+
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
-import com.google.common.collect.ImmutableSet;
+import org.junit.Before;
+import org.junit.Test;
+
+import org.mockito.Mock;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
@@ -228,7 +234,8 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
         new LazyMuleArtifactContext(muleContext, toArtifactast(getSimpleApp(), getExtensions(muleContext.getExtensionManager())),
                                     optionalObjectsController, empty(), emptyMap(), APP,
                                     empty(), lockFactory,
-                                    new DefaultComponentBuildingDefinitionRegistryFactory()) {
+                                    new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                    mock(FeatureFlaggingService.class)) {
 
           @Override
           protected DefaultListableBeanFactory createBeanFactory() {

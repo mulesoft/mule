@@ -21,6 +21,10 @@ public class MockScheduler extends ScheduledThreadPoolExecutor implements Schedu
     super(1);
   }
 
+  public MockScheduler(String name) {
+    super(1, new org.mule.runtime.core.api.util.concurrent.NamedThreadFactory(name));
+  }
+  
   @Override
   public void stop() {
     shutdownNow();

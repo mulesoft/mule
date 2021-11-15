@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.config.builders;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -44,6 +43,8 @@ import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QU
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;

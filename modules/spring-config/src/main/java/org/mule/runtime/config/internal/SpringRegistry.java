@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
+
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -30,6 +32,7 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -56,6 +59,7 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
   public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
   private final BeanDependencyResolver beanDependencyResolver;
 
+  protected ApplicationContext baseApplicationContext;
   protected ApplicationContext applicationContext;
 
   private boolean readOnly;
@@ -69,10 +73,13 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
   // Registered objects before the spring registry has been initialised.
   private final Map<String, BeanDefinition> registeredBeanDefinitionsBeforeInitialization = new HashMap<>();
 
-  public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext,
+  public SpringRegistry(ApplicationContext baseApplicationContext,
+                        ApplicationContext applicationContext,
+                        MuleContext muleContext,
                         ConfigurationDependencyResolver dependencyResolver,
                         LifecycleInterceptor lifecycleInterceptor) {
     super(REGISTRY_ID, muleContext, lifecycleInterceptor);
+    this.baseApplicationContext = baseApplicationContext;
     setApplicationContext(applicationContext);
     this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
   }
@@ -131,9 +138,13 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
     if (!isReadOnly() && ((ConfigurableApplicationContext) applicationContext).isActive()) {
       ((ConfigurableApplicationContext) applicationContext).close();
     }
+    if (((ConfigurableApplicationContext) baseApplicationContext).isActive()) {
+      ((ConfigurableApplicationContext) baseApplicationContext).close();
+    }
 
     // release the circular implicit ref to MuleContext
     applicationContext = null;
+    baseApplicationContext = null;
     this.springContextInitialised.set(false);
   }
 
@@ -342,10 +353,16 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
     }
   }
 
-  protected <T> Map<String, T> internalLookupByTypeWithoutAncestorsAndObjectProviders(Class<T> type, boolean nonSingletons,
-                                                                                      boolean eagerInit) {
+  private <T> Map<String, T> internalLookupByTypeWithoutAncestorsAndObjectProviders(Class<T> type, boolean nonSingletons,
+                                                                                    boolean eagerInit) {
+    return internalLookupByTypeWithoutAncestorsAndObjectProviders(type, nonSingletons, eagerInit, applicationContext);
+  }
+
+  private <T> Map<String, T> internalLookupByTypeWithoutAncestorsAndObjectProviders(Class<T> type, boolean nonSingletons,
+                                                                                    boolean eagerInit,
+                                                                                    ApplicationContext applicationCtx) {
     try {
-      Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationContext.getAutowireCapableBeanFactory())
+      Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationCtx.getAutowireCapableBeanFactory())
           .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
       if (nonSingletons && eagerInit) {
         beans.forEach((key, value) -> applyLifecycleIfPrototype(value, key, true));
@@ -365,13 +382,19 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
     }
   }
 
-  // TODO(pablo.kraan): MULE-12609 - making public to be able to use it from a different package
-  public <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
-    return internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false);
+  <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
+    return internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, applicationContext);
   }
 
-  // TODO(pablo.kraan): MULE-12609 - making public to be able to use it from a different package
-  public Map<String, Object> getDependencies(String key) {
+  <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
+    // respect the order in which spring had resolved the beans
+    Map<String, T> objects = new LinkedHashMap<>();
+    objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, baseApplicationContext));
+    objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, applicationContext));
+    return objects;
+  }
+
+  Map<String, Object> getDependencies(String key) {
     if (!readOnly) {
       Map<String, Object> dependents = new HashMap<>();
       for (String dependentKey : ((ConfigurableApplicationContext) applicationContext).getBeanFactory()
