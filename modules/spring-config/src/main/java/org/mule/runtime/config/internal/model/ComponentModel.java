@@ -25,6 +25,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 import static org.mule.runtime.core.api.util.StringUtils.trim;
@@ -32,7 +33,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLIC
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -415,10 +415,10 @@ public abstract class ComponentModel {
                                       ExtensionModelHelper extensionModelHelper,
                                       ParameterizedModel model, Predicate<ParameterModel> parameterModelFilter) {
 
-    //MULE-19928: munit tests fail to initialize an object store inside a redelivery policy.
+    //MULE-19928: add the redelivery component as a nested component
+    // of the source so the object store is correctly initialized in munit tests with lazy init
     componentModel.getParent().getInnerComponents().stream()
-        .filter(innerComponentModel -> innerComponentModel.getIdentifier().getName().equals(REDELIVERY_POLICY_ELEMENT_IDENTIFIER)
-            && innerComponentModel.getIdentifier().getNamespace().equals(CORE_PREFIX))
+        .filter(innerComponentModel -> innerComponentModel.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER))
         .findAny()
         .ifPresent(redeliveryComponentModel -> {
           model.getAllParameterModels().stream()
