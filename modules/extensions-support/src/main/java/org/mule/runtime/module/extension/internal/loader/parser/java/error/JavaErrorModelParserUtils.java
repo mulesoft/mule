@@ -119,13 +119,8 @@ public final class JavaErrorModelParserUtils {
                                                           elementName,
                                                           OnException.class,
                                                           org.mule.sdk.api.annotation.OnException.class,
-                                                          ann -> element
-                                                              .getValueFromAnnotation(OnException.class)
-                                                              .get()
-                                                              .getClassValue(OnException::value),
-                                                          ann -> element
-                                                              .getValueFromAnnotation(org.mule.sdk.api.annotation.OnException.class)
-                                                              .get()
+                                                          ann -> ann.getClassValue(OnException::value),
+                                                          ann -> ann
                                                               .getClassValue(org.mule.sdk.api.annotation.OnException::value));
 
     return classValue

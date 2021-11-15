@@ -17886,6 +17886,11 @@
               "namespace": "MULE"
             }
           },
+          "deprecationModel": {
+            "message": "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA",
+            "deprecatedSince": "1.3.0",
+            "toRemoveIn": "2.0.0"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -20258,6 +20263,11 @@
               "type": "SOURCE",
               "namespace": "MULE"
             }
+          },
+          "deprecationModel": {
+            "message": "This source is being tapped by the DEA, it\u0027s usage is discouraged.",
+            "deprecatedSince": "1.6.0",
+            "toRemoveIn": "3.0.0"
           },
           "parameterGroupModels": [
             {
@@ -26529,6 +26539,11 @@
               }
             }
           },
+          "deprecationModel": {
+            "message": "This source is being tapped by the DEA, it\u0027s usage is discouraged.",
+            "deprecatedSince": "1.6.0",
+            "toRemoveIn": "3.0.0"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -28873,6 +28888,11 @@
                 "namespace": "MULE"
               }
             }
+          },
+          "deprecationModel": {
+            "message": "This source is being tapped by the DEA, it\u0027s usage is discouraged.",
+            "deprecatedSince": "1.6.0",
+            "toRemoveIn": "3.0.0"
           },
           "parameterGroupModels": [
             {
@@ -53058,6 +53078,11 @@
           "type": "CONNECTION",
           "namespace": "MULE"
         }
+      },
+      "deprecationModel": {
+        "message": "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA",
+        "deprecatedSince": "1.3.0",
+        "toRemoveIn": "2.0.0"
       },
       "parameterGroupModels": [
         {

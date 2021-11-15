@@ -87,12 +87,7 @@ public final class JavaStereotypeModelParserUtils {
       return of(factory.createStereotype(stereotypeDefinition));
     }
 
-    if (annotatedElement instanceof Type) {
-      return ((Type) annotatedElement).getSuperType()
-          .flatMap(type -> resolveStereotype(type, elementType, elementName, factory));
-    } else {
-      return empty();
-    }
+    return empty();
   }
 
   /**
