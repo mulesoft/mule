@@ -312,10 +312,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   protected ArtifactAst resolveParentArtifact(FeatureFlaggingService featureFlaggingService) {
     if (POLICY.equals(artifactType)) {
-      return applicationFilteredFromPolicyArtifactAst(() -> {
-        return muleArtifactContext.getApplicationName();
-      },
-                                                      parentArtifactAst,
+      return applicationFilteredFromPolicyArtifactAst(parentArtifactAst,
                                                       featureFlaggingService);
     }
     return parentArtifactAst;

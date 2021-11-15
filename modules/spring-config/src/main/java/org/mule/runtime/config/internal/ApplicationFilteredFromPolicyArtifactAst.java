@@ -33,19 +33,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 final class ApplicationFilteredFromPolicyArtifactAst extends BaseArtifactAst {
 
-  private final Supplier<String> applicationName;
   private final ArtifactAst parentArtifactAst;
   private final FeatureFlaggingService featureFlaggingService;
 
-  ApplicationFilteredFromPolicyArtifactAst(Supplier<String> applicationName, ArtifactAst parentArtifactAst,
+  ApplicationFilteredFromPolicyArtifactAst(ArtifactAst parentArtifactAst,
                                            FeatureFlaggingService featureFlaggingService) {
-    this.applicationName = applicationName;
     this.parentArtifactAst = parentArtifactAst;
     this.featureFlaggingService = featureFlaggingService;
   }
@@ -123,14 +120,13 @@ final class ApplicationFilteredFromPolicyArtifactAst extends BaseArtifactAst {
     }
   }
 
-  public static ArtifactAst applicationFilteredFromPolicyArtifactAst(Supplier<String> applicationName,
-                                                                     ArtifactAst parentArtifactAst,
+  public static ArtifactAst applicationFilteredFromPolicyArtifactAst(ArtifactAst parentArtifactAst,
                                                                      FeatureFlaggingService featureFlaggingService) {
     if (shareErrorTypeRepository() && featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
       // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
       return parentArtifactAst;
     } else {
-      return new ApplicationFilteredFromPolicyArtifactAst(applicationName, parentArtifactAst, featureFlaggingService);
+      return new ApplicationFilteredFromPolicyArtifactAst(parentArtifactAst, featureFlaggingService);
     }
   }
 
