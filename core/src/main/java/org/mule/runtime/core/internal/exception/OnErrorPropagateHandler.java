@@ -7,15 +7,22 @@
 package org.mule.runtime.core.internal.exception;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -23,6 +30,21 @@ import java.util.function.Function;
  * @since 4.0
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
+
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
+
+  private SingleErrorTypeMatcher redeliveryExhaustedMatcher;
+
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    super.doInitialise();
+
+    ErrorType redeliveryExhaustedErrorType = errorTypeRepository.getErrorType(REDELIVERY_EXHAUSTED)
+        .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
+
+    redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
+  }
 
   @Override
   public boolean acceptsAll() {
@@ -73,7 +95,12 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   private boolean isRedeliveryExhausted(Exception exception) {
-    return (exception instanceof MessageRedeliveredException);
+    if (exception instanceof MessagingException) {
+      Optional<Error> error = ((MessagingException) exception).getEvent().getError();
+      return error.map(e -> redeliveryExhaustedMatcher.match(e.getErrorType()))
+          .orElse(false);
+    }
+    return false;
   }
 
 }
