@@ -29,8 +29,6 @@ import org.springframework.context.support.AbstractRefreshableConfigApplicationC
  */
 public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicationContext {
 
-  public static final String INNER_BEAN_PREFIX = "(inner bean)";
-
   private final DefaultRegistry serviceDiscoverer;
   private final MuleContextWithRegistry muleContext;
 
@@ -38,7 +36,6 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
    * Configures the context.
    *
    * @param muleContext  the {@link MuleContext} that own this context
-   * @param artifactType the type of artifact to determine the base objects of the created context.
    */
   public BaseMuleArtifactContext(MuleContext muleContext) {
     this.muleContext = (MuleContextWithRegistry) muleContext;

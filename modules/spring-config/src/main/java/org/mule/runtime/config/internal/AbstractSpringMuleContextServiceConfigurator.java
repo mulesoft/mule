@@ -30,6 +30,11 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
+/**
+ * Base class for populating constant bean definitions into a {@link Registry}.
+ * 
+ * @since 4.5
+ */
 abstract class AbstractSpringMuleContextServiceConfigurator {
 
   private final CustomServiceRegistry customServiceRegistry;
@@ -56,6 +61,20 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
   }
 
+  protected boolean isServiceRuntimeProvided(final CustomService customService) {
+    return customService.getServiceImpl().map(impl -> impl instanceof Service).orElse(false)
+        || customService.getServiceClass().map(cls -> Service.class.isAssignableFrom(cls)).orElse(false);
+  }
+
+  /**
+   * Determine the best way to create a bean definition from a custom service, depending on:
+   * <ul>
+   * <li>Whether the class or an implementation of a service has been configured.</li>
+   * <li>Whether the service is actually custom or is one provided by the runtime.</li>
+   * <li>In the case of services provided by the runtime, make those be initialized lazily.</li>
+   * </ul>
+   */
+  // TODO MULE-19927 refactor this code for simplicity
   protected BeanDefinition getCustomServiceBeanDefinition(CustomService customService, String serviceId) {
     BeanDefinition beanDefinition;
 
