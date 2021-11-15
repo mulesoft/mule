@@ -25,10 +25,13 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 import static org.mule.runtime.core.api.util.StringUtils.trim;
+import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
@@ -411,6 +414,30 @@ public abstract class ComponentModel {
                                       Multimap<ComponentIdentifier, ComponentModel> nestedComponents,
                                       ExtensionModelHelper extensionModelHelper,
                                       ParameterizedModel model, Predicate<ParameterModel> parameterModelFilter) {
+
+    //MULE-19928: add the redelivery component as a nested component
+    // of the source so the object store is correctly initialized in munit tests with lazy init
+    componentModel.getParent().getInnerComponents().stream()
+        .filter(innerComponentModel -> innerComponentModel.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER))
+        .findAny()
+        .ifPresent(redeliveryComponentModel -> {
+          model.getAllParameterModels().stream()
+              .filter(parameterModel -> parameterModel.getName().equals(REDELIVERY_POLICY_PARAMETER_NAME)).findAny()
+              .ifPresent(redeliveryParameterModel -> {
+                nestedComponents.put(redeliveryComponentModel.getIdentifier(), redeliveryComponentModel);
+                redeliveryParameterModel.getType().accept(new MetadataTypeVisitor() {
+
+                  @Override
+                  public void visitObject(ObjectType objectType) {
+                    enrichComponentModels(componentModel, nestedComponents,
+                                          extensionModelHelper.resolveDslElementModel(objectType, CORE_PREFIX),
+                                          redeliveryParameterModel, extensionModelHelper);
+                  }
+                });
+              });
+        });
+
+
     childrenComponentModels
         .forEach(childComp -> {
           extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
