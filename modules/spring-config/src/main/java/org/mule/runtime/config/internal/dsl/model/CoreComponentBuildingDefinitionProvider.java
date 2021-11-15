@@ -7,7 +7,6 @@
 
 package org.mule.runtime.config.internal.dsl.model;
 
-import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
@@ -15,6 +14,7 @@ import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionP
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
+import static org.mule.runtime.core.api.context.notification.AnySelector.ANY_SELECTOR;
 import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
@@ -51,8 +51,9 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
+import static org.apache.commons.lang3.ArrayUtils.addAll;
+
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.DataUnit;
@@ -92,6 +93,7 @@ import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.context.notification.ResourceIdentifierSelector;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RaiseErrorProcessor;
@@ -139,9 +141,9 @@ import org.mule.runtime.core.internal.routing.RoundRobin;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
-import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
+import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -634,10 +636,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private TypeConverter<String, Predicate<? extends Notification>> getNotificationSubscriptionConverter() {
     return subscription -> {
       if (ANY_SELECTOR_STRING.equals(subscription)) {
-        return (Predicate<? extends Notification>) (n -> true);
+        return ANY_SELECTOR;
       }
-      return (notification -> subscription != null ? subscription
-          .equals(((AbstractServerNotification) notification).getResourceIdentifier()) : true);
+      return new ResourceIdentifierSelector(subscription);
     };
   }
 
