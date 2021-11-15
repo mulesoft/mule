@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.privileged.component;
 
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+
+import static java.lang.Integer.toHexString;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Collections.unmodifiableSet;
+
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -108,6 +111,15 @@ public final class AnnotatedObjectInvocationHandler {
           if (overridingMethod.isPresent()) {
             annotatedObjectInvocationHandler.getOverridingMethods().put(method, overridingMethod.get());
             return annotatedObjectInvocationHandler;
+          } else if (method.getName().equals("toString")) {
+            return (MethodInterceptor) (obj, toStringMethod, args, proxy) -> {
+              String base = obj.getClass().getName() + "@" + toHexString(obj.hashCode()) + "; location: ";
+              if (((Component) obj).getLocation() != null) {
+                return base + ((Component) obj).getLocation().getLocation();
+              } else {
+                return base + "(null)";
+              }
+            };
           } else {
             return NoOp.INSTANCE;
           }
@@ -183,7 +195,7 @@ public final class AnnotatedObjectInvocationHandler {
 
   private static class ComponentInterceptor extends AbstractComponent implements MethodInterceptor {
 
-    private Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
+    private final Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
 
     public ComponentInterceptor(Set<Method> managedMethods) {
       for (Method method : managedMethods) {
