@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -66,7 +67,7 @@ import reactor.core.publisher.Mono;
 @NoExtend
 public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
-  private static final String EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG =
+  private static final String EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG =
       "The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.";
 
   public static final String SECURE_HASH_EXPR_FORMAT = "" +
@@ -224,11 +225,14 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       messageId = getIdForEvent(event);
     } catch (ExpressionRuntimeException e) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG, e);
-      } else {
-        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG);
+        // Logs the details of the error.
+        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG, e);
       }
-      return null;
+
+      // The current transaction needs to be committed, so it's not rolled back, what would cause an infinite loop.
+      TransactionCoordination.getInstance().commitCurrentTransaction();
+
+      throw new ExpressionRuntimeException(createStaticMessage(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG), e);
     } catch (Exception ex) {
       exceptionSeen = of(ex);
     }
