@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static com.google.common.base.Predicates.or;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -60,7 +61,7 @@ public final class RefNameDeclarationEnricher extends AbstractAnnotatedFieldDecl
 
   @Override
   protected Predicate<Field> getFieldHasAnnotationPredicate() {
-    return withAnnotation(RefName.class);
+    return or(withAnnotation(RefName.class), withAnnotation(org.mule.sdk.api.annotation.param.RefName.class));
   }
 
   @Override

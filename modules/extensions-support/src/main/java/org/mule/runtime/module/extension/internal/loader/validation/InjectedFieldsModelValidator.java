@@ -90,7 +90,8 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
             Optional<Class> implementingType = getImplementingType(model);
             validateFields(model, implementingType, String.class, DefaultEncoding.class,
                            org.mule.sdk.api.annotation.param.DefaultEncoding.class);
-            validateFields(model, implementingType, String.class, RefName.class);
+            validateFields(model, implementingType, String.class, RefName.class,
+                           org.mule.sdk.api.annotation.param.RefName.class);
             validateFields(model, implementingType, MuleVersion.class, RuntimeVersion.class);
           }
 
@@ -105,7 +106,8 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
             Optional<Class> implementingType = getImplementingType(model);
             validateFields(model, getImplementingType(model), String.class, DefaultEncoding.class,
                            org.mule.sdk.api.annotation.param.DefaultEncoding.class);
-            validateFields(model, getImplementingType(model), String.class, RefName.class);
+            validateFields(model, getImplementingType(model), String.class, RefName.class,
+                           org.mule.sdk.api.annotation.param.RefName.class);
             validateFields(model, implementingType, MuleVersion.class, RuntimeVersion.class);
 
           }
