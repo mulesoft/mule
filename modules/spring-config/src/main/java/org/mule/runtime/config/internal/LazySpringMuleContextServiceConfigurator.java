@@ -18,7 +18,6 @@ import static org.mule.runtime.config.internal.LazySampleDataService.NON_LAZY_SA
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
@@ -40,6 +39,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.metadata.cache.DelegateMetadataCacheManager;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
@@ -87,46 +87,36 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
   void createArtifactServices() {
     super.createArtifactServices();
 
-    registerBeanDefinition(OBJECT_EXPRESSION_MANAGER,
-                           getBeanDefinition(LazyExpressionManagerFactoryBean.class));
-    registerBeanDefinition(OBJECT_CONNECTIVITY_TESTER_FACTORY,
-                           getBeanDefinition(NoOpConnectivityTesterFactory.class));
+    registerBeanDefinition(OBJECT_EXPRESSION_MANAGER, getBeanDefinition(LazyExpressionManagerFactoryBean.class));
+    registerBeanDefinition(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(NoOpConnectivityTesterFactory.class));
 
     registerConstantBeanDefinition(CONNECTIVITY_TESTING_SERVICE_KEY,
                                    new LazyConnectivityTestingService(lazyComponentInitializer, () -> getRegistry()
-                                       .<ConnectivityTestingService>lookupByName(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
-                                       .get()));
-    registerBeanDefinition(NON_LAZY_CONNECTIVITY_TESTING_SERVICE,
-                           getBeanDefinition(DefaultConnectivityTestingService.class));
+                                       .<ConnectivityTestingService>lookupObject(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)));
+    registerBeanDefinition(NON_LAZY_CONNECTIVITY_TESTING_SERVICE, getBeanDefinition(DefaultConnectivityTestingService.class));
 
     registerConstantBeanDefinition(METADATA_SERVICE_KEY,
                                    new LazyMetadataService(lazyComponentInitializer, () -> getRegistry()
-                                       .<MetadataService>lookupByName(NON_LAZY_METADATA_SERVICE_KEY)
-                                       .get()));
-    registerBeanDefinition(NON_LAZY_METADATA_SERVICE_KEY,
-                           getBeanDefinition(MuleMetadataService.class));
+                                       .<MetadataService>lookupObject(NON_LAZY_METADATA_SERVICE_KEY)));
+    registerBeanDefinition(NON_LAZY_METADATA_SERVICE_KEY, getBeanDefinition(MuleMetadataService.class));
 
     registerConstantBeanDefinition(VALUE_PROVIDER_SERVICE_KEY,
                                    new LazyValueProviderService(lazyComponentInitializer, () -> getRegistry()
-                                       .<ValueProviderService>lookupByName(NON_LAZY_VALUE_PROVIDER_SERVICE)
-                                       .get(),
+                                       .<ValueProviderService>lookupObject(NON_LAZY_VALUE_PROVIDER_SERVICE),
                                                                 () -> getMuleContext().getConfigurationComponentLocator()));
-    registerBeanDefinition(NON_LAZY_VALUE_PROVIDER_SERVICE,
-                           getBeanDefinition(MuleValueProviderService.class));
+    registerBeanDefinition(NON_LAZY_VALUE_PROVIDER_SERVICE, getBeanDefinition(MuleValueProviderService.class));
 
     registerConstantBeanDefinition(SAMPLE_DATA_SERVICE_KEY,
                                    new LazySampleDataService(lazyComponentInitializer, () -> getRegistry()
-                                       .<SampleDataService>lookupByName(NON_LAZY_SAMPLE_DATA_SERVICE).get()));
-    registerBeanDefinition(NON_LAZY_SAMPLE_DATA_SERVICE,
-                           getBeanDefinition(MuleSampleDataService.class));
+                                       .<SampleDataService>lookupObject(NON_LAZY_SAMPLE_DATA_SERVICE)));
+    registerBeanDefinition(NON_LAZY_SAMPLE_DATA_SERVICE, getBeanDefinition(MuleSampleDataService.class));
 
     registerConstantBeanDefinition(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, lazyComponentInitializer);
 
     String sharedPartitionedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
     if (sharedPartitionedPersistentObjectStorePath != null) {
       // We need to first define this service so it would be later initialized
-      registerBeanDefinition(SHARED_PERSISTENT_OBJECT_STORE_KEY,
-                             getBeanDefinition(SharedPartitionedPersistentObjectStore.class));
+      registerBeanDefinition(SHARED_PERSISTENT_OBJECT_STORE_KEY, getBeanDefinition(SharedPartitionedPersistentObjectStore.class));
       registerConstantBeanDefinition(SHARED_PERSISTENT_OBJECT_STORE_KEY,
                                      new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionedPersistentObjectStorePath),
                                                                                   runtimeLockFactory));
@@ -135,27 +125,21 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
       osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
       registerConstantBeanDefinition(LAZY_MULE_OBJECT_STORE_MANAGER, osm);
 
-      registerBeanDefinition(DEFAULT_METADATA_CACHE_MANAGER_KEY,
-                             getBeanDefinition(DefaultPersistentMetadataCacheManager.class));
+      registerBeanDefinition(DEFAULT_METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class));
       registerConstantBeanDefinition(METADATA_CACHE_MANAGER_KEY,
                                      new DelegateMetadataCacheManager(() -> {
-                                       DefaultPersistentMetadataCacheManager defaultPersistentMetadataCacheManager =
-                                           (DefaultPersistentMetadataCacheManager) getRegistry()
-                                               .lookupByName(DEFAULT_METADATA_CACHE_MANAGER_KEY)
-                                               .get();
-                                       defaultPersistentMetadataCacheManager
-                                           .setLockFactory(runtimeLockFactory);
-                                       defaultPersistentMetadataCacheManager
-                                           .setObjectStoreManager(getRegistry()
-                                               .<ObjectStoreManager>lookupByName(LAZY_MULE_OBJECT_STORE_MANAGER)
-                                               .get());
+                                       DefaultPersistentMetadataCacheManager defaultPersistentMetadataCacheManager = getRegistry()
+                                           .<DefaultPersistentMetadataCacheManager>lookupObject(DEFAULT_METADATA_CACHE_MANAGER_KEY);
+                                       defaultPersistentMetadataCacheManager.setLockFactory(runtimeLockFactory);
+                                       defaultPersistentMetadataCacheManager.setObjectStoreManager(getRegistry()
+                                           .<ObjectStoreManager>lookupObject(LAZY_MULE_OBJECT_STORE_MANAGER));
                                        return defaultPersistentMetadataCacheManager;
                                      }));
     }
   }
 
-  protected Registry getRegistry() {
-    return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
+  protected MuleRegistry getRegistry() {
+    return getMuleContext().getRegistry();
   }
 
 }
