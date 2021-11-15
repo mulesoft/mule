@@ -32,6 +32,7 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -359,9 +360,9 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
 
   private <T> Map<String, T> internalLookupByTypeWithoutAncestorsAndObjectProviders(Class<T> type, boolean nonSingletons,
                                                                                     boolean eagerInit,
-                                                                                    ApplicationContext applicationContext2) {
+                                                                                    ApplicationContext applicationCtx) {
     try {
-      Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationContext2.getAutowireCapableBeanFactory())
+      Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationCtx.getAutowireCapableBeanFactory())
           .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
       if (nonSingletons && eagerInit) {
         beans.forEach((key, value) -> applyLifecycleIfPrototype(value, key, true));
@@ -386,7 +387,8 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
   }
 
   <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
-    Map<String, T> objects = new HashMap<>();
+    // respect the order in which spring had resolved the beans
+    Map<String, T> objects = new LinkedHashMap<>();
     objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, baseApplicationContext));
     objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, applicationContext));
     return objects;
