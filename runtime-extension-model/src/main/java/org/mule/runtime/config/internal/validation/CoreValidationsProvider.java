@@ -53,8 +53,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new FirstSuccessfulRoutes(),
                   new ScatterGatherRoutes(),
                   new ParseTemplateResourceExist(artifactRegionClassLoader),
-                  new SourcePositiveMaxItemsPerPoll()
-    );
+                  new SourcePositiveMaxItemsPerPoll());
   }
 
   @Override
