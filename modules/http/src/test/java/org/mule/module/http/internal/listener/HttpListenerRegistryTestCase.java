@@ -311,20 +311,25 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void decodeNoPathFound(){
+    public void decodeNoPathFound()
+    {
         httpListenerRegistry = new HttpListenerRegistry();
         httpListenerRegistry.addRequestHandler(testServer, mock(RequestHandler.class), new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), "/{uriParam}/"));
         RequestHandler requestHandler = httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath("/apath%2F%2F"));
 
-        if(parseBoolean(decodeUrlDisable.getValue())){
+        if(parseBoolean(decodeUrlDisable.getValue()))
+        {
             assertThat(requestHandler, not(instanceOf(NoListenerRequestHandler.class)));
-        } else {
+        }
+        else
+        {
             assertThat(requestHandler, is(instanceOf(NoListenerRequestHandler.class)));
         }
     }
 
     @Test
-    public void decodePathFound(){
+    public void decodePathFound()
+    {
         httpListenerRegistry = new HttpListenerRegistry();
         httpListenerRegistry.addRequestHandler(testServer, mock(RequestHandler.class), new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), "/{uriParam}/"));
         RequestHandler requestHandler = httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath("/apath%2F"));

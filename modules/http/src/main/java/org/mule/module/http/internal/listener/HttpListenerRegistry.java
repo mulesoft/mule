@@ -228,7 +228,8 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             {
                 String decode = decode(request.getPath(), UTF_8.displayName());
 
-                if(!decodeUrlDisabled){
+                if(!decodeUrlDisabled)
+                {
                     pathName = decode;
                 }
             }
