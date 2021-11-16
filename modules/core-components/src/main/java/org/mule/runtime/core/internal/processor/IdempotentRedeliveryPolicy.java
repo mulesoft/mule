@@ -239,6 +239,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       exceptionSeen = of(ex);
     }
 
+    if (messageId == null && !exceptionSeen.isPresent()) {
+      // The current transaction needs to be committed, so it's not rolled back, what would cause an infinite loop.
+      TransactionCoordination.getInstance().commitCurrentTransaction();
+
+      throw new ExpressionRuntimeException(createStaticMessage(BLANK_MESSAGE_ID_ERROR_MSG));
+    }
+
     Lock lock = lockFactory.createLock(idrId + "-" + messageId);
     lock.lock();
     try {
@@ -265,11 +272,6 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
         incrementCounter(messageId, createMessagingException(event, ex));
         throw ex;
       }
-    } catch (ObjectStoreException e) {
-      // The current transaction needs to be committed, so it's not rolled back, what would cause an infinite loop.
-      TransactionCoordination.getInstance().commitCurrentTransaction();
-
-      throw new ExpressionRuntimeException(createStaticMessage(BLANK_MESSAGE_ID_ERROR_MSG));
     } finally {
       lock.unlock();
     }
