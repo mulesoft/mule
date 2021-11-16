@@ -6,16 +6,21 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
+import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -49,6 +54,17 @@ public abstract class AbstractErrorTypesValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();
   protected static final ComponentIdentifier ON_ERROR_CONTINUE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
+
+  private final FeatureFlaggingService featureFlaggingService;
+
+  public AbstractErrorTypesValidation(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
+  }
+
+  @Override
+  public Level getLevel() {
+    return featureFlaggingService.isEnabled(ENFORCE_ERROR_TYPES_VALIDATION) ? ERROR : WARN;
+  }
 
   protected static boolean errorMappingPresent(ComponentAst operationComponent) {
     if (!operationComponent.getModel(ParameterizedModel.class).isPresent()) {

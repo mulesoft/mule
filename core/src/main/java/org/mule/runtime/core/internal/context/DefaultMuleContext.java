@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.context;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
@@ -301,6 +302,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureSetVariableWithNullVale();
       configureStartExtensionComponentsWithArtifactClassloader();
       configureRemoveShadowedImplicitInputs();
+      configureEnforceErrorTypesValidation();
     }
   }
 
@@ -1283,6 +1285,19 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureRemoveShadowedImplicitInputs() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DW_REMOVE_SHADOWED_IMPLICIT_INPUTS,
+                                                featureContext -> featureContext
+                                                    .getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#ENFORCE_ERROR_TYPES_VALIDATION} feature flag.
+   *
+   * @since 4.4.0
+   */
+  private static void configureEnforceErrorTypesValidation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENFORCE_ERROR_TYPES_VALIDATION,
                                                 featureContext -> featureContext
                                                     .getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
