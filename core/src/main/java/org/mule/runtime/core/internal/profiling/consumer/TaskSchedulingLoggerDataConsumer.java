@@ -45,7 +45,7 @@ public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<T
 
   @Override
   public Predicate<TaskSchedulingProfilingEventContext> getEventContextFilter() {
-    return taskSchedulingProfilingEventContext -> taskSchedulingProfilingEventContext.getTaskTracingContext() != null;
+    return taskSchedulingProfilingEventContext -> taskSchedulingProfilingEventContext.getTaskTracingContext().isPresent();
   }
 
   protected Logger getDataConsumerLogger() {
