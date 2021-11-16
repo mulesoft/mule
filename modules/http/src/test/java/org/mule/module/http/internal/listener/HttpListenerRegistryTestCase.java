@@ -6,31 +6,41 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static java.lang.Boolean.parseBoolean;
+
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.StringUtils;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @SmallTest
+@RunWith(Parameterized.class)
 public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
 {
 
@@ -75,11 +85,30 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     private final ServerAddress testServerAddress = new ServerAddress(TEST_IP, TEST_PORT);
 
     @Rule
+    public SystemProperty decodeUrlDisable;
+
+    @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
     private RequestHandler mockRequestHandler = mock(RequestHandler.class);
     private Map<String, RequestHandler> requestHandlerPerPath = new HashMap<>();
     private HttpListenerRegistry httpListenerRegistry;
     private Server testServer;
+
+    @Parameterized.Parameters(name= "{0}")
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]
+            {
+                {"true"},
+                {"false"}
+            });
+    }
+
+    public HttpListenerRegistryTestCase(String disable)
+    {
+        this.decodeUrlDisable = new SystemProperty(MuleProperties.MULE_DISABLE_DECODE_URL, disable);
+    }
 
     @Before
     public void createMockTestServer()
@@ -283,6 +312,31 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         assertThat(requestHandler, is(instanceOf(NoListenerRequestHandler.class)));
     }
 
+    @Test
+    public void decodeNoPathFound()
+    {
+        httpListenerRegistry = new HttpListenerRegistry();
+        httpListenerRegistry.addRequestHandler(testServer, mock(RequestHandler.class), new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), "/{uriParam}/"));
+        RequestHandler requestHandler = httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath("/apath%2F%2F"));
+
+        if(parseBoolean(decodeUrlDisable.getValue()))
+        {
+            assertThat(requestHandler, not(instanceOf(NoListenerRequestHandler.class)));
+        }
+        else
+        {
+            assertThat(requestHandler, is(instanceOf(NoListenerRequestHandler.class)));
+        }
+    }
+
+    @Test
+    public void decodePathFound()
+    {
+        httpListenerRegistry = new HttpListenerRegistry();
+        httpListenerRegistry.addRequestHandler(testServer, mock(RequestHandler.class), new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), "/{uriParam}/"));
+        RequestHandler requestHandler = httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath("/apath%2F"));
+        assertThat(requestHandler, not(instanceOf(NoListenerRequestHandler.class)));
+    }
 
     @Test
     public void replacePathCatchAllForCatchAll()

@@ -219,5 +219,6 @@ public class MuleProperties
     public static final String COMPUTE_CONNECTION_ERRORS_IN_STATS = SYSTEM_PROPERTY_PREFIX + "compute.connection.errors.in.stats";;
     public static final String MULE_DISABLE_COMPOUND_CORRELATION_ID = SYSTEM_PROPERTY_PREFIX + "compoundCorrelationId.disable";
     public static final String MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID = SYSTEM_PROPERTY_PREFIX + "forEachCompoundCorrelationId.disable";
+    public static final String MULE_DISABLE_DECODE_URL = SYSTEM_PROPERTY_PREFIX + "http.decodeUrl.disable";
 
 }

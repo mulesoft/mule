@@ -6,10 +6,14 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.api.config.MuleProperties.MULE_DISABLE_DECODE_URL;
 import static org.mule.module.http.internal.HttpParser.decode;
 import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
+import static org.mule.util.Preconditions.checkArgument;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
@@ -20,7 +24,6 @@ import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
 
 import com.google.common.base.Joiner;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,8 @@ public class HttpListenerRegistry implements RequestHandlerProvider
     private Logger logger = LoggerFactory.getLogger(getClass());
     private final ServerAddressMap<Server> serverAddressToServerMap = new ServerAddressMap<>();
     private final Map<Server, ServerAddressRequestHandlerRegistry> requestHandlerPerServerAddress = new HashMap<>();
+
+    private final boolean decodeUrlDisabled = parseBoolean(getProperty(MULE_DISABLE_DECODE_URL, "false"));
 
     /**
      * Introduces a new {@link RequestHandler} for requests matching a given {@link ListenerRequestMatcher} in the provided
@@ -218,11 +222,16 @@ public class HttpListenerRegistry implements RequestHandlerProvider
          */
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
-            final String pathName;
+            String pathName = request.getPath();
             checkArgument(request.getPath().startsWith(SLASH), "path parameter must start with /");
             try
             {
-                pathName = decode(request.getPath(), UTF_8.displayName());
+                String decode = decode(request.getPath(), UTF_8.displayName());
+
+                if(!decodeUrlDisabled)
+                {
+                    pathName = decode;
+                }
             }
             catch (IllegalArgumentException | MuleRuntimeException e)
             {
