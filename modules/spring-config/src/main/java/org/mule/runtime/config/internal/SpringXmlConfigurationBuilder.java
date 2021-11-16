@@ -8,19 +8,16 @@ package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
+import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
 import static org.mule.runtime.config.internal.SpringRegistry.SPRING_APPLICATION_CONTEXT;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
-import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
@@ -28,20 +25,17 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ImportedResource;
-import org.mule.runtime.ast.api.util.AstTraversalDirection;
-import org.mule.runtime.ast.api.util.BaseArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
@@ -51,6 +45,7 @@ import org.mule.runtime.config.internal.dsl.model.config.ConfigurationProperties
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -61,20 +56,15 @@ import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfiguration
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
-import org.mule.runtime.core.internal.exception.FilteredErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.CompositeMuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -166,6 +156,26 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext);
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
     baseMuleArtifactContext.refresh();
+
+    ((DefaultMuleContext) muleContext).setInjector(new Injector() {
+
+      @Override
+      public <T> T inject(T object) {
+        try {
+          return initialiseObject((ConfigurableApplicationContext) baseMuleArtifactContext, EMPTY, object);
+        } catch (LifecycleException e) {
+          throw new MuleRuntimeException(e);
+        } catch (Exception e) {
+          throw new MuleRuntimeException(new LifecycleException(e, object));
+        }
+      }
+
+      private <T> T initialiseObject(ConfigurableApplicationContext applicationContext, String key, T object)
+          throws LifecycleException {
+        applicationContext.getBeanFactory().autowireBean(object);
+        return (T) applicationContext.getBeanFactory().initializeBean(object, key);
+      }
+    });
 
     muleArtifactContext = createApplicationContext(muleContext, baseMuleArtifactContext.getBean(FeatureFlaggingService.class));
     muleArtifactContext.setParent(baseMuleArtifactContext);
@@ -275,7 +285,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
         .withExtensionModels(extensions)
-        .withParentArtifact(resolveParentArtifact());
+        .withParentArtifact(resolveParentArtifact(featureFlaggingService));
     if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)) {
       builder.withLegacyFailStrategy();
     }
@@ -300,70 +310,12 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     return builder.build();
   }
 
-  protected ArtifactAst resolveParentArtifact() {
+  protected ArtifactAst resolveParentArtifact(FeatureFlaggingService featureFlaggingService) {
     if (POLICY.equals(artifactType)) {
-      if (shareErrorTypeRepository()) {
-        // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
-        return parentArtifactAst;
-      } else {
-        return new BaseArtifactAst() {
-
-          @Override
-          public String getArtifactName() {
-            return muleArtifactContext.getApplicationName();
-          }
-
-          @Override
-          public org.mule.runtime.ast.api.ArtifactType getArtifactType() {
-            return org.mule.runtime.ast.api.ArtifactType.POLICY;
-          }
-
-          @Override
-          public Set<ExtensionModel> dependencies() {
-            return parentArtifactAst.dependencies();
-          }
-
-          @Override
-          public Optional<ArtifactAst> getParent() {
-            return parentArtifactAst.getParent();
-          }
-
-          @Override
-          public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
-            return parentArtifactAst.recursiveStream(direction);
-          }
-
-          @Override
-          public List<ComponentAst> topLevelComponents() {
-            return parentArtifactAst.topLevelComponents();
-          }
-
-          @Override
-          public void updatePropertiesResolver(UnaryOperator<String> newPropertiesResolver) {
-            parentArtifactAst.updatePropertiesResolver(newPropertiesResolver);
-          }
-
-          @Override
-          public ErrorTypeRepository getErrorTypeRepository() {
-            // Since there is already a workaround to allow polices to use http connector without declaring the dependency
-            // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
-            // well.
-            return new FilteredErrorTypeRepository(parentArtifactAst.getErrorTypeRepository(),
-                                                   new HashSet<>(asList("HTTP", CORE_NAMESPACE_NAME)));
-          }
-
-          @Override
-          public Collection<ImportedResource> getImportedResources() {
-            return parentArtifactAst.getImportedResources();
-          }
-        };
-      }
+      return applicationFilteredFromPolicyArtifactAst(parentArtifactAst,
+                                                      featureFlaggingService);
     }
     return parentArtifactAst;
-  }
-
-  private boolean shareErrorTypeRepository() {
-    return getBoolean(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY);
   }
 
   private ConfigResource[] resolveArtifactConfigResources() {

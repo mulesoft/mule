@@ -327,9 +327,7 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
   private <T> T initialiseObject(ConfigurableApplicationContext applicationContext, String key, T object)
       throws LifecycleException {
     applicationContext.getBeanFactory().autowireBean(object);
-    T initialised = (T) applicationContext.getBeanFactory().initializeBean(object, key);
-
-    return initialised;
+    return (T) applicationContext.getBeanFactory().initializeBean(object, key);
   }
 
   protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit) {

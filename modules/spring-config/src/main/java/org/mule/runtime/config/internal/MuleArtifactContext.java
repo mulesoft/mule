@@ -52,6 +52,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
@@ -222,7 +223,15 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected final void doValidateModel(ArtifactAst appModel, Predicate<Validation> validationsFilter)
       throws ConfigurationException {
-    final ValidationResult validation = validate(appModel, validationsFilter,
+    final ValidationResult validation = validate(appModel,
+                                                 v -> {
+                                                   try {
+                                                     muleContext.getInjector().inject(v);
+                                                   } catch (MuleException e) {
+                                                     throw new MuleRuntimeException(e);
+                                                   }
+                                                 },
+                                                 validationsFilter,
                                                  // get the region classloader from the artifact one
                                                  this.muleContext.getExecutionClassLoader().getParent());
 
