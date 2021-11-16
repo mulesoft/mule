@@ -144,13 +144,12 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
     irp.setObjectStoreManager(mockObjectStoreManager);
   }
 
-  @Test
+  @Test(expected = ExpressionRuntimeException.class)
   public void messageDigestFailure() throws Exception {
     when(expressionManager.openSession(any())).thenThrow(new ExpressionRuntimeException(createStaticMessage("mock")));
     when(message.getPayload()).thenReturn(new TypedValue<>(new Object(), OBJECT));
     irp.initialise();
-    CoreEvent process = irp.process(event);
-    assertThat(process, nullValue());
+    irp.process(event);
   }
 
   @Test
