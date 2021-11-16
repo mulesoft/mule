@@ -25,6 +25,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -89,13 +90,13 @@ public final class MuleExtensionAnnotationParser {
                                                                                                        Class<T> annotation,
                                                                                                        Function<Annotation, T[]> containerMapper) {
 
-    Stream<AnnotationValueFetcher<T>> singleElementStream = element.getValueFromAnnotation(annotation)
+    Stream<AnnotationValueFetcher<T>> singleElementStream = getAnnotationFromHierarchy(element, annotation)
         .map(Stream::of)
         .orElse(Stream.empty());
 
     Repeatable repeatableContainer = annotation.getAnnotation(Repeatable.class);
     if (repeatableContainer != null) {
-      Stream<AnnotationValueFetcher<T>> containerStream = element.getValueFromAnnotation(repeatableContainer.value())
+      Stream<AnnotationValueFetcher<T>> containerStream = getAnnotationFromHierarchy(element, repeatableContainer.value())
           .map(container -> container.getInnerAnnotations((Function) containerMapper).stream())
           .orElse(Stream.empty());
 
@@ -103,6 +104,20 @@ public final class MuleExtensionAnnotationParser {
     } else {
       return singleElementStream;
     }
+  }
+
+  private static <T extends Annotation> Optional<AnnotationValueFetcher<T>> getAnnotationFromHierarchy(WithAnnotations element,
+                                                                                                       Class<T> annotation) {
+    Optional<AnnotationValueFetcher<T>> valueFetcher = element.getValueFromAnnotation(annotation);
+    if (valueFetcher.isPresent()) {
+      return valueFetcher;
+    }
+
+    if (element instanceof Type) {
+      return ((Type) element).getSuperType().flatMap(superType -> getAnnotationFromHierarchy(superType, annotation));
+    }
+
+    return empty();
   }
 
   public static List<String> getParamNames(Method method) {
@@ -324,17 +339,19 @@ public final class MuleExtensionAnnotationParser {
     Optional<AnnotationValueFetcher<R>> legacyAnnotation = element.getValueFromAnnotation(legacyAnnotationClass);
     Optional<AnnotationValueFetcher<S>> sdkAnnotation = element.getValueFromAnnotation(sdkAnnotationClass);
 
-    Optional<T> result;
     if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
       throw dualDefinitionExceptionFactory.get();
     } else if (legacyAnnotation.isPresent()) {
-      result = legacyAnnotation.map(legacyAnnotationMapping);
+      return legacyAnnotation.map(legacyAnnotationMapping);
     } else if (sdkAnnotation.isPresent()) {
-      result = sdkAnnotation.map(sdkAnnotationMapping);
+      return sdkAnnotation.map(sdkAnnotationMapping);
+    } else if (element instanceof Type) {
+      return ((Type) element).getSuperType()
+          .flatMap(superType -> mapReduceAnnotation(superType, legacyAnnotationClass, sdkAnnotationClass,
+                                                    legacyAnnotationMapping, sdkAnnotationMapping,
+                                                    dualDefinitionExceptionFactory));
     } else {
-      result = empty();
+      return empty();
     }
-
-    return result;
   }
 }
