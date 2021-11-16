@@ -98,9 +98,11 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     @Parameterized.Parameters(name= "{0}")
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {
-            {"true"},
-            {"false"}});
+        return Arrays.asList(new Object[][]
+            {
+                {"true"},
+                {"false"}
+            });
     }
 
     public HttpListenerRegistryTestCase(String disable)
