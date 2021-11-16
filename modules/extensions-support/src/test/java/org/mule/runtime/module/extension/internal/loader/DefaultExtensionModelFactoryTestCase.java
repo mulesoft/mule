@@ -276,14 +276,15 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceWithDefaultBackPressureStrategies() {
+  public void sourceWithInheritedBackPressureStrategies() {
     SourceModel source = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ReconnectableListenPayments").get();
 
     Optional<ParameterModel> parameter = source.getAllParameterModels().stream()
         .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
         .findAny();
 
-    assertThat(parameter.isPresent(), is(false));
+    assertThat(parameter.isPresent(), is(true));
+    assertThat(parameter.get().getDefaultValue(), is(FAIL));
   }
 
   @Test
