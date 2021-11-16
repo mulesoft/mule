@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 /**
- * ADD JDOC
+ * Utils class for java source related parsing.
  *
  * @since 4.5.0
  */
