@@ -84,6 +84,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
     final DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
     muleConfiguration.setId(AbstractConfigurationFailuresTestCase.class.getSimpleName());
+    applyConfiguration(muleConfiguration);
     contextBuilder.setMuleConfiguration(muleConfiguration);
     MuleContextWithRegistry muleContext =
         (MuleContextWithRegistry) muleContextFactory.createMuleContext(builders, contextBuilder);
@@ -112,6 +113,10 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
       muleContext.stop();
       muleContext.dispose();
     }
+  }
+
+  protected void applyConfiguration(DefaultMuleConfiguration muleConfiguration) {
+    // nothing to do by default
   }
 
   protected boolean disableXmlValidations() {

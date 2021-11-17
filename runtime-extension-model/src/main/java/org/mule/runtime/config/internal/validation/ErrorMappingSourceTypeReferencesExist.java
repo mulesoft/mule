@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -30,6 +32,10 @@ import java.util.function.Predicate;
  * Referenced error types do exist in the context of the artifact
  */
 public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesValidation {
+
+  public ErrorMappingSourceTypeReferencesExist(FeatureFlaggingService featureFlaggingService) {
+    super(featureFlaggingService);
+  }
 
   @Override
   public String getName() {
