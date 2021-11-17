@@ -209,6 +209,7 @@
         </some:one-required-aliased-parameter-resolver-operation>
     </flow>
 
+<<<<<<< HEAD
     <flow name="value">
         <some:say-hi person="   Max Mule   "/>
     </flow>
