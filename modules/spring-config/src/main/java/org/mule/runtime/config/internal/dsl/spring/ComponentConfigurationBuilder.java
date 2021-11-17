@@ -130,8 +130,8 @@ class ComponentConfigurationBuilder<T> {
   }
 
   /**
-   * Process a single {@link AttributeDefinition} from a {@link ComponentBuildingDefinition} and uses an invokes a
-   * {@code Consumer} when the value is a bean definition or a different {@code Consumer} if the value is a bean reference.
+   * Process a single {@link AttributeDefinition} from a {@link ComponentBuildingDefinition} and uses a {@code Consumer} when the
+   * value is a bean definition or a different {@code Consumer} if the value is a bean reference.
    */
   private class ConfigurableAttributeDefinitionVisitor implements AttributeDefinitionVisitor {
 
