@@ -146,6 +146,22 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
+  @Test
+  public void legacyApiConfigRef() {
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    mockImplementingType(configurationModel, ConfigLegacyApiRefName.class);
+
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void sdkApiConfigRef() {
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    mockImplementingType(configurationModel, ConfigSdkApiRefName.class);
+
+    validate(extensionModel, validator);
+  }
+
   @Test(expected = IllegalModelDefinitionException.class)
   public void repeatedRefNameConfigField() {
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
@@ -268,12 +284,24 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     private Boolean encoding1;
   }
 
+  public static class ConfigLegacyApiRefName {
+
+    @RefName
+    private String refName;
+  }
+
+  public static class ConfigSdkApiRefName {
+
+    @org.mule.sdk.api.annotation.param.RefName
+    private String refName;
+  }
+
   public static class ConfigRepeatedRefName {
 
     @RefName
     private String refName1;
 
-    @RefName
+    @org.mule.sdk.api.annotation.param.RefName
     private String refName2;
   }
 

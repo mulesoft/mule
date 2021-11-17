@@ -121,6 +121,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.sdk.api.annotation.param.NullSafe;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.sdk.api.runtime.parameter.ParameterResolver;
@@ -1043,6 +1044,24 @@ public final class IntrospectionUtils {
     return JavaParserUtils.getAlias(field);
   }
 
+  /**
+   * @param field a field
+   * @return whether the given {@code field} is a config override
+   */
+  public static boolean isConfigOverride(Field field) {
+    return JavaParserUtils.isConfigOverride(field);
+  }
+
+  /**
+   * @param field a field
+   * @return {@link NullSafe#defaultImplementingType()} {@link Optional} or
+   *         {@link org.mule.runtime.extension.api.annotation.param.NullSafe#defaultImplementingType()} {@link Optional} in case
+   *         the given {@link Field field} is annotated.
+   */
+  public static Optional<Class<?>> getNullSafeDefaultImplementedType(Field field) {
+    return JavaParserUtils.getNullSafeDefaultImplementedType(field);
+  }
+
   private static List<Class<?>> getDescendingHierarchy(Class<?> type) {
     List<Class<?>> types = new LinkedList<>();
     types.add(type);
@@ -1516,23 +1535,23 @@ public final class IntrospectionUtils {
   public static void injectFields(Object target, String configName, String encoding, MuleVersion muleVersion,
                                   ReflectionCache reflectionCache) {
     set(getDefaultEncodingFieldSetter(target, reflectionCache), target, encoding);
-    set(getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache), target, configName);
+    set(getRefNameFieldSetter(target, reflectionCache), target, configName);
     set(getFieldSetterForAnnotatedField(target, RuntimeVersion.class, reflectionCache), target, muleVersion);
   }
 
   /**
-   * Introspects the {@code target} object for a field annotated with {@link RefName}. If found, it injects the {@code configName}
-   * value into it.
+   * Introspects the {@code target} object for a field annotated with {@link RefName} or
+   * {@link org.mule.sdk.api.annotation.param.RefName}. If found, it injects the {@code configName} value into it.
    * <p>
-   * The {@code target} object is expected to have only one field annotated with {@link RefName} and that field is required to be
-   * a String.
+   * The {@code target} object is expected to have only one field annotated with {@link RefName} or
+   * {@link org.mule.sdk.api.annotation.param.RefName} and that field is required to be a String.
    *
    * @param target          object in which the value are going to be set
    * @param configName      the value to be injected
    * @param reflectionCache the cache for expensive reflection lookups
    */
   public static void injectRefName(Object target, String configName, ReflectionCache reflectionCache) {
-    set(getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache), target, configName);
+    set(getRefNameFieldSetter(target, reflectionCache), target, configName);
   }
 
   /**
@@ -1540,13 +1559,42 @@ public final class IntrospectionUtils {
    *
    * @param target          object in which the fields are going to be set
    * @param reflectionCache the cache for expensive reflection lookups
-   * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
+   * @throws IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
   public static Optional<FieldSetter> getDefaultEncodingFieldSetter(Object target, ReflectionCache reflectionCache) {
     Optional<FieldSetter> legacyDefaultEncodingFieldSetter =
         getFieldSetterForAnnotatedField(target, DefaultEncoding.class, reflectionCache);
     return legacyDefaultEncodingFieldSetter.isPresent() ? legacyDefaultEncodingFieldSetter
         : getFieldSetterForAnnotatedField(target, org.mule.sdk.api.annotation.param.DefaultEncoding.class, reflectionCache);
+  }
+
+  /**
+   * Returns {@link FieldSetter} for a field in the {@code target} annotated {@link RefName} or
+   * {@link org.mule.sdk.api.annotation.param.RefName} if present.
+   *
+   * @param target          object in which the fields are going to be set
+   * @param reflectionCache the cache for expensive reflection lookups
+   * @return the {@link FieldSetter}
+   * @throws IllegalModelDefinitionException if there is more than one field annotated with {@link RefName} and or
+   *                                         {@link org.mule.sdk.api.annotation.param.RefName}
+   */
+  public static Optional<FieldSetter> getRefNameFieldSetter(Object target, ReflectionCache reflectionCache) {
+    Optional<FieldSetter> legacyRefNameFieldSetter =
+        getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache);
+    Optional<FieldSetter> sdkRefNameFieldSetter =
+        getFieldSetterForAnnotatedField(target, org.mule.sdk.api.annotation.param.RefName.class, reflectionCache);
+    if (legacyRefNameFieldSetter.isPresent() & sdkRefNameFieldSetter.isPresent()) {
+      throw new IllegalModelDefinitionException(format(
+                                                       "Class '%s' has 2 fields annotated with '@%s' or '@%s'. Only one field may carry those annotations",
+                                                       target.getClass().getName(), RefName.class.getName(),
+                                                       org.mule.sdk.api.annotation.param.RefName.class.getName()));
+    } else if (legacyRefNameFieldSetter.isPresent()) {
+      return legacyRefNameFieldSetter;
+    } else if (sdkRefNameFieldSetter.isPresent()) {
+      return sdkRefNameFieldSetter;
+    } else {
+      return empty();
+    }
   }
 
   /**

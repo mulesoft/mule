@@ -204,7 +204,8 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public boolean isConfigOverride() {
-    return parameter.getAnnotation(ConfigOverride.class).isPresent();
+    return parameter.isAnnotatedWith(ConfigOverride.class) ||
+        parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.ConfigOverride.class);
   }
 
   @Override
@@ -353,8 +354,18 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   private void collectNullSafeProperties() {
-    if (parameter.isAnnotatedWith(NullSafe.class)) {
-      if (parameter.isAnnotatedWith(ConfigOverride.class)) {
+    Optional<Type> nullSafeAnnotationType = mapReduceSingleAnnotation(parameter,
+                                                                      "parameter",
+                                                                      parameter.getName(),
+                                                                      NullSafe.class,
+                                                                      org.mule.sdk.api.annotation.param.NullSafe.class,
+                                                                      value -> value
+                                                                          .getClassValue(NullSafe::defaultImplementingType),
+                                                                      value -> value
+                                                                          .getClassValue(org.mule.sdk.api.annotation.param.NullSafe::defaultImplementingType));
+
+    if (nullSafeAnnotationType.isPresent()) {
+      if (isConfigOverride()) {
         throw new IllegalParameterModelDefinitionException(
                                                            format("Parameter '%s' is annotated with '@%s' and also marked as a config override, which is redundant. "
                                                                + "The default value for this parameter will come from the configuration parameter",
@@ -366,15 +377,13 @@ public class JavaParameterModelParser implements ParameterModelParser {
                                                                   parameter.getName(), NullSafe.class.getSimpleName()));
       }
 
-      Type nullSafeAnnotationType =
-          parameter.getValueFromAnnotation(NullSafe.class).get().getClassValue(NullSafe::defaultImplementingType);
-      final boolean hasDefaultOverride = !nullSafeAnnotationType.isSameType(Object.class);
+      final boolean hasDefaultOverride = !nullSafeAnnotationType.get().isSameType(Object.class);
 
       MetadataType nullSafeType =
-          hasDefaultOverride ? nullSafeAnnotationType.asMetadataType() : type;
+          hasDefaultOverride ? nullSafeAnnotationType.get().asMetadataType() : type;
 
       boolean isInstantiable =
-          hasDefaultOverride ? nullSafeAnnotationType.isInstantiable() : parameter.getType().isInstantiable();
+          hasDefaultOverride ? nullSafeAnnotationType.get().isInstantiable() : parameter.getType().isInstantiable();
 
       type.accept(new BasicTypeMetadataVisitor() {
 
@@ -429,7 +438,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
                                                                       parameter.getType().getName()));
           }
 
-          if (hasDefaultOverride && !parameter.getType().isAssignableFrom(nullSafeAnnotationType)) {
+          if (hasDefaultOverride && !parameter.getType().isAssignableFrom(nullSafeAnnotationType.get())) {
             throw new IllegalParameterModelDefinitionException(
                                                                format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
                                                                    + " is not a subtype of the parameter's type",

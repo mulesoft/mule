@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -30,7 +31,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.fruit.Apple;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -118,21 +118,6 @@ public class RefNameDeclarationEnricherTestCase extends AbstractMuleTestCase {
     public String getName() {
       return name;
     }
-  }
-
-  public static class TestMultipleNameAwareConfig {
-
-    @RefName
-    private String name;
-
-    @RefName
-    private String redundantName;
-  }
-
-  public static class TestIllegalNameAwareConfig {
-
-    @RefName
-    private Apple name;
   }
 
   public static class TestNameAwareConnectionProvider implements ConnectionProvider<Object> {

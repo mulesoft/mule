@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 
@@ -197,10 +198,18 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
   }
 
   private void parseExclusiveOptionalDescriptor() {
-    exclusiveOptionalDescriptor = type.getAnnotation(ExclusiveOptionals.class)
-        .map(annotation -> new ExclusiveOptionalDescriptor(parameters.stream()
+    Optional<Boolean> exclusiveOptionalsIsOneRequired =
+        mapReduceSingleAnnotation(type, "parameter", "",
+                                  ExclusiveOptionals.class,
+                                  org.mule.sdk.api.annotation.param.ExclusiveOptionals.class,
+                                  value -> value.getBooleanValue(ExclusiveOptionals::isOneRequired),
+                                  value -> value
+                                      .getBooleanValue(org.mule.sdk.api.annotation.param.ExclusiveOptionals::isOneRequired));
+
+    exclusiveOptionalDescriptor =
+        exclusiveOptionalsIsOneRequired.map(isOneRequired -> new ExclusiveOptionalDescriptor(parameters.stream()
             .filter(f -> !f.isRequired())
             .map(WithAlias::getAlias)
-            .collect(toSet()), annotation.isOneRequired()));
+            .collect(toSet()), isOneRequired));
   }
 }

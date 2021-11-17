@@ -57,48 +57,161 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void collectionWithImplementingType() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(CollectionWithDefaultImplementingType.class));
+  public void collectionWithImplementingTypeUsingSdkApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(CollectionWithDefaultImplementingTypeUsingSdkApi.class));
     validate(extensionModel, validator);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void dictionaryWithImplementingType() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(DictionaryWithDefaultImplementingType.class));
+  public void dictionaryWithImplementingTypeUsingSdkApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(DictionaryWithDefaultImplementingTypeUsingSdkApi.class));
     validate(extensionModel, validator);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void implementingTypeIsNotAssignable() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(ImplementingTypeNotAssignable.class));
+  public void implementingTypeIsNotAssignableUsingSdkApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(ImplementingTypeNotAssignableUsingSdkApi.class));
     validate(extensionModel, validator);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void basicTypeField() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(BasicTypeWithNullSafe.class));
+  public void basicTypeFieldUsingSdkApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(BasicTypeWithNullSafeUsingSdkApi.class));
     validate(extensionModel, validator);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void abstractFieldType() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(AbstractNullSafeTypeWithoutOverride.class));
+  public void abstractFieldTypeUsingSdkApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(AbstractNullSafeTypeWithoutOverrideUsingSdkApi.class));
     validate(extensionModel, validator);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void abstractImplementingType() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(AbstractNullSafeTypeWithAbstractOverride.class));
+  public void abstractImplementingTypeUsingSdkApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(AbstractNullSafeTypeWithAbstractOverrideUsingSdkApi.class));
     validate(extensionModel, validator);
   }
 
   @Test
-  public void validModel() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(ValidModel.class));
+  public void validModelUsingSdkApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(ValidModelUsingSdkApi.class));
     validate(extensionModel, validator);
   }
 
-  private static class CollectionWithDefaultImplementingType {
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void collectionWithImplementingTypeUsingLegacyApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(CollectionWithDefaultImplementingTypeUsingLegacyApi.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void dictionaryWithImplementingTypeUsingLegacyApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(DictionaryWithDefaultImplementingTypeUsingLegacyApi.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void implementingTypeIsNotAssignableUsingLegacyApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(ImplementingTypeNotAssignableUsingLegacyApi.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void basicTypeFieldUsingLegacyApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(BasicTypeWithNullSafeUsingLegacyApi.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void abstractFieldTypeUsingLegacyApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(AbstractNullSafeTypeWithoutOverrideUsingLegacyApi.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void abstractImplementingTypeUsingLegacyApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(AbstractNullSafeTypeWithAbstractOverrideUsingLegacyApi.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void validModeUsingLegacyApi() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(ValidModelUsingLegacyApi.class));
+    validate(extensionModel, validator);
+  }
+
+  private static class CollectionWithDefaultImplementingTypeUsingSdkApi {
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe(defaultImplementingType = LinkedList.class)
+    @Optional
+    private List<String> strings;
+  }
+
+  private static class DictionaryWithDefaultImplementingTypeUsingSdkApi {
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe(defaultImplementingType = LinkedList.class)
+    @Optional
+    private Map<String, String> strings;
+  }
+
+  private static class BasicTypeWithNullSafeUsingSdkApi {
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe
+    @Optional
+    private String bla;
+  }
+
+  private static class ImplementingTypeNotAssignableUsingSdkApi {
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe(defaultImplementingType = UnrelatedPojo.class)
+    @Optional
+    private ParentPojo pojo;
+  }
+
+  private static class AbstractNullSafeTypeWithoutOverrideUsingSdkApi {
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe
+    @Optional
+    private ParentPojo pojo;
+  }
+
+  private static class AbstractNullSafeTypeWithAbstractOverrideUsingSdkApi {
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe(defaultImplementingType = AbstractChildPojo.class)
+    @Optional
+    private ParentPojo pojo;
+  }
+
+  private static class ValidModelUsingSdkApi {
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe(defaultImplementingType = ChildPojo.class)
+    @Optional
+    private ParentPojo pojo;
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe
+    @Optional
+    private ChildPojo childPojo;
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe
+    @Optional
+    private Map<String, String> mapOfStrings;
+
+    @Parameter
+    @org.mule.sdk.api.annotation.param.NullSafe
+    @Optional
+    private List<String> listOfStrings;
+  }
+
+  private static class CollectionWithDefaultImplementingTypeUsingLegacyApi {
 
     @Parameter
     @NullSafe(defaultImplementingType = LinkedList.class)
@@ -106,7 +219,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private List<String> strings;
   }
 
-  private static class DictionaryWithDefaultImplementingType {
+  private static class DictionaryWithDefaultImplementingTypeUsingLegacyApi {
 
     @Parameter
     @NullSafe(defaultImplementingType = LinkedList.class)
@@ -114,7 +227,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private Map<String, String> strings;
   }
 
-  private static class BasicTypeWithNullSafe {
+  private static class BasicTypeWithNullSafeUsingLegacyApi {
 
     @Parameter
     @NullSafe
@@ -122,7 +235,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private String bla;
   }
 
-  private static class ImplementingTypeNotAssignable {
+  private static class ImplementingTypeNotAssignableUsingLegacyApi {
 
     @Parameter
     @NullSafe(defaultImplementingType = UnrelatedPojo.class)
@@ -130,7 +243,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private ParentPojo pojo;
   }
 
-  private static class AbstractNullSafeTypeWithoutOverride {
+  private static class AbstractNullSafeTypeWithoutOverrideUsingLegacyApi {
 
     @Parameter
     @NullSafe
@@ -138,7 +251,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private ParentPojo pojo;
   }
 
-  private static class AbstractNullSafeTypeWithAbstractOverride {
+  private static class AbstractNullSafeTypeWithAbstractOverrideUsingLegacyApi {
 
     @Parameter
     @NullSafe(defaultImplementingType = AbstractChildPojo.class)
@@ -146,7 +259,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private ParentPojo pojo;
   }
 
-  private static class ValidModel {
+  private static class ValidModelUsingLegacyApi {
 
     @Parameter
     @NullSafe(defaultImplementingType = ChildPojo.class)
@@ -176,7 +289,6 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
   private static class UnrelatedPojo {
 
   }
-
 
   private static class ChildPojo extends ParentPojo {
 
