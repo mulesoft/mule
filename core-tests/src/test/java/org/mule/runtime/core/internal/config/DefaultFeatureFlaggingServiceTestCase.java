@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.config;
 
 import io.qameta.allure.Story;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -17,6 +18,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
 import org.togglz.core.repository.FeatureState;
 
 import java.util.HashMap;
@@ -29,7 +31,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.TestingFeatures.TESTING_FEATURE;
-import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
+import static org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
@@ -39,8 +41,8 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.Featu
 public class DefaultFeatureFlaggingServiceTestCase {
 
   public static final String ARTIFACT_ID = "artifactId";
-  private final FeatureFlaggingService featureFlaggingService;
-
+  private final boolean registered;
+  private FeatureFlaggingService featureFlaggingService;
   private final Feature feature;
   private final boolean enabled;
 
@@ -50,32 +52,42 @@ public class DefaultFeatureFlaggingServiceTestCase {
   @Parameters(name = "Feature \"{1}\" should be {2}")
   public static List<Object[]> parameters() {
     return asList(
-                  new Object[] {buildFeatureConfigurations(TESTING_FEATURE, false), TESTING_FEATURE, false, null},
-                  new Object[] {buildFeatureConfigurations(TESTING_FEATURE, true), TESTING_FEATURE, true, null},
-                  new Object[] {buildFeatureConfigurations(), TESTING_FEATURE, false, (Consumer<ExpectedException>) (e -> {
-                    e.expect(MuleRuntimeException.class);
-                    e.expectMessage(format("Feature %s not registered", TESTING_FEATURE.name()));
-                  })});
+                  new Object[] {TESTING_FEATURE, false, true},
+                  new Object[] {TESTING_FEATURE, true, true},
+                  new Object[] {TESTING_FEATURE, false, true});
 
   }
 
-  public DefaultFeatureFlaggingServiceTestCase(Map<Feature, Boolean> featureConfigurations, Feature feature, boolean enabled,
-                                               Consumer<ExpectedException> configureExpected) {
+  public DefaultFeatureFlaggingServiceTestCase(Feature feature, boolean enabled,
+                                               boolean registered) {
 
     this.feature = feature;
     this.enabled = enabled;
+    this.registered = registered;
+  }
 
+  @Before
+  public void before() {
     Map<org.togglz.core.Feature, FeatureState> featureStates = new HashMap<>();
-    featureConfigurations
-        .forEach((feat, enbld) -> featureStates
-            .put(FEATURE_PROVIDER.getOrRegisterRuntimeTogglzFeatureFrom(feat),
-                 new FeatureState(FEATURE_PROVIDER.getOrRegisterRuntimeTogglzFeatureFrom(feat), enbld)));
-
     featureFlaggingService =
-        new DefaultFeatureFlaggingService(ARTIFACT_ID, new MuleTogglzManagedArtifactFeatures(ARTIFACT_ID, featureStates));
-    if (configureExpected != null) {
-      configureExpected.accept(expectedException);
+        new DefaultFeatureFlaggingService(ARTIFACT_ID, getFeaturesStates());
+
+    if (!registered) {
+      expectedException.expect(MuleRuntimeException.class);
+      expectedException.expectMessage(format("Feature %s not registered", TESTING_FEATURE.name()));
     }
+  }
+
+  private Map<Feature, Boolean> getFeaturesStates() {
+    if (!registered) {
+      return new HashMap<>();
+    }
+    return new HashMap<Feature, Boolean>() {
+
+      {
+        put(feature, enabled);
+      }
+    };
   }
 
   @Test

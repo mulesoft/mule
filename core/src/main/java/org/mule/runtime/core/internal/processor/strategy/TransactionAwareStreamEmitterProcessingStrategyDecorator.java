@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
@@ -46,7 +45,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.togglz.core.user.FeatureUser;
 import reactor.util.context.Context;
 
 import javax.inject.Inject;
@@ -70,13 +68,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   @Inject
   private MuleContext muleContext;
 
-  private FeatureUser featureUser;
-
 
 
   @Override
   public void initialise() throws InitialisationException {
-    this.featureUser = new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext));
     super.initialise();
   }
 

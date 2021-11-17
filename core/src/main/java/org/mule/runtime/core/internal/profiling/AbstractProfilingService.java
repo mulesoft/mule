@@ -8,9 +8,6 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.setFeatureState;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
-import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.runtime.core.internal.profiling.notification.ProfilingNotification.getFullyQualifiedProfilingNotificationIdentifier;
 
 import org.mule.runtime.api.config.MuleRuntimeFeature;
@@ -27,12 +24,8 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.internal.config.FeatureFlaggingUtils;
-import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
-import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
-import org.togglz.core.Feature;
-import org.togglz.core.repository.FeatureState;
+import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -50,16 +43,15 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
   protected ServerNotificationManager notificationManager;
 
   @Inject
+  protected RuntimeFeatureFlaggingService featureFlaggingService;
+
+  @Inject
   MuleContext muleContext;
 
   private final Set<NotificationListener<?>> addedListeners = new HashSet<>();
 
-  protected MuleTogglzArtifactFeatureUser featureUser;
-
   @Override
-  public void initialise() throws InitialisationException {
-    featureUser = new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext));
-  }
+  public void initialise() throws InitialisationException {}
 
   @Override
   public void start() throws MuleException {
@@ -69,13 +61,9 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
   private void registerDataConsumers(Set<ProfilingDataConsumer<?>> dataConsumers) {
     for (ProfilingDataConsumer<?> dataConsumer : dataConsumers) {
       Set<? extends ProfilingEventType<?>> profilingEventTypes = dataConsumer.getProfilingEventTypes();
-      FeatureFlaggingUtils.withFeatureUser(new MuleTogglzArtifactFeatureUser(ProfilingUtils.getArtifactId(muleContext)), () -> {
-        for (ProfilingEventType<?> profilingEventType : profilingEventTypes) {
-          Feature feature =
-              FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(profilingEventType, dataConsumer.getClass().getName());
-          setFeatureState(new FeatureState(feature));
-        }
-      });
+      for (ProfilingEventType<?> profilingEventType : profilingEventTypes) {
+        featureFlaggingService.registerProfilingFeature(profilingEventType, dataConsumer.getClass().getName());
+      }
     }
     registerNotificationListeners(dataConsumers);
     onDataConsumersRegistered();

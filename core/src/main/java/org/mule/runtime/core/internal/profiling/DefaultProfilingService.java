@@ -21,6 +21,7 @@ import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingData
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
+import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,12 +43,15 @@ import javax.inject.Inject;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
+  @Inject
+  private RuntimeFeatureFlaggingService featureFlaggingService;
+
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
   private ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 
-  private final ProfilingDataProducerResolver profilingDataProducerResolver =
-      new ProfilingDataProducerResolver(this, threadSnapshotCollector);
+  private ProfilingDataProducerResolver profilingDataProducerResolver;
+
 
   private final Map<ProfilingEventType<?>, Map<ProfilingProducerScope, ResettableProfilingDataProducer<?, ?>>> profilingDataProducers =
       new ConcurrentHashMap<>();
@@ -65,6 +69,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   @Override
   public void initialise() throws InitialisationException {
+    initialiseProfilingDataProducerIfNeeded();
     super.initialise();
   }
 
@@ -91,12 +96,20 @@ public class DefaultProfilingService extends AbstractProfilingService {
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
                                                                                                    ProfilingEventType<T> profilingEventType,
                                                                                                    ProfilingProducerScope profilingProducerScope) {
+    initialiseProfilingDataProducerIfNeeded();
+
     return (ProfilingDataProducer<T, S>) profilingDataProducers
         .computeIfAbsent(profilingEventType,
                          profEventType -> new ConcurrentHashMap<>())
         .computeIfAbsent(profilingProducerScope,
                          profilingProdScope -> profilingDataProducerResolver
                              .getProfilingDataProducer(profilingEventType, profilingProducerScope));
+  }
+
+  private void initialiseProfilingDataProducerIfNeeded() {
+    if (profilingDataProducerResolver == null) {
+      profilingDataProducerResolver = new ProfilingDataProducerResolver(this, threadSnapshotCollector, featureFlaggingService);
+    }
   }
 
   @Override

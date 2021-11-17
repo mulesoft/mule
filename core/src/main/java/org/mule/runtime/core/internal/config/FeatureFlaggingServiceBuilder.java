@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.config;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.getTogglzManagedArtifactFeatures;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -22,6 +21,7 @@ import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.config.FeatureContext;
+import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
 import org.slf4j.Logger;
 
 /**
@@ -115,8 +115,7 @@ public final class FeatureFlaggingServiceBuilder {
           .put(feature, isFeatureFlagEnabled(feature, featureContext, artifactDescriptorPredicate)));
     }
 
-    return new DefaultFeatureFlaggingService(artifactUserId,
-                                             getTogglzManagedArtifactFeatures(artifactUserId, features));
+    return new DefaultFeatureFlaggingService(artifactUserId, features);
   }
 
   /**

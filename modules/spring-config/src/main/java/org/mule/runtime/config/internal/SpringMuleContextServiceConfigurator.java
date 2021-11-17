@@ -62,7 +62,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
-import static org.mule.runtime.core.internal.config.management.MuleTogglzProfilingFeatures.PROFILING_SERVICE_FEATURE;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -130,6 +129,7 @@ import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
+import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
@@ -276,11 +276,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
   }
 
   private BeanDefinition getBeanDefinitionForProfilingService() {
-    if (PROFILING_SERVICE_FEATURE.isActive()) {
-      return getBeanDefinition(DefaultProfilingService.class);
-    } else {
-      return getBeanDefinition(NoOpProfilingService.class);
-    }
+    return getBeanDefinition(ProfilingServiceWrapper.class);
   }
 
   void createArtifactServices() {

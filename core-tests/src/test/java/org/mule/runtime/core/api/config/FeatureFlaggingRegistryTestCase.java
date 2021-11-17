@@ -10,14 +10,11 @@ package org.mule.runtime.core.api.config;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.CONDITION_CAN_NOT_BE_NULL;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.FEATURE_ALREADY_REGISTERED;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.FEATURE_CAN_NOT_BE_NULL;
 import static org.mule.runtime.core.api.config.TestingFeatures.TESTING_FEATURE;
-import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
-import static org.mule.runtime.core.internal.config.togglz.feature.provider.DefaultMuleTogglzFeatureProvider.RUNTIME_FEATURE_NOT_REGISTERED;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
@@ -107,21 +104,9 @@ public class FeatureFlaggingRegistryTestCase {
     featureFlaggingRegistry.registerFeature(TESTING_FEATURE, c -> false);
   }
 
-  @Test
-  public void failWhenATogglzRuntimeFeatureIsNotRegistered() {
-    expectedException.expect(IllegalArgumentException.class);
-    Feature mockedFeature = Mockito.mock(Feature.class);
-    expectedException.expectMessage(format(RUNTIME_FEATURE_NOT_REGISTERED, mockedFeature));
-    FEATURE_PROVIDER.getRuntimeTogglzFeature(mockedFeature);
-  }
-
   private void assertFeature(boolean enabled) {
-    // Features are registered through Feature Flagging Registry and the configuration are correctly evaluated.
     assertThat(featureFlaggingRegistry.getFeatureConfigurations().keySet(), contains(TESTING_FEATURE));
     assertThat(featureFlaggingRegistry.getFeatureConfigurations().get(TESTING_FEATURE).test(null), is(enabled));
-
-    // Features are also registered through Togglz.
-    assertThat(FEATURE_PROVIDER.getFeatures(), hasItem(FEATURE_PROVIDER.getRuntimeTogglzFeature(TESTING_FEATURE)));
   }
 
 }

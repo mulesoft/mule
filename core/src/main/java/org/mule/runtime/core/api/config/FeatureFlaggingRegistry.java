@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.config;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.addMuleTogglzRuntimeFeature;
 
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -81,8 +80,6 @@ public class FeatureFlaggingRegistry {
     if (added != null) {
       throw new IllegalArgumentException(format(FEATURE_ALREADY_REGISTERED, feature));
     }
-
-    addMuleTogglzRuntimeFeature(feature);
   }
 
   /**
@@ -101,8 +98,6 @@ public class FeatureFlaggingRegistry {
     if (added != null) {
       throw new IllegalArgumentException(format(FEATURE_ALREADY_REGISTERED, feature));
     }
-
-    addMuleTogglzRuntimeFeature(feature);
   }
 
   private void validate(Feature feature, Predicate<?> condition) {

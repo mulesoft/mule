@@ -11,17 +11,21 @@ import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
+import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
 
 public class ExtensionDataProducerProvider
     implements ProfilingDataProducerProvider<ExtensionProfilingEventContext, Object> {
 
   private final DefaultProfilingService profilingService;
   private final ProfilingEventType<ExtensionProfilingEventContext> profilingEventType;
+  private final RuntimeFeatureFlaggingService featureFlaggingService;
 
   public ExtensionDataProducerProvider(DefaultProfilingService profilingService,
-                                       ProfilingEventType<ExtensionProfilingEventContext> profilingEventType) {
+                                       ProfilingEventType<ExtensionProfilingEventContext> profilingEventType,
+                                       RuntimeFeatureFlaggingService featureFlaggingService) {
     this.profilingService = profilingService;
     this.profilingEventType = profilingEventType;
+    this.featureFlaggingService = featureFlaggingService;
 
   }
 
@@ -29,6 +33,7 @@ public class ExtensionDataProducerProvider
   public <T extends ProfilingEventContext, S> ResettableProfilingDataProducer<T, S> getProfilingDataProducer(
                                                                                                              ProfilingProducerScope producerContext) {
     return (ResettableProfilingDataProducer<T, S>) new ExtensionProfilingDataProducer(profilingService, profilingEventType,
-                                                                                      producerContext);
+                                                                                      producerContext,
+                                                                                      featureFlaggingService);
   }
 }

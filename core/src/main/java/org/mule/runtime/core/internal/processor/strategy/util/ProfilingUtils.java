@@ -7,9 +7,6 @@
 
 package org.mule.runtime.core.internal.processor.strategy.util;
 
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.withFeatureUser;
-import static org.mule.runtime.core.internal.config.management.MuleTogglzProfilingFeatures.PROFILING_SERVICE_FEATURE;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
@@ -19,7 +16,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.api.processor.HasLocation;
-import org.togglz.core.user.FeatureUser;
 
 /**
  * Utility methods for handling profiling of processing strategy.
@@ -64,10 +60,6 @@ public final class ProfilingUtils {
    */
   public static String getArtifactType(MuleContext muleContext) {
     return muleContext.getArtifactType().getAsString();
-  }
-
-  public static boolean isProfilingServiceActive(FeatureUser featureUser) {
-    return withFeatureUser(featureUser, () -> PROFILING_SERVICE_FEATURE.isActive());
   }
 
   /**

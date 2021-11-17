@@ -14,6 +14,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEv
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.producer.ComponentThreadingProfilingDataProducer;
+import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
 
 public class ComponentThreadingDataProducerProvider
     implements ProfilingDataProducerProvider<DefaultComponentThreadingProfilingEventContext, CoreEvent> {
@@ -21,13 +22,16 @@ public class ComponentThreadingDataProducerProvider
   private final DefaultProfilingService profilingService;
   private final ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType;
   private final ThreadSnapshotCollector threadSnapshotCollector;
+  private final RuntimeFeatureFlaggingService featureFlaggingService;
 
   public ComponentThreadingDataProducerProvider(DefaultProfilingService profilingService,
                                                 ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType,
-                                                ThreadSnapshotCollector threadSnapshotCollector) {
+                                                ThreadSnapshotCollector threadSnapshotCollector,
+                                                RuntimeFeatureFlaggingService featureFlaggingService) {
     this.profilingService = profilingService;
     this.profilingEventType = profilingEventType;
     this.threadSnapshotCollector = threadSnapshotCollector;
+    this.featureFlaggingService = featureFlaggingService;
 
   }
 
@@ -37,6 +41,7 @@ public class ComponentThreadingDataProducerProvider
     return (ResettableProfilingDataProducer<T, S>) new ComponentThreadingProfilingDataProducer(profilingService,
                                                                                                profilingEventType,
                                                                                                threadSnapshotCollector,
-                                                                                               producerContext);
+                                                                                               producerContext,
+                                                                                               featureFlaggingService);
   }
 }

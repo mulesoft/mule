@@ -33,6 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
@@ -53,14 +54,10 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.setFeatureState;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.withFeatureUser;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
-import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
@@ -76,7 +73,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mockito.InOrder;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -97,8 +94,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
-import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
@@ -106,6 +103,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -258,7 +256,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   public AbstractProcessingStrategyTestCase(Mode mode, boolean profiling) {
     this.mode = mode;
     this.enableProfilingServiceProperty =
-        new SystemProperty((MuleRuntimeFeature.ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get()),
+        new SystemProperty((ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get()),
                            Boolean.toString(profiling));
     this.profiling = profiling;
   }
@@ -326,57 +324,18 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                                                 PS_OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
     when(profilingDataConsumer.getEventContextFilter()).thenReturn(processingStrategyProfilingEventContext -> true);
 
-    if (profiling) {
-      withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-        setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(STARTING_OPERATION_EXECUTION,
-                                                                                                  "TEST_CONSUMER"),
-                                         true));
-      });
-
-      withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-        setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_SCHEDULING_FLOW_EXECUTION,
-                                                                                                  "TEST_CONSUMER"),
-                                         true));
-      });
-
-      withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-        setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(STARTING_FLOW_EXECUTION,
-                                                                                                  "TEST_CONSUMER"),
-                                         true));
-      });
-
-      withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-        setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(FLOW_EXECUTED,
-                                                                                                  "TEST_CONSUMER"),
-                                         true));
-      });
-
-      withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-        setFeatureState(new FeatureState(FEATURE_PROVIDER
-            .getOrRegisterProfilingTogglzFeatureFrom(PS_SCHEDULING_OPERATION_EXECUTION,
-                                                     "TEST_CONSUMER"),
-                                         true));
-      });
-
-      withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-        setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_STARTING_OPERATION_EXECUTION,
-                                                                                                  "TEST_CONSUMER"),
-                                         true));
-      });
-
-      withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-        setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_OPERATION_EXECUTED,
-                                                                                                  "TEST_CONSUMER"),
-                                         true));
-      });
-
-      withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-        setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(PS_FLOW_MESSAGE_PASSING,
-                                                                                                  "TEST_CONSUMER"),
-                                         true));
-      });
-
-    }
+    RuntimeFeatureFlaggingService featureFlaggingService =
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(RuntimeFeatureFlaggingService.class);
+    featureFlaggingService
+        .toggleProfilingFeature(PS_SCHEDULING_FLOW_EXECUTION, profilingDataConsumer.getClass().getName(), profiling);
+    featureFlaggingService.toggleProfilingFeature(STARTING_FLOW_EXECUTION, profilingDataConsumer.getClass().getName(), profiling);
+    featureFlaggingService.toggleProfilingFeature(FLOW_EXECUTED, profilingDataConsumer.getClass().getName(), profiling);
+    featureFlaggingService
+        .toggleProfilingFeature(PS_SCHEDULING_OPERATION_EXECUTION, profilingDataConsumer.getClass().getName(), profiling);
+    featureFlaggingService
+        .toggleProfilingFeature(PS_STARTING_OPERATION_EXECUTION, profilingDataConsumer.getClass().getName(), profiling);
+    featureFlaggingService.toggleProfilingFeature(PS_OPERATION_EXECUTED, profilingDataConsumer.getClass().getName(), profiling);
+    featureFlaggingService.toggleProfilingFeature(PS_FLOW_MESSAGE_PASSING, profilingDataConsumer.getClass().getName(), profiling);
   }
 
   @Override

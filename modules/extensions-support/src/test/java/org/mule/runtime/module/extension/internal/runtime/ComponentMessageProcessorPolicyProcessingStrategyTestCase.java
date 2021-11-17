@@ -54,8 +54,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.config.DefaultFeatureFlaggingService;
-import org.mule.runtime.core.internal.config.MuleTogglzManagedArtifactFeatures;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -64,6 +62,8 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
+import org.mule.runtime.feature.internal.togglz.config.MuleTogglzManagedArtifactFeatures;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
@@ -138,10 +138,8 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
         muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY,
-                                                                         new DefaultFeatureFlaggingService("artifacctId",
-                                                                                                           new MuleTogglzManagedArtifactFeatures(
-                                                                                                                                                 "artifactId",
-                                                                                                                                                 new HashMap<>())));
+                                                                         new DefaultFeatureFlaggingService("artifactId",
+                                                                                                           new HashMap<>()));
       }
     });
   }

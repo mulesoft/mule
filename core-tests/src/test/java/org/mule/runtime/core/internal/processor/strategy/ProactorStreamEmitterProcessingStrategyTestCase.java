@@ -806,7 +806,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
   @Test
   @Issue("MULE-17048")
-  @Description("Verify that the event loop scheduler (cpu lite) is stopped fea the others. Otherwise, an interrupted event may resume processing on ")
+  @Description("Verify that the event loop scheduler (cpu lite) is stopped before the others. Otherwise, an interrupted event may resume processing on ")
   public void schedulersStoppedInOrder() throws MuleException {
     spySchedulers();
 

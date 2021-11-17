@@ -17,11 +17,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STA
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.setFeatureState;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.withFeatureUser;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getComponentThreadingInfoMap;
-import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
@@ -49,15 +45,15 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
+import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
-import org.togglz.core.repository.FeatureState;
 
 import java.util.Collection;
 import java.util.Set;
@@ -110,23 +106,16 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
     enableProfilingFeatures();
   }
 
-  private void enableProfilingFeatures() {
-    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(STARTING_OPERATION_EXECUTION,
-                                                                                                "TEST_CONSUMER"),
-                                       true));
-    });
-
-    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(OPERATION_EXECUTED,
-                                                                                                "TEST_CONSUMER"),
-                                       true));
-    });
-
-    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(OPERATION_THREAD_RELEASE,
-                                                                                                "TEST_CONSUMER"),
-                                       true));
+  private void enableProfilingFeatures() throws Exception {
+    eventType().forEach(eventType -> {
+      try {
+        ((MuleContextWithRegistry) muleContext)
+            .getRegistry()
+            .lookupObject(RuntimeFeatureFlaggingService.class)
+            .toggleProfilingFeature(eventType, "TEST_DATA_CONSUMER", true);
+      } catch (Exception e) {
+        throw new RuntimeException();
+      }
     });
   }
 

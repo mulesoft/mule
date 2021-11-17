@@ -14,10 +14,6 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXT
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.setFeatureState;
-import static org.mule.runtime.core.internal.config.FeatureFlaggingUtils.withFeatureUser;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
-import static org.mule.runtime.core.internal.config.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
@@ -27,10 +23,11 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
-import org.mule.runtime.core.internal.config.togglz.user.MuleTogglzArtifactFeatureUser;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
 import org.mule.runtime.core.internal.profiling.ArtifactProfilingProducerScope;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Optional;
@@ -48,7 +45,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
-import org.togglz.core.repository.FeatureState;
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
@@ -81,19 +77,16 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
     profilingService = new TestDefaultProfilingService(logger);
     initialiseIfNeeded(profilingService, muleContext);
     startIfNeeded(profilingService);
-
-    withFeatureUser(new MuleTogglzArtifactFeatureUser(getArtifactId(muleContext)), () -> {
-      setFeatureState(new FeatureState(FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(EXTENSION_PROFILING_EVENT,
-                                                                                                "TEST_CONSUMER"),
-                                       true));
-    });
-
-
   }
 
   @Test
   @Description("When a profiling event related to an extension is triggered, the data consumers process the data accordingly.")
-  public void dataConsumersForComponentProfilingEventAreTriggered() {
+  public void dataConsumersForComponentProfilingEventAreTriggered() throws Exception {
+    ((MuleContextWithRegistry) muleContext)
+        .getRegistry()
+        .lookupObject(RuntimeFeatureFlaggingService.class)
+        .toggleProfilingFeature(EXTENSION_PROFILING_EVENT, "TEST_DATA_CONSUMER", true);
+
     ProfilingDataProducer<ExtensionProfilingEventContext, Object> dataProducer =
         profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT,
                                                   new ArtifactProfilingProducerScope(ProfilingUtils.getArtifactId(muleContext)));
