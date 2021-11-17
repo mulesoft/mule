@@ -316,7 +316,7 @@ public final class TemplateParser {
           break;
       }
       lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
-      lastIsBackSlash = c == '\\';
+      lastIsBackSlash = (c == '\\' && !lastIsBackSlash);
       column++;
     }
     return stack;
