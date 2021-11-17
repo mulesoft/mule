@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.config.internal.dsl.model.properties;
 
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -15,6 +21,8 @@ import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
+import java.util.Collection;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 public final class ConfigurationPropertiesProviderFactoryUtils {
@@ -43,6 +51,15 @@ public final class ConfigurationPropertiesProviderFactoryUtils {
               }
             }));
 
+    component
+        .directChildrenStream()
+        .forEach(child -> {
+          DefaultConfigurationParameters.Builder childParametersBuilder = DefaultConfigurationParameters.builder();
+          configurationParametersBuilder.withComplexParameter(child.getIdentifier(),
+                                                              resolveConfigurationParameters(childParametersBuilder, child,
+                                                                                             localResolver));
+        });
+
     return configurationParametersBuilder.build();
   }
 
@@ -53,8 +70,69 @@ public final class ConfigurationPropertiesProviderFactoryUtils {
         .forEach(pm -> {
           ComponentParameterAst param = component.getParameter(parameterGroup.getName(), pm.getName());
           if (param != null) {
-            configurationParametersBuilder
-                .withSimpleParameter(pm.getName(), localResolver.apply(param.getResolvedRawValue()));
+            param.getModel().getType().accept(new MetadataTypeVisitor() {
+
+              @Override
+              public void visitArrayType(ArrayType arrayType) {
+                getParamComponentIdentifier(param).ifPresent(paramComponentIdentifier -> {
+                  DefaultConfigurationParameters.Builder childParametersBuilder = DefaultConfigurationParameters.builder();
+
+                  visitMultiple(localResolver, param, childParametersBuilder);
+
+                  configurationParametersBuilder.withComplexParameter(paramComponentIdentifier,
+                                                                      childParametersBuilder.build());
+                });
+              }
+
+              @Override
+              public void visitObject(ObjectType objectType) {
+                getParamComponentIdentifier(param).ifPresent(paramComponentIdentifier -> {
+                  DefaultConfigurationParameters.Builder childParametersBuilder = DefaultConfigurationParameters.builder();
+
+                  if (isMap(objectType)) {
+                    visitMultiple(localResolver, param, childParametersBuilder);
+                  } else {
+                    Object value = param.getValue().getRight();
+                    if (value instanceof ComponentAst) {
+                      resolveConfigurationParameters(childParametersBuilder, (ComponentAst) value, localResolver);
+                    }
+                  }
+
+                  configurationParametersBuilder.withComplexParameter(paramComponentIdentifier,
+                                                                      childParametersBuilder.build());
+                });
+              }
+
+              protected Optional<ComponentIdentifier> getParamComponentIdentifier(ComponentParameterAst param) {
+                return param.getGenerationInformation().getSyntax()
+                    .map(paramSyntax -> ComponentIdentifier.builder()
+                        .namespaceUri(paramSyntax.getNamespace())
+                        .namespace(paramSyntax.getPrefix())
+                        .name(paramSyntax.getElementName())
+                        .build());
+              }
+
+              protected void visitMultiple(UnaryOperator<String> localResolver, ComponentParameterAst param,
+                                           DefaultConfigurationParameters.Builder childParametersBuilder) {
+                Object value = param.getValue().getRight();
+                if (value != null && value instanceof Collection) {
+                  ((Collection) value).forEach(item -> {
+                    DefaultConfigurationParameters.Builder itemBuilder = DefaultConfigurationParameters.builder();
+                    if (item instanceof ComponentAst) {
+                      resolveConfigurationParameters(itemBuilder, (ComponentAst) item, localResolver);
+                      childParametersBuilder.withComplexParameter(((ComponentAst) item).getIdentifier(),
+                                                                  itemBuilder.build());
+                    }
+                  });
+                }
+              }
+
+              @Override
+              public void defaultVisit(MetadataType metadataType) {
+                configurationParametersBuilder
+                    .withSimpleParameter(pm.getName(), localResolver.apply(param.getResolvedRawValue()));
+              }
+            });
           }
         });
   }
