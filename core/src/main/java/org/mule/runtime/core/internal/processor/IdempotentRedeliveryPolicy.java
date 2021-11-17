@@ -69,6 +69,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   private static final String EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG =
       "The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.";
+  private static final String BLANK_MESSAGE_ID_ERROR_MSG =
+      "The message cannot be processed because the message ID is null or blank.";
 
   public static final String SECURE_HASH_EXPR_FORMAT = "" +
       "%%dw 2.0" + lineSeparator() +
@@ -235,6 +237,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       throw new ExpressionRuntimeException(createStaticMessage(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG), e);
     } catch (Exception ex) {
       exceptionSeen = of(ex);
+    }
+
+    if (messageId == null && !exceptionSeen.isPresent()) {
+      // The current transaction needs to be committed, so it's not rolled back, what would cause an infinite loop.
+      TransactionCoordination.getInstance().commitCurrentTransaction();
+
+      throw new ExpressionRuntimeException(createStaticMessage(BLANK_MESSAGE_ID_ERROR_MSG));
     }
 
     Lock lock = lockFactory.createLock(idrId + "-" + messageId);
