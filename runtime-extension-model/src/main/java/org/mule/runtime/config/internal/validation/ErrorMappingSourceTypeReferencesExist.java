@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.config.internal.validation;
 
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
+import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
-import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
@@ -43,7 +44,7 @@ public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesVal
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    return WARN;
   }
 
   @Override

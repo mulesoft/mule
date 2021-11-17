@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -42,7 +43,7 @@ public class RaiseErrorTypeReferencesPresent extends AbstractErrorTypesValidatio
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    return WARN;
   }
 
   @Override

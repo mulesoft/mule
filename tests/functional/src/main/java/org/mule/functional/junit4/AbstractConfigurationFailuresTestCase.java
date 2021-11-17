@@ -6,12 +6,6 @@
  */
 package org.mule.functional.junit4;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
@@ -20,6 +14,14 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.get
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -80,6 +82,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
     final DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
     muleConfiguration.setId(AbstractConfigurationFailuresTestCase.class.getSimpleName());
+    applyConfiguration(muleConfiguration);
     contextBuilder.setMuleConfiguration(muleConfiguration);
     MuleContextWithRegistry muleContext =
         (MuleContextWithRegistry) muleContextFactory.createMuleContext(builders, contextBuilder);
@@ -108,6 +111,10 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
       muleContext.stop();
       muleContext.dispose();
     }
+  }
+
+  protected void applyConfiguration(DefaultMuleConfiguration muleConfiguration) {
+    // nothing to do by default
   }
 
   protected boolean disableXmlValidations() {
