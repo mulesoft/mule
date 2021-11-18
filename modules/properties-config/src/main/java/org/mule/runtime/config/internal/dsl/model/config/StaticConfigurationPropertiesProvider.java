@@ -23,6 +23,7 @@ import java.util.Optional;
 public final class StaticConfigurationPropertiesProvider implements ConfigurationPropertiesProvider {
 
   // this is static to avoid reading and processing the environment properties every time
+  private final ConfigurationPropertiesProvider sysPropsProvider = new SystemPropertiesConfigurationProvider();
   private final ConfigurationPropertiesProvider environmentProvider = new EnvironmentPropertiesConfigurationProvider();
 
   private final Map<String, String> artifactProperties;
@@ -33,13 +34,17 @@ public final class StaticConfigurationPropertiesProvider implements Configuratio
 
   @Override
   public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
-    final String propertyValue = artifactProperties.get(configurationAttributeKey);
-
-    if (propertyValue == null) {
-      return environmentProvider.provide(configurationAttributeKey);
-    } else {
+    String propertyValue = artifactProperties.get(configurationAttributeKey);
+    if (propertyValue != null) {
       return of(new DefaultConfigurationProperty(this, configurationAttributeKey, propertyValue));
     }
+
+    Optional<? extends ConfigurationProperty> sysPropValue = sysPropsProvider.provide(configurationAttributeKey);
+    if (sysPropValue.isPresent()) {
+      return sysPropValue;
+    }
+
+    return environmentProvider.provide(configurationAttributeKey);
   }
 
   @Override

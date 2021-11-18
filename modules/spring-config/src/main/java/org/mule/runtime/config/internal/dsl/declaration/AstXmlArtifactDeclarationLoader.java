@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.declaration;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Predicates.alwaysTrue;
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.sort;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -37,6 +30,16 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.sort;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Predicates.alwaysTrue;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -95,11 +98,10 @@ import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
-import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -132,20 +134,9 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     this.context = context;
 
     DefaultConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
-
-          ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
-
-          @Override
-          public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
-            return parentProvider.provide(configurationAttributeKey);
-          }
-
-          @Override
-          public String getDescription() {
-            return "Deployment properties";
-          }
-        });
+        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(empty(),
+                                                                                                 new SystemPropertiesConfigurationProvider())),
+                                                   new EnvironmentPropertiesConfigurationProvider());
 
     parser = AstXmlParser.builder().withSchemaValidationsDisabled()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))

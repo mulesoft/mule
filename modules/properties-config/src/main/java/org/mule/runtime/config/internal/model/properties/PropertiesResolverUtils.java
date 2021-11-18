@@ -6,18 +6,20 @@
  */
 package org.mule.runtime.config.internal.model.properties;
 
-import static java.lang.Class.forName;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.ServiceLoader.load;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+
+import static java.lang.Class.forName;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.ServiceLoader.load;
+import static java.util.stream.Collectors.toList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
@@ -36,6 +38,7 @@ import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationProper
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
@@ -80,24 +83,31 @@ public class PropertiesResolverUtils {
 
     EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
         new EnvironmentPropertiesConfigurationProvider();
-    ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
-        createProviderFromGlobalProperties(artifactAst);
-
     DefaultConfigurationPropertiesResolver environmentPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(empty(), environmentPropertiesConfigurationProvider);
 
+    SystemPropertiesConfigurationProvider systemPropertiesConfigurationProvider =
+        new SystemPropertiesConfigurationProvider();
+    DefaultConfigurationPropertiesResolver systemPropertiesConfigurationPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
+                                                   systemPropertiesConfigurationProvider);
+
     DefaultConfigurationPropertiesResolver parentLocalResolver;
     if (deploymentPropertiesConfigurationProperties != null) {
-      parentLocalResolver = new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
+      parentLocalResolver = new DefaultConfigurationPropertiesResolver(of(systemPropertiesConfigurationPropertiesResolver),
                                                                        deploymentPropertiesConfigurationProperties);
     } else {
-      parentLocalResolver = environmentPropertiesConfigurationPropertiesResolver;
+      parentLocalResolver = systemPropertiesConfigurationPropertiesResolver;
     }
 
+    ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
+        createProviderFromGlobalProperties(artifactAst);
+
     DefaultConfigurationPropertiesResolver localResolver =
-        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
-                                                                                                 globalPropertiesConfigurationAttributeProvider)),
-                                                   environmentPropertiesConfigurationProvider);
+        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
+                                                                                                                                               globalPropertiesConfigurationAttributeProvider)),
+                                                                                                 environmentPropertiesConfigurationProvider)),
+                                                   systemPropertiesConfigurationProvider);
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
     if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
@@ -155,11 +165,15 @@ public class PropertiesResolverUtils {
       DefaultConfigurationPropertiesResolver configurationPropertiesResolver =
           new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
                                                      configurationAttributesProvider.get());
-      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(of(configurationPropertiesResolver),
-                                                                            environmentPropertiesConfigurationProvider);
+      systemPropertiesResolver =
+          new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(configurationPropertiesResolver),
+                                                                                                   environmentPropertiesConfigurationProvider)),
+                                                     systemPropertiesConfigurationProvider);
     } else {
-      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
-                                                                            environmentPropertiesConfigurationProvider);
+      systemPropertiesResolver =
+          new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
+                                                                                                   environmentPropertiesConfigurationProvider)),
+                                                     systemPropertiesConfigurationProvider);
     }
 
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
@@ -194,21 +208,27 @@ public class PropertiesResolverUtils {
 
     EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
         new EnvironmentPropertiesConfigurationProvider();
-
     DefaultConfigurationPropertiesResolver environmentPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(empty(), environmentPropertiesConfigurationProvider);
 
+    SystemPropertiesConfigurationProvider systemPropertiesConfigurationProvider =
+        new SystemPropertiesConfigurationProvider();
+    DefaultConfigurationPropertiesResolver systemPropertiesConfigurationPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
+                                                   systemPropertiesConfigurationProvider);
+
     DefaultConfigurationPropertiesResolver parentLocalResolver;
     if (deploymentPropertiesConfigurationProperties != null) {
-      parentLocalResolver = new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
+      parentLocalResolver = new DefaultConfigurationPropertiesResolver(of(systemPropertiesConfigurationPropertiesResolver),
                                                                        deploymentPropertiesConfigurationProperties);
     } else {
-      parentLocalResolver = environmentPropertiesConfigurationPropertiesResolver;
+      parentLocalResolver = systemPropertiesConfigurationPropertiesResolver;
     }
 
     DefaultConfigurationPropertiesResolver localResolver =
-        new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
-                                                   environmentPropertiesConfigurationProvider);
+        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
+                                                                                                 environmentPropertiesConfigurationProvider)),
+                                                   systemPropertiesConfigurationProvider);
     localResolver.setRootResolver(parentLocalResolver);
 
     FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
@@ -234,8 +254,9 @@ public class PropertiesResolverUtils {
     }
 
     DefaultConfigurationPropertiesResolver systemPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                   environmentPropertiesConfigurationProvider);
+        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                                                                 environmentPropertiesConfigurationProvider)),
+                                                   systemPropertiesConfigurationProvider);
 
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null
