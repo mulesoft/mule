@@ -6,15 +6,14 @@
  */
 package org.mule.functional.junit4;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
-import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
@@ -95,23 +94,32 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected ConfigurationBuilder getBuilder() throws Exception {
     ArtifactDeclaration artifactDeclaration = getArtifactDeclaration();
     if (artifactDeclaration != null) {
-      return createConfigurationBuilder(artifactDeclaration);
+      return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
+                                                          enableLazyInit(),
+                                                          artifactDeclaration);
     }
 
     String configResources = getConfigResources();
     if (configResources != null) {
-      return createConfigurationBuilder(new String[] {configResources}, emptyMap(), APP, enableLazyInit(),
-                                        disableXmlValidations());
+      return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
+                                                          disableXmlValidations(), enableLazyInit(),
+                                                          mustRegenerateExtensionModels(),
+                                                          new String[] {configResources});
     }
     configResources = getConfigFile();
     if (configResources != null) {
       if (configResources.contains(",")) {
         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
       }
-      return createConfigurationBuilder(new String[] {configResources}, artifactProperties(), APP, enableLazyInit(),
-                                        disableXmlValidations());
+      return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
+                                                          disableXmlValidations(), enableLazyInit(),
+                                                          mustRegenerateExtensionModels(),
+                                                          new String[] {configResources});
     }
-    return createConfigurationBuilder(getConfigFiles(), artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
+    return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
+                                                        disableXmlValidations(), enableLazyInit(),
+                                                        mustRegenerateExtensionModels(),
+                                                        getConfigFiles());
   }
 
   public static ConfigurationBuilder extensionManagerWithMuleExtModelBuilder() {
@@ -254,6 +262,17 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * @return a boolean indicating if the Mule App should start without XML Validations.
    */
   public boolean disableXmlValidations() {
+    return false;
+  }
+
+  /**
+   * Subclasses can override this method so that extension models used are regenerated before running its tests. For example, some
+   * part of a extension model might only be created if a certain system property is in place, so the test classes that test that
+   * feature will have to generate the extension model when the property is already set.
+   *
+   * @return whether the tests on this class need for extensions model to be generated again.
+   */
+  protected boolean mustRegenerateExtensionModels() {
     return false;
   }
 

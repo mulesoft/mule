@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
@@ -153,7 +154,7 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   private SpringXmlConfigurationBuilder xmlConfigurationBuilderRelativeToPath(File basePath, String[] resources)
       throws IOException {
     return withContextClassLoader(new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null),
-                                  () -> new SpringXmlConfigurationBuilder(resources, new HashMap<>(), APP, false,
+                                  () -> new SpringXmlConfigurationBuilder(resources, emptyMap(), APP, false,
                                                                           false));
   }
 

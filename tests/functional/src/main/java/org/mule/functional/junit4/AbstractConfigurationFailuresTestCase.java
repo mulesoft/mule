@@ -6,7 +6,6 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
@@ -77,9 +76,11 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
         muleContext.setExtensionManager(defaultExtensionManager);
       }
     });
-    ConfigurationBuilder configurationBuilder =
-        createConfigurationBuilder(new String[] {configuration}, emptyMap(), APP, enableLazyInit(),
-                                   disableXmlValidations());
+    ConfigurationBuilder configurationBuilder = new ArtifactAstXmlParserConfigurationBuilder(emptyMap(),
+                                                                                             enableLazyInit(),
+                                                                                             disableXmlValidations(),
+                                                                                             false,
+                                                                                             new String[] {configuration});
     configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);
     builders.add(configurationBuilder);
     builders.add(testServicesConfigurationBuilder);

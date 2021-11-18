@@ -6,53 +6,37 @@
  */
 package org.mule.runtime.config.internal;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
-import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
 import static org.mule.runtime.config.internal.registry.AbstractSpringRegistry.SPRING_APPLICATION_CONTEXT;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.ast.api.xml.AstXmlParser;
-import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
-import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
@@ -61,112 +45,59 @@ import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStra
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * <code>SpringXmlConfigurationBuilder</code> enables Mule to be configured from a Spring XML Configuration file used with Mule
- * name-spaces. Multiple configuration files can be loaded from this builder (specified as a comma-separated list).
+ * Generates a Spring context for the artifact of the provided {@link ArtifactAst}, and sets it as the registry in the
+ * {@link MuleContext}.
  * 
- * @deprecated Use {@link ArtifactAstConfigurationBuilder} instead.
+ * @since 4.5
  */
-@Deprecated
-public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder
+public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilder
     implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory,
     ComponentBuildingDefinitionRegistryFactoryAware {
 
-  private MemoryManagementService memoryManagementService;
-  private ArtifactDeclaration artifactDeclaration;
   private boolean enableLazyInit = false;
-  private boolean disableXmlValidations = false;
 
+  private final ArtifactAst artifactAst;
+  private final Map<String, String> artifactProperties;
   private ArtifactAst parentArtifactAst;
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
+  private final MemoryManagementService memoryManagementService;
   private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
 
-  private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
-                                        ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
-                                        LockFactory runtimeLockFactory, MemoryManagementService memoryManagementService)
+  private ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
+                                          ArtifactType artifactType, boolean enableLazyInit,
+                                          LockFactory runtimeLockFactory, MemoryManagementService memoryManagementService)
       throws ConfigurationException {
-    super(configResources, artifactProperties);
+    this.artifactAst = artifactAst;
+    this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
     this.enableLazyInit = enableLazyInit;
-    this.disableXmlValidations = disableXmlValidations;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
   }
 
-  public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
-                                       ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations)
+  public ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
+                                         ArtifactType artifactType, boolean enableLazyInit)
       throws ConfigurationException {
-    this(configResources, artifactProperties, artifactType, enableLazyInit, disableXmlValidations,
-         getRuntimeLockFactory(), DefaultMemoryManagementService.getInstance());
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String configResources, Map<String, String> artifactProperties, ArtifactType artifactType)
-      throws ConfigurationException {
-    this(new String[] {configResources}, artifactProperties, artifactType, false, false);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String configResource) throws ConfigurationException {
-    this(configResource, emptyMap(), APP);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String[] configFiles, Map<String, String> artifactProperties)
-      throws ConfigurationException {
-    this(configFiles, artifactProperties, APP, false, false);
-  }
-
-  // TODO: MULE-19422 Remove specific tests usages
-  @Deprecated
-  public SpringXmlConfigurationBuilder(String[] configFiles, boolean enableLazyInit, boolean disableXmlValidations)
-      throws ConfigurationException {
-    this(configFiles, emptyMap(), APP, enableLazyInit, disableXmlValidations, getRuntimeLockFactory(),
+    this(artifactAst, artifactProperties, artifactType, enableLazyInit,
+         getRuntimeLockFactory(),
          DefaultMemoryManagementService.getInstance());
-  }
-
-  public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
-                                       Map<String, String> artifactProperties, ArtifactType artifactType,
-                                       boolean enableLazyInitialisation, boolean disableXmlValidations,
-                                       LockFactory runtimeLockFactory)
-      throws ConfigurationException {
-    this(configurationFiles, artifactProperties, artifactType, enableLazyInitialisation, disableXmlValidations,
-         runtimeLockFactory, DefaultMemoryManagementService.getInstance());
-    this.artifactDeclaration = artifactDeclaration;
-  }
-
-  public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
-                                       Map<String, String> artifactProperties, ArtifactType artifactType,
-                                       boolean enableLazyInitialisation, boolean disableXmlValidations,
-                                       LockFactory runtimeLockFactory,
-                                       MemoryManagementService memoryManagementService)
-      throws ConfigurationException {
-    this(configurationFiles, artifactDeclaration, artifactProperties, artifactType, enableLazyInitialisation,
-         disableXmlValidations,
-         runtimeLockFactory);
-    this.memoryManagementService = memoryManagementService;
   }
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
-    if (isEmpty(artifactConfigResources) && artifactType == DOMAIN) {
+    if (emptyArtifact().equals(artifactAst) && artifactType == DOMAIN) {
       ((DefaultMuleContext) muleContext).setLifecycleStrategy(new NullDomainMuleContextLifecycleStrategy());
       return;
     }
@@ -216,13 +147,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     return baseRegistry;
   }
 
-  /**
-   * Template method for modifying the list of resources to be loaded. This operation is a no-op by default.
-   *
-   * @param allResources the list of {@link ConfigResource} to be loaded
-   */
-  protected void addResources(List<ConfigResource> allResources) {}
-
   private MuleArtifactContext createApplicationContext(MuleContext muleContext,
                                                        OptionalObjectsController optionalObjectsController,
                                                        Optional<ConfigurationProperties> parentConfigurationProperties,
@@ -232,7 +156,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                        FeatureFlaggingService featureFlaggingService)
       throws Exception {
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
-    return doCreateApplicationContext(muleContext, artifactDeclaration, optionalObjectsController, parentConfigurationProperties,
+    return doCreateApplicationContext(muleContext, optionalObjectsController, parentConfigurationProperties,
                                       baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
                                       featureFlaggingService);
   }
@@ -253,7 +177,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   private MuleArtifactContext doCreateApplicationContext(MuleContext muleContext,
-                                                         ArtifactDeclaration artifactDeclaration,
                                                          OptionalObjectsController optionalObjectsController,
                                                          Optional<ConfigurationProperties> parentConfigurationProperties,
                                                          BaseConfigurationComponentLocator baseConfigurationComponentLocator,
@@ -264,16 +187,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         this.componentBuildingDefinitionRegistryFactory
             .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
 
-    final ArtifactAst artifactAst =
-        createApplicationModel(getExtensions(muleContext.getExtensionManager()),
-                               artifactDeclaration, resolveArtifactConfigResources(), getArtifactProperties(),
-                               disableXmlValidations, featureFlaggingService);
-
     MuleArtifactContext muleArtifactContext;
     if (enableLazyInit) {
       muleArtifactContext = new LazyMuleArtifactContext(muleContext, artifactAst,
                                                         optionalObjectsController,
-                                                        parentConfigurationProperties,
+                                                        resolveParentConfigurationProperties(),
                                                         baseConfigurationComponentLocator,
                                                         errorTypeRepository, errorTypeLocator,
                                                         getArtifactProperties(), artifactType,
@@ -285,7 +203,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     } else {
       muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
                                                     optionalObjectsController,
-                                                    parentConfigurationProperties,
+                                                    resolveParentConfigurationProperties(),
                                                     baseConfigurationComponentLocator,
                                                     errorTypeRepository, errorTypeLocator,
                                                     getArtifactProperties(), artifactType,
@@ -298,83 +216,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     return muleArtifactContext;
   }
 
-  private Set<ExtensionModel> getExtensions(ExtensionManager extensionManager) {
-    return extensionManager == null ? emptySet() : extensionManager.getExtensions();
-  }
-
-  private ArtifactAst createApplicationModel(Set<ExtensionModel> extensions,
-                                             ArtifactDeclaration artifactDeclaration,
-                                             ConfigResource[] artifactConfigResources,
-                                             Map<String, String> artifactProperties,
-                                             boolean disableXmlValidations,
-                                             FeatureFlaggingService featureFlaggingService) {
-    try {
-      final ArtifactAst artifactAst;
-
-      if (artifactDeclaration == null) {
-        if (artifactConfigResources.length == 0) {
-          artifactAst = emptyArtifact();
-        } else {
-          final AstXmlParser parser =
-              createMuleXmlParser(extensions, artifactProperties, disableXmlValidations, featureFlaggingService);
-          artifactAst = parser.parse(artifactConfigResources);
-        }
-      } else {
-        artifactAst = toArtifactast(artifactDeclaration, extensions);
-      }
-
-      return artifactAst;
-    } catch (MuleRuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
-                                           Map<String, String> artifactProperties, boolean disableXmlValidations,
-                                           FeatureFlaggingService featureFlaggingService) {
-    ConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
-
-    Builder builder = AstXmlParser.builder()
-        .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
-        .withExtensionModels(extensions)
-        .withParentArtifact(resolveParentArtifact(featureFlaggingService));
-    if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)) {
-      builder.withLegacyFailStrategy();
-    }
-    if (disableXmlValidations) {
-      builder.withSchemaValidationsDisabled();
-    }
-
-    switch (artifactType) {
-      case APP:
-        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.APPLICATION);
-        break;
-      case DOMAIN:
-        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.DOMAIN);
-        break;
-      case POLICY:
-        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.POLICY);
-        break;
-      default:
-        break;
-    }
-
-    return builder.build();
-  }
-
   protected ArtifactAst resolveParentArtifact(FeatureFlaggingService featureFlaggingService) {
     if (POLICY.equals(artifactType)) {
-      return applicationFilteredFromPolicyArtifactAst(parentArtifactAst,
-                                                      featureFlaggingService);
+      return applicationFilteredFromPolicyArtifactAst(parentArtifactAst, featureFlaggingService);
     }
     return parentArtifactAst;
-  }
-
-  private ConfigResource[] resolveArtifactConfigResources() {
-    return artifactConfigResources;
   }
 
   private Optional<ConfigurationProperties> resolveParentConfigurationProperties() {
@@ -448,5 +294,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   @Override
   public void setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
     this.componentBuildingDefinitionRegistryFactory = ofNullable(componentBuildingDefinitionRegistryFactory);
+  }
+
+  public Map<String, String> getArtifactProperties() {
+    return artifactProperties;
   }
 }

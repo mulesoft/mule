@@ -7,10 +7,10 @@
 package org.mule.functional.junit4;
 
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
-import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -91,8 +91,11 @@ public class ApplicationContextBuilder {
     // No op
   }
 
-  protected ConfigurationBuilder getAppBuilder(String[] configResource) throws Exception {
-    return createConfigurationBuilder(configResource, domainArtifactContext);
+  protected ConfigurationBuilder getAppBuilder(String[] configResources) throws Exception {
+    ArtifactAstXmlParserConfigurationBuilder appBuilder =
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources);
+    appBuilder.setParentArtifactContext(domainArtifactContext);
+    return appBuilder;
   }
 
   /**

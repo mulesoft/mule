@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.config.api;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -22,7 +24,9 @@ import java.util.Map;
 
 /**
  * @since 4.0
+ * @deprecated Use {@link ArtifactAstConfigurationBuilder} instead.
  */
+@Deprecated
 public final class SpringXmlConfigurationBuilderFactory {
 
   private SpringXmlConfigurationBuilderFactory() {

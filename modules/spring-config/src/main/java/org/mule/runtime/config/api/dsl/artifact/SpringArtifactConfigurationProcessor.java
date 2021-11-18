@@ -36,6 +36,17 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
       return new ImmutableArtifactContext(artifactContextConfiguration.getMuleContext());
     }
 
+    // TODO how to deal with the FFR?
+    // new ArtifactAstConfigurationBuilder(createApplicationModel(getExtensions(artifactContextConfiguration.getMuleContext()
+    // .getExtensionManager()),
+    // artifactContextConfiguration.getArtifactDeclaration(),
+    // configResources,
+    // artifactContextConfiguration.getArtifactProperties(),
+    // artifactContextConfiguration.isDisableXmlValidations(),
+    // null),
+    // null, null, false);
+    //
+
     SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
         new SpringXmlConfigurationBuilder(configResources,
                                           artifactContextConfiguration.getArtifactDeclaration(),
@@ -53,4 +64,72 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
     springXmlConfigurationBuilder.configure(artifactContextConfiguration.getMuleContext());
     return springXmlConfigurationBuilder.createArtifactContext();
   }
+
+  // private Set<ExtensionModel> getExtensions(ExtensionManager extensionManager) {
+  // return extensionManager == null ? emptySet() : extensionManager.getExtensions();
+  // }
+  //
+  // private ArtifactAst createApplicationModel(Set<ExtensionModel> extensions,
+  // ArtifactDeclaration artifactDeclaration,
+  // ConfigResource[] artifactConfigResources,
+  // Map<String, String> artifactProperties,
+  // boolean disableXmlValidations,
+  // FeatureFlaggingService featureFlaggingService) {
+  // try {
+  // final ArtifactAst artifactAst;
+  //
+  // if (artifactDeclaration == null) {
+  // if (artifactConfigResources.length == 0) {
+  // artifactAst = emptyArtifact();
+  // } else {
+  // final AstXmlParser parser =
+  // createMuleXmlParser(extensions, artifactProperties, disableXmlValidations, featureFlaggingService);
+  // artifactAst = parser.parse(artifactConfigResources);
+  // }
+  // } else {
+  // artifactAst = toArtifactast(artifactDeclaration, extensions);
+  // }
+  //
+  // return artifactAst;
+  // } catch (MuleRuntimeException e) {
+  // throw e;
+  // } catch (Exception e) {
+  // throw new MuleRuntimeException(e);
+  // }
+  // }
+  //
+  // private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
+  // Map<String, String> artifactProperties, boolean disableXmlValidations,
+  // FeatureFlaggingService featureFlaggingService) {
+  // ConfigurationPropertiesResolver propertyResolver =
+  // new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
+  //
+  // Builder builder = AstXmlParser.builder()
+  // .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
+  // .withExtensionModels(extensions)
+  // .withParentArtifact(resolveParentArtifact(featureFlaggingService));
+  // if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)) {
+  // builder.withLegacyFailStrategy();
+  // }
+  // if (disableXmlValidations) {
+  // builder.withSchemaValidationsDisabled();
+  // }
+  //
+  // switch (artifactType) {
+  // case APP:
+  // builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.APPLICATION);
+  // break;
+  // case DOMAIN:
+  // builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.DOMAIN);
+  // break;
+  // case POLICY:
+  // builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.POLICY);
+  // break;
+  // default:
+  // break;
+  // }
+  //
+  // return builder.build();
+  // }
+
 }
