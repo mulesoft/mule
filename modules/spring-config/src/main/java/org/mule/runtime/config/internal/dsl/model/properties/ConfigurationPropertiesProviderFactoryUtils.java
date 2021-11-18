@@ -53,12 +53,11 @@ public final class ConfigurationPropertiesProviderFactoryUtils {
 
     component
         .directChildrenStream()
-        .forEach(child -> {
-          DefaultConfigurationParameters.Builder childParametersBuilder = DefaultConfigurationParameters.builder();
-          configurationParametersBuilder.withComplexParameter(child.getIdentifier(),
-                                                              resolveConfigurationParameters(childParametersBuilder, child,
-                                                                                             localResolver));
-        });
+        .forEach(child -> configurationParametersBuilder
+            .withComplexParameter(child.getIdentifier(),
+                                  resolveConfigurationParameters(DefaultConfigurationParameters.builder(),
+                                                                 child,
+                                                                 localResolver)));
 
     return configurationParametersBuilder.build();
   }
