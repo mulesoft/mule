@@ -34,7 +34,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
-import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
+import org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
 import org.mule.sdk.api.annotation.source.SourceClusterSupport;
