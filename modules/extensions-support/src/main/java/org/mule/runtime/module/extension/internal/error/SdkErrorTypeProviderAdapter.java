@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.error;
 
-import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.sdk.api.annotation.error.ErrorTypeProvider;
@@ -57,8 +56,11 @@ public class SdkErrorTypeProviderAdapter implements ErrorTypeProvider {
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
-    return (Set<ErrorTypeDefinition>) delegate.getErrorTypes().stream()
-        .map(SdkErrorTypeDefinitionAdapter::new)
-        .collect(toCollection(LinkedHashSet::new));
+    Set<ErrorTypeDefinition> errors = new LinkedHashSet<>();
+    for (org.mule.runtime.extension.api.error.ErrorTypeDefinition def : delegate.getErrorTypes()) {
+      errors.add(new SdkErrorTypeDefinitionAdapter(def));
+    }
+
+    return errors;
   }
 }
