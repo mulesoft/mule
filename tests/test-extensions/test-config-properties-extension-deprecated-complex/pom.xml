@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mule-test-extensions-parent</artifactId>
+        <groupId>org.mule.tests</groupId>
+        <version>4.5.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>test-config-properties-extension-deprecated-complex</artifactId>
+
+    <name>Mule Test Config Properties Extension Complex (deprecated)</name>
+    <description>A Mule extension with complex elements for testing deprecated Configuration Properties provider</description>
+
+    <properties>
+        <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
