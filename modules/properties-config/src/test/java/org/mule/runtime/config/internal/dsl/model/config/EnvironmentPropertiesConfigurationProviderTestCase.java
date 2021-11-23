@@ -8,16 +8,14 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableMap;
 
-public class EnvironmentPropertiesConfigurationProviderTestCase extends AbstractMuleTestCase {
+import org.junit.Test;
 
+public class EnvironmentPropertiesConfigurationProviderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void environmentVariables() {
@@ -28,33 +26,6 @@ public class EnvironmentPropertiesConfigurationProviderTestCase extends Abstract
             .put(variableKey, variableValue).build());
     assertThat(environmentPropertiesConfigurationProvider.provide(variableKey).get().getValue(),
                is(variableValue));
-  }
-
-  @Test
-  public void systemProperty() throws Exception {
-    String propertyKey = "propertyA";
-    String propertyValue = "propertyAValue";
-    testWithSystemProperty(propertyKey, propertyValue, () -> {
-      EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
-          new EnvironmentPropertiesConfigurationProvider();
-      assertThat(environmentPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
-                 is(propertyValue));
-
-    });
-  }
-
-  @Test
-  public void systemPropertyPrecedenceOverEnvVariable() throws Exception {
-    String key = "varA";
-    String keyPropertyValue = "varPropertyValue";
-    String keyVariableValue = "varEnvironmentValue";
-    testWithSystemProperty(key, keyPropertyValue, () -> {
-      EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
-          new EnvironmentPropertiesConfigurationProvider(() -> ImmutableMap.<String, String>builder()
-              .put(key, keyVariableValue).build());
-      assertThat(environmentPropertiesConfigurationProvider.provide(key).get().getValue(),
-                 is(keyPropertyValue));
-    });
   }
 
 }

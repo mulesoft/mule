@@ -6,24 +6,6 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Sets.newHashSet;
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Math.max;
-import static java.lang.Runtime.getRuntime;
-import static java.lang.String.format;
-import static java.lang.String.join;
-import static java.lang.Thread.currentThread;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -39,6 +21,26 @@ import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Math.max;
+import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Sets.newHashSet;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -85,6 +87,7 @@ import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesCo
 import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
+import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -419,10 +422,14 @@ public final class XmlExtensionLoaderDelegate {
     final ConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(new XmlExtensionConfigurationPropertiesResolver()),
                                                    createProviderFromGlobalProperties(ast));
-    // system properties, such as "file.separator" properties reader
-    final ConfigurationPropertiesResolver systemPropertiesResolver =
+    final ConfigurationPropertiesResolver envVariablesResolver =
         new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
                                                    new EnvironmentPropertiesConfigurationProvider());
+
+    // system properties, such as "file.separator" properties reader
+    final ConfigurationPropertiesResolver systemPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(of(envVariablesResolver),
+                                                   new SystemPropertiesConfigurationProvider());
     // "file::" properties reader
     final String description = format("External files for smart connector '%s'", modulePath);
     final FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
