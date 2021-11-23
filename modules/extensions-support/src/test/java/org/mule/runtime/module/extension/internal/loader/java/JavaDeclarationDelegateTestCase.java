@@ -34,10 +34,13 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
@@ -89,7 +92,9 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
+import org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.internal.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -426,32 +431,30 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   public void defaultClusterSupport() {
     SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("ListenPayments");
 
-    ParameterDeclaration clusterSupportParameter = sourceDeclaration.getAllParameters().stream()
-        .filter(parameterDeclaration -> parameterDeclaration.getName().equals("primaryNodeOnly")).findFirst().get();
+    SourceClusterSupportModelProperty sourceClusterSupportModelProperty =
+        sourceDeclaration.getModelProperty(SourceClusterSupportModelProperty.class).get();
 
-    assertThat(clusterSupportParameter.getDefaultValue(), is(false));
+    assertThat(sourceClusterSupportModelProperty.getSourceClusterSupport(), is(DEFAULT_ALL_NODES));
   }
 
   @Test
   public void clusterSupportDefaultingPrimaryNodeOnly() {
     SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("listen-payments-cluster");
 
-    ParameterDeclaration clusterSupportParameter = sourceDeclaration.getAllParameters().stream()
-        .filter(parameterDeclaration -> parameterDeclaration.getName().equals("primaryNodeOnly")).findFirst().get();
+    SourceClusterSupportModelProperty sourceClusterSupportModelProperty =
+        sourceDeclaration.getModelProperty(SourceClusterSupportModelProperty.class).get();
 
-    assertThat(clusterSupportParameter.getDefaultValue(), is(true));
+    assertThat(sourceClusterSupportModelProperty.getSourceClusterSupport(), is(DEFAULT_PRIMARY_NODE_ONLY));
   }
 
   @Test
   public void backPressureSupport() {
     SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("ListenPaymentsAllOptional");
-    ParameterDeclaration backPressureSupportParameter = sourceDeclaration.getAllParameters().stream()
-        .filter(parameterDeclaration -> parameterDeclaration.getName().equals("onCapacityOverload")).findFirst().get();
+    BackPressureStrategyModelProperty backPressureStrategyModelProperty =
+        sourceDeclaration.getModelProperty(BackPressureStrategyModelProperty.class).get();
 
-    assertThat(backPressureSupportParameter.getDefaultValue(), is(FAIL));
-    assertThat(stream(backPressureSupportParameter.getType().getAnnotation(EnumAnnotation.class).get().getValues())
-        .collect(toList()), hasItems("FAIL", "DROP"));
-
+    assertThat(backPressureStrategyModelProperty.getDefaultMode(), is(FAIL));
+    assertThat(backPressureStrategyModelProperty.getSupportedModes(), hasItems(FAIL, DROP));
   }
 
   private SourceDeclaration getSourceDeclarationWithName(String sourceName) {
@@ -869,7 +872,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(source.getName(), is(sourceName));
 
     List<ParameterDeclaration> parameters = source.getAllParameters();
-    assertThat(parameters, hasSize(35));
+    assertThat(parameters, hasSize(33));
 
     assertParameter(parameters, SOURCE_PARAMETER, "", INT_TYPE, true, NOT_SUPPORTED, null);
     assertParameter(parameters, SOURCE_CALLBACK_PARAMETER, "", toMetadataType(Long.class), false, SUPPORTED, "#[payload]");

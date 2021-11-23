@@ -25,9 +25,9 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
 import java.util.List;
