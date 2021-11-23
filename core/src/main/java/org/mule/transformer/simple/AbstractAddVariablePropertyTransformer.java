@@ -20,10 +20,16 @@ import org.mule.util.StringUtils;
 
 import java.text.MessageFormat;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static org.mule.api.config.MuleProperties.MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE;
+
 public abstract class AbstractAddVariablePropertyTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator identifierEvaluator;
     private AttributeEvaluator valueEvaluator;
+    private static final boolean setVariableInheritedMimeTypeDisabled =
+            parseBoolean(getProperty(MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE, "true"));
 
     public AbstractAddVariablePropertyTransformer()
     {
@@ -64,7 +70,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             }
             else
             {
-                if (isMimeTypeSet() || !StringUtils.isEmpty(encoding))
+                if (isMimeTypeSet() || !StringUtils.isEmpty(encoding) || setVariableInheritedMimeTypeDisabled)
                 {
                     DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType());
                     dataType.setEncoding(getEncoding());
