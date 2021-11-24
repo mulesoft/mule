@@ -13169,7 +13169,7 @@
         },
         {
           "hasResponse": false,
-          "runsOnPrimaryNodeOnly": true,
+          "runsOnPrimaryNodeOnly": false,
           "output": {
             "type": {
               "format": {

@@ -10,34 +10,15 @@ import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_DESCRIPTION;
-import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addPrimaryNodeParameter;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 
-import org.mule.metadata.api.annotation.EnumAnnotation;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.OptionalParameterDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
-import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
-import org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.internal.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
@@ -142,12 +123,10 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       case DEFAULT_PRIMARY_NODE_ONLY:
         runsOnPrimaryNodeOnly = false;
         resultingSourceClusterSupport = DEFAULT_PRIMARY_NODE_ONLY;
-        // addPrimaryNodeParameter(sourceDeclarer.getDeclaration(), true);
         break;
       case DEFAULT_ALL_NODES:
         runsOnPrimaryNodeOnly = false;
         resultingSourceClusterSupport = DEFAULT_ALL_NODES;
-        // addPrimaryNodeParameter(sourceDeclarer.getDeclaration(), false);
         break;
       case NOT_SUPPORTED:
       default:
@@ -157,36 +136,6 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
     sourceDeclarer.runsOnPrimaryNodeOnly(runsOnPrimaryNodeOnly);
     sourceDeclarer.withModelProperty(new SourceClusterSupportModelProperty(resultingSourceClusterSupport));
   }
-
-  // private void declareBackPressureSupport(ExtensionDeclarer extensionDeclarer, SourceDeclarer sourceDeclarer,
-  // Optional<BackPressureStrategyModelProperty> configuredBackPressureStrategyModelProperty) {
-  // BackPressureStrategyModelProperty backPressureStrategyModelProperty =
-  // configuredBackPressureStrategyModelProperty.orElseGet(BackPressureStrategyModelProperty::getDefault);
-  // sourceDeclarer.withModelProperty(backPressureStrategyModelProperty);
-  // if (backPressureStrategyModelProperty.getSupportedModes().size() > 1) {
-  // addBackPressureParameter(extensionDeclarer, sourceDeclarer, backPressureStrategyModelProperty);
-  // }
-  // }
-  //
-  // private void addBackPressureParameter(ExtensionDeclarer extensionDeclarer,
-  // SourceDeclarer sourceDeclarer,
-  // BackPressureStrategyModelProperty property) {
-  //
-  // OptionalParameterDeclarer parameter =
-  // sourceDeclarer.onParameterGroup(DEFAULT_GROUP_NAME).withOptionalParameter(BACK_PRESSURE_STRATEGY_PARAMETER_NAME);
-  // parameter.describedAs(BACK_PRESSURE_STRATEGY_PARAMETER_DESCRIPTION);
-  // parameter.defaultingTo(property.getDefaultMode());
-  // parameter.withExpressionSupport(NOT_SUPPORTED);
-  // parameter.withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-  //
-  // MetadataType type = BaseTypeBuilder.create(JAVA).stringType()
-  // .id(format("%s-%s-backPressureStrategy", extensionDeclarer.getDeclaration().getName(),
-  // sourceDeclarer.getDeclaration().getName()))
-  // .with(new EnumAnnotation<>(property.getSupportedModes().stream().map(BackPressureMode::name).toArray(String[]::new)))
-  // .with(new ClassInformationAnnotation(BackPressureMode.class))
-  // .build();
-  // parameter.ofDynamicType(type);
-  // }
 
   private void declareSourceCallbackParameters(Optional<SourceCallbackModelParser> parser,
                                                Supplier<ParameterizedDeclarer> declarer) {
