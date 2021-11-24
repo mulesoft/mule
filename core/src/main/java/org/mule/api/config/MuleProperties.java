@@ -220,5 +220,8 @@ public class MuleProperties
     public static final String MULE_DISABLE_COMPOUND_CORRELATION_ID = SYSTEM_PROPERTY_PREFIX + "compoundCorrelationId.disable";
     public static final String MULE_DISABLE_FOREACH_COMPOUND_CORRELATION_ID = SYSTEM_PROPERTY_PREFIX + "forEachCompoundCorrelationId.disable";
     public static final String MULE_DISABLE_DECODE_URL = SYSTEM_PROPERTY_PREFIX + "http.decodeUrl.disable";
+    //MULE-19941
+    public static final String MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE = SYSTEM_PROPERTY_PREFIX + "setVariable.inheritedMimeType.disable";
+
 
 }

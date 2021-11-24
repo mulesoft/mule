@@ -5,21 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformers.simple;
+package org.mule.issues;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.api.lifecycle.Callable;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transformer.types.MimeTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +23,10 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.api.config.MuleProperties.MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-//MULE-19814
-public class SetVariableMimeTypeTestCase extends FunctionalTestCase
+public class MULE19941TestCase extends FunctionalTestCase
 {
 
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
@@ -43,22 +38,9 @@ public class SetVariableMimeTypeTestCase extends FunctionalTestCase
         return "set-variable-mime-type-config.xml";
     }
 
-    //MULE-19941
     @Rule
     public SystemProperty setVariableInheritedMimeTypeDisabledProperty =
-            new SystemProperty(MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE, "false");
-
-    @Test
-    public void setsMimeTypeOnVariableWithoutContentTypeOnPayload() throws Exception
-    {
-        LocalMuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://testInput1", TEST_MESSAGE, null);
-
-        DataType dataType = (DataType) response.getPayload();
-
-        assertThat(dataType.getMimeType(), equalTo(MimeTypes.APPLICATION_JSON));
-    }
+            new SystemProperty(MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE, "true");
 
     @Test
     public void setsContentTypeOnPayloadWithoutMimeTypeOnVariable() throws Exception
@@ -72,28 +54,6 @@ public class SetVariableMimeTypeTestCase extends FunctionalTestCase
 
         DataType dataType = (DataType) response.getPayload();
 
-        assertThat(dataType.getMimeType(), equalTo(MimeTypes.APPLICATION_JSON));
-    }
-
-    @Test
-    public void requestWithoutAnyDataTypeSet() throws Exception
-    {
-        LocalMuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://testInput3", TEST_MESSAGE, null);
-
-        DataType dataType = (DataType) response.getPayload();
-
-        assertThat(dataType.getMimeType(), equalTo(MimeTypes.ANY));
         assertThat(dataType.getMimeType(), equalTo("*/*"));
-    }
-
-    public static class FlowVariableDataTypeAccessor implements Callable
-    {
-
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception {
-            return eventContext.getMessage().getPropertyDataType("testVariable", PropertyScope.INVOCATION);
-        }
     }
 }
