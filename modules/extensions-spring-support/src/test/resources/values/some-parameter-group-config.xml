@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
 
-<!--    <flow name="dslTrueSomeParameter">
+    <flow name="dslTrueSomeParameter">
         <some:one-required-parameter-resolver-operation-dsl-true>
             <some:awesome-parameter-group someParameter="hello dog!"/>
         </some:one-required-parameter-resolver-operation-dsl-true>
@@ -207,7 +207,7 @@
             <some:complex-parameter-alias another-parameter-alias="#[vars.anotherParameter]"
                                           yet-another-parameter-alias="#['whatever']"/>
         </some:one-required-aliased-parameter-resolver-operation>
-    </flow>-->
+    </flow>
 
     <flow name="value">
         <some:say-hi person="   Max Mule   "/>
