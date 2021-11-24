@@ -140,4 +140,8 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
   protected CustomServiceRegistry getCustomServiceRegistry() {
     return customServiceRegistry;
   }
+
+  protected Registry getServiceLocator() {
+    return serviceLocator;
+  }
 }

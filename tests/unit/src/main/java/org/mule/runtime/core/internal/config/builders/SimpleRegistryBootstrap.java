@@ -42,7 +42,7 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
    * @param muleContext           {@code MuleContext} in which the objects will be registered
    */
   public SimpleRegistryBootstrap(ArtifactType supportedArtifactType, MuleContext muleContext) {
-    super(supportedArtifactType, muleContext);
+    super(supportedArtifactType, muleContext, k -> true);
   }
 
   @Override

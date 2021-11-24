@@ -15,23 +15,23 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
- * Specialization of {@link DefaultLifecycleObjectSorter} which uses a {@link SpringRegistry} to not only consider the provided
- * objects but the beans on which that object depends on. This is accomplished by introspecting the {@link BeanDefinition} that
- * was derived from the {@link Inject} annotations
+ * Specialization of {@link DefaultLifecycleObjectSorter} which uses an {@link AbstractSpringRegistry} to not only consider the
+ * provided objects but the beans on which that object depends on. This is accomplished by introspecting the
+ * {@link BeanDefinition} that was derived from the {@link Inject} annotations
  *
  * @since 4.2.0
  */
 public class SpringLifecycleObjectSorter extends DefaultLifecycleObjectSorter {
 
-  private final SpringRegistry registry;
+  private final AbstractSpringRegistry registry;
 
   /**
    * Creates a new instance
    *
    * @param orderedLifecycleTypes an ordered array specifying a type based order
-   * @param registry              a {@link SpringRegistry}
+   * @param registry              an {@link AbstractSpringRegistry}
    */
-  public SpringLifecycleObjectSorter(Class<?>[] orderedLifecycleTypes, SpringRegistry registry) {
+  public SpringLifecycleObjectSorter(Class<?>[] orderedLifecycleTypes, AbstractSpringRegistry registry) {
     super(orderedLifecycleTypes);
     this.registry = registry;
   }

@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.registry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.context.ApplicationContext;
@@ -31,5 +32,10 @@ public class BaseSpringRegistry extends AbstractSpringRegistry {
   @Override
   public BeanDependencyResolver getBeanDependencyResolver() {
     return beanDependencyResolver;
+  }
+
+  @Override
+  protected <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
+    return internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, getApplicationContext());
   }
 }
