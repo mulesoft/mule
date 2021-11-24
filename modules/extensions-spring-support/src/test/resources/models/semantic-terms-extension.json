@@ -9433,6 +9433,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -9574,7 +9575,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],

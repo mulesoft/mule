@@ -21477,6 +21477,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -21618,7 +21619,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -21809,7 +21810,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -21917,7 +21918,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 7
+                      "order": 8
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -21971,7 +21972,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 5
+                      "order": 6
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -22017,7 +22018,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 6
+                      "order": 7
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -22102,7 +22103,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 10
+                      "order": 11
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -22156,7 +22157,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 8
+                      "order": 9
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -22202,7 +22203,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 9
+                      "order": 10
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -22434,6 +22435,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -22575,7 +22577,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -22766,7 +22768,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -38636,6 +38638,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -38777,7 +38780,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 5,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -39064,6 +39067,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -39205,7 +39209,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 5,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -39492,6 +39496,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -39633,7 +39638,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 5,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -39843,7 +39848,7 @@
                   "password": false,
                   "text": false,
                   "query": false,
-                  "order": 2
+                  "order": 3
                 },
                 "allowedStereotypeModels": [],
                 "semanticTerms": [],
@@ -39888,7 +39893,7 @@
                   "password": false,
                   "text": false,
                   "query": false,
-                  "order": 3
+                  "order": 4
                 },
                 "allowedStereotypeModels": [],
                 "semanticTerms": [],
@@ -39970,6 +39975,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -40111,7 +40117,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1,
+                "order": 2,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -40215,6 +40221,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -40557,7 +40564,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -40630,7 +40637,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -40644,7 +40650,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "#root:shiporder"
       },
       "fields": [
         {
@@ -40795,7 +40802,6 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
-        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
@@ -40809,7 +40815,8 @@
           "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "csv-object"
       },
       "fields": []
     },
@@ -40817,7 +40824,6 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -40829,7 +40835,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "custom-java"
       },
       "fields": []
     },
@@ -40837,8 +40844,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "label": "Person",
-        "typeId": "http://example.com/example.json",
         "classInformation": {
           "classname": "void",
           "hasDefaultConstructor": false,
@@ -40850,7 +40855,9 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "http://example.com/example.json",
+        "label": "Person"
       },
       "open": {
         "type": "Any"
@@ -40894,7 +40901,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -40908,7 +40914,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "json-object"
       },
       "fields": [
         {

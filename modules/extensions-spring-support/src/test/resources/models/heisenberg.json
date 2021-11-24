@@ -18915,7 +18915,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 17
+                      "order": 19
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -18944,7 +18944,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 18
+                      "order": 20
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -18977,7 +18977,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 19
+                      "order": 21
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -19075,7 +19075,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 20
+                      "order": 22
                     },
                     "allowedStereotypeModels": [
                       {
@@ -19517,7 +19517,7 @@
                       "password": false,
                       "text": true,
                       "query": false,
-                      "order": 21
+                      "order": 23
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -19567,7 +19567,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 22
+                      "order": 24
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -19596,7 +19596,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 23
+                      "order": 25
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -19629,7 +19629,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 24
+                      "order": 26
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -19727,7 +19727,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 25
+                      "order": 27
                     },
                     "allowedStereotypeModels": [
                       {
@@ -20169,7 +20169,7 @@
                       "password": false,
                       "text": true,
                       "query": false,
-                      "order": 26
+                      "order": 28
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -20587,36 +20587,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-AsyncListenPayments-backPressureStrategy",
@@ -20650,20 +20620,52 @@
                   "defaultValue": "FAIL",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 15,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "onCapacityOverload",
                   "description": "Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": false,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -21000,7 +21002,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15,
+                    "order": 17,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -21191,7 +21193,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 18,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -21276,7 +21278,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 17
+                      "order": 19
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -21305,7 +21307,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 18
+                      "order": 20
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -21338,7 +21340,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 19
+                      "order": 21
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -21436,7 +21438,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 20
+                      "order": 22
                     },
                     "allowedStereotypeModels": [
                       {
@@ -21881,7 +21883,7 @@
                       "password": false,
                       "text": true,
                       "query": false,
-                      "order": 21
+                      "order": 23
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -21931,7 +21933,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 22
+                      "order": 24
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -21960,7 +21962,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 23
+                      "order": 25
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -21993,7 +21995,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 24
+                      "order": 26
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -22091,7 +22093,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 25
+                      "order": 27
                     },
                     "allowedStereotypeModels": [
                       {
@@ -22533,7 +22535,7 @@
                       "password": false,
                       "text": true,
                       "query": false,
-                      "order": 26
+                      "order": 28
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -22955,36 +22957,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-ListenPayments-backPressureStrategy",
@@ -23018,20 +22990,52 @@
                   "defaultValue": "FAIL",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 15,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "onCapacityOverload",
                   "description": "Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": false,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -23368,7 +23372,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15,
+                    "order": 17,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -23559,7 +23563,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 18,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -23644,7 +23648,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 7
+                      "order": 9
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -23673,7 +23677,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 8
+                      "order": 10
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -23706,7 +23710,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 9
+                      "order": 11
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -23804,7 +23808,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 10
+                      "order": 12
                     },
                     "allowedStereotypeModels": [
                       {
@@ -24038,7 +24042,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 11
+                      "order": 13
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -24067,7 +24071,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 12
+                      "order": 14
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -24100,7 +24104,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 13
+                      "order": 15
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -24198,7 +24202,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 14
+                      "order": 16
                     },
                     "allowedStereotypeModels": [
                       {
@@ -24543,36 +24547,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-ListenPaymentsAllOptional-backPressureStrategy",
@@ -24606,20 +24580,52 @@
                   "defaultValue": "FAIL",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "onCapacityOverload",
                   "description": "Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": false,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 7,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -24956,7 +24962,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 6,
+                    "order": 8,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -25232,7 +25238,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 18
+                      "order": 20
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -25261,7 +25267,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 19
+                      "order": 21
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -25294,7 +25300,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 20
+                      "order": 22
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -25392,7 +25398,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 21
+                      "order": 23
                     },
                     "allowedStereotypeModels": [
                       {
@@ -25837,7 +25843,7 @@
                       "password": false,
                       "text": true,
                       "query": false,
-                      "order": 22
+                      "order": 24
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -25887,7 +25893,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 23
+                      "order": 25
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -25916,7 +25922,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 24
+                      "order": 26
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -25949,7 +25955,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 25
+                      "order": 27
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -26047,7 +26053,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 26
+                      "order": 28
                     },
                     "allowedStereotypeModels": [
                       {
@@ -26489,7 +26495,7 @@
                       "password": false,
                       "text": true,
                       "query": false,
-                      "order": 27
+                      "order": 29
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -26944,36 +26950,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": false,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-ReconnectableListenPayments-backPressureStrategy",
@@ -27007,20 +26983,52 @@
                   "defaultValue": "FAIL",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 16,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "onCapacityOverload",
                   "description": "Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": false,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -27357,7 +27365,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 18,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -27548,7 +27556,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17,
+                    "order": 19,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -27633,7 +27641,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 17
+                      "order": 19
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -27662,7 +27670,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 18
+                      "order": 20
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -27695,7 +27703,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 19
+                      "order": 21
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -27793,7 +27801,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 20
+                      "order": 22
                     },
                     "allowedStereotypeModels": [
                       {
@@ -28238,7 +28246,7 @@
                       "password": false,
                       "text": true,
                       "query": false,
-                      "order": 21
+                      "order": 23
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -28288,7 +28296,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 22
+                      "order": 24
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -28317,7 +28325,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 23
+                      "order": 25
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -28350,7 +28358,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 24
+                      "order": 26
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -28448,7 +28456,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 25
+                      "order": 27
                     },
                     "allowedStereotypeModels": [
                       {
@@ -28890,7 +28898,7 @@
                       "password": false,
                       "text": true,
                       "query": false,
-                      "order": 26
+                      "order": 28
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -29312,36 +29320,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Boolean"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": true,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "primaryNodeOnly",
-                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-listen-payments-cluster-backPressureStrategy",
@@ -29375,20 +29353,52 @@
                   "defaultValue": "FAIL",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 15,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "onCapacityOverload",
                   "description": "Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
                 },
                 {
@@ -29725,7 +29735,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15,
+                    "order": 17,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -29916,7 +29926,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 18,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -54336,6 +54346,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -54477,7 +54488,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],

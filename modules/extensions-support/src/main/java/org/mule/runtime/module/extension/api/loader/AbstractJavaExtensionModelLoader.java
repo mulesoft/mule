@@ -123,7 +123,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new SampleDataDeclarationEnricher(),
                                                                                                new ParameterAllowedStereotypesDeclarionEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
-                                                                                               new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new ObjectStoreParameterDeclarationEnricher(),
                                                                                                new PollingSourceDeclarationEnricher()));
 
