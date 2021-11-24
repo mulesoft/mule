@@ -7,6 +7,7 @@
 package org.mule.runtime.http.api.server;
 
 import static java.lang.Boolean.getBoolean;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 
 /**
  * Contains a set of system properties that may be used to customize the behavior of the underlying HTTP transport.
@@ -23,6 +24,9 @@ public final class HttpServerProperties {
    * of the header keys are preserved.
    */
   public static boolean PRESERVE_HEADER_CASE = getBoolean("org.glassfish.grizzly.http.PRESERVE_HEADER_CASE");
+
+  public static final String MAX_REQUEST_HEADERS_KEY = SYSTEM_PROPERTY_PREFIX + "http.MAX_REQUEST_HEADERS";
+  public static final String MAX_RESPONSE_HEADERS_KEY = SYSTEM_PROPERTY_PREFIX + "http.MAX_RESPONSE_HEADERS";
 
   private HttpServerProperties() {
     // Nothing to do
