@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.some.extension;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -137,6 +137,21 @@ public class SomeOps {
   @MediaType(value = TEXT_PLAIN)
   public String sayHiText(@Text String persona) {
     return buildHelloMessage(persona);
+  }
+
+  @MediaType(value = TEXT_PLAIN)
+  public String sayHiPojo(PersonPojo personPojo) {
+    return buildHelloMessage(personPojo.getName());
+  }
+
+  @MediaType(value = TEXT_PLAIN)
+  public String sayHiParameterGroup(@ParameterGroup(name = "person-pg") PersonPojo personPojo) {
+    return buildHelloMessage(personPojo.getName());
+  }
+
+  @MediaType(value = TEXT_PLAIN)
+  public String sayHiParameterGroupDsl(@ParameterGroup(name = "person-pg-dsl", showInDsl = true) PersonPojo personPojo) {
+    return buildHelloMessage(personPojo.getName());
   }
 
   private String buildHelloMessage(String person) {

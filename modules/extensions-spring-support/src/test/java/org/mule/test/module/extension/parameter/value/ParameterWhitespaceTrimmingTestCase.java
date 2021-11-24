@@ -9,7 +9,7 @@ package org.mule.test.module.extension.parameter.value;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY;
 
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -22,20 +22,22 @@ import org.junit.runners.Parameterized;
 @RunnerDelegateTo(Parameterized.class)
 public class ParameterWhitespaceTrimmingTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private final boolean trimWhitespaces;
+  private final boolean disableWhitespaceTrimming;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        {"whitespace trimming disabled", false},
-        {"whitespace trimming enabled", true}
+        {"disable whitespace trimming", true},
+        {"enable whitespace trimming (default behaviour)", false}
     });
   }
 
-  public ParameterWhitespaceTrimmingTestCase(String name, boolean trimWhitespaces) {
-    this.trimWhitespaces = trimWhitespaces;
-    if (trimWhitespaces) {
-      System.setProperty(ENABLE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY, "true");
+  public ParameterWhitespaceTrimmingTestCase(String name, boolean disableWhitespaceTrimming) {
+    this.disableWhitespaceTrimming = disableWhitespaceTrimming;
+    if (disableWhitespaceTrimming) {
+      System.setProperty(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY, "true");
+    } else {
+      System.clearProperty(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY);
     }
   }
 
@@ -45,54 +47,156 @@ public class ParameterWhitespaceTrimmingTestCase extends AbstractExtensionFuncti
   }
 
   @Test
-  public void whitespacesForParameterValue() throws Exception {
+  public void whitespacesForSimpleParameter() throws Exception {
     Object value = flowRunner("value").run().getMessage().getPayload().getValue();
-    if (this.trimWhitespaces) {
-      assertThat(value, is("Hello Max Mule!"));
-    } else {
+    if (this.disableWhitespaceTrimming) {
       assertThat(value, is("Hello    Max Mule   !"));
+    } else {
+      assertThat(value, is("Hello Max Mule!"));
     }
   }
 
   @Test
-  public void whitespacesAreNotTrimmedForParameterValueExpression() throws Exception {
+  public void whitespacesAreNotTrimmedForSimpleParameterExpression() throws Exception {
     Object value = flowRunner("expression").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
   }
 
   @Test
-  public void whitespacesAreTrimmedForContentParameterValue() throws Exception {
+  public void whitespacesAreTrimmedForContent() throws Exception {
     Object value = flowRunner("content").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello Max Mule!"));
   }
 
   @Test
-  public void whitespacesAreNotTrimmedForContentParameterValueExpression() throws Exception {
+  public void whitespacesAreNotTrimmedForContentExpression() throws Exception {
     Object value = flowRunner("contentExpression").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
   }
 
   @Test
-  public void whitespacesAreNotTrimmedForContentParameterValueCDATA() throws Exception {
+  public void whitespacesAreNotTrimmedForContentCDATA() throws Exception {
     Object value = flowRunner("contentCDATA").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
   }
 
   @Test
-  public void whitespacesAreTrimmedForTextParameterValue() throws Exception {
+  public void whitespacesAreTrimmedForText() throws Exception {
     Object value = flowRunner("text").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello Max Mule!"));
   }
 
   @Test
-  public void whitespacesAreNotTrimmedForTextParameterValueExpression() throws Exception {
+  public void whitespacesAreNotTrimmedForTextExpression() throws Exception {
     Object value = flowRunner("textExpression").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
   }
 
   @Test
-  public void whitespacesAreNotTrimmedForTextParameterValueCDATA() throws Exception {
+  public void whitespacesAreNotTrimmedForTextCDATA() throws Exception {
     Object value = flowRunner("textCDATA").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesForPojo() throws Exception {
+    Object value = flowRunner("pojo").run().getMessage().getPayload().getValue();
+    if (this.disableWhitespaceTrimming) {
+      assertThat(value, is("Hello    Max Mule   !"));
+    } else {
+      assertThat(value, is("Hello Max Mule!"));
+    }
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForPojoExpression() throws Exception {
+    Object value = flowRunner("pojoExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreTrimmedForPojoText() throws Exception {
+    Object value = flowRunner("pojoText").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello Max Mule!"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForPojoTextExpression() throws Exception {
+    Object value = flowRunner("pojoTextExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreTrimmedForPojoTextCDATA() throws Exception {
+    Object value = flowRunner("pojoTextCDATA").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello Max Mule!"));
+  }
+
+  @Test
+  public void whitespacesForPg() throws Exception {
+    Object value = flowRunner("pg").run().getMessage().getPayload().getValue();
+    if (this.disableWhitespaceTrimming) {
+      assertThat(value, is("Hello    Max Mule   !"));
+    } else {
+      assertThat(value, is("Hello Max Mule!"));
+    }
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForPgExpression() throws Exception {
+    Object value = flowRunner("pgExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreTrimmedForPgText() throws Exception {
+    Object value = flowRunner("pgText").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello Max Mule!"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForPgTextExpression() throws Exception {
+    Object value = flowRunner("pgTextExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForPgTextCDATA() throws Exception {
+    Object value = flowRunner("pgTextCDATA").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesForPgDsl() throws Exception {
+    Object value = flowRunner("pgDsl").run().getMessage().getPayload().getValue();
+    if (this.disableWhitespaceTrimming) {
+      assertThat(value, is("Hello    Max Mule   !"));
+    } else {
+      assertThat(value, is("Hello Max Mule!"));
+    }
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForPgDSLExpression() throws Exception {
+    Object value = flowRunner("pgDslExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreTrimmedForPgDslText() throws Exception {
+    Object value = flowRunner("pgDslText").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello Max Mule!"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForPgDslTextExpression() throws Exception {
+    Object value = flowRunner("pgDslTextExpression").run().getMessage().getPayload().getValue();
+    assertThat(value, is("Hello    Max Mule   !"));
+  }
+
+  @Test
+  public void whitespacesAreNotTrimmedForPgDslTextCDATA() throws Exception {
+    Object value = flowRunner("pgDslTextCDATA").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
   }
 }

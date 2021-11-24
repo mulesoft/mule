@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
 
-    <flow name="dslTrueSomeParameter">
+<!--    <flow name="dslTrueSomeParameter">
         <some:one-required-parameter-resolver-operation-dsl-true>
             <some:awesome-parameter-group someParameter="hello dog!"/>
         </some:one-required-parameter-resolver-operation-dsl-true>
@@ -207,7 +207,7 @@
             <some:complex-parameter-alias another-parameter-alias="#[vars.anotherParameter]"
                                           yet-another-parameter-alias="#['whatever']"/>
         </some:one-required-aliased-parameter-resolver-operation>
-    </flow>
+    </flow>-->
 
     <flow name="value">
         <some:say-hi person="   Max Mule   "/>
@@ -263,6 +263,122 @@
                 <![CDATA[   Max Mule   ]]>
             </some:persona>
         </some:say-hi-text>
+    </flow>
+
+    <flow name="pojo">
+        <some:say-hi-pojo>
+            <some:person-pojo person="   Max Mule   "/>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pojoExpression">
+        <some:say-hi-pojo>
+            <some:person-pojo person="#['   Max Mule   ']"/>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pojoText">
+        <some:say-hi-pojo>
+            <some:person-pojo>
+                <some:person-text>
+                    Max Mule
+                </some:person-text>
+            </some:person-pojo>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pojoTextExpression">
+        <some:say-hi-pojo>
+            <some:person-pojo>
+                <some:person-text>
+                    #['   Max Mule   ']
+                </some:person-text>
+            </some:person-pojo>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pojoTextCDATA">
+        <some:say-hi-pojo>
+            <some:person-pojo>
+                <some:person-text>
+                    <![CDATA[   Max Mule   ]]>
+                </some:person-text>
+            </some:person-pojo>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pg">
+        <some:say-hi-parameter-group person="   Max Mule   "/>
+    </flow>
+
+    <flow name="pgExpression">
+        <some:say-hi-parameter-group person="#['   Max Mule   ']"/>
+    </flow>
+
+    <flow name="pgText">
+        <some:say-hi-parameter-group>
+            <some:person-text>
+                Max Mule
+            </some:person-text>
+        </some:say-hi-parameter-group>
+    </flow>
+
+    <flow name="pgTextExpression">
+        <some:say-hi-parameter-group>
+            <some:person-text>
+                #['   Max Mule   ']
+            </some:person-text>
+        </some:say-hi-parameter-group>
+    </flow>
+
+    <flow name="pgTextCDATA">
+        <some:say-hi-parameter-group>
+            <some:person-text>
+                <![CDATA[   Max Mule   ]]>
+            </some:person-text>
+        </some:say-hi-parameter-group>
+    </flow>
+
+    <flow name="pgDsl">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl person="   Max Mule   "/>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+    <flow name="pgDslExpression">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl person="#['   Max Mule   ']"/>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+    <flow name="pgDslText">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl>
+                <some:person-text>
+                    Max Mule
+                </some:person-text>
+            </some:person-pg-dsl>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+    <flow name="pgDslTextExpression">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl>
+                <some:person-text>
+                    #['   Max Mule   ']
+                </some:person-text>
+            </some:person-pg-dsl>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+    <flow name="pgDslTextCDATA">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl>
+                <some:person-text>
+                    <![CDATA[   Max Mule   ]]>
+                </some:person-text>
+            </some:person-pg-dsl>
+        </some:say-hi-parameter-group-dsl>
     </flow>
 
 </mule>

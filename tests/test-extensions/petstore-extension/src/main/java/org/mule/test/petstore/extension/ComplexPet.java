@@ -6,6 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -17,6 +18,11 @@ public class ComplexPet {
   @Parameter
   @Optional
   private String category;
+
+  @Parameter
+  @Optional
+  @Content
+  private String personContent;
 
   public String getPetType() {
     return petType;
