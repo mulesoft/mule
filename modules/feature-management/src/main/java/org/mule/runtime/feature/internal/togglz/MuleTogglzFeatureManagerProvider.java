@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.feature.internal.togglz;
 
-import org.mule.runtime.feature.internal.togglz.config.MuleTogglzProfilingFeatures;
+import org.mule.runtime.feature.internal.togglz.config.MuleHotSwitchProfilingFeatures;
 import org.mule.runtime.feature.internal.togglz.provider.DefaultMuleTogglzFeatureProvider;
 import org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository;
 import org.togglz.core.manager.FeatureManager;
@@ -24,7 +24,7 @@ import static org.mule.runtime.feature.internal.togglz.activation.MuleTogglzActi
 public class MuleTogglzFeatureManagerProvider implements FeatureManagerProvider {
 
   public static DefaultMuleTogglzFeatureProvider FEATURE_PROVIDER =
-      new DefaultMuleTogglzFeatureProvider(MuleTogglzProfilingFeatures.class);
+      new DefaultMuleTogglzFeatureProvider(MuleHotSwitchProfilingFeatures.class);
 
   private static FeatureManager FEATURE_MANAGER = new FeatureManagerBuilder()
       .featureProvider(FEATURE_PROVIDER)

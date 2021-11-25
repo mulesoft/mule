@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.withFeatureUser;
-import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzProfilingFeatures.PROFILING_SERVICE_FEATURE;
+import static org.mule.runtime.feature.internal.togglz.config.MuleHotSwitchProfilingFeatures.PROFILING_SERVICE_FEATURE;
 import static org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository.FEATURE_IS_NOT_REGISTERED;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;

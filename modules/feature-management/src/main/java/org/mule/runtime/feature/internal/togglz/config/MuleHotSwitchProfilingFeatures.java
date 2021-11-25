@@ -15,7 +15,7 @@ import org.togglz.core.annotation.Label;
 import org.togglz.core.repository.FeatureState;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.togglz.core.context.FeatureContext.getFeatureManager;
 
 /**
@@ -23,21 +23,21 @@ import static org.togglz.core.context.FeatureContext.getFeatureManager;
  *
  * @since 4.5.0
  */
-public enum MuleTogglzProfilingFeatures implements Feature {
+public enum MuleHotSwitchProfilingFeatures implements Feature {
 
   @Label("Profiling service to enable disable profiling")
   @EnabledByDefault
   @DefaultActivationStrategy(id = SystemPropertyActivationStrategy.ID,
       parameters = {
           @ActivationParameter(name = SystemPropertyActivationStrategy.PARAM_PROPERTY_NAME,
-              value = SYSTEM_PROPERTY_PREFIX + "enable.profiling.service")
+              value = ENABLE_PROFILING_SERVICE_PROPERTY)
       })
   PROFILING_SERVICE_FEATURE;
 
   public boolean isActive() {
     ClassLoader cl = currentThread().getContextClassLoader();
     try {
-      currentThread().setContextClassLoader(MuleTogglzProfilingFeatures.class.getClassLoader());
+      currentThread().setContextClassLoader(MuleHotSwitchProfilingFeatures.class.getClassLoader());
       return getFeatureManager().isActive(this);
     } finally {
       currentThread().setContextClassLoader(cl);
@@ -47,7 +47,7 @@ public enum MuleTogglzProfilingFeatures implements Feature {
   public FeatureState getFeatureState() {
     ClassLoader cl = currentThread().getContextClassLoader();
     try {
-      currentThread().setContextClassLoader(MuleTogglzProfilingFeatures.class.getClassLoader());
+      currentThread().setContextClassLoader(MuleHotSwitchProfilingFeatures.class.getClassLoader());
       return getFeatureManager().getFeatureState(this);
     } finally {
       currentThread().setContextClassLoader(cl);

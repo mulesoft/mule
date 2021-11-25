@@ -7,6 +7,7 @@
 package org.mule.runtime.feature.internal.togglz.provider;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -19,7 +20,6 @@ import org.togglz.core.metadata.FeatureMetaData;
 import org.togglz.core.metadata.enums.EnumFeatureMetaData;
 import org.togglz.core.spi.FeatureProvider;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,7 +67,7 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
     if (featureEnum == null || !featureEnum.isEnum()) {
       throw new IllegalArgumentException(ARGUMENT_MUST_BE_ENUM);
     }
-    addFeatures(Arrays.asList(featureEnum.getEnumConstants()));
+    addFeatures(asList(featureEnum.getEnumConstants()));
   }
 
   private void addFeatures(Collection<? extends Feature> newFeatures) {
