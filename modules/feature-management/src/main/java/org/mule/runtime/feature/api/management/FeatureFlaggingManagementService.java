@@ -24,7 +24,7 @@ public interface FeatureFlaggingManagementService {
   void disableFeatureFor(String featureName, String applicationName);
 
   /**
-   * disable the feature for an application.
+   * enable the feature for an application.
    *
    * @param featureName
    * @param applicationName

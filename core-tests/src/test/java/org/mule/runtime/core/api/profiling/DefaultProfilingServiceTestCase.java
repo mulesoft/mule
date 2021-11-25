@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.api.profiling;
 
 import static java.util.Collections.singleton;
@@ -19,12 +18,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
@@ -72,7 +72,7 @@ import org.mockito.junit.MockitoRule;
 @Story(DEFAULT_PROFILING_SERVICE)
 public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase {
 
-  public static final String TEST_CONSUMER = "TEST_CONSUMER";
+  public static final String TEST_DATA_CONSUMER = "TEST_DATA_CONSUMER";
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -96,12 +96,11 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
 
   @Before
   public void configureProfilingService() throws MuleException {
-    ;
     profilingService = new DefaultProfilingService();
     initialiseIfNeeded(profilingService, muleContext);
     profilingService
         .setProfilingDataConsumerDiscoveryStrategies(of(singleton(new TestProfilingDataConsumerDiscoveryStrategy())));
-    when(featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_PROFILING_SERVICE)).thenReturn(true);
+    when(featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE)).thenReturn(true);
     startIfNeeded(profilingService);
     profilingService.registerProfilingDataProducer(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE,
                                                    new TestProfilingDataProducer(profilingService));
@@ -152,7 +151,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     ((MuleContextWithRegistry) muleContext)
         .getRegistry()
         .lookupObject(RuntimeFeatureFlaggingService.class)
-        .toggleProfilingFeature(EXTENSION_PROFILING_EVENT, "TEST_DATA_CONSUMER", true);
+        .toggleProfilingFeature(EXTENSION_PROFILING_EVENT, TEST_DATA_CONSUMER, true);
 
     ProfilingDataProducer<ExtensionProfilingEventContext, Object> profilingDataProducer =
         profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT);
@@ -235,7 +234,6 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     }
   }
 
-
   /**
    * Stub for testing profiling service.
    */
@@ -246,7 +244,6 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
       return 0;
     }
   }
-
 
   /**
    * Stub for testing profiling service.
@@ -274,7 +271,6 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     }
   }
 
-
   /**
    * Test {@link ProfilingEventType}
    */
@@ -283,10 +279,14 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     TEST_PROFILING_EVENT_TYPE {
 
       @Override
-      public String getProfilingEventTypeIdentifier() {return"test";}
+      public String getProfilingEventTypeIdentifier() {
+        return "test";
+      }
 
       @Override
-      public String getProfilingEventTypeNamespace() {return"test-namespace";}
+      public String getProfilingEventTypeNamespace() {
+        return "test-namespace";
+      }
 
     }
 

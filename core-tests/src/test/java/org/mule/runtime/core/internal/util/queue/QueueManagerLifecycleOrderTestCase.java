@@ -20,7 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
-import static org.mule.runtime.core.internal.processor.rector.profiling.ReactorProfilingUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
+import static org.mule.runtime.core.internal.processor.rector.profiling.CoreProfilingServiceTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.api.component.Component;
@@ -145,7 +145,6 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestC
       return new NotImplementedException("This is test code");
     }
   }
-
 
   private class RecordingFlow extends DefaultFlowBuilder.DefaultFlow {
 

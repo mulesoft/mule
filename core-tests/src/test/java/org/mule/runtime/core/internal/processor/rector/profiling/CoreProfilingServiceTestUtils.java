@@ -15,15 +15,13 @@ import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.function.Consumer;
-
 /**
- * Utils for test reactor profiling
+ * Utils for testing reactor profiling.
  */
-public class ReactorProfilingUtils {
+public class CoreProfilingServiceTestUtils {
 
   /**
-   * mocks the return of a the transformation of a reactive chain for the processing strategy, triggering a profiling event.
+   * mocks the return of the transformation of a reactive chain for the processing strategy, triggering a profiling event.
    *
    * @param coreProfilingService  the core profiling service to mock
    * @param profilingDataProducer the profiling service data producer
@@ -39,8 +37,7 @@ public class ReactorProfilingUtils {
   }
 
   /**
-   * mocks the return of a the transformation of a reactive chain for the processing strategy, without triggering a profiling
-   * event.
+   * mocks the return of the transformation of a reactive chain for the processing strategy, without triggering a profiling event.
    *
    * @param coreProfilingService the core profiling service to mock
    * @see CoreProfilingService

@@ -10,7 +10,6 @@ package org.mule.runtime.core.internal.processor.strategy.util;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
-import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -70,26 +69,5 @@ public final class ProfilingUtils {
   public static <T extends ProfilingEventContext> String getFullyQualifiedProfilingEventTypeIdentifier(
                                                                                                        ProfilingEventType<T> profilingEventType) {
     return profilingEventType.getProfilingEventTypeNamespace() + ":" + profilingEventType.getProfilingEventTypeIdentifier();
-  }
-
-  /**
-   * @param profilingProducerContext the {@link org.mule.runtime.api.profiling.ProfilingDataProducer}
-   * @return the fqn.
-   */
-  public static String getFullyQualifiedProlingProducerContextIdentifier(ProfilingProducerScope profilingProducerContext) {
-    return profilingProducerContext.getProducerScopeTypeIdentifier() + ":" + profilingProducerContext
-        .getProducerScopeIdentifier();
-  }
-
-  /**
-   * @param profilingEventType the {@link ProfilingEventType}.
-   * @param prefix             the consumer name
-   * @param <T>                the class of {@link ProfilingEventType}
-   * @return a fully qualified name for a feature used as id.
-   */
-  public static <T extends ProfilingEventContext> String getFullyQualifiedProfilingEventTypeFeatureIdentifier(
-                                                                                                              ProfilingEventType<T> profilingEventType,
-                                                                                                              String prefix) {
-    return prefix + ":" + getFullyQualifiedProfilingEventTypeIdentifier(profilingEventType);
   }
 }

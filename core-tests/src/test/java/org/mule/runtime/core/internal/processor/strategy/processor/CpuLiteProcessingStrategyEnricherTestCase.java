@@ -11,7 +11,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.internal.processor.rector.profiling.ReactorProfilingUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
+import static org.mule.runtime.core.internal.processor.rector.profiling.CoreProfilingServiceTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
@@ -33,11 +33,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(ENRICHER)

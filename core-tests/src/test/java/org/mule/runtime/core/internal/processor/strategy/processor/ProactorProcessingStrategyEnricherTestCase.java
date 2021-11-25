@@ -12,7 +12,7 @@ import static java.util.function.Function.identity;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.internal.processor.rector.profiling.ReactorProfilingUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
+import static org.mule.runtime.core.internal.processor.rector.profiling.CoreProfilingServiceTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 

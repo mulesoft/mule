@@ -69,7 +69,6 @@ import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
-import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;

@@ -58,8 +58,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 
-import static java.lang.String.format;
-
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;

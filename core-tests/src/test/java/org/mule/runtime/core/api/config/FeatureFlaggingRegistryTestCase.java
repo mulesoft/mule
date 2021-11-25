@@ -25,7 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import org.mockito.Mockito;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.size.SmallTest;

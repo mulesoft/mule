@@ -16,6 +16,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 

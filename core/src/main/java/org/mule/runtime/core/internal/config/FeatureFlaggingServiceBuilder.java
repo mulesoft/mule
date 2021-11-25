@@ -119,7 +119,7 @@ public final class FeatureFlaggingServiceBuilder {
   }
 
   /**
-   * True if a feature flag is enabled under a determined feature context.\
+   * True if a feature flag is enabled under a determined feature context.
    *
    * @param feature          The feature whose feature flag must be evaluated.
    * @param featureContext   The feature context that must be used to set the feature flag.

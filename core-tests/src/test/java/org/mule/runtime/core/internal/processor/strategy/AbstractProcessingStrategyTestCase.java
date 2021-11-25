@@ -43,7 +43,6 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.FLOW_BACK_PRESSURE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -146,7 +145,6 @@ import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import org.togglz.core.repository.FeatureState;
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)

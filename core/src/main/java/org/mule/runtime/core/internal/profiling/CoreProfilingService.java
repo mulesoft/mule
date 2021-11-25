@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 public interface CoreProfilingService extends ProfilingService {
 
   /**
-   * Enrichesa {@link Mono} with profiling event.
+   * Enriches {@link Mono} with profiling event.
    *
    * @param original     the original {@link Mono}
    * @param dataProducer the {@link ProfilingDataProducer} used for profiling
@@ -36,7 +36,7 @@ public interface CoreProfilingService extends ProfilingService {
                                                                             Function<S, T> transformer);
 
   /**
-   * Enrichesa {@link Flux} with profiling event.
+   * Enriches {@link Flux} with profiling event.
    *
    * @param original     the original {@link Flux}
    * @param dataProducer the {@link ProfilingDataProducer} used for profiling
