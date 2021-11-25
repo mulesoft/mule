@@ -15,6 +15,8 @@ import static org.mule.runtime.feature.internal.togglz.scope.type.MuleTogglzFeat
 /**
  * A {@link MuleTogglzFeatureScope} that represents the scope of artifact. When a feature is enabled/disabled using this scope, it
  * will change the status for the corresponding artifact, that is.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzArtifactFeatureScope implements MuleTogglzFeatureScope {
 

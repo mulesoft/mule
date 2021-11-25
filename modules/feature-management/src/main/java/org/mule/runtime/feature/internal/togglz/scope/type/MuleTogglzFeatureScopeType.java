@@ -12,6 +12,8 @@ import org.mule.runtime.feature.internal.togglz.scope.MuleTogglzFeatureScope;
  * Mule Togglz Feature Scope Types.
  *
  * @see MuleTogglzFeatureScope
+ *
+ * @since 4.5.0
  */
 public enum MuleTogglzFeatureScopeType {
 

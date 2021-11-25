@@ -1137,7 +1137,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     }
   }
 
-
   public enum Mode {
     /**
      * Test using {@link Flow#process(CoreEvent)}.

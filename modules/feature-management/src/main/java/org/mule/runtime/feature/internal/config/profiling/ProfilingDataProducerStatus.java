@@ -8,6 +8,8 @@ package org.mule.runtime.feature.internal.config.profiling;
 
 /**
  * The status for a {@link org.mule.runtime.api.profiling.ProfilingDataProducer}.
+ *
+ * @since 4.5.0
  */
 public interface ProfilingDataProducerStatus {
 

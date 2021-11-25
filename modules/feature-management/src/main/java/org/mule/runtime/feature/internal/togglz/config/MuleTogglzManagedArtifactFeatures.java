@@ -13,7 +13,7 @@ import org.togglz.core.repository.FeatureState;
 import java.util.Map;
 
 /**
- * A Read-only Map that represents the features associated to an artifact.
+ * Represents the features associated to an artifact.
  *
  * @since 4.5.0
  */

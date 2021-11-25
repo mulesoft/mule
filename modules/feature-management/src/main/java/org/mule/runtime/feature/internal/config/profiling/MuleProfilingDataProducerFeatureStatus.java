@@ -23,6 +23,8 @@ import java.util.Set;
 /**
  * The status of a {@link org.mule.runtime.api.profiling.ProfilingDataProducer} according to the requirements from the
  * {@link org.mule.runtime.api.profiling.ProfilingDataConsumer}
+ *
+ * @since 4.5.0
  */
 public class MuleProfilingDataProducerFeatureStatus implements ProfilingDataProducerStatus {
 

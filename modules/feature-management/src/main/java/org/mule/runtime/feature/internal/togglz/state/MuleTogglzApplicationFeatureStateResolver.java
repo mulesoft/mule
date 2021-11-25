@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@link MuleTogglzFeatureStateResolver} for application scopes.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzApplicationFeatureStateResolver implements MuleTogglzFeatureStateResolver {
 
