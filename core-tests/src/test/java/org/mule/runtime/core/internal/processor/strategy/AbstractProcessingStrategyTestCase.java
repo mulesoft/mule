@@ -250,7 +250,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   public AbstractProcessingStrategyTestCase(Mode mode, boolean profiling) {
     this.mode = mode;
     this.enableProfilingServiceProperty =
-        new SystemProperty((ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get()),
+        new SystemProperty(ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get(),
                            Boolean.toString(profiling));
   }
 

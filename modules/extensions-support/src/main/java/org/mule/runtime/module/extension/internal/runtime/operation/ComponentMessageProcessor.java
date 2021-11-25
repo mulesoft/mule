@@ -6,13 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.lang.Runtime.getRuntime;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -58,7 +52,14 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 
+import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -79,7 +80,9 @@ import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -176,10 +179,6 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-
-
-import org.togglz.core.user.FeatureUser;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -276,7 +275,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   private String processorPath = null;
-  private FeatureUser featureUser;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -674,8 +672,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               });
         }
 
-        private Consumer<? super CoreEvent> innerEventDispatcher(
-                                                                 final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
+        private Consumer<? super CoreEvent> innerEventDispatcher(final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
           return event -> prepareAndExecuteOperation(event,
                                                      // The callback must be listened to within the
                                                      // processingStrategy's onProcessor, so that any thread
@@ -1090,8 +1087,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
     if (outerFluxTerminationTimeout >= 0) {
       outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
-          .withMaxConcurrentTasks(1)
-          .withName(toString() + ".outer.flux."));
+          .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
       LOGGER.debug("Created outerFluxCompletionScheduler ({}) of component '{}'", outerFluxCompletionScheduler, processorPath);
     }
 
@@ -1175,7 +1171,20 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
-                                        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
+                                        getThreadReleaseDataProducer());
+  }
+
+  private boolean isProfilingEnabled() {
+    return profilingService != null && featureFlaggingService != null
+        && featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE);
+  }
+
+  private ProfilingDataProducer<ComponentThreadingProfilingEventContext> getThreadReleaseDataProducer() {
+    if (isProfilingEnabled()) {
+      return profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE);
+    } else {
+      return null;
+    }
   }
 
   protected InterceptorChain createInterceptorChain() {

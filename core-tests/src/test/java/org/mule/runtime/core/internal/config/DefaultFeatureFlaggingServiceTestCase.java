@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.config;
 
 import io.qameta.allure.Story;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,7 +23,6 @@ import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -37,8 +37,9 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.Featu
 @Story(FEATURE_FLAGGING)
 public class DefaultFeatureFlaggingServiceTestCase {
 
-  private final FeatureFlaggingService featureFlaggingService;
-
+  public static final String ARTIFACT_ID = "artifactId";
+  private final boolean registered;
+  private FeatureFlaggingService featureFlaggingService;
   private final Feature feature;
   private final boolean enabled;
 
@@ -48,25 +49,41 @@ public class DefaultFeatureFlaggingServiceTestCase {
   @Parameters(name = "Feature \"{1}\" should be {2}")
   public static List<Object[]> parameters() {
     return asList(
-                  new Object[] {buildFeatureConfigurations(TESTING_FEATURE, false), TESTING_FEATURE, false, null},
-                  new Object[] {buildFeatureConfigurations(TESTING_FEATURE, true), TESTING_FEATURE, true, null},
-                  new Object[] {buildFeatureConfigurations(), TESTING_FEATURE, false, (Consumer<ExpectedException>) (e -> {
-                    e.expect(MuleRuntimeException.class);
-                    e.expectMessage(format("Feature %s not registered", TESTING_FEATURE.name()));
-                  })});
+                  new Object[] {TESTING_FEATURE, false, true},
+                  new Object[] {TESTING_FEATURE, true, true},
+                  new Object[] {TESTING_FEATURE, false, true});
 
   }
 
-  public DefaultFeatureFlaggingServiceTestCase(Map<Feature, Boolean> featureConfigurations, Feature feature, boolean enabled,
-                                               Consumer<ExpectedException> configureExpected) {
+  public DefaultFeatureFlaggingServiceTestCase(Feature feature, boolean enabled,
+                                               boolean registered) {
 
     this.feature = feature;
     this.enabled = enabled;
+    this.registered = registered;
+  }
 
-    featureFlaggingService = new DefaultFeatureFlaggingService("id", featureConfigurations);
-    if (configureExpected != null) {
-      configureExpected.accept(expectedException);
+  @Before
+  public void before() {
+    featureFlaggingService =
+        new DefaultFeatureFlaggingService(ARTIFACT_ID, getFeaturesStates());
+
+    if (!registered) {
+      expectedException.expect(MuleRuntimeException.class);
+      expectedException.expectMessage(format("Feature %s not registered", TESTING_FEATURE.name()));
     }
+  }
+
+  private Map<Feature, Boolean> getFeaturesStates() {
+    if (!registered) {
+      return new HashMap<>();
+    }
+    return new HashMap<Feature, Boolean>() {
+
+      {
+        put(feature, enabled);
+      }
+    };
   }
 
   @Test
@@ -74,17 +91,4 @@ public class DefaultFeatureFlaggingServiceTestCase {
     assertThat(featureFlaggingService.isEnabled(feature), is(enabled));
   }
 
-  private static Map<Feature, Boolean> buildFeatureConfigurations(Object... values) {
-    assertThat("Values must be even", values.length % 2, is(0));
-
-    Map<Feature, Boolean> m = new HashMap<>();
-
-    for (int i = 0; i < values.length; i += 2) {
-      m.put((Feature) values[i], (Boolean) values[i + 1]);
-    }
-
-    return m;
-  }
-
 }
-
