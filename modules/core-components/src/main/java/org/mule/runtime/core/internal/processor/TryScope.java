@@ -22,8 +22,8 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALW
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyDecorator.popTxFromSubscriberContext;
-import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyDecorator.pushTxToSubscriberContext;
+import static org.mule.runtime.core.internal.util.TransactionUtils.popTxFromSubscriberContext;
+import static org.mule.runtime.core.internal.util.TransactionUtils.pushTxToSubscriberContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;

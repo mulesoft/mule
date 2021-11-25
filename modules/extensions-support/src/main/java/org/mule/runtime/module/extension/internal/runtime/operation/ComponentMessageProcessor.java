@@ -102,8 +102,10 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.internal.util.TransactionUtils;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
+import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -454,7 +456,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
         setOperationExecutionParams(location, event, configuration, parameters, operationEvent, callback, ctx);
 
-        fluxSupplier.get().next(operationEvent);
+        if (fluxSupplier instanceof TransactionAwareFluxSinkSupplier && TransactionUtils.isTxActive(ctx)) {
+          ((TransactionAwareFluxSinkSupplier<CoreEvent>) fluxSupplier).getThreadFluxSink().next(operationEvent);
+        } else {
+          fluxSupplier.get().next(operationEvent);
+        }
       };
 
       if (location != null) {

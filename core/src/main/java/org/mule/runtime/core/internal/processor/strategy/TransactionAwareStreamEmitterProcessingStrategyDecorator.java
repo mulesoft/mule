@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -19,10 +22,11 @@ import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
-
+import static org.mule.runtime.core.internal.util.TransactionUtils.isTxActive;
+import static org.mule.runtime.core.internal.util.TransactionUtils.popTxFromSubscriberContext;
+import static org.mule.runtime.core.internal.util.TransactionUtils.pushTxToSubscriberContext;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyList;
-
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
@@ -40,13 +44,10 @@ import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import reactor.util.context.Context;
 
 import javax.inject.Inject;
 
@@ -175,35 +176,5 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             return from(pub).transform(delegate.onProcessor(processor));
           }
         });
-  }
-
-  private boolean isTxActive(Context ctx) {
-    return ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> !txScopes.isEmpty()).orElse(false);
-  }
-
-  /**
-   * Cleanup the state set by {@link #pushTxToSubscriberContext(String)}.
-   *
-   * @since 4.3
-   */
-  public static Function<Context, Context> popTxFromSubscriberContext() {
-    return context -> {
-      Deque<String> currentTxChains = new ArrayDeque<>(context.getOrDefault(TX_SCOPES_KEY, emptyList()));
-      currentTxChains.pop();
-      return context.put(TX_SCOPES_KEY, currentTxChains);
-    };
-  }
-
-  /**
-   * Force the upstream publisher to behave as if a transaction were active, effectively avoiding thread switches.
-   *
-   * @since 4.3
-   */
-  public static Function<Context, Context> pushTxToSubscriberContext(String location) {
-    return context -> {
-      Deque<String> currentTxChains = new ArrayDeque<>(context.getOrDefault(TX_SCOPES_KEY, emptyList()));
-      currentTxChains.push(location);
-      return context.put(TX_SCOPES_KEY, currentTxChains);
-    };
   }
 }

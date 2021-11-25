@@ -15,6 +15,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import reactor.core.publisher.FluxSink;
 
 /**
@@ -51,6 +53,10 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
     } else {
       return delegate.get();
     }
+  }
+
+  public FluxSink<T> getThreadFluxSink() {
+    return sinks.get(currentThread(), t -> newSinkFactory.get());
   }
 
   @Override
