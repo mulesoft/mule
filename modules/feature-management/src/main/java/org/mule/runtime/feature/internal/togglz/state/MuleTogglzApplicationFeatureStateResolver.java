@@ -46,7 +46,6 @@ public class MuleTogglzApplicationFeatureStateResolver implements MuleTogglzFeat
     return featureStates
         .computeIfAbsent(scope, scp -> new ConcurrentHashMap<>())
         .computeIfAbsent(featureState.getFeature(), feature -> new MuleTogglzFeatureState(feature, stateRepository, scope))
-        .setEnabled(featureState.isEnabled())
         .setEnabled(featureState.isEnabled());
   }
 
