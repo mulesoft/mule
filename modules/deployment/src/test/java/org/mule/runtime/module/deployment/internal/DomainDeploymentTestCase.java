@@ -7,12 +7,32 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.TestDomainFactory.createDomainFactory;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
+
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.apache.commons.io.FileUtils.forceDelete;
@@ -37,24 +57,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.TestDomainFactory.createDomainFactory;
-import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
@@ -88,7 +90,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
@@ -338,7 +339,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   @Issue("MULE-17593")
   @Description("The IBM CTG connector must be prevented to use the fix in MULE-17112.")
-  public void blacklistedPluginWithDependencyAndConflictingVersionSharedByApp() throws Exception {
+  public void denylistedPluginWithDependencyAndConflictingVersionSharedByApp() throws Exception {
     ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("mule-ibm-ctg-connector")
         .withGroupId("com.mulesoft.connectors").withVersion("2.3.1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
