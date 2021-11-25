@@ -6,11 +6,12 @@
  */
 package org.mule.functional.junit4;
 
-import static java.util.Collections.singleton;
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+
+import static java.util.Collections.singleton;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ public class ApplicationContextBuilder {
   private String contextId;
   private ArtifactContext domainArtifactContext;
   private String[] applicationResources = new String[0];
+
+  private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
   private final MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(APP);
 
@@ -59,9 +63,12 @@ public class ApplicationContextBuilder {
   protected MuleContext doBuildContext() throws Exception {
     MuleContext context;
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-    List<ConfigurationBuilder> builders = new ArrayList<>();
+    List<ConfigurationBuilder> builders = new ArrayList<>(3);
     builders.add(extensionManagerWithMuleExtModelBuilder(getExtensionModels()));
-    builders.add(getAppBuilder(this.applicationResources));
+    ConfigurationBuilder appBuilder = getAppBuilder(this.applicationResources);
+    testServicesConfigBuilder = new TestServicesConfigurationBuilder();
+    appBuilder.addServiceConfigurator(testServicesConfigBuilder);
+    builders.add(appBuilder);
     builders.add(new TestPolicyProviderConfigurationBuilder());
     addBuilders(builders);
     final DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
