@@ -16,6 +16,8 @@ import static org.mule.runtime.api.profiling.ProfilingProducerScopeType.ARTIFACT
 /**
  * A {@link ProfilingProducerScope} that let us retrieve {@link org.mule.runtime.api.profiling.ProfilingDataProducer} associated
  * to an artifact.
+ *
+ * @since 4.5.0
  */
 public class ArtifactProfilingProducerScope implements ProfilingProducerScope {
 
