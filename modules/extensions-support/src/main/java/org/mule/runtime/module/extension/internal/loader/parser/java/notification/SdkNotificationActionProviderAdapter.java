@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.notification;
 
-
 import static java.util.stream.Collectors.toCollection;
 
 import org.mule.sdk.api.annotation.notification.NotificationActionProvider;
