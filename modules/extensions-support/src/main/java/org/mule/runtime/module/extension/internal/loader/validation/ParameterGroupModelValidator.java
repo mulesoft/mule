@@ -47,7 +47,7 @@ public final class ParameterGroupModelValidator implements ExtensionModelValidat
             problemsReporter
                 .addError(new Problem(groupModel,
                                       format("The parameter group of type '%s' should be non abstract with a default constructor.",
-                                             group.getType().getDeclaringClass())));
+                                             group.getType().getTypeName())));
           }
         });
   }

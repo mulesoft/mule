@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
@@ -29,7 +30,9 @@ import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -37,6 +40,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class ParameterGroupModelValidatorTestCase {
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Mock
   private ExtensionModel extensionModel;
@@ -61,8 +67,9 @@ public class ParameterGroupModelValidatorTestCase {
     when(operationModel.getParameterGroupModels()).thenReturn(asList(groupModel));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
+  @Test
   public void invalidModelDueToNonInstantiableParameterGroup() {
+    expectedException.expect(IllegalModelDefinitionException.class);
     TypeWrapper type = new TypeWrapper(Serializable.class, typeLoader);
     ParameterGroupDescriptor descriptor =
         new ParameterGroupDescriptor("name", type, null, mock(AnnotatedElement.class), null);
@@ -74,8 +81,9 @@ public class ParameterGroupModelValidatorTestCase {
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
+  @Test
   public void invalidModelDueEmptyParameterGroup() {
+    expectedException.expect(IllegalModelDefinitionException.class);
     ParameterGroupDescriptor descriptor =
         new ParameterGroupDescriptor("name", new TypeWrapper(EmptyGroupPojo.class, typeLoader),
                                      null, mock(AnnotatedElement.class), null);
@@ -94,6 +102,22 @@ public class ParameterGroupModelValidatorTestCase {
     when(groupModel.getModelProperty(ParameterGroupModelProperty.class))
         .thenReturn(of(new ParameterGroupModelProperty(descriptor)));
 
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void invalidModelNonInstantiableMessage() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException
+        .expectMessage("The parameter group of type 'java.io.Serializable' should be non abstract with a default constructor.");
+    TypeWrapper type = new TypeWrapper(Serializable.class, typeLoader);
+    ParameterGroupDescriptor descriptor =
+        new ParameterGroupDescriptor("name", type, null, mock(AnnotatedElement.class), null);
+
+    when(groupModel.getModelProperty(ParameterGroupModelProperty.class))
+        .thenReturn(of(new ParameterGroupModelProperty(descriptor)));
+
+    when(groupModel.getParameterModels()).thenReturn(asList(parameterModel));
     validate(extensionModel, validator);
   }
 
