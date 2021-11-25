@@ -19,15 +19,13 @@ public interface FeatureFlaggingManagementService {
    * disable the feature for an application.
    *
    * @param featureName     the feature name to be disabled.
-   * @param applicationName the application name.
    */
-  void disableFeatureFor(String featureName, String applicationName);
+  void disableFeatureFor(String featureName);
 
   /**
    * enable the feature for an application.
    *
    * @param featureName
-   * @param applicationName
    */
-  void enableFeatureFor(String featureName, String applicationName);
+  void enableFeatureFor(String featureName);
 }

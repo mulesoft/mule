@@ -14,6 +14,8 @@ import java.util.Map;
 
 /**
  * A Read-only Map that represents the features associated to an artifact.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzManagedArtifactFeatures {
 

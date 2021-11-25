@@ -107,6 +107,7 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.DefaultFeatureManagementService;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.connection.DelegateConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
@@ -141,8 +142,6 @@ import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
-import org.mule.runtime.feature.api.management.FeatureFlaggingManagementService;
-import org.mule.runtime.feature.internal.togglz.config.DefaultProfilingFeatureManagementService;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
 import java.util.Map;
@@ -247,7 +246,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
       .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
       .put(MULE_PROFILING_SERVICE_KEY, getBeanDefinitionForProfilingService())
-      .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultProfilingFeatureManagementService.class))
+      .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;

@@ -4,35 +4,41 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.feature.internal.togglz.config;
+package org.mule.runtime.core.internal.config;
 
 import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.getFeature;
 import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.setFeatureState;
 import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.withFeatureUser;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.feature.api.management.FeatureFlaggingManagementService;
 import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.togglz.core.repository.FeatureState;
+
+import javax.inject.Inject;
 
 /**
  * The default implementation for a service to enable/disable runtime features.
  *
  * @since 4.5.0
  */
-public class DefaultProfilingFeatureManagementService implements FeatureFlaggingManagementService {
+public class DefaultFeatureManagementService implements FeatureFlaggingManagementService {
+
+  @Inject
+  MuleContext muleContext;
 
   @Override
-  public void disableFeatureFor(String featureName, String artifactId) {
-    setStatus(featureName, artifactId, false);
+  public void disableFeatureFor(String featureName) {
+    setStatus(featureName, false);
   }
 
   @Override
-  public void enableFeatureFor(String featureName, String artifactId) {
-    setStatus(featureName, artifactId, true);
+  public void enableFeatureFor(String featureName) {
+    setStatus(featureName, true);
   }
 
-  private void setStatus(String featureName, String applicationName, boolean status) {
-    withFeatureUser(new MuleTogglzArtifactFeatureUser(applicationName),
+  private void setStatus(String featureName, boolean status) {
+    withFeatureUser(new MuleTogglzArtifactFeatureUser(muleContext.getConfiguration().getId()),
                     () -> setFeatureState(new FeatureState(getFeature(featureName), status)));
   }
 }
