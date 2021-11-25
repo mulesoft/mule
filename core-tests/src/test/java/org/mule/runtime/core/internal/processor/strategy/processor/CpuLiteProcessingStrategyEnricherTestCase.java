@@ -11,17 +11,15 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.internal.processor.rector.profiling.CoreProfilingServiceTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
-import org.junit.Before;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
 import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteAsyncNonBlockingProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBlockingProcessingStrategyEnricher;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 
 import io.qameta.allure.Description;
@@ -50,12 +48,7 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   private CoreEvent coreEvent;
 
   @Mock
-  private CoreProfilingService profilingService;
-
-  @Before
-  public void before() {
-    mockProcessingStrategyProfilingChainWithoutTriggeringEvent(profilingService);
-  }
+  private ProfilingService profilingService;
 
   @Test
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with CPU_LITE enricher")

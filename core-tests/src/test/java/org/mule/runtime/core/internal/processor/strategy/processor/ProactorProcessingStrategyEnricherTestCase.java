@@ -11,22 +11,21 @@ import static java.util.Arrays.asList;
 import static java.util.function.Function.identity;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.internal.processor.rector.profiling.CoreProfilingServiceTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatchers;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProactorProcessingStrategyEnricher;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 
 import io.qameta.allure.Description;
@@ -53,13 +52,6 @@ public class ProactorProcessingStrategyEnricherTestCase extends AbstractEnriched
   private ImmediateScheduler dispatcherScheduler;
   @Mock
   private CoreEvent coreEvent;
-  @Mock
-  private CoreProfilingService profilingService;
-
-  @Before
-  public void before() {
-    mockProcessingStrategyProfilingChainWithoutTriggeringEvent(profilingService);
-  }
 
   public ProactorProcessingStrategyEnricherTestCase(int parallelism) {
     this.parallelism = parallelism;
@@ -74,7 +66,7 @@ public class ProactorProcessingStrategyEnricherTestCase extends AbstractEnriched
   @Description("Verify that the reactive processor is enriched in a correct way when enriched with proactor enricher")
   public void proactorEnricher() {
     ReactiveProcessor transform =
-        new ProactorProcessingStrategyEnricher(() -> dispatcherScheduler, identity(), profilingService,
+        new ProactorProcessingStrategyEnricher(() -> dispatcherScheduler, identity(), mock(ProfilingService.class),
                                                ARTIFACT_ID, ARTIFACT_TYPE, parallelism,
                                                parallelism, parallelism)
                                                    .enrich(reactiveProcessor);

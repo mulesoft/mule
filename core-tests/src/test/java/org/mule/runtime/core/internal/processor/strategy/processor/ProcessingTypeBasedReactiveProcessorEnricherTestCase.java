@@ -17,11 +17,10 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.internal.processor.rector.profiling.CoreProfilingServiceTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.ENRICHER;
 
-import org.junit.Before;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
@@ -30,7 +29,6 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBloc
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProactorProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 
 import java.util.Collection;
@@ -74,15 +72,10 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
   private ImmediateScheduler cpuLiteAsyncScheduler;
 
   @Mock
-  private CoreProfilingService profilingService;
+  private ProfilingService profilingService;
 
   @Mock
   private CoreEvent coreEvent;
-
-  @Before
-  public void before() {
-    mockProcessingStrategyProfilingChainWithoutTriggeringEvent(profilingService);
-  }
 
   public ProcessingTypeBasedReactiveProcessorEnricherTestCase(int parallelism) {
     this.parallelism = parallelism;

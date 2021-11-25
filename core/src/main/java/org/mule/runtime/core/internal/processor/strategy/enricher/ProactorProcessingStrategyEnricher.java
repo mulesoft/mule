@@ -11,10 +11,11 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Math.max;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
@@ -32,13 +33,13 @@ public class ProactorProcessingStrategyEnricher implements ReactiveProcessorEnri
   private final int subscribers;
   private final Supplier<Scheduler> contextSchedulerSupplier;
   private final Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator;
-  private final CoreProfilingService profilingService;
+  private final ProfilingService profilingService;
   private final String artifactId;
   private final String artifactType;
 
   public ProactorProcessingStrategyEnricher(Supplier<Scheduler> contextSchedulerSupplier,
                                             Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator,
-                                            CoreProfilingService profilingService,
+                                            ProfilingService profilingService,
                                             String artifactId,
                                             String artifactType,
                                             int maxConcurrency,

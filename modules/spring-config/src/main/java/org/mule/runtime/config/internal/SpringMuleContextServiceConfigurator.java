@@ -62,7 +62,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
-import static org.mule.runtime.feature.api.management.FeatureFlaggingManagementService.PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -107,7 +106,6 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
-import org.mule.runtime.core.internal.config.DefaultFeatureManagementService;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.connection.DelegateConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
@@ -129,7 +127,7 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
-import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
@@ -245,8 +243,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
       .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
-      .put(MULE_PROFILING_SERVICE_KEY, getBeanDefinitionForProfilingService())
-      .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))
+      .put(MULE_PROFILING_SERVICE_KEY, getBeanDefinition(DefaultProfilingService.class))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;
@@ -274,10 +271,6 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     this.serviceLocator = serviceLocator;
     this.originalRegistry = originalRegistry;
     this.resourceLocator = resourceLocator;
-  }
-
-  private BeanDefinition getBeanDefinitionForProfilingService() {
-    return getBeanDefinition(ProfilingServiceWrapper.class);
   }
 
   void createArtifactServices() {

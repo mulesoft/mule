@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.processor.strategy.enricher;
 
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom;
 
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 
 import java.util.function.Supplier;
 
@@ -23,12 +23,12 @@ import java.util.function.Supplier;
 public class CpuLiteNonBlockingProcessingStrategyEnricher implements ReactiveProcessorEnricher {
 
   private final Supplier<Scheduler> liteSchedulerSupplier;
-  private final CoreProfilingService profilingService;
+  private final ProfilingService profilingService;
   private final String artifactId;
   private final String artifactType;
 
   public CpuLiteNonBlockingProcessingStrategyEnricher(Supplier<Scheduler> liteSchedulerSupplier,
-                                                      CoreProfilingService profilingService,
+                                                      ProfilingService profilingService,
                                                       String artifactId,
                                                       String artifactType) {
     this.liteSchedulerSupplier = liteSchedulerSupplier;

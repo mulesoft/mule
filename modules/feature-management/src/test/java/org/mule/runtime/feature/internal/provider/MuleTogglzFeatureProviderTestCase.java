@@ -22,7 +22,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.runtime.feature.internal.togglz.MuleTogglzProfilingFeature;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzRuntimeFeature;
 import org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils;
 import org.mule.runtime.feature.internal.togglz.provider.DefaultMuleTogglzFeatureProvider;
@@ -71,32 +70,12 @@ public class MuleTogglzFeatureProviderTestCase {
     assertThat(feature.getRuntimeFeature(), Matchers.equalTo(TestRuntimeProfilingFeatures.TEST_RUNTIME_FEATURE));
   }
 
-  @Test
-  public void muleProfilingFeaturesAreRegisteredCorrectly() {
-    MuleTogglzProfilingFeature feature =
-        featureProvider.getOrRegisterProfilingTogglzFeatureFrom(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE,
-                                                                DUMMY_CONSUMER_IDENTIFIER);
-    assertThat(featureProvider.getMetaData(feature).getDefaultFeatureState().isEnabled(), Matchers.is(false));
-    assertThat(featureProvider.getFeature(
-                                          MuleTogglzFeatureFlaggingUtils
-                                              .getFullyQualifiedProfilingEventTypeFeatureIdentifier(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE,
-                                                                                                    DUMMY_CONSUMER_IDENTIFIER)),
-               Matchers.equalTo(feature));
-  }
 
   @Test
   public void runtimeFeaturesRegisteredTwiceReturnSameInstance() {
     org.mule.runtime.api.config.Feature mockedFeature = mock(org.mule.runtime.api.config.Feature.class);
     MuleTogglzRuntimeFeature feature = featureProvider.getOrRegisterRuntimeTogglzFeatureFrom(mockedFeature);
     MuleTogglzRuntimeFeature featureAgain = featureProvider.getOrRegisterRuntimeTogglzFeatureFrom(mockedFeature);
-    MatcherAssert.assertThat(feature, Matchers.sameInstance(featureAgain));
-  }
-
-  @Test
-  public void profilingFeaturesRegisteredTwiceReturnSameInstance() {
-    ProfilingEventType eventType = mock(ProfilingEventType.class);
-    MuleTogglzProfilingFeature feature = featureProvider.getOrRegisterProfilingTogglzFeatureFrom(eventType, CONSUMER_NAME);
-    MuleTogglzProfilingFeature featureAgain = featureProvider.getOrRegisterProfilingTogglzFeatureFrom(eventType, CONSUMER_NAME);
     MatcherAssert.assertThat(feature, Matchers.sameInstance(featureAgain));
   }
 

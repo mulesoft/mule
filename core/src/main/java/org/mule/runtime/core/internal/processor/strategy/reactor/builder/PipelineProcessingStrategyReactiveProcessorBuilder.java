@@ -7,8 +7,9 @@
 
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
-import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
@@ -18,17 +19,16 @@ import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUt
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
-import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.reactivestreams.Publisher;
 
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Function;
 
 /**
  * Builder for a {@link ReactiveProcessor} that enriches a pipeline {@link ReactiveProcessor} with processing strategy logic. The
@@ -45,7 +45,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
   private final ReactiveProcessor pipeline;
   private final ClassLoader executionClassloader;
   private ScheduledExecutorService scheduler;
-  private CoreProfilingService profilingService;
+  private ProfilingService profilingService;
 
   private PipelineProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor pipeline, ClassLoader executionClassloader,
                                                              String artifactId, String artifactType) {
@@ -82,7 +82,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
    * @return the builder with decorator set.
    */
   public PipelineProcessingStrategyReactiveProcessorBuilder withProfilingService(
-                                                                                 CoreProfilingService profilingService) {
+                                                                                 ProfilingService profilingService) {
     this.profilingService = profilingService;
     return this;
   }
@@ -95,37 +95,31 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
                                                                                                   ReactorPublisherBuilder<T> publisher) {
 
     ComponentLocation location = getLocation(pipeline);
-    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> psSchedulingFlowExecutionDataProducer =
+    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> psSchedulingFlowExecutionDataProducer =
         dataProducerFromProfilingService(PS_SCHEDULING_FLOW_EXECUTION);
-    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> startingFlowExecutionDataproducer =
+    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> startingFlowExecutionDataproducer =
         dataProducerFromProfilingService(STARTING_FLOW_EXECUTION);
-    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> flowExecutedDataProducer =
+    Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> flowExecutedDataProducer =
         dataProducerFromProfilingService(FLOW_EXECUTED);
 
-    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transfomer =
-        new Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext>() {
-
-          @Override
-          public ComponentProcessingStrategyProfilingEventContext apply(CoreEvent coreEvent) {
-            return new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, getLocation(pipeline),
-                                                                               Thread.currentThread().getName(), artifactId,
-                                                                               artifactType, currentTimeMillis());
-          }
-        };
-
     return publisher
-        .profileProcessingStrategyEvent(profilingService, psSchedulingFlowExecutionDataProducer, transfomer)
+        .profileProcessingStrategyEvent(location, psSchedulingFlowExecutionDataProducer, artifactId, artifactType)
         .publishOn(ofNullable(scheduler))
-        .profileProcessingStrategyEvent(profilingService, startingFlowExecutionDataproducer, transfomer)
+        .profileProcessingStrategyEvent(location, startingFlowExecutionDataproducer, artifactId, artifactType)
         .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
         .transform(pipeline)
-        .profileProcessingStrategyEvent(profilingService, flowExecutedDataProducer, transfomer);
+        .profileProcessingStrategyEvent(location, flowExecutedDataProducer, artifactId, artifactType);
   }
 
-  private ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducerFromProfilingService(
-                                                                                                                              ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType) {
-    return profilingService.getProfilingDataProducer(profilingEventType);
+  private Optional<ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext>> dataProducerFromProfilingService(
+                                                                                                                             ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType) {
+    if (profilingService == null) {
+      return empty();
+    } else {
+      return of(profilingService.getProfilingDataProducer(profilingEventType));
+    }
   }
+
 }
 
 

@@ -170,7 +170,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private ConnectionManagerAdapter connectionManagerAdapter;
 
   @Mock
-  private ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
+  private ProfilingDataProducer<ComponentThreadingProfilingEventContext> threadReleaseDataProducer;
 
   private final String name;
   private final Object result = new Object();

@@ -15,16 +15,12 @@ import static org.togglz.core.user.thread.ThreadLocalUserProvider.release;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
-import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.feature.internal.togglz.MuleTogglzProfilingFeature;
 import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.togglz.core.repository.FeatureState;
 import org.togglz.core.user.FeatureUser;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -175,15 +171,6 @@ public class MuleTogglzFeatureFlaggingUtils {
   }
 
   /**
-   * @param profilingProducerContext the {@link org.mule.runtime.api.profiling.ProfilingDataProducer}
-   * @return the fqn.
-   */
-  public static String getFullyQualifiedProlingProducerContextIdentifier(ProfilingProducerScope profilingProducerContext) {
-    return profilingProducerContext.getProducerScopeTypeIdentifier() + ":" + profilingProducerContext
-        .getProducerScopeIdentifier();
-  }
-
-  /**
    * @param profilingEventType the {@link ProfilingEventType}.
    * @param prefix             the consumer name
    * @param <T>                the class of {@link ProfilingEventType}
@@ -203,12 +190,5 @@ public class MuleTogglzFeatureFlaggingUtils {
   public static <T extends ProfilingEventContext> String getFullyQualifiedProfilingEventTypeIdentifier(
                                                                                                        ProfilingEventType<T> profilingEventType) {
     return profilingEventType.getProfilingEventTypeNamespace() + ":" + profilingEventType.getProfilingEventTypeIdentifier();
-  }
-
-  public static Collection<Feature> runtimeFeaturesFrom(Collection<MuleTogglzProfilingFeature> profilingFeatures) {
-    Collection<Feature> runtimeFeatures = new HashSet<>();
-
-    // profilingFeatures.forEach(profilingFeature -> runtimeFeatures.add(new RuntimeFeatu));
-    return runtimeFeatures;
   }
 }

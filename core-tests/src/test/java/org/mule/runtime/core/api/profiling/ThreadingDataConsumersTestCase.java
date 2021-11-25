@@ -45,12 +45,10 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
-import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
@@ -67,7 +65,6 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
   public static final String ARTIFACT_ID = "artifactId";
   public static final String ARTIFACT_TYPE = "artifactType";
   public static final long PROFILING_EVENT_TIMESTAMP = 5678L;
-  public static final String TEST_DATA_CONSUMER = "TEST_DATA_CONSUMER";
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
@@ -104,20 +101,6 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
     when(identifier.getName()).thenReturn("test");
     when(identifier.getNamespace()).thenReturn("test");
     profilingService = getTestProfilingService();
-    enableProfilingFeatures();
-  }
-
-  private void enableProfilingFeatures() {
-    eventType().forEach(eventType -> {
-      try {
-        ((MuleContextWithRegistry) muleContext)
-            .getRegistry()
-            .lookupObject(ProfilingFeatureFlaggingService.class)
-            .toggleProfilingFeature(eventType, TEST_DATA_CONSUMER, true);
-      } catch (Exception e) {
-        throw new RuntimeException();
-      }
-    });
   }
 
   private ProfilingService getTestProfilingService() throws MuleException {
@@ -139,7 +122,7 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
   @Test
   @Description("When a profiling event related to threading is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForThreadingProfilingEventTypesConsumeDataAccordingly() {
-    ProfilingDataProducer<ComponentThreadingProfilingEventContext, Object> dataProducer =
+    ProfilingDataProducer<ComponentThreadingProfilingEventContext> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
     ComponentThreadingProfilingEventContext profilerEventContext =

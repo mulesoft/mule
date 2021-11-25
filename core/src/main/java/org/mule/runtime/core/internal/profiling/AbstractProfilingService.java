@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.profiling;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.core.internal.profiling.notification.ProfilingNotification.getFullyQualifiedProfilingNotificationIdentifier;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -17,15 +18,15 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
-import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,16 +38,15 @@ import javax.inject.Inject;
  *
  * @since 4.4
  */
-public abstract class AbstractProfilingService implements CoreProfilingService, Initialisable, Startable, Stoppable {
+public abstract class AbstractProfilingService implements ProfilingService, Initialisable, Startable, Stoppable {
 
   @Inject
   protected ServerNotificationManager notificationManager;
 
   @Inject
-  protected ProfilingFeatureFlaggingService featureFlaggingService;
+  private ServerNotificationHandler serverNotificationHandler;
 
-  @Inject
-  MuleContext muleContext;
+  private FeatureFlaggingService featureFlags;
 
   private final Set<NotificationListener<?>> addedListeners = new HashSet<>();
 
@@ -55,27 +55,12 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
 
   @Override
   public void start() throws MuleException {
-    registerDataConsumers(getDiscoveryStrategy().discover());
-  }
-
-  private void registerDataConsumers(Set<ProfilingDataConsumer<?>> dataConsumers) {
-    for (ProfilingDataConsumer<?> dataConsumer : dataConsumers) {
-      Set<? extends ProfilingEventType<?>> profilingEventTypes = dataConsumer.getProfilingEventTypes();
-      for (ProfilingEventType<?> profilingEventType : profilingEventTypes) {
-        featureFlaggingService.registerProfilingFeature(profilingEventType, dataConsumer.getClass().getName());
-      }
+    if (featureFlags.isEnabled(ENABLE_PROFILING_SERVICE)) {
+      registerNotificationListeners(getDiscoveryStrategy().discover());
     }
-    registerNotificationListeners(dataConsumers);
-    onDataConsumersRegistered();
   }
 
-  /**
-   * Invoked when new {@link ProfilingDataConsumer} is registered.
-   */
-  protected abstract void onDataConsumersRegistered();
-
-  private void registerNotificationListeners(
-                                             Set<ProfilingDataConsumer<?>> profilingDataConsumers) {
+  private void registerNotificationListeners(Set<ProfilingDataConsumer<? extends ProfilingEventContext>> profilingDataConsumers) {
     profilingDataConsumers.forEach(this::registerNotificationListener);
   }
 
@@ -111,7 +96,12 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
   protected abstract ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy();
 
   public <T extends ProfilingEventContext> void notifyEvent(T profilingEventContext, ProfilingEventType<T> action) {
-    notificationManager.fireNotification(new ProfilingNotification<>(profilingEventContext, action));
+    serverNotificationHandler.fireNotification(new ProfilingNotification<>(profilingEventContext, action));
+  }
+
+  @Inject
+  public void setFeatureFlags(FeatureFlaggingService featureFlags) {
+    this.featureFlags = featureFlags;
   }
 
   /**
@@ -127,5 +117,4 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
                                                         .atLeast(ENABLE_PROFILING_SERVICE.getEnabledByDefaultSince()))
                                                     .isPresent());
   }
-
 }

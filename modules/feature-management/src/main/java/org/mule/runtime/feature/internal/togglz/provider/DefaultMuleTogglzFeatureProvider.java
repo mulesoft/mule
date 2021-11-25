@@ -13,7 +13,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureMetadata;
-import org.mule.runtime.feature.internal.togglz.MuleTogglzProfilingFeature;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzRuntimeFeature;
 import org.togglz.core.Feature;
 import org.togglz.core.metadata.FeatureMetaData;
@@ -43,9 +42,6 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
   public static final String FEATURE_NAME_MUST_NOT_BE_NULL = "Feature name must not be null.";
 
   private final Cache<org.mule.runtime.api.config.Feature, MuleTogglzRuntimeFeature> runtimeFeaturesCache =
-      Caffeine.newBuilder().build();
-
-  private final Cache<ProfilingEventType<?>, Map<String, MuleTogglzProfilingFeature>> profilingEventTypesFeatures =
       Caffeine.newBuilder().build();
 
   private Map<String, FeatureMetaData> metaDataCache = null;
@@ -127,25 +123,6 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
     }
 
     features.put(newFeature.name(), newFeature);
-  }
-
-  @Override
-  public MuleTogglzProfilingFeature getOrRegisterProfilingTogglzFeatureFrom(ProfilingEventType<?> profilingEventType,
-                                                                            String consumerName) {
-    if (consumerName == null) {
-      throw new IllegalArgumentException(CONSUMER_NAME_MUST_NOT_BE_NULL);
-    }
-    MuleTogglzProfilingFeature consumerFeature = new MuleTogglzProfilingFeature(profilingEventType, consumerName);
-    addTogglzFeatureMetadata(consumerFeature);
-    return profilingEventTypesFeatures
-        .get(profilingEventType, profEventType -> new ConcurrentHashMap<>())
-        .computeIfAbsent(consumerName, name -> consumerFeature);
-  }
-
-  public Collection<MuleTogglzProfilingFeature> getConsumerFeaturesFor(ProfilingEventType<?> profilingEventType) {
-    return profilingEventTypesFeatures
-        .get(profilingEventType, profEventType -> new ConcurrentHashMap<>())
-        .values();
   }
 
   @Override

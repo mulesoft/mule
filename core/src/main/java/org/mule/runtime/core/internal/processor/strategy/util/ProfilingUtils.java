@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.processor.strategy.util;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.profiling.ProfilingEventContext;
-import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
@@ -61,13 +59,4 @@ public final class ProfilingUtils {
     return muleContext.getArtifactType().getAsString();
   }
 
-  /**
-   * @param profilingEventType the {@link ProfilingEventType}
-   * @param <T>                the {@link ProfilingEventContext} associated to the profilingEventType.
-   * @return the fqn.
-   */
-  public static <T extends ProfilingEventContext> String getFullyQualifiedProfilingEventTypeIdentifier(
-                                                                                                       ProfilingEventType<T> profilingEventType) {
-    return profilingEventType.getProfilingEventTypeNamespace() + ":" + profilingEventType.getProfilingEventTypeIdentifier();
-  }
 }

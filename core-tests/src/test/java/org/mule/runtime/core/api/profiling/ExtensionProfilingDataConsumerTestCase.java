@@ -23,11 +23,7 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
-import org.mule.runtime.core.internal.profiling.ArtifactProfilingProducerScope;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
-import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Optional;
@@ -81,16 +77,10 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
 
   @Test
   @Description("When a profiling event related to an extension is triggered, the data consumers process the data accordingly.")
-  public void dataConsumersForComponentProfilingEventAreTriggered() throws Exception {
-    ((MuleContextWithRegistry) muleContext)
-        .getRegistry()
-        .lookupObject(ProfilingFeatureFlaggingService.class)
-        .toggleProfilingFeature(EXTENSION_PROFILING_EVENT, "TEST_DATA_CONSUMER", true);
-
-    ProfilingDataProducer<ExtensionProfilingEventContext, Object> dataProducer =
-        profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT,
-                                                  new ArtifactProfilingProducerScope(ProfilingUtils.getArtifactId(muleContext)));
-    dataProducer.triggerProfilingEvent(new Object(), o -> profilingEventContext);
+  public void dataConsumersForComponentProfilingEventAreTriggered() {
+    ProfilingDataProducer<ExtensionProfilingEventContext> dataProducer =
+        profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT);
+    dataProducer.triggerProfilingEvent(profilingEventContext);
 
     verify(logger).info(PROFILING_EVENT_CONTEXT);
     verify(logger).info(OK);
