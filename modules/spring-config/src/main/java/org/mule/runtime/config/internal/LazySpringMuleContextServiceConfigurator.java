@@ -17,7 +17,7 @@ import static org.mule.runtime.config.internal.LazyMuleArtifactContext.SHARED_PA
 import static org.mule.runtime.config.internal.LazySampleDataService.NON_LAZY_SAMPLE_DATA_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
@@ -30,7 +30,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.config.internal.lazy.LazyExpressionManagerFactoryBean;
+import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.lazy.NoOpConnectivityTesterFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
@@ -87,7 +87,8 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
   void createArtifactServices() {
     super.createArtifactServices();
 
-    registerBeanDefinition(OBJECT_EXPRESSION_MANAGER, getBeanDefinition(LazyExpressionManagerFactoryBean.class));
+    registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
+                           getBeanDefinition(LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
     registerBeanDefinition(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(NoOpConnectivityTesterFactory.class));
 
     registerConstantBeanDefinition(CONNECTIVITY_TESTING_SERVICE_KEY,

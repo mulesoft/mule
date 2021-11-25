@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.internal.el;
 
-import static java.lang.String.format;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
+import static java.lang.String.format;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -22,10 +23,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +30,10 @@ import org.junit.rules.ExpectedException;
 
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
@@ -48,8 +49,7 @@ public class DefaultExpressionManagerDefaultTestCase extends AbstractMuleContext
 
   @Before
   public void configureExpressionManager() throws MuleException {
-    expressionManager = new DefaultExpressionManager();
-    initialiseIfNeeded(expressionManager, muleContext);
+    expressionManager = muleContext.getExpressionManager();
   }
 
   @Description("Verifies that parsing works with inner expressions in MVEL but only with regular ones in DW.")

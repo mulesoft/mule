@@ -48,6 +48,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.api.store.ObjectStore;
@@ -65,6 +66,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
+import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.event.DefaultEventContextService;
 import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
@@ -151,7 +153,10 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
 
     registerObject(OBJECT_STREAMING_GHOST_BUSTER, new StreamingGhostBuster(), muleContext);
     registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager(), muleContext);
-    registerObject(OBJECT_EXPRESSION_MANAGER, new DefaultExpressionManager(), muleContext);
+    DefaultExpressionManager expressionManager = new DefaultExpressionManager();
+    DefaultExpressionLanguageFactoryService service = registry.lookupObject(DefaultExpressionLanguageFactoryService.class);
+    expressionManager.setExpressionLanguage(new DataWeaveExpressionLanguageAdaptor(muleContext, null, service, null));
+    registerObject(OBJECT_EXPRESSION_MANAGER, expressionManager, muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
     registerObject(METADATA_SERVICE_KEY, new MuleMetadataService(), muleContext);

@@ -15,14 +15,16 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
+
+import java.util.Random;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
-
-import java.util.Random;
 
 public class MVELDeepAssignBenchmark extends AbstractBenchmark {
 
@@ -42,7 +44,13 @@ public class MVELDeepAssignBenchmark extends AbstractBenchmark {
   @Setup
   public void setup() throws MuleException {
     muleContext = createMuleContextWithServices();
-    ((MVELExpressionLanguage) lookupObject(muleContext, OBJECT_EXPRESSION_LANGUAGE)).setAutoResolveVariables(false);
+    MVELExpressionLanguage mvelExpressionLanguage =
+        (MVELExpressionLanguage) lookupObject(muleContext, OBJECT_EXPRESSION_LANGUAGE);
+    mvelExpressionLanguage.setAutoResolveVariables(false);
+
+    ExtendedExpressionManager expressionManager = muleContext.getExpressionManager();
+    ((DefaultExpressionManager) expressionManager).setMelDefault(true);
+    ((DefaultExpressionManager) expressionManager).setExpressionLanguage(mvelExpressionLanguage);
     flow = createFlow(muleContext);
     event = createEvent(flow, payload);
   }

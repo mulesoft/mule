@@ -6,17 +6,16 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.params;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.asDataWeaveExpression;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -28,8 +27,7 @@ public class ParameterExtractorCorrectDWTestCase extends AbstractMuleContextTest
 
   @Before
   public void setUp() throws Exception {
-    expressionManager = new DefaultExpressionManager();
-    initialiseIfNeeded(expressionManager, muleContext);
+    expressionManager = muleContext.getExpressionManager();
   }
 
   @Test
