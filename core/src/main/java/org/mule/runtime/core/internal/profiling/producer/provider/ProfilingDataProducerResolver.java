@@ -32,7 +32,7 @@ import org.mule.runtime.core.internal.profiling.ExtensionDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ProcessingStratetegyDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ProfilingDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +41,8 @@ import java.util.Map;
  * Used for resolving data producers.
  *
  * @see DefaultProfilingService
+ *
+ * @since 4.5.0
  */
 public class ProfilingDataProducerResolver {
 
@@ -51,11 +53,11 @@ public class ProfilingDataProducerResolver {
   private final Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducerProvider<?, ?>> profilingDataProducerProviders =
       new HashMap<>();
 
-  private final RuntimeFeatureFlaggingService featureFlaggingService;
+  private final ProfilingFeatureFlaggingService featureFlaggingService;
 
   public ProfilingDataProducerResolver(DefaultProfilingService profilingService,
                                        ThreadSnapshotCollector threadSnapshotCollector,
-                                       RuntimeFeatureFlaggingService featureFlaggingService) {
+                                       ProfilingFeatureFlaggingService featureFlaggingService) {
     this.profilingService = profilingService;
     this.threadSnapshotCollector = threadSnapshotCollector;
     this.featureFlaggingService = featureFlaggingService;

@@ -14,20 +14,25 @@ import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEv
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.producer.ComponentThreadingProfilingDataProducer;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
+/**
+ * A {@link ProfilingDataProducerProvider} that provides {@link ComponentThreadingProfilingDataProducer}
+ *
+ * @since 4.5.0
+ */
 public class ComponentThreadingDataProducerProvider
     implements ProfilingDataProducerProvider<DefaultComponentThreadingProfilingEventContext, CoreEvent> {
 
   private final DefaultProfilingService profilingService;
   private final ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType;
   private final ThreadSnapshotCollector threadSnapshotCollector;
-  private final RuntimeFeatureFlaggingService featureFlaggingService;
+  private final ProfilingFeatureFlaggingService featureFlaggingService;
 
   public ComponentThreadingDataProducerProvider(DefaultProfilingService profilingService,
                                                 ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType,
                                                 ThreadSnapshotCollector threadSnapshotCollector,
-                                                RuntimeFeatureFlaggingService featureFlaggingService) {
+                                                ProfilingFeatureFlaggingService featureFlaggingService) {
     this.profilingService = profilingService;
     this.profilingEventType = profilingEventType;
     this.threadSnapshotCollector = threadSnapshotCollector;

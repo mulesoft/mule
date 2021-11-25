@@ -14,6 +14,11 @@ import org.mule.runtime.feature.api.management.FeatureFlaggingManagementService;
 import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.togglz.core.repository.FeatureState;
 
+/**
+ * The default implementation for a service to enable/disable runtime features.
+ *
+ * @since 4.5.0
+ */
 public class DefaultProfilingFeatureManagementService implements FeatureFlaggingManagementService {
 
   @Override
@@ -30,5 +35,4 @@ public class DefaultProfilingFeatureManagementService implements FeatureFlagging
     withFeatureUser(new MuleTogglzArtifactFeatureUser(applicationName),
                     () -> setFeatureState(new FeatureState(getFeature(featureName), status)));
   }
-
 }

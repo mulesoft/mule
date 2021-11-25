@@ -16,6 +16,8 @@ import org.togglz.core.user.FeatureUser;
  * verification.
  *
  * @see <a href="http://google.com">https://www.togglz.org/documentation/activation-strategies.html/a>
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzActivatedIfEnabledActivationStrategy implements ActivationStrategy {
 

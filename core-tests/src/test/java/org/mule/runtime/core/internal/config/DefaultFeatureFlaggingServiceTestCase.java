@@ -19,7 +19,6 @@ import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
-import org.togglz.core.repository.FeatureState;
 
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +65,6 @@ public class DefaultFeatureFlaggingServiceTestCase {
 
   @Before
   public void before() {
-    Map<org.togglz.core.Feature, FeatureState> featureStates = new HashMap<>();
     featureFlaggingService =
         new DefaultFeatureFlaggingService(ARTIFACT_ID, getFeaturesStates());
 
@@ -91,18 +89,6 @@ public class DefaultFeatureFlaggingServiceTestCase {
   @Test
   public void testCase() {
     assertThat(featureFlaggingService.isEnabled(feature), is(enabled));
-  }
-
-  private static Map<Feature, Boolean> buildFeatureConfigurations(Object... values) {
-    assertThat("Values must be even", values.length % 2, is(0));
-
-    Map<Feature, Boolean> m = new HashMap<>();
-
-    for (int i = 0; i < values.length; i += 2) {
-      m.put((Feature) values[i], (Boolean) values[i + 1]);
-    }
-
-    return m;
   }
 
 }

@@ -13,7 +13,7 @@ package org.mule.runtime.feature.api.management;
  */
 public interface FeatureFlaggingManagementService {
 
-  String REGISTRY_KEY = "PROFILING_FEATURE_MANAGEMENT_SERVICE";
+  String PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY = "PROFILING_FEATURE_MANAGEMENT_SERVICE";
 
   /**
    * disable the feature for an application.

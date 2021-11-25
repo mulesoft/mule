@@ -13,9 +13,10 @@ import org.mule.runtime.feature.internal.togglz.scope.type.MuleTogglzFeatureScop
  * {@link org.togglz.core.repository.FeatureState} can vary.
  *
  * @see org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository
+ *
+ * @since 4.5.0
  */
 public interface MuleTogglzFeatureScope {
-
 
   /**
    * The scope type.

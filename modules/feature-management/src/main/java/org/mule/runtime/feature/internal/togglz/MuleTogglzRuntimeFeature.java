@@ -13,7 +13,7 @@ import org.mule.runtime.api.config.Feature;
  * <p>
  * All Runtime Features are registered in Togglz.
  *
- * @see org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder
+ * @since 4.5.0
  */
 public class MuleTogglzRuntimeFeature implements org.togglz.core.Feature {
 

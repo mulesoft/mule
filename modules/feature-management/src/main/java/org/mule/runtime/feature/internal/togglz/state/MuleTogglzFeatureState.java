@@ -13,6 +13,8 @@ import org.togglz.core.repository.FeatureState;
 
 /**
  * This represents a Mule Togglz Feature State.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzFeatureState extends FeatureState implements Disposable {
 

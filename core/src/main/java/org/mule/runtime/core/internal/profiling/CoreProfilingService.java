@@ -16,7 +16,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A Profiling Service that adds some profiling methods internal to the runtime core. This is used only by the core.
+ * A Profiling Service that adds some profiling functionality internal to the runtime core. This is used only by the runtime core.
+ *
+ * @since 4.5.0
  */
 public interface CoreProfilingService extends ProfilingService {
 

@@ -11,18 +11,23 @@ import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
+/**
+ * A {@link ProfilingDataProducerProvider} that provides {@link ExtensionProfilingDataProducer}
+ *
+ * @since 4.5.0
+ */
 public class ExtensionDataProducerProvider
     implements ProfilingDataProducerProvider<ExtensionProfilingEventContext, Object> {
 
   private final DefaultProfilingService profilingService;
   private final ProfilingEventType<ExtensionProfilingEventContext> profilingEventType;
-  private final RuntimeFeatureFlaggingService featureFlaggingService;
+  private final ProfilingFeatureFlaggingService featureFlaggingService;
 
   public ExtensionDataProducerProvider(DefaultProfilingService profilingService,
                                        ProfilingEventType<ExtensionProfilingEventContext> profilingEventType,
-                                       RuntimeFeatureFlaggingService featureFlaggingService) {
+                                       ProfilingFeatureFlaggingService featureFlaggingService) {
     this.profilingService = profilingService;
     this.profilingEventType = profilingEventType;
     this.featureFlaggingService = featureFlaggingService;

@@ -6,17 +6,16 @@
  */
 package org.mule.runtime.feature.internal.togglz.config;
 
+import org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureState;
 import org.togglz.core.Feature;
 import org.togglz.core.repository.FeatureState;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A Read-only Map that represents the features associated to an artifact.
  */
-public class MuleTogglzManagedArtifactFeatures implements Map<Feature, FeatureState> {
+public class MuleTogglzManagedArtifactFeatures {
 
   private final String artifactId;
   private final Map<Feature, FeatureState> features;
@@ -27,64 +26,8 @@ public class MuleTogglzManagedArtifactFeatures implements Map<Feature, FeatureSt
     this.features = features;
   }
 
-  @Override
-  public int size() {
-    return features.size();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return features.isEmpty();
-  }
-
-  @Override
   public boolean containsKey(Object key) {
     return features.containsKey(key);
-  }
-
-  @Override
-  public boolean containsValue(Object value) {
-    return features.containsValue(value);
-  }
-
-  @Override
-  public FeatureState get(Object key) {
-    return features.get(key);
-  }
-
-  @Override
-  public FeatureState put(Feature key, FeatureState value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public FeatureState remove(Object key) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void putAll(Map<? extends Feature, ? extends FeatureState> m) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Set<Feature> keySet() {
-    return features.keySet();
-  }
-
-  @Override
-  public Collection<FeatureState> values() {
-    return features.values();
-  }
-
-  @Override
-  public Set<Entry<Feature, FeatureState>> entrySet() {
-    return features.entrySet();
   }
 
   /**
@@ -94,7 +37,22 @@ public class MuleTogglzManagedArtifactFeatures implements Map<Feature, FeatureSt
     return artifactId;
   }
 
+  /**
+   * disposes the feature states.
+   */
   public void dispose() {
+    for (FeatureState featureState : features.values()) {
+      if (featureState instanceof MuleTogglzFeatureState) {
+        ((MuleTogglzFeatureState) featureState).dispose();
+      }
+    }
+  }
 
+  /**
+   * @param togglzFeature the {@link Feature}
+   * @return the corresponding FeatureS
+   */
+  public FeatureState get(Feature togglzFeature) {
+    return features.get(togglzFeature);
   }
 }

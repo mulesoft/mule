@@ -21,7 +21,7 @@ import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingData
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -44,7 +44,7 @@ import javax.inject.Inject;
 public class DefaultProfilingService extends AbstractProfilingService {
 
   @Inject
-  private RuntimeFeatureFlaggingService featureFlaggingService;
+  private ProfilingFeatureFlaggingService featureFlaggingService;
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
@@ -64,6 +64,9 @@ public class DefaultProfilingService extends AbstractProfilingService {
                          profEventType -> new ConcurrentHashMap<>())
         .put(new ArtifactProfilingProducerScope(getArtifactId(muleContext)),
              new ResettableProfilingDataProducerDelegate<T, S>(profilingDataProducer, profDataProducer -> {
+               if (profDataProducer instanceof ResettableProfilingDataProducer) {
+                 ((ResettableProfilingDataProducer<T, S>) profDataProducer).reset();
+               }
              }));
   }
 

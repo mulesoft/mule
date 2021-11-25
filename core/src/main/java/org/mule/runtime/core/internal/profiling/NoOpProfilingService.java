@@ -20,6 +20,8 @@ import java.util.function.Function;
 /**
  * A Profiling Service that disables all data production. The {@link ProfilingDataProducer} implements operations that do not
  * propagate the profiling data.
+ *
+ * @since 4.5.0
  */
 public class NoOpProfilingService implements CoreProfilingService {
 

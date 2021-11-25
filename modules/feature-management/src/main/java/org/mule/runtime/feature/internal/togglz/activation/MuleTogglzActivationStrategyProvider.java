@@ -17,6 +17,8 @@ import java.util.ServiceLoader;
 /**
  * {@link ActivationStrategyProvider} for the Mule Runtime. It provides the @{@link ActivationStrategy}'s found through SPI in the
  * current TCCL as well the mule runtime activation strategies.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzActivationStrategyProvider implements ActivationStrategyProvider {
 

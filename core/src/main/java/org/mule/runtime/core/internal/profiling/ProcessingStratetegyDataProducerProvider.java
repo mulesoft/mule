@@ -13,18 +13,24 @@ import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyPr
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
+
+/**
+ * A {@link ProfilingDataProducerProvider} that provides {@link ComponentProcessingStrategyProfilingDataProducer}
+ *
+ * @since 4.5.0
+ */
 public class ProcessingStratetegyDataProducerProvider
     implements ProfilingDataProducerProvider<DefaultComponentProcessingStrategyProfilingEventContext, CoreEvent> {
 
   private final DefaultProfilingService profilingService;
   private final ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType;
-  private final RuntimeFeatureFlaggingService featureFlaggingService;
+  private final ProfilingFeatureFlaggingService featureFlaggingService;
 
   public ProcessingStratetegyDataProducerProvider(DefaultProfilingService profilingService,
                                                   ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
-                                                  RuntimeFeatureFlaggingService featureFlaggingService) {
+                                                  ProfilingFeatureFlaggingService featureFlaggingService) {
     this.profilingService = profilingService;
     this.profilingEventType = profilingEventType;
     this.featureFlaggingService = featureFlaggingService;

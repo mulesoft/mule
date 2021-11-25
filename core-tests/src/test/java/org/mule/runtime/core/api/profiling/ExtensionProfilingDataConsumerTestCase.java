@@ -27,7 +27,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
 import org.mule.runtime.core.internal.profiling.ArtifactProfilingProducerScope;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Optional;
@@ -84,7 +84,7 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
   public void dataConsumersForComponentProfilingEventAreTriggered() throws Exception {
     ((MuleContextWithRegistry) muleContext)
         .getRegistry()
-        .lookupObject(RuntimeFeatureFlaggingService.class)
+        .lookupObject(ProfilingFeatureFlaggingService.class)
         .toggleProfilingFeature(EXTENSION_PROFILING_EVENT, "TEST_DATA_CONSUMER", true);
 
     ProfilingDataProducer<ExtensionProfilingEventContext, Object> dataProducer =

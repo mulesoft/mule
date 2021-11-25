@@ -12,6 +12,8 @@ import org.togglz.core.repository.FeatureState;
 
 /**
  * Resolves the feature state according to a type of scope
+ *
+ * @since 4.5.0
  */
 public interface MuleTogglzFeatureStateResolver {
 

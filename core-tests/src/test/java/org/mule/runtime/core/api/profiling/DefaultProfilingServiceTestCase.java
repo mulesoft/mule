@@ -29,7 +29,6 @@ import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
@@ -47,7 +46,7 @@ import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessi
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
@@ -112,7 +111,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     ProfilingDataProducer<TestProfilingEventContext, Object> profilingDataProducer =
         profilingService.getProfilingDataProducer(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE);
     assertThat(profilingDataProducer, instanceOf(ResettableProfilingDataProducerDelegate.class));
-    assertThat(((ResettableProfilingDataProducerDelegate) profilingDataProducer).getDelegatee(),
+    assertThat(((ResettableProfilingDataProducerDelegate) profilingDataProducer).getDelegate(),
                instanceOf(TestProfilingDataProducer.class));
   }
 
@@ -150,7 +149,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   public void notificationTriggeredOnComponentProfilingEvent() throws Exception {
     ((MuleContextWithRegistry) muleContext)
         .getRegistry()
-        .lookupObject(RuntimeFeatureFlaggingService.class)
+        .lookupObject(ProfilingFeatureFlaggingService.class)
         .toggleProfilingFeature(EXTENSION_PROFILING_EVENT, TEST_DATA_CONSUMER, true);
 
     ProfilingDataProducer<ExtensionProfilingEventContext, Object> profilingDataProducer =
@@ -166,8 +165,8 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   public void notificationTriggeredOnOperationStartedEvent() throws Exception {
     ((MuleContextWithRegistry) muleContext)
         .getRegistry()
-        .lookupObject(RuntimeFeatureFlaggingService.class)
-        .toggleProfilingFeature(STARTING_OPERATION_EXECUTION, "TEST_DATA_CONSUMER", true);
+        .lookupObject(ProfilingFeatureFlaggingService.class)
+        .toggleProfilingFeature(STARTING_OPERATION_EXECUTION, TEST_DATA_CONSUMER, true);
 
     ProfilingDataProducer<ComponentThreadingProfilingEventContext, Object> profilingDataProducer =
         profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
@@ -250,6 +249,10 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
    */
   private static class TestComponentProfilingEventContext implements ExtensionProfilingEventContext {
 
+    public static final String TEST_COMPONENT_ID = "TEST_COMPONENT_ID";
+    public static final String TEST_COMPONENT_EVENT_ID = "TEST_COMPONENT_EVENT_ID";
+    public static final String NON_EXISTENT = "NON_EXISTENT";
+
     @Override
     public long getTriggerTimestamp() {
       return 0;
@@ -257,17 +260,17 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
 
     @Override
     public String getProfilingDataSourceIdentifier() {
-      return "TEST_COMPONENT_ID";
+      return TEST_COMPONENT_ID;
     }
 
     @Override
     public String getExtensionEventSubtypeIdentifier() {
-      return "TEST_COMPONENT_EVENT_ID";
+      return TEST_COMPONENT_EVENT_ID;
     }
 
     @Override
     public Optional<Object> get(String key) {
-      return of("NON_EXISTENT");
+      return of(NON_EXISTENT);
     }
   }
 
@@ -278,17 +281,18 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
 
     TEST_PROFILING_EVENT_TYPE {
 
+      public static final String TEST_PROFILING_NAMESPACE = "test-namespace";
+      public static final String TEST_PROFILING_EVENT_IDENTIFIER = "test";
+
       @Override
       public String getProfilingEventTypeIdentifier() {
-        return "test";
+        return TEST_PROFILING_EVENT_IDENTIFIER;
       }
 
       @Override
       public String getProfilingEventTypeNamespace() {
-        return "test-namespace";
+        return TEST_PROFILING_NAMESPACE;
       }
-
     }
-
   }
 }

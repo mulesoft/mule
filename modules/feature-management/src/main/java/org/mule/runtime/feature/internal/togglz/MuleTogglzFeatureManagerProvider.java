@@ -17,7 +17,9 @@ import org.togglz.core.user.thread.ThreadLocalUserProvider;
 import static org.mule.runtime.feature.internal.togglz.activation.MuleTogglzActivationStrategyProvider.getDefaultActivationStrategyProvider;
 
 /**
- * a {@link FeatureManagerProvider} for the Mule Runtime.
+ * a {@link FeatureManagerProvider} for the Mule Runtime. This is retrieved through SPI.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzFeatureManagerProvider implements FeatureManagerProvider {
 
@@ -39,6 +41,7 @@ public class MuleTogglzFeatureManagerProvider implements FeatureManagerProvider 
 
   @Override
   public int priority() {
+    // Not used. By default.
     return 30;
   }
 }

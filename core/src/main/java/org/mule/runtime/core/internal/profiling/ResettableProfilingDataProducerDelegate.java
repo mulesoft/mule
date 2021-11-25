@@ -15,6 +15,8 @@ import java.util.function.Function;
 
 /**
  * A wrapper for making a {@link ProfilingDataProducer} resettable.
+ *
+ * @since 4.5.0
  */
 public class ResettableProfilingDataProducerDelegate<T extends ProfilingEventContext, S>
     implements ResettableProfilingDataProducer<T, S> {
@@ -44,7 +46,7 @@ public class ResettableProfilingDataProducerDelegate<T extends ProfilingEventCon
     resetAction.accept(this);
   }
 
-  public ProfilingDataProducer<T, S> getDelegatee() {
+  public ProfilingDataProducer<T, S> getDelegate() {
     return profilingDataProducer;
   }
 }

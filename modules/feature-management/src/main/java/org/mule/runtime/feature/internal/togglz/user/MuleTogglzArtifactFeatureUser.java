@@ -11,6 +11,8 @@ import org.togglz.core.user.FeatureUser;
 
 /**
  * A {@link MuleFeatureUser} that corresponds to an artifact.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzArtifactFeatureUser implements MuleFeatureUser, FeatureUser {
 

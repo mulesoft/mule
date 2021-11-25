@@ -18,7 +18,7 @@ import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.feature.internal.config.profiling.MuleProfilingDataProducerFeatureStatus;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingDataProducerStatus;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.feature.internal.togglz.config.MuleTogglzManagedArtifactFeatures;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
@@ -34,17 +34,15 @@ import java.util.Set;
 /**
  * Default implementation of {@code FeatureFlaggingService}
  */
-public class DefaultFeatureFlaggingService implements RuntimeFeatureFlaggingService, Disposable {
+public class DefaultFeatureFlaggingService implements ProfilingFeatureFlaggingService, Disposable {
 
   private final FeatureUser featureUser;
-  private final String artifactId;
   private final MuleTogglzManagedArtifactFeatures features;
 
   public DefaultFeatureFlaggingService(String artifactId, Map<org.mule.runtime.api.config.Feature, Boolean> features) {
     registerFeatures(features.keySet());
     featureUser = new MuleTogglzArtifactFeatureUser(artifactId);
     this.features = getTogglzManagedArtifactFeatures(artifactId, features);
-    this.artifactId = artifactId;
   }
 
   private void registerFeatures(Set<org.mule.runtime.api.config.Feature> features) {
@@ -77,10 +75,10 @@ public class DefaultFeatureFlaggingService implements RuntimeFeatureFlaggingServ
   }
 
   @Override
-  public void registerProfilingFeature(ProfilingEventType<?> profilingEventType, String profilingFeatureSuffix) {
+  public void registerProfilingFeature(ProfilingEventType<?> profilingEventType, String identifier) {
     withFeatureUser(featureUser, () -> {
       Feature feature =
-          FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(profilingEventType, profilingFeatureSuffix);
+          FEATURE_PROVIDER.getOrRegisterProfilingTogglzFeatureFrom(profilingEventType, identifier);
       setFeatureState(getFeatureState(feature));
     });
   }

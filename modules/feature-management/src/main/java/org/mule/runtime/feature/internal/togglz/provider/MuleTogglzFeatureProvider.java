@@ -14,6 +14,8 @@ import org.togglz.core.spi.FeatureProvider;
 
 /**
  * Implementation of {@link FeatureProvider} for the Mule Runtime.
+ *
+ * @since 4.5.0
  */
 public interface MuleTogglzFeatureProvider extends FeatureProvider {
 

@@ -13,7 +13,6 @@ import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureF
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzProfilingFeature;
 import org.mule.runtime.feature.internal.togglz.provider.DefaultMuleTogglzFeatureProvider;
-import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.togglz.core.Feature;
 import org.togglz.core.repository.FeatureState;
 import org.togglz.core.user.FeatureUser;

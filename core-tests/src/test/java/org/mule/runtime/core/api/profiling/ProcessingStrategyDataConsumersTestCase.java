@@ -40,7 +40,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
@@ -110,12 +110,12 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     enableProfilingFeatures();
   }
 
-  private void enableProfilingFeatures() throws Exception {
+  private void enableProfilingFeatures() {
     eventType().forEach(eventType -> {
       try {
         ((MuleContextWithRegistry) muleContext)
             .getRegistry()
-            .lookupObject(RuntimeFeatureFlaggingService.class)
+            .lookupObject(ProfilingFeatureFlaggingService.class)
             .toggleProfilingFeature(eventType, "TEST_DATA_CONSUMER", true);
       } catch (Exception e) {
         throw new RuntimeException();

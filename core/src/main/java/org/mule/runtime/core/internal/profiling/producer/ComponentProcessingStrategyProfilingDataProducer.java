@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingDataProducerStatus;
 
 import java.util.function.Function;
@@ -31,13 +31,13 @@ public class ComponentProcessingStrategyProfilingDataProducer
 
   private final DefaultProfilingService defaultProfilingService;
   private final ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType;
-  private final RuntimeFeatureFlaggingService featureFlaggingService;
+  private final ProfilingFeatureFlaggingService featureFlaggingService;
   private ProfilingDataProducerStatus profilingProducerStatus;
 
   public ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService defaultProfilingService,
                                                           ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
                                                           ProfilingProducerScope profilingProducerContext,
-                                                          RuntimeFeatureFlaggingService featureFlaggingService) {
+                                                          ProfilingFeatureFlaggingService featureFlaggingService) {
     this.defaultProfilingService = defaultProfilingService;
     this.profilingEventType = profilingEventType;
     this.profilingProducerStatus =

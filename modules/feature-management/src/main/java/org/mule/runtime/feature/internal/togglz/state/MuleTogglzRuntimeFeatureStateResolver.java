@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link MuleTogglzFeatureStateResolver} for the runtime scope.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzRuntimeFeatureStateResolver implements MuleTogglzFeatureStateResolver {
 

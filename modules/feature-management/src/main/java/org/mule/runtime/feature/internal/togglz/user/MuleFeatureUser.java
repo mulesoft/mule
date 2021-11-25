@@ -9,6 +9,8 @@ package org.mule.runtime.feature.internal.togglz.user;
 /**
  * Represents a component that may use a {@link org.mule.runtime.api.config.Feature}. It can be any logical part of mule. For
  * example, an application, a component location, the runtime itself can be a feature user.
+ *
+ * @since 4.5.0
  */
 public interface MuleFeatureUser {
 

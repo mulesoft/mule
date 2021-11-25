@@ -20,6 +20,7 @@ import java.util.Objects;
  * {@link ProfilingEventType}'s it listens to is registered. In this way, we can enable, disable this features in runtime and the
  * profiling data is not generated in case no data consumers listens to it.
  *
+ * @since 4.5.0
  */
 public class MuleTogglzProfilingFeature implements Feature {
 

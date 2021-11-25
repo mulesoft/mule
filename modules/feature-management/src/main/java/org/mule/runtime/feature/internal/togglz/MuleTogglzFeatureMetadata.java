@@ -21,6 +21,8 @@ import java.util.Set;
 
 /**
  * A {@link FeatureMetaData} used for the features defined by the runtime.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzFeatureMetadata implements FeatureMetaData {
 

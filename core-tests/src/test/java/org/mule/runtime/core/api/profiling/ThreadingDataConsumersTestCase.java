@@ -50,7 +50,7 @@ import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
@@ -67,6 +67,7 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
   public static final String ARTIFACT_ID = "artifactId";
   public static final String ARTIFACT_TYPE = "artifactType";
   public static final long PROFILING_EVENT_TIMESTAMP = 5678L;
+  public static final String TEST_DATA_CONSUMER = "TEST_DATA_CONSUMER";
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
@@ -106,13 +107,13 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
     enableProfilingFeatures();
   }
 
-  private void enableProfilingFeatures() throws Exception {
+  private void enableProfilingFeatures() {
     eventType().forEach(eventType -> {
       try {
         ((MuleContextWithRegistry) muleContext)
             .getRegistry()
-            .lookupObject(RuntimeFeatureFlaggingService.class)
-            .toggleProfilingFeature(eventType, "TEST_DATA_CONSUMER", true);
+            .lookupObject(ProfilingFeatureFlaggingService.class)
+            .toggleProfilingFeature(eventType, TEST_DATA_CONSUMER, true);
       } catch (Exception e) {
         throw new RuntimeException();
       }

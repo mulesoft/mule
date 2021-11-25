@@ -30,6 +30,8 @@ import java.util.concurrent.Callable;
 
 /**
  * Utility methods for feature flagging, bridging mule API with togglz.
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzFeatureFlaggingUtils {
 

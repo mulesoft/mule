@@ -15,7 +15,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEv
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
-import org.mule.runtime.feature.internal.config.profiling.RuntimeFeatureFlaggingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingDataProducerStatus;
 
 import java.util.function.Function;
@@ -38,7 +38,7 @@ public class ComponentThreadingProfilingDataProducer
                                                  ProfilingEventType<ComponentThreadingProfilingEventContext> profilingEventType,
                                                  ThreadSnapshotCollector threadSnapshotCollector,
                                                  ProfilingProducerScope profilingProducerContext,
-                                                 RuntimeFeatureFlaggingService featureFlaggingService) {
+                                                 ProfilingFeatureFlaggingService featureFlaggingService) {
     this.defaultProfilingService = defaultProfilingService;
     this.profilingEventType = profilingEventType;
     this.threadSnapshotCollector = threadSnapshotCollector;

@@ -11,19 +11,32 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SE
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import javax.inject.Inject;
 import java.util.function.Function;
 
-public class ProfilingServiceWrapper implements CoreProfilingService {
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+/**
+ * A {@link CoreProfilingService} that may not produce profiling data if the profiling functionality is totally disabled.
+ *
+ * @see DefaultProfilingService
+ * @see NoOpProfilingService
+ */
+public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle {
 
   @Inject
   MuleContext muleContext;
@@ -92,5 +105,49 @@ public class ProfilingServiceWrapper implements CoreProfilingService {
                                                                                    ProfilingDataProducer<T, S> dataProducer,
                                                                                    Function<S, T> transformer) {
     return profilingService.enrichWithProfilingEventFlux(original, dataProducer, transformer);
+  }
+
+  @Override
+  public void dispose() {
+    if (profilingService == null) {
+      initialiseProfilingService();
+    }
+
+    if (profilingService instanceof Disposable) {
+      ((Disposable) profilingService).dispose();
+    }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (profilingService == null) {
+      initialiseProfilingService();
+    }
+
+    if (profilingService instanceof Initialisable) {
+      ((Initialisable) profilingService).initialise();
+    }
+  }
+
+  @Override
+  public void start() throws MuleException {
+    if (profilingService == null) {
+      initialiseProfilingService();
+    }
+
+    if (profilingService instanceof Startable) {
+      ((Startable) profilingService).start();
+    }
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    if (profilingService == null) {
+      initialiseProfilingService();
+    }
+
+    if (profilingService instanceof Stoppable) {
+      ((Stoppable) profilingService).stop();
+    }
   }
 }

@@ -19,7 +19,9 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
 import static org.togglz.core.context.FeatureContext.getFeatureManager;
 
 /**
- * The definition of Profiling/Troubleshooting {@link Feature}'s
+ * The definition of Profiling/Troubleshooting {@link Feature}'s.
+ *
+ * @since 4.5.0
  */
 public enum MuleTogglzProfilingFeatures implements Feature {
 

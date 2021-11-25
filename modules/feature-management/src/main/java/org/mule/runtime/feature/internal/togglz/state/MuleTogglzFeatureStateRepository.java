@@ -23,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Togglz {@link StateRepository} for the Mule runtime
+ *
+ * @since 4.5.0
  */
 public class MuleTogglzFeatureStateRepository implements StateRepository {
 
