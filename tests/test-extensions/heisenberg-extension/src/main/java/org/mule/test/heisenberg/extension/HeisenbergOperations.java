@@ -143,60 +143,60 @@ public class HeisenbergOperations implements Disposable {
     return null;
   }
 
-  public List<Result<String, Object>> getSimpleBlacklist(@Config HeisenbergExtension config) {
-    List<Result<String, Object>> blacklist = new LinkedList<>();
-    blacklist.add(Result.<String, Object>builder().output("Fring").build());
-    blacklist.add(Result.<String, Object>builder().output("Salamanca").build());
-    blacklist.add(Result.<String, Object>builder().output("Ehrmantraut").build());
-    return blacklist;
+  public List<Result<String, Object>> getSimpleBlocklist(@Config HeisenbergExtension config) {
+    List<Result<String, Object>> blocklist = new LinkedList<>();
+    blocklist.add(Result.<String, Object>builder().output("Fring").build());
+    blocklist.add(Result.<String, Object>builder().output("Salamanca").build());
+    blocklist.add(Result.<String, Object>builder().output("Ehrmantraut").build());
+    return blocklist;
   }
 
-  public List<Result<InputStream, Object>> getBlacklist(@Config HeisenbergExtension config) {
-    List<Result<InputStream, Object>> blacklist = new LinkedList<>();
-    blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Fring".getBytes())).build());
-    blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Salamanca".getBytes())).build());
-    blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Ehrmantraut".getBytes())).build());
-    return blacklist;
+  public List<Result<InputStream, Object>> getBlocklist(@Config HeisenbergExtension config) {
+    List<Result<InputStream, Object>> blocklist = new LinkedList<>();
+    blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Fring".getBytes())).build());
+    blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Salamanca".getBytes())).build());
+    blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Ehrmantraut".getBytes())).build());
+    return blocklist;
   }
 
-  public PagingProvider<HeisenbergConnection, Result<InputStream, Object>> getPagedBlacklist(@Config HeisenbergExtension config) {
+  public PagingProvider<HeisenbergConnection, Result<InputStream, Object>> getPagedBlocklist(@Config HeisenbergExtension config) {
 
     return new PagingProvider<HeisenbergConnection, Result<InputStream, Object>>() {
 
       private final static int LIST_PAGE_SIZE = 2;
 
-      private List<Result<InputStream, Object>> blacklist;
-      private Iterator<Result<InputStream, Object>> blacklistIterator;
+      private List<Result<InputStream, Object>> blocklist;
+      private Iterator<Result<InputStream, Object>> blocklistIterator;
 
       public void initializeList() {
-        blacklist = new LinkedList<>();
-        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Fring".getBytes())).build());
-        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Salamanca".getBytes())).build());
-        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Ehrmantraut".getBytes())).build());
-        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Alquist".getBytes())).build());
-        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Schrader".getBytes())).build());
-        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Gomez".getBytes())).build());
-        blacklistIterator = blacklist.iterator();
+        blocklist = new LinkedList<>();
+        blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Fring".getBytes())).build());
+        blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Salamanca".getBytes())).build());
+        blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Ehrmantraut".getBytes())).build());
+        blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Alquist".getBytes())).build());
+        blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Schrader".getBytes())).build());
+        blocklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Gomez".getBytes())).build());
+        blocklistIterator = blocklist.iterator();
       }
 
       @Override
       public List<Result<InputStream, Object>> getPage(HeisenbergConnection connection) {
-        if (blacklist == null) {
+        if (blocklist == null) {
           initializeList();
         }
         List<Result<InputStream, Object>> page = new LinkedList<>();
-        for (int i = 0; i < LIST_PAGE_SIZE && blacklistIterator.hasNext(); i++) {
-          page.add(blacklistIterator.next());
+        for (int i = 0; i < LIST_PAGE_SIZE && blocklistIterator.hasNext(); i++) {
+          page.add(blocklistIterator.next());
         }
         return page;
       }
 
       @Override
       public java.util.Optional<Integer> getTotalResults(HeisenbergConnection connection) {
-        if (blacklist == null) {
+        if (blocklist == null) {
           initializeList();
         }
-        return java.util.Optional.of(blacklist.size());
+        return java.util.Optional.of(blocklist.size());
       }
 
       @Override
@@ -206,25 +206,25 @@ public class HeisenbergOperations implements Disposable {
     };
   }
 
-  public PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>> getPagedCursorProviderBlacklist(@Config HeisenbergExtension config,
+  public PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>> getPagedCursorProviderBlocklist(@Config HeisenbergExtension config,
                                                                                                               org.mule.sdk.api.runtime.streaming.StreamingHelper streamingHelper) {
 
     return new PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>>() {
 
       private final static int LIST_PAGE_SIZE = 2;
 
-      private List<Result<CursorProvider, Object>> blacklist;
-      private Iterator<Result<CursorProvider, Object>> blacklistIterator;
+      private List<Result<CursorProvider, Object>> blocklist;
+      private Iterator<Result<CursorProvider, Object>> blocklistIterator;
 
       public void initializeList() {
-        blacklist = new LinkedList<>();
-        blacklist.add(asCursorProviderResult("Fring"));
-        blacklist.add(asCursorProviderResult("Salamanca"));
-        blacklist.add(asCursorProviderResult("Ehrmantraut"));
-        blacklist.add(asCursorProviderResult("Alquist"));
-        blacklist.add(asCursorProviderResult("Schrader"));
-        blacklist.add(asCursorProviderResult("Gomez"));
-        blacklistIterator = blacklist.iterator();
+        blocklist = new LinkedList<>();
+        blocklist.add(asCursorProviderResult("Fring"));
+        blocklist.add(asCursorProviderResult("Salamanca"));
+        blocklist.add(asCursorProviderResult("Ehrmantraut"));
+        blocklist.add(asCursorProviderResult("Alquist"));
+        blocklist.add(asCursorProviderResult("Schrader"));
+        blocklist.add(asCursorProviderResult("Gomez"));
+        blocklistIterator = blocklist.iterator();
       }
 
       private Result<CursorProvider, Object> asCursorProviderResult(String name) {
@@ -234,22 +234,22 @@ public class HeisenbergOperations implements Disposable {
 
       @Override
       public List<Result<CursorProvider, Object>> getPage(HeisenbergConnection connection) {
-        if (blacklist == null) {
+        if (blocklist == null) {
           initializeList();
         }
         List<Result<CursorProvider, Object>> page = new LinkedList<>();
-        for (int i = 0; i < LIST_PAGE_SIZE && blacklistIterator.hasNext(); i++) {
-          page.add(blacklistIterator.next());
+        for (int i = 0; i < LIST_PAGE_SIZE && blocklistIterator.hasNext(); i++) {
+          page.add(blocklistIterator.next());
         }
         return page;
       }
 
       @Override
       public java.util.Optional<Integer> getTotalResults(HeisenbergConnection connection) {
-        if (blacklist == null) {
+        if (blocklist == null) {
           initializeList();
         }
-        return java.util.Optional.of(blacklist.size());
+        return java.util.Optional.of(blocklist.size());
       }
 
       @Override
