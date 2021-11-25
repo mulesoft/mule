@@ -70,7 +70,7 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
   }
 
   /**
-   * Invoked when new {@link ProfilingDataConsumer} are registered.
+   * Invoked when new {@link ProfilingDataConsumer} is registered.
    */
   protected abstract void onDataConsumersRegistered();
 
