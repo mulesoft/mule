@@ -12,7 +12,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesBlacklist.isBlacklisted;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.DuplicateExportedPackageException;
@@ -223,7 +223,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                      pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
                                      artifactPluginDescriptorResolved.getBundleDescriptor()));
                     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
-                    boolean includeLocals = !isBlacklisted(pluginDescriptor.getBundleDescriptor());
+                    boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
                     pluginDescriptor
                         .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, includeLocals)
                             .dependingOn(ImmutableSet.of(
@@ -284,7 +284,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
     final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    boolean includeLocals = !isBlacklisted(pluginDescriptor.getBundleDescriptor());
+    boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
     pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
         .exportingPackages(exportedClassPackages).build());
   }

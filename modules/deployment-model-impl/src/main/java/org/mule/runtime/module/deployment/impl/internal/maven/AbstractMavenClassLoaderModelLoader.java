@@ -27,7 +27,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesBlacklist.isBlacklisted;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -230,7 +230,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     } else {
       artifactAttributes = collectLocalPackages(packagerClassLoaderModel);
     }
-    if (!isBlacklisted(artifactBundleDescriptor)) {
+    if (!isDenylisted(artifactBundleDescriptor)) {
       populateLocalPackages(artifactAttributes, classLoaderModelBuilder);
     }
 
@@ -464,7 +464,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     final List<URL> dependenciesArtifactsUrls =
         loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedDependencies, emptyList());
 
-    if (!isBlacklisted(artifactBundleDescriptor)) {
+    if (!isDenylisted(artifactBundleDescriptor)) {
       populateLocalPackages(discoverLocalPackages(dependenciesArtifactsUrls), classLoaderModelBuilder);
     }
 

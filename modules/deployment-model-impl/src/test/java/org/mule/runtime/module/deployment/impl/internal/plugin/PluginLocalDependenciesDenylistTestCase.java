@@ -7,9 +7,10 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesBlacklist.isBlacklisted;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -18,24 +19,24 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class PluginLocalDependenciesBlacklistTestCase extends AbstractMuleTestCase {
+public class PluginLocalDependenciesDenylistTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void ibmCTGIsBlacklisted() {
+  public void ibmCTGIsDenylisted() {
     BundleDescriptor ctgBundleDescriptor = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.1").build();
-    assertThat(isBlacklisted(ctgBundleDescriptor), is(true));
+    assertThat(isDenylisted(ctgBundleDescriptor), is(true));
   }
 
   @Test
-  public void microsoftDynamicsNavIsBlacklisted() {
+  public void microsoftDynamicsNavIsDenylisted() {
     BundleDescriptor ctgBundleDescriptor = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-microsoft-dynamics-nav-connector").setVersion("2.0.1").build();
-    assertThat(isBlacklisted(ctgBundleDescriptor), is(true));
+    assertThat(isDenylisted(ctgBundleDescriptor), is(true));
   }
 
   @Test
-  public void priorVersionsAreBlacklisted() {
+  public void priorVersionsAreDenylisted() {
     BundleDescriptor priorMajor = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-ibm-ctg-connector").setVersion("1.4.4").build();
 
@@ -45,13 +46,13 @@ public class PluginLocalDependenciesBlacklistTestCase extends AbstractMuleTestCa
     BundleDescriptor priorPatch = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.0").build();
 
-    assertThat(isBlacklisted(priorMajor), is(true));
-    assertThat(isBlacklisted(priorMinor), is(true));
-    assertThat(isBlacklisted(priorPatch), is(true));
+    assertThat(isDenylisted(priorMajor), is(true));
+    assertThat(isDenylisted(priorMinor), is(true));
+    assertThat(isDenylisted(priorPatch), is(true));
   }
 
   @Test
-  public void latterVersionsAreNotBlacklisted() {
+  public void latterVersionsAreNotDenylisted() {
     BundleDescriptor latterMajor = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-ibm-ctg-connector").setVersion("3.0.0").build();
 
@@ -61,20 +62,20 @@ public class PluginLocalDependenciesBlacklistTestCase extends AbstractMuleTestCa
     BundleDescriptor latterPatch = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.2").build();
 
-    assertThat(isBlacklisted(latterMajor), is(false));
-    assertThat(isBlacklisted(latterMinor), is(false));
-    assertThat(isBlacklisted(latterPatch), is(false));
+    assertThat(isDenylisted(latterMajor), is(false));
+    assertThat(isDenylisted(latterMinor), is(false));
+    assertThat(isDenylisted(latterPatch), is(false));
   }
 
   @Test
   public void wrongGroupOrArtifactDontMatch() {
     BundleDescriptor wrongGroup = new BundleDescriptor.Builder().setGroupId("com.mulesoft.wrong")
         .setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.1").build();
-    assertThat(isBlacklisted(wrongGroup), is(false));
+    assertThat(isDenylisted(wrongGroup), is(false));
 
     BundleDescriptor wrongArtifact = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-ibm-ctg-wrong").setVersion("2.3.1").build();
-    assertThat(isBlacklisted(wrongArtifact), is(false));
+    assertThat(isDenylisted(wrongArtifact), is(false));
   }
 
 }
