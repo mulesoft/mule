@@ -7073,7 +7073,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "getBlacklist",
+          "name": "getBlocklist",
           "description": "",
           "modelProperties": {},
           "kind": "operation"
@@ -9955,7 +9955,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "getPagedBlacklist",
+          "name": "getPagedBlocklist",
           "description": "",
           "modelProperties": {},
           "kind": "operation"
@@ -10814,7 +10814,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "getPagedCursorProviderBlacklist",
+          "name": "getPagedCursorProviderBlocklist",
           "description": "",
           "modelProperties": {},
           "kind": "operation"
@@ -12817,7 +12817,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "getSimpleBlacklist",
+          "name": "getSimpleBlocklist",
           "description": "",
           "modelProperties": {},
           "kind": "operation"
