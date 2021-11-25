@@ -460,8 +460,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     assumeThat(mode, is(SOURCE));
 
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory(
-                                   (context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     2,
                                                                                                     () -> cpuLight,
                                                                                                     () -> cpuLight,

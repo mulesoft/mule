@@ -7,14 +7,15 @@
 
 package org.mule.runtime.core.internal.config;
 
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import static org.mule.runtime.core.api.config.TestingFeatures.TESTING_FEATURE;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -24,13 +25,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.core.api.config.TestingFeatures.TESTING_FEATURE;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
+import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 @io.qameta.allure.Feature(DEPLOYMENT_CONFIGURATION)
@@ -76,7 +78,7 @@ public class DefaultFeatureFlaggingServiceTestCase {
 
   private Map<Feature, Boolean> getFeaturesStates() {
     if (!registered) {
-      return new HashMap<>();
+      return emptyMap();
     }
     return new HashMap<Feature, Boolean>() {
 
