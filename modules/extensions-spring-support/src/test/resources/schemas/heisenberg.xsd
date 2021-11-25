@@ -1604,8 +1604,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetBlacklistType" substitutionGroup="heisenberg-empire" name="get-blacklist"></xs:element>
-  <xs:complexType name="GetBlacklistType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetBlocklistType" substitutionGroup="heisenberg-empire" name="get-blocklist"></xs:element>
+  <xs:complexType name="GetBlocklistType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
@@ -1736,8 +1736,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPagedBlacklistType" substitutionGroup="heisenberg-empire" name="get-paged-blacklist"></xs:element>
-  <xs:complexType name="GetPagedBlacklistType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPagedBlocklistType" substitutionGroup="heisenberg-empire" name="get-paged-blocklist"></xs:element>
+  <xs:complexType name="GetPagedBlocklistType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
@@ -1772,8 +1772,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPagedCursorProviderBlacklistType" substitutionGroup="heisenberg-empire" name="get-paged-cursor-provider-blacklist"></xs:element>
-  <xs:complexType name="GetPagedCursorProviderBlacklistType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPagedCursorProviderBlocklistType" substitutionGroup="heisenberg-empire" name="get-paged-cursor-provider-blocklist"></xs:element>
+  <xs:complexType name="GetPagedCursorProviderBlocklistType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
@@ -1882,8 +1882,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetSimpleBlacklistType" substitutionGroup="heisenberg-empire" name="get-simple-blacklist"></xs:element>
-  <xs:complexType name="GetSimpleBlacklistType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetSimpleBlocklistType" substitutionGroup="heisenberg-empire" name="get-simple-blocklist"></xs:element>
+  <xs:complexType name="GetSimpleBlocklistType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>

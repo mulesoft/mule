@@ -46,7 +46,7 @@ public class WeaponXOperations {
     return injectors;
   }
 
-  public Iterator<String> wolverineBlacklist() {
+  public Iterator<String> wolverineBlocklist() {
     return asList("Sabretooth", "Omega Red", "Dr. Cornelius", "Lady Deathstrike", "Mystique", "Silver Samurai").iterator();
   }
 

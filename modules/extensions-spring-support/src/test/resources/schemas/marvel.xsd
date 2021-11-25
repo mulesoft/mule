@@ -657,8 +657,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WolverineBlacklistType" substitutionGroup="mule:abstract-operator" name="wolverine-blacklist"></xs:element>
-  <xs:complexType name="WolverineBlacklistType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WolverineBlocklistType" substitutionGroup="mule:abstract-operator" name="wolverine-blocklist"></xs:element>
+  <xs:complexType name="WolverineBlocklistType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
