@@ -8828,7 +8828,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "WOLVERINE_BLACKLIST",
+        "type": "WOLVERINE_BLOCKLIST",
         "namespace": "MARVEL",
         "parent": {
           "type": "PROCESSOR",
@@ -8966,7 +8966,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "wolverineBlacklist",
+      "name": "wolverineBlocklist",
       "description": "",
       "modelProperties": {},
       "kind": "operation"
