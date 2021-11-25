@@ -8,6 +8,7 @@ package org.mule.runtime.feature.internal.provider;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.withFeatureUser;
@@ -87,9 +88,9 @@ public class MuleTogglzFeatureManagerProviderTestCase {
   public void registerRuntimeFeature() {
     org.mule.runtime.api.config.Feature runtimeFeature = mock(org.mule.runtime.api.config.Feature.class);
     MuleTogglzRuntimeFeature togglzRuntimeFeature = FEATURE_PROVIDER.getOrRegisterRuntimeTogglzFeatureFrom(runtimeFeature);
-    assertThat(featureManager.getFeatureState(togglzRuntimeFeature).isEnabled(), Matchers.is(false));
+    assertThat(featureManager.getFeatureState(togglzRuntimeFeature).isEnabled(), is(false));
     featureManager.setFeatureState(new FeatureState(togglzRuntimeFeature, true));
-    assertThat(featureManager.getFeatureState(togglzRuntimeFeature).isEnabled(), Matchers.is(true));
+    assertThat(featureManager.getFeatureState(togglzRuntimeFeature).isEnabled(), is(true));
   }
 
   @Test
@@ -99,13 +100,13 @@ public class MuleTogglzFeatureManagerProviderTestCase {
 
     withFeatureUser(ARTIFACT_FEATURE_USER, () -> {
       FeatureState featureState = featureManager.getFeatureState(togglzRuntimeFeature);
-      assertThat(featureState.isEnabled(), Matchers.is(false));
+      assertThat(featureState.isEnabled(), is(false));
 
       featureManager.setFeatureState(new FeatureState(togglzRuntimeFeature, true));
-      assertThat(featureState.isEnabled(), Matchers.is(true));
+      assertThat(featureState.isEnabled(), is(true));
     });
 
     withFeatureUser(ANOTHER_ARTIFACT_FEATURE_USER,
-                    () -> assertThat(featureManager.getFeatureState(togglzRuntimeFeature).isEnabled(), Matchers.is(false)));
+                    () -> assertThat(featureManager.getFeatureState(togglzRuntimeFeature).isEnabled(), is(false)));
   }
 }
