@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.feature.internal.provider;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
 import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.withFeatureUser;
 import static org.mule.runtime.feature.internal.togglz.config.MuleHotSwitchProfilingFeatures.PROFILING_SERVICE_FEATURE;
@@ -17,12 +21,10 @@ import static org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureSt
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
-import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzRuntimeFeature;
 import org.mule.runtime.feature.internal.togglz.activation.strategies.MuleTogglzActivatedIfEnabledActivationStrategy;
@@ -51,7 +53,7 @@ public class MuleTogglzFeatureManagerProviderTestCase {
       new MuleTogglzArtifactFeatureUser(ANOTHER_TEST_ARTIFACT_ID);
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expectedException = none();
 
   FeatureManager featureManager = new MuleTogglzFeatureManagerProvider().getFeatureManager();
 
@@ -65,7 +67,7 @@ public class MuleTogglzFeatureManagerProviderTestCase {
   @Test
   public void activateFeatureUserCanBeRetrievedThroughThread() {
     FeatureUser featureUser = mock(FeatureUser.class);
-    withFeatureUser(featureUser, () -> assertThat(featureManager.getCurrentFeatureUser(), Matchers.equalTo(featureUser)));
+    withFeatureUser(featureUser, () -> assertThat(featureManager.getCurrentFeatureUser(), equalTo(featureUser)));
   }
 
   @Test
@@ -78,9 +80,9 @@ public class MuleTogglzFeatureManagerProviderTestCase {
   public void featureNotExisting() {
     expectedException.expect(IllegalArgumentException.class);
     expectedException
-        .expectMessage(String.format(FEATURE_IS_NOT_REGISTERED, MOCKED_FEATURE_NAME));
+        .expectMessage(format(FEATURE_IS_NOT_REGISTERED, MOCKED_FEATURE_NAME));
     Feature feature = mock(Feature.class);
-    Mockito.when(feature.name()).thenReturn(MOCKED_FEATURE_NAME);
+    when(feature.name()).thenReturn(MOCKED_FEATURE_NAME);
     featureManager.getFeatureState(feature);
   }
 

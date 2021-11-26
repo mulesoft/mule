@@ -37,10 +37,14 @@ public class MuleTogglzArtifactFeatureScope implements MuleTogglzFeatureScope {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
+
     MuleTogglzArtifactFeatureScope that = (MuleTogglzArtifactFeatureScope) o;
     return Objects.equals(artifactId, that.artifactId);
   }

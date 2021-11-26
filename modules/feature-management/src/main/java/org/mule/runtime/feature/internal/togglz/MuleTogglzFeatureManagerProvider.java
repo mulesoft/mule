@@ -23,6 +23,7 @@ import static org.mule.runtime.feature.internal.togglz.activation.MuleTogglzActi
  */
 public class MuleTogglzFeatureManagerProvider implements FeatureManagerProvider {
 
+  public static final int PRIORITY = 30;
   public static DefaultMuleTogglzFeatureProvider FEATURE_PROVIDER =
       new DefaultMuleTogglzFeatureProvider(MuleHotSwitchProfilingFeatures.class);
 
@@ -42,6 +43,6 @@ public class MuleTogglzFeatureManagerProvider implements FeatureManagerProvider 
   @Override
   public int priority() {
     // Not used. By default.
-    return 30;
+    return PRIORITY;
   }
 }

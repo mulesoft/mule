@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.feature.internal.provider;
 
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
@@ -23,7 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzRuntimeFeature;
-import org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils;
 import org.mule.runtime.feature.internal.togglz.provider.DefaultMuleTogglzFeatureProvider;
 import org.togglz.core.Feature;
 import org.togglz.core.annotation.EnabledByDefault;
@@ -51,9 +52,9 @@ public class MuleTogglzFeatureProviderTestCase {
     assertThat(featureProvider.getFeatures(), hasItem(TestProfilingFeatures.ENABLED_TESTING_FEATURE));
     assertThat(featureProvider.getFeatures(), hasItem(TestProfilingFeatures.DISABLED_TESTING_FEATURE));
     assertThat(featureProvider.getMetaData(TestProfilingFeatures.ENABLED_TESTING_FEATURE).getDefaultFeatureState().isEnabled(),
-               Matchers.is(true));
+               is(true));
     assertThat(featureProvider.getMetaData(TestProfilingFeatures.DISABLED_TESTING_FEATURE).getDefaultFeatureState().isEnabled(),
-               Matchers.is(false));
+               is(false));
   }
 
   @Test
@@ -64,10 +65,10 @@ public class MuleTogglzFeatureProviderTestCase {
     // Registration of a runtime feature should be disabled in Togglz by default. When the configuration is evaluated the
     // FeatureState
     // should change corresponding to the application.
-    assertThat(featureProvider.getMetaData(feature).getDefaultFeatureState().isEnabled(), Matchers.is(false));
+    assertThat(featureProvider.getMetaData(feature).getDefaultFeatureState().isEnabled(), is(false));
     assertThat(featureProvider.getFeature(TestRuntimeProfilingFeatures.TEST_RUNTIME_FEATURE.toString()),
-               Matchers.equalTo(feature));
-    assertThat(feature.getRuntimeFeature(), Matchers.equalTo(TestRuntimeProfilingFeatures.TEST_RUNTIME_FEATURE));
+               equalTo(feature));
+    assertThat(feature.getRuntimeFeature(), equalTo(TestRuntimeProfilingFeatures.TEST_RUNTIME_FEATURE));
   }
 
 
@@ -76,7 +77,7 @@ public class MuleTogglzFeatureProviderTestCase {
     org.mule.runtime.api.config.Feature mockedFeature = mock(org.mule.runtime.api.config.Feature.class);
     MuleTogglzRuntimeFeature feature = featureProvider.getOrRegisterRuntimeTogglzFeatureFrom(mockedFeature);
     MuleTogglzRuntimeFeature featureAgain = featureProvider.getOrRegisterRuntimeTogglzFeatureFrom(mockedFeature);
-    MatcherAssert.assertThat(feature, Matchers.sameInstance(featureAgain));
+    assertThat(feature, sameInstance(featureAgain));
   }
 
   /**
@@ -145,7 +146,7 @@ public class MuleTogglzFeatureProviderTestCase {
     }
 
     public Optional<String> getOverridingSystemPropertyName() {
-      return Optional.ofNullable(this.overridingSystemPropertyName);
+      return ofNullable(this.overridingSystemPropertyName);
     }
 
   }

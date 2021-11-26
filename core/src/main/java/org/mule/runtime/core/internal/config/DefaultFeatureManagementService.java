@@ -25,7 +25,7 @@ import javax.inject.Inject;
 public class DefaultFeatureManagementService implements FeatureFlaggingManagementService {
 
   @Inject
-  MuleContext muleContext;
+  private MuleContext muleContext;
 
   @Override
   public void disableFeatureFor(String featureName) {

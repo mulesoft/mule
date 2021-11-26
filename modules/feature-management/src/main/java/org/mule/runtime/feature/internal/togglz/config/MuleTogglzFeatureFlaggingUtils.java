@@ -31,6 +31,8 @@ import java.util.concurrent.Callable;
  */
 public class MuleTogglzFeatureFlaggingUtils {
 
+  private MuleTogglzFeatureFlaggingUtils() {}
+
   /**
    * Adds a runtime feature as togglz feature. This will be registered as a {@link Feature} and will be available for verifying if
    * it is enabled/disabled, activated/deactivated through Togglz.

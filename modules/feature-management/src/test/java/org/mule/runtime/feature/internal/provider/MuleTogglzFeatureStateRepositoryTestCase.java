@@ -7,14 +7,18 @@
 package org.mule.runtime.feature.internal.provider;
 
 import static java.lang.String.format;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.withFeatureUser;
 import static org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository.FEATURE_IS_NOT_REGISTERED;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.mockito.Mockito;
+import org.mule.runtime.feature.internal.togglz.provider.MuleTogglzFeatureProvider;
+import org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository;
+import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
 
 import io.qameta.allure.Story;
 import org.junit.Before;
@@ -24,9 +28,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mule.runtime.feature.internal.togglz.provider.MuleTogglzFeatureProvider;
-import org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository;
-import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.togglz.core.Feature;
 import org.togglz.core.repository.FeatureState;
 
@@ -54,11 +55,11 @@ public class MuleTogglzFeatureStateRepositoryTestCase {
 
   @Before
   public void setUp() {
-    Mockito.when(notRegisteredFeature.name()).thenReturn(NON_EXISTING_FEATURE);
-    Mockito.when(featureProvider.getFeature(NON_EXISTING_FEATURE)).thenReturn(null);
+    when(notRegisteredFeature.name()).thenReturn(NON_EXISTING_FEATURE);
+    when(featureProvider.getFeature(NON_EXISTING_FEATURE)).thenReturn(null);
 
-    Mockito.when(existingFeature.name()).thenReturn(EXISTING_FEATURE);
-    Mockito.when(featureProvider.getFeature(EXISTING_FEATURE)).thenReturn(existingFeature);
+    when(existingFeature.name()).thenReturn(EXISTING_FEATURE);
+    when(featureProvider.getFeature(EXISTING_FEATURE)).thenReturn(existingFeature);
   }
 
   @Test
@@ -74,13 +75,13 @@ public class MuleTogglzFeatureStateRepositoryTestCase {
     MuleTogglzFeatureStateRepository featureStateRepository = new MuleTogglzFeatureStateRepository(featureProvider);
     featureStateRepository.setFeatureState(new FeatureState(existingFeature, true));
     FeatureState featureStateEnabled = featureStateRepository.getFeatureState(existingFeature);
-    MatcherAssert.assertThat(featureStateEnabled.isEnabled(), Matchers.is(true));
+    assertThat(featureStateEnabled.isEnabled(), is(true));
 
     featureStateRepository.setFeatureState(new FeatureState(existingFeature, false));
     FeatureState featureStateDisabled = featureStateRepository.getFeatureState(existingFeature);
-    MatcherAssert.assertThat(featureStateDisabled.isEnabled(), Matchers.is(false));
+    assertThat(featureStateDisabled.isEnabled(), is(false));
 
-    MatcherAssert.assertThat(featureStateEnabled, Matchers.sameInstance(featureStateDisabled));
+    assertThat(featureStateEnabled, sameInstance(featureStateDisabled));
   }
 
   @Test
@@ -91,11 +92,11 @@ public class MuleTogglzFeatureStateRepositoryTestCase {
     });
 
     FeatureState featureState = featureStateRepository.getFeatureState(existingFeature);
-    MatcherAssert.assertThat(featureState.isEnabled(), Matchers.is(false));
+    assertThat(featureState.isEnabled(), is(false));
 
     withFeatureUser(new MuleTogglzArtifactFeatureUser(TEST_ARTIFACT), () -> {
       FeatureState featureStateInArtifactScope = featureStateRepository.getFeatureState(existingFeature);
-      MatcherAssert.assertThat(featureStateInArtifactScope.isEnabled(), Matchers.is(true));
+      assertThat(featureStateInArtifactScope.isEnabled(), is(true));
     });
   }
 
@@ -107,13 +108,13 @@ public class MuleTogglzFeatureStateRepositoryTestCase {
     });
 
     final FeatureState featureState = featureStateRepository.getFeatureState(existingFeature);
-    MatcherAssert.assertThat(featureState.isEnabled(), Matchers.is(false));
+    assertThat(featureState.isEnabled(), is(false));
 
     withFeatureUser(new MuleTogglzArtifactFeatureUser(TEST_ARTIFACT), () -> {
       featureStateRepository.removeFeatureState(featureState);
     });
 
     FeatureState featureStateAfterRemoval = featureStateRepository.getFeatureState(existingFeature);
-    MatcherAssert.assertThat(featureStateAfterRemoval.isEnabled(), Matchers.is(false));
+    assertThat(featureStateAfterRemoval.isEnabled(), is(false));
   }
 }

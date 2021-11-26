@@ -8,6 +8,7 @@ package org.mule.runtime.feature.internal.togglz.state;
 
 import static org.mule.runtime.feature.internal.togglz.scope.type.MuleTogglzFeatureScopeType.ARTIFACT_SCOPE_TYPE;
 import static org.mule.runtime.feature.internal.togglz.user.MuleFeatureUser.FEATURE_SCOPE_ATTRIBUTE_KEY;
+import static java.util.Collections.singletonMap;
 import static org.togglz.core.context.FeatureContext.getFeatureManager;
 
 import org.mule.runtime.feature.internal.togglz.provider.MuleTogglzFeatureProvider;
@@ -19,7 +20,6 @@ import org.togglz.core.repository.StateRepository;
 import org.togglz.core.user.FeatureUser;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Togglz {@link StateRepository} for the Mule runtime
@@ -29,12 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MuleTogglzFeatureStateRepository implements StateRepository {
 
   private final Map<MuleTogglzFeatureScopeType, MuleTogglzFeatureStateResolver> featureResolvers =
-      new ConcurrentHashMap<MuleTogglzFeatureScopeType, MuleTogglzFeatureStateResolver>() {
-
-        {
-          put(ARTIFACT_SCOPE_TYPE, new MuleTogglzApplicationFeatureStateResolver(MuleTogglzFeatureStateRepository.this));
-        }
-      };
+      singletonMap(ARTIFACT_SCOPE_TYPE, new MuleTogglzApplicationFeatureStateResolver(MuleTogglzFeatureStateRepository.this));
 
   public static final String INVALID_FEATURE_SCOPE_ATTRIBUTE = "Invalid feature scope attribute";
   public static final String FEATURE_IS_NOT_REGISTERED = "Feature '%s' is not registered";
