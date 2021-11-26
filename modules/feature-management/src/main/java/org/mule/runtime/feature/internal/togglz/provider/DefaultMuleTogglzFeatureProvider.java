@@ -36,13 +36,12 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
   public static final String FEATURE_ENUMS_NOT_NULL = "The featureEnums argument must not be null";
   public static final String ARGUMENT_MUST_BE_ENUM = "The featureEnum argument must be an enum";
   public static final String FEATURE_HAS_ALREADY_BEEN_ADDED = "The '%s' feature has already been added";
-  public static final String NO_FEATURES_ADDED = "There are no features added in this provider instance.";
   public static final String FEATURE_NAME_MUST_NOT_BE_NULL = "Feature name must not be null.";
 
   private final Cache<org.mule.runtime.api.config.Feature, MuleTogglzRuntimeFeature> runtimeFeaturesCache =
       Caffeine.newBuilder().build();
 
-  private Map<String, FeatureMetaData> metadataCache = null;
+  private Map<String, FeatureMetaData> metadataCache = new ConcurrentHashMap<>();
   private final Map<String, Feature> features = new ConcurrentHashMap<>();
 
   public DefaultMuleTogglzFeatureProvider(Class<? extends Feature> initialFeatureEnum) {
@@ -64,10 +63,7 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
     addFeatures(asList(featureEnum.getEnumConstants()));
   }
 
-  private synchronized void addFeatures(Collection<? extends Feature> newFeatures) {
-    if (metadataCache == null) {
-      metadataCache = new ConcurrentHashMap<>();
-    }
+  private void addFeatures(Collection<? extends Feature> newFeatures) {
     for (Feature newFeature : newFeatures) {
       if (metadataCache.put(newFeature.name(), new EnumFeatureMetaData(newFeature)) != null) {
         throw new IllegalArgumentException(format(FEATURE_HAS_ALREADY_BEEN_ADDED, newFeature.name()));
@@ -84,9 +80,6 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
 
   @Override
   public FeatureMetaData getMetaData(Feature feature) {
-    if (metadataCache == null) {
-      throw new IllegalStateException(NO_FEATURES_ADDED);
-    }
     return metadataCache.get(feature.name());
   }
 
@@ -111,11 +104,7 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
     return newFeature;
   }
 
-  private synchronized void addTogglzFeatureMetadata(Feature newFeature) {
-    if (metadataCache == null) {
-      metadataCache = new ConcurrentHashMap<>();
-    }
-
+  private void addTogglzFeatureMetadata(Feature newFeature) {
     if (metadataCache.put(newFeature.name(), new MuleTogglzFeatureMetadata(newFeature)) != null) {
       return;
     }
