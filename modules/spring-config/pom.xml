@@ -45,6 +45,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-feature-management</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-properties-config</artifactId>
             <version>${project.version}</version>
         </dependency>

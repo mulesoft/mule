@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.config;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.config.FeatureContext;
+import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
 import org.slf4j.Logger;
 
 /**
@@ -31,6 +33,7 @@ import org.slf4j.Logger;
  *
  * @see FeatureFlaggingService
  * @see org.mule.runtime.core.api.config.FeatureFlaggingRegistry
+ *
  * @since 4.4.0
  */
 public final class FeatureFlaggingServiceBuilder {
@@ -99,17 +102,21 @@ public final class FeatureFlaggingServiceBuilder {
    * @return The {@link FeatureFlaggingService} instance.
    */
   public FeatureFlaggingService build() {
+    String artifactUserId = null;
     Map<Feature, Boolean> features = new HashMap<>();
     LOGGER.debug("Configuring feature flags...");
     if (muleContext != null) {
+      artifactUserId = getArtifactId(muleContext);
       muleContextFlags.forEach((feature, artifactDescriptorPredicate) -> features
           .put(feature, isFeatureFlagEnabled(feature, muleContext, artifactDescriptorPredicate)));
     }
     if (featureContext != null) {
+      artifactUserId = featureContext.getArtifactName();
       featureContextFlags.forEach((feature, artifactDescriptorPredicate) -> features
           .put(feature, isFeatureFlagEnabled(feature, featureContext, artifactDescriptorPredicate)));
     }
-    return new DefaultFeatureFlaggingService(features);
+
+    return new DefaultFeatureFlaggingService(artifactUserId, features);
   }
 
   /**

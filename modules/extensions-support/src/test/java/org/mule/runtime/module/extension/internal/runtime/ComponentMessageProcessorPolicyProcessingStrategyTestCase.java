@@ -6,18 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Optional.of;
-import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
@@ -37,6 +25,21 @@ import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.probe.PollingProber.probe;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.of;
+import static java.util.concurrent.Executors.newFixedThreadPool;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
@@ -54,7 +57,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.config.DefaultFeatureFlaggingService;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -63,6 +65,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
@@ -98,6 +101,7 @@ import reactor.core.publisher.Mono;
 public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComponentMessageProcessorPolicyProcessingStrategyTestCase.class);
+  public static final String TEST_ARTIFACT_ID = "artifactId";
 
   @Parameters(name = "async: {0}, processingType: {1}")
   public static List<Object[]> parameters() {
@@ -137,7 +141,8 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
         muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY,
-                                                                         new DefaultFeatureFlaggingService());
+                                                                         new DefaultFeatureFlaggingService(TEST_ARTIFACT_ID,
+                                                                                                           emptyMap()));
       }
     });
   }

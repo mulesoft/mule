@@ -32,6 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
@@ -249,7 +250,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   public AbstractProcessingStrategyTestCase(Mode mode, boolean profiling) {
     this.mode = mode;
     this.enableProfilingServiceProperty =
-        new SystemProperty((MuleRuntimeFeature.ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get()),
+        new SystemProperty(ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get(),
                            Boolean.toString(profiling));
   }
 

@@ -7,6 +7,9 @@
 
 package org.mule.runtime.core.api.config;
 
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
+
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.MuleContext;
@@ -14,9 +17,6 @@ import org.mule.runtime.core.api.MuleContext;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableMap;
 
 /**
  * Service used to register feature flags which will be evaluated at deployment time. For example:
