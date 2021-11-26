@@ -22,11 +22,10 @@ import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
-import static org.mule.runtime.core.internal.util.TransactionUtils.isTxActive;
-import static org.mule.runtime.core.internal.util.TransactionUtils.popTxFromSubscriberContext;
-import static org.mule.runtime.core.internal.util.TransactionUtils.pushTxToSubscriberContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveInContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
 import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.emptyList;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
@@ -58,8 +57,6 @@ import javax.inject.Inject;
  * @since 4.3.0
  */
 public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends ProcessingStrategyDecorator {
-
-  private static final String TX_SCOPES_KEY = "mule.tx.activeTransactionsInReactorChain";
 
   private static final Consumer<CoreEvent> NULL_EVENT_CONSUMER = event -> {
   };
@@ -105,7 +102,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
 
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
-          if (isTxActive(ctx)) {
+          if (isTxActiveInContext(ctx)) {
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
@@ -152,7 +149,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
 
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
-          if (isTxActive(ctx)) {
+          if (isTxActiveInContext(ctx)) {
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)

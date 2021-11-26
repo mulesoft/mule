@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util;
+package org.mule.runtime.core.internal.util.rx;
 
 import reactor.util.context.Context;
 
@@ -14,18 +14,21 @@ import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
 
-public class TransactionUtils {
+/**
+ * Utils class to simulate transactional behavior in reactor.
+ *
+ * @since 4.5, 4.4.1, 4.3.1
+ */
+public class ReactorTransactionUtils {
 
   public static final String TX_SCOPES_KEY = "mule.tx.activeTransactionsInReactorChain";
 
-  public static boolean isTxActive(Context ctx) {
-    return ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> !txScopes.isEmpty()).orElse(false);
+  public static boolean isTxActiveInContext(Context ctx) {
+    return ctx != null && ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> !txScopes.isEmpty()).orElse(false);
   }
 
   /**
    * Cleanup the state set by {@link #pushTxToSubscriberContext(String)}.
-   *
-   * @since 4.3
    */
   public static Function<Context, Context> popTxFromSubscriberContext() {
     return context -> {
@@ -37,8 +40,6 @@ public class TransactionUtils {
 
   /**
    * Force the upstream publisher to behave as if a transaction were active, effectively avoiding thread switches.
-   *
-   * @since 4.3
    */
   public static Function<Context, Context> pushTxToSubscriberContext(String location) {
     return context -> {
