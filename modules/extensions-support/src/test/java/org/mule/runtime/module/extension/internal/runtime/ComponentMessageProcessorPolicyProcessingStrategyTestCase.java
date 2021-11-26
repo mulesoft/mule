@@ -147,7 +147,6 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     });
   }
 
-
   @Before
   public void before() throws MuleException {
     CoreEvent response = testEvent();

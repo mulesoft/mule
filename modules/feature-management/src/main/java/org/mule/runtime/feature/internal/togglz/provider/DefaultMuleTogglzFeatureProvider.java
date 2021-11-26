@@ -64,7 +64,7 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
     addFeatures(asList(featureEnum.getEnumConstants()));
   }
 
-  private void addFeatures(Collection<? extends Feature> newFeatures) {
+  private synchronized void addFeatures(Collection<? extends Feature> newFeatures) {
     if (metadataCache == null) {
       metadataCache = new ConcurrentHashMap<>();
     }
@@ -111,9 +111,9 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
     return newFeature;
   }
 
-  private void addTogglzFeatureMetadata(Feature newFeature) {
+  private synchronized void addTogglzFeatureMetadata(Feature newFeature) {
     if (metadataCache == null) {
-      metadataCache = new HashMap<>();
+      metadataCache = new ConcurrentHashMap<>();
     }
 
     if (metadataCache.put(newFeature.name(), new MuleTogglzFeatureMetadata(newFeature)) != null) {
