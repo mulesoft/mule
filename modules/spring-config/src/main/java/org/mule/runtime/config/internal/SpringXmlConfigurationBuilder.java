@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerFactory.JSON;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
 import static org.mule.runtime.config.internal.SpringRegistry.SPRING_APPLICATION_CONTEXT;
@@ -36,6 +37,9 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
+import org.mule.runtime.ast.api.serialization.ArtifactAstSerializer;
+import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
@@ -61,6 +65,8 @@ import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -268,12 +274,26 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         artifactAst = toArtifactast(artifactDeclaration, extensions);
       }
 
-      return artifactAst;
+      return testSerializationDeserialization(artifactAst);
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private ArtifactAst testSerializationDeserialization(ArtifactAst artifactAst)
+      throws IOException {
+    ArtifactAstSerializer jsonArtifactAstSerializer = new ArtifactAstSerializerProvider().getSerializer(JSON, "1.0");
+    InputStream inputStream = jsonArtifactAstSerializer.serialize(artifactAst);
+    ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
+    ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
+        .deserialize(inputStream, name -> artifactAst.dependencies().stream()
+            .filter(x -> x.getName().equals(name))
+            .findFirst()
+            .orElse(null));
+
+    return deserializedArtifactAst;
   }
 
   private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,

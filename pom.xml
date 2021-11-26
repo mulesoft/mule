@@ -293,6 +293,26 @@
                 <artifactId>tika-core</artifactId>
                 <version>${tikaVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-artifact-ast</artifactId>
+                <version>${muleAstVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-artifact-ast-dependency-graph</artifactId>
+                <version>${muleAstVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-artifact-ast-xml-parser</artifactId>
+                <version>${muleAstVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-artifact-ast-serialization</artifactId>
+                <version>${muleAstVersion}</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
