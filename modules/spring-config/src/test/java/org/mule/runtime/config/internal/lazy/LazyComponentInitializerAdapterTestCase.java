@@ -56,6 +56,7 @@ import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegist
 import org.mule.runtime.config.internal.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.OptionalObjectsController;
+import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
@@ -232,7 +233,7 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   private LazyMuleArtifactContext createLazyMuleArtifactContextStub(ObjectProviderAwareBeanFactory beanFactory) {
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext, toArtifactast(getSimpleApp(), getExtensions(muleContext.getExtensionManager())),
-                                    optionalObjectsController, empty(), emptyMap(), APP,
+                                    optionalObjectsController, empty(), new BaseConfigurationComponentLocator(), emptyMap(), APP,
                                     empty(), lockFactory,
                                     new DefaultComponentBuildingDefinitionRegistryFactory(),
                                     mock(FeatureFlaggingService.class)) {

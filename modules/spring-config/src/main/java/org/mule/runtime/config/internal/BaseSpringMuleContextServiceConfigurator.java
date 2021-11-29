@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
@@ -46,6 +47,8 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
   void createArtifactServices() {
     registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, ((MuleContextWithRegistry) muleContext).getRegistry()
         .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
+
+    registerConstantBeanDefinition(ErrorTypeRepository.class.getName(), new DefaultErrorTypeRepository());
 
     createRuntimeServices();
   }

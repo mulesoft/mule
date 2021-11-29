@@ -70,6 +70,7 @@ import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegist
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.config.internal.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.OptionalObjectsController;
+import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.CoreComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
 import org.mule.runtime.core.api.MuleContext;
@@ -464,8 +465,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private MuleArtifactContext createMuleArtifactContextStub(DefaultListableBeanFactory mockedBeanFactory) {
     MuleArtifactContext muleArtifactContext =
-        new MuleArtifactContext(mockMuleContext, emptyArtifact(),
-                                mock(OptionalObjectsController.class), empty(), emptyMap(), APP,
+        new MuleArtifactContext(mockMuleContext, emptyArtifact(), mock(OptionalObjectsController.class),
+                                empty(), new BaseConfigurationComponentLocator(), emptyMap(), APP,
                                 new DefaultComponentBuildingDefinitionRegistryFactory(),
                                 mock(FeatureFlaggingService.class)) {
 

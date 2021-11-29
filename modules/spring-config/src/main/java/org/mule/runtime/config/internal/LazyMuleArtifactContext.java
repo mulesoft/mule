@@ -48,6 +48,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
+import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
@@ -118,6 +119,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
+   * @param baseConfigurationComponentLocator
    * @param artifactProperties                         map of properties that can be referenced from the
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
@@ -130,13 +132,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
                                  OptionalObjectsController optionalObjectsController,
                                  Optional<ConfigurationProperties> parentConfigurationProperties,
+                                 BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
                                  FeatureFlaggingService featureFlaggingService)
       throws BeansException {
-    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
+    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties, baseConfigurationComponentLocator,
           artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory, featureFlaggingService);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
