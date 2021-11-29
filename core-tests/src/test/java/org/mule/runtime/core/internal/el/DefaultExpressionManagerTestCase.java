@@ -6,10 +6,23 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static org.mule.runtime.api.el.BindingContext.builder;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.DataType.fromFunction;
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.api.metadata.MediaType.XML;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,54 +32,28 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.el.BindingContext.builder;
-import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.DataType.fromFunction;
-import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.api.metadata.MediaType.XML;
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
-import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
-import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -76,6 +63,10 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
@@ -96,8 +87,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
 
   @Before
   public void configureExpressionManager() throws MuleException {
-    expressionManager = new DefaultExpressionManager();
-    initialiseIfNeeded(expressionManager, muleContext);
+    expressionManager = muleContext.getExpressionManager();
   }
 
   @Test
@@ -319,26 +309,8 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     assertThat(expressionManager.isExpression("${var}"), is(false));
   }
 
-  protected void disableMel() throws InitialisationException {
-    Registry registry = mock(Registry.class);
-    when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class))
-        .thenReturn(of(new WeaveDefaultExpressionLanguageFactoryService(null)));
-    when(registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED)).thenReturn(empty());
-
-    final MuleContextWithRegistry mockMuleContext = mockMuleContext();
-    MuleConfiguration config = mockMuleContext.getConfiguration();
-    doReturn(true).when(config).isValidateExpressions();
-
-    expressionManager = new DefaultExpressionManager();
-    ((DefaultExpressionManager) expressionManager).setRegistry(registry);
-    ((DefaultExpressionManager) expressionManager).setMuleContext(mockMuleContext);
-    initialiseIfNeeded(expressionManager, false, mockMuleContext);
-  }
-
   @Test
   public void melPrefixIsValidDw() throws MuleException {
-    disableMel();
-
     assertThat(expressionManager.isValid("#[mel:1]"), is(true));
     expressionManager.evaluate("#[mel:1]");
   }

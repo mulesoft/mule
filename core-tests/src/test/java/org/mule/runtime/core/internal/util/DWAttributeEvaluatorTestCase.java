@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.core.internal.util;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
@@ -19,16 +13,23 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -38,12 +39,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
 
   private static final String HOST_PORT_JSON = "{\"host\":\"0.0.0.0\", \"port\" : 8081}";
@@ -52,13 +54,16 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   private static final String DW_CAR_LIST = "#[[{color : 'RED', price: 1000}]]";
   private static final DataType CAR_DATA_TYPE = DataType.fromType(Car.class);
   private static final DataType CAR_LIST_DATA_TYPE = DataType.builder().collectionType(List.class).itemType(Car.class).build();
-  private CoreEvent mockMuleEvent = mock(CoreEvent.class);
-  private DefaultExpressionManager expressionManager;
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
+
+  private final CoreEvent mockMuleEvent = mock(CoreEvent.class);
+  private ExtendedExpressionManager expressionManager;
 
   @Before
   public void setUp() throws MuleException {
-    expressionManager = new DefaultExpressionManager();
-    initialiseIfNeeded(expressionManager, muleContext);
+    expressionManager = muleContext.getExpressionManager();
   }
 
   @Test

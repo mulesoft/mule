@@ -6,41 +6,42 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
-import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import static java.lang.String.format;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
 
   private static final String KEY = "Name";
   private static final String VALUE = "MG";
-  private ExpressionManager el;
 
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    Map<String, Object> objects = new HashMap<>();
-    objects.putAll(super.getStartUpRegistryObjects());
-    objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
-    return objects;
-  }
+  private ExpressionManager expressionManager;
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    el = muleContext.getExpressionManager();
+  @Before
+  public void configureExpressionManager() throws MuleException {
+    expressionManager = muleContext.getExpressionManager();
+    ((DefaultExpressionManager) expressionManager).setMelDefault(true);
+    ((DefaultExpressionManager) expressionManager)
+        .setExpressionLanguage((((MuleContextWithRegistry) muleContext).getRegistry()).lookupObject(OBJECT_EXPRESSION_LANGUAGE));
   }
 
   @Override
@@ -100,14 +101,14 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   public void map() throws Exception {
     Map<String, String> payload = new HashMap<>();
     CoreEvent event = eventBuilder(muleContext).message(of(payload)).build();
-    Map result = (Map) el.evaluate("#[mel:{\"a\" : {\"b\" : \"c\"}, \"d\" : [\"e\"]}]", event).getValue();
-    Map result2 = (Map) el.evaluate("#[mel:{\"d\" : [\"e\"], \"a\" : {\"b\" : \"c\"}}]", event).getValue();
+    Map result = (Map) expressionManager.evaluate("#[mel:{\"a\" : {\"b\" : \"c\"}, \"d\" : [\"e\"]}]", event).getValue();
+    Map result2 = (Map) expressionManager.evaluate("#[mel:{\"d\" : [\"e\"], \"a\" : {\"b\" : \"c\"}}]", event).getValue();
     assertThat(((ArrayList<String>) result.get("d")).get(0), equalTo("e"));
     assertThat(((ArrayList<String>) result2.get("d")).get(0), equalTo("e"));
   }
 
   private void runExpressionAndExpect(String expression, Object expectedValue, CoreEvent event) throws Exception {
-    Object result = el.evaluate(expression, event, TEST_CONNECTOR_LOCATION).getValue();
+    Object result = expressionManager.evaluate(expression, event, TEST_CONNECTOR_LOCATION).getValue();
     assertThat(format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
   }
 }
