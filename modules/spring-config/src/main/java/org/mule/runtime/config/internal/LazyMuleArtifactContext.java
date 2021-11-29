@@ -57,6 +57,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -120,6 +122,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
    * @param baseConfigurationComponentLocator
+   * @param errorTypeLocator
+   * @param errorTypeRepository
    * @param artifactProperties                         map of properties that can be referenced from the
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
@@ -133,13 +137,16 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  OptionalObjectsController optionalObjectsController,
                                  Optional<ConfigurationProperties> parentConfigurationProperties,
                                  BaseConfigurationComponentLocator baseConfigurationComponentLocator,
+                                 ContributedErrorTypeRepository errorTypeRepository,
+                                 ContributedErrorTypeLocator errorTypeLocator,
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
                                  FeatureFlaggingService featureFlaggingService)
       throws BeansException {
-    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties, baseConfigurationComponentLocator,
+    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
+          baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
           artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory, featureFlaggingService);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype

@@ -57,6 +57,8 @@ import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfiguration
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.CompositeMuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -180,6 +182,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     muleArtifactContext = createApplicationContext(muleContext,
                                                    baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
+                                                   baseMuleArtifactContext.getBean(ContributedErrorTypeRepository.class),
+                                                   baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
                                                    baseMuleArtifactContext.getBean(FeatureFlaggingService.class));
     muleArtifactContext.setParent(baseMuleArtifactContext);
     createSpringRegistry(muleContext, baseMuleArtifactContext, muleArtifactContext);
@@ -194,6 +198,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   private MuleArtifactContext createApplicationContext(MuleContext muleContext,
                                                        BaseConfigurationComponentLocator baseConfigurationComponentLocator,
+                                                       ContributedErrorTypeRepository errorTypeRepository,
+                                                       ContributedErrorTypeLocator errorTypeLocator,
                                                        FeatureFlaggingService featureFlaggingService)
       throws Exception {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
@@ -209,7 +215,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
     return doCreateApplicationContext(muleContext, artifactDeclaration, applicationObjectcontroller,
-                                      baseConfigurationComponentLocator,
+                                      baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
                                       featureFlaggingService);
   }
 
@@ -217,6 +223,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                          ArtifactDeclaration artifactDeclaration,
                                                          OptionalObjectsController optionalObjectsController,
                                                          BaseConfigurationComponentLocator baseConfigurationComponentLocator,
+                                                         ContributedErrorTypeRepository errorTypeRepository,
+                                                         ContributedErrorTypeLocator errorTypeLocator,
                                                          FeatureFlaggingService featureFlaggingService) {
     ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
         this.componentBuildingDefinitionRegistryFactory
@@ -233,6 +241,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         optionalObjectsController,
                                                         resolveParentConfigurationProperties(),
                                                         baseConfigurationComponentLocator,
+                                                        errorTypeRepository, errorTypeLocator,
                                                         getArtifactProperties(), artifactType,
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
@@ -243,6 +252,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     optionalObjectsController,
                                                     resolveParentConfigurationProperties(),
                                                     baseConfigurationComponentLocator,
+                                                    errorTypeRepository, errorTypeLocator,
                                                     getArtifactProperties(), artifactType,
                                                     componentBuildingDefinitionRegistryFactory,
                                                     featureFlaggingService);

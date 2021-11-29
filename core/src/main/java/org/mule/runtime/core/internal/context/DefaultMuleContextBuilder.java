@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.context;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
-import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
+
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -28,8 +28,6 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
-import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
@@ -88,14 +86,15 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
     muleContext.setArtifactType(artifactType);
 
-    // Instances of the repository and locator need to be injected into another objects before actually determining the possible
-    // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual
-    // values to be provided at a later time.
-    final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
-    muleContext.setErrorTypeRepository(contributedErrorTypeRepository);
-    final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
-    contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
-    muleContext.setErrorTypeLocator(contributedErrorTypeLocator);
+    // // Instances of the repository and locator need to be injected into another objects before actually determining the
+    // possible
+    // // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual
+    // // values to be provided at a later time.
+    // final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
+    // muleContext.setErrorTypeRepository(contributedErrorTypeRepository);
+    // final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
+    // contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
+    // muleContext.setErrorTypeLocator(contributedErrorTypeLocator);
 
     final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
     muleContext.setRegistry(registry);

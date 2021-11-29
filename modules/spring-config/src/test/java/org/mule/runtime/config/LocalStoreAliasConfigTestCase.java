@@ -7,8 +7,6 @@
 
 package org.mule.runtime.config;
 
-import static java.util.Collections.emptyMap;
-import static org.junit.Assert.assertSame;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_IN_MEMORY;
@@ -18,18 +16,29 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 
+import static java.util.Collections.emptyMap;
+
+import static org.junit.Assert.assertSame;
+
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
 
+  @Rule
+  public final TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
+
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new SpringXmlConfigurationBuilder(new String[0], emptyMap());
+    ConfigurationBuilder configurationBuilder = new SpringXmlConfigurationBuilder(new String[0], emptyMap());
+    configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);
+    return configurationBuilder;
   }
 
   @Test
