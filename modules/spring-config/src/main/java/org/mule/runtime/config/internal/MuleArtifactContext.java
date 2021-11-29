@@ -140,10 +140,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final MuleContextWithRegistry muleContext;
   private final BeanDefinitionFactory beanDefinitionFactory;
   private final ArtifactType artifactType;
-  protected BaseConfigurationComponentLocator baseComponentLocator;
+  private final BaseConfigurationComponentLocator baseComponentLocator;
   protected SpringConfigurationComponentLocator componentLocator;
-  private ContributedErrorTypeRepository errorTypeRepository;
-  private ContributedErrorTypeLocator errorTypeLocator;
+  private final ContributedErrorTypeRepository errorTypeRepository;
+  private final ContributedErrorTypeLocator errorTypeLocator;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
   private final ExtensionManager extensionManager;
@@ -158,9 +158,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
-   * @param baseConfigurationComponentLocator
-   * @param errorTypeRepository
-   * @param errorTypeLocator
+   * @param baseConfigurationComponentLocator          indirection to the actual ConfigurationComponentLocator in the full
+   *                                                   registry
+   * @param errorTypeRepository                        repository where the errors of the artifact will be registered.
+   * @param errorTypeLocator                           locator where the errors of the artifact will be registered.
    * @param artifactProperties                         map of properties that can be referenced from the
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
