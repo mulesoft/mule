@@ -12,6 +12,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.config.MuleProperties.isMelDefault;
 import static org.mule.runtime.core.internal.execution.ClassLoaderInjectorInvocationHandler.createClassLoaderInjectorInvocationHandler;
 
+import static java.util.Collections.emptyList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.BindingContext;
@@ -31,6 +33,7 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Creates the default {@link org.mule.runtime.core.api.el.ExpressionManager}
@@ -60,7 +63,9 @@ public class DefaultExpressionManagerFactoryBean implements FactoryBean<Extended
   private ExtendedExpressionLanguageAdaptor mvelExpressionLanguage;
 
   @Inject
-  private List<GlobalBindingContextProvider> globalBindingContextProviders;
+  // Avoid this to fail on unit tests with an incomplete repository
+  @Autowired(required = false)
+  private final List<GlobalBindingContextProvider> globalBindingContextProviders = emptyList();
 
   @Override
   public ExtendedExpressionManager getObject() throws Exception {

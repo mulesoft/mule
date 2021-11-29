@@ -94,7 +94,6 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.io.IOException;
@@ -143,6 +142,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final ArtifactType artifactType;
   protected BaseConfigurationComponentLocator baseComponentLocator;
   protected SpringConfigurationComponentLocator componentLocator;
+  private ContributedErrorTypeRepository errorTypeRepository;
+  private ContributedErrorTypeLocator errorTypeLocator;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
   private final ExtensionManager extensionManager;
@@ -158,6 +159,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
    * @param baseConfigurationComponentLocator
+   * @param errorTypeRepository
+   * @param errorTypeLocator
    * @param artifactProperties                         map of properties that can be referenced from the
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
@@ -168,6 +171,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              OptionalObjectsController optionalObjectsController,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              BaseConfigurationComponentLocator baseConfigurationComponentLocator,
+                             ContributedErrorTypeRepository errorTypeRepository,
+                             ContributedErrorTypeLocator errorTypeLocator,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
                              FeatureFlaggingService featureFlaggingService) {
@@ -178,6 +183,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
     this.resourceLocator = new DefaultResourceLocator();
     this.baseComponentLocator = baseConfigurationComponentLocator;
+    this.errorTypeRepository = errorTypeRepository;
+    this.errorTypeLocator = errorTypeLocator;
     originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
 
     extensionManager = muleContext.getExtensionManager();
@@ -279,8 +286,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     // Because instances of the repository and locator may be already created and injected into another objects, those instances
     // cannot just be set into the registry, and this contributing layer is needed to ensure the correct functioning of the DI
     // mechanism.
-    ((ContributedErrorTypeRepository) muleContext.getErrorTypeRepository()).setDelegate(errorTypeRepository);
-    ((ContributedErrorTypeLocator) ((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).setDelegate(errorTypeLocator);
+    this.errorTypeRepository.setDelegate(errorTypeRepository);
+    this.errorTypeLocator.setDelegate(errorTypeLocator);
   }
 
   public void initialize() {

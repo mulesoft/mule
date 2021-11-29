@@ -1126,22 +1126,20 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     return id;
   }
 
-  public void setErrorTypeLocator(ErrorTypeLocator errorTypeLocator) {
-    this.errorTypeLocator = errorTypeLocator;
-  }
-
   @Override
   public ErrorTypeLocator getErrorTypeLocator() {
+    if (errorTypeLocator == null) {
+      errorTypeLocator = getRegistry().lookupObject(ErrorTypeLocator.class.getName());
+    }
     return errorTypeLocator;
   }
 
   @Override
   public ErrorTypeRepository getErrorTypeRepository() {
+    if (errorTypeRepository == null) {
+      errorTypeRepository = getRegistry().lookupObject(ErrorTypeRepository.class.getName());
+    }
     return errorTypeRepository;
-  }
-
-  public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {
-    this.errorTypeRepository = errorTypeRepository;
   }
 
   @Override

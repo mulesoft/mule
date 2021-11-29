@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -14,6 +15,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
 
@@ -48,7 +52,14 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
     registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, ((MuleContextWithRegistry) muleContext).getRegistry()
         .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
 
-    registerConstantBeanDefinition(ErrorTypeRepository.class.getName(), new DefaultErrorTypeRepository());
+    // Instances of the repository and locator need to be injected into another objects before actually determining the possible
+    // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual
+    // values to be provided at a later time.
+    final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
+    registerConstantBeanDefinition(ErrorTypeRepository.class.getName(), contributedErrorTypeRepository);
+    final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
+    contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
+    registerConstantBeanDefinition(ErrorTypeLocator.class.getName(), contributedErrorTypeLocator);
 
     createRuntimeServices();
   }

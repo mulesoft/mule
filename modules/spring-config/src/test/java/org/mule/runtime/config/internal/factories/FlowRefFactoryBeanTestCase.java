@@ -83,6 +83,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -465,9 +467,10 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private MuleArtifactContext createMuleArtifactContextStub(DefaultListableBeanFactory mockedBeanFactory) {
     MuleArtifactContext muleArtifactContext =
-        new MuleArtifactContext(mockMuleContext, emptyArtifact(), mock(OptionalObjectsController.class),
-                                empty(), new BaseConfigurationComponentLocator(), emptyMap(), APP,
-                                new DefaultComponentBuildingDefinitionRegistryFactory(),
+        new MuleArtifactContext(mockMuleContext, emptyArtifact(), mock(OptionalObjectsController.class), empty(),
+                                new BaseConfigurationComponentLocator(),
+                                new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
+                                emptyMap(), APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
                                 mock(FeatureFlaggingService.class)) {
 
           @Override

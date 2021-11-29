@@ -58,6 +58,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
@@ -68,10 +69,12 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -223,11 +226,13 @@ public class MuleContextUtils {
 
     final ExtensionManager extensionManager = mock(ExtensionManager.class, withSettings().lenient());
     when(extensionManager.getExtensions()).thenReturn(emptySet());
-    when(muleContext.getCustomizationService()).thenReturn(mock(CustomServiceRegistry.class));
     when(muleContext.getExtensionManager()).thenReturn(extensionManager);
 
-    SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());
+    CustomServiceRegistry customServices = new DefaultCustomizationService();
+    new TestServicesConfigurationBuilder(true, true).configure(customServices);
+    when(muleContext.getCustomizationService()).thenReturn(customServices);
 
+    SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());
     when(muleContext.getSchedulerService()).thenReturn(schedulerService);
 
     ContributedErrorTypeRepository errorTypeRepository = new ContributedErrorTypeRepository();
