@@ -59,7 +59,7 @@
     </flow>
 
     <flow name="listStringMediaType">
-        <heisenberg:get-simple-blacklist config-ref="heisenberg" outputMimeType="application/java"/>
+        <heisenberg:get-simple-blocklist config-ref="heisenberg" outputMimeType="application/java"/>
         <foreach>
             <custom-processor
                     class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
@@ -68,7 +68,7 @@
 
 
     <flow name="listStreamMediaType">
-        <heisenberg:get-blacklist config-ref="heisenberg" outputMimeType="application/java; header=false"
+        <heisenberg:get-blocklist config-ref="heisenberg" outputMimeType="application/java; header=false"
                                   outputEncoding="UTF-16"/>
         <foreach>
             <custom-processor
@@ -77,7 +77,7 @@
     </flow>
 
     <flow name="pagedStreamMediaType">
-        <heisenberg:get-paged-blacklist config-ref="heisenberg" outputMimeType="application/java; header=false"
+        <heisenberg:get-paged-blocklist config-ref="heisenberg" outputMimeType="application/java; header=false"
                                         outputEncoding="UTF-16"/>
         <foreach>
             <custom-processor
@@ -86,7 +86,7 @@
     </flow>
 
     <flow name="pagedCursorProviderMediaType">
-        <heisenberg:get-paged-cursor-provider-blacklist config-ref="heisenberg"
+        <heisenberg:get-paged-cursor-provider-blocklist config-ref="heisenberg"
                                                         outputMimeType="application/java; header=false"
                                                         outputEncoding="UTF-16"/>
         <foreach>
