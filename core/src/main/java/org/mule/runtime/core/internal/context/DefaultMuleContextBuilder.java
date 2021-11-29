@@ -86,16 +86,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
     muleContext.setArtifactType(artifactType);
 
-    // // Instances of the repository and locator need to be injected into another objects before actually determining the
-    // possible
-    // // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual
-    // // values to be provided at a later time.
-    // final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
-    // muleContext.setErrorTypeRepository(contributedErrorTypeRepository);
-    // final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
-    // contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
-    // muleContext.setErrorTypeLocator(contributedErrorTypeLocator);
-
     final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
     muleContext.setRegistry(registry);
     muleContext.setInjector(registry);
