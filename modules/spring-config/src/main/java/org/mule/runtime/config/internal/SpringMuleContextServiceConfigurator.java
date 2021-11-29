@@ -66,9 +66,7 @@ import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.ConnectionNotification;
 import org.mule.runtime.api.notification.ConnectionNotificationListener;
@@ -118,8 +116,6 @@ import org.mule.runtime.core.internal.context.notification.DefaultNotificationLi
 import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.event.DefaultEventContextService;
-import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
-import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
@@ -141,7 +137,6 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
@@ -282,9 +277,9 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     registerBeanDefinition(OBJECT_MULE_CONTEXT, createMuleContextDefinition());
     registerConstantBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME, muleContext.getObjectSerializer());
     registerConstantBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
-    registerConstantBeanDefinition(ErrorTypeRepository.class.getName(), new ContributedErrorTypeRepository());
-    registerConstantBeanDefinition(ErrorTypeLocator.class.getName(), new ContributedErrorTypeLocator());
-    registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, componentLocator);
+    // registerConstantBeanDefinition(ErrorTypeRepository.class.getName(), new ContributedErrorTypeRepository());
+    // registerConstantBeanDefinition(ErrorTypeLocator.class.getName(), new ContributedErrorTypeLocator());
+    // registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, componentLocator);
     registerConstantBeanDefinition(OBJECT_NOTIFICATION_HANDLER, muleContext.getNotificationManager());
     registerConstantBeanDefinition(OBJECT_REGISTRY, serviceLocator);
     registerConstantBeanDefinition(OBJECT_STATISTICS, muleContext.getStatistics());

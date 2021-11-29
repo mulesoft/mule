@@ -40,6 +40,7 @@ import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
+import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
@@ -177,7 +178,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       }
     });
 
-    muleArtifactContext = createApplicationContext(muleContext, baseMuleArtifactContext.getBean(FeatureFlaggingService.class));
+    muleArtifactContext = createApplicationContext(muleContext,
+                                                   baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
+                                                   baseMuleArtifactContext.getBean(FeatureFlaggingService.class));
     muleArtifactContext.setParent(baseMuleArtifactContext);
     createSpringRegistry(muleContext, baseMuleArtifactContext, muleArtifactContext);
   }
@@ -190,6 +193,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   protected void addResources(List<ConfigResource> allResources) {}
 
   private MuleArtifactContext createApplicationContext(MuleContext muleContext,
+                                                       BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                        FeatureFlaggingService featureFlaggingService)
       throws Exception {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
@@ -204,12 +208,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
 
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
-    return doCreateApplicationContext(muleContext, artifactDeclaration, applicationObjectcontroller, featureFlaggingService);
+    return doCreateApplicationContext(muleContext, artifactDeclaration, applicationObjectcontroller,
+                                      baseConfigurationComponentLocator,
+                                      featureFlaggingService);
   }
 
   private MuleArtifactContext doCreateApplicationContext(MuleContext muleContext,
                                                          ArtifactDeclaration artifactDeclaration,
                                                          OptionalObjectsController optionalObjectsController,
+                                                         BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                          FeatureFlaggingService featureFlaggingService) {
     ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
         this.componentBuildingDefinitionRegistryFactory
@@ -225,6 +232,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       muleArtifactContext = new LazyMuleArtifactContext(muleContext, artifactAst,
                                                         optionalObjectsController,
                                                         resolveParentConfigurationProperties(),
+                                                        baseConfigurationComponentLocator,
                                                         getArtifactProperties(), artifactType,
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
@@ -234,6 +242,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
                                                     optionalObjectsController,
                                                     resolveParentConfigurationProperties(),
+                                                    baseConfigurationComponentLocator,
                                                     getArtifactProperties(), artifactType,
                                                     componentBuildingDefinitionRegistryFactory,
                                                     featureFlaggingService);
