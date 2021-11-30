@@ -135,9 +135,9 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
         .withName("custom-scheduler-test")
         .withWaitAllowed(false)
         .withDirectRunCpuLightWhenTargetBusy(false)
-        .withMaxConcurrentTasks(500)
+        .withMaxConcurrentTasks(10)
         .withShutdownTimeout(() -> 5000L, TimeUnit.MILLISECONDS);
-    notificationsLiteScheduler = muleContext.getSchedulerService().customScheduler(schedulerConfig);
+    notificationsLiteScheduler = muleContext.getSchedulerService().customScheduler(schedulerConfig, 10000);
     notificationsIoScheduler = muleContext.getSchedulerService().ioScheduler();
   }
 
