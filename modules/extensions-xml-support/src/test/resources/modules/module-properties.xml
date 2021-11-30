@@ -105,4 +105,34 @@
         <output type="string"/>
     </operation>
 
+    <operation name="call-private-nested-operations">
+        <parameters>
+            <parameter name="inputParam" type="string"/>
+        </parameters>
+        <body>
+          <tns:call-another-private-nested-operation nested_inputParam="#[vars.inputParam ++ ' These are two']"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="call-another-private-nested-operation" visibility="PRIVATE">
+        <parameters>
+            <parameter name="nested_inputParam" type="string"/>
+        </parameters>
+        <body>
+            <tns:set-payload-with-all-properties deeper_nested_inputParam="#[vars.nested_inputParam ++ ' nice properties, ' ++ vars.defaultConfigPropertyUseOptional]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-with-all-properties" visibility="PRIVATE">defaultConfigPropertyUseOptional
+        <parameters>
+            <parameter name="deeper_nested_inputParam" type="string"/>
+        </parameters>
+        <body>
+          <mule:set-payload value="#[vars.deeper_nested_inputParam ++  ' and ' ++ vars.defaultConfigParam]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
 </module>
