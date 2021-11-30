@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.queue;
 
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.CORE_ERROR_TYPE_REPO;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -90,6 +92,8 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestC
   public void testStartupOrder() throws Exception {
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_NOTIFICATION_DISPATCHER,
                                                                          mock(NotificationDispatcher.class));
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(ErrorTypeRepository.class.getName(),
+                                                                         CORE_ERROR_TYPE_REPO.get());
     FlowConstruct fc = new RecordingFlow("dummy", muleContext);
     fc.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(fc);

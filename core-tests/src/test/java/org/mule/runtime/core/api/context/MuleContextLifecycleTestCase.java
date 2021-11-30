@@ -6,13 +6,7 @@
  */
 package org.mule.runtime.core.api.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
+import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.CORE_ERROR_TYPE_REPO;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTING;
@@ -20,7 +14,16 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.tck.MuleAssert.assertTrue;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -79,6 +82,8 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     notificationListenerRegistry = new DefaultNotificationListenerRegistry();
     ((MuleContextWithRegistry) ctx).getRegistry().registerObject(NotificationListenerRegistry.REGISTRY_KEY,
                                                                  notificationListenerRegistry);
+    ((MuleContextWithRegistry) ctx).getRegistry().registerObject(ErrorTypeRepository.class.getName(),
+                                                                 CORE_ERROR_TYPE_REPO.get());
     testServicesConfigurationBuilder.configure(ctx);
   }
 
@@ -393,7 +398,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
 
   private static class SensingLifecycleManager extends MuleContextLifecycleManager {
 
-    private List<String> appliedLifecyclePhases;
+    private final List<String> appliedLifecyclePhases;
 
     public SensingLifecycleManager() {
       super();
