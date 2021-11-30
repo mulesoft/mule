@@ -1250,7 +1250,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0, 4.4.1, 4.3.1"))
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.3.1"))
                                                     .isPresent());
   }
 
