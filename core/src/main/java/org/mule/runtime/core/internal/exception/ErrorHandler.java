@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
@@ -21,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -74,6 +76,9 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
 
@@ -194,12 +199,17 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerLocation().toString());
     acceptsAllOnErrorPropagate.setExceptionListener(new DefaultExceptionListener());
     initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
-    if (this.getLocation() != null) {
+
+    if (this.getLocation() != null && shouldAddLocationToDefaultErrorHandler()) {
       String location = this.getLocation().getLocation();
       String containerLocation = location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
       acceptsAllOnErrorPropagate.setFlowLocation(builderFromStringRepresentation(containerLocation).build());
     }
     this.exceptionListeners.add(acceptsAllOnErrorPropagate);
+  }
+
+  public boolean shouldAddLocationToDefaultErrorHandler() {
+    return featureFlaggingService.isEnabled(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING);
   }
 
   /**
