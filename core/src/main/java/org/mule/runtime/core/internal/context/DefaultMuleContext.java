@@ -1305,6 +1305,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                     .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 
+  /**
+   * Configures the {@link MuleRuntimeFeature#DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING} feature flag.
+   *
+   * @since 4.5.0, 4.4.1, 4.3.1
+   */
   private static void configureDefaultErrorHandlerNotRollbackingEveryTx() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
