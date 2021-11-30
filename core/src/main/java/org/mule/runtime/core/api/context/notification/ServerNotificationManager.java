@@ -47,6 +47,7 @@ import org.mule.runtime.api.notification.SecurityNotificationListener;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -59,10 +60,13 @@ import org.mule.runtime.core.privileged.context.notification.OptimisedNotificati
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
@@ -125,7 +129,15 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
    * object to send notifications.
    */
   public void initialise() throws InitialisationException {
-    notificationsLiteScheduler = muleContext.getSchedulerService().cpuLightScheduler();
+    // notificationsLiteScheduler = muleContext.getSchedulerService().cpuLightScheduler();
+    SchedulerConfig schedulerConfig = SchedulerConfig.config()
+        .withPrefix("Notifications_Server")
+        .withName("custom-scheduler-test")
+        .withWaitAllowed(false)
+        .withDirectRunCpuLightWhenTargetBusy(false)
+        .withMaxConcurrentTasks(500)
+        .withShutdownTimeout(() -> 5000L, TimeUnit.MILLISECONDS);
+    notificationsLiteScheduler = muleContext.getSchedulerService().customScheduler(schedulerConfig);
     notificationsIoScheduler = muleContext.getSchedulerService().ioScheduler();
   }
 
