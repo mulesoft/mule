@@ -1302,7 +1302,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     featureFlaggingRegistry.registerFeatureFlag(ENFORCE_ERROR_TYPES_VALIDATION,
                                                 featureContext -> featureContext
                                                     .getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
 
   /**
