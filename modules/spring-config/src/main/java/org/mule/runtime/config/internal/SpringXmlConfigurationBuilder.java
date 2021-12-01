@@ -379,7 +379,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                          ApplicationContext parentContext)
       throws ConfigurationException {
     if (baseApplicationContext instanceof ConfigurableApplicationContext) {
-      // ((ConfigurableApplicationContext) baseApplicationContext).setParent(parentContext);
       return new SpringRegistry(baseApplicationContext, applicationContext, muleContext,
                                 new ConfigurationDependencyResolver(applicationContext.getApplicationModel()),
                                 ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
