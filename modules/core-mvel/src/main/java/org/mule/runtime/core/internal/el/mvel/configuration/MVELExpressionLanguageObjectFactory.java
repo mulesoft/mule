@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.el.mvel.configuration;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
@@ -24,7 +23,7 @@ import javax.inject.Inject;
 public class MVELExpressionLanguageObjectFactory extends AbstractComponentFactory<MVELExpressionLanguage> {
 
   @Inject
-  MuleContext muleContext;
+  private MVELExpressionLanguage mvel;
 
   private boolean autoResolveVariables;
   private MVELGlobalFunctionsConfig globalFunctions;
@@ -49,27 +48,25 @@ public class MVELExpressionLanguageObjectFactory extends AbstractComponentFactor
 
   @Override
   public MVELExpressionLanguage doGetObject() throws Exception {
-    MVELExpressionLanguage result = new MVELExpressionLanguage(muleContext);
-
-    result.setAutoResolveVariables(autoResolveVariables);
+    mvel.setAutoResolveVariables(autoResolveVariables);
 
     if (globalFunctions != null) {
-      result.setGlobalFunctionsFile(globalFunctions.getFile());
-      result.setGlobalFunctionsString(globalFunctions.getInlineScript());
+      mvel.setGlobalFunctionsFile(globalFunctions.getFile());
+      mvel.setGlobalFunctionsString(globalFunctions.getInlineScript());
     }
 
     if (aliases != null) {
       Map<String, String> aliasesMap = new HashMap<>();
       aliases.forEach(x -> aliasesMap.put(x.getKey(), x.getValue()));
-      result.setAliases(aliasesMap);
+      mvel.setAliases(aliasesMap);
     }
 
     if (imports != null) {
       Map<String, Class<?>> importsMap = new HashMap<>();
       imports.forEach(x -> importsMap.put(x.getKey(), x.getValue()));
-      result.setImports(importsMap);
+      mvel.setImports(importsMap);
     }
 
-    return result;
+    return mvel;
   }
 }
