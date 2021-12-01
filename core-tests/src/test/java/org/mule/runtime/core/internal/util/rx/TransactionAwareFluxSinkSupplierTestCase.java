@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -90,9 +91,9 @@ public class TransactionAwareFluxSinkSupplierTestCase {
   @Test
   public void txIsHandledCorrectlyInContext() {
     Context ctx = pushTxToSubscriberContext("location").apply(empty());
-    assertThat(ctx.<Deque<String>>get(TX_SCOPES_KEY).contains("location"), is(true));
+    assertThat(ctx.<Deque<String>>get(TX_SCOPES_KEY), hasItem("location"));
     ctx = popTxFromSubscriberContext().apply(ctx);
-    assertThat(ctx.<Deque<String>>get(TX_SCOPES_KEY).contains("location"), is(false));
+    assertThat(ctx.<Deque<String>>get(TX_SCOPES_KEY), not(hasItem("location")));
   }
 
   @Test
