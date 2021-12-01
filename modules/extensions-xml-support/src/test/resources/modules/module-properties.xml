@@ -125,7 +125,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="set-payload-with-all-properties" visibility="PRIVATE">defaultConfigPropertyUseOptional
+    <operation name="set-payload-with-all-properties" visibility="PRIVATE">
         <parameters>
             <parameter name="deeper_nested_inputParam" type="string"/>
         </parameters>
