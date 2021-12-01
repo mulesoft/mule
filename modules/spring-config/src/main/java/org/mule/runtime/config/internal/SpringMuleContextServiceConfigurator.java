@@ -290,6 +290,9 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     registerBeanDefinition(OBJECT_MULE_CONTEXT, createMuleContextDefinition());
     registerConstantBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME, muleContext.getObjectSerializer());
     registerConstantBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
+    // registerConstantBeanDefinition(ErrorTypeRepository.class.getName(), new ContributedErrorTypeRepository());
+    // registerConstantBeanDefinition(ErrorTypeLocator.class.getName(), new ContributedErrorTypeLocator());
+    // registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, componentLocator);
     registerConstantBeanDefinition(OBJECT_NOTIFICATION_HANDLER, muleContext.getNotificationManager());
     registerConstantBeanDefinition(OBJECT_REGISTRY, serviceLocator);
     registerConstantBeanDefinition(OBJECT_STATISTICS, muleContext.getStatistics());
