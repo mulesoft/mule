@@ -11,10 +11,13 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
+import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,11 +94,6 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   boolean emitsResponse();
 
   /**
-   * @return whether this source should run on primary nodes only
-   */
-  boolean runsOnPrimaryNodeOnly();
-
-  /**
    * @return whether this source should be ignored and excluded from the resulting {@link ExtensionModel}
    */
   boolean isIgnored();
@@ -139,6 +137,16 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
    * @return the source's {@link DisplayModel}
    */
   Optional<DisplayModel> getDisplayModel();
+
+  /**
+   * @return the back pressure support info for the source
+   */
+  Optional<BackPressureStrategyModelProperty> getBackPressureStrategyModelProperty();
+
+  /**
+   * @return the type of cluster support this source provides
+   */
+  SourceClusterSupportModelProperty getSourceClusterSupportModelProperty();
 
   /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a

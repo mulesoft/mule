@@ -79,8 +79,6 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
           if (type.isAssignableTo(PollingSource.class)
               || type.isAssignableTo(org.mule.sdk.api.runtime.source.PollingSource.class)) {
 
-            source.setRunsOnPrimaryNodeOnly(true);
-
             thereArePollingSources.set(true);
 
             source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declareSchedulingStrategyParameter(loader));

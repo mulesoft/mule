@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
+import org.mule.sdk.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
 import org.mule.runtime.extension.api.runtime.connectivity.ReconnectionCallback;
 

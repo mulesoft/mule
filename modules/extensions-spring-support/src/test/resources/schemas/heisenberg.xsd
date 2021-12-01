@@ -775,6 +775,11 @@
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-AsyncListenPayments-backPressureStrategyEnumType" use="optional" default="FAIL" name="onCapacityOverload">
+          <xs:annotation>
+            <xs:documentation>Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
@@ -940,14 +945,14 @@
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
-          <xs:annotation>
-            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-ListenPayments-backPressureStrategyEnumType" use="optional" default="FAIL" name="onCapacityOverload">
           <xs:annotation>
             <xs:documentation>Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
@@ -1057,14 +1062,14 @@
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
-          <xs:annotation>
-            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-ListenPaymentsAllOptional-backPressureStrategyEnumType" use="optional" default="FAIL" name="onCapacityOverload">
           <xs:annotation>
             <xs:documentation>Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
@@ -1218,6 +1223,11 @@
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-ReconnectableListenPayments-backPressureStrategyEnumType" use="optional" default="FAIL" name="onCapacityOverload">
+          <xs:annotation>
+            <xs:documentation>Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
@@ -1377,14 +1387,14 @@
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
-          <xs:annotation>
-            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-listen-payments-cluster-backPressureStrategyEnumType" use="optional" default="FAIL" name="onCapacityOverload">
           <xs:annotation>
             <xs:documentation>Strategy that the runtime will apply when the flow receives more messages than it has the capacity to handle</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
@@ -3927,6 +3937,19 @@
       </xs:simpleType>
     </xs:union>
   </xs:simpleType>
+  <xs:simpleType name="Heisenberg-AsyncListenPayments-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
   <xs:simpleType name="Heisenberg-ListenPayments-backPressureStrategyEnumType">
     <xs:union>
       <xs:simpleType>
@@ -3941,6 +3964,19 @@
     </xs:union>
   </xs:simpleType>
   <xs:simpleType name="Heisenberg-ListenPaymentsAllOptional-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="Heisenberg-ReconnectableListenPayments-backPressureStrategyEnumType">
     <xs:union>
       <xs:simpleType>
         <xs:restriction base="xs:string">

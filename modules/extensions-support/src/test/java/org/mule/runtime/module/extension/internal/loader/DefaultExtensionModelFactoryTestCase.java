@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -74,6 +75,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -276,14 +278,14 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceWithDefaultBackPressureStrategies() {
+  public void sourceWithInheritedBackPressureStrategies() {
     SourceModel source = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ReconnectableListenPayments").get();
 
-    Optional<ParameterModel> parameter = source.getAllParameterModels().stream()
-        .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
-        .findAny();
+    BackPressureStrategyModelProperty backPressureStrategyModelProperty =
+        source.getModelProperty(BackPressureStrategyModelProperty.class).get();
 
-    assertThat(parameter.isPresent(), is(false));
+    assertThat(backPressureStrategyModelProperty.getDefaultMode(), is(FAIL));
+    assertThat(backPressureStrategyModelProperty.getSupportedModes(), hasItems(FAIL, DROP));
   }
 
   @Test

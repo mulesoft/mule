@@ -8,16 +8,21 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
+import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 import java.util.HashMap;
 import java.util.List;
@@ -73,8 +78,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .hasResponse(parser.emitsResponse())
           .requiresConnection(parser.isConnected())
           .transactional(parser.isTransactional())
-          .supportsStreaming(parser.supportsStreaming())
-          .runsOnPrimaryNodeOnly(parser.runsOnPrimaryNodeOnly());
+          .supportsStreaming(parser.supportsStreaming());
 
       parser.getDeprecationModel().ifPresent(sourceDeclarer::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> sourceDeclarer.getDeclaration().setDisplayModel(d));
@@ -104,9 +108,14 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate);
       declareSourceCallbackParameters(parser.getOnBackPressureCallbackParser(), sourceDeclarer::onBackPressure);
 
+      sourceDeclarer.withModelProperty(parser.getSourceClusterSupportModelProperty());
+
+      sourceDeclarer.withModelProperty(parser.getBackPressureStrategyModelProperty().orElse(getDefault()));
+
       sourceDeclarers.put(parser, sourceDeclarer);
     }
   }
+
 
   private void declareSourceCallbackParameters(Optional<SourceCallbackModelParser> parser,
                                                Supplier<ParameterizedDeclarer> declarer) {

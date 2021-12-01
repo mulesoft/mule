@@ -15,12 +15,14 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguag
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
 import java.io.InputStream;
@@ -129,5 +131,16 @@ public class JavaModelLoaderUtils {
   public static boolean isRoute(ExtensionParameter parameter) {
     return parameter.getType().isAssignableTo(Route.class)
         || parameter.getType().isAssignableTo(org.mule.sdk.api.runtime.route.Route.class);
+  }
+
+  /**
+   * @param sourceElement a source
+   * @return whether the given source emits response or not
+   * 
+   * @since 4.5.0
+   */
+  public static boolean emitsResponse(SourceElement sourceElement) {
+    return sourceElement.isAnnotatedWith(EmitsResponse.class)
+        || sourceElement.isAnnotatedWith(org.mule.sdk.api.annotation.source.EmitsResponse.class);
   }
 }

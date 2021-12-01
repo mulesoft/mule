@@ -6362,7 +6362,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 9,
+                    "order": 8,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -6705,7 +6705,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 8,
+                    "order": 9,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -13814,7 +13814,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13956,7 +13956,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -14043,7 +14043,7 @@
                   "password": false,
                   "text": false,
                   "query": false,
-                  "order": 4
+                  "order": 5
                 },
                 "allowedStereotypeModels": [],
                 "semanticTerms": [],
@@ -14218,7 +14218,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14360,7 +14360,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 4,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -14447,7 +14447,7 @@
                   "password": false,
                   "text": false,
                   "query": false,
-                  "order": 3
+                  "order": 4
                 },
                 "allowedStereotypeModels": [],
                 "semanticTerms": [],
@@ -14559,7 +14559,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14902,7 +14902,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
