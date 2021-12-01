@@ -7,20 +7,20 @@
 package org.mule.runtime.core.internal.util.rx;
 
 
+import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static java.util.Collections.synchronizedSet;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.TX_SCOPES_KEY;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
+import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -38,7 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class TransactionAwareFluxSinkSupplierTestCase {
 
@@ -79,7 +78,7 @@ public class TransactionAwareFluxSinkSupplierTestCase {
   @Issue("MULE-19937")
   @Test
   public void returnsNewSinkWhenInTxByContext() {
-    Context ctx = pushTxToSubscriberContext("location").apply(Context.empty());
+    Context ctx = pushTxToSubscriberContext("location").apply(empty());
     FluxSink supplied = txSupplier.get(ctx);
     // Assert is another sink
     assertThat(supplied, is(not(sameInstance(mockSink))));
@@ -89,11 +88,11 @@ public class TransactionAwareFluxSinkSupplierTestCase {
 
   @Issue("MULE-19937")
   @Test
-  public void TxIsHandledCorrectlyInContext() {
-    Context ctx = pushTxToSubscriberContext("location").apply(Context.empty());
-    assertTrue(ctx.<Deque<String>>get(TX_SCOPES_KEY).contains("location"));
+  public void txIsHandledCorrectlyInContext() {
+    Context ctx = pushTxToSubscriberContext("location").apply(empty());
+    assertThat(ctx.<Deque<String>>get(TX_SCOPES_KEY).contains("location"), is(true));
     ctx = popTxFromSubscriberContext().apply(ctx);
-    assertFalse(ctx.<Deque<String>>get(TX_SCOPES_KEY).contains("location"));
+    assertThat(ctx.<Deque<String>>get(TX_SCOPES_KEY).contains("location"), is(false));
   }
 
   @Test
@@ -135,9 +134,9 @@ public class TransactionAwareFluxSinkSupplierTestCase {
   @Test
   public void newSinkPerThreadWithContext() throws Exception {
     Set<FluxSink> sinks = synchronizedSet(new HashSet<>());
-    Context ctx = pushTxToSubscriberContext("location").apply(Context.empty());
+    Context ctx = pushTxToSubscriberContext("location").apply(empty());
 
-    ExecutorService executorService = Executors.newFixedThreadPool(THREAD_TEST);
+    ExecutorService executorService = newFixedThreadPool(THREAD_TEST);
     try {
       for (int i = 0; i < THREAD_TEST; i++) {
         executorService.submit(() -> {
