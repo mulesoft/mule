@@ -22,7 +22,7 @@ import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
-import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveInContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveByContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
 import static java.lang.System.currentTimeMillis;
@@ -102,7 +102,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
 
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
-          if (isTxActiveInContext(ctx)) {
+          if (isTxActiveByContext(ctx)) {
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
@@ -149,7 +149,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
 
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
-          if (isTxActiveInContext(ctx)) {
+          if (isTxActiveByContext(ctx)) {
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)

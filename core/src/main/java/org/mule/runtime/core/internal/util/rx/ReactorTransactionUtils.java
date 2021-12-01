@@ -19,11 +19,15 @@ import static java.util.Collections.emptyList;
  *
  * @since 4.5, 4.4.1, 4.3.1
  */
-public class ReactorTransactionUtils {
+public final class ReactorTransactionUtils {
+
+  private ReactorTransactionUtils() {
+    // Nothing to do
+  }
 
   public static final String TX_SCOPES_KEY = "mule.tx.activeTransactionsInReactorChain";
 
-  public static boolean isTxActiveInContext(Context ctx) {
+  public static boolean isTxActiveByContext(Context ctx) {
     return ctx != null && ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> !txScopes.isEmpty()).orElse(false);
   }
 

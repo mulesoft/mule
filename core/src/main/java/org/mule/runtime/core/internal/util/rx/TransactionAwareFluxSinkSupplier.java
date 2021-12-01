@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.util.rx;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveInContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveByContext;
 
 import java.util.function.Supplier;
 
@@ -53,7 +53,7 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
     // So, this thread will not unbind the tx (causing an error next time it tries to bind one), and the first one will
     // then process the queued event without having the tx bound (so it will process as if it wasn't a tx in the
     // beginning).
-    if (isTransactionActive() || isTxActiveInContext(ctx)) {
+    if (isTransactionActive() || isTxActiveByContext(ctx)) {
       return sinks.get(currentThread(), t -> newSinkFactory.get());
     } else {
       return delegate.get();
