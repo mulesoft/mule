@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.util.Collections.emptyList;
+
 import reactor.util.context.Context;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.function.Function;
 
-import static java.util.Collections.emptyList;
-
 /**
- * Utils class to simulate transactional behavior in reactor.
+ * Utils class to allow transactional behavior in reactor.
  *
  * @since 4.5, 4.4.1, 4.3.1
  */
