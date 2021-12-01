@@ -14,6 +14,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -288,6 +289,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnablePolicyIsolation();
       configureSetVariableWithNullVale();
       configureStartExtensionComponentsWithArtifactClassloader();
+      configureDefaultErrorHandlerNotRollbackingEveryTx();
     }
   }
 
@@ -1238,4 +1240,18 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                     .getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING} feature flag.
+   *
+   * @since 4.5.0, 4.4.1, 4.3.1
+   */
+  private static void configureDefaultErrorHandlerNotRollbackingEveryTx() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.3.1"))
+                                                    .isPresent());
+  }
+
 }
