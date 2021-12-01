@@ -526,16 +526,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
-    org.mule.runtime.core.internal.registry.Registry originalRegistry =
-        ((MuleRegistryHelper) (muleContext.getRegistry())).getDelegate();
     return new SpringMuleContextServiceConfigurator(muleContext,
                                                     getConfigurationProperties(),
                                                     getArtifactType(),
                                                     getOptionalObjectsController(),
                                                     beanFactory,
-                                                    componentLocator,
                                                     getServiceDiscoverer(),
-                                                    originalRegistry,
                                                     getResourceLocator());
   }
 

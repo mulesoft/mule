@@ -145,7 +145,6 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
-import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
@@ -178,7 +177,6 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
   private final CustomServiceRegistry customServiceRegistry;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
   private final ResourceLocator resourceLocator;
-  private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES = ImmutableSet.<String>builder()
       .add(OBJECT_SECURITY_MANAGER)
@@ -256,7 +254,6 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
       .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))
       .build();
 
-  private final SpringConfigurationComponentLocator componentLocator;
   private final ConfigurationProperties configurationProperties;
   private final Registry serviceLocator;
 
@@ -265,9 +262,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
                                               ArtifactType artifactType,
                                               OptionalObjectsController optionalObjectsController,
                                               BeanDefinitionRegistry beanDefinitionRegistry,
-                                              SpringConfigurationComponentLocator componentLocator,
                                               Registry serviceLocator,
-                                              org.mule.runtime.core.internal.registry.Registry originalRegistry,
                                               ResourceLocator resourceLocator) {
     super((CustomServiceRegistry) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
 
@@ -277,9 +272,6 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     this.artifactType = artifactType;
     this.optionalObjectsController = optionalObjectsController;
     this.beanDefinitionRegistry = beanDefinitionRegistry;
-    this.componentLocator = componentLocator;
-    this.serviceLocator = serviceLocator;
-    this.originalRegistry = originalRegistry;
     this.resourceLocator = resourceLocator;
   }
 
@@ -308,7 +300,6 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     createLocalLockFactoryBeanDefinitions();
     createQueueManagerBeanDefinitions();
     createCustomServices();
-    absorbOriginalRegistry();
   }
 
   private void loadServiceConfigurators() {
@@ -348,20 +339,6 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     } else {
       beanDefinitionRegistry.registerAlias(OBJECT_QUEUE_MANAGER, OBJECT_LOCAL_QUEUE_MANAGER);
     }
-  }
-
-  private void absorbOriginalRegistry() {
-    if (originalRegistry == null) {
-      return;
-    }
-
-    originalRegistry.lookupByType(Object.class)
-        .forEach((key, value) -> {
-          if (!(value instanceof GlobalBindingContextProvider)) {
-            registerConstantBeanDefinition(key, value);
-          }
-        });
-    originalRegistry = null;
   }
 
   private void createLocalLockFactoryBeanDefinitions() {

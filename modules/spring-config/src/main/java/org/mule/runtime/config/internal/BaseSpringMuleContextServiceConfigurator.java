@@ -19,7 +19,6 @@ import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
-import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
@@ -96,10 +95,9 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
       return;
     }
 
-    originalRegistry.lookupByType(GlobalBindingContextProvider.class)
+    originalRegistry.lookupByType(Object.class)
         .forEach((key, value) -> registerConstantBeanDefinition(key, value));
     originalRegistry = null;
   }
-
 
 }
