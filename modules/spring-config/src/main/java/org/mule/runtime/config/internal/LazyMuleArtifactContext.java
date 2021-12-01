@@ -121,9 +121,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
-   * @param baseConfigurationComponentLocator
-   * @param errorTypeLocator
-   * @param errorTypeRepository
+   * @param baseConfigurationComponentLocator          indirection to the actual ConfigurationComponentLocator in the full
+   *                                                   registry
+   * @param errorTypeRepository                        repository where the errors of the artifact will be registered.
+   * @param errorTypeLocator                           locator where the errors of the artifact will be registered.
    * @param artifactProperties                         map of properties that can be referenced from the
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
