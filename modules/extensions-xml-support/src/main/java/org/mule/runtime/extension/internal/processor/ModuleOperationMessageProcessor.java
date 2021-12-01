@@ -361,12 +361,12 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     // If this operation is called from an outer operation, we need to obtain the config from the previous caller in order to
     // populate the event variables as expected.
     Map<String, Pair<Object, MetadataType>> resolvedProperties = properties;
-    if (event.getVariables().containsKey(MODULE_OPERATION_CONFIG_REF)) {
-      builder.addVariable(MODULE_OPERATION_CONFIG_REF, event.getVariables().get(MODULE_OPERATION_CONFIG_REF).getValue());
+    TypedValue<?> configRef = event.getVariables().get(MODULE_OPERATION_CONFIG_REF);
+    if (configRef != null) {
+      builder.addVariable(MODULE_OPERATION_CONFIG_REF, configRef.getValue());
 
       if (properties.isEmpty()) {
-        resolvedProperties = parseParameters(createPropertiesFromConfigName((String) event.getVariables()
-            .get(MODULE_OPERATION_CONFIG_REF).getValue()), allProperties);
+        resolvedProperties = parseParameters(createPropertiesFromConfigName((String) configRef.getValue()), allProperties);
       }
     }
 
