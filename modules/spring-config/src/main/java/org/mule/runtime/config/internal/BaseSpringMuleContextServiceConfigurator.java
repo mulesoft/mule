@@ -19,6 +19,7 @@ import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
+import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
@@ -42,12 +43,15 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
 
   private final MuleContext muleContext;
+  private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   public BaseSpringMuleContextServiceConfigurator(MuleContext muleContext,
                                                   BeanDefinitionRegistry beanDefinitionRegistry,
-                                                  Registry serviceLocator) {
+                                                  Registry serviceLocator,
+                                                  org.mule.runtime.core.internal.registry.Registry originalRegistry) {
     super((CustomServiceRegistry) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
     this.muleContext = muleContext;
+    this.originalRegistry = originalRegistry;
   }
 
   void createArtifactServices() {
@@ -66,6 +70,7 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
     registerConstantBeanDefinition(ErrorTypeLocator.class.getName(), contributedErrorTypeLocator);
 
     createRuntimeServices();
+    absorbOriginalRegistry();
   }
 
   private void createRuntimeServices() {
@@ -85,5 +90,16 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
       }
     }
   }
+
+  private void absorbOriginalRegistry() {
+    if (originalRegistry == null) {
+      return;
+    }
+
+    originalRegistry.lookupByType(GlobalBindingContextProvider.class)
+        .forEach((key, value) -> registerConstantBeanDefinition(key, value));
+    originalRegistry = null;
+  }
+
 
 }

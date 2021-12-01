@@ -145,7 +145,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final ContributedErrorTypeRepository errorTypeRepository;
   private final ContributedErrorTypeLocator errorTypeLocator;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
-  private org.mule.runtime.core.internal.registry.Registry originalRegistry;
   private final ExtensionManager extensionManager;
 
   /**
@@ -186,7 +185,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.baseComponentLocator = baseConfigurationComponentLocator;
     this.errorTypeRepository = errorTypeRepository;
     this.errorTypeLocator = errorTypeLocator;
-    originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
 
     extensionManager = muleContext.getExtensionManager();
 
@@ -525,11 +523,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     super.customizeBeanFactory(beanFactory);
     baseComponentLocator.setDelegate(componentLocator);
     createServiceConfigurator(beanFactory).createArtifactServices();
-
-    originalRegistry = null;
   }
 
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
+    org.mule.runtime.core.internal.registry.Registry originalRegistry =
+        ((MuleRegistryHelper) (muleContext.getRegistry())).getDelegate();
     return new SpringMuleContextServiceConfigurator(muleContext,
                                                     getConfigurationProperties(),
                                                     getArtifactType(),
@@ -637,10 +635,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public Registry getRegistry() {
     return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
-  }
-
-  protected org.mule.runtime.core.internal.registry.Registry getOriginalRegistry() {
-    return originalRegistry;
   }
 
   @Override

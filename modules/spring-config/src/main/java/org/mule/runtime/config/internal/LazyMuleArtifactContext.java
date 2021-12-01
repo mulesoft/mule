@@ -59,6 +59,8 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
+import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -169,6 +171,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
+    Registry originalRegistry = ((MuleRegistryHelper) (getMuleContext().getRegistry())).getDelegate();
     return new LazySpringMuleContextServiceConfigurator(this,
                                                         artifactProperties,
                                                         runtimeLockFactory,
@@ -179,7 +182,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                         beanFactory,
                                                         componentLocator,
                                                         getServiceDiscoverer(),
-                                                        getOriginalRegistry(),
+                                                        originalRegistry,
                                                         getResourceLocator());
   }
 

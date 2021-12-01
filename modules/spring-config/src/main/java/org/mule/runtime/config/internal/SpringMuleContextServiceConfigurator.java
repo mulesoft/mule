@@ -13,6 +13,7 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJEC
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
@@ -144,6 +145,7 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
+import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
@@ -354,7 +356,11 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     }
 
     originalRegistry.lookupByType(Object.class)
-        .forEach((key, value) -> registerConstantBeanDefinition(key, value));
+        .forEach((key, value) -> {
+          if (!(value instanceof GlobalBindingContextProvider)) {
+            registerConstantBeanDefinition(key, value);
+          }
+        });
     originalRegistry = null;
   }
 
@@ -421,7 +427,10 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
   protected void createBootstrapBeanDefinitions() {
     try {
       SpringRegistryBootstrap springRegistryBootstrap =
-          new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, this::registerBeanDefinition);
+          new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, this::registerBeanDefinition,
+                                      propertyKey -> !(propertyKey.endsWith(".binding.provider")
+                                          || propertyKey.endsWith(".FunctionsProvider")
+                                          || propertyKey.endsWith(COMPATIBILITY_PLUGIN_INSTALLED)));
       springRegistryBootstrap.initialise();
     } catch (InitialisationException e) {
       throw new RuntimeException(e);
