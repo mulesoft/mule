@@ -14,6 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static java.util.Collections.synchronizedSet;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +23,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import reactor.core.publisher.FluxSink;
+import reactor.util.context.Context;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -64,6 +67,17 @@ public class TransactionAwareFluxSinkSupplierTestCase {
   }
 
   @Test
+  public void returnsNewSinkWhenInTxByContext() {
+    Context ctx = pushTxToSubscriberContext("location").apply(Context.empty());
+    FluxSink supplied = txSupplier.get(ctx);
+    // Assert is another sink
+    assertThat(supplied, is(not(mockSink)));
+    // Assert that supplied for same thread supplies same sink
+    assertThat(txSupplier.get(ctx), is(supplied));
+    popTxFromSubscriberContext().apply(ctx);
+  }
+
+  @Test
   public void newSinkPerThread() throws Exception {
     List<Thread> threads = new ArrayList<>();
     Set<FluxSink> sinks = synchronizedSet(new HashSet<>());
@@ -83,6 +97,33 @@ public class TransactionAwareFluxSinkSupplierTestCase {
         } catch (TransactionException e) {
 
         }
+      });
+      threads.add(thread);
+    }
+
+    for (Thread t : threads) {
+      t.start();
+    }
+    for (Thread t : threads) {
+      t.join();
+    }
+
+    // Every thread created has a different sink
+    assertThat(sinks, hasSize(THREAD_TEST));
+  }
+
+  @Test
+  public void newSinkPerThreadWithContext() throws Exception {
+    List<Thread> threads = new ArrayList<>();
+    Set<FluxSink> sinks = synchronizedSet(new HashSet<>());
+    for (int i = 0; i < THREAD_TEST; i++) {
+      Thread thread = new Thread(() -> {
+        Context ctx = pushTxToSubscriberContext("location").apply(Context.empty());
+        FluxSink sink = txSupplier.get(ctx);
+        // Assert that supplied for same thread supplies same sink
+        assertThat(txSupplier.get(ctx), is(sink));
+        sinks.add(sink);
+        popTxFromSubscriberContext().apply(ctx);
       });
       threads.add(thread);
     }
