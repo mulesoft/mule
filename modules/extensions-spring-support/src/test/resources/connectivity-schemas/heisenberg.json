@@ -25,7 +25,11 @@
             },
             "beardTrimming": {
               "range": "string",
-              "mandatory": false
+              "mandatory": false,
+              "enumValues": [
+                "GOATIE",
+                "MUSTACHE"
+              ]
             },
             "saulPhoneNumber": {
               "propertyTerm": "connectivity.port",
@@ -75,7 +79,11 @@
             },
             "beardTrimming": {
               "range": "string",
-              "mandatory": false
+              "mandatory": false,
+              "enumValues": [
+                "GOATIE",
+                "MUSTACHE"
+              ]
             },
             "saulPhoneNumber": {
               "propertyTerm": "connectivity.port",
