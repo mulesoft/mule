@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.lang.Class.forName;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
@@ -20,7 +13,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.XmlConstants.buildRawParamKeyForDocAttribute;
-import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
@@ -31,7 +23,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPE
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.loadProviderFactories;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
@@ -41,6 +32,15 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+
+import static java.lang.Class.forName;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
@@ -62,7 +62,6 @@ import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 
@@ -79,10 +78,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import com.google.common.collect.ImmutableSet;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@link ComponentAst} and its parameters to actual
@@ -636,14 +635,6 @@ public class BeanDefinitionFactory {
   private void processMuleConfiguration(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                         ComponentAst component, BeanDefinitionRegistry registry) {
     if (component.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-      AtomicReference<BeanDefinition> expressionLanguage = new AtomicReference<>();
-
-      component.directChildrenStream()
-          .filter(springComponentModels::containsKey)
-          .map(springComponentModels::get)
-          .filter(childSpringComponentModel -> areMatchingTypes(MVELExpressionLanguage.class,
-                                                                childSpringComponentModel.getType()))
-          .forEach(childSpringComponentModel -> expressionLanguage.set(childSpringComponentModel.getBeanDefinition()));
       ComponentParameterAst objectSerializerRefParam = component.getParameter(DEFAULT_GROUP_NAME, OBJECT_SERIALIZER_REF);
       if (objectSerializerRefParam != null) {
         String defaultObjectSerializer = objectSerializerRefParam.getResolvedRawValue();
@@ -651,9 +642,6 @@ public class BeanDefinitionFactory {
           registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
           registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
         }
-      }
-      if (expressionLanguage.get() != null) {
-        registry.registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage.get());
       }
     }
   }
