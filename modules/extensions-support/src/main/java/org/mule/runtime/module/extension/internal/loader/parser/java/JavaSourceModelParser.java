@@ -22,6 +22,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sema
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaParserSourceUtils.fromLegacySourceClusterSupport;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaParserSourceUtils.fromSdkBackPressureMode;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -37,8 +39,9 @@ import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
-import org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
@@ -272,13 +275,29 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public Optional<SourceClusterSupport> getSourceClusterSupport() {
-    return mapReduceSingleAnnotation(sourceElement, "source", sourceElement.getName(), ClusterSupport.class,
-                                     org.mule.sdk.api.annotation.source.ClusterSupport.class,
-                                     legacyAnnotation -> fromLegacySourceClusterSupport(legacyAnnotation
-                                         .getEnumValue(ClusterSupport::value)),
-                                     sdkAnnotation -> sdkAnnotation
-                                         .getEnumValue(org.mule.sdk.api.annotation.source.ClusterSupport::value));
+  public SourceClusterSupportModelProperty getSourceClusterSupportModelProperty() {
+    Optional<SourceClusterSupport> sourceClusterSupport =
+        mapReduceSingleAnnotation(sourceElement, "source", sourceElement.getName(), ClusterSupport.class,
+                                  org.mule.sdk.api.annotation.source.ClusterSupport.class,
+                                  legacyAnnotation -> fromLegacySourceClusterSupport(legacyAnnotation
+                                      .getEnumValue(ClusterSupport::value)),
+                                  sdkAnnotation -> sdkAnnotation
+                                      .getEnumValue(org.mule.sdk.api.annotation.source.ClusterSupport::value));
+    SourceClusterSupport resultingSourceClusterSupport;
+
+    switch (sourceClusterSupport.orElse(DEFAULT_ALL_NODES)) {
+      case DEFAULT_PRIMARY_NODE_ONLY:
+        resultingSourceClusterSupport = DEFAULT_PRIMARY_NODE_ONLY;
+        break;
+      case DEFAULT_ALL_NODES:
+        resultingSourceClusterSupport = DEFAULT_ALL_NODES;
+        break;
+      case NOT_SUPPORTED:
+      default:
+        resultingSourceClusterSupport = SourceClusterSupport.NOT_SUPPORTED;
+    }
+
+    return new SourceClusterSupportModelProperty(resultingSourceClusterSupport);
   }
 
   @Override

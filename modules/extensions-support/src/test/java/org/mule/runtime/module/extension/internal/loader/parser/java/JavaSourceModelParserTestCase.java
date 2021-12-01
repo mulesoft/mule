@@ -23,9 +23,10 @@ import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
@@ -43,50 +44,44 @@ public class JavaSourceModelParserTestCase {
 
   @Test
   public void defaultClusterSupport() {
-    Optional<SourceClusterSupport> clusterSupport = parseClusterSupportFromSourceClass(TestSource.class);
-    assertThat(clusterSupport.isPresent(), is(false));
+    SourceClusterSupportModelProperty clusterSupport = parseClusterSupportFromSourceClass(TestSource.class);
+    assertThat(clusterSupport.getSourceClusterSupport(), is(DEFAULT_ALL_NODES));
   }
 
   @Test
   public void noClusterSupport() {
-    Optional<SourceClusterSupport> clusterSupport = parseClusterSupportFromSourceClass(NonClusteredSource.class);
-    assertThat(clusterSupport.isPresent(), is(true));
-    assertThat(clusterSupport.get(), is(NOT_SUPPORTED));
+    SourceClusterSupportModelProperty clusterSupport = parseClusterSupportFromSourceClass(NonClusteredSource.class);
+    assertThat(clusterSupport.getSourceClusterSupport(), is(NOT_SUPPORTED));
   }
 
   @Test
   public void clusterSupportDefaultingAllNodes() {
-    Optional<SourceClusterSupport> clusterSupport = parseClusterSupportFromSourceClass(AllNodesSource.class);
-    assertThat(clusterSupport.isPresent(), is(true));
-    assertThat(clusterSupport.get(), is(DEFAULT_ALL_NODES));
+    SourceClusterSupportModelProperty clusterSupport = parseClusterSupportFromSourceClass(AllNodesSource.class);
+    assertThat(clusterSupport.getSourceClusterSupport(), is(DEFAULT_ALL_NODES));
   }
 
   @Test
   public void clusterSupportDefaultingPrimaryNodeOnly() {
-    Optional<SourceClusterSupport> clusterSupport = parseClusterSupportFromSourceClass(PrimaryNodeSource.class);
-    assertThat(clusterSupport.isPresent(), is(true));
-    assertThat(clusterSupport.get(), is(DEFAULT_PRIMARY_NODE_ONLY));
+    SourceClusterSupportModelProperty clusterSupport = parseClusterSupportFromSourceClass(PrimaryNodeSource.class);
+    assertThat(clusterSupport.getSourceClusterSupport(), is(DEFAULT_PRIMARY_NODE_ONLY));
   }
 
   @Test
   public void sdkNoClusterSupport() {
-    Optional<SourceClusterSupport> clusterSupport = parseClusterSupportFromSourceClass(SdkNonClusteredSource.class);
-    assertThat(clusterSupport.isPresent(), is(true));
-    assertThat(clusterSupport.get(), is(NOT_SUPPORTED));
+    SourceClusterSupportModelProperty clusterSupport = parseClusterSupportFromSourceClass(SdkNonClusteredSource.class);
+    assertThat(clusterSupport.getSourceClusterSupport(), is(NOT_SUPPORTED));
   }
 
   @Test
   public void sdkClusterSupportDefaultingAllNodes() {
-    Optional<SourceClusterSupport> clusterSupport = parseClusterSupportFromSourceClass(SdkAllNodesSource.class);
-    assertThat(clusterSupport.isPresent(), is(true));
-    assertThat(clusterSupport.get(), is(DEFAULT_ALL_NODES));
+    SourceClusterSupportModelProperty clusterSupport = parseClusterSupportFromSourceClass(SdkAllNodesSource.class);
+    assertThat(clusterSupport.getSourceClusterSupport(), is(DEFAULT_ALL_NODES));
   }
 
   @Test
   public void sdkClusterSupportDefaultingPrimaryNodeOnly() {
-    Optional<SourceClusterSupport> clusterSupport = parseClusterSupportFromSourceClass(SdkPrimaryNodeSource.class);
-    assertThat(clusterSupport.isPresent(), is(true));
-    assertThat(clusterSupport.get(), is(DEFAULT_PRIMARY_NODE_ONLY));
+    SourceClusterSupportModelProperty clusterSupport = parseClusterSupportFromSourceClass(SdkPrimaryNodeSource.class);
+    assertThat(clusterSupport.getSourceClusterSupport(), is(DEFAULT_PRIMARY_NODE_ONLY));
   }
 
   @Test
@@ -157,9 +152,9 @@ public class JavaSourceModelParserTestCase {
     return parser.getBackPressureStrategyModelProperty();
   }
 
-  private Optional<org.mule.sdk.api.annotation.source.SourceClusterSupport> parseClusterSupportFromSourceClass(Class<? extends Source> sourceClass) {
+  private SourceClusterSupportModelProperty parseClusterSupportFromSourceClass(Class<? extends Source> sourceClass) {
     mockSourceWrapperWithClass(sourceClass);
-    return parser.getSourceClusterSupport();
+    return parser.getSourceClusterSupportModelProperty();
   }
 
   private void mockSourceWrapperWithClass(Class<? extends Source> sourceClass) {

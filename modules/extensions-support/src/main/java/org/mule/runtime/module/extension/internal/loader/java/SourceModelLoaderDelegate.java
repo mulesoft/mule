@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
-import static org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty.getDefault;
+import static org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
@@ -19,7 +19,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
-import org.mule.runtime.extension.internal.property.SourceClusterSupportModelProperty;
+import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
 import org.mule.sdk.api.annotation.source.SourceClusterSupport;
@@ -108,7 +108,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
       declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate);
       declareSourceCallbackParameters(parser.getOnBackPressureCallbackParser(), sourceDeclarer::onBackPressure);
 
-      declareClusterSupport(sourceDeclarer, parser.getSourceClusterSupport());
+      sourceDeclarer.withModelProperty(parser.getSourceClusterSupportModelProperty());
 
       sourceDeclarer.withModelProperty(parser.getBackPressureStrategyModelProperty().orElse(getDefault()));
 
@@ -116,26 +116,6 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
     }
   }
 
-  private void declareClusterSupport(SourceDeclarer sourceDeclarer, Optional<SourceClusterSupport> sourceClusterSupport) {
-    boolean runsOnPrimaryNodeOnly;
-    SourceClusterSupport resultingSourceClusterSupport;
-    switch (sourceClusterSupport.orElse(DEFAULT_ALL_NODES)) {
-      case DEFAULT_PRIMARY_NODE_ONLY:
-        runsOnPrimaryNodeOnly = false;
-        resultingSourceClusterSupport = DEFAULT_PRIMARY_NODE_ONLY;
-        break;
-      case DEFAULT_ALL_NODES:
-        runsOnPrimaryNodeOnly = false;
-        resultingSourceClusterSupport = DEFAULT_ALL_NODES;
-        break;
-      case NOT_SUPPORTED:
-      default:
-        runsOnPrimaryNodeOnly = true;
-        resultingSourceClusterSupport = SourceClusterSupport.NOT_SUPPORTED;
-    }
-    sourceDeclarer.runsOnPrimaryNodeOnly(runsOnPrimaryNodeOnly);
-    sourceDeclarer.withModelProperty(new SourceClusterSupportModelProperty(resultingSourceClusterSupport));
-  }
 
   private void declareSourceCallbackParameters(Optional<SourceCallbackModelParser> parser,
                                                Supplier<ParameterizedDeclarer> declarer) {

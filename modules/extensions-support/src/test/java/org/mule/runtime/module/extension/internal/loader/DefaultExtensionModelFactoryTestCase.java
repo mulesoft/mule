@@ -75,7 +75,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
-import org.mule.runtime.extension.internal.property.BackPressureStrategyModelProperty;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
