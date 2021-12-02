@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal;
+package org.mule.runtime.config.internal.registry;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
  */
 public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
 
-  private final SpringRegistry springRegistry;
+  private final SpringContextRegistry springRegistry;
   private final ConfigurationDependencyResolver configurationDependencyResolver;
 
   /**
@@ -46,7 +46,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
    * @param springRegistry                  the context spring registry
    */
   public DefaultBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
-                                       SpringRegistry springRegistry) {
+                                       SpringContextRegistry springRegistry) {
     this.configurationDependencyResolver = configurationDependencyResolver;
     this.springRegistry = springRegistry;
   }
@@ -88,7 +88,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
     if (object instanceof InjectedDependenciesProvider) {
       ((InjectedDependenciesProvider) object).getInjectedDependencies()
           .forEach(dependency -> dependency
-              .reduce(type -> Stream.of(springRegistry.applicationContext.getBeanNamesForType(dependency.getLeft()))
+              .reduce(type -> Stream.of(springRegistry.getBeanNamesForType(dependency.getLeft()))
                   .map(name -> new Pair<>(name, springRegistry.get(name)))
                   .collect(toList()), name -> asList(new Pair<>(name, springRegistry.get(name))))
               .forEach(pair -> addDependency(node, pair.getFirst(), pair.getSecond(), processedKeys)));

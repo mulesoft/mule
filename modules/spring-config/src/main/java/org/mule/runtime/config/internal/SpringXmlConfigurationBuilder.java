@@ -11,7 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
-import static org.mule.runtime.config.internal.SpringRegistry.SPRING_APPLICATION_CONTEXT;
+import static org.mule.runtime.config.internal.registry.SpringRegistry.SPRING_APPLICATION_CONTEXT;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
@@ -25,12 +25,10 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -46,7 +44,8 @@ import org.mule.runtime.config.internal.dsl.model.config.ConfigurationProperties
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
-import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
+import org.mule.runtime.config.internal.registry.SpringRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -158,26 +157,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
     baseMuleArtifactContext.refresh();
+    BaseSpringRegistry baseRegistry = new BaseSpringRegistry(baseMuleArtifactContext, muleContext,
+                                                             ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
 
-    ((DefaultMuleContext) muleContext).setInjector(new Injector() {
-
-      @Override
-      public <T> T inject(T object) {
-        try {
-          return initialiseObject((ConfigurableApplicationContext) baseMuleArtifactContext, EMPTY, object);
-        } catch (LifecycleException e) {
-          throw new MuleRuntimeException(e);
-        } catch (Exception e) {
-          throw new MuleRuntimeException(new LifecycleException(e, object));
-        }
-      }
-
-      private <T> T initialiseObject(ConfigurableApplicationContext applicationContext, String key, T object)
-          throws LifecycleException {
-        applicationContext.getBeanFactory().autowireBean(object);
-        return (T) applicationContext.getBeanFactory().initializeBean(object, key);
-      }
-    });
+    ((DefaultMuleContext) muleContext).setRegistry(baseRegistry);
+    ((DefaultMuleContext) muleContext).setInjector(baseRegistry);
 
     muleArtifactContext = createApplicationContext(muleContext,
                                                    baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
@@ -185,7 +169,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
                                                    baseMuleArtifactContext.getBean(FeatureFlaggingService.class));
     muleArtifactContext.setParent(baseMuleArtifactContext);
-    createSpringRegistry(muleContext, baseMuleArtifactContext, muleArtifactContext);
+    createSpringRegistry((DefaultMuleContext) muleContext, baseMuleArtifactContext, muleArtifactContext);
   }
 
   /**
@@ -358,7 +342,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     return parentLazyComponentInitializer;
   }
 
-  private void createSpringRegistry(MuleContext muleContext, ApplicationContext baseApplicationContext,
+  private void createSpringRegistry(DefaultMuleContext muleContext, ApplicationContext baseApplicationContext,
                                     MuleArtifactContext applicationContext)
       throws Exception {
     SpringRegistry registry;
@@ -368,11 +352,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     } else {
       registry = new SpringRegistry(baseApplicationContext, applicationContext, muleContext,
                                     new ConfigurationDependencyResolver(applicationContext.getApplicationModel()),
-                                    ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
+                                    muleContext.getLifecycleInterceptor());
     }
 
-    ((MuleContextWithRegistry) muleContext).setRegistry(registry);
-    ((DefaultMuleContext) muleContext).setInjector(registry);
+    muleContext.setRegistry(registry);
+    muleContext.setInjector(registry);
   }
 
   private SpringRegistry createRegistryWithParentContext(MuleContext muleContext,
