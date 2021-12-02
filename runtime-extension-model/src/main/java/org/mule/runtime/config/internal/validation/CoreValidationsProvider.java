@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.validation.ArtifactValidation;
@@ -23,7 +24,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
   private ClassLoader artifactRegionClassLoader;
 
   @Inject
-  private final Optional<FeatureFlaggingService> featureFlaggingService = Optional.empty();
+  private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
 
   @Override
   public List<Validation> get() {
