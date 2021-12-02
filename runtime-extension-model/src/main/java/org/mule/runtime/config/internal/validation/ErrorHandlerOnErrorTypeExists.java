@@ -31,7 +31,7 @@ import java.util.function.Predicate;
  */
 public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation {
 
-  public ErrorHandlerOnErrorTypeExists(FeatureFlaggingService featureFlaggingService) {
+  public ErrorHandlerOnErrorTypeExists(Optional<FeatureFlaggingService> featureFlaggingService) {
     super(featureFlaggingService);
   }
 

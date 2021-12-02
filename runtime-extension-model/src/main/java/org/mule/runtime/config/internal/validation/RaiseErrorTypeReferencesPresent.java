@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class RaiseErrorTypeReferencesPresent extends AbstractErrorTypesValidation {
 
-  public RaiseErrorTypeReferencesPresent(FeatureFlaggingService featureFlaggingService) {
+  public RaiseErrorTypeReferencesPresent(Optional<FeatureFlaggingService> featureFlaggingService) {
     super(featureFlaggingService);
   }
 
