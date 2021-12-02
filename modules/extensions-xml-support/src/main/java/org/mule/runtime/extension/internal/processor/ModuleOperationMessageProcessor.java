@@ -162,7 +162,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   /**
    * Plains the complete list of configurations and connections for the parameterized {@link ExtensionModel}
    *
-   * @param extensionModel looks for all the the parameters of the configuration and connection.
+   * @param extensionModel looks for all the parameters of the configuration and connection.
    * @return a list of {@link ParameterModel} that will not repeat their {@link ParameterModel#getName()}s.
    */
   private List<ParameterModel> getAllProperties(ExtensionModel extensionModel) {
@@ -354,18 +354,21 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     InternalEvent.Builder builder = InternalEvent.builder(event.getContext());
     builder.message(builder().nullValue().build());
 
-    Map<String, Pair<Object, MetadataType>> resolvedProperties;
     // If this operation is called from an outer operation, we need to obtain the config from the previous caller in order to
     // populate the event variables as expected.
-    if (properties.isEmpty() && event.getVariables().containsKey(MODULE_OPERATION_CONFIG_REF)) {
-      resolvedProperties = parseParameters(createPropertiesFromConfigName((String) event.getVariables()
-          .get(MODULE_OPERATION_CONFIG_REF).getValue()), allProperties);
-    } else {
-      resolvedProperties = properties;
-    }
-    addVariables(event, builder, resolvedProperties);
+    Map<String, Pair<Object, MetadataType>> resolvedProperties = properties;
+    TypedValue<?> configRef = event.getVariables().get(MODULE_OPERATION_CONFIG_REF);
+    if (configRef != null) {
+      builder.addVariable(MODULE_OPERATION_CONFIG_REF, configRef.getValue());
 
+      if (properties.isEmpty()) {
+        resolvedProperties = parseParameters(createPropertiesFromConfigName((String) configRef.getValue()), allProperties);
+      }
+    }
+
+    addVariables(event, builder, resolvedProperties);
     addVariables(event, builder, parameters);
+
     builder.internalParameters(((InternalEvent) event).getInternalParameters());
     builder.addInternalParameter(getParameterId(ORIGINAL_EVENT_KEY, event), event);
     builder.securityContext(event.getSecurityContext());
