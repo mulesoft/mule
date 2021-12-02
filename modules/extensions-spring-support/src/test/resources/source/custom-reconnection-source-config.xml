@@ -47,4 +47,24 @@
         <set-payload value="100"/>
     </flow>
 
+    <flow name="successfulCustomReconnectionSdkApi" initialState="stopped">
+        <!--invalid initialBatchNumber with negative value -->
+        <heisenberg:sdk-reconnectable-listen-payments config-ref="heisenberg" initialBatchNumber="-1" reconnectable="true">
+            <heisenberg:success-info knownAddresses="#[[]]"/>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:sdk-reconnectable-listen-payments>
+
+        <set-payload value="100"/>
+    </flow>
+
+    <flow name="failingCustomReconnectionSdkApi" initialState="stopped">
+        <!--invalid initialBatchNumber with negative value -->
+        <heisenberg:sdk-reconnectable-listen-payments config-ref="heisenberg" initialBatchNumber="-1" reconnectable="false">
+            <heisenberg:success-info knownAddresses="#[[]]"/>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:sdk-reconnectable-listen-payments>
+
+        <set-payload value="100"/>
+    </flow>
+
 </mule>

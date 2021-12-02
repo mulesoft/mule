@@ -24,8 +24,8 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
+import org.mule.sdk.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 

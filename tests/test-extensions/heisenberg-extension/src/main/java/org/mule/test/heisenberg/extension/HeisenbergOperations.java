@@ -539,7 +539,7 @@ public class HeisenbergOperations implements Disposable {
     return phoneNumbers;
   }
 
-  @OnException(NullExceptionEnricher.class)
+  @org.mule.sdk.api.annotation.OnException(NullExceptionEnricher.class)
   public void failToExecute() throws HeisenbergException {
     callGusFring();
   }

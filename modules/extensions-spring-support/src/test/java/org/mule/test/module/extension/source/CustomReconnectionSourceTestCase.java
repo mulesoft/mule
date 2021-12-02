@@ -13,6 +13,8 @@ import static org.mule.test.allure.AllureConstants.ReconnectionPolicyFeature.REC
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.heisenberg.extension.ReconnectableHeisenbergSource.failedReconnections;
 import static org.mule.test.heisenberg.extension.ReconnectableHeisenbergSource.succesfulReconnections;
+import static org.mule.test.heisenberg.extension.ReconnectableHeisenbergSdkSource.failedReconnectionsSdk;
+import static org.mule.test.heisenberg.extension.ReconnectableHeisenbergSdkSource.succesfulReconnectionsSdk;
 
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -64,6 +66,20 @@ public class CustomReconnectionSourceTestCase extends AbstractExtensionFunctiona
     assertThat(succesfulReconnections, is(0));
   }
 
+  @Test
+  public void successfulCustomReconnectionSdkApi() throws Exception {
+    startFlow("successfulCustomReconnectionSdkApi");
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> succesfulReconnectionsSdk > 1);
+    assertThat(failedReconnectionsSdk, is(0));
+  }
+
+  @Test
+  public void failingCustomReconnectionSdkApi() throws Exception {
+    startFlow("failingCustomReconnectionSdkApi");
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> failedReconnectionsSdk > 0);
+    assertThat(succesfulReconnectionsSdk, is(0));
+  }
+
   private void startFlow(String flowName) throws Exception {
     ((Flow) getFlowConstruct(flowName)).start();
   }
@@ -71,5 +87,7 @@ public class CustomReconnectionSourceTestCase extends AbstractExtensionFunctiona
   private void reset() {
     succesfulReconnections = 0;
     failedReconnections = 0;
+    failedReconnectionsSdk = 0;
+    succesfulReconnectionsSdk = 0;
   }
 }

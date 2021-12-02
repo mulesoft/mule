@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.sdk.api.runtime.exception.ExceptionHandlerFactory;
 
 /**
  * Model property to be used on components which support the use of an {@link ExceptionHandler}. This property gives access to a
