@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -36,7 +37,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.google.common.collect.ImmutableList;
 
@@ -84,7 +84,7 @@ public abstract class AbstractCoreValidationTestCase {
         .build();
   }
 
-  protected Optional<ValidationResultItem> runValidation(final String... xmlConfigs) {
+  protected List<ValidationResultItem> runValidation(final String... xmlConfigs) {
     final List<Pair<String, InputStream>> configs = new ArrayList<>();
 
     for (int i = 0; i < xmlConfigs.length; i++) {
@@ -96,10 +96,8 @@ public abstract class AbstractCoreValidationTestCase {
     return recursiveStreamWithHierarchy(ast)
         .filter(c -> getValidation().applicable()
             .test(ImmutableList.<ComponentAst>builder().addAll(c.getSecond()).add(c.getFirst()).build()))
-        .map(c -> getValidation().validate(c.getFirst(), ast))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst();
+        .flatMap(c -> getValidation().validateMany(c.getFirst(), ast).stream())
+        .collect(toList());
   }
 
   protected abstract Validation getValidation();

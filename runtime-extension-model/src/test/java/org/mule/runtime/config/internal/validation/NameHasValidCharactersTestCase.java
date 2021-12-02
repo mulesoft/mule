@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -46,7 +47,8 @@ public class NameHasValidCharactersTestCase extends AbstractCoreValidationTestCa
         "        </error-handler>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>");
+        "</mule>")
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Invalid global element name 'flow/myFlow'. Problem is: Invalid character used in location. Invalid characters are /,[,],{,},#"));
