@@ -80,7 +80,6 @@ import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinit
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
@@ -90,6 +89,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.sdk.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.heisenberg.extension.AsyncHeisenbergSource;

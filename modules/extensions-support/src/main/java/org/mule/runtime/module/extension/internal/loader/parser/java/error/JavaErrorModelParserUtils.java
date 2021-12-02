@@ -38,6 +38,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionHandlerFactory;
+import org.mule.runtime.module.extension.internal.runtime.exception.SdkExceptionHandlerAdapter;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.HashMap;
@@ -125,7 +126,7 @@ public final class JavaErrorModelParserUtils {
 
     return classValue
         .flatMap(c -> c.getDeclaringClass())
-        .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory((Class<? extends ExceptionHandler>) clazz)));
+        .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory(clazz)));
   }
 
   private static List<ErrorModelParser> parseErrorTypeDefinitions(Type type) {

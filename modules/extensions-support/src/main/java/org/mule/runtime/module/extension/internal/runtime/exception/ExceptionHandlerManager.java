@@ -17,8 +17,8 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 
 import java.util.Optional;
 import java.util.function.Predicate;

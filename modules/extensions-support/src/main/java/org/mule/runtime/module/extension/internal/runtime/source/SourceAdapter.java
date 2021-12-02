@@ -525,8 +525,10 @@ public class SourceAdapter implements Lifecycle, Restartable {
       return of(
                 create(sink -> ((Reconnectable) sourceInvokationTarget.get()).reconnect(e,
                                                                                         new ReactiveReconnectionCallback(sink))));
+    } else if (sourceInvokationTarget.get() instanceof org.mule.sdk.api.runtime.connectivity.Reconnectable) {
+      return of(create(sink -> ((org.mule.sdk.api.runtime.connectivity.Reconnectable) sourceInvokationTarget.get())
+          .reconnect(e, new ReactiveReconnectionCallback(sink))));
     }
-
     return empty();
   }
 

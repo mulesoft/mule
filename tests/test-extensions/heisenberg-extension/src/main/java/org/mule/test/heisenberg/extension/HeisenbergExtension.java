@@ -18,7 +18,6 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
@@ -35,10 +34,12 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.sdk.api.annotation.Export;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.ExternalLib;
+import org.mule.sdk.api.annotation.OnException;
 import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.sdk.api.annotation.param.display.Example;
 import org.mule.sdk.api.meta.ExpressionSupport;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
+import org.mule.test.heisenberg.extension.exception.SdkHeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
@@ -63,11 +64,11 @@ import javax.inject.Inject;
 @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT)
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
     KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class, HeisenbergOperationLifecycleValidator.class})
-@OnException(HeisenbergConnectionExceptionEnricher.class)
+@OnException(SdkHeisenbergConnectionExceptionEnricher.class)
 @ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
 @Sources({HeisenbergSource.class, HeisenbergSourceAllOptionalCallbacks.class, DEARadioSource.class, AsyncHeisenbergSource.class})
 @org.mule.sdk.api.annotation.Sources({ReconnectableHeisenbergSource.class, HeisenbergClusterSource.class,
-    IgnoredHeisenbergSource.class, SdkIgnoredHeisenbergSource.class})
+    IgnoredHeisenbergSource.class, SdkIgnoredHeisenbergSource.class, ReconnectableHeisenbergSdkSource.class})
 @Export(classes = {HeisenbergExtension.class, DifferedKnockableDoor.class}, resources = "methRecipe.json")
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Drug.class, subTypes = {Meta.class})
