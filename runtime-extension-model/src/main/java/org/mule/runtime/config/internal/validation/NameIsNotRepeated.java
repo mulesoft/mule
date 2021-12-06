@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsComponentId;
@@ -17,6 +14,10 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -24,6 +25,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -95,8 +97,12 @@ public class NameIsNotRepeated implements Validation {
       return empty();
     }
 
-    return of(create(repeated, this,
-                     "Two configuration elements have been defined with the same global name. Global name '"
+    final List<ComponentAst> allRepeated = new ArrayList<>();
+    allRepeated.add(component);
+    allRepeated.addAll(repeated);
+
+    return of(create(allRepeated, this,
+                     "Two (or more) configuration elements have been defined with the same global name. Global name '"
                          + component.getComponentId().get() + "' must be unique."));
   }
 
