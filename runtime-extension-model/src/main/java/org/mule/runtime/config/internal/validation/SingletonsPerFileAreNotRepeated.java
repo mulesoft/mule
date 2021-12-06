@@ -6,21 +6,11 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
-import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -49,6 +39,7 @@ public class SingletonsPerFileAreNotRepeated extends SingletonsAreNotRepeated {
     return !super.isApplicable(smp);
   }
 
+  @Override
   protected Predicate<? super ComponentAst> additionalFilter(ComponentAst component) {
     return comp -> comp.getMetadata().getFileName().equals(component.getMetadata().getFileName());
   }

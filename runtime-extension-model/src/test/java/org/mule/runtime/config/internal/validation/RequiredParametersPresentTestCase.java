@@ -12,7 +12,7 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DS
 import static java.lang.String.format;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
@@ -28,34 +28,35 @@ import io.qameta.allure.Story;
 
 @Feature(MULE_DSL)
 @Story(DSL_VALIDATION_STORY)
-public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
-
-  private static final String REPEATED_GLOBAL_NAME = "LenderService";
+public class RequiredParametersPresentTestCase extends AbstractCoreValidationTestCase {
 
   @Override
   protected Validation getValidation() {
-    return new NameIsNotRepeated();
+    return new RequiredParametersPresent();
   }
 
   @Test
-  public void repeatedGlobalNames() {
-    final Optional<ValidationResultItem> msg = runValidation(getConfigDsl());
+  public void flowRefWithNoName() {
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+        "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+        +
+        "\n" +
+        "    <flow name=\"flow\">\n" +
+        "        <flow-ref/>\n" +
+        "    </flow>\n" +
+        "    \n" +
+        "</mule>");
 
     assertThat(msg.get().getMessage(),
-               containsString(format("Two (or more) configuration elements have been defined with the same global name. Global name '%s' must be unique",
-                                     REPEATED_GLOBAL_NAME)));
+               containsString(format("Element <flow-ref> is missing required parameter 'name'.")));
   }
 
   @Test
-  @Issue("MULE-19959")
-  public void repeatedGlobalNamesAllReported() {
-    final Optional<ValidationResultItem> msg = runValidation(getConfigDsl());
-
-    assertThat(msg.get().getComponents(), hasSize(2));
-  }
-
-  protected String getConfigDsl() {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+  @Issue("MULE-19899")
+  public void numberParamWithUnresolvedProperty() {
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xmlns:test=\"http://www.mulesoft.org/schema/mule/test\"\n" +
@@ -64,12 +65,11 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
         "               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd\">\n"
         +
         "\n" +
-        "    <test:config name=\"" + REPEATED_GLOBAL_NAME + "\"/>\n" +
+        "    <test:other-config name=\"cfg\" count=\"${other.count}\"/>\n" +
         "\n" +
-        "    <flow name=\"" + REPEATED_GLOBAL_NAME + "\">\n" +
-        "        <logger/>\n" +
-        "    </flow>\n" +
-        "    \n" +
-        "</mule>";
+        "</mule>");
+
+    assertThat(msg.map(r -> r.getMessage()).orElse(null), msg.isPresent(), is(false));
   }
+
 }
