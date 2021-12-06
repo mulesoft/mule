@@ -47,8 +47,7 @@ public class ScatterGatherRoutesTestCase extends AbstractCoreValidationTestCase 
         "        </scatter-gather>\n" +
         "    </flow>\n" +
         "    \n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.get().getMessage(),
                containsString("At least 2 routes are required for 'scatter-gather'."));

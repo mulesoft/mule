@@ -50,8 +50,7 @@ public class ErrorHandlerRefOrOnErrorExclusivenessTestCase extends AbstractCoreV
         "        </error-handler>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.get().getMessage(),
                containsString("A reference 'error-handler' cannot have 'on-error's."));

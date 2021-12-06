@@ -44,8 +44,7 @@ public class NoExpressionsInNoExpressionsSupportedParamsTestCase extends Abstrac
         "        <logger level=\"#['WARN']\"/>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.get().getMessage(),
                containsString("An expression value was given for parameter 'level' but it doesn't support expressions"));
@@ -68,8 +67,7 @@ public class NoExpressionsInNoExpressionsSupportedParamsTestCase extends Abstrac
         "        <logger/>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.get().getMessage(),
                containsString("An expression value was given for parameter 'frequency' but it doesn't support expressions"));

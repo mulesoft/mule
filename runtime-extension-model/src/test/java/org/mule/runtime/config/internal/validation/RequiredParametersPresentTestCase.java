@@ -12,14 +12,12 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DS
 import static java.lang.String.format;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -49,8 +47,7 @@ public class RequiredParametersPresentTestCase extends AbstractCoreValidationTes
         "        <flow-ref/>\n" +
         "    </flow>\n" +
         "    \n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.get().getMessage(),
                containsString(format("Element <flow-ref> is missing required parameter 'name'.")));
@@ -70,25 +67,9 @@ public class RequiredParametersPresentTestCase extends AbstractCoreValidationTes
         "\n" +
         "    <test:other-config name=\"cfg\" count=\"${other.count}\"/>\n" +
         "\n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.map(r -> r.getMessage()).orElse(null), msg.isPresent(), is(false));
   }
 
-  @Test
-  @Issue("MULE-19963")
-  public void manyRequiredMissingAllReported() {
-    final List<ValidationResultItem> msgs = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
-        +
-        "\n" +
-        "    <global-property/>\n" +
-        "\n" +
-        "</mule>");
-
-    assertThat(msgs, hasSize(2));
-  }
 }

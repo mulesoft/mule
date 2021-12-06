@@ -65,8 +65,7 @@ public class SingletonsAreNotRepeatedTestCase extends AbstractCoreValidationTest
                                                                  + " defaultTransactionTimeout=\"30000\"/>\n" +
                                                                  "\n" +
                                                                  "</mule>\n" +
-                                                                 "")
-                                                                     .stream().findFirst();
+                                                                 "");
 
     assertThat(msg.get().getMessage(),
                containsString(format("The configuration element '%s' can only appear once",

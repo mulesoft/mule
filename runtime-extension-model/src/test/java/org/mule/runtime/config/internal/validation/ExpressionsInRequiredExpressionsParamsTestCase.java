@@ -33,8 +33,7 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
         "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
         "    <configuration correlationIdGeneratorExpression=\"1, 2, 3\"/>\n" +
         "\n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.isPresent(), is(true));
     assertThat(msg.get().getMessage(),
@@ -54,8 +53,7 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
         "        </foreach>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.isPresent(), is(false));
   }

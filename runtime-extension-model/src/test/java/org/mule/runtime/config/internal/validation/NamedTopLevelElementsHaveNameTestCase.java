@@ -45,8 +45,7 @@ public class NamedTopLevelElementsHaveNameTestCase extends AbstractCoreValidatio
         "    <flow>\n" +
         "        <logger/>\n" +
         "    </flow>\n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.get().getMessage(),
                containsString("Global element 'flow' does not provide a name attribute."));
