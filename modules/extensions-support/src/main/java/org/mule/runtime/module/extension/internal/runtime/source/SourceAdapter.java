@@ -65,7 +65,6 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
@@ -73,6 +72,7 @@ import org.mule.runtime.extension.internal.property.TransactionalTypeModelProper
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveReconnectionCallback;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.SdkReconnectableAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -81,6 +81,7 @@ import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySo
 import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.Restartable;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
+import org.mule.sdk.api.runtime.connectivity.Reconnectable;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 
@@ -521,13 +522,9 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   Optional<Publisher<Void>> getReconnectionAction(ConnectionException e) {
-    if (sourceInvokationTarget.get() instanceof Reconnectable) {
-      return of(
-                create(sink -> ((Reconnectable) sourceInvokationTarget.get()).reconnect(e,
-                                                                                        new ReactiveReconnectionCallback(sink))));
-    } else if (sourceInvokationTarget.get() instanceof org.mule.sdk.api.runtime.connectivity.Reconnectable) {
-      return of(create(sink -> ((org.mule.sdk.api.runtime.connectivity.Reconnectable) sourceInvokationTarget.get())
-          .reconnect(e, new ReactiveReconnectionCallback(sink))));
+    Reconnectable adapter = SdkReconnectableAdapter.from(sourceInvokationTarget.get());
+    if (adapter != null) {
+      return of(create(sink -> (adapter).reconnect(e, new ReactiveReconnectionCallback(sink))));
     }
     return empty();
   }

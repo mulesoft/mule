@@ -16,16 +16,24 @@ import org.mule.sdk.api.runtime.exception.ExceptionHandler;
  */
 public class SdkExceptionHandlerAdapter extends ExceptionHandler {
 
-  public SdkExceptionHandlerAdapter(org.mule.runtime.extension.api.runtime.exception.ExceptionHandler handler) {
+  private final org.mule.runtime.extension.api.runtime.exception.ExceptionHandler delegate;
 
+  public static ExceptionHandler from(Object value) {
+    if (value instanceof ExceptionHandler) {
+      return (ExceptionHandler) value;
+    } else if (value instanceof org.mule.runtime.extension.api.runtime.exception.ExceptionHandler) {
+      return new SdkExceptionHandlerAdapter((org.mule.runtime.extension.api.runtime.exception.ExceptionHandler) value);
+    } else {
+      throw new IllegalArgumentException("Unsupported type: " + value.getClass());
+    }
   }
 
-  public SdkExceptionHandlerAdapter(ExceptionHandler handler) {
-
+  public SdkExceptionHandlerAdapter(org.mule.runtime.extension.api.runtime.exception.ExceptionHandler exceptionHandler) {
+    this.delegate = exceptionHandler;
   }
 
   @Override
   public Exception enrichException(Exception e) {
-    return null;
+    return delegate.enrichException(e);
   }
 }

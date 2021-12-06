@@ -27,7 +27,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
@@ -144,8 +143,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
-    return sourceElement.getAnnotation(MediaType.class)
-        .map(a -> new MediaTypeModelProperty(a.value(), a.strict()));
+    return JavaExtensionModelParserUtils.getMediaTypeModelProperty(sourceElement, "Source", getName());
   }
 
   @Override
