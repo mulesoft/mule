@@ -55,15 +55,17 @@ public abstract class AbstractErrorTypesValidation implements Validation {
   protected static final ComponentIdentifier ON_ERROR_CONTINUE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
 
-  private final FeatureFlaggingService featureFlaggingService;
+  private final Optional<FeatureFlaggingService> featureFlaggingService;
 
-  public AbstractErrorTypesValidation(FeatureFlaggingService featureFlaggingService) {
+  public AbstractErrorTypesValidation(Optional<FeatureFlaggingService> featureFlaggingService) {
     this.featureFlaggingService = featureFlaggingService;
   }
 
   @Override
   public Level getLevel() {
-    return featureFlaggingService.isEnabled(ENFORCE_ERROR_TYPES_VALIDATION) ? ERROR : WARN;
+    return featureFlaggingService.map(ffs -> ffs.isEnabled(ENFORCE_ERROR_TYPES_VALIDATION)).orElse(true)
+        ? ERROR
+        : WARN;
   }
 
   protected static boolean errorMappingPresent(ComponentAst operationComponent) {

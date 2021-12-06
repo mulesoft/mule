@@ -34,7 +34,7 @@ import java.util.function.Predicate;
  */
 public class ErrorMappingTargetTypeReferencesExist extends AbstractErrorTypesValidation {
 
-  public ErrorMappingTargetTypeReferencesExist(FeatureFlaggingService featureFlaggingService) {
+  public ErrorMappingTargetTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService) {
     super(featureFlaggingService);
   }
 
