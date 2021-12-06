@@ -7,10 +7,6 @@
 
 package org.mule.runtime.core.api.profiling;
 
-import static com.google.common.collect.ImmutableSet.of;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -21,9 +17,16 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.enableProfilingFeatureTestConsumer;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
+
+import static java.util.Arrays.asList;
+
+import static com.google.common.collect.ImmutableSet.of;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -105,6 +108,17 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     when(identifier.getName()).thenReturn("test");
     when(identifier.getNamespace()).thenReturn("test");
     profilingService = getTestProfilingService();
+    enableProfilingFeatures();
+  }
+
+  private void enableProfilingFeatures() {
+    eventType().forEach(eventType -> {
+      try {
+        enableProfilingFeatureTestConsumer(muleContext, eventType, true);
+      } catch (Exception e) {
+        throw new RuntimeException();
+      }
+    });
   }
 
   private ProfilingService getTestProfilingService() throws MuleException {
@@ -128,7 +142,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   @Test
   @Description("When a profiling event related to processing strategy is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForProcessingStrategiesProfilingEventTypesConsumeDataAccordingly() {
-    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext> dataProducer =
+    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, Object> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
     ComponentProcessingStrategyProfilingEventContext profilerEventContext =

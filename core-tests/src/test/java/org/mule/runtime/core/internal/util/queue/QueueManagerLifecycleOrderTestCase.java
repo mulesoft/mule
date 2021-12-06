@@ -8,11 +8,13 @@ package org.mule.runtime.core.internal.util.queue;
 
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
+import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import static java.util.Collections.emptyList;
@@ -40,6 +42,7 @@ import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
+import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -76,6 +79,11 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestC
     objects.put(OBJECT_QUEUE_MANAGER, rtqm);
     objects.put(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
     objects.put(INTERCEPTOR_MANAGER_REGISTRY_KEY, mock(InterceptorManager.class));
+    CoreProfilingService coreProfilingService = mock(CoreProfilingService.class);
+    objects.put(MULE_PROFILING_SERVICE_KEY, coreProfilingService);
+
+    mockProcessingStrategyProfilingChainWithoutTriggeringEvent(coreProfilingService);
+
     muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                                     new SimpleConfigurationBuilder(objects));
     testServicesConfigurationBuilder.configure(muleContext);

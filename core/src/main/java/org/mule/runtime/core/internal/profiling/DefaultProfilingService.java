@@ -7,41 +7,35 @@
 
 package org.mule.runtime.core.internal.profiling;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
-import static java.util.Optional.empty;
-import static java.lang.String.format;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import static java.util.Optional.empty;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
-import org.mule.runtime.core.internal.profiling.producer.ComponentProcessingStrategyProfilingDataProducer;
-import org.mule.runtime.core.internal.profiling.producer.ComponentThreadingProfilingDataProducer;
-import org.mule.runtime.core.internal.profiling.producer.ExtensionProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import javax.inject.Inject;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+
 
 /**
  * Default diagnostic service for the runtime.
@@ -52,48 +46,44 @@ import javax.inject.Inject;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
+  @Inject
+  private ProfilingFeatureFlaggingService featureFlaggingService;
+
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
   private ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 
-  protected Map<ProfilingEventType<? extends ProfilingEventContext>, ProfilingDataProducer<?>> profilingDataProducers =
-      new HashMap() {
+  private ProfilingDataProducerResolver profilingDataProducerResolver;
 
-        {
-          put(FLOW_EXECUTED,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, FLOW_EXECUTED));
-          put(PS_SCHEDULING_FLOW_EXECUTION,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_SCHEDULING_FLOW_EXECUTION));
-          put(STARTING_FLOW_EXECUTION,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, STARTING_FLOW_EXECUTION));
-          put(PS_FLOW_MESSAGE_PASSING,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_FLOW_MESSAGE_PASSING));
-          put(PS_OPERATION_EXECUTED,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this, PS_OPERATION_EXECUTED));
-          put(PS_SCHEDULING_OPERATION_EXECUTION,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
-                                                                   PS_SCHEDULING_OPERATION_EXECUTION));
-          put(PS_STARTING_OPERATION_EXECUTION,
-              new ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService.this,
-                                                                   PS_STARTING_OPERATION_EXECUTION));
-          put(EXTENSION_PROFILING_EVENT,
-              new ExtensionProfilingDataProducer(DefaultProfilingService.this,
-                                                 EXTENSION_PROFILING_EVENT));
-          put(STARTING_OPERATION_EXECUTION,
-              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, STARTING_OPERATION_EXECUTION,
-                                                          threadSnapshotCollector));
-          put(OPERATION_THREAD_RELEASE,
-              new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, OPERATION_THREAD_RELEASE,
-                                                          threadSnapshotCollector));
-          put(OPERATION_EXECUTED, new ComponentThreadingProfilingDataProducer(DefaultProfilingService.this, OPERATION_EXECUTED,
-                                                                              threadSnapshotCollector));
-        }
-      };
+
+  private final Map<ProfilingEventType<?>, Map<ProfilingProducerScope, ResettableProfilingDataProducer<?, ?>>> profilingDataProducers =
+      new ConcurrentHashMap<>();
 
   @Override
-  public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
-                                                                              ProfilingDataProducer<T> profilingDataProducer) {
-    profilingDataProducers.put(profilingEventType, profilingDataProducer);
+  public <T extends ProfilingEventContext, S> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
+                                                                                 ProfilingDataProducer<T, S> profilingDataProducer) {
+    profilingDataProducers
+        .computeIfAbsent(profilingEventType,
+                         profEventType -> new ConcurrentHashMap<>())
+        .put(new ArtifactProfilingProducerScope(getArtifactId(muleContext)),
+             new ResettableProfilingDataProducerDelegate<T, S>(profilingDataProducer, profDataProducer -> {
+               if (profDataProducer instanceof ResettableProfilingDataProducer) {
+                 ((ResettableProfilingDataProducer<T, S>) profDataProducer).reset();
+               }
+             }));
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseProfilingDataProducerIfNeeded();
+    super.initialise();
+  }
+
+  @Override
+  protected void onDataConsumersRegistered() {
+    profilingDataProducers
+        .values()
+        .forEach(producers -> producers.values().forEach(ResettableProfilingDataProducer::reset));
   }
 
   @Override
@@ -102,13 +92,30 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Override
-  public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(
-                                                                                             ProfilingEventType<T> profilingEventType) {
-    if (!profilingDataProducers.containsKey(profilingEventType)) {
-      throw new MuleRuntimeException((createStaticMessage(format("Profiling event type not registered: %s",
-                                                                 profilingEventType))));
+  public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
+                                                                                                   ProfilingEventType<T> profilingEventType) {
+    return getProfilingDataProducer(profilingEventType,
+                                    new ArtifactProfilingProducerScope(getArtifactId(muleContext)));
+  }
+
+  @Override
+  public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
+                                                                                                   ProfilingEventType<T> profilingEventType,
+                                                                                                   ProfilingProducerScope profilingProducerScope) {
+    initialiseProfilingDataProducerIfNeeded();
+
+    return (ProfilingDataProducer<T, S>) profilingDataProducers
+        .computeIfAbsent(profilingEventType,
+                         profEventType -> new ConcurrentHashMap<>())
+        .computeIfAbsent(profilingProducerScope,
+                         profilingProdScope -> profilingDataProducerResolver
+                             .getProfilingDataProducer(profilingEventType, profilingProducerScope));
+  }
+
+  private void initialiseProfilingDataProducerIfNeeded() {
+    if (profilingDataProducerResolver == null) {
+      profilingDataProducerResolver = new ProfilingDataProducerResolver(this, threadSnapshotCollector, featureFlaggingService);
     }
-    return (ProfilingDataProducer<T>) profilingDataProducers.get(profilingEventType);
   }
 
   @Override
@@ -120,7 +127,22 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Inject
-  public void setProfilingDataConsumerDiscoveryStrategies(Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies) {
+  public void setProfilingDataConsumerDiscoveryStrategies(
+                                                          Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies) {
     this.profilingDataConsumerDiscoveryStrategies = profilingDataConsumerDiscoveryStrategies;
+  }
+
+  @Override
+  public <T extends ProfilingEventContext, S> Mono<S> enrichWithProfilingEventMono(Mono<S> original,
+                                                                                   ProfilingDataProducer<T, S> dataProducer,
+                                                                                   Function<S, T> transformer) {
+    return original.doOnNext(s -> dataProducer.triggerProfilingEvent(s, transformer));
+  }
+
+  @Override
+  public <T extends ProfilingEventContext, S> Flux<S> enrichWithProfilingEventFlux(Flux<S> original,
+                                                                                   ProfilingDataProducer<T, S> dataProducer,
+                                                                                   Function<S, T> transformer) {
+    return original.doOnNext(s -> dataProducer.triggerProfilingEvent(s, transformer));
   }
 }

@@ -61,6 +61,7 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -84,6 +85,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -112,7 +114,13 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     @Override
     public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return () -> singleton(profilingDataConsumer);
+      return new ProfilingDataConsumerDiscoveryStrategy() {
+
+        @Override
+        public Set<ProfilingDataConsumer<?>> discover() {
+          return singleton(profilingDataConsumer);
+        }
+      };
     }
   };
 
@@ -384,7 +392,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory(
+                                   (context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     1,
                                                                                                     () -> cpuLight,
                                                                                                     () -> cpuLight,
@@ -408,7 +417,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("If max concurrency is 2, only 2 threads are used for CPU_LITE processors and further requests blocks.")
   public void singleCpuLightConcurrentMaxConcurrency2() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory(
+                                   (context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     2,
                                                                                                     () -> cpuLight,
                                                                                                     () -> cpuLight,
@@ -434,7 +444,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     assumeThat(mode, is(SOURCE));
 
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory(
+                                   (context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     2,
                                                                                                     () -> cpuLight,
                                                                                                     () -> cpuLight,
@@ -460,7 +471,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     assumeThat(mode, is(SOURCE));
 
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory(
+                                   (context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     2,
                                                                                                     () -> cpuLight,
                                                                                                     () -> cpuLight,
