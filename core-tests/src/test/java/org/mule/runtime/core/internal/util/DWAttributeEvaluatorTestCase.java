@@ -116,7 +116,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getJavaPojo() throws MuleException {
     AttributeEvaluator attributeEvaluator =
-      getAttributeEvaluator(DW_CAR, DataType.fromType(Car.class));
+        getAttributeEvaluator(DW_CAR, DataType.fromType(Car.class));
     Object car = attributeEvaluator.resolveValue(newEvent());
     assertThat(car, is(allOf(hasProperty("color", is("RED")), hasProperty("price", is(1000)))));
   }
@@ -139,7 +139,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getListOfCarsFromJsonCar() throws MuleException {
     AttributeEvaluator attributeEvaluator =
-      getAttributeEvaluator("#[[payload]]", CAR_LIST_DATA_TYPE);
+        getAttributeEvaluator("#[[payload]]", CAR_LIST_DATA_TYPE);
     List<Car> cars = attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
     Car car = cars.get(0);
     assertThat(car, is(allOf(hasProperty("color", is("RED")), hasProperty("price", is(1000)))));
@@ -148,7 +148,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getListOfCarsFromExpression() throws MuleException {
     AttributeEvaluator attributeEvaluator =
-      getAttributeEvaluator(DW_CAR_LIST, CAR_LIST_DATA_TYPE);
+        getAttributeEvaluator(DW_CAR_LIST, CAR_LIST_DATA_TYPE);
     List<Car> cars = attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
     Car car = cars.get(0);
     assertThat(car, is(allOf(hasProperty("color", is("RED")), hasProperty("price", is(1000)))));
@@ -199,11 +199,11 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
 
   private CoreEvent newEvent(Object payload, MediaType applicationJson) throws MuleException {
     return CoreEvent.builder(this.<CoreEvent>newEvent())
-      .message(Message.builder()
-                 .value(payload)
-                 .mediaType(applicationJson)
-                 .build())
-      .build();
+        .message(Message.builder()
+            .value(payload)
+            .mediaType(applicationJson)
+            .build())
+        .build();
   }
 
   private AttributeEvaluator getAttributeEvaluator(String expression) {
