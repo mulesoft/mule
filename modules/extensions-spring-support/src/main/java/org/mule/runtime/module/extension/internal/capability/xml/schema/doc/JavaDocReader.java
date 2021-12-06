@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.doc;
 
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.jsoup.safety.Safelist.none;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocReader.ParsingState.ON_BODY;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocReader.ParsingState.ON_PARAM;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocReader.ParsingState.UNSUPPORTED;
@@ -22,7 +23,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
 /**
  * JavaDoc Reader which encapsulates the logic of parsing JavaDocs.
@@ -40,9 +41,9 @@ public class JavaDocReader {
   private static final char OPENING_BRACKET_CHAR = '{';
   private static final char LESS_THAN_CHAR = '<';
   private static final char GREATER_THAN_CHAR = '>';
-  public static final Whitelist WHITELIST = Whitelist.none().addTags("a").addAttributes("a", "href")
+  public static final Safelist SAFELIST = none().addTags("a").addAttributes("a", "href")
       .addProtocols("a", "href", "http", "https");
-  public static final Whitelist NONE = Whitelist.none();
+  public static final Safelist NONE = none();
 
   /**
    * Extracts the JavaDoc of an element and parses it returning a easy to consume {@link JavaDocModel}
@@ -125,7 +126,7 @@ public class JavaDocReader {
    * url[Inner].
    */
   private static String removeHTML(String text) {
-    String textWithAnchors = Jsoup.clean(text, WHITELIST);
+    String textWithAnchors = Jsoup.clean(text, SAFELIST);
     Document htmlDoc = Jsoup.parseBodyFragment(textWithAnchors);
     for (org.jsoup.nodes.Element anchor : htmlDoc.select("a")) {
       anchor.html(anchor.attr("href") + "[" + anchor.html() + "]");
