@@ -588,32 +588,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                        .build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("expression-language")
-        .withTypeDefinition(fromType(MVELExpressionLanguage.class))
-        .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
-        .withSetterParameterDefinition("autoResolveVariables", fromSimpleParameter("autoResolveVariables").build())
-        .withSetterParameterDefinition("globalFunctions", fromChildConfiguration(MVELGlobalFunctionsConfig.class).build())
-        .withSetterParameterDefinition("imports", fromChildCollectionConfiguration(ImportEntry.class).build())
-        .withSetterParameterDefinition("aliases", fromChildCollectionConfiguration(AliasEntry.class).build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("import")
-        .withTypeDefinition(fromType(ImportEntry.class))
-        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("class", stringToClassConverter()).build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("alias")
-        .withTypeDefinition(fromType(AliasEntry.class))
-        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("expression").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("global-functions")
-        .withTypeDefinition(fromType(MVELGlobalFunctionsConfig.class))
-        .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
-        .withSetterParameterDefinition("inlineScript", fromTextContent().build())
-        .build());
+    componentBuildingDefinitions.addAll(getMvelBuildingDefinitions());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
 
@@ -662,6 +637,40 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     return definitions;
   }
+
+  private List<ComponentBuildingDefinition> getMvelBuildingDefinitions() {
+    List<ComponentBuildingDefinition> mvelComponentBuildingDefinitions = new ArrayList<>();
+
+    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("expression-language")
+        .withTypeDefinition(fromType(MVELExpressionLanguage.class))
+        .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
+        .withSetterParameterDefinition("autoResolveVariables", fromSimpleParameter("autoResolveVariables").build())
+        .withSetterParameterDefinition("globalFunctions", fromChildConfiguration(MVELGlobalFunctionsConfig.class).build())
+        .withSetterParameterDefinition("imports", fromChildCollectionConfiguration(ImportEntry.class).build())
+        .withSetterParameterDefinition("aliases", fromChildCollectionConfiguration(AliasEntry.class).build())
+        .build());
+
+    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("import")
+        .withTypeDefinition(fromType(ImportEntry.class))
+        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("value", fromSimpleParameter("class", stringToClassConverter()).build())
+        .build());
+
+    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("alias")
+        .withTypeDefinition(fromType(AliasEntry.class))
+        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("value", fromSimpleParameter("expression").build())
+        .build());
+
+    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("global-functions")
+        .withTypeDefinition(fromType(MVELGlobalFunctionsConfig.class))
+        .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
+        .withSetterParameterDefinition("inlineScript", fromTextContent().build())
+        .build());
+
+    return mvelComponentBuildingDefinitions;
+  }
+
 
   @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {

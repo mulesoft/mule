@@ -21,13 +21,14 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class ConfigReferenceParametersStereotypesValidations extends AbstractReferenceParametersStereotypesValidations {
 
-  private final FeatureFlaggingService featureFlaggingService;
+  private final Optional<FeatureFlaggingService> featureFlaggingService;
 
-  public ConfigReferenceParametersStereotypesValidations(FeatureFlaggingService featureFlaggingService) {
+  public ConfigReferenceParametersStereotypesValidations(Optional<FeatureFlaggingService> featureFlaggingService) {
     this.featureFlaggingService = featureFlaggingService;
   }
 
@@ -82,7 +83,7 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
   protected boolean appFromPolicy(ArtifactAst artifact) {
     // ... or apps to policies if explicitely enabled
     return artifact.getArtifactType().equals(POLICY)
-        && !featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)
+        && featureFlaggingService.map(ffs -> !ffs.isEnabled(ENABLE_POLICY_ISOLATION)).orElse(false)
         && artifact.getParent()
             .map(p -> p.getArtifactType().equals(APPLICATION))
             .orElse(false);

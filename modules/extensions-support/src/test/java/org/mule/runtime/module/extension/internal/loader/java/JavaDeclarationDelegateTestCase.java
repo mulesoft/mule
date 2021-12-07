@@ -9,9 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -32,9 +34,13 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
+import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
@@ -84,7 +90,9 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -416,6 +424,46 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
         .collect(toList());
 
     assertThat(ignoredSources, hasSize(1));
+  }
+
+  @Test
+  public void defaultClusterSupport() {
+    SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("ListenPayments");
+
+    SourceClusterSupportModelProperty sourceClusterSupportModelProperty =
+        sourceDeclaration.getModelProperty(SourceClusterSupportModelProperty.class).get();
+
+    assertThat(sourceClusterSupportModelProperty.getSourceClusterSupport(), is(DEFAULT_ALL_NODES));
+  }
+
+  @Test
+  public void clusterSupportDefaultingPrimaryNodeOnly() {
+    SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("listen-payments-cluster");
+
+    SourceClusterSupportModelProperty sourceClusterSupportModelProperty =
+        sourceDeclaration.getModelProperty(SourceClusterSupportModelProperty.class).get();
+
+    assertThat(sourceClusterSupportModelProperty.getSourceClusterSupport(), is(DEFAULT_PRIMARY_NODE_ONLY));
+  }
+
+  @Test
+  public void backPressureSupport() {
+    SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("ListenPaymentsAllOptional");
+    BackPressureStrategyModelProperty backPressureStrategyModelProperty =
+        sourceDeclaration.getModelProperty(BackPressureStrategyModelProperty.class).get();
+
+    assertThat(backPressureStrategyModelProperty.getDefaultMode(), is(FAIL));
+    assertThat(backPressureStrategyModelProperty.getSupportedModes(), hasItems(FAIL, DROP));
+  }
+
+  private SourceDeclaration getSourceDeclarationWithName(String sourceName) {
+    ExtensionDeclarer declarer = declareExtension();
+    ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
+
+    ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
+
+    return config.getMessageSources().stream().filter(sourceDeclaration -> sourceDeclaration.getName().equals(sourceName))
+        .findFirst().get();
   }
 
   private DefaultExtensionLoadingContext createLoadingContext() {

@@ -50,8 +50,8 @@ public class BackPressureConfigTestCase extends AbstractExtensionFunctionalTestC
   }
 
   @Test
-  public void defaultCase() {
-    assertStrategy("defaultCase", WAIT);
+  public void inheritDefaultFromParentSourceClass() {
+    assertStrategy("defaultCase", FAIL);
   }
 
   private void assertStrategy(String flowName, BackPressureStrategy expected) {

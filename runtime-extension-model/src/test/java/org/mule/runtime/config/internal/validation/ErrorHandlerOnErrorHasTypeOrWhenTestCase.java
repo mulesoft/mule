@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -48,7 +49,8 @@ public class ErrorHandlerOnErrorHasTypeOrWhenTestCase extends AbstractCoreValida
         "        </error-handler>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>");
+        "</mule>")
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
@@ -74,7 +76,8 @@ public class ErrorHandlerOnErrorHasTypeOrWhenTestCase extends AbstractCoreValida
         "        </error-handler>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>");
+        "</mule>")
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));

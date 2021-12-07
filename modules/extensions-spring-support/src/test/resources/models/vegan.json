@@ -4440,7 +4440,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4582,7 +4582,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
+                    "order": 3,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -4676,7 +4676,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 10
+                      "order": 11
                     },
                     "allowedStereotypeModels": [],
                     "semanticTerms": [],
@@ -4993,7 +4993,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 11,
+                    "order": 7,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5135,7 +5135,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 7,
+                    "order": 8,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -5191,7 +5191,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 8
+                    "order": 9
                   },
                   "allowedStereotypeModels": [
                     {
@@ -5244,7 +5244,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 9
+                    "order": 10
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10919,7 +10919,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -11061,7 +11061,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
+                    "order": 3,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -13416,7 +13416,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -13558,7 +13558,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],

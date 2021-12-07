@@ -99,6 +99,9 @@
         <source name="source-alias">
             <description><![CDATA[Source Documentation]]></description>
             <parameters>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>

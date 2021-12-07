@@ -10,7 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.validate;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
@@ -223,17 +223,20 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected final void doValidateModel(ArtifactAst appModel, Predicate<Validation> validationsFilter)
       throws ConfigurationException {
-    final ValidationResult validation = validate(appModel,
-                                                 v -> {
-                                                   try {
-                                                     muleContext.getInjector().inject(v);
-                                                   } catch (MuleException e) {
-                                                     throw new MuleRuntimeException(e);
-                                                   }
-                                                 },
-                                                 validationsFilter,
-                                                 // get the region classloader from the artifact one
-                                                 this.muleContext.getExecutionClassLoader().getParent());
+
+    final ValidationResult validation = validatorBuilder()
+        .withValidationEnricher(v -> {
+          try {
+            muleContext.getInjector().inject(v);
+          } catch (MuleException e) {
+            throw new MuleRuntimeException(e);
+          }
+        })
+        .withValidationsFilter(validationsFilter)
+        // get the region classloader from the artifact one
+        .withArtifactRegionClassLoader(this.muleContext.getExecutionClassLoader().getParent())
+        .build()
+        .validate(appModel);
 
     final Collection<ValidationResultItem> items = validation.getItems();
 

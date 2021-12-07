@@ -80,8 +80,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private boolean enableLazyInit = false;
   private boolean disableXmlValidations = false;
 
-  private SpringRegistry registry;
-
   private ArtifactAst parentArtifactAst;
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
@@ -154,6 +152,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     initialiseIfNeeded(this, muleContext);
 
     final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext);
+    if (baseMuleArtifactContext instanceof ConfigurableApplicationContext) {
+      ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
+    }
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
     baseMuleArtifactContext.refresh();
 
@@ -343,14 +344,17 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private void createSpringRegistry(MuleContext muleContext, ApplicationContext baseApplicationContext,
                                     MuleArtifactContext applicationContext)
       throws Exception {
+    SpringRegistry registry;
+
     if (parentContext != null) {
-      createRegistryWithParentContext(muleContext, baseApplicationContext, applicationContext, parentContext);
+      registry = createRegistryWithParentContext(muleContext, baseApplicationContext, applicationContext, parentContext);
 
       if ((parentContext instanceof MuleArtifactContext &&
           ((MuleArtifactContext) parentContext).getMuleContext().getRegistry() instanceof MuleRegistryHelper)) {
         MuleRegistryHelper parentMuleRegistryHelper =
             (MuleRegistryHelper) ((MuleArtifactContext) parentContext).getMuleContext().getRegistry();
 
+        // TODO MULE-19960 Refactor how transformers are discovered and remove this
         CompositeMuleRegistryHelper compositeMuleRegistryHelper =
             new CompositeMuleRegistryHelper(registry, muleContext, parentMuleRegistryHelper);
         ((MuleContextWithRegistry) muleContext).setRegistry(compositeMuleRegistryHelper);
@@ -360,8 +364,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     } else {
       registry = new SpringRegistry(baseApplicationContext, applicationContext, muleContext,
-                                    new ConfigurationDependencyResolver(applicationContext
-                                        .getApplicationModel()),
+                                    new ConfigurationDependencyResolver(applicationContext.getApplicationModel()),
                                     ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
 
       ((MuleContextWithRegistry) muleContext).setRegistry(registry);
@@ -372,15 +375,13 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   private SpringRegistry createRegistryWithParentContext(MuleContext muleContext,
                                                          ApplicationContext baseApplicationContext,
-                                                         ApplicationContext applicationContext,
+                                                         MuleArtifactContext applicationContext,
                                                          ApplicationContext parentContext)
       throws ConfigurationException {
-    if (applicationContext instanceof ConfigurableApplicationContext) {
-      ((ConfigurableApplicationContext) applicationContext).setParent(parentContext);
-      registry = new SpringRegistry(baseApplicationContext, applicationContext, muleContext,
-                                    new ConfigurationDependencyResolver(muleArtifactContext.getApplicationModel()),
-                                    ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
-      return registry;
+    if (baseApplicationContext instanceof ConfigurableApplicationContext) {
+      return new SpringRegistry(baseApplicationContext, applicationContext, muleContext,
+                                new ConfigurationDependencyResolver(applicationContext.getApplicationModel()),
+                                ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
     } else {
       throw new ConfigurationException(createStaticMessage("Cannot set a parent context if the ApplicationContext does not implement ConfigurableApplicationContext"));
     }

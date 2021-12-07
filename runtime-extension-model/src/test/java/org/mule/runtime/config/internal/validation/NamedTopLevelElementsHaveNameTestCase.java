@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -44,7 +45,8 @@ public class NamedTopLevelElementsHaveNameTestCase extends AbstractCoreValidatio
         "    <flow>\n" +
         "        <logger/>\n" +
         "    </flow>\n" +
-        "</mule>");
+        "</mule>")
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Global element 'flow' does not provide a name attribute."));
