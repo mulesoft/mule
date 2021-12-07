@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.mule.runtime.api.metadata.DataType.builder;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 
@@ -22,11 +19,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -124,115 +118,6 @@ public class MuleRegistryHelper implements MuleRegistry {
   @Override
   public MuleContext getMuleContext() {
     return muleContext;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Transformer lookupTransformer(String name) {
-    return (Transformer) registry.lookupObject(name);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  // TODO remove
-  public Transformer lookupTransformer(DataType source, DataType result) throws TransformerException {
-    // To maintain the previous behaviour, we don't want to consider the result mimeType when resolving a transformer
-    // and only find transformers with a targetType the same as or a super class of the expected one.
-    // The same could be done for the source but since if the source expected by the transformer is more generic that
-    // the provided, it will be found.
-    result = builder(result).mediaType(ANY).charset((Charset) null).build();
-
-    final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
-    Transformer cachedTransformer = exactTransformerCache.get(dataTypePairHash);
-    if (cachedTransformer != null) {
-      return cachedTransformer;
-    }
-
-    Transformer trans = resolveTransformer(source, result);
-
-    if (trans != null) {
-      Transformer concurrentlyAddedTransformer = exactTransformerCache.putIfAbsent(dataTypePairHash, trans);
-      if (concurrentlyAddedTransformer != null) {
-        return concurrentlyAddedTransformer;
-      } else {
-        return trans;
-      }
-    } else {
-      throw new TransformerException(noTransformerFoundForMessage(source, result));
-    }
-  }
-
-  // TODO remove
-  protected Transformer resolveTransformer(DataType source, DataType result) throws TransformerException {
-    Lock readLock = transformerResolversLock.readLock();
-    readLock.lock();
-
-    try {
-      for (TransformerResolver resolver : transformerResolvers) {
-        try {
-          Transformer trans = resolver.resolve(source, result);
-          if (trans != null) {
-            return trans;
-          }
-        } catch (ResolverException e) {
-          throw new TransformerException(noTransformerFoundForMessage(source, result), e);
-        }
-      }
-    } finally {
-      readLock.unlock();
-    }
-
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  // TODO remove
-  public List<Transformer> lookupTransformers(DataType source, DataType result) {
-    // To maintain the previous behaviour, we don't want to consider the result mimeType when resolving a transformer
-    // and only find transformers with a targetType the same as or a super class of the expected one.
-    // The same could be done for the source but since if the source expected by the transformer is more generic that
-    // the provided, it will be found.
-    result = builder(result).mediaType(ANY).charset((Charset) null).build();
-
-    final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
-
-    List<Transformer> results = transformerListCache.get(dataTypePairHash);
-    if (results != null) {
-      return results;
-    }
-
-    results = new ArrayList<>(2);
-
-    Lock readLock = transformersLock.readLock();
-    readLock.lock();
-    try {
-      for (Transformer transformer : transformers) {
-        // The transformer must have the DiscoveryTransformer interface if we are
-        // going to find it here
-        if (!(transformer instanceof Converter)) {
-          continue;
-        }
-        if (result.isCompatibleWith(transformer.getReturnDataType()) && transformer.isSourceDataTypeSupported(source)) {
-          results.add(transformer);
-        }
-      }
-    } finally {
-      readLock.unlock();
-    }
-
-    List<Transformer> concurrentlyAddedTransformers = transformerListCache.putIfAbsent(dataTypePairHash, results);
-    if (concurrentlyAddedTransformers != null) {
-      return concurrentlyAddedTransformers;
-    }
-
-    return results;
   }
 
   /**

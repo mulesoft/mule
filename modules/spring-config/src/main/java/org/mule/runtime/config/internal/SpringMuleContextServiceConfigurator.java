@@ -59,6 +59,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
@@ -132,6 +133,7 @@ import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCa
 import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
@@ -184,6 +186,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
       .add(OBJECT_MULE_STREAM_CLOSER_SERVICE)
       .add(OBJECT_CONVERTER_RESOLVER)
       .add(OBJECT_TRANSFORMATION_SERVICE)
+      .add(OBJECT_TRANSFORMER_RESOLVER)
       .add(OBJECT_TRANSFORMERS_REGISTRY)
       .add(OBJECT_PROCESSING_TIME_WATCHER)
       .add(OBJECT_POLICY_MANAGER)
@@ -245,6 +248,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
       .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
       .put(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class))
       .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(ExtendedTransformationService.class))
+      .put(OBJECT_TRANSFORMER_RESOLVER, getBeanDefinition(TypeBasedTransformerResolver.class))
       .put(OBJECT_TRANSFORMERS_REGISTRY, getBeanDefinition(DefaultTransformersRegistry.class))
       .put(OBJECT_SCHEDULER_POOLS_CONFIG, getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()))
       .put(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class))

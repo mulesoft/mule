@@ -90,7 +90,7 @@ public class TransformerUtils {
       StringTokenizer st = new StringTokenizer(names, COMMA);
       while (st.hasMoreTokens()) {
         String key = st.nextToken().trim();
-        Transformer transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(key);
+        Transformer transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(key);
 
         if (transformer == null) {
           throw new DefaultMuleException(objectNotRegistered("Transformer", key));

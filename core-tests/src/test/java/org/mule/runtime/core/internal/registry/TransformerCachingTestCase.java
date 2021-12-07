@@ -19,19 +19,29 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.FilterInputStream;
 import java.nio.charset.Charset;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
 
+  private TransformersRegistry registry;
+
+  @Before
+  public void before() throws RegistrationException {
+    registry = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
+  }
+
   @Test
   public void testCacheUpdate() throws Exception {
     DataType sourceType = DataType.fromType(FilterInputStream.class);
-    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
+    // MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
     Transformer trans = registry.lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof InputStreamToByteArray);

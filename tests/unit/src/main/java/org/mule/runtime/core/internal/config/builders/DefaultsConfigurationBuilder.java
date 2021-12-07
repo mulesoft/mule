@@ -40,6 +40,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLI
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_FACTORY_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
@@ -79,6 +80,7 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
@@ -146,6 +148,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_TRANSFORMERS_REGISTRY, transformersRegistry, muleContext);
     registerObject(OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(transformersRegistry), muleContext);
     registerObject(OBJECT_TRANSFORMATION_SERVICE, new ExtendedTransformationService(muleContext), muleContext);
+    registerObject(OBJECT_TRANSFORMER_RESOLVER, new TypeBasedTransformerResolver(), muleContext);
 
     registerObject(DEFAULT_OBJECT_SERIALIZER_NAME, new JavaObjectSerializer(), muleContext);
 
