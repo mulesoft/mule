@@ -75,7 +75,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
     }
 
     addAutoDiscoveredDependencies(key, processedKeys, node);
-    addConfigurationDependencies(key, processedKeys, node);
+    //addConfigurationDependencies(key, processedKeys, node);
     addDeclaredDependencies(object, processedKeys, node);
   }
 
