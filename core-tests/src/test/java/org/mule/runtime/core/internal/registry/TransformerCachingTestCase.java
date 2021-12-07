@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
@@ -20,10 +21,10 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
-
 import java.io.FilterInputStream;
 import java.nio.charset.Charset;
+
+import org.junit.Test;
 
 public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
 
@@ -43,12 +44,6 @@ public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
     assertTrue(trans instanceof FilterInputStreamToByteArray);
 
     trans = registry.lookupTransformer(INPUT_STREAM, BYTE_ARRAY);
-    assertNotNull(trans);
-    assertTrue(trans instanceof InputStreamToByteArray);
-
-    registry.unregisterTransformer(trans2.getName());
-
-    trans = registry.lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof InputStreamToByteArray);
   }

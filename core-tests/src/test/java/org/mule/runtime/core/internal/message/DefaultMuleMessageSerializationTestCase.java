@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -21,21 +22,28 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.apache.commons.lang3.SerializationUtils;
-import org.junit.After;
-import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.SerializationUtils;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContextTestCase {
 
   private static final String INNER_TEST_MESSAGE = "TestTestTestHello";
 
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
+
   @After
-  public void teardown() {
+  public void tearDown() {
     currentMuleContext.set(null);
   }
 
@@ -56,7 +64,6 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
 
     final Message message = InternalMessage.builder().value(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
-    currentMuleContext.set(muleContext);
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 
     assertTrue(deserializedMessage.getPayload().getValue() instanceof byte[]);
@@ -68,7 +75,6 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
     final Message message = InternalMessage.builder().value(stream).addOutboundProperty("foo", "bar").build();
 
-    currentMuleContext.set(muleContext);
     InternalMessage deserializedMessage = serializationRoundtrip(message);
     assertEquals(byte[].class, deserializedMessage.getPayload().getDataType().getType());
     byte[] payload = (byte[]) deserializedMessage.getPayload().getValue();
@@ -79,7 +85,6 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
   public void messageSerializationKeepsMediaType() throws Exception {
     final Message message = InternalMessage.builder()
         .payload(new TypedValue<>(new ByteArrayInputStream("{\"id\":\"1\"}".getBytes()), DataType.JSON_STRING)).build();
-    currentMuleContext.set(muleContext);
     InternalMessage deserializedMessage = serializationRoundtrip(message);
     assertThat(deserializedMessage.getPayload().getDataType().getMediaType(),
                is(equalTo(message.getPayload().getDataType().getMediaType())));
@@ -91,7 +96,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
 
   static class NonSerializable {
 
-    private String content = INNER_TEST_MESSAGE;
+    private final String content = INNER_TEST_MESSAGE;
 
     String getContent() {
       return content;

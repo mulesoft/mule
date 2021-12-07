@@ -16,9 +16,10 @@ import org.mule.runtime.core.api.transformer.TransformerException;
  * 
  * @since 4.1.4
  */
+// TODO remove
 public class CompositeMuleRegistryHelper extends MuleRegistryHelper {
 
-  private MuleRegistryHelper parentRegistryHelper;
+  private final MuleRegistryHelper parentRegistryHelper;
 
   public CompositeMuleRegistryHelper(Registry muleRegistry, MuleContext muleContext,
                                      MuleRegistryHelper parentMuleRegistryHelper) {

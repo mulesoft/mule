@@ -63,6 +63,7 @@ public interface MuleRegistry extends Registry {
    * @return a list of matching transformers. If there were no matches an empty list is returned.
    * @since 3.0.0
    */
+  // TODO remove
   List<Transformer> lookupTransformers(DataType source, DataType result);
 
   /**
@@ -74,6 +75,7 @@ public interface MuleRegistry extends Registry {
    * @throws TransformerException will be thrown if there is more than one match
    * @since 3.0.0
    */
+  // TODO remove
   Transformer lookupTransformer(DataType source, DataType result) throws TransformerException;
 
   Collection<FlowConstruct> lookupFlowConstructs();
@@ -82,9 +84,8 @@ public interface MuleRegistry extends Registry {
   // Registration methods
   // /////////////////////////////////////////////////////////////////////////
 
+  // TODO remove
   void registerTransformer(Transformer transformer) throws MuleException;
-
-  void unregisterTransformer(String transformerName) throws MuleException;
 
   void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
 

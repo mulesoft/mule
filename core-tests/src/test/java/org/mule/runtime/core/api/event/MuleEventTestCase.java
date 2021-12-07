@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.api.event;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
+
 import static java.util.Collections.singletonMap;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
@@ -15,9 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -44,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -58,6 +61,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
 
   @After
   public void teardown() {
@@ -131,7 +139,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     }
     PrivilegedEvent testEvent = this.<PrivilegedEvent.Builder>getEventBuilder()
         .message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
-    currentMuleContext.set(muleContext);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
 

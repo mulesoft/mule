@@ -146,6 +146,7 @@ public class MuleProperties {
   public static final String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
   public static final String OBJECT_MULE_NAMESPACE_MANAGER = "_muleNamespaceManager";
   public static final String OBJECT_CONVERTER_RESOLVER = "_converterResolver";
+  public static final String OBJECT_TRANSFORMERS_REGISTRY = "_muleTransfromersRegistry";
   public static final String OBJECT_EXPRESSION_LANGUAGE = "_muleExpressionLanguage";
   public static final String OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER = "_muleDwExpressionLanguageAdapter";
   public static final String OBJECT_EXPRESSION_MANAGER = "_muleExpressionManager";

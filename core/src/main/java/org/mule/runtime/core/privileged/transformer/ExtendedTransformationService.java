@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.privileged.transformer;
 
-import static java.util.Arrays.asList;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
+
+import static java.util.Arrays.asList;
+
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -19,6 +21,7 @@ import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -37,12 +40,13 @@ public class ExtendedTransformationService extends DefaultTransformationService 
 
   private static final Logger logger = LoggerFactory.getLogger(ExtendedTransformationService.class);
 
+  private DataTypeConversionResolver dataTypeConversionResolver;
 
+  // TODO remove
   @Inject
   public ExtendedTransformationService(MuleContext muleContext) {
     super(muleContext);
   }
-
 
   /**
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
@@ -144,7 +148,7 @@ public class ExtendedTransformationService extends DefaultTransformationService 
 
           // Resolves implicit conversion if possible
           Transformer implicitTransformer =
-              muleContext.getDataTypeConverterResolver().resolve(originalSourceType, transformer.getSourceDataTypes());
+              dataTypeConversionResolver.resolve(originalSourceType, transformer.getSourceDataTypes());
 
           if (implicitTransformer != null) {
             if (logger.isDebugEnabled()) {
@@ -221,4 +225,8 @@ public class ExtendedTransformationService extends DefaultTransformationService 
     return DataType.builder().mediaType(mimeType).charset(encoding).build().getMediaType();
   }
 
+  @Inject
+  public void setDataTypeConversionResolver(DataTypeConversionResolver dataTypeConversionResolver) {
+    this.dataTypeConversionResolver = dataTypeConversionResolver;
+  }
 }

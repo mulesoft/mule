@@ -43,7 +43,6 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.profiling.ProfilingService;
@@ -57,8 +56,6 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
@@ -305,19 +302,6 @@ public class MuleContextUtils {
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
-  }
-
-  /**
-   * Will find a transformer that is the closest match to the desired input and output.
-   *
-   * @param source The desired input type for the transformer
-   * @param result the desired output type for the transformer
-   * @return A transformer that exactly matches or the will accept the input and output parameters
-   * @throws TransformerException will be thrown if there is more than one match
-   */
-  public static <T> Transformer lookupTransformer(MuleContextWithRegistry context, DataType source, DataType result)
-      throws TransformerException {
-    return context.getRegistry().lookupTransformer(source, result);
   }
 
   /**

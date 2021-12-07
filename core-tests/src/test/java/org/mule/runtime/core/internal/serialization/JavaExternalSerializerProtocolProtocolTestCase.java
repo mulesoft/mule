@@ -6,12 +6,26 @@
  */
 package org.mule.runtime.core.internal.serialization;
 
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.tck.core.internal.serialization.AbstractSerializerProtocolContractTestCase;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class JavaExternalSerializerProtocolProtocolTestCase extends AbstractSerializerProtocolContractTestCase {
+
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Override
   protected void doSetUp() throws Exception {

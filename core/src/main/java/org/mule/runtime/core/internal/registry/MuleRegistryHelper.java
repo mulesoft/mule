@@ -58,18 +58,23 @@ public class MuleRegistryHelper implements MuleRegistry {
   /**
    * We cache transformer searches so that we only search once
    */
+  // TODO remove
   protected Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap<>(8);
+  // TODO remove
   protected Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap<>(8);
 
   private final MuleContext muleContext;
 
+  // TODO remove
   private final ReadWriteLock transformerResolversLock = new ReentrantReadWriteLock();
 
   /**
    * Transformer transformerResolvers are registered on context start, then they are not unregistered.
    */
+  // TODO remove
   private final List<TransformerResolver> transformerResolvers = new ArrayList<>();
 
+  // TODO remove
   private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
 
   private final Map<Object, Object> postProcessedObjects = new HashMap<>();
@@ -133,6 +138,7 @@ public class MuleRegistryHelper implements MuleRegistry {
    * {@inheritDoc}
    */
   @Override
+  // TODO remove
   public Transformer lookupTransformer(DataType source, DataType result) throws TransformerException {
     // To maintain the previous behaviour, we don't want to consider the result mimeType when resolving a transformer
     // and only find transformers with a targetType the same as or a super class of the expected one.
@@ -160,6 +166,7 @@ public class MuleRegistryHelper implements MuleRegistry {
     }
   }
 
+  // TODO remove
   protected Transformer resolveTransformer(DataType source, DataType result) throws TransformerException {
     Lock readLock = transformerResolversLock.readLock();
     readLock.lock();
@@ -186,6 +193,7 @@ public class MuleRegistryHelper implements MuleRegistry {
    * {@inheritDoc}
    */
   @Override
+  // TODO remove
   public List<Transformer> lookupTransformers(DataType source, DataType result) {
     // To maintain the previous behaviour, we don't want to consider the result mimeType when resolving a transformer
     // and only find transformers with a targetType the same as or a super class of the expected one.
@@ -252,10 +260,12 @@ public class MuleRegistryHelper implements MuleRegistry {
    * {@inheritDoc}
    */
   @Override
+  // TODO remove
   public final void registerTransformer(Transformer transformer) throws MuleException {
     registerObject(getName(transformer), transformer, Transformer.class);
   }
 
+  // TODO remove
   public void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action) {
     if (t instanceof Converter) {
       Lock transformerResolversReadLock = transformerResolversLock.readLock();
@@ -292,17 +302,6 @@ public class MuleRegistryHelper implements MuleRegistry {
   @Override
   public void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException {
     registry.registerObject(getName(flowConstruct), flowConstruct, FlowConstruct.class);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void unregisterTransformer(String transformerName) throws MuleException {
-    Transformer transformer = lookupTransformer(transformerName);
-    notifyTransformerResolvers(transformer, TransformerResolver.RegistryAction.REMOVED);
-    registry.unregisterObject(transformerName, Transformer.class);
-
   }
 
   /**
@@ -435,6 +434,7 @@ public class MuleRegistryHelper implements MuleRegistry {
     postObjectRegistrationActions(value);
   }
 
+  // TODO remove
   public void registerTransformerResolver(TransformerResolver value) {
     Lock lock = transformerResolversLock.writeLock();
     lock.lock();
@@ -502,10 +502,12 @@ public class MuleRegistryHelper implements MuleRegistry {
     return false;
   }
 
+  // TODO remove
   private String getDataTypeSourceResultPairHash(DataType source, DataType result) {
     return source.getClass().getName() + source.hashCode() + ":" + result.getClass().getName() + result.hashCode();
   }
 
+  // TODO remove
   private class TransformerResolverComparator implements Comparator<TransformerResolver> {
 
     @Override

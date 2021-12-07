@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.journal.queue;
 
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -21,12 +23,13 @@ import java.util.Iterator;
 
 import javax.transaction.xa.Xid;
 
+import com.google.common.collect.Multimap;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import com.google.common.collect.Multimap;
 
 public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTestCase {
 
@@ -38,6 +41,15 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   private final DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, RETURNS_DEEP_STUBS.get());
 
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Before
   public void setUpMocks() {

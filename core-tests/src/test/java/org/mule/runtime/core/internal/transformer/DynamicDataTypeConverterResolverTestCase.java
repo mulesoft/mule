@@ -16,27 +16,30 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
+import org.mockito.Mockito;
+
 @SmallTest
 public class DynamicDataTypeConverterResolverTestCase extends AbstractMuleTestCase {
 
-  private MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class);
-  private MuleRegistry muleRegistry = mock(MuleRegistry.class);
+  private final MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class);
+  private final MuleRegistry muleRegistry = mock(MuleRegistry.class);
+  private final TransformersRegistry transformersRegistry = mock(TransformersRegistry.class);
 
   @Test
   public void doesNotFailWhenThereIsNoDataTypeResolution() throws TransformerException {
     when(muleContext.getRegistry()).thenReturn(muleRegistry);
-    when(muleRegistry.lookupTransformer(Mockito.any(DataType.class), Mockito.any(DataType.class))).thenReturn(null);
+    when(transformersRegistry.lookupTransformer(Mockito.any(DataType.class), Mockito.any(DataType.class))).thenReturn(null);
 
-    DynamicDataTypeConversionResolver resolver = new DynamicDataTypeConversionResolver(muleContext);
+    DynamicDataTypeConversionResolver resolver = new DynamicDataTypeConversionResolver(transformersRegistry);
 
     List<DataType> targetValues = new ArrayList<>();
     targetValues.add(DataType.STRING);
@@ -50,9 +53,9 @@ public class DynamicDataTypeConverterResolverTestCase extends AbstractMuleTestCa
     Transformer expectedConverter = new MockConverterBuilder().from(DataType.BYTE_ARRAY).to(DataType.STRING).build();
 
     when(muleContext.getRegistry()).thenReturn(muleRegistry);
-    when(muleRegistry.lookupTransformer(DataType.BYTE_ARRAY, DataType.STRING)).thenReturn(expectedConverter);
+    when(transformersRegistry.lookupTransformer(DataType.BYTE_ARRAY, DataType.STRING)).thenReturn(expectedConverter);
 
-    DynamicDataTypeConversionResolver resolver = new DynamicDataTypeConversionResolver(muleContext);
+    DynamicDataTypeConversionResolver resolver = new DynamicDataTypeConversionResolver(transformersRegistry);
 
     List<DataType> targetValues = new ArrayList<>();
     targetValues.add(DataType.INPUT_STREAM);
