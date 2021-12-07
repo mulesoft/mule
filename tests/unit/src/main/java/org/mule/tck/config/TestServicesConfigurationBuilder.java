@@ -95,8 +95,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
                                                    spy(schedulerService));
     customizationService.registerCustomServiceImpl(MOCK_EXPR_EXECUTOR,
                                                    mock(DefaultExpressionLanguageFactoryService.class, RETURNS_DEEP_STUBS));
-    customizationService.registerCustomServiceImpl(MOCK_HTTP_SERVICE,
-                                                   mock(HttpService.class));
+    customizationService.registerCustomServiceImpl(MOCK_HTTP_SERVICE, mockHttpService());
   }
 
   protected void registerServices(MuleContext muleContext, MuleRegistry registry) throws RegistrationException {
@@ -142,12 +141,16 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     }
 
     if (mockHttpService) {
-      registry.registerObject(MOCK_HTTP_SERVICE, mock(HttpService.class));
+      registry.registerObject(MOCK_HTTP_SERVICE, mockHttpService());
     }
 
     overriddenDefaultServices.forEach((serviceId, serviceImpl) -> {
       ((MuleContextWithRegistry) muleContext).getCustomizationService().overrideDefaultServiceImpl(serviceId, serviceImpl);
     });
+  }
+
+  protected HttpService mockHttpService() {
+    return mock(HttpService.class);
   }
 
   public void stopServices() throws MuleException {
