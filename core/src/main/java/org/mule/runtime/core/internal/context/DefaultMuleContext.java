@@ -945,17 +945,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       synchronized (dataTypeConversionResolverLock) {
         if (dataTypeConversionResolver == null) {
           dataTypeConversionResolver = getRegistry().lookupObject(OBJECT_CONVERTER_RESOLVER);
-          //
-          // if (dataTypeConversionResolver == null) {
-          // try {
-          // dataTypeConversionResolver =
-          // new DynamicDataTypeConversionResolver(this, getRegistry().lookupObject(DefaultTransformersRegistry.class));
-          // getRegistry().registerObject(OBJECT_CONVERTER_RESOLVER, dataTypeConversionResolver);
-          // } catch (RegistrationException e) {
-          // // Should not occur
-          // throw new IllegalStateException(e);
-          // }
-          // }
         }
       }
     }
