@@ -100,4 +100,12 @@ public class ModuleWithPropertiesTestCase extends AbstractCeXmlExtensionMuleArti
     CoreEvent muleEvent = flowRunner("testSetPayloadAddParamAndPropertyValueThruInternalOperationFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("a parameter value some config-value-parameter"));
   }
+
+  @Test
+  @Issue("MULE-19962")
+  public void testSetPayloadPropertiesCallingNestedOperations() throws Exception {
+    CoreEvent muleEvent = flowRunner("testSetPayloadPropertiesCallingNestedOperations").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(),
+               is("What are these? These are two nice properties, some default-config-value-parameter and some default-config-value-parameter"));
+  }
 }
