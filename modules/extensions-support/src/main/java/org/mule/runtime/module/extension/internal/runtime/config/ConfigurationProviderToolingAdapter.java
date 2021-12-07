@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -13,6 +14,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -25,6 +27,7 @@ import static org.mule.runtime.module.extension.internal.value.ValueProviderUtil
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -39,11 +42,17 @@ import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -77,6 +86,9 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   protected final ConnectionManager connectionManager;
   private final ConfigurationInstance configuration;
   private final ReflectionCache reflectionCache;
+  private final MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
+
+  private LazyValue<MetadataCacheIdGenerator<ComponentAst>> cacheIdGeneratorLazyValue;
 
   ConfigurationProviderToolingAdapter(String name,
                                       ExtensionModel extensionModel,
@@ -91,6 +103,20 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
     DefaultRegistry registry = new DefaultRegistry(muleContext);
     this.connectionManager = registry.<ConnectionManager>lookupByName(OBJECT_CONNECTION_MANAGER).get();
     this.metadataService = registry.<MuleMetadataService>lookupByType(MuleMetadataService.class).get();
+    this.cacheIdGeneratorFactory =
+        registry.<MetadataCacheIdGeneratorFactory>lookupByType(MetadataCacheIdGeneratorFactory.class).get();
+    setCacheIdGenerator();
+  }
+
+  private void setCacheIdGenerator() {
+    cacheIdGeneratorLazyValue = new LazyValue<>(() -> {
+      DslResolvingContext context = DslResolvingContext.getDefault(muleContext.getExtensionManager().getExtensions());
+      ComponentLocator<ComponentAst> configLocator = location -> muleContext.getConfigurationComponentLocator()
+          .find(location)
+          .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
+
+      return cacheIdGeneratorFactory.create(context, configLocator);
+    });
   }
 
   /**
@@ -152,8 +178,18 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
           ((BaseEventContext) fakeEvent.getContext()).success();
         }
       }
-    }, connectionManager, metadataService.getMetadataCache(getName()), ExtensionsTypeLoaderFactory.getDefault()
-        .createTypeLoader(classLoader));
+    }, connectionManager, metadataService.getMetadataCache(getMetadataCacheId().getValue()),
+                                      ExtensionsTypeLoaderFactory.getDefault()
+                                          .createTypeLoader(classLoader));
+  }
+
+  private MetadataCacheId getMetadataCacheId() {
+    return cacheIdGeneratorLazyValue.get().getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
+        .orElseThrow(() -> new IllegalStateException(
+                                                     format("Missing information to obtain the MetadataCache for the component '%s'. "
+                                                         +
+                                                         "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
+                                                            this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
   }
 
   /**
