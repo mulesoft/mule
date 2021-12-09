@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFo
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -37,6 +38,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
+/**
+ * Implementation of {@link TransformersRegistry} with resolution caches.
+ *
+ * @since 4.5
+ */
 public class DefaultTransformersRegistry implements TransformersRegistry, Initialisable, Disposable {
 
   @Inject
@@ -51,9 +57,9 @@ public class DefaultTransformersRegistry implements TransformersRegistry, Initia
   /**
    * Transformer transformerResolvers are registered on context start, then they are not unregistered.
    */
-  private List<TransformerResolver> transformerResolvers;
+  private List<TransformerResolver> transformerResolvers = emptyList();
 
-  private Collection<Transformer> transformers;
+  private Collection<Transformer> transformers = emptyList();
 
   @Override
   public void initialise() throws InitialisationException {

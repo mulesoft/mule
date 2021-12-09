@@ -48,8 +48,8 @@ public interface TransformersRegistry {
   /**
    * Allows to register transformers AFTER this registry has been initialized.
    * 
-   * @param transformer
-   * @throws MuleException
+   * @param transformer the transformer to register
+   * @throws MuleException if there was a problem registering the transformer.
    */
   void registerTransformer(Transformer transformer) throws MuleException;
 
