@@ -6,25 +6,28 @@
  */
 package org.mule.runtime.core.internal.config;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
+import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CORRELATION_ID;
+import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CorrelationIdOnSourcesStory.CORRELATION_ID_ON_SOURCES;
+
+import static java.lang.Integer.parseInt;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.rules.ExpectedException.none;
+
+import org.mule.runtime.api.el.ExpressionCompilationException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.runtime.api.el.ExpressionCompilationException;
-import org.mule.runtime.core.api.config.CorrelationIdGenerator;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import static java.lang.Integer.parseInt;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.rules.ExpectedException.none;
-import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CORRELATION_ID;
-import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CorrelationIdOnSourcesStory.CORRELATION_ID_ON_SOURCES;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Issue("MULE-18770")
 @Feature(CORRELATION_ID)
@@ -47,7 +50,7 @@ public class ExpressionCorrelationIdGeneratorTestCase extends AbstractMuleContex
         new ExpressionCorrelationIdGenerator(muleContext, "#[(random() * 42 as String splitBy('.'))[0]]");
     generator.initializeGenerator();
 
-    assertThat(parseInt(generator.generateCorrelationId()), is(both(greaterThan(0)).and(lessThan(42))));
+    assertThat(parseInt(generator.generateCorrelationId()), is(both(greaterThanOrEqualTo(0)).and(lessThan(42))));
   }
 
 }
