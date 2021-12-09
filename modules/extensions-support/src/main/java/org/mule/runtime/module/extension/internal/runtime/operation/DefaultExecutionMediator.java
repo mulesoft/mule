@@ -239,17 +239,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   }
 
   private void profileThreadRelease(ExecutionContextAdapter<M> context) {
-    // TODO: Evaluate a feature flag check (could be "thread.profiling" or something like that) and a get of the producer for each
-    // invocation.
-    if (threadReleaseDataProducer == null) {
-      return;
-    }
-
     String threadName = currentThread().getName();
     String artifactId = getArtifactId(context.getMuleContext());
     String artifactType = getArtifactType(context.getMuleContext());
-    threadReleaseDataProducer.triggerProfilingEvent(new DefaultComponentThreadingProfilingEventContext(context.getEvent(), context
-        .getComponent().getLocation(), threadName, artifactId, artifactType, currentTimeMillis()));
+    threadReleaseDataProducer.triggerProfilingEvent(context
+        .getEvent(), event -> new DefaultComponentThreadingProfilingEventContext(event, context
+            .getComponent().getLocation(), threadName, artifactId, artifactType, currentTimeMillis()));
   }
 
   private Throwable handleError(Throwable original, ExecutionContextAdapter context) {
