@@ -78,6 +78,19 @@ public interface AnnotationValueFetcher<A extends Annotation> {
   <E extends Enum> E getEnumValue(Function<A, E> function);
 
   /**
+   * Returns the list of {@link Enum} values of an annotation property
+   *
+   * @param function A function which executes the logic of retrieving the property value.
+   * @param <E>      The {@link Enum} type
+   * @return The {@link Enum} value
+   *
+   * @since 4.5
+   */
+  default <E extends Enum> List<E> getEnumArrayValue(Function<A, E[]> function) {
+    return getArrayValue(function);
+  }
+
+  /**
    * Returns a {@link AnnotationValueFetcher} from an {@link Annotation} inside the current {@link Annotation}
    * 
    * @param function A function which executes the logic of retrieving the property value.
