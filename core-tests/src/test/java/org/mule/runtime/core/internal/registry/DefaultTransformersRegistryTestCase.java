@@ -70,7 +70,7 @@ public class DefaultTransformersRegistryTestCase extends AbstractMuleContextTest
 
   @Test
   public void lookupsTransformersByType() throws Exception {
-    List trans = transformersRegistry.lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
+    List<Transformer> trans = transformersRegistry.lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
     assertEquals(2, trans.size());
     assertTrue(trans.contains(t1));
     assertTrue(trans.contains(t2));
@@ -91,10 +91,10 @@ public class DefaultTransformersRegistryTestCase extends AbstractMuleContextTest
         new MockConverterBuilder().named("appleToBanana").from(APPLE_DATA_TYPE).to(BANANA_DATA_TYPE).build();
     Transformer bananaToBloodOrange =
         new MockConverterBuilder().named("bananaToBloodOrange").from(BANANA_DATA_TYPE).to(BLOOD_ORANGE_DATA_TYPE).build();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(fruitToSeed);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(seedToApple);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(appleToBanana);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(bananaToBloodOrange);
+    transformersRegistry.registerTransformer(fruitToSeed);
+    transformersRegistry.registerTransformer(seedToApple);
+    transformersRegistry.registerTransformer(appleToBanana);
+    transformersRegistry.registerTransformer(bananaToBloodOrange);
 
     Transformer trans = transformersRegistry.lookupTransformer(FRUIT_DATA_TYPE, BLOOD_ORANGE_DATA_TYPE);
     assertThat(trans, is(notNullValue()));
@@ -121,8 +121,10 @@ public class DefaultTransformersRegistryTestCase extends AbstractMuleContextTest
         .to(BLOOD_ORANGE_DATA_TYPE).weighting(10).build();
     Transformer bananaToOrange =
         new MockConverterBuilder().named("bananaToOrange").from(BANANA_DATA_TYPE).to(ORANGE_DATA_TYPE).weighting(1).build();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(bananaToBloodOrange);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(bananaToOrange);
+    TransformersRegistry transfromersRegistry =
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
+    transfromersRegistry.registerTransformer(bananaToBloodOrange);
+    transfromersRegistry.registerTransformer(bananaToOrange);
 
     Transformer trans =
         transformersRegistry.lookupTransformer(BANANA_DATA_TYPE, ORANGE_DATA_TYPE);

@@ -44,7 +44,6 @@ public class DefaultTransformationService implements TransformationService {
   @Inject
   private TransformersRegistry transformersRegistry;
 
-  // TODO remove
   @Inject
   public DefaultTransformationService(MuleContext muleContext) {
     this.muleContext = muleContext;

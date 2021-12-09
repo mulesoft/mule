@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -14,25 +13,13 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,34 +36,9 @@ public class MuleRegistryHelper implements MuleRegistry {
    */
   private final Registry registry;
 
-  /**
-   * We cache transformer searches so that we only search once
-   */
-  // TODO remove
-  protected Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap<>(8);
-  // TODO remove
-  protected Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap<>(8);
-
   private final MuleContext muleContext;
 
-  // TODO remove
-  private final ReadWriteLock transformerResolversLock = new ReentrantReadWriteLock();
-
-  /**
-   * Transformer transformerResolvers are registered on context start, then they are not unregistered.
-   */
-  // TODO remove
-  private final List<TransformerResolver> transformerResolvers = new ArrayList<>();
-
-  // TODO remove
-  private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
-
   private final Map<Object, Object> postProcessedObjects = new HashMap<>();
-
-  /**
-   * Transformers are registered on context start, then they are usually not unregistered
-   */
-  private final Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
 
   public MuleRegistryHelper(Registry registry, MuleContext muleContext) {
     this.registry = registry;
@@ -99,8 +61,6 @@ public class MuleRegistryHelper implements MuleRegistry {
    */
   @Override
   public void dispose() {
-    transformerListCache.clear();
-    exactTransformerCache.clear();
     registry.dispose();
   }
 
@@ -139,46 +99,6 @@ public class MuleRegistryHelper implements MuleRegistry {
   @Override
   public boolean isSingleton(String key) {
     return registry.isSingleton(key);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  // TODO remove
-  public final void registerTransformer(Transformer transformer) throws MuleException {
-    registerObject(getName(transformer), transformer, Transformer.class);
-  }
-
-  // TODO remove
-  public void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action) {
-    if (t instanceof Converter) {
-      Lock transformerResolversReadLock = transformerResolversLock.readLock();
-      transformerResolversReadLock.lock();
-      try {
-
-        for (TransformerResolver resolver : transformerResolvers) {
-          resolver.transformerChange(t, action);
-        }
-      } finally {
-        transformerResolversReadLock.unlock();
-      }
-
-      transformerListCache.clear();
-      exactTransformerCache.clear();
-
-      Lock transformersWriteLock = transformersLock.writeLock();
-      transformersWriteLock.lock();
-      try {
-        if (action == ADDED) {
-          transformers.add(t);
-        } else {
-          transformers.remove(t);
-        }
-      } finally {
-        transformersWriteLock.unlock();
-      }
-    }
   }
 
   /**
@@ -299,13 +219,6 @@ public class MuleRegistryHelper implements MuleRegistry {
     // TODO MULE-10238 - Remove this check once SimpleRegistry gets removed
     if (!postProcessedObjects.containsKey(value)) {
       postProcessedObjects.put(value, value);
-      if (value instanceof TransformerResolver) {
-        registerTransformerResolver((TransformerResolver) value);
-      }
-
-      if (value instanceof Converter) {
-        notifyTransformerResolvers((Converter) value, ADDED);
-      }
     }
   }
 
@@ -317,18 +230,6 @@ public class MuleRegistryHelper implements MuleRegistry {
     registry.registerObject(key, value);
 
     postObjectRegistrationActions(value);
-  }
-
-  // TODO remove
-  public void registerTransformerResolver(TransformerResolver value) {
-    Lock lock = transformerResolversLock.writeLock();
-    lock.lock();
-    try {
-      transformerResolvers.add(value);
-      Collections.sort(transformerResolvers, new TransformerResolverComparator());
-    } finally {
-      lock.unlock();
-    }
   }
 
   /**
@@ -385,27 +286,6 @@ public class MuleRegistryHelper implements MuleRegistry {
   @Override
   public boolean isRemote() {
     return false;
-  }
-
-  // TODO remove
-  private String getDataTypeSourceResultPairHash(DataType source, DataType result) {
-    return source.getClass().getName() + source.hashCode() + ":" + result.getClass().getName() + result.hashCode();
-  }
-
-  // TODO remove
-  private class TransformerResolverComparator implements Comparator<TransformerResolver> {
-
-    @Override
-    public int compare(TransformerResolver transformerResolver, TransformerResolver transformerResolver1) {
-      if (transformerResolver.getClass().equals(TypeBasedTransformerResolver.class)) {
-        return 1;
-      }
-
-      if (transformerResolver1.getClass().equals(TypeBasedTransformerResolver.class)) {
-        return -1;
-      }
-      return 0;
-    }
   }
 
   public Registry getDelegate() {

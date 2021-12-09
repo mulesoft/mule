@@ -9,12 +9,17 @@ package org.mule.runtime.core.internal.transformer;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
 
 import static java.util.Collections.sort;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -36,7 +41,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
-public class DefaultTransformersRegistry implements TransformersRegistry {
+public class DefaultTransformersRegistry implements TransformersRegistry, Initialisable, Disposable {
+
+  @Inject
+  private MuleContext muleContext;
 
   /**
    * We cache transformer searches so that we only search once
@@ -49,13 +57,25 @@ public class DefaultTransformersRegistry implements TransformersRegistry {
   /**
    * Transformer transformerResolvers are registered on context start, then they are not unregistered.
    */
-  @Inject
-  private final List<TransformerResolver> transformerResolvers = new ArrayList<>();
+  private List<TransformerResolver> transformerResolvers = new ArrayList<>();
 
   private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
 
-  @Inject
-  private final Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
+  private Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
+
+  @Override
+  public void initialise() throws InitialisationException {
+    transformers.stream()
+        .filter(t -> t instanceof Converter)
+        .forEach(t -> notifyTransformerResolvers(t, ADDED));
+    sort(transformerResolvers, new TransformerResolverComparator());
+  }
+
+  @Override
+  public void dispose() {
+    transformerListCache.clear();
+    exactTransformerCache.clear();
+  }
 
   @Override
   public Transformer lookupTransformer(DataType source, DataType result) throws TransformerException {
@@ -151,23 +171,13 @@ public class DefaultTransformersRegistry implements TransformersRegistry {
 
   @Override
   public void registerTransformer(Transformer transformer) throws MuleException {
+    initialiseIfNeeded(transformer, muleContext);
     if (transformer instanceof Converter) {
       notifyTransformerResolvers(transformer, ADDED);
     }
   }
 
-  public void registerTransformerResolver(TransformerResolver value) {
-    Lock lock = transformerResolversLock.writeLock();
-    lock.lock();
-    try {
-      transformerResolvers.add(value);
-      sort(transformerResolvers, new TransformerResolverComparator());
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  private void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action) {
+  public void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action) {
     if (t instanceof Converter) {
       Lock transformerResolversReadLock = transformerResolversLock.readLock();
       transformerResolversReadLock.lock();
@@ -182,18 +192,6 @@ public class DefaultTransformersRegistry implements TransformersRegistry {
 
       transformerListCache.clear();
       exactTransformerCache.clear();
-
-      Lock transformersWriteLock = transformersLock.writeLock();
-      transformersWriteLock.lock();
-      try {
-        if (action == ADDED) {
-          transformers.add(t);
-        } else {
-          transformers.remove(t);
-        }
-      } finally {
-        transformersWriteLock.unlock();
-      }
     }
   }
 
@@ -214,5 +212,15 @@ public class DefaultTransformersRegistry implements TransformersRegistry {
       }
       return 0;
     }
+  }
+
+  @Inject
+  public void setTransformerResolvers(List<TransformerResolver> transformerResolvers) {
+    this.transformerResolvers = transformerResolvers;
+  }
+
+  @Inject
+  public void setTransformers(Collection<Transformer> transformers) {
+    this.transformers = transformers;
   }
 }

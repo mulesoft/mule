@@ -8,6 +8,8 @@
 package org.mule.runtime.core.internal.transformer;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
@@ -40,11 +42,9 @@ public class TransformerResolutionTestCase extends AbstractMuleTestCase {
     DefaultTransformersRegistry registry = new DefaultTransformersRegistry();
     TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
     resolver.setTransformersRegistry(registry);
-    registry.registerTransformerResolver(resolver);
-
-    registry.registerTransformer(new StringToOrange());
-    registry.registerTransformer(new StringToApple());
-    registry.registerTransformer(new StringToFruit());
+    registry.setTransformerResolvers(singletonList(resolver));
+    registry.setTransformers(asList(new StringToOrange(), new StringToApple(), new StringToFruit()));
+    registry.initialise();
 
     try {
       Transformer transformer = registry.lookupTransformer(DataType.STRING, FRUIT_DATA_TYPE);

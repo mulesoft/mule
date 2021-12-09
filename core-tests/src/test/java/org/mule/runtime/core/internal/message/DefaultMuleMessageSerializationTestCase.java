@@ -20,6 +20,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -60,7 +61,8 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
   public void testNonSerializablePayload() throws Exception {
     // add a transformer to the registry that can convert a NonSerializable to byte[]. This
     // will be used during Serialization
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new NonSerializableToByteArray());
+    ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class)
+        .registerTransformer(new NonSerializableToByteArray());
 
     final Message message = InternalMessage.builder().value(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 

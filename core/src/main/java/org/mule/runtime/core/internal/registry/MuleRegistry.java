@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.util.Collection;
 
@@ -49,9 +48,6 @@ public interface MuleRegistry extends Registry {
   // /////////////////////////////////////////////////////////////////////////
   // Registration methods
   // /////////////////////////////////////////////////////////////////////////
-
-  // TODO remove
-  void registerTransformer(Transformer transformer) throws MuleException;
 
   void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
 

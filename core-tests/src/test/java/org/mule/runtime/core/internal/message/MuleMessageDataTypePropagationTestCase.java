@@ -188,7 +188,6 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     Message message = Message.builder().value(payload).mediaType(APPLICATION_XML_CUSTOM).build();
 
     TransformersRegistry transformersRegistry = mock(TransformersRegistry.class);
-    // when(muleContext.getRegistry()).thenReturn(muleRegistry);
     Transformer transformer = mock(Transformer.class);
     when(transformer.transform(anyObject(), anyObject())).thenReturn(TEST_PAYLOAD);
     when(transformersRegistry.lookupTransformer(any(), any())).thenReturn(transformer);

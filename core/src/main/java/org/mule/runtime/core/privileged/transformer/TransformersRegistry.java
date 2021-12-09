@@ -40,6 +40,12 @@ public interface TransformersRegistry {
    */
   Transformer lookupTransformer(DataType source, DataType result) throws TransformerException;
 
+  /**
+   * Allows to register transformers AFTER this registry has been initialized.
+   * 
+   * @param transformer
+   * @throws MuleException
+   */
   void registerTransformer(Transformer transformer) throws MuleException;
 
 }

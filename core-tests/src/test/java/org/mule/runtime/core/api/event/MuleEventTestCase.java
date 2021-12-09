@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -146,19 +147,21 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {
+    TransformersRegistry transformersRegistry =
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
+
     Transformer trans1 = new TestEventTransformer();
     trans1.setName("OptimusPrime");
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans1);
+    transformersRegistry.registerTransformer(trans1);
 
     Transformer trans2 = new TestEventTransformer();
     trans2.setName("Bumblebee");
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans2);
+    transformersRegistry.registerTransformer(trans2);
 
     List<Transformer> transformers = new ArrayList<>();
     transformers.add(trans1);
     transformers.add(trans2);
   }
-
 
   @Test
   public void testFlowVarNamesAddImmutable() throws Exception {

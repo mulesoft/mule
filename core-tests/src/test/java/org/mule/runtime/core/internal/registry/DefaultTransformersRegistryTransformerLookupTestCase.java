@@ -7,6 +7,9 @@
 
 package org.mule.runtime.core.internal.registry;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
@@ -43,10 +46,9 @@ public class DefaultTransformersRegistryTransformerLookupTestCase extends Abstra
     when(transformerResolver.resolve(DataType.STRING, ORANGE_DATA_TYPE)).thenReturn(stringToOrange);
     when(transformerResolver.resolve(ORANGE_DATA_TYPE, DataType.STRING)).thenReturn(orangeToString);
 
-    transformersRegistry.registerTransformerResolver(transformerResolver);
-
-    transformersRegistry.registerTransformer(orangeToString);
-    transformersRegistry.registerTransformer(stringToOrange);
+    transformersRegistry.setTransformerResolvers(singletonList(transformerResolver));
+    transformersRegistry.setTransformers(asList(orangeToString, stringToOrange));
+    transformersRegistry.initialise();
   }
 
   @Test

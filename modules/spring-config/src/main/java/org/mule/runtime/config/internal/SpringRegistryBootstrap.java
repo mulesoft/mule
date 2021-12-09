@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.config.internal;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import org.mule.runtime.api.exception.MuleException;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
@@ -41,8 +42,8 @@ import org.springframework.context.ApplicationContext;
  */
 public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements Initialisable {
 
-  private OptionalObjectsController optionalObjectsController;
-  private BiConsumer<String, BeanDefinition> beanDefinitionRegister;
+  private final OptionalObjectsController optionalObjectsController;
+  private final BiConsumer<String, BeanDefinition> beanDefinitionRegister;
 
   /**
    * @param artifactType              type of artifact. Bootstrap entries may be associated to an specific type of artifact. If
@@ -58,11 +59,6 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     super(artifactType, muleContext);
     this.optionalObjectsController = optionalObjectsController;
     this.beanDefinitionRegister = beanDefinitionRegister;
-  }
-
-  @Override
-  protected void registerTransformers() throws MuleException {
-    // no-op .. will happen on post processors
   }
 
   @Override

@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.transformer;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
@@ -32,11 +35,11 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected void doSetUp() throws Exception {
-    transformersRegistry.registerTransformer(new StringToApple());
-    transformersRegistry.registerTransformer(new StringToOrange());
-    TypeBasedTransformerResolver transfromerResolver = new TypeBasedTransformerResolver();
-    transfromerResolver.setTransformersRegistry(transformersRegistry);
-    transformersRegistry.registerTransformerResolver(transfromerResolver);
+    transformersRegistry.setTransformers(asList(new StringToApple(), new StringToOrange()));
+    TypeBasedTransformerResolver transformerResolver = new TypeBasedTransformerResolver();
+    transformerResolver.setTransformersRegistry(transformersRegistry);
+    transformersRegistry.setTransformerResolvers(singletonList(transformerResolver));
+    transformersRegistry.initialise();
   }
 
   @Test
@@ -56,7 +59,8 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase {
       // expected
     }
 
-    transformersRegistry.registerTransformer(new StringToRedApple());
+    transformersRegistry.setTransformers(asList(new StringToApple(), new StringToOrange(), new StringToRedApple()));
+    transformersRegistry.initialise();
 
     t = transformersRegistry.lookupTransformer(DataType.STRING, DataType.fromType(RedApple.class));
     assertThat(t, not(nullValue()));

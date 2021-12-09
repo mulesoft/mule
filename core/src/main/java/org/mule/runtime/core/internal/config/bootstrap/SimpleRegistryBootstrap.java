@@ -6,28 +6,23 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 
-import org.mule.runtime.api.exception.MuleException;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
-import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.StreamCloser;
 import org.mule.runtime.core.privileged.registry.ObjectProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-
-import java.util.Map;
 
 /**
  * An implementation of {@link AbstractRegistryBootstrap} to populate instances of {@link SimpleRegistry}
@@ -68,16 +63,7 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
       // the transformer with the same name
       trans.setName("_" + trans.getName());
     }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans);
-  }
-
-  @Override
-  protected void registerTransformers() throws MuleException {
-    MuleRegistryHelper registry = (MuleRegistryHelper) ((MuleContextWithRegistry) muleContext).getRegistry();
-    Map<String, Converter> converters = registry.lookupByType(Converter.class);
-    for (Converter converter : converters.values()) {
-      registry.notifyTransformerResolvers(converter, TransformerResolver.RegistryAction.ADDED);
-    }
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(trans.getName(), trans);
   }
 
   @Override

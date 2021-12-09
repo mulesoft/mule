@@ -42,7 +42,6 @@ public class ExtendedTransformationService extends DefaultTransformationService 
 
   private DataTypeConversionResolver dataTypeConversionResolver;
 
-  // TODO remove
   @Inject
   public ExtendedTransformationService(MuleContext muleContext) {
     super(muleContext);
