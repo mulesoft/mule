@@ -12,6 +12,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.mule.test.allure.AllureConstants.SerializationFeature.SERIALIZATION;
+import static org.mule.test.allure.AllureConstants.SerializationFeature.SerializationStory.MESSAGE_SERIALIZATION;
 
 import static java.util.Optional.empty;
 
@@ -44,6 +46,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SERIALIZATION)
+@Story(MESSAGE_SERIALIZATION)
 public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerProtocolContractTestCase {
 
   public static final String INSTANCE_NAME = "serializedInstance";

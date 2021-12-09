@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -22,6 +25,11 @@ import java.math.BigDecimal;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTestCase {
 
   private TransformersRegistry registry;

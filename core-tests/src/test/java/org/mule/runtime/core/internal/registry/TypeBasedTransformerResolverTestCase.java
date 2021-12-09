@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -31,7 +34,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
   private final MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class, RETURNS_DEEP_STUBS);

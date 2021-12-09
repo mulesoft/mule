@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -36,6 +39,11 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class DefaultTransformersRegistryTestCase extends AbstractMuleContextTestCase {
 
   private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);

@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.transformer;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,7 +30,12 @@ import org.junit.Test;
 
 import org.mockito.Mockito;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class DynamicDataTypeConverterResolverTestCase extends AbstractMuleTestCase {
 
   private final MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class);

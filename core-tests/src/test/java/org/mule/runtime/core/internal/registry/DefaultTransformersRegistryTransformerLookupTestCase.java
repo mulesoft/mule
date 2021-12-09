@@ -7,6 +7,9 @@
 
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -31,7 +34,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class DefaultTransformersRegistryTransformerLookupTestCase extends AbstractMuleTestCase {
 
   private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);

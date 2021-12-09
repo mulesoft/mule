@@ -62,7 +62,6 @@ import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
-import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;

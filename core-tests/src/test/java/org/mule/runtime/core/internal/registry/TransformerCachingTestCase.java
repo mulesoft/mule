@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +31,11 @@ import java.nio.charset.Charset;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
 
   private TransformersRegistry registry;

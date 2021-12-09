@@ -13,6 +13,11 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.util.List;
 
+/**
+ * Provides capabilities for obtaining the appropriate transformers given the from/to {@link DataType}s.
+ * 
+ * @since 4.5
+ */
 public interface TransformersRegistry {
 
   /**

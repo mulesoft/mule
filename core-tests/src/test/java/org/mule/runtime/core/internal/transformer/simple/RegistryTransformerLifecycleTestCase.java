@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.transformer.simple;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
 
 import static java.util.Collections.singletonMap;
 
@@ -29,10 +31,17 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 /**
  * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer since it is a prototype in Spring, so spring
  * does not manage the object.
  */
+@Issue("MULE-4599")
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class RegistryTransformerLifecycleTestCase extends AbstractMuleContextTestCase {
 
   @Test

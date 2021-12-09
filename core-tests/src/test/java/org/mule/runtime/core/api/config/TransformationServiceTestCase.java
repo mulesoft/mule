@@ -7,6 +7,8 @@
 package org.mule.runtime.core.api.config;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -40,7 +42,12 @@ import java.io.ByteArrayInputStream;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
   private class A {

@@ -7,6 +7,9 @@
 
 package org.mule.runtime.core.internal.transformer;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -30,7 +33,12 @@ import java.nio.charset.Charset;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class TransformerResolutionTestCase extends AbstractMuleTestCase {
 
   public static final DataType FRUIT_DATA_TYPE = DataType.fromType(Fruit.class);

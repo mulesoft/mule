@@ -21,7 +21,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap;
 import org.mule.runtime.core.internal.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
-import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.internal.config.bootstrap.TransformerBootstrapProperty;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
@@ -34,7 +33,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Specialization of {@link SimpleRegistryBootstrap which instead of registering the objects directly into a {@link Registry},
+ * Specialization of {@link AbstractRegistryBootstrap} which instead of registering the objects directly into a {@link Registry},
  * generates {@link BeanDefinition}s into a {@link BeanDefinitionRegistry} so that the Spring framework can create those objects
  * when initialising an {@link ApplicationContext}}
  *

@@ -34,10 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
@@ -52,29 +48,26 @@ public class DefaultTransformersRegistry implements TransformersRegistry, Initia
   private final Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap<>(8);
   private final Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap<>(8);
 
-  private final ReadWriteLock transformerResolversLock = new ReentrantReadWriteLock();
-
   /**
    * Transformer transformerResolvers are registered on context start, then they are not unregistered.
    */
-  private List<TransformerResolver> transformerResolvers = new ArrayList<>();
+  private List<TransformerResolver> transformerResolvers;
 
-  private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
-
-  private Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
+  private Collection<Transformer> transformers;
 
   @Override
   public void initialise() throws InitialisationException {
     transformers.stream()
         .filter(t -> t instanceof Converter)
-        .forEach(t -> notifyTransformerResolvers(t, ADDED));
+        .forEach(t -> notifyTransformerResolvers(t));
     sort(transformerResolvers, new TransformerResolverComparator());
+
+    clearCaches();
   }
 
   @Override
   public void dispose() {
-    transformerListCache.clear();
-    exactTransformerCache.clear();
+    clearCaches();
   }
 
   @Override
@@ -106,22 +99,15 @@ public class DefaultTransformersRegistry implements TransformersRegistry, Initia
   }
 
   private Transformer resolveTransformer(DataType source, DataType result) throws TransformerException {
-    Lock readLock = transformerResolversLock.readLock();
-    readLock.lock();
-
-    try {
-      for (TransformerResolver resolver : transformerResolvers) {
-        try {
-          Transformer trans = resolver.resolve(source, result);
-          if (trans != null) {
-            return trans;
-          }
-        } catch (ResolverException e) {
-          throw new TransformerException(noTransformerFoundForMessage(source, result), e);
+    for (TransformerResolver resolver : transformerResolvers) {
+      try {
+        Transformer trans = resolver.resolve(source, result);
+        if (trans != null) {
+          return trans;
         }
+      } catch (ResolverException e) {
+        throw new TransformerException(noTransformerFoundForMessage(source, result), e);
       }
-    } finally {
-      readLock.unlock();
     }
 
     return null;
@@ -144,21 +130,15 @@ public class DefaultTransformersRegistry implements TransformersRegistry, Initia
 
     results = new ArrayList<>(2);
 
-    Lock readLock = transformersLock.readLock();
-    readLock.lock();
-    try {
-      for (Transformer transformer : transformers) {
-        // The transformer must have the DiscoveryTransformer interface if we are
-        // going to find it here
-        if (!(transformer instanceof Converter)) {
-          continue;
-        }
-        if (result.isCompatibleWith(transformer.getReturnDataType()) && transformer.isSourceDataTypeSupported(source)) {
-          results.add(transformer);
-        }
+    for (Transformer transformer : transformers) {
+      // The transformer must have the DiscoveryTransformer interface if we are
+      // going to find it here
+      if (!(transformer instanceof Converter)) {
+        continue;
       }
-    } finally {
-      readLock.unlock();
+      if (result.isCompatibleWith(transformer.getReturnDataType()) && transformer.isSourceDataTypeSupported(source)) {
+        results.add(transformer);
+      }
     }
 
     List<Transformer> concurrentlyAddedTransformers = transformerListCache.putIfAbsent(dataTypePairHash, results);
@@ -173,25 +153,22 @@ public class DefaultTransformersRegistry implements TransformersRegistry, Initia
   public void registerTransformer(Transformer transformer) throws MuleException {
     initialiseIfNeeded(transformer, muleContext);
     if (transformer instanceof Converter) {
-      notifyTransformerResolvers(transformer, ADDED);
+      notifyTransformerResolvers(transformer);
     }
+
+    clearCaches();
   }
 
-  public void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action) {
+  protected void clearCaches() {
+    transformerListCache.clear();
+    exactTransformerCache.clear();
+  }
+
+  public void notifyTransformerResolvers(Transformer t) {
     if (t instanceof Converter) {
-      Lock transformerResolversReadLock = transformerResolversLock.readLock();
-      transformerResolversReadLock.lock();
-      try {
-
-        for (TransformerResolver resolver : transformerResolvers) {
-          resolver.transformerChange(t, action);
-        }
-      } finally {
-        transformerResolversReadLock.unlock();
+      for (TransformerResolver resolver : transformerResolvers) {
+        resolver.transformerChange(t, ADDED);
       }
-
-      transformerListCache.clear();
-      exactTransformerCache.clear();
     }
   }
 

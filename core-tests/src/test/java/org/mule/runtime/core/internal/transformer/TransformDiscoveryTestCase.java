@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.transformer;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -29,6 +32,11 @@ import java.nio.charset.Charset;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase {
 
   private final DefaultTransformersRegistry transformersRegistry = new DefaultTransformersRegistry();
