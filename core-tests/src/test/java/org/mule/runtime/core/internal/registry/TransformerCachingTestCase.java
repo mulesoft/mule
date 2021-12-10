@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
@@ -18,19 +21,33 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
 
 import java.io.FilterInputStream;
 import java.nio.charset.Charset;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
+
+  private TransformersRegistry registry;
+
+  @Before
+  public void before() throws RegistrationException {
+    registry = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
+  }
 
   @Test
   public void testCacheUpdate() throws Exception {
     DataType sourceType = DataType.fromType(FilterInputStream.class);
-    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
     Transformer trans = registry.lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof InputStreamToByteArray);
@@ -43,12 +60,6 @@ public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
     assertTrue(trans instanceof FilterInputStreamToByteArray);
 
     trans = registry.lookupTransformer(INPUT_STREAM, BYTE_ARRAY);
-    assertNotNull(trans);
-    assertTrue(trans instanceof InputStreamToByteArray);
-
-    registry.unregisterTransformer(trans2.getName());
-
-    trans = registry.lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof InputStreamToByteArray);
   }

@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
-import static java.util.Collections.singletonMap;
-import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
+import static java.util.Collections.singletonMap;
+
+import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -18,6 +22,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -26,17 +31,25 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 /**
  * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer since it is a prototype in Spring, so spring
  * does not manage the object.
  */
+@Issue("MULE-4599")
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class RegistryTransformerLifecycleTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testLifecycleInTransientRegistry() throws Exception {
     TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
     transformer.setProperty("foo");
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(transformer);
+    ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class)
+        .registerTransformer(transformer);
     muleContext.dispose();
     // Artifacts excluded from lifecycle in MuleContextLifecyclePhase gets lifecycle when an object is registered.
     assertRegistrationOnlyLifecycle(transformer);

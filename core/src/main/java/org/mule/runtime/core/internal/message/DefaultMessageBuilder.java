@@ -6,13 +6,7 @@
  */
 package org.mule.runtime.core.internal.message;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableSet;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
@@ -29,6 +23,15 @@ import static org.mule.runtime.core.api.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.api.util.ObjectUtils.getString;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
+
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -47,6 +50,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -80,8 +84,8 @@ public final class DefaultMessageBuilder
   private TypedValue payload = of(NULL_TYPED_VALUE);
   private TypedValue attributes = of(NULL_TYPED_VALUE);
 
-  private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>();
-  private Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>();
+  private final Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>();
+  private final Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>();
   private Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
   private Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
 
@@ -399,10 +403,10 @@ public final class DefaultMessageBuilder
     private transient Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
 
     private transient TypedValue typedValue;
-    private TypedValue typedAttributes;
+    private final TypedValue typedAttributes;
 
-    private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>();
-    private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>();
+    private final Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>();
+    private final Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>();
 
     private MessageImplementation(TypedValue typedValue, TypedValue typedAttributes,
                                   Map<String, TypedValue<Serializable>> inboundProperties,
@@ -518,7 +522,8 @@ public final class DefaultMessageBuilder
       private String contentType;
       private Object contents;
 
-      public SerializedDataHandler(String name, DataHandler handler, MuleContext muleContext) throws IOException {
+      public SerializedDataHandler(String name, DataHandler handler, TransformersRegistry transformersRegistry)
+          throws IOException {
         if (handler != null && !(handler instanceof Serializable)) {
           contentType = handler.getContentType();
           Object theContent = handler.getContent();
@@ -527,10 +532,9 @@ public final class DefaultMessageBuilder
           } else if (currentMuleContext.get() != null) {
             try {
               DataType source = fromObject(theContent);
-              Transformer transformer =
-                  ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY);
+              Transformer transformer = transformersRegistry.lookupTransformer(source, BYTE_ARRAY);
               if (transformer == null) {
-                throw new TransformerException(noTransformerFoundForMessage(source, DataType.BYTE_ARRAY));
+                throw new TransformerException(noTransformerFoundForMessage(source, BYTE_ARRAY));
               }
               contents = transformer.transform(theContent);
             } catch (TransformerException ex) {
@@ -556,11 +560,15 @@ public final class DefaultMessageBuilder
     private void writeObject(ObjectOutputStream out) throws Exception {
       out.defaultWriteObject();
       serializeValue(out);
-      out.writeObject(serializeAttachments(inboundAttachments));
-      out.writeObject(serializeAttachments(outboundAttachments));
+      TransformersRegistry transformersRegistry =
+          ((MuleContextWithRegistry) currentMuleContext.get()).getRegistry().lookupObject(TransformersRegistry.class);
+      out.writeObject(serializeAttachments(inboundAttachments, transformersRegistry));
+      out.writeObject(serializeAttachments(outboundAttachments, transformersRegistry));
     }
 
-    private Map<String, SerializedDataHandler> serializeAttachments(Map<String, DataHandler> attachments) throws IOException {
+    private Map<String, SerializedDataHandler> serializeAttachments(Map<String, DataHandler> attachments,
+                                                                    TransformersRegistry transformersRegistry)
+        throws IOException {
       Map<String, SerializedDataHandler> toWrite;
       if (attachments == null) {
         toWrite = null;
@@ -569,9 +577,7 @@ public final class DefaultMessageBuilder
         for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
           String name = entry.getKey();
           // TODO MULE-10013 remove this logic from here
-          toWrite
-              .put(name,
-                   new SerializedDataHandler(name, entry.getValue(), currentMuleContext.get()));
+          toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), transformersRegistry));
         }
       }
 
@@ -588,10 +594,10 @@ public final class DefaultMessageBuilder
         // TODO MULE-10013 remove this logic from here
         if (currentMuleContext.get() != null) {
           byte[] valueAsByteArray = (byte[]) currentMuleContext.get().getTransformationService()
-              .transform(this, DataType.BYTE_ARRAY).getPayload().getValue();
+              .transform(this, BYTE_ARRAY).getPayload().getValue();
           out.writeInt(valueAsByteArray.length);
           new DataOutputStream(out).write(valueAsByteArray);
-          out.writeObject(DataType.builder(DataType.BYTE_ARRAY).mediaType(typedValue.getDataType().getMediaType()).build());
+          out.writeObject(DataType.builder(BYTE_ARRAY).mediaType(typedValue.getDataType().getMediaType()).build());
         } else {
           throw new NotSerializableException(typedValue.getDataType().getType().getName());
         }

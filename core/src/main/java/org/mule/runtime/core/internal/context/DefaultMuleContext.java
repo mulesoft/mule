@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.context;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
@@ -15,7 +16,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXC
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -134,7 +134,6 @@ import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.Registry;
-import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.splash.ArtifactShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ArtifactStartupSplashScreen;
@@ -144,7 +143,6 @@ import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
 import java.util.Collection;
 import java.util.List;
@@ -306,10 +304,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnforceErrorTypesValidation();
       configureDefaultErrorHandlerNotRollbackingEveryTx();
     }
-  }
-
-  public DefaultMuleContext() {
-    transformationService = new ExtendedTransformationService(this);
   }
 
   @Override
@@ -951,17 +945,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       synchronized (dataTypeConversionResolverLock) {
         if (dataTypeConversionResolver == null) {
           dataTypeConversionResolver = getRegistry().lookupObject(OBJECT_CONVERTER_RESOLVER);
-
-          if (dataTypeConversionResolver == null) {
-            dataTypeConversionResolver = new DynamicDataTypeConversionResolver(this);
-
-            try {
-              getRegistry().registerObject(OBJECT_CONVERTER_RESOLVER, dataTypeConversionResolver);
-            } catch (RegistrationException e) {
-              // Should not occur
-              throw new IllegalStateException(e);
-            }
-          }
         }
       }
     }

@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.api.event;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
+
 import static java.util.Collections.singletonMap;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
@@ -15,9 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -32,6 +34,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -44,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -58,6 +62,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
 
   @After
   public void teardown() {
@@ -131,7 +140,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     }
     PrivilegedEvent testEvent = this.<PrivilegedEvent.Builder>getEventBuilder()
         .message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
-    currentMuleContext.set(muleContext);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
 
@@ -139,19 +147,21 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {
+    TransformersRegistry transformersRegistry =
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
+
     Transformer trans1 = new TestEventTransformer();
     trans1.setName("OptimusPrime");
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans1);
+    transformersRegistry.registerTransformer(trans1);
 
     Transformer trans2 = new TestEventTransformer();
     trans2.setName("Bumblebee");
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans2);
+    transformersRegistry.registerTransformer(trans2);
 
     List<Transformer> transformers = new ArrayList<>();
     transformers.add(trans1);
     transformers.add(trans2);
   }
-
 
   @Test
   public void testFlowVarNamesAddImmutable() throws Exception {

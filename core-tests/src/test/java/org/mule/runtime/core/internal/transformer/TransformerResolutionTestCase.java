@@ -7,26 +7,39 @@
 
 package org.mule.runtime.core.internal.transformer;
 
-import static org.junit.Assert.assertTrue;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
 
-import org.junit.Test;
-
 import java.nio.charset.Charset;
 
+import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
-public class TransformerResolutionTestCase extends AbstractMuleContextTestCase {
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
+public class TransformerResolutionTestCase extends AbstractMuleTestCase {
 
   public static final DataType FRUIT_DATA_TYPE = DataType.fromType(Fruit.class);
   public static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
@@ -34,17 +47,18 @@ public class TransformerResolutionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void resolvesMultipleApplicableTransformers() throws MuleException {
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new StringToOrange());
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new StringToApple());
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new StringToFruit());
-
+    DefaultTransformersRegistry registry = new DefaultTransformersRegistry();
+    TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
+    resolver.setTransformersRegistry(registry);
+    registry.setTransformerResolvers(singletonList(resolver));
+    registry.setTransformers(asList(new StringToOrange(), new StringToApple(), new StringToFruit()));
+    registry.initialise();
 
     try {
-      Transformer transformer =
-          ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(DataType.STRING, FRUIT_DATA_TYPE);
-      assertTrue(String.format("Expected a %s transformer but got %s", StringToFruit.class.getName(),
-                               transformer.getClass().getName()),
-                 transformer instanceof StringToFruit);
+      Transformer transformer = registry.lookupTransformer(DataType.STRING, FRUIT_DATA_TYPE);
+      assertThat(format("Expected a %s transformer but got %s", StringToFruit.class.getName(),
+                        transformer.getClass().getName()),
+                 transformer, instanceOf(StringToFruit.class));
     } catch (TransformerException e) {
       fail("Unable to properly resolve transformer");
     }

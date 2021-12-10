@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.api;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectNotOfSpecifiedType;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -23,7 +24,7 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -39,6 +40,9 @@ import javax.inject.Inject;
 public class DefaultTransformationService implements TransformationService {
 
   protected MuleContext muleContext;
+
+  @Inject
+  private TransformersRegistry transformersRegistry;
 
   @Inject
   public DefaultTransformationService(MuleContext muleContext) {
@@ -82,7 +86,7 @@ public class DefaultTransformationService implements TransformationService {
     Transformer transformer;
     if (value != null) {
       try {
-        transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(valueDataType, expectedDataType);
+        transformer = transformersRegistry.lookupTransformer(valueDataType, expectedDataType);
       } catch (TransformerException e) {
         throw new TransformerException(createStaticMessage("The value '%s' of type %s could not be transformed to the desired type %s",
                                                            value.toString().trim(), value.getClass().getName(),
@@ -125,7 +129,7 @@ public class DefaultTransformationService implements TransformationService {
     // The transformer to execute on this message
     Transformer transformer = null;
     try {
-      transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(dataType, resultType);
+      transformer = transformersRegistry.lookupTransformer(dataType, resultType);
       if (transformer == null) {
         throw new MessageTransformerException(noTransformerFoundForMessage(dataType, resultType), null, message);
       }
