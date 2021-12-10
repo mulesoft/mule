@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
 
@@ -51,8 +52,8 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
   public static class B {
   }
 
-  private final DataType dataTypeA = DataType.fromType(A.class);
-  private final DataType dataTypeB = DataType.fromType(B.class);
+  private final DataType dataTypeA = fromType(A.class);
+  private final DataType dataTypeB = fromType(B.class);
 
   @Before
   public void setUp() throws Exception {

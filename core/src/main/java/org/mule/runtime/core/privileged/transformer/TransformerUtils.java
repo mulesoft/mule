@@ -136,7 +136,7 @@ public class TransformerUtils {
   }
 
   /**
-   * @deprecated since 4.5
+   * @deprecated since 4.5, transformations are done internally by the Runtime, no need to call them explicitly.
    */
   @Deprecated
   public static <T> Object transformToAny(T input, MuleContext muleContext, DataType... supportedTypes) {

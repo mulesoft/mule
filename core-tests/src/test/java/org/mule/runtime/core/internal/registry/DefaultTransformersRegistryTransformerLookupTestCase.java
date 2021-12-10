@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
 
@@ -44,15 +45,15 @@ public class DefaultTransformersRegistryTransformerLookupTestCase extends Abstra
 
   private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
 
-  private final Converter stringToOrange = new MockConverterBuilder().from(DataType.STRING).to(ORANGE_DATA_TYPE).build();
-  private final Converter orangeToString = new MockConverterBuilder().from(ORANGE_DATA_TYPE).to(DataType.STRING).build();
+  private final Converter stringToOrange = new MockConverterBuilder().from(STRING).to(ORANGE_DATA_TYPE).build();
+  private final Converter orangeToString = new MockConverterBuilder().from(ORANGE_DATA_TYPE).to(STRING).build();
   private final DefaultTransformersRegistry transformersRegistry = spy(new DefaultTransformersRegistry());
 
   @Before
   public void setUp() throws Exception {
     TransformerResolver transformerResolver = mock(TransformerResolver.class);
-    when(transformerResolver.resolve(DataType.STRING, ORANGE_DATA_TYPE)).thenReturn(stringToOrange);
-    when(transformerResolver.resolve(ORANGE_DATA_TYPE, DataType.STRING)).thenReturn(orangeToString);
+    when(transformerResolver.resolve(STRING, ORANGE_DATA_TYPE)).thenReturn(stringToOrange);
+    when(transformerResolver.resolve(ORANGE_DATA_TYPE, STRING)).thenReturn(orangeToString);
 
     transformersRegistry.setTransformerResolvers(singletonList(transformerResolver));
     transformersRegistry.setTransformers(asList(orangeToString, stringToOrange));
@@ -61,8 +62,8 @@ public class DefaultTransformersRegistryTransformerLookupTestCase extends Abstra
 
   @Test
   public void cachesTransformerResolvers() throws Exception {
-    Transformer transformer1 = transformersRegistry.lookupTransformer(DataType.STRING, ORANGE_DATA_TYPE);
-    Transformer transformer2 = transformersRegistry.lookupTransformer(ORANGE_DATA_TYPE, DataType.STRING);
+    Transformer transformer1 = transformersRegistry.lookupTransformer(STRING, ORANGE_DATA_TYPE);
+    Transformer transformer2 = transformersRegistry.lookupTransformer(ORANGE_DATA_TYPE, STRING);
 
     assertThat(transformer1, sameInstance(stringToOrange));
     assertThat(transformer2, sameInstance(orangeToString));
@@ -70,7 +71,7 @@ public class DefaultTransformersRegistryTransformerLookupTestCase extends Abstra
 
   @Test
   public void cachesTransformers() throws Exception {
-    List<Transformer> transformers = transformersRegistry.lookupTransformers(DataType.STRING, ORANGE_DATA_TYPE);
+    List<Transformer> transformers = transformersRegistry.lookupTransformers(STRING, ORANGE_DATA_TYPE);
 
     assertThat(transformers, hasSize(1));
     assertThat(transformers.get(0), sameInstance(stringToOrange));

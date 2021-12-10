@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
@@ -531,9 +532,9 @@ public final class DefaultMessageBuilder
           } else if (currentMuleContext.get() != null) {
             try {
               DataType source = fromObject(theContent);
-              Transformer transformer = transformersRegistry.lookupTransformer(source, DataType.BYTE_ARRAY);
+              Transformer transformer = transformersRegistry.lookupTransformer(source, BYTE_ARRAY);
               if (transformer == null) {
-                throw new TransformerException(noTransformerFoundForMessage(source, DataType.BYTE_ARRAY));
+                throw new TransformerException(noTransformerFoundForMessage(source, BYTE_ARRAY));
               }
               contents = transformer.transform(theContent);
             } catch (TransformerException ex) {
@@ -593,10 +594,10 @@ public final class DefaultMessageBuilder
         // TODO MULE-10013 remove this logic from here
         if (currentMuleContext.get() != null) {
           byte[] valueAsByteArray = (byte[]) currentMuleContext.get().getTransformationService()
-              .transform(this, DataType.BYTE_ARRAY).getPayload().getValue();
+              .transform(this, BYTE_ARRAY).getPayload().getValue();
           out.writeInt(valueAsByteArray.length);
           new DataOutputStream(out).write(valueAsByteArray);
-          out.writeObject(DataType.builder(DataType.BYTE_ARRAY).mediaType(typedValue.getDataType().getMediaType()).build());
+          out.writeObject(DataType.builder(BYTE_ARRAY).mediaType(typedValue.getDataType().getMediaType()).build());
         } else {
           throw new NotSerializableException(typedValue.getDataType().getType().getName());
         }
