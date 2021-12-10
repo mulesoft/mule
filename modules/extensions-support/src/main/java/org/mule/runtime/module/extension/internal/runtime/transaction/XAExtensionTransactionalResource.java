@@ -15,7 +15,7 @@ import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateEx
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
-import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
+import org.mule.sdk.api.connectivity.XATransactionalConnection;
 
 import javax.transaction.xa.XAResource;
 

@@ -10,7 +10,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.tx.Transactional;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 /**
  * Generic transactional resource for extension's {@link TransactionalConnection}s

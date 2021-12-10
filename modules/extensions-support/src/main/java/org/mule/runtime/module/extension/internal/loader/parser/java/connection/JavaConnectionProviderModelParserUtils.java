@@ -9,6 +9,9 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.connection
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.sdk.api.connectivity.ConnectionProvider;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 public final class JavaConnectionProviderModelParserUtils {
 
@@ -22,5 +25,14 @@ public final class JavaConnectionProviderModelParserUtils {
         || element.isAssignableTo(org.mule.sdk.api.connectivity.CachedConnectionProvider.class);
   }
 
-  private JavaConnectionProviderModelParserUtils() {}
+  public static boolean isDefinedThroughSdkApi(ConnectionProviderElement element) {
+    return element.isAssignableTo(ConnectionProvider.class);
+  }
+
+  public static boolean isTransactional(Type connectionType) {
+    return connectionType.isAssignableTo(TransactionalConnection.class);
+  }
+
+  private JavaConnectionProviderModelParserUtils() {
+  }
 }

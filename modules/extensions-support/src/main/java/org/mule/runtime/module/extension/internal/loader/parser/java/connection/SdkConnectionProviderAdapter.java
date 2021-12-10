@@ -6,15 +6,31 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.connection;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
-public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C> {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, Lifecycle, MuleContextAware {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SdkConnectionProviderAdapter.class);
 
   private final org.mule.sdk.api.connectivity.ConnectionProvider<C> delegate;
+  private MuleContext muleContext;
 
   public static <C> ConnectionProvider<C> from(Object connectionProvider) {
     if (connectionProvider != null) {
@@ -53,6 +69,38 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C> {
 
   public org.mule.sdk.api.connectivity.ConnectionProvider<C> getDelegate() {
     return delegate;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (muleContext != null) {
+      initialiseIfNeeded(delegate, true, muleContext);
+    } else {
+      initialiseIfNeeded(delegate);
+    }
+  }
+
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(delegate);
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(delegate);
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(delegate, LOGGER);
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    muleContext = context;
+    if (delegate instanceof MuleContextAware) {
+      ((MuleContextAware) delegate).setMuleContext(muleContext);
+    }
   }
 
   private static class SdkPoolingConnectionProviderAdapter<C> extends SdkConnectionProviderAdapter<C>
